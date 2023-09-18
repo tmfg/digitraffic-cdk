@@ -3,7 +3,9 @@
   "compilerOptions": {
     "lib": ["es2022"],
     "types": ["heft-jest", "node"],
-    "module": "commonjs",
+    "declaration": true,
+    "outDir": "../../../../lib",
+    "module": "ES2022",
     "target": "es2022",
     "sourceMap": true,
     "strict": true,
