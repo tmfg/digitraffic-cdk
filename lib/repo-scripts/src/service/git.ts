@@ -15,7 +15,7 @@ const gitSubmoduleStatuses = {
     U: "merge conflict"
 } as const satisfies Record<GitSubmoduleStatusState, string>;
 
-type GitSubmoduleStatuses = ValueOf<typeof gitSubmoduleStatuses>;
+type GitSubmoduleRepoStatuses = ValueOf<typeof gitSubmoduleStatuses>;
 
 interface GitRemote {
     readonly remoteName: string;
@@ -24,7 +24,7 @@ interface GitRemote {
 }
 
 interface GitSubmoduleStatus {
-    readonly status: GitSubmoduleStatuses;
+    readonly status: GitSubmoduleRepoStatuses;
     readonly sha: string;
     readonly path: string;
     readonly tag?: string;
