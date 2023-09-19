@@ -123,6 +123,33 @@ function createSubmoduleFile(modules: GitSubmodule[]): string {
     return modules.map(createSubmoduleString).join("\n");
 }
 
+/*
+async function unstageGitModulesFile() {
+    const {stdout} = await $`git status --short`
+
+    const result = _.chain(stdout.split("\n"))
+    .map(line => //.exec(line))
+}
+*/
+
+async function addMissingSubmodules(
+    gitSubmodules: GitSubmodule[],
+    moduleStatuses: GitSubmoduleStatus[]
+): Promise<void> {
+    const addedSubmodules = gitSubmodules.filter((submodule) =>
+        moduleStatuses.find((status) => submodule.path === status.path)
+    );
+    const newSubmodules = _.xorBy(gitSubmodules, addedSubmodules, "path");
+
+    console.log(JSON.stringify(newSubmodules));
+
+    await Promise.all(
+        newSubmodules.map((submodule) => $`git submodule add -f ${submodule.url} ${submodule.path}`)
+    );
+
+    // await unstageGitModulesFile();
+}
+
 export async function init(): Promise<void> {
     const { gitSubmodules } = await Settings.getSettings();
 
@@ -132,6 +159,8 @@ export async function init(): Promise<void> {
 
     const moduleStatuses = await getSubmoduleStatuses();
     console.log(JSON.stringify({ gitSubmodules, moduleStatuses }, null, 2));
+
+    await addMissingSubmodules(gitSubmodules, moduleStatuses);
 
     echo`Initializing git submodule`;
     await $`git submodule update --init --recursive`;
