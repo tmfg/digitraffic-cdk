@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import * as Git from "../service/git";
+import * as Git from "../service/git.js";
 
 const program = new Command();
 

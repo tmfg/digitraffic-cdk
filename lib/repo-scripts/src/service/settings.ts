@@ -1,6 +1,6 @@
 import _ from "lodash";
 import fs from "fs-extra";
-import { renameKeys } from "./core";
+import { renameKeys } from "./core.js";
 
 export interface GitSubmodule {
     readonly path: string;

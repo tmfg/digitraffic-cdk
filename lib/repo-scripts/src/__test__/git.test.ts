@@ -1,4 +1,4 @@
-import { parseGitStatusLine } from "../service/git";
+import { parseGitStatusLine } from "../service/git.js";
 
 describe("git service", () => {
     describe("parseGitStatusLine", () => {

@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-expressions */
-import type { GitSubmodule } from "./settings";
+import type { GitSubmodule } from "./settings.js";
 import fs from "fs-extra";
 import { $, echo, within, cd } from "zx";
-import * as Settings from "../service/settings";
-import { ValueOf, isValue } from "./core";
+import * as Settings from "../service/settings.js";
+import { ValueOf, isValue } from "./core.js";
 import _ from "lodash";
 
 type GitSubmoduleStatusState = " " | "+" | "-" | "U";
