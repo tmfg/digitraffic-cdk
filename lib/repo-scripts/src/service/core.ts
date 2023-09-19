@@ -22,5 +22,3 @@ export function renameKeys(obj: object): object {
 export function isValue<T>(value: T | undefined | null): value is T {
     return !_.isEmpty(value);
 }
-
-export type ValueOf<Obj> = Obj[keyof Obj];

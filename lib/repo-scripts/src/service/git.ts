@@ -3,7 +3,8 @@ import type { GitSubmodule } from "./settings.js";
 import fs from "fs-extra";
 import { $, echo, within, cd } from "zx";
 import * as Settings from "../service/settings.js";
-import { ValueOf, isValue } from "./core.js";
+import { isValue } from "./core.js";
+import type { ValueOf } from "@digitraffic/common/dist/types/util-types.js";
 import _ from "lodash";
 
 type GitSubmoduleStatusState = " " | "+" | "-" | "U";
