@@ -1,17 +1,15 @@
 import _ from "lodash";
 
-export function snakeToCamel(str: string): string {
-    return str
-        .toLowerCase()
-        .replace(/([-_][a-z])/g, (group) => group.toUpperCase().replace("-", "").replace("_", ""));
-}
+// Hack for camelCase. Some problem with ESM and jest.
+// @ts-ignore
+const camelCase: typeof _.camelCase = (x) => _.camelCase(x);
 
 export function renameKeys(obj: object): object {
     if (_.isArray(obj)) {
         return _.map(obj, renameKeys);
     }
     if (_.isObject(obj)) {
-        const camelKeys = _.mapKeys(obj, (_, key) => snakeToCamel(key));
+        const camelKeys = _.mapKeys(obj, (_, key) => camelCase(key));
         return _.mapValues(camelKeys, renameKeys);
     }
 
