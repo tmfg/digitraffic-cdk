@@ -120,8 +120,9 @@ function createSubmoduleString({ path, url }: GitSubmodule): string {
 `.trim();
 }
 
-function createSubmoduleFile(modules: GitSubmodule[]): string {
-    return modules.map(createSubmoduleString).join("\n");
+async function createSubmoduleFile(modules: GitSubmodule[]): Promise<void> {
+    const submoduleContent = modules.map(createSubmoduleString).join("\n");
+    await fs.writeFile(".gitmodules", submoduleContent, { encoding: "utf-8" });
 }
 
 async function unstageGitModulesFile(): Promise<void> {
@@ -161,8 +162,7 @@ export async function init(): Promise<void> {
     const { gitSubmodules } = await Settings.getSettings();
 
     echo`Updating .gitmodules file.`;
-    const submoduleContent = createSubmoduleFile(gitSubmodules);
-    await fs.writeFile(".gitmodules", submoduleContent, { encoding: "utf-8" });
+    await createSubmoduleFile(gitSubmodules);
 
     const moduleStatuses = await getSubmoduleStatuses();
     console.log(JSON.stringify({ gitSubmodules, moduleStatuses }, null, 2));
