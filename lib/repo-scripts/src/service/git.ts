@@ -34,6 +34,12 @@ interface GitSubmoduleState extends GitSubmoduleStatus {
     readonly url: string;
 }
 
+export interface GitStatusLine {
+    status: string;
+    from?: string;
+    target: string;
+}
+
 async function getSubmoduleStatus(): Promise<GitSubmoduleStatus[]> {
     const { stdout } = await $`git submodule status`;
     const submoduleStrings = stdout.split("\n");
@@ -58,8 +64,8 @@ function getRemote(status: GitSubmoduleStatus): Promise<string> {
         const { stdout } = await $`git remote -v`;
         return _.chain(stdout.split("\n"))
             .map(
-                (str): GitRemote | undefined =>
-                    /^(?<remoteName>[^ ]+)\s+(?<remoteUrl>[^ ]+)\s\((?<operation>[^)]+)\)$/.exec(str)
+                (line): GitRemote | undefined =>
+                    /^(?<remoteName>[^ ]+)\s+(?<remoteUrl>[^ ]+)\s\((?<operation>[^)]+)\)$/.exec(line)
                         ?.groups as unknown as GitRemote | undefined
             )
             .filter(isValue)
@@ -75,6 +81,34 @@ async function getSubmoduleStatuses(): Promise<GitSubmoduleState[]> {
     return await Promise.all(
         submoduleStatus.map(async (status) => ({ ...status, url: await getRemote(status) }))
     );
+}
+
+interface GitStatusLineLike {
+    status: string;
+    from?: string;
+    fromQ?: string;
+    target?: string;
+    targetQ?: string;
+}
+
+export function parseGitStatusLine(line: string): GitStatusLine | undefined {
+    const groups =
+        /^(?<status>(?:\?\?|\!\!|[A-Z ]{2})) (?:(?:"(?<fromQ>[^"]+)"|(?<from>[^ ]+)) -> )?(?:"(?<targetQ>[^"]+)"|(?<target>[^ ]+))$/.exec(
+            line
+        )?.groups as unknown as GitStatusLineLike | undefined;
+
+    if (!groups) {
+        throw new Error("unable to parse status line");
+    }
+
+    const target = (groups.target ?? groups.targetQ) as unknown as string;
+    const from = (groups.from ?? groups.fromQ) as unknown as string;
+
+    return {
+        status: groups.status,
+        target,
+        from
+    };
 }
 
 function createSubmoduleString({ path, url }: GitSubmodule): string {
