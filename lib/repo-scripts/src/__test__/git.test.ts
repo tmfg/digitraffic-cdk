@@ -3,7 +3,7 @@ import { parseGitStatusLine } from "../service/git.js";
 describe("git service", () => {
     describe("parseGitStatusLine", () => {
         it("should throw error when unable to parse the status line", () => {
-            expect(() => parseGitStatusLine("garbage")).toThrow();
+            expect(parseGitStatusLine("garbage")).toBe(undefined);
         });
 
         it.each`

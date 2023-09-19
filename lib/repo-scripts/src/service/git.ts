@@ -92,14 +92,14 @@ async function getSubmoduleStatuses(): Promise<GitSubmoduleState[]> {
     );
 }
 
-export function parseGitStatusLine(line: string): GitStatusLine {
+export function parseGitStatusLine(line: string): GitStatusLine | undefined {
     const groups =
         /^(?<status>(?:\?\?|\!\!|[A-Z ]{2})) (?:(?:"(?<fromQ>[^"]+)"|(?<from>[^ ]+)) -> )?(?:"(?<targetQ>[^"]+)"|(?<target>[^ ]+))$/.exec(
             line
         )?.groups as unknown as GitStatusLineLike | undefined;
 
     if (!groups) {
-        throw new Error("unable to parse status line");
+        return undefined;
     }
 
     const target = (groups.target ?? groups.targetQ) as unknown as string;
@@ -129,6 +129,7 @@ async function unstageGitModulesFile(): Promise<void> {
 
     const result: GitStatusLine | undefined = _.chain(stdout.split("\n"))
         .map(parseGitStatusLine)
+        .filter(isValue)
         .filter((statusLine) => /\.gitmodules/.test(statusLine.target))
         .head()
         .value();
