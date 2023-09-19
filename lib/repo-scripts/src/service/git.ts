@@ -35,9 +35,17 @@ interface GitSubmoduleState extends GitSubmoduleStatus {
 }
 
 export interface GitStatusLine {
-    status: string;
-    from?: string;
-    target: string;
+    readonly status: string;
+    readonly from?: string;
+    readonly target: string;
+}
+
+interface GitStatusLineLike {
+    readonly status: string;
+    readonly from?: string;
+    readonly fromQ?: string;
+    readonly target?: string;
+    readonly targetQ?: string;
 }
 
 async function getSubmoduleStatus(): Promise<GitSubmoduleStatus[]> {
@@ -81,14 +89,6 @@ async function getSubmoduleStatuses(): Promise<GitSubmoduleState[]> {
     return await Promise.all(
         submoduleStatus.map(async (status) => ({ ...status, url: await getRemote(status) }))
     );
-}
-
-interface GitStatusLineLike {
-    status: string;
-    from?: string;
-    fromQ?: string;
-    target?: string;
-    targetQ?: string;
 }
 
 export function parseGitStatusLine(line: string): GitStatusLine {
