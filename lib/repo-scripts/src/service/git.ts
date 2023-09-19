@@ -91,7 +91,7 @@ interface GitStatusLineLike {
     targetQ?: string;
 }
 
-export function parseGitStatusLine(line: string): GitStatusLine | undefined {
+export function parseGitStatusLine(line: string): GitStatusLine {
     const groups =
         /^(?<status>(?:\?\?|\!\!|[A-Z ]{2})) (?:(?:"(?<fromQ>[^"]+)"|(?<from>[^ ]+)) -> )?(?:"(?<targetQ>[^"]+)"|(?<target>[^ ]+))$/.exec(
             line
@@ -123,14 +123,19 @@ function createSubmoduleFile(modules: GitSubmodule[]): string {
     return modules.map(createSubmoduleString).join("\n");
 }
 
-/*
-async function unstageGitModulesFile() {
-    const {stdout} = await $`git status --short`
+async function unstageGitModulesFile(): Promise<void> {
+    const { stdout } = await $`git status --short`;
 
-    const result = _.chain(stdout.split("\n"))
-    .map(line => //.exec(line))
+    const result: GitStatusLine | undefined = _.chain(stdout.split("\n"))
+        .map(parseGitStatusLine)
+        .filter((statusLine) => /\.gitmodules/.test(statusLine.target))
+        .head()
+        .value();
+
+    if (result) {
+        await $`git restore --staged .gitmodules`;
+    }
 }
-*/
 
 async function addMissingSubmodules(
     gitSubmodules: GitSubmodule[],
@@ -147,7 +152,7 @@ async function addMissingSubmodules(
         newSubmodules.map((submodule) => $`git submodule add -f ${submodule.url} ${submodule.path}`)
     );
 
-    // await unstageGitModulesFile();
+    await unstageGitModulesFile();
 }
 
 export async function init(): Promise<void> {
