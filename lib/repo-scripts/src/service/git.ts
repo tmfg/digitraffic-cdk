@@ -169,6 +169,26 @@ async function initializeSubmodules(moduleStatuses: GitSubmoduleStatus[]): Promi
     );
 }
 
+async function updateRemotes(
+    gitSubmodules: GitSubmodule[],
+    moduleStatuses: GitSubmoduleState[]
+): Promise<void> {
+    await Promise.all(
+        gitSubmodules.map(async (gitSubmodule) => {
+            const currentStatus = moduleStatuses.find((status) => status.path === gitSubmodule.path);
+
+            if (!currentStatus) {
+                console.error(`Couldn't find status for "${gitSubmodule.path}"`);
+                return;
+            }
+
+            if (currentStatus.url !== gitSubmodule.url) {
+                await $`git submodule set-url ${gitSubmodule.path} ${gitSubmodule.url}`;
+            }
+        })
+    );
+}
+
 export async function init(): Promise<void> {
     const { gitSubmodules } = await Settings.getSettings();
 
@@ -181,6 +201,8 @@ export async function init(): Promise<void> {
     await addMissingSubmodules(gitSubmodules, moduleStatuses);
 
     await initializeSubmodules(await getSubmoduleStatuses());
+
+    await updateRemotes(gitSubmodules, await getSubmoduleStatuses());
 }
 
 export async function deinit(): Promise<void> {}
