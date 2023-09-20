@@ -8,7 +8,7 @@
     "bundle": "esbuild --bundle src/cli/*.ts --outdir=dist/cli --platform=node --target=node18 --format=esm --out-extension:.js=.mjs --banner:js='import { createRequire } from \"module\"; const require = createRequire(import.meta.url);'",
     "bundle:watch": "npm run bundle -- --watch",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
-    "publish:cdk": "npm run build:bundle && cp dist/cli/*.js ../../common/scripts/",
+    "publish:cdk": "npm run build:bundle && cp dist/cli/*.mjs ../../common/scripts/",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean --watch"
   },
