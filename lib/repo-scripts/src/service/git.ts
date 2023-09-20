@@ -159,6 +159,16 @@ async function addMissingSubmodules(
     await unstageGitModulesFile();
 }
 
+async function initializeSubmodules(moduleStatuses: GitSubmoduleStatus[]): Promise<void> {
+    await Promise.all(
+        moduleStatuses.map(async (module) => {
+            if (module.status === "uninitialized") {
+                await $`git submodule update --init ${module.path}`;
+            }
+        })
+    );
+}
+
 export async function init(): Promise<void> {
     const { gitSubmodules } = await Settings.getSettings();
 
@@ -170,8 +180,7 @@ export async function init(): Promise<void> {
 
     await addMissingSubmodules(gitSubmodules, moduleStatuses);
 
-    echo`Initializing git submodule`;
-    await $`git submodule update --init --recursive`;
+    await initializeSubmodules(await getSubmoduleStatuses());
 }
 
 export async function deinit(): Promise<void> {}
