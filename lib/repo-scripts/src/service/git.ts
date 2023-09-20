@@ -122,6 +122,7 @@ function createSubmoduleString({ path, url }: GitSubmodule): string {
 
 async function createSubmoduleFile(modules: GitSubmodule[]): Promise<void> {
     const submoduleContent = modules.map(createSubmoduleString).join("\n");
+    console.log(submoduleContent);
     await fs.writeFile(".gitmodules", submoduleContent, { encoding: "utf-8" });
 }
 
