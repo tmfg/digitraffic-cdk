@@ -1,6 +1,7 @@
 # Rush files
 common/changes
 common/scripts/*.js
+common/scripts/*.mjs
 common/config
 CHANGELOG.*
 

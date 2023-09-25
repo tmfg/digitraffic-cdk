@@ -120,8 +120,10 @@ function createSubmoduleString({ path, url }: GitSubmodule): string {
 `.trim();
 }
 
-function createSubmoduleFile(modules: GitSubmodule[]): string {
-    return modules.map(createSubmoduleString).join("\n");
+async function createSubmoduleFile(modules: GitSubmodule[]): Promise<void> {
+    const submoduleContent = modules.map(createSubmoduleString).join("\n");
+    console.log(submoduleContent);
+    await fs.writeFile(".gitmodules", submoduleContent, { encoding: "utf-8" });
 }
 
 async function unstageGitModulesFile(): Promise<void> {
@@ -157,20 +159,50 @@ async function addMissingSubmodules(
     await unstageGitModulesFile();
 }
 
+async function initializeSubmodules(moduleStatuses: GitSubmoduleStatus[]): Promise<void> {
+    await Promise.all(
+        moduleStatuses.map(async (module) => {
+            if (module.status === "uninitialized") {
+                await $`git submodule update --init ${module.path}`;
+            }
+        })
+    );
+}
+
+async function updateRemotes(
+    gitSubmodules: GitSubmodule[],
+    moduleStatuses: GitSubmoduleState[]
+): Promise<void> {
+    await Promise.all(
+        gitSubmodules.map(async (gitSubmodule) => {
+            const currentStatus = moduleStatuses.find((status) => status.path === gitSubmodule.path);
+
+            if (!currentStatus) {
+                console.error(`Couldn't find status for "${gitSubmodule.path}"`);
+                return;
+            }
+
+            if (currentStatus.url !== gitSubmodule.url) {
+                await $`git submodule set-url ${gitSubmodule.path} ${gitSubmodule.url}`;
+            }
+        })
+    );
+}
+
 export async function init(): Promise<void> {
     const { gitSubmodules } = await Settings.getSettings();
 
     echo`Updating .gitmodules file.`;
-    const submoduleContent = createSubmoduleFile(gitSubmodules);
-    await fs.writeFile(".gitmodules", submoduleContent, { encoding: "utf-8" });
+    await createSubmoduleFile(gitSubmodules);
 
     const moduleStatuses = await getSubmoduleStatuses();
     console.log(JSON.stringify({ gitSubmodules, moduleStatuses }, null, 2));
 
     await addMissingSubmodules(gitSubmodules, moduleStatuses);
 
-    echo`Initializing git submodule`;
-    await $`git submodule update --init --recursive`;
+    await initializeSubmodules(await getSubmoduleStatuses());
+
+    await updateRemotes(gitSubmodules, await getSubmoduleStatuses());
 }
 
 export async function deinit(): Promise<void> {}

@@ -23,13 +23,13 @@
       "name": "repo:check-dependencies",
       "commandKind": "global",
       "summary": "Checks if dependencies are declared correctly",
-      "shellCommand": "node common/scripts/check-dependencies.js"
+      "shellCommand": "node common/scripts/check-dependencies.mjs"
     },
     {
       "name": "repo:init",
       "commandKind": "global",
       "summary": "Used to initialize the repository",
-      "shellCommand": "node common/scripts/git-init-submodule.js"
+      "shellCommand": "node common/scripts/git-submodule-extra.mjs init"
     },
     {
       "name": "repo:deinit",

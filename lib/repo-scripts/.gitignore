@@ -12,7 +12,7 @@
 
 !dist/
 !dist/cli/
-!dist/cli/*.js
+!dist/cli/*.mjs
 
 !src/
 !src/**/

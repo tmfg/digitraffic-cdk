@@ -14,10 +14,19 @@ export interface Settings {
 export type FileType = "default" | "override";
 
 export async function getRepoFile(name: string, type: FileType = "default"): Promise<object> {
+    let settingsString: string | undefined;
+    const settingsFile = `common/config/repo/${name}.${type}.json`;
+
     try {
-        return (await fs.readJson(`common/config/repo/${name}.${type}.json`)) as object;
+        settingsString = (await fs.readFile(settingsFile)) as unknown as string;
     } catch (_) {
         return {};
+    }
+
+    try {
+        return JSON.parse(settingsString) as object;
+    } catch (_) {
+        throw new Error(`Syntax error in: "${settingsFile}".`);
     }
 }
 
