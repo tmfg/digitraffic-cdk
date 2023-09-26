@@ -1,5 +1,5 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
-import type { Connection, FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2/promise.js";
+import type { Connection } from "mysql2/promise.js";
 import { Pool, createPool } from "mysql2/promise.js";
 import { getFromEnvOrSecret } from "./secret.js";
 
@@ -18,10 +18,10 @@ export enum DatabaseEnvironmentKeys {
     DB_APPLICATION = "DB_APPLICATION"
 }
 
-export type MysqlQueryResponse = [
-    RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[] | ResultSetHeader,
-    FieldPacket[]
-];
+// export type MysqlQueryResponse = [
+//     RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[] | ResultSetHeader,
+//     FieldPacket[]
+// ];
 
 const pool = await initMysqlDbConnection();
 
