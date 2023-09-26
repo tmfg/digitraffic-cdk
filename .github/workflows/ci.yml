@@ -24,16 +24,9 @@ jobs:
       - name: Cache pnpm store cache
         uses: actions/cache@v3
         with:
-          key: ${{ runner.os }}-rush-build-${{ hashFiles('common/config/rush/repo-state.json') }}
+          key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
           path: |
             common/temp/pnpm-store
-
-      - name: Cache rush build
-        uses: actions/cache@v3
-        with:
-          key: ${{ runner.os }}-rush-build-${{ hashFiles('common/config/rush/repo-state.json') }}-${{ github.ref_name }}
-          path: |
-            common/temp/build-cache
 
       # - name: Verify Change Logs
       #   run: node common/scripts/install-run-rush.js change --verify
