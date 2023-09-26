@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "heft build --clean",
-    "build:bundle": "npm run build && npm run bundle",
+    "build": "npm run build:clean && npm run bundle -- --log-level=warning",
+    "build:clean": "heft build --clean",
+    "build:watch": "npm run build -- --watch",
     "bundle": "esbuild --bundle src/cli/*.ts --outdir=dist/cli --platform=node --target=node18 --format=esm --out-extension:.js=.mjs --banner:js='import { createRequire } from \"module\"; const require = createRequire(import.meta.url);'",
     "bundle:watch": "npm run bundle -- --watch",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
