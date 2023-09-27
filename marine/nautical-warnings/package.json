@@ -7,7 +7,7 @@
     "build": "tsc && npm run postbuild",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "cdk": "cdk",
+    "cdk": "npx cdk@latest",
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy NauticalWarningsProd",
     "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy NauticalWarningsTest",
     "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff NauticalWarningsProd",

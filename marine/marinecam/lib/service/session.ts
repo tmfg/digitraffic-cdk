@@ -25,11 +25,11 @@ axiosRetry(axios, {
     retryDelay: (retry) => 1000 + retry * 3000
 });
 
-const COMPR_LEVEL = "70";
-const DEST_WIDTH = "1280";
-const DEST_HEIGHT = "720";
+const COMPR_LEVEL = "70" as const;
+const DEST_WIDTH = "1280" as const;
+const DEST_HEIGHT = "720" as const;
 
-const AXIOS_TIMEOUT_MILLIS = 8000;
+const AXIOS_TIMEOUT_MILLIS = 2000 as const;
 
 const COMMUNICATION_URL_PART = "/Communication";
 const VIDEO_URL_PART = "/Video/";
@@ -73,18 +73,18 @@ export class Session {
 
     post<T>(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
         return axios.post<T>(url, xml, {
-            ...configuration,
-            ...{ httpsAgent: agent, timeout: AXIOS_TIMEOUT_MILLIS }
+            ...{ httpsAgent: agent, timeout: AXIOS_TIMEOUT_MILLIS },
+            ...configuration
         });
     }
 
-    async sendMessage<T>(command: Command<T>): Promise<T> {
+    async sendMessage<T>(command: Command<T>, configuration?: AxiosRequestConfig): Promise<T> {
         const xml = command.createXml(this.sequenceId, this.connectionId);
         this.sequenceId++;
 
-        //        logger.debug("sending:" + xml);
+        logger.debug("sending:" + xml);
 
-        const resp = await this.post<string>(this.communicationUrl, xml);
+        const resp = await this.post<string>(this.communicationUrl, xml, configuration);
 
         if (resp.status !== 200) {
             throw Error("sendMessage failed " + JSON.stringify(resp));
@@ -93,13 +93,14 @@ export class Session {
         const response: CommandResponse = (await parse(resp.data)) as CommandResponse;
         command.checkError(response);
 
-        //        logger.debug("response " + JSON.stringify(response, null, 2));
+        logger.debug("response " + JSON.stringify(response, null, 2));
 
         return command.getResult(response);
     }
 
     async connect(): Promise<string> {
-        this.connectionId = await this.sendMessage(new ConnectCommand());
+        // longer timeout for connect
+        this.connectionId = await this.sendMessage(new ConnectCommand(), { timeout: 4000 });
 
         return this.connectionId;
     }
@@ -109,7 +110,8 @@ export class Session {
             .addInputParameters("Username", username)
             .addInputParameters("Password", password);
 
-        return this.sendMessage(command);
+        // use a bit longer timeout for login
+        return this.sendMessage(command, { timeout: 8000 });
     }
 
     getThumbnail(cameraId: string): Promise<string> {
