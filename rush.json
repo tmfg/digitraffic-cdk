@@ -34,7 +34,7 @@
     /**
      * The list of shell commands to run before the Rush installation starts
      */
-    "preRushInstall": ["node common/scripts/git-init-submodule.js"],
+    "preRushInstall": ["node common/scripts/git-submodule-extra.mjs init"],
 
     /**
      * The list of shell commands to run after the Rush installation finishes

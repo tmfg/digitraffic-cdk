@@ -1,12 +1,19 @@
 #!/usr/bin/env node
-"use strict";
+import { createRequire } from "module"; const require = createRequire(import.meta.url);
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJS = (cb, mod) => function __require() {
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined")
+    return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
+var __commonJS = (cb, mod) => function __require2() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __copyProps = (to, from, except, desc) => {
@@ -28,12 +35,12 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // ../../common/temp/node_modules/.pnpm/merge2@1.4.1/node_modules/merge2/index.js
 var require_merge2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/merge2@1.4.1/node_modules/merge2/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/merge2@1.4.1/node_modules/merge2/index.js"(exports, module) {
     "use strict";
-    var Stream = require("stream");
+    var Stream = __require("stream");
     var PassThrough = Stream.PassThrough;
     var slice = Array.prototype.slice;
-    module2.exports = merge22;
+    module.exports = merge22;
     function merge22() {
       const streamsQueue = [];
       const args = slice.call(arguments);
@@ -216,8 +223,8 @@ var require_path = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.convertPosixPathToPattern = exports.convertWindowsPathToPattern = exports.convertPathToPattern = exports.escapePosixPath = exports.escapeWindowsPath = exports.escape = exports.removeLeadingDotSegment = exports.makeAbsolute = exports.unixify = void 0;
-    var os2 = require("os");
-    var path2 = require("path");
+    var os2 = __require("os");
+    var path2 = __require("path");
     var IS_WINDOWS_PLATFORM = os2.platform() === "win32";
     var LEADING_DOT_SEGMENT_CHARACTERS_COUNT = 2;
     var POSIX_UNESCAPED_GLOB_SYMBOLS_RE = /(\\?)([()*?[\]{|}]|^!|[!+@](?=\()|\\(?![!()*+?@[\]{|}]))/g;
@@ -265,8 +272,8 @@ var require_path = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/is-extglob@2.1.1/node_modules/is-extglob/index.js
 var require_is_extglob = __commonJS({
-  "../../common/temp/node_modules/.pnpm/is-extglob@2.1.1/node_modules/is-extglob/index.js"(exports, module2) {
-    module2.exports = function isExtglob(str) {
+  "../../common/temp/node_modules/.pnpm/is-extglob@2.1.1/node_modules/is-extglob/index.js"(exports, module) {
+    module.exports = function isExtglob(str) {
       if (typeof str !== "string" || str === "") {
         return false;
       }
@@ -283,7 +290,7 @@ var require_is_extglob = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/is-glob@4.0.3/node_modules/is-glob/index.js
 var require_is_glob = __commonJS({
-  "../../common/temp/node_modules/.pnpm/is-glob@4.0.3/node_modules/is-glob/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/is-glob@4.0.3/node_modules/is-glob/index.js"(exports, module) {
     var isExtglob = require_is_extglob();
     var chars = { "{": "}", "(": ")", "[": "]" };
     var strictCheck = function(str) {
@@ -396,7 +403,7 @@ var require_is_glob = __commonJS({
       }
       return false;
     };
-    module2.exports = function isGlob(str, options) {
+    module.exports = function isGlob(str, options) {
       if (typeof str !== "string" || str === "") {
         return false;
       }
@@ -414,17 +421,17 @@ var require_is_glob = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/glob-parent@5.1.2/node_modules/glob-parent/index.js
 var require_glob_parent = __commonJS({
-  "../../common/temp/node_modules/.pnpm/glob-parent@5.1.2/node_modules/glob-parent/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/glob-parent@5.1.2/node_modules/glob-parent/index.js"(exports, module) {
     "use strict";
     var isGlob = require_is_glob();
-    var pathPosixDirname = require("path").posix.dirname;
-    var isWin32 = require("os").platform() === "win32";
+    var pathPosixDirname = __require("path").posix.dirname;
+    var isWin32 = __require("os").platform() === "win32";
     var slash2 = "/";
     var backslash = /\\/g;
     var enclosure = /[\{\[].*[\}\]]$/;
     var globby2 = /(^|[^\\])([\{\[]|\([^\)]+$)/;
     var escaped = /\\([\!\*\?\|\[\]\(\)\{\}])/g;
-    module2.exports = function globParent(str, opts) {
+    module.exports = function globParent(str, opts) {
       var options = Object.assign({ flipBackslashes: true }, opts);
       if (options.flipBackslashes && isWin32 && str.indexOf(slash2) < 0) {
         str = str.replace(backslash, slash2);
@@ -527,10 +534,10 @@ var require_utils = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/stringify.js
 var require_stringify = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/stringify.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/stringify.js"(exports, module) {
     "use strict";
     var utils = require_utils();
-    module2.exports = (ast, options = {}) => {
+    module.exports = (ast, options = {}) => {
       let stringify = (node, parent = {}) => {
         let invalidBlock = options.escapeInvalid && utils.isInvalidBrace(parent);
         let invalidNode = node.invalid === true && options.escapeInvalid === true;
@@ -558,9 +565,9 @@ var require_stringify = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/is-number@7.0.0/node_modules/is-number/index.js
 var require_is_number = __commonJS({
-  "../../common/temp/node_modules/.pnpm/is-number@7.0.0/node_modules/is-number/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/is-number@7.0.0/node_modules/is-number/index.js"(exports, module) {
     "use strict";
-    module2.exports = function(num) {
+    module.exports = function(num) {
       if (typeof num === "number") {
         return num - num === 0;
       }
@@ -574,7 +581,7 @@ var require_is_number = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/to-regex-range@5.0.1/node_modules/to-regex-range/index.js
 var require_to_regex_range = __commonJS({
-  "../../common/temp/node_modules/.pnpm/to-regex-range@5.0.1/node_modules/to-regex-range/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/to-regex-range@5.0.1/node_modules/to-regex-range/index.js"(exports, module) {
     "use strict";
     var isNumber = require_is_number();
     var toRegexRange = (min, max, options) => {
@@ -780,15 +787,15 @@ var require_to_regex_range = __commonJS({
     }
     toRegexRange.cache = {};
     toRegexRange.clearCache = () => toRegexRange.cache = {};
-    module2.exports = toRegexRange;
+    module.exports = toRegexRange;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fill-range@7.0.1/node_modules/fill-range/index.js
 var require_fill_range = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fill-range@7.0.1/node_modules/fill-range/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fill-range@7.0.1/node_modules/fill-range/index.js"(exports, module) {
     "use strict";
-    var util = require("util");
+    var util = __require("util");
     var toRegexRange = require_to_regex_range();
     var isObject = (val) => val !== null && typeof val === "object" && !Array.isArray(val);
     var transform = (toNumber) => {
@@ -986,13 +993,13 @@ var require_fill_range = __commonJS({
       }
       return fillLetters(start, end, Math.max(Math.abs(step), 1), opts);
     };
-    module2.exports = fill;
+    module.exports = fill;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/compile.js
 var require_compile = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/compile.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/compile.js"(exports, module) {
     "use strict";
     var fill = require_fill_range();
     var utils = require_utils();
@@ -1037,13 +1044,13 @@ var require_compile = __commonJS({
       };
       return walk(ast);
     };
-    module2.exports = compile;
+    module.exports = compile;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/expand.js
 var require_expand = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/expand.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/expand.js"(exports, module) {
     "use strict";
     var fill = require_fill_range();
     var stringify = require_stringify();
@@ -1134,15 +1141,15 @@ var require_expand = __commonJS({
       };
       return utils.flatten(walk(ast));
     };
-    module2.exports = expand;
+    module.exports = expand;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/constants.js
 var require_constants = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/constants.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/constants.js"(exports, module) {
     "use strict";
-    module2.exports = {
+    module.exports = {
       MAX_LENGTH: 1024 * 64,
       // Digits
       CHAR_0: "0",
@@ -1241,7 +1248,7 @@ var require_constants = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/parse.js
 var require_parse = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/parse.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/parse.js"(exports, module) {
     "use strict";
     var stringify = require_stringify();
     var {
@@ -1479,13 +1486,13 @@ var require_parse = __commonJS({
       push({ type: "eos" });
       return ast;
     };
-    module2.exports = parse;
+    module.exports = parse;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/index.js
 var require_braces = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/index.js"(exports, module) {
     "use strict";
     var stringify = require_stringify();
     var compile = require_compile();
@@ -1542,15 +1549,15 @@ var require_braces = __commonJS({
       }
       return options.expand !== true ? braces.compile(input, options) : braces.expand(input, options);
     };
-    module2.exports = braces;
+    module.exports = braces;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/constants.js
 var require_constants2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/constants.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/constants.js"(exports, module) {
     "use strict";
-    var path2 = require("path");
+    var path2 = __require("path");
     var WIN_SLASH = "\\\\/";
     var WIN_NO_SLASH = `[^${WIN_SLASH}]`;
     var DOT_LITERAL = "\\.";
@@ -1615,7 +1622,7 @@ var require_constants2 = __commonJS({
       word: "A-Za-z0-9_",
       xdigit: "A-Fa-f0-9"
     };
-    module2.exports = {
+    module.exports = {
       MAX_LENGTH: 1024 * 64,
       POSIX_REGEX_SOURCE,
       // regular expressions
@@ -1747,7 +1754,7 @@ var require_constants2 = __commonJS({
 var require_utils2 = __commonJS({
   "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/utils.js"(exports) {
     "use strict";
-    var path2 = require("path");
+    var path2 = __require("path");
     var win32 = process.platform === "win32";
     var {
       REGEX_BACKSLASH,
@@ -1808,7 +1815,7 @@ var require_utils2 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/scan.js
 var require_scan = __commonJS({
-  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/scan.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/scan.js"(exports, module) {
     "use strict";
     var utils = require_utils2();
     var {
@@ -2135,13 +2142,13 @@ var require_scan = __commonJS({
       }
       return state;
     };
-    module2.exports = scan;
+    module.exports = scan;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/parse.js
 var require_parse2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/parse.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/parse.js"(exports, module) {
     "use strict";
     var constants = require_constants2();
     var utils = require_utils2();
@@ -2916,15 +2923,15 @@ var require_parse2 = __commonJS({
       }
       return source;
     };
-    module2.exports = parse;
+    module.exports = parse;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/picomatch.js
 var require_picomatch = __commonJS({
-  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/picomatch.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/lib/picomatch.js"(exports, module) {
     "use strict";
-    var path2 = require("path");
+    var path2 = __require("path");
     var scan = require_scan();
     var parse = require_parse2();
     var utils = require_utils2();
@@ -3060,23 +3067,23 @@ var require_picomatch = __commonJS({
       }
     };
     picomatch.constants = constants;
-    module2.exports = picomatch;
+    module.exports = picomatch;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/index.js
 var require_picomatch2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/picomatch@2.3.1/node_modules/picomatch/index.js"(exports, module) {
     "use strict";
-    module2.exports = require_picomatch();
+    module.exports = require_picomatch();
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/micromatch@4.0.5/node_modules/micromatch/index.js
 var require_micromatch = __commonJS({
-  "../../common/temp/node_modules/.pnpm/micromatch@4.0.5/node_modules/micromatch/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/micromatch@4.0.5/node_modules/micromatch/index.js"(exports, module) {
     "use strict";
-    var util = require("util");
+    var util = __require("util");
     var braces = require_braces();
     var picomatch = require_picomatch2();
     var utils = require_utils2();
@@ -3230,7 +3237,7 @@ var require_micromatch = __commonJS({
         throw new TypeError("Expected a string");
       return micromatch.braces(pattern, { ...options, expand: true });
     };
-    module2.exports = micromatch;
+    module.exports = micromatch;
   }
 });
 
@@ -3240,7 +3247,7 @@ var require_pattern = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.removeDuplicateSlashes = exports.matchAny = exports.convertPatternsToRe = exports.makeRe = exports.getPatternParts = exports.expandBraceExpansion = exports.expandPatternsWithBraceExpansion = exports.isAffectDepthOfReadingPattern = exports.endsWithSlashGlobStar = exports.hasGlobStar = exports.getBaseDirectory = exports.isPatternRelatedToParentDirectory = exports.getPatternsOutsideCurrentDirectory = exports.getPatternsInsideCurrentDirectory = exports.getPositivePatterns = exports.getNegativePatterns = exports.isPositivePattern = exports.isNegativePattern = exports.convertToNegativePattern = exports.convertToPositivePattern = exports.isDynamicPattern = exports.isStaticPattern = void 0;
-    var path2 = require("path");
+    var path2 = __require("path");
     var globParent = require_glob_parent();
     var micromatch = require_micromatch();
     var GLOBSTAR = "**";
@@ -3617,7 +3624,7 @@ var require_fs2 = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createFileSystemAdapter = exports.FILE_SYSTEM_ADAPTER = void 0;
-    var fs4 = require("fs");
+    var fs4 = __require("fs");
     exports.FILE_SYSTEM_ADAPTER = {
       lstat: fs4.lstat,
       stat: fs4.stat,
@@ -3690,9 +3697,9 @@ var require_out = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/queue-microtask@1.2.3/node_modules/queue-microtask/index.js
 var require_queue_microtask = __commonJS({
-  "../../common/temp/node_modules/.pnpm/queue-microtask@1.2.3/node_modules/queue-microtask/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/queue-microtask@1.2.3/node_modules/queue-microtask/index.js"(exports, module) {
     var promise;
-    module2.exports = typeof queueMicrotask === "function" ? queueMicrotask.bind(typeof window !== "undefined" ? window : global) : (cb) => (promise || (promise = Promise.resolve())).then(cb).catch((err) => setTimeout(() => {
+    module.exports = typeof queueMicrotask === "function" ? queueMicrotask.bind(typeof window !== "undefined" ? window : global) : (cb) => (promise || (promise = Promise.resolve())).then(cb).catch((err) => setTimeout(() => {
       throw err;
     }, 0));
   }
@@ -3700,8 +3707,8 @@ var require_queue_microtask = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/run-parallel@1.2.0/node_modules/run-parallel/index.js
 var require_run_parallel = __commonJS({
-  "../../common/temp/node_modules/.pnpm/run-parallel@1.2.0/node_modules/run-parallel/index.js"(exports, module2) {
-    module2.exports = runParallel;
+  "../../common/temp/node_modules/.pnpm/run-parallel@1.2.0/node_modules/run-parallel/index.js"(exports, module) {
+    module.exports = runParallel;
     var queueMicrotask2 = require_queue_microtask();
     function runParallel(tasks, cb) {
       let results, pending, keys;
@@ -3998,7 +4005,7 @@ var require_fs4 = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createFileSystemAdapter = exports.FILE_SYSTEM_ADAPTER = void 0;
-    var fs4 = require("fs");
+    var fs4 = __require("fs");
     exports.FILE_SYSTEM_ADAPTER = {
       lstat: fs4.lstat,
       stat: fs4.stat,
@@ -4022,7 +4029,7 @@ var require_settings2 = __commonJS({
   "../../common/temp/node_modules/.pnpm/@nodelib+fs.scandir@2.1.5/node_modules/@nodelib/fs.scandir/out/settings.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var path2 = require("path");
+    var path2 = __require("path");
     var fsStat = require_out();
     var fs4 = require_fs4();
     var Settings = class {
@@ -4081,7 +4088,7 @@ var require_out2 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/reusify@1.0.4/node_modules/reusify/reusify.js
 var require_reusify = __commonJS({
-  "../../common/temp/node_modules/.pnpm/reusify@1.0.4/node_modules/reusify/reusify.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/reusify@1.0.4/node_modules/reusify/reusify.js"(exports, module) {
     "use strict";
     function reusify(Constructor) {
       var head = new Constructor();
@@ -4106,13 +4113,13 @@ var require_reusify = __commonJS({
         release
       };
     }
-    module2.exports = reusify;
+    module.exports = reusify;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fastq@1.15.0/node_modules/fastq/queue.js
 var require_queue = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fastq@1.15.0/node_modules/fastq/queue.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fastq@1.15.0/node_modules/fastq/queue.js"(exports, module) {
     "use strict";
     var reusify = require_reusify();
     function fastqueue(context, worker, concurrency) {
@@ -4346,8 +4353,8 @@ var require_queue = __commonJS({
         return p;
       }
     }
-    module2.exports = fastqueue;
-    module2.exports.promise = queueAsPromised;
+    module.exports = fastqueue;
+    module.exports.promise = queueAsPromised;
   }
 });
 
@@ -4407,7 +4414,7 @@ var require_async3 = __commonJS({
   "../../common/temp/node_modules/.pnpm/@nodelib+fs.walk@1.2.8/node_modules/@nodelib/fs.walk/out/readers/async.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var events_1 = require("events");
+    var events_1 = __require("events");
     var fsScandir = require_out2();
     var fastq = require_queue();
     var common = require_common2();
@@ -4546,7 +4553,7 @@ var require_stream2 = __commonJS({
   "../../common/temp/node_modules/.pnpm/@nodelib+fs.walk@1.2.8/node_modules/@nodelib/fs.walk/out/providers/stream.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var stream_1 = require("stream");
+    var stream_1 = __require("stream");
     var async_1 = require_async3();
     var StreamProvider = class {
       constructor(_root, _settings) {
@@ -4671,7 +4678,7 @@ var require_settings3 = __commonJS({
   "../../common/temp/node_modules/.pnpm/@nodelib+fs.walk@1.2.8/node_modules/@nodelib/fs.walk/out/settings.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var path2 = require("path");
+    var path2 = __require("path");
     var fsScandir = require_out2();
     var Settings = class {
       constructor(_options = {}) {
@@ -4743,7 +4750,7 @@ var require_reader2 = __commonJS({
   "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/reader.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var path2 = require("path");
+    var path2 = __require("path");
     var fsStat = require_out();
     var utils = require_utils3();
     var Reader = class {
@@ -4782,7 +4789,7 @@ var require_stream3 = __commonJS({
   "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/stream.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var stream_1 = require("stream");
+    var stream_1 = __require("stream");
     var fsStat = require_out();
     var fsWalk = require_out3();
     var reader_1 = require_reader2();
@@ -5150,7 +5157,7 @@ var require_provider = __commonJS({
   "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/provider.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var path2 = require("path");
+    var path2 = __require("path");
     var deep_1 = require_deep();
     var entry_1 = require_entry();
     var error_1 = require_error();
@@ -5233,7 +5240,7 @@ var require_stream4 = __commonJS({
   "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/stream.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var stream_1 = require("stream");
+    var stream_1 = __require("stream");
     var stream_2 = require_stream3();
     var provider_1 = require_provider();
     var ProviderStream = class extends provider_1.default {
@@ -5345,8 +5352,8 @@ var require_settings4 = __commonJS({
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DEFAULT_FILE_SYSTEM_ADAPTER = void 0;
-    var fs4 = require("fs");
-    var os2 = require("os");
+    var fs4 = __require("fs");
+    var os2 = __require("os");
     var CPU_COUNT = Math.max(os2.cpus().length, 1);
     exports.DEFAULT_FILE_SYSTEM_ADAPTER = {
       lstat: fs4.lstat,
@@ -5401,7 +5408,7 @@ var require_settings4 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/index.js
 var require_out4 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/index.js"(exports, module) {
     "use strict";
     var taskManager = require_tasks();
     var async_1 = require_async6();
@@ -5496,7 +5503,7 @@ var require_out4 = __commonJS({
         throw new TypeError("Patterns must be a string (non empty) or an array of strings");
       }
     }
-    module2.exports = FastGlob;
+    module.exports = FastGlob;
   }
 });
 
@@ -5504,8 +5511,8 @@ var require_out4 = __commonJS({
 var require_path_type = __commonJS({
   "../../common/temp/node_modules/.pnpm/path-type@4.0.0/node_modules/path-type/index.js"(exports) {
     "use strict";
-    var { promisify } = require("util");
-    var fs4 = require("fs");
+    var { promisify } = __require("util");
+    var fs4 = __require("fs");
     async function isType(fsStatType, statsMethodName, filePath) {
       if (typeof filePath !== "string") {
         throw new TypeError(`Expected a string, got ${typeof filePath}`);
@@ -5544,9 +5551,9 @@ var require_path_type = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/dir-glob@3.0.1/node_modules/dir-glob/index.js
 var require_dir_glob = __commonJS({
-  "../../common/temp/node_modules/.pnpm/dir-glob@3.0.1/node_modules/dir-glob/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/dir-glob@3.0.1/node_modules/dir-glob/index.js"(exports, module) {
     "use strict";
-    var path2 = require("path");
+    var path2 = __require("path");
     var pathType = require_path_type();
     var getExtensions = (extensions) => extensions.length > 1 ? `{${extensions.join(",")}}` : extensions[0];
     var getPath = (filepath, cwd) => {
@@ -5577,7 +5584,7 @@ var require_dir_glob = __commonJS({
       }
       return [path2.posix.join(directory, "**")];
     };
-    module2.exports = async (input, options) => {
+    module.exports = async (input, options) => {
       options = {
         cwd: process.cwd(),
         ...options
@@ -5591,7 +5598,7 @@ var require_dir_glob = __commonJS({
       }));
       return [].concat.apply([], globs);
     };
-    module2.exports.sync = (input, options) => {
+    module.exports.sync = (input, options) => {
       options = {
         cwd: process.cwd(),
         ...options
@@ -5607,7 +5614,7 @@ var require_dir_glob = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/ignore@5.2.4/node_modules/ignore/index.js
 var require_ignore = __commonJS({
-  "../../common/temp/node_modules/.pnpm/ignore@5.2.4/node_modules/ignore/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/ignore@5.2.4/node_modules/ignore/index.js"(exports, module) {
     function makeArray(subject) {
       return Array.isArray(subject) ? subject : [subject];
     }
@@ -5965,7 +5972,7 @@ var require_ignore = __commonJS({
     var isPathValid = (path2) => checkPath(path2 && checkPath.convert(path2), path2, RETURN_FALSE);
     factory.isPathValid = isPathValid;
     factory.default = factory;
-    module2.exports = factory;
+    module.exports = factory;
     if (
       // Detect `process` so that it can run in browsers.
       typeof process !== "undefined" && (process.env && process.env.IGNORE_TEST_WIN32 || process.platform === "win32")
@@ -6011,8 +6018,8 @@ var require_universalify = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/polyfills.js
 var require_polyfills = __commonJS({
-  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/polyfills.js"(exports, module2) {
-    var constants = require("constants");
+  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/polyfills.js"(exports, module) {
+    var constants = __require("constants");
     var origCwd = process.cwd;
     var cwd = null;
     var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform;
@@ -6035,7 +6042,7 @@ var require_polyfills = __commonJS({
         Object.setPrototypeOf(process.chdir, chdir);
     }
     var chdir;
-    module2.exports = patch;
+    module.exports = patch;
     function patch(fs4) {
       if (constants.hasOwnProperty("O_SYMLINK") && process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
         patchLchmod(fs4);
@@ -6327,9 +6334,9 @@ var require_polyfills = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/legacy-streams.js
 var require_legacy_streams = __commonJS({
-  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/legacy-streams.js"(exports, module2) {
-    var Stream = require("stream").Stream;
-    module2.exports = legacy;
+  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/legacy-streams.js"(exports, module) {
+    var Stream = __require("stream").Stream;
+    module.exports = legacy;
     function legacy(fs4) {
       return {
         ReadStream,
@@ -6426,9 +6433,9 @@ var require_legacy_streams = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/clone.js
 var require_clone = __commonJS({
-  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/clone.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/clone.js"(exports, module) {
     "use strict";
-    module2.exports = clone;
+    module.exports = clone;
     var getPrototypeOf = Object.getPrototypeOf || function(obj) {
       return obj.__proto__;
     };
@@ -6449,12 +6456,12 @@ var require_clone = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/graceful-fs.js
 var require_graceful_fs = __commonJS({
-  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/graceful-fs.js"(exports, module2) {
-    var fs4 = require("fs");
+  "../../common/temp/node_modules/.pnpm/graceful-fs@4.2.11/node_modules/graceful-fs/graceful-fs.js"(exports, module) {
+    var fs4 = __require("fs");
     var polyfills = require_polyfills();
     var legacy = require_legacy_streams();
     var clone = require_clone();
-    var util = require("util");
+    var util = __require("util");
     var gracefulQueue;
     var previousSymbol;
     if (typeof Symbol === "function" && typeof Symbol.for === "function") {
@@ -6513,7 +6520,7 @@ var require_graceful_fs = __commonJS({
       if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || "")) {
         process.on("exit", function() {
           debug(fs4[gracefulQueue]);
-          require("assert").equal(fs4[gracefulQueue].length, 0);
+          __require("assert").equal(fs4[gracefulQueue].length, 0);
         });
       }
     }
@@ -6521,9 +6528,9 @@ var require_graceful_fs = __commonJS({
     if (!global[gracefulQueue]) {
       publishQueue(global, fs4[gracefulQueue]);
     }
-    module2.exports = patch(clone(fs4));
+    module.exports = patch(clone(fs4));
     if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs4.__patched) {
-      module2.exports = patch(fs4);
+      module.exports = patch(fs4);
       fs4.__patched = true;
     }
     function patch(fs5) {
@@ -6935,10 +6942,10 @@ var require_fs5 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/utils.js
 var require_utils5 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/utils.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/utils.js"(exports, module) {
     "use strict";
-    var path2 = require("path");
-    module2.exports.checkPath = function checkPath(pth) {
+    var path2 = __require("path");
+    module.exports.checkPath = function checkPath(pth) {
       if (process.platform === "win32") {
         const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path2.parse(pth).root, ""));
         if (pathHasInvalidWinCharacters) {
@@ -6953,7 +6960,7 @@ var require_utils5 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/make-dir.js
 var require_make_dir = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports, module) {
     "use strict";
     var fs4 = require_fs5();
     var { checkPath } = require_utils5();
@@ -6963,14 +6970,14 @@ var require_make_dir = __commonJS({
         return options;
       return { ...defaults, ...options }.mode;
     };
-    module2.exports.makeDir = async (dir, options) => {
+    module.exports.makeDir = async (dir, options) => {
       checkPath(dir);
       return fs4.mkdir(dir, {
         mode: getMode(options),
         recursive: true
       });
     };
-    module2.exports.makeDirSync = (dir, options) => {
+    module.exports.makeDirSync = (dir, options) => {
       checkPath(dir);
       return fs4.mkdirSync(dir, {
         mode: getMode(options),
@@ -6982,12 +6989,12 @@ var require_make_dir = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/index.js
 var require_mkdirs = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var { makeDir: _makeDir, makeDirSync } = require_make_dir();
     var makeDir = u(_makeDir);
-    module2.exports = {
+    module.exports = {
       mkdirs: makeDir,
       mkdirsSync: makeDirSync,
       // alias
@@ -7001,14 +7008,14 @@ var require_mkdirs = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/path-exists/index.js
 var require_path_exists = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/path-exists/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/path-exists/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var fs4 = require_fs5();
     function pathExists(path2) {
       return fs4.access(path2).then(() => true).catch(() => false);
     }
-    module2.exports = {
+    module.exports = {
       pathExists: u(pathExists),
       pathExistsSync: fs4.existsSync
     };
@@ -7017,7 +7024,7 @@ var require_path_exists = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/utimes.js
 var require_utimes = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/utimes.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/utimes.js"(exports, module) {
     "use strict";
     var fs4 = require_graceful_fs();
     function utimesMillis(path2, atime, mtime, callback) {
@@ -7037,7 +7044,7 @@ var require_utimes = __commonJS({
       fs4.futimesSync(fd, atime, mtime);
       return fs4.closeSync(fd);
     }
-    module2.exports = {
+    module.exports = {
       utimesMillis,
       utimesMillisSync
     };
@@ -7046,11 +7053,11 @@ var require_utimes = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/stat.js
 var require_stat = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/stat.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/stat.js"(exports, module) {
     "use strict";
     var fs4 = require_fs5();
-    var path2 = require("path");
-    var util = require("util");
+    var path2 = __require("path");
+    var util = __require("util");
     function getStats(src, dest, opts) {
       const statFunc = opts.dereference ? (file) => fs4.stat(file, { bigint: true }) : (file) => fs4.lstat(file, { bigint: true });
       return Promise.all([
@@ -7171,7 +7178,7 @@ var require_stat = __commonJS({
     function errMsg(src, dest, funcName) {
       return `Cannot ${funcName} '${src}' to a subdirectory of itself, '${dest}'.`;
     }
-    module2.exports = {
+    module.exports = {
       checkPaths,
       checkPathsSync,
       checkParentPaths,
@@ -7184,10 +7191,10 @@ var require_stat = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy.js
 var require_copy = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy.js"(exports, module) {
     "use strict";
     var fs4 = require_graceful_fs();
-    var path2 = require("path");
+    var path2 = __require("path");
     var mkdirs = require_mkdirs().mkdirs;
     var pathExists = require_path_exists().pathExists;
     var utimesMillis = require_utimes().utimesMillis;
@@ -7410,16 +7417,16 @@ var require_copy = __commonJS({
         return fs4.symlink(resolvedSrc, dest, cb);
       });
     }
-    module2.exports = copy;
+    module.exports = copy;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy-sync.js
 var require_copy_sync = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy-sync.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy-sync.js"(exports, module) {
     "use strict";
     var fs4 = require_graceful_fs();
-    var path2 = require("path");
+    var path2 = __require("path");
     var mkdirsSync = require_mkdirs().mkdirsSync;
     var utimesMillisSync = require_utimes().utimesMillisSync;
     var stat = require_stat();
@@ -7551,16 +7558,16 @@ var require_copy_sync = __commonJS({
       fs4.unlinkSync(dest);
       return fs4.symlinkSync(resolvedSrc, dest);
     }
-    module2.exports = copySync;
+    module.exports = copySync;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/index.js
 var require_copy2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromCallback;
-    module2.exports = {
+    module.exports = {
       copy: u(require_copy()),
       copySync: require_copy_sync()
     };
@@ -7569,7 +7576,7 @@ var require_copy2 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/remove/index.js
 var require_remove = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/remove/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/remove/index.js"(exports, module) {
     "use strict";
     var fs4 = require_graceful_fs();
     var u = require_universalify().fromCallback;
@@ -7579,7 +7586,7 @@ var require_remove = __commonJS({
     function removeSync(path2) {
       fs4.rmSync(path2, { recursive: true, force: true });
     }
-    module2.exports = {
+    module.exports = {
       remove: u(remove),
       removeSync
     };
@@ -7588,11 +7595,11 @@ var require_remove = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/empty/index.js
 var require_empty = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/empty/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/empty/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var fs4 = require_fs5();
-    var path2 = require("path");
+    var path2 = __require("path");
     var mkdir = require_mkdirs();
     var remove = require_remove();
     var emptyDir = u(async function emptyDir2(dir) {
@@ -7616,7 +7623,7 @@ var require_empty = __commonJS({
         remove.removeSync(item);
       });
     }
-    module2.exports = {
+    module.exports = {
       emptyDirSync,
       emptydirSync: emptyDirSync,
       emptyDir,
@@ -7627,10 +7634,10 @@ var require_empty = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/file.js
 var require_file = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/file.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/file.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromCallback;
-    var path2 = require("path");
+    var path2 = __require("path");
     var fs4 = require_graceful_fs();
     var mkdir = require_mkdirs();
     function createFile(file, callback) {
@@ -7688,7 +7695,7 @@ var require_file = __commonJS({
       }
       fs4.writeFileSync(file, "");
     }
-    module2.exports = {
+    module.exports = {
       createFile: u(createFile),
       createFileSync
     };
@@ -7697,10 +7704,10 @@ var require_file = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/link.js
 var require_link = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/link.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/link.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromCallback;
-    var path2 = require("path");
+    var path2 = __require("path");
     var fs4 = require_graceful_fs();
     var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
@@ -7757,7 +7764,7 @@ var require_link = __commonJS({
       mkdir.mkdirsSync(dir);
       return fs4.linkSync(srcpath, dstpath);
     }
-    module2.exports = {
+    module.exports = {
       createLink: u(createLink),
       createLinkSync
     };
@@ -7766,9 +7773,9 @@ var require_link = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-paths.js
 var require_symlink_paths = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports, module) {
     "use strict";
-    var path2 = require("path");
+    var path2 = __require("path");
     var fs4 = require_graceful_fs();
     var pathExists = require_path_exists().pathExists;
     function symlinkPaths(srcpath, dstpath, callback) {
@@ -7839,7 +7846,7 @@ var require_symlink_paths = __commonJS({
         }
       }
     }
-    module2.exports = {
+    module.exports = {
       symlinkPaths,
       symlinkPathsSync
     };
@@ -7848,7 +7855,7 @@ var require_symlink_paths = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-type.js
 var require_symlink_type = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-type.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-type.js"(exports, module) {
     "use strict";
     var fs4 = require_graceful_fs();
     function symlinkType(srcpath, type, callback) {
@@ -7874,7 +7881,7 @@ var require_symlink_type = __commonJS({
       }
       return stats && stats.isDirectory() ? "dir" : "file";
     }
-    module2.exports = {
+    module.exports = {
       symlinkType,
       symlinkTypeSync
     };
@@ -7883,10 +7890,10 @@ var require_symlink_type = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink.js
 var require_symlink = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromCallback;
-    var path2 = require("path");
+    var path2 = __require("path");
     var fs4 = require_fs5();
     var _mkdirs = require_mkdirs();
     var mkdirs = _mkdirs.mkdirs;
@@ -7961,7 +7968,7 @@ var require_symlink = __commonJS({
       mkdirsSync(dir);
       return fs4.symlinkSync(srcpath, dstpath, type);
     }
-    module2.exports = {
+    module.exports = {
       createSymlink: u(createSymlink),
       createSymlinkSync
     };
@@ -7970,12 +7977,12 @@ var require_symlink = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/index.js
 var require_ensure = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/index.js"(exports, module) {
     "use strict";
     var { createFile, createFileSync } = require_file();
     var { createLink, createLinkSync } = require_link();
     var { createSymlink, createSymlinkSync } = require_symlink();
-    module2.exports = {
+    module.exports = {
       // file
       createFile,
       createFileSync,
@@ -7997,7 +8004,7 @@ var require_ensure = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/jsonfile@6.1.0/node_modules/jsonfile/utils.js
 var require_utils6 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/jsonfile@6.1.0/node_modules/jsonfile/utils.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/jsonfile@6.1.0/node_modules/jsonfile/utils.js"(exports, module) {
     function stringify(obj, { EOL = "\n", finalEOL = true, replacer = null, spaces } = {}) {
       const EOF = finalEOL ? EOL : "";
       const str = JSON.stringify(obj, replacer, spaces);
@@ -8008,18 +8015,18 @@ var require_utils6 = __commonJS({
         content = content.toString("utf8");
       return content.replace(/^\uFEFF/, "");
     }
-    module2.exports = { stringify, stripBom };
+    module.exports = { stringify, stripBom };
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/jsonfile@6.1.0/node_modules/jsonfile/index.js
 var require_jsonfile = __commonJS({
-  "../../common/temp/node_modules/.pnpm/jsonfile@6.1.0/node_modules/jsonfile/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/jsonfile@6.1.0/node_modules/jsonfile/index.js"(exports, module) {
     var _fs;
     try {
       _fs = require_graceful_fs();
     } catch (_) {
-      _fs = require("fs");
+      _fs = __require("fs");
     }
     var universalify = require_universalify();
     var { stringify, stripBom } = require_utils6();
@@ -8081,16 +8088,16 @@ var require_jsonfile = __commonJS({
       writeFile,
       writeFileSync
     };
-    module2.exports = jsonfile;
+    module.exports = jsonfile;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/jsonfile.js
 var require_jsonfile2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/jsonfile.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/jsonfile.js"(exports, module) {
     "use strict";
     var jsonFile = require_jsonfile();
-    module2.exports = {
+    module.exports = {
       // jsonfile exports
       readJson: jsonFile.readFile,
       readJsonSync: jsonFile.readFileSync,
@@ -8102,11 +8109,11 @@ var require_jsonfile2 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/output-file/index.js
 var require_output_file = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/output-file/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/output-file/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromCallback;
     var fs4 = require_graceful_fs();
-    var path2 = require("path");
+    var path2 = __require("path");
     var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
     function outputFile(file, data, encoding, callback) {
@@ -8135,7 +8142,7 @@ var require_output_file = __commonJS({
       mkdir.mkdirsSync(dir);
       fs4.writeFileSync(file, ...args);
     }
-    module2.exports = {
+    module.exports = {
       outputFile: u(outputFile),
       outputFileSync
     };
@@ -8144,7 +8151,7 @@ var require_output_file = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json.js
 var require_output_json = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json.js"(exports, module) {
     "use strict";
     var { stringify } = require_utils6();
     var { outputFile } = require_output_file();
@@ -8152,13 +8159,13 @@ var require_output_json = __commonJS({
       const str = stringify(data, options);
       await outputFile(file, str, options);
     }
-    module2.exports = outputJson;
+    module.exports = outputJson;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json-sync.js
 var require_output_json_sync = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json-sync.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json-sync.js"(exports, module) {
     "use strict";
     var { stringify } = require_utils6();
     var { outputFileSync } = require_output_file();
@@ -8166,13 +8173,13 @@ var require_output_json_sync = __commonJS({
       const str = stringify(data, options);
       outputFileSync(file, str, options);
     }
-    module2.exports = outputJsonSync;
+    module.exports = outputJsonSync;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/index.js
 var require_json = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var jsonFile = require_jsonfile2();
@@ -8184,16 +8191,16 @@ var require_json = __commonJS({
     jsonFile.writeJSONSync = jsonFile.writeJsonSync;
     jsonFile.readJSON = jsonFile.readJson;
     jsonFile.readJSONSync = jsonFile.readJsonSync;
-    module2.exports = jsonFile;
+    module.exports = jsonFile;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move.js
 var require_move = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move.js"(exports, module) {
     "use strict";
     var fs4 = require_graceful_fs();
-    var path2 = require("path");
+    var path2 = __require("path");
     var copy = require_copy2().copy;
     var remove = require_remove().remove;
     var mkdirp = require_mkdirs().mkdirp;
@@ -8267,16 +8274,16 @@ var require_move = __commonJS({
         return remove(src, cb);
       });
     }
-    module2.exports = move;
+    module.exports = move;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move-sync.js
 var require_move_sync = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move-sync.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move-sync.js"(exports, module) {
     "use strict";
     var fs4 = require_graceful_fs();
-    var path2 = require("path");
+    var path2 = __require("path");
     var copySync = require_copy2().copySync;
     var removeSync = require_remove().removeSync;
     var mkdirpSync = require_mkdirs().mkdirpSync;
@@ -8324,16 +8331,16 @@ var require_move_sync = __commonJS({
       copySync(src, dest, opts);
       return removeSync(src);
     }
-    module2.exports = moveSync;
+    module.exports = moveSync;
   }
 });
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/index.js
 var require_move2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromCallback;
-    module2.exports = {
+    module.exports = {
       move: u(require_move()),
       moveSync: require_move_sync()
     };
@@ -8342,9 +8349,9 @@ var require_move2 = __commonJS({
 
 // ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/index.js
 var require_lib = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/index.js"(exports, module2) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/index.js"(exports, module) {
     "use strict";
-    module2.exports = {
+    module.exports = {
       // Export promiseified graceful-fs:
       ...require_fs5(),
       // Export extra methods:
@@ -8362,18 +8369,18 @@ var require_lib = __commonJS({
 });
 
 // ../../common/temp/node_modules/.pnpm/globby@13.2.2/node_modules/globby/index.js
-var import_node_fs2 = __toESM(require("node:fs"), 1);
-var import_node_path2 = __toESM(require("node:path"), 1);
 var import_merge2 = __toESM(require_merge2(), 1);
 var import_fast_glob2 = __toESM(require_out4(), 1);
 var import_dir_glob = __toESM(require_dir_glob(), 1);
+import fs2 from "node:fs";
+import nodePath from "node:path";
 
 // ../../common/temp/node_modules/.pnpm/globby@13.2.2/node_modules/globby/ignore.js
-var import_node_process = __toESM(require("node:process"), 1);
-var import_node_fs = __toESM(require("node:fs"), 1);
-var import_node_path = __toESM(require("node:path"), 1);
 var import_fast_glob = __toESM(require_out4(), 1);
 var import_ignore = __toESM(require_ignore(), 1);
+import process2 from "node:process";
+import fs from "node:fs";
+import path from "node:path";
 
 // ../../common/temp/node_modules/.pnpm/slash@4.0.0/node_modules/slash/index.js
 function slash(path2) {
@@ -8386,10 +8393,10 @@ function slash(path2) {
 }
 
 // ../../common/temp/node_modules/.pnpm/globby@13.2.2/node_modules/globby/utilities.js
-var import_node_url = require("node:url");
-var import_node_stream = require("node:stream");
-var toPath = (urlOrPath) => urlOrPath instanceof URL ? (0, import_node_url.fileURLToPath)(urlOrPath) : urlOrPath;
-var FilterStream = class extends import_node_stream.Transform {
+import { fileURLToPath } from "node:url";
+import { Transform } from "node:stream";
+var toPath = (urlOrPath) => urlOrPath instanceof URL ? fileURLToPath(urlOrPath) : urlOrPath;
+var FilterStream = class extends Transform {
   constructor(filter) {
     super({
       objectMode: true,
@@ -8413,16 +8420,16 @@ var ignoreFilesGlobOptions = {
   dot: true
 };
 var GITIGNORE_FILES_PATTERN = "**/.gitignore";
-var applyBaseToPattern = (pattern, base) => isNegativePattern(pattern) ? "!" + import_node_path.default.posix.join(base, pattern.slice(1)) : import_node_path.default.posix.join(base, pattern);
+var applyBaseToPattern = (pattern, base) => isNegativePattern(pattern) ? "!" + path.posix.join(base, pattern.slice(1)) : path.posix.join(base, pattern);
 var parseIgnoreFile = (file, cwd) => {
-  const base = slash(import_node_path.default.relative(cwd, import_node_path.default.dirname(file.filePath)));
+  const base = slash(path.relative(cwd, path.dirname(file.filePath)));
   return file.content.split(/\r?\n/).filter((line) => line && !line.startsWith("#")).map((pattern) => applyBaseToPattern(pattern, base));
 };
 var toRelativePath = (fileOrDirectory, cwd) => {
   cwd = slash(cwd);
-  if (import_node_path.default.isAbsolute(fileOrDirectory)) {
+  if (path.isAbsolute(fileOrDirectory)) {
     if (slash(fileOrDirectory).startsWith(cwd)) {
-      return import_node_path.default.relative(cwd, fileOrDirectory);
+      return path.relative(cwd, fileOrDirectory);
     }
     throw new Error(`Path ${fileOrDirectory} is not in cwd ${cwd}`);
   }
@@ -8438,7 +8445,7 @@ var getIsIgnoredPredicate = (files, cwd) => {
   };
 };
 var normalizeOptions = (options = {}) => ({
-  cwd: toPath(options.cwd) || import_node_process.default.cwd(),
+  cwd: toPath(options.cwd) || process2.cwd(),
   suppressErrors: Boolean(options.suppressErrors),
   deep: typeof options.deep === "number" ? options.deep : Number.POSITIVE_INFINITY
 });
@@ -8448,7 +8455,7 @@ var isIgnoredByIgnoreFiles = async (patterns, options) => {
   const files = await Promise.all(
     paths.map(async (filePath) => ({
       filePath,
-      content: await import_node_fs.default.promises.readFile(filePath, "utf8")
+      content: await fs.promises.readFile(filePath, "utf8")
     }))
   );
   return getIsIgnoredPredicate(files, cwd);
@@ -8458,7 +8465,7 @@ var isIgnoredByIgnoreFilesSync = (patterns, options) => {
   const paths = import_fast_glob.default.sync(patterns, { cwd, suppressErrors, deep, ...ignoreFilesGlobOptions });
   const files = paths.map((filePath) => ({
     filePath,
-    content: import_node_fs.default.readFileSync(filePath, "utf8")
+    content: fs.readFileSync(filePath, "utf8")
   }));
   return getIsIgnoredPredicate(files, cwd);
 };
@@ -8480,7 +8487,7 @@ var checkCwdOption = (options) => {
   }
   let stat;
   try {
-    stat = import_node_fs2.default.statSync(options.cwd);
+    stat = fs2.statSync(options.cwd);
   } catch {
     return;
   }
@@ -8524,7 +8531,7 @@ var createFilterFunction = (isIgnored) => {
   const seen = /* @__PURE__ */ new Set();
   return (fastGlobResult) => {
     const path2 = fastGlobResult.path || fastGlobResult;
-    const pathKey = import_node_path2.default.normalize(path2);
+    const pathKey = nodePath.normalize(path2);
     const seenOrIgnored = seen.has(pathKey) || isIgnored && isIgnored(path2);
     seen.add(pathKey);
     return !seenOrIgnored;
@@ -8631,7 +8638,7 @@ var generateGlobTasks = normalizeArguments(generateTasks);
 var generateGlobTasksSync = normalizeArgumentsSync(generateTasksSync);
 
 // src/cli/check-dependencies.ts
-var import_fs_extra = __toESM(require_lib());
+var import_fs_extra = __toESM(require_lib(), 1);
 
 // ../../common/temp/node_modules/.pnpm/chalk@5.3.0/node_modules/chalk/source/vendor/ansi-styles/index.js
 var ANSI_BACKGROUND_OFFSET = 10;
@@ -8820,16 +8827,16 @@ var ansiStyles = assembleStyles();
 var ansi_styles_default = ansiStyles;
 
 // ../../common/temp/node_modules/.pnpm/chalk@5.3.0/node_modules/chalk/source/vendor/supports-color/index.js
-var import_node_process2 = __toESM(require("node:process"), 1);
-var import_node_os = __toESM(require("node:os"), 1);
-var import_node_tty = __toESM(require("node:tty"), 1);
-function hasFlag(flag, argv = globalThis.Deno ? globalThis.Deno.args : import_node_process2.default.argv) {
+import process3 from "node:process";
+import os from "node:os";
+import tty from "node:tty";
+function hasFlag(flag, argv = globalThis.Deno ? globalThis.Deno.args : process3.argv) {
   const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
   const position = argv.indexOf(prefix + flag);
   const terminatorPosition = argv.indexOf("--");
   return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
 }
-var { env } = import_node_process2.default;
+var { env } = process3;
 var flagForceColor;
 if (hasFlag("no-color") || hasFlag("no-colors") || hasFlag("color=false") || hasFlag("color=never")) {
   flagForceColor = 0;
@@ -8885,8 +8892,8 @@ function _supportsColor(haveStream, { streamIsTTY, sniffFlags = true } = {}) {
   if (env.TERM === "dumb") {
     return min;
   }
-  if (import_node_process2.default.platform === "win32") {
-    const osRelease = import_node_os.default.release().split(".");
+  if (process3.platform === "win32") {
+    const osRelease = os.release().split(".");
     if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
       return Number(osRelease[2]) >= 14931 ? 3 : 2;
     }
@@ -8940,8 +8947,8 @@ function createSupportsColor(stream, options = {}) {
   return translateLevel(level);
 }
 var supportsColor = {
-  stdout: createSupportsColor({ isTTY: import_node_tty.default.isatty(1) }),
-  stderr: createSupportsColor({ isTTY: import_node_tty.default.isatty(2) })
+  stdout: createSupportsColor({ isTTY: tty.isatty(1) }),
+  stderr: createSupportsColor({ isTTY: tty.isatty(2) })
 };
 var supports_color_default = supportsColor;
 

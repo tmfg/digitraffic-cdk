@@ -20,8 +20,28 @@ jobs:
         with:
           node-version: 16
 
-      - name: Rush Install
+      - name: Cache pnpm store cache
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
+          path: |
+            common/temp/pnpm-store
+
+      - name: Cache rush build
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-rush-build-${{ hashFiles('common/config/rush/repo-state.json') }}-${{ github.ref_name }}
+          path: |
+            common/temp/build-cache
+
+      - name: Rush subrepos
+        run: node common/scripts/install-run-rush.js repo:init
+
+      - name: Rush install
         run: node common/scripts/install-run-rush.js install
+
+      - name: Rush build
+        run: node common/scripts/install-run-rush.js build
 
       - name: Create eslint reports
         run: node common/scripts/install-run-rush.js ci:eslint-report
@@ -76,7 +96,7 @@ jobs:
           count_errors = 0
 
           for report_path, _, status_line in reports_created:
-              if "0 errors" in status_line:
+              if "0 problems" in status_line or "0 errors" in status_line:
                   print(f"No error in {report_path}. Continue")
                   continue
 
