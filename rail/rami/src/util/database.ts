@@ -18,11 +18,6 @@ export enum DatabaseEnvironmentKeys {
     DB_APPLICATION = "DB_APPLICATION"
 }
 
-// export type MysqlQueryResponse = [
-//     RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[] | ResultSetHeader,
-//     FieldPacket[]
-// ];
-
 const pool = await initMysqlDbConnection();
 
 export async function end(): Promise<void> {
