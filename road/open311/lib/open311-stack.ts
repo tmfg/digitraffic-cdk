@@ -6,14 +6,10 @@ import { Construct } from "constructs";
 import { Aspects, Stack, StackProps, Tags } from "aws-cdk-lib";
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { SOLUTION_KEY } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Props } from "./app-props";
 
 export class Open311Stack extends Stack {
-    constructor(
-        scope: Construct,
-        id: string,
-        open311Props: Props,
-        props?: StackProps
-    ) {
+    constructor(scope: Construct, id: string, open311Props: Props, props?: StackProps) {
         super(scope, id, props);
 
         // VPC reference construction requires vpcId and availability zones
@@ -21,7 +17,7 @@ export class Open311Stack extends Stack {
         const vpc = ec2.Vpc.fromVpcAttributes(this, "vpc", {
             vpcId: open311Props.vpcId,
             privateSubnetIds: open311Props.privateSubnetIds,
-            availabilityZones: open311Props.availabilityZones,
+            availabilityZones: open311Props.availabilityZones
         });
         // security group that allows Lambda database access
         const lambdaDbSg = ec2.SecurityGroup.fromSecurityGroupId(

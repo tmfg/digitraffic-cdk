@@ -9,18 +9,14 @@ import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/sub
 import {
     corsMethod,
     defaultIntegration,
-    methodResponse,
+    methodResponse
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { addDefaultValidator } from "@digitraffic/common/dist/utils/api-model";
 import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { Props } from "./app-props";
 
-export function create(
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    stack: Construct,
-    props: Props
-) {
+export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
     const integrationApi = createApi(stack);
     createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
     createUsagePlan(integrationApi);
@@ -29,7 +25,7 @@ export function create(
 function createApi(stack: Construct) {
     return new apigateway.RestApi(stack, "Open311-integration", {
         deployOptions: {
-            loggingLevel: apigateway.MethodLoggingLevel.ERROR,
+            loggingLevel: apigateway.MethodLoggingLevel.ERROR
         },
         restApiName: "Open311 integration API",
         endpointTypes: [EndpointType.REGIONAL],
@@ -39,10 +35,10 @@ function createApi(stack: Construct) {
                     effect: iam.Effect.ALLOW,
                     actions: ["execute-api:Invoke"],
                     resources: ["*"],
-                    principals: [new iam.AnyPrincipal()],
-                }),
-            ],
-        }),
+                    principals: [new iam.AnyPrincipal()]
+                })
+            ]
+        })
     });
 }
 
@@ -58,21 +54,10 @@ function createRequestsResource(
     const v1Resource = apiResource.addResource("v1");
     const open311Resource = v1Resource.addResource("open311-integration");
     const requests = open311Resource.addResource("requests");
-    const messageResponseModel = integrationApi.addModel(
-        "MessageResponseModel",
-        MessageModel
-    );
+    const messageResponseModel = integrationApi.addModel("MessageResponseModel", MessageModel);
 
     createUpdateRequestHandler(requests, stack, vpc, lambdaDbSg, props);
-    createDeleteRequestHandler(
-        requests,
-        messageResponseModel,
-        validator,
-        stack,
-        vpc,
-        lambdaDbSg,
-        props
-    );
+    createDeleteRequestHandler(requests, messageResponseModel, validator, stack, vpc, lambdaDbSg, props);
 }
 
 function createUpdateRequestHandler(
@@ -89,18 +74,13 @@ function createUpdateRequestHandler(
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: updateRequestsId,
             code: new lambda.AssetCode("dist/lambda/update-requests"),
-            handler: "lambda-update-requests.handler",
+            handler: "lambda-update-requests.handler"
         })
     );
     requests.addMethod("POST", new LambdaIntegration(updateRequestsHandler), {
-        apiKeyRequired: true,
+        apiKeyRequired: true
     });
-    createSubscription(
-        updateRequestsHandler,
-        updateRequestsId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(updateRequestsHandler, updateRequestsId, props.logsDestinationArn, stack);
 }
 
 function createDeleteRequestHandler(
@@ -119,24 +99,20 @@ function createDeleteRequestHandler(
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: deleteRequestId,
             code: new lambda.AssetCode("dist/lambda/delete-request"),
-            handler: "lambda-delete-request.handler",
+            handler: "lambda-delete-request.handler"
         })
     );
     const deleteRequestIntegration = defaultIntegration(deleteRequestHandler, {
         requestParameters: {
-            "integration.request.path.request_id":
-                "method.request.path.request_id",
-            "integration.request.querystring.extensions":
-                "method.request.querystring.extensions",
+            "integration.request.path.request_id": "method.request.path.request_id",
+            "integration.request.querystring.extensions": "method.request.querystring.extensions"
         },
         requestTemplates: {
             "application/json": JSON.stringify({
-                request_id:
-                    "$util.escapeJavaScript($input.params('request_id'))",
-                extensions:
-                    "$util.escapeJavaScript($input.params('extensions'))",
-            }),
-        },
+                request_id: "$util.escapeJavaScript($input.params('request_id'))",
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
+        }
     });
     const request = requests.addResource("{request_id}");
     request.addMethod("DELETE", deleteRequestIntegration, {
@@ -144,40 +120,23 @@ function createDeleteRequestHandler(
         requestValidator: validator,
         requestParameters: {
             "method.request.path.request_id": true,
-            "method.request.querystring.extensions": false,
+            "method.request.querystring.extensions": false
         },
         methodResponses: [
-            corsMethod(
-                methodResponse(
-                    "200",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-            corsMethod(
-                methodResponse(
-                    "500",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-        ],
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, messageResponseModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+        ]
     });
-    createSubscription(
-        deleteRequestHandler,
-        deleteRequestId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);
 }
 
 function createUsagePlan(integrationApi: apigateway.RestApi) {
     const apiKey = integrationApi.addApiKey("Integration API key");
     const plan = integrationApi.addUsagePlan("Integration Usage Plan", {
-        name: "Integration Usage Plan",
+        name: "Integration Usage Plan"
     });
     plan.addApiStage({
-        stage: integrationApi.deploymentStage,
+        stage: integrationApi.deploymentStage
     });
     plan.addApiKey(apiKey);
 }

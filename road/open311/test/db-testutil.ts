@@ -4,13 +4,7 @@ import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "road",
-        "road",
-        "localhost:54322/road"
-    );
+    return commonDbTestBase(fn, truncate, "road", "road", "127.0.0.1:54322/road");
 }
 
 export async function truncate(db: DTDatabase): Promise<void> {
@@ -20,20 +14,16 @@ export async function truncate(db: DTDatabase): Promise<void> {
             db.none("DELETE FROM open311_service_request_state"),
             db.none("DELETE FROM open311_service"),
             db.none("DELETE FROM open311_subject"),
-            db.none("DELETE FROM open311_subsubject"),
+            db.none("DELETE FROM open311_subsubject")
         ]);
     });
 }
 
-export async function insertServiceRequest(
-    db: DTDatabase,
-    serviceRequests: ServiceRequest[]
-): Promise<void> {
+export async function insertServiceRequest(db: DTDatabase, serviceRequests: ServiceRequest[]): Promise<void> {
     await db.tx(async (t) => {
-        const queries: Promise<null>[] = serviceRequests.map(
-            (serviceRequest) => {
-                return t.none(
-                    `INSERT INTO open311_service_request(
+        const queries: Promise<null>[] = serviceRequests.map((serviceRequest) => {
+            return t.none(
+                `INSERT INTO open311_service_request(
                      service_request_id,
                      status,
                      status_notes,
@@ -83,10 +73,9 @@ export async function insertServiceRequest(
                    $23,
                    $24,
                    $25)`,
-                    RequestsDb.createEditObject(serviceRequest)
-                );
-            }
-        );
+                RequestsDb.createEditObject(serviceRequest)
+            );
+        });
         await t.batch(queries);
     });
 }

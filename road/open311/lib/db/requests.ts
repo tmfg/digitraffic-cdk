@@ -1,7 +1,4 @@
-import {
-    ServiceRequestStatus,
-    ServiceRequestWithExtensions,
-} from "../model/service-request";
+import { ServiceRequestStatus, ServiceRequestWithExtensions } from "../model/service-request";
 import { PreparedStatement } from "pg-promise";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
@@ -11,7 +8,7 @@ type DbServiceRequest = ServiceRequestWithExtensions & {
 
 const DELETE_REQUEST_PS = new PreparedStatement({
     name: "delete-request-by-id",
-    text: "DELETE FROM open311_service_request WHERE service_request_id = $1",
+    text: "DELETE FROM open311_service_request WHERE service_request_id = $1"
 });
 
 const UPSERT_REQUEST_PS = new PreparedStatement({
@@ -89,65 +86,8 @@ const UPSERT_REQUEST_PS = new PreparedStatement({
         service_object_type = $22,
         media_urls = $23,
         subject_id = $24,
-        subsubject_id = $25`,
+        subsubject_id = $25`
 });
-
-export function findAll(
-    db: DTDatabase
-): Promise<ServiceRequestWithExtensions[]> {
-    return db
-        .manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`)
-        .then((requests) => requests.map((r) => toServiceRequest(r)));
-}
-
-export function find(
-    service_request_id: string,
-    db: DTDatabase
-): Promise<ServiceRequestWithExtensions | null> {
-    const ps = new PreparedStatement({
-        name: "find-service-request-by-id",
-        text: `${SELECT_REQUEST} WHERE service_request_id = $1`,
-        values: [service_request_id],
-    });
-    return db
-        .oneOrNone(ps)
-        .then((r) => (r == null ? null : toServiceRequest(r)));
-}
-
-export function update(
-    serviceRequests: ServiceRequestWithExtensions[],
-    db: DTDatabase
-): Promise<null[]> {
-    return db.tx((t) => {
-        const queries: Promise<null>[] = serviceRequests.map(
-            (serviceRequest) => {
-                if (serviceRequest.status === ServiceRequestStatus.closed) {
-                    return t.none(DELETE_REQUEST_PS, [
-                        serviceRequest.service_request_id,
-                    ]);
-                } else {
-                    return t.none(
-                        UPSERT_REQUEST_PS,
-                        createEditObject(serviceRequest)
-                    );
-                }
-            }
-        );
-        return t.batch(queries);
-    });
-}
-
-export function doDelete(
-    serviceRequestId: string,
-    db: DTDatabase
-): Promise<null> {
-    return db.tx((t) => {
-        return t.none(
-            "DELETE FROM open311_service_request WHERE service_request_id = $1",
-            serviceRequestId
-        );
-    });
-}
 
 const SELECT_REQUEST = `
     SELECT service_request_id,
@@ -175,7 +115,44 @@ const SELECT_REQUEST = `
         media_urls,
         subject_id,
         subsubject_id
-FROM open311_service_request`;
+FROM open311_service_request` as const;
+
+export function findAll(db: DTDatabase): Promise<ServiceRequestWithExtensions[]> {
+    return db
+        .manyOrNone<DbServiceRequest>(`${SELECT_REQUEST} ORDER BY service_request_id`)
+        .then((requests) => requests.map((r) => toServiceRequest(r)));
+}
+
+export function find(
+    service_request_id: string,
+    db: DTDatabase
+): Promise<ServiceRequestWithExtensions | null> {
+    const ps = new PreparedStatement({
+        name: "find-service-request-by-id",
+        text: `${SELECT_REQUEST} WHERE service_request_id = $1`,
+        values: [service_request_id]
+    });
+    return db.oneOrNone(ps).then((r) => (r === null ? null : toServiceRequest(r)));
+}
+
+export function update(serviceRequests: ServiceRequestWithExtensions[], db: DTDatabase): Promise<null[]> {
+    return db.tx((t) => {
+        const queries: Promise<null>[] = serviceRequests.map((serviceRequest) => {
+            if (serviceRequest.status === ServiceRequestStatus.closed) {
+                return t.none(DELETE_REQUEST_PS, [serviceRequest.service_request_id]);
+            } else {
+                return t.none(UPSERT_REQUEST_PS, createEditObject(serviceRequest));
+            }
+        });
+        return t.batch(queries);
+    });
+}
+
+export function doDelete(serviceRequestId: string, db: DTDatabase): Promise<null> {
+    return db.tx((t) => {
+        return t.none("DELETE FROM open311_service_request WHERE service_request_id = $1", serviceRequestId);
+    });
+}
 
 function toServiceRequest(r: DbServiceRequest): ServiceRequestWithExtensions {
     return {
@@ -203,16 +180,14 @@ function toServiceRequest(r: DbServiceRequest): ServiceRequestWithExtensions {
         service_object_type: r.service_object_type,
         media_urls: r.media_urls,
         subject_id: r.subject_id,
-        subSubject_id: r.subsubject_id,
+        subSubject_id: r.subsubject_id
     };
 }
 
 /**
  * Creates an object with all necessary properties for pg-promise
  */
-export function createEditObject(
-    serviceRequest: ServiceRequestWithExtensions
-): any[] {
+export function createEditObject(serviceRequest: ServiceRequestWithExtensions): unknown[] {
     const editObject = {
         ...{
             status_notes: null,
@@ -235,9 +210,9 @@ export function createEditObject(
             service_object_type: null,
             media_urls: null,
             subject_id: null,
-            subSubject_id: null,
+            subSubject_id: null
         },
-        ...serviceRequest,
+        ...serviceRequest
     };
 
     const editObjectWithLonLat =
@@ -249,8 +224,8 @@ export function createEditObject(
                   ...serviceRequest,
                   ...{
                       long: null,
-                      lat: null,
-                  },
+                      lat: null
+                  }
               };
 
     // ordering is important!

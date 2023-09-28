@@ -10,14 +10,14 @@ import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addDefaultValidator,
     addServiceModel,
-    createArraySchema,
+    createArraySchema
 } from "@digitraffic/common/dist/utils/api-model";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
     corsMethod,
     defaultIntegration,
-    methodResponse,
+    methodResponse
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { addTags } from "@digitraffic/common/dist/aws/infra/documentation";
 import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";
@@ -29,58 +29,31 @@ import { default as RequestSchema } from "./model/request-schema";
 import { default as StateSchema } from "./model/state-schema";
 import { default as SubjectSchema } from "./model/subject-schema";
 import { default as SubSubjectSchema } from "./model/subsubject-schema";
+import { Props } from "./app-props";
 
-export function create(
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    stack: Stack,
-    props: Props
-) {
+export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Stack, props: Props) {
     const publicApi = createApi(stack, props.allowFromIpAddresses);
 
-    createUsagePlan(
-        publicApi,
-        "Open311 CloudFront API Key",
-        "Open311 CloudFront Usage Plan"
-    );
+    createUsagePlan(publicApi, "Open311 CloudFront API Key", "Open311 CloudFront Usage Plan");
 
     const validator = addDefaultValidator(publicApi);
 
-    const requestModel = addServiceModel(
-        "RequestModel",
-        publicApi,
-        RequestSchema
-    );
+    const requestModel = addServiceModel("RequestModel", publicApi, RequestSchema);
     const requestsModel = addServiceModel(
         "RequestsModel",
         publicApi,
         createArraySchema(requestModel, publicApi)
     );
     const stateModel = addServiceModel("StateModel", publicApi, StateSchema);
-    const subjectModel = addServiceModel(
-        "SubjectModel",
-        publicApi,
-        SubjectSchema
-    );
-    const subSubjectModel = addServiceModel(
-        "SubSubjectModel",
-        publicApi,
-        SubSubjectSchema
-    );
-    const serviceModel = addServiceModel(
-        "ServiceModel",
-        publicApi,
-        ServiceSchema
-    );
+    const subjectModel = addServiceModel("SubjectModel", publicApi, SubjectSchema);
+    const subSubjectModel = addServiceModel("SubSubjectModel", publicApi, SubSubjectSchema);
+    const serviceModel = addServiceModel("ServiceModel", publicApi, ServiceSchema);
     const servicesModel = addServiceModel(
         "ServicesModel",
         publicApi,
         createArraySchema(serviceModel, publicApi)
     );
-    const messageResponseModel = publicApi.addModel(
-        "MessageResponseModel",
-        MessageModel
-    );
+    const messageResponseModel = publicApi.addModel("MessageResponseModel", MessageModel);
 
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
@@ -153,22 +126,17 @@ function createRequestsResource(
 ) {
     const requests = open311Resource.addResource("requests");
 
-    const getRequestsId = "GetRequests";
+    const getRequestsId = "Open311-GetRequests";
     const getRequestsHandler = new lambda.Function(
         stack,
         getRequestsId,
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: getRequestsId,
             code: new lambda.AssetCode("dist/lambda/get-requests"),
-            handler: "lambda-get-requests.handler",
+            handler: "lambda-get-requests.handler"
         })
     );
-    createSubscription(
-        getRequestsHandler,
-        getRequestsId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(getRequestsHandler, getRequestsId, props.logsDestinationArn, stack);
     createGetRequestsIntegration(
         getRequestsId,
         requests,
@@ -178,22 +146,17 @@ function createRequestsResource(
         stack
     );
 
-    const getRequestId = "GetRequest";
+    const getRequestId = "Open311-GetRequest";
     const getRequestHandler = new lambda.Function(
         stack,
         getRequestId,
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: getRequestId,
             code: new lambda.AssetCode("dist/lambda/get-request"),
-            handler: "lambda-get-request.handler",
+            handler: "lambda-get-request.handler"
         })
     );
-    createSubscription(
-        getRequestHandler,
-        getRequestId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(getRequestHandler, getRequestId, props.logsDestinationArn, stack);
     createGetRequestIntegration(
         getRequestsId,
         requests,
@@ -216,19 +179,15 @@ function createGetRequestIntegration(
 ) {
     const getRequestIntegration = defaultIntegration(getRequestHandler, {
         requestParameters: {
-            "integration.request.path.request_id":
-                "method.request.path.request_id",
-            "integration.request.querystring.extensions":
-                "method.request.querystring.extensions",
+            "integration.request.path.request_id": "method.request.path.request_id",
+            "integration.request.querystring.extensions": "method.request.querystring.extensions"
         },
         requestTemplates: {
             "application/json": JSON.stringify({
-                request_id:
-                    "$util.escapeJavaScript($input.params('request_id'))",
-                extensions:
-                    "$util.escapeJavaScript($input.params('extensions'))",
-            }),
-        },
+                request_id: "$util.escapeJavaScript($input.params('request_id'))",
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
+        }
     });
     const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration, {
@@ -236,27 +195,13 @@ function createGetRequestIntegration(
         requestValidator: validator,
         requestParameters: {
             "method.request.path.request_id": true,
-            "method.request.querystring.extensions": false,
+            "method.request.querystring.extensions": false
         },
         methodResponses: [
-            corsMethod(
-                methodResponse("200", MediaType.APPLICATION_JSON, requestModel)
-            ),
-            corsMethod(
-                methodResponse(
-                    "404",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-            corsMethod(
-                methodResponse(
-                    "500",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-        ],
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, requestModel)),
+            corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, messageResponseModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+        ]
     });
     addTags("GetRequest", DATA_V1_TAGS, request, stack);
 }
@@ -271,33 +216,23 @@ function createGetRequestsIntegration(
 ) {
     const getRequestsIntegration = defaultIntegration(getRequestsHandler, {
         requestParameters: {
-            "integration.request.querystring.extensions":
-                "method.request.querystring.extensions",
+            "integration.request.querystring.extensions": "method.request.querystring.extensions"
         },
         requestTemplates: {
             "application/json": JSON.stringify({
-                extensions:
-                    "$util.escapeJavaScript($input.params('extensions'))",
-            }),
-        },
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
+        }
     });
     requests.addMethod("GET", getRequestsIntegration, {
         apiKeyRequired: true,
         requestParameters: {
-            "method.request.querystring.extensions": false,
+            "method.request.querystring.extensions": false
         },
         methodResponses: [
-            corsMethod(
-                methodResponse("200", MediaType.APPLICATION_JSON, requestsModel)
-            ),
-            corsMethod(
-                methodResponse(
-                    "500",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-        ],
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, requestsModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+        ]
     });
     addTags("GetRequests", DATA_V1_TAGS, requests, stack);
 }
@@ -314,22 +249,17 @@ function createStatesResource(
 ) {
     const states = open311Resource.addResource("states");
 
-    const getStatesId = "GetStates";
+    const getStatesId = "Open311-GetStates";
     const getStatesHandler = new lambda.Function(
         stack,
         getStatesId,
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: getStatesId,
             code: new lambda.AssetCode("dist/lambda/get-states"),
-            handler: "lambda-get-states.handler",
+            handler: "lambda-get-states.handler"
         })
     );
-    createSubscription(
-        getStatesHandler,
-        getStatesId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetStates",
         states,
@@ -358,15 +288,10 @@ function createSubjectsResource(
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: getSubjectsId,
             code: new lambda.AssetCode("dist/lambda/get-subjects"),
-            handler: "lambda-get-subjects.handler",
+            handler: "lambda-get-subjects.handler"
         })
     );
-    createSubscription(
-        getSubjectsHandler,
-        getSubjectsId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(getSubjectsHandler, getSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetSubjects",
         subjects,
@@ -395,15 +320,10 @@ function createSubSubjectsResource(
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: getSubSubjectsId,
             code: new lambda.AssetCode("dist/lambda/get-subsubjects"),
-            handler: "lambda-get-subsubjects.handler",
+            handler: "lambda-get-subsubjects.handler"
         })
     );
-    createSubscription(
-        getSubSubjectsHandler,
-        getSubSubjectsId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(getSubSubjectsHandler, getSubSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetSubSubjects",
         subSubjects,
@@ -427,22 +347,17 @@ function createServicesResource(
 ) {
     const services = open311Resource.addResource("services");
 
-    const getServicesId = "GetServices";
+    const getServicesId = "Open311-GetServices";
     const getServicesHandler = new lambda.Function(
         stack,
         getServicesId,
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: getServicesId,
             code: new lambda.AssetCode("dist/lambda/get-services"),
-            handler: "lambda-get-services.handler",
+            handler: "lambda-get-services.handler"
         })
     );
-    createSubscription(
-        getServicesHandler,
-        getServicesId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(getServicesHandler, getServicesId, props.logsDestinationArn, stack);
     createGetResourcesIntegration(
         services,
         getServicesHandler,
@@ -452,22 +367,17 @@ function createServicesResource(
         stack
     );
 
-    const getServiceId = "GetService";
+    const getServiceId = "Open311-GetService";
     const getServiceHandler = new lambda.Function(
         stack,
         getServiceId,
         dbLambdaConfiguration(vpc, lambdaDbSg, props, {
             functionName: getServiceId,
             code: new lambda.AssetCode("dist/lambda/get-service"),
-            handler: "lambda-get-service.handler",
+            handler: "lambda-get-service.handler"
         })
     );
-    createSubscription(
-        getServiceHandler,
-        getServiceId,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(getServiceHandler, getServiceId, props.logsDestinationArn, stack);
     createGetServiceIntegration(
         getServiceId,
         services,
@@ -491,17 +401,9 @@ function createGetResourcesIntegration(
     resource.addMethod("GET", integration, {
         apiKeyRequired: true,
         methodResponses: [
-            corsMethod(
-                methodResponse("200", MediaType.APPLICATION_JSON, model)
-            ),
-            corsMethod(
-                methodResponse(
-                    "500",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-        ],
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, model)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+        ]
     });
     addTags(tag, DATA_V1_TAGS, resource, stack);
 }
@@ -516,32 +418,23 @@ function createGetLocalizedResourceIntegration(
 ) {
     const integration = defaultIntegration(handler, {
         requestParameters: {
-            "integration.request.querystring.locale":
-                "method.request.querystring.locale",
+            "integration.request.querystring.locale": "method.request.querystring.locale"
         },
         requestTemplates: {
             "application/json": JSON.stringify({
-                locale: "$util.escapeJavaScript($input.params('locale'))",
-            }),
-        },
+                locale: "$util.escapeJavaScript($input.params('locale'))"
+            })
+        }
     });
     resource.addMethod("GET", integration, {
         apiKeyRequired: true,
         requestParameters: {
-            "method.request.querystring.locale": false,
+            "method.request.querystring.locale": false
         },
         methodResponses: [
-            corsMethod(
-                methodResponse("200", MediaType.APPLICATION_JSON, model)
-            ),
-            corsMethod(
-                methodResponse(
-                    "500",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-        ],
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, model)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+        ]
     });
     addTags(id, DATA_V1_TAGS, resource, stack);
 }
@@ -557,42 +450,26 @@ function createGetServiceIntegration(
 ) {
     const getServiceIntegration = defaultIntegration(getServiceHandler, {
         requestParameters: {
-            "integration.request.path.service_id":
-                "method.request.path.service_id",
+            "integration.request.path.service_id": "method.request.path.service_id"
         },
         requestTemplates: {
             "application/json": JSON.stringify({
-                service_id:
-                    "$util.escapeJavaScript($input.params('service_id'))",
-            }),
-        },
+                service_id: "$util.escapeJavaScript($input.params('service_id'))"
+            })
+        }
     });
     const service = services.addResource("{service_id}");
     service.addMethod("GET", getServiceIntegration, {
         apiKeyRequired: true,
         requestValidator: validator,
         requestParameters: {
-            "method.request.path.service_id": true,
+            "method.request.path.service_id": true
         },
         methodResponses: [
-            corsMethod(
-                methodResponse("200", MediaType.APPLICATION_JSON, serviceModel)
-            ),
-            corsMethod(
-                methodResponse(
-                    "404",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-            corsMethod(
-                methodResponse(
-                    "500",
-                    MediaType.APPLICATION_JSON,
-                    messageResponseModel
-                )
-            ),
-        ],
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, serviceModel)),
+            corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, messageResponseModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+        ]
     });
     addTags("GetService", DATA_V1_TAGS, service, stack);
 }
@@ -600,14 +477,14 @@ function createGetServiceIntegration(
 function createApi(stack: Construct, allowFromIpAddresses: string[]) {
     return new apigateway.RestApi(stack, "Open311-public", {
         defaultCorsPreflightOptions: {
-            allowOrigins: apigateway.Cors.ALL_ORIGINS,
+            allowOrigins: apigateway.Cors.ALL_ORIGINS
         },
         endpointExportName: "Open311publicEndpoint",
         deployOptions: {
-            loggingLevel: apigateway.MethodLoggingLevel.ERROR,
+            loggingLevel: apigateway.MethodLoggingLevel.ERROR
         },
         restApiName: "Open311 public API",
         endpointTypes: [EndpointType.REGIONAL],
-        policy: createIpRestrictionPolicyDocument(allowFromIpAddresses),
+        policy: createIpRestrictionPolicyDocument(allowFromIpAddresses)
     });
 }

@@ -1,8 +1,4 @@
-/*
-    Example stack configuration interfaces
- */
-
-declare interface Props {
+export interface Props {
     vpcId: string;
     privateSubnetIds: string[];
     availabilityZones: string[];
@@ -14,10 +10,10 @@ declare interface Props {
         username: string;
         password: string;
         url: string;
-    },
-    allowFromIpAddresses: string[]
+    };
+    allowFromIpAddresses: string[];
 }
-declare interface DbProps {
+export interface DbProps {
     username: string;
     password: string;
     uri: string;

@@ -18,11 +18,9 @@ describe(
             const server = new TestHttpServer();
             server.listen(SERVER_PORT, {
                 "/states": (url) => {
-                    const locale = (
-                        (url as string).match(/\/.+=(.+)/) as string[]
-                    )[1];
+                    const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                     return fakeStates(locale);
-                },
+                }
             });
 
             try {
@@ -30,17 +28,11 @@ describe(
 
                 await handler();
 
-                const foundSubjectsFi = await StatesDb.findAll(
-                    Locale.FINNISH,
-                    db
-                );
+                const foundSubjectsFi = await StatesDb.findAll(Locale.FINNISH, db);
                 expect(foundSubjectsFi.length).toBe(1);
                 expect(foundSubjectsFi[0].key).toBe(expectedKey);
 
-                const foundSubjectsEn = await StatesDb.findAll(
-                    Locale.ENGLISH,
-                    db
-                );
+                const foundSubjectsEn = await StatesDb.findAll(Locale.ENGLISH, db);
                 expect(foundSubjectsEn.length).toBe(1);
                 expect(foundSubjectsEn[0].key).toBe(expectedKey);
             } finally {
@@ -50,8 +42,8 @@ describe(
     })
 );
 
-function fakeStates(locale?: string) {
-    if (locale == "fi") {
+function fakeStates(locale?: string): string {
+    if (locale === "fi") {
         return `
 <?xml version="1.0" encoding="UTF-8"?>
 <states>

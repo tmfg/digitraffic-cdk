@@ -1,7 +1,7 @@
 import {
     ServiceRequestWithExtensionsDto,
     ServiceRequestStatus,
-    ServiceRequestWithExtensions,
+    ServiceRequestWithExtensions
 } from "../lib/model/service-request";
 import { Service, ServiceType } from "../lib/model/service";
 import { toServiceRequestWithExtensions } from "../lib/service/requests";
@@ -17,9 +17,9 @@ export function newService(): Service {
         service_name: "some name",
         keywords: "some, words",
         description: "some description",
-        type: ServiceType.batch,
+        type: "batch",
         metadata: false,
-        group: "some group",
+        group: "some group"
     };
 }
 
@@ -57,7 +57,7 @@ export function newServiceRequest(
         service_object_type: "some service_object_type",
         media_urls: ["http://example.com", "http://example.net"],
         subject_id: 1,
-        subSubject_id: 2,
+        subSubject_id: 2
     };
 }
 
@@ -65,7 +65,7 @@ export function newState(locale: Locale): ServiceRequestState {
     return {
         key: Math.floor(Math.random() * 1000),
         name: Math.random().toFixed(10).split(".")[1],
-        locale,
+        locale
     };
 }
 
@@ -74,9 +74,7 @@ export function newSubject(locale?: Locale): Subject {
         active: Math.round(Math.random()),
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
-        locale:
-            locale ??
-            shuffle([Locale.FINNISH, Locale.SWEDISH, Locale.ENGLISH])[0],
+        locale: locale ?? shuffle([Locale.FINNISH, Locale.SWEDISH, Locale.ENGLISH])[0]
     };
 }
 
@@ -85,10 +83,8 @@ export function newSubSubject(locale?: Locale): SubSubject {
         active: Math.round(Math.random()),
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
-        locale:
-            locale ??
-            shuffle([Locale.FINNISH, Locale.SWEDISH, Locale.ENGLISH])[0],
-        subject_id: Math.floor(Math.random() * 10000),
+        locale: locale ?? shuffle([Locale.FINNISH, Locale.SWEDISH, Locale.ENGLISH])[0],
+        subject_id: Math.floor(Math.random() * 10000)
     };
 }
 

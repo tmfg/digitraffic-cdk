@@ -5,7 +5,7 @@ export async function getServices(
     endpointUser: string,
     endpointPass: string,
     endpointUrl: string
-) {
+): Promise<Service[]> {
     const parsedServices: ServicesResponse = await getXml(
         endpointUser,
         endpointPass,
@@ -15,9 +15,7 @@ export async function getServices(
     const services = responseToServices(parsedServices);
 
     // integration can return services with all fields as null, ensure conformity with db constraints
-    return services.filter(
-        (s) => s.service_code != null && s.service_name != null
-    );
+    return services.filter((s) => s.service_code !== null && s.service_name !== null);
 }
 
 interface ServicesResponse {
@@ -45,8 +43,8 @@ function responseToServices(response: ServicesResponse): Service[] {
         service_name: s.service_name[0],
         description: s.description[0],
         metadata: s.metadata[0] === "true",
-        type: ServiceType[s.type[0] as ServiceType],
+        type: s.type[0] as ServiceType,
         keywords: s.keywords[0],
-        group: s.group[0],
+        group: s.group[0]
     }));
 }

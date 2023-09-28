@@ -1,8 +1,4 @@
-export enum ServiceType {
-    realtime = "realtime",
-    batch = "batch",
-    blackbox = "blackbox",
-}
+export type ServiceType = "realtime" | "batch" | "blackbox";
 
 export interface Service {
     service_code: string;

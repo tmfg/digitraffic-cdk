@@ -18,35 +18,24 @@ describe(
             const server = new TestHttpServer();
             server.listen(SERVER_PORT, {
                 "/subsubjects": (url) => {
-                    const locale = (
-                        (url as string).match(/\/.+=(.+)/) as string[]
-                    )[1];
+                    const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                     return fakeSubSubjects(locale);
-                },
+                }
             });
 
             try {
                 const expectedId = 305;
                 await handler();
 
-                const foundSubSubjectsFi = await SubSubjectsDb.findAll(
-                    Locale.FINNISH,
-                    db
-                );
+                const foundSubSubjectsFi = await SubSubjectsDb.findAll(Locale.FINNISH, db);
                 expect(foundSubSubjectsFi.length).toBe(1);
                 expect(foundSubSubjectsFi[0].id).toBe(expectedId);
 
-                const foundSubSubjectsSv = await SubSubjectsDb.findAll(
-                    Locale.SWEDISH,
-                    db
-                );
+                const foundSubSubjectsSv = await SubSubjectsDb.findAll(Locale.SWEDISH, db);
                 expect(foundSubSubjectsSv.length).toBe(1);
                 expect(foundSubSubjectsSv[0].id).toBe(expectedId);
 
-                const foundSubSubjectsEn = await SubSubjectsDb.findAll(
-                    Locale.ENGLISH,
-                    db
-                );
+                const foundSubSubjectsEn = await SubSubjectsDb.findAll(Locale.ENGLISH, db);
                 expect(foundSubSubjectsEn.length).toBe(1);
                 expect(foundSubSubjectsEn[0].id).toBe(expectedId);
             } finally {
@@ -56,8 +45,8 @@ describe(
     })
 );
 
-function fakeSubSubjects(locale?: string) {
-    if (locale == "fi") {
+function fakeSubSubjects(locale?: string): string {
+    if (locale === "fi") {
         return `
 <?xml version="1.0" encoding="UTF-8"?>
 <subsubjects>
@@ -70,7 +59,7 @@ function fakeSubSubjects(locale?: string) {
     </subsubject>
 </subsubjects>
 `;
-    } else if (locale == "sv") {
+    } else if (locale === "sv") {
         return `
 <?xml version="1.0" encoding="UTF-8"?>
 <subsubjects>
