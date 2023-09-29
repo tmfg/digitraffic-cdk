@@ -15,7 +15,7 @@ import {
     KEY_HOST,
     KEY_REGION,
     KEY_REMOVESECURITY,
-    KEY_TITLE,
+    KEY_TITLE
 } from "./lambda/update-swagger/lambda-update-swagger";
 import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
@@ -46,38 +46,21 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1,
         memorySize: 128,
-        timeout: Duration.seconds(10),
+        timeout: Duration.seconds(10)
     };
 
-    const updateDocsLambda = MonitoredFunction.create(
-        stack,
-        functionName,
-        lambdaConf
-    );
+    const updateDocsLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
     const statement = new PolicyStatement();
-    statement.addActions(
-        "apigateway:GET",
-        "apigateway:POST",
-        "apigateway:PUT",
-        "apigateway:PATCH"
-    );
+    statement.addActions("apigateway:GET", "apigateway:POST", "apigateway:PUT", "apigateway:PATCH");
     statement.addResources("*");
 
     updateDocsLambda.addToRolePolicy(statement);
 
-    createSubscription(
-        updateDocsLambda,
-        functionName,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(updateDocsLambda, functionName, props.logsDestinationArn, stack);
 }
 
-function createUpdateSwaggerDescriptionsLambda(
-    stack: DigitrafficStack,
-    bucket: Bucket
-) {
+function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: Bucket) {
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
     const props = stack.configuration as Props;
 
@@ -112,18 +95,14 @@ function createUpdateSwaggerDescriptionsLambda(
         logRetention: RetentionDays.ONE_YEAR,
         code: new AssetCode("dist/lambda/update-swagger"),
         handler: "lambda-update-swagger.handler",
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_16_X,
         memorySize: 192,
         reservedConcurrentExecutions: 1,
         environment: lambdaEnv,
-        timeout: Duration.seconds(10),
+        timeout: Duration.seconds(10)
     };
 
-    const updateSwaggerLambda = MonitoredFunction.create(
-        stack,
-        functionName,
-        lambdaConf
-    );
+    const updateSwaggerLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
     const statement = new PolicyStatement();
     statement.addActions("apigateway:GET");
@@ -135,17 +114,12 @@ function createUpdateSwaggerDescriptionsLambda(
 
     updateSwaggerLambda.addToRolePolicy(statement);
 
-    createSubscription(
-        updateSwaggerLambda,
-        functionName,
-        props.logsDestinationArn,
-        stack
-    );
+    createSubscription(updateSwaggerLambda, functionName, props.logsDestinationArn, stack);
 
     const ruleName = `${stack.stackName}-UpdateSwaggerRule`;
     const rule = new Rule(stack, ruleName, {
         schedule: Schedule.rate(Duration.hours(1)),
-        ruleName,
+        ruleName
     });
     rule.addTarget(new LambdaFunction(updateSwaggerLambda));
 }

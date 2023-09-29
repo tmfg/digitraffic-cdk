@@ -29,7 +29,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.6.27-1",
+    "@digitraffic/common": "2023.9.14-1",
     "aws-cdk-lib": "~2.85.0",
     "aws-sdk": "~2.1405.0",
     "axios": "^1.4.0",
