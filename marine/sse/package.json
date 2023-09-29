@@ -8,7 +8,7 @@
     "build": "npm run prebuild && tsc && npm run postbuild",
     "postbuild": "esbuild lib/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "cdk": "cdk",
+    "cdk": "npx cdk@latest",
     "cdk-deploy-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy",
     "cdk-deploy-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
     "cdk-diff-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
@@ -23,7 +23,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.23-5",
+    "@digitraffic/common": "2023.9.14-1",
     "@middy/core": "^4.5.2",
     "aws-cdk-lib": "~2.85.0",
     "constructs": "10.2.61",
@@ -54,6 +54,7 @@
     "parallelshell": "3.0.2",
     "sinon": "15.2.0",
     "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
     "typescript": "~4.9.5"
   },
   "externals": [
