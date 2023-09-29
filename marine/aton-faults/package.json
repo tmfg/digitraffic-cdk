@@ -24,7 +24,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.6.27-1",
+    "@digitraffic/common": "2023.9.14-1",
     "@middy/core": "^4.5.2",
     "@middy/sqs-partial-batch-failure": "^4.5.2",
     "@turf/boolean-disjoint": "^6.5.0",
