@@ -7,7 +7,7 @@
     "build": "tsc && npm run postbuild",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "cdk": "cdk",
+    "cdk": "npx cdk@latest",
     "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy",
     "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
     "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
@@ -23,7 +23,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.6.27-1",
+    "@digitraffic/common": "2023.9.14-1",
     "aws-cdk-lib": "~2.85.0",
     "axios": "^1.3.6",
     "constructs": "10.2.61",
