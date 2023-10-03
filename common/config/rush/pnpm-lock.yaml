@@ -1359,8 +1359,8 @@ importers:
   ../../other/es-key-figures:
     dependencies:
       '@digitraffic/common':
-        specifier: workspace:*
-        version: link:../../lib/digitraffic-common
+        specifier: 2023.8.10-1
+        version: 2023.8.10-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.10)(aws-cdk-lib@2.85.0)(aws-sdk@2.1405.0)(axios@1.4.0)(change-case@4.1.2)(constructs@10.2.61)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.0)
       aws-cdk-lib:
         specifier: ~2.85.0
         version: 2.85.0(constructs@10.2.61)
@@ -5862,6 +5862,41 @@ packages:
 
   /@digitraffic/common@2023.6.27-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.10)(aws-cdk-lib@2.85.0)(aws-sdk@2.1405.0)(axios@1.4.0)(change-case@4.1.2)(constructs@10.2.61)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.0):
     resolution: {integrity: sha512-2fKbqPp0jbu4JSD4/QPxRb3Mf8GyORpJyQx9E+SKed4u2p27UYP5UgOG599zVwpNQWtcPM18qj1kSzsIKuitxQ==}
+    engines: {node: '>=14 <17 || >=18 <19'}
+    peerDependencies:
+      '@aws-cdk/aws-synthetics-alpha': ^2.85.0-alpha.0
+      '@types/geojson': ^7946.0.10
+      aws-cdk-lib: ^2.85.0
+      aws-sdk: ^2.1405.0
+      axios: ^1.2.6
+      change-case: ^4.1.2
+      constructs: ^10.2.17
+      date-fns: ~2.30.0
+      date-fns-tz: ~2.0.0
+      etag: ^1.8.1
+      geojson-validation: ^1.0.2
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^11.5.0
+    dependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.85.0-alpha.0(aws-cdk-lib@2.85.0)(constructs@10.2.61)
+      '@types/geojson': 7946.0.10
+      aws-cdk-lib: 2.85.0(constructs@10.2.61)
+      aws-sdk: 2.1405.0
+      axios: 1.4.0
+      change-case: 4.1.2
+      constructs: 10.2.61
+      date-fns: 2.30.0
+      date-fns-tz: 2.0.0(date-fns@2.30.0)
+      etag: 1.8.1
+      geojson-validation: 1.0.2
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 11.5.0(pg-native@3.0.1)
+    dev: false
+
+  /@digitraffic/common@2023.8.10-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.10)(aws-cdk-lib@2.85.0)(aws-sdk@2.1405.0)(axios@1.4.0)(change-case@4.1.2)(constructs@10.2.61)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.0):
+    resolution: {integrity: sha512-qLwLP92AyxF5Jir0p7Sm96CJxzo/6ll8ugyqVBs0iRQVjCfz97c2rZ05IcrMZGm5ha43slq6zHZMsFlVNKdcig==}
     engines: {node: '>=14 <17 || >=18 <19'}
     peerDependencies:
       '@aws-cdk/aws-synthetics-alpha': ^2.85.0-alpha.0
