@@ -7,6 +7,6 @@ export class GofrepStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: GofrepProps) {
         super(scope, id, appProps);
 
-        IntegrationApi.create(this);
+        IntegrationApi.create(this, appProps.apiKey);
     }
 }

@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc && npm run postbuild",
     "postbuild": "esbuild lib/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "cdk": "cdk",
+    "cdk": "npx cdk@latest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
@@ -15,7 +15,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.6.27-1",
+    "@digitraffic/common": "2023.9.14-1",
     "aws-cdk-lib": "~2.85.0",
     "aws-sdk": "~2.1405.0",
     "axios": "^1.3.6",

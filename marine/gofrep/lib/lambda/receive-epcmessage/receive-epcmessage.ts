@@ -1,12 +1,10 @@
 import * as EpcMessageService from "../../service/epcmessage";
 import { EpcMessage } from "../../model/epcmessage";
 import { EpcMessageResponse } from "../../model/epcmessage_response";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export function handler(epcMessage: EpcMessage): string | EpcMessageResponse {
-    console.info(
-        "DEBUG method=receiveEpcMessage received message: %s",
-        JSON.stringify(epcMessage)
-    );
+    logger.debug("method=receiveEpcMessage received message: " + JSON.stringify(epcMessage));
 
     // TODO implement proxying to final destination
     return EpcMessageService.createEpcMessageResponse(epcMessage, new Date());

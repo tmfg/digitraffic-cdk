@@ -5,80 +5,71 @@ import {
     MockIntegration,
     PassthroughBehavior,
     Resource,
-    RestApi,
+    RestApi
 } from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
 import {
     add404Support,
-    createDefaultPolicyDocument,
+    createDefaultPolicyDocument
 } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { FormalityResponseJson } from "./model/formality";
 import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import {
     defaultIntegration,
     getResponse,
-    methodResponse,
     RESPONSE_200_OK,
     RESPONSE_400_BAD_REQUEST,
-    RESPONSE_500_SERVER_ERROR,
+    RESPONSE_500_SERVER_ERROR
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { MessageModel, DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { EpcMessageSchema } from "./model/epcmessage_schema";
 
-export function create(stack: DigitrafficStack) {
+export function create(stack: DigitrafficStack, apikey: string): void {
     const api = createRestApi(stack, "GOFREP-Public", "GOFREP public API");
 
     const epcModel = addServiceModel("EPCModel", api, EpcMessageSchema);
     const messageModel = api.addModel("MessageResponseModel", MessageModel);
     const resource = api.root.addResource("mrs");
-    createUsagePlan(
-        api,
-        "GOFREP integration API Key",
-        "GOFREP integration Usage Plan"
-    );
+    createDefaultUsagePlan(api, "GOFREP / Integration", apikey);
     createMrsReportingFormalityResource(resource);
     createReceiveMrsReportResource(stack, resource, epcModel, messageModel);
 }
 
-function createRestApi(
-    stack: Construct,
-    apiId: string,
-    apiName: string
-): RestApi {
+function createRestApi(stack: Construct, apiId: string, apiName: string): RestApi {
     const restApi = new RestApi(stack, apiId, {
         deployOptions: {
-            loggingLevel: MethodLoggingLevel.ERROR,
+            loggingLevel: MethodLoggingLevel.ERROR
         },
         restApiName: apiName,
         endpointTypes: [EndpointType.REGIONAL],
-        policy: createDefaultPolicyDocument(),
+        policy: createDefaultPolicyDocument()
     });
     add404Support(restApi, stack);
     return restApi;
 }
 
-function createMrsReportingFormalityResource(resource: Resource) {
+function createMrsReportingFormalityResource(resource: Resource): void {
     const integration = new MockIntegration({
         passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
         requestTemplates: {
             "application/json": `{
                 "statusCode": 200
-            }`,
+            }`
         },
         integrationResponses: [
             {
                 statusCode: "200",
                 responseTemplates: {
-                    "application/json": JSON.stringify(FormalityResponseJson),
-                },
-            },
-        ],
+                    "application/json": JSON.stringify(FormalityResponseJson)
+                }
+            }
+        ]
     });
 
     const metadataResource = resource.addResource("formality");
@@ -87,9 +78,9 @@ function createMrsReportingFormalityResource(resource: Resource) {
         apiKeyRequired: true,
         methodResponses: [
             {
-                statusCode: "200",
-            },
-        ],
+                statusCode: "200"
+            }
+        ]
     });
 }
 
@@ -98,7 +89,7 @@ function createReceiveMrsReportResource(
     resource: Resource,
     epcModel: IModel,
     messageModel: IModel
-) {
+): void {
     const metadataResource = resource.addResource("report");
     const functionName = "GOFREP-ReceiveMRSReport";
     // ATTENTION!
@@ -109,15 +100,10 @@ function createReceiveMrsReportResource(
         functionName,
         databaseFunctionProps(stack, {}, functionName, "receive-epcmessage", {
             singleLambda: true,
-            timeout: 10,
+            timeout: 10
         })
     );
-    createSubscription(
-        handler,
-        functionName,
-        stack.configuration.logsDestinationArn,
-        stack
-    );
+    createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
 
     const integration = defaultIntegration(handler, {
         passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
@@ -125,18 +111,18 @@ function createReceiveMrsReportResource(
         responses: [
             getResponse(RESPONSE_200_OK, { disableCors: true }),
             getResponse(RESPONSE_400_BAD_REQUEST, { disableCors: true }),
-            getResponse(RESPONSE_500_SERVER_ERROR, { disableCors: true }),
-        ],
+            getResponse(RESPONSE_500_SERVER_ERROR, { disableCors: true })
+        ]
     });
     metadataResource.addMethod("POST", integration, {
         apiKeyRequired: true,
         requestModels: {
-            "application/json": epcModel,
+            "application/json": epcModel
         },
         methodResponses: [
-            methodResponse("200", MediaType.APPLICATION_JSON, epcModel),
-            methodResponse("400", MediaType.APPLICATION_JSON, messageModel),
-            methodResponse("500", MediaType.APPLICATION_JSON, messageModel),
-        ],
+            DigitrafficMethodResponse.response200(epcModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response400(messageModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageModel, MediaType.APPLICATION_JSON)
+        ]
     });
 }
