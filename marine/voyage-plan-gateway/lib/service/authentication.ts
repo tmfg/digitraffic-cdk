@@ -1,6 +1,5 @@
-import CryptoJS from 'crypto-js';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { v4: uuidv4 } = require('uuid');
+import { HmacSHA256, enc } from "crypto-js";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Generates a HMAC authorization header.
@@ -17,20 +16,21 @@ const { v4: uuidv4 } = require('uuid');
  */
 export function generateHmacAuthorizationHeader(url: string, appId: string, apiKey: string): string {
     if (!url) {
-        throw new Error('Missing or empty URL');
+        throw new Error("Missing or empty URL");
     }
     if (!appId) {
-        throw new Error('Missing or empty app id');
+        throw new Error("Missing or empty app id");
     }
     if (!apiKey) {
-        throw new Error('Missing or empty API key');
+        throw new Error("Missing or empty API key");
     }
 
     const nonce: string = uuidv4().substring(0, 32);
     const encodedUrl = encodeURIComponent(url).toLowerCase();
-    const requestTimestamp = Math.trunc((new Date).getTime() / 1000);
-    const signatureRaw = appId + 'GET' + encodedUrl + requestTimestamp + nonce;
-    const hash = CryptoJS.HmacSHA256(signatureRaw, apiKey);
-    const signature = hash.toString(CryptoJS.enc.Base64);
+    const requestTimestamp = Math.trunc(new Date().getTime() / 1000);
+    const signatureRaw = `${appId}GET${encodedUrl}${requestTimestamp}${nonce}`;
+    const hash = HmacSHA256(signatureRaw, apiKey);
+    const signature = hash.toString(enc.Base64);
+
     return `amx ${appId}:${signature}:${nonce}:${requestTimestamp}`;
 }

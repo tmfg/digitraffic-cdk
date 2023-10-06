@@ -1,9 +1,4 @@
-import {
-    RtzSchedule,
-    RtzSchedules,
-    RtzVoyagePlan,
-    RtzWaypoint,
-} from "@digitraffic/common/dist/marine/rtz";
+import { RtzSchedule, RtzSchedules, RtzVoyagePlan, RtzWaypoint } from "@digitraffic/common/dist/marine/rtz";
 import * as jsts from "jsts";
 import moment, { Moment } from "moment-timezone";
 import GeometryFactory = jsts.geom.GeometryFactory;
@@ -25,7 +20,7 @@ const SPATIAL_LIMITS = gf.createPolygon(
         new jsts.geom.Coordinate(29.62, 70.4),
         new jsts.geom.Coordinate(26.68, 71.28),
         new jsts.geom.Coordinate(21.05, 69.78),
-        new jsts.geom.Coordinate(20.84, 68.82),
+        new jsts.geom.Coordinate(20.84, 68.82)
     ]),
     []
 );
@@ -53,12 +48,10 @@ export enum ValidationError {
     NO_ETA_OR_ETD_ATTRIBUTES = "No ETA or ETD attribute in scheduleElement",
 
     // schedules content
-    NO_FUTURE_TIMESTAMPS = "No timestamps set in the future",
+    NO_FUTURE_TIMESTAMPS = "No timestamps set in the future"
 }
 
-export function validateStructure(
-    voyagePlan?: RtzVoyagePlan
-): ValidationError[] {
+export function validateStructure(voyagePlan?: RtzVoyagePlan): ValidationError[] {
     if (!voyagePlan) {
         return [ValidationError.EMPTY_VOYAGE_PLAN];
     }
@@ -71,9 +64,7 @@ export function validateStructure(
     );
 }
 
-export function validateWaypointsStructure(
-    wps?: RtzWaypoint[]
-): ValidationError[] {
+export function validateWaypointsStructure(wps?: RtzWaypoint[]): ValidationError[] {
     const validationErrors: ValidationError[] = [];
 
     if (!wps || !wps.length) {
@@ -95,9 +86,7 @@ export function validateWaypointsStructure(
             pos.forEach((p) => {
                 const posAttrs = p.$;
                 if (!posAttrs) {
-                    validationErrors.push(
-                        ValidationError.NO_POSITION_ATTRIBUTES
-                    );
+                    validationErrors.push(ValidationError.NO_POSITION_ATTRIBUTES);
                     return;
                 }
                 const lon = posAttrs.lon;
@@ -115,9 +104,7 @@ export function validateWaypointsStructure(
     return validationErrors;
 }
 
-export function validateSchedulesStructure(
-    schedules?: RtzSchedules[]
-): ValidationError[] {
+export function validateSchedulesStructure(schedules?: RtzSchedules[]): ValidationError[] {
     const validationErrors: ValidationError[] = [];
 
     if (!schedules || !schedules.length) {
@@ -127,9 +114,7 @@ export function validateSchedulesStructure(
 
     schedules.forEach((scheds) => {
         if (!scheds) {
-            console.warn(
-                "method=validateSchedulesStructure Empty schedule element"
-            );
+            console.warn("method=validateSchedulesStructure Empty schedule element");
             return;
         }
         if (!scheds.schedule || !scheds.schedule.length) {
@@ -140,24 +125,18 @@ export function validateSchedulesStructure(
             if (sched.calculated && sched.calculated.length) {
                 sched.calculated.forEach((s) => {
                     if (!s.scheduleElement || !s.scheduleElement.length) {
-                        console.warn(
-                            "method=validateSchedulesStructure Missing schedule element"
-                        );
+                        console.warn("method=validateSchedulesStructure Missing schedule element");
                         //    validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
                     }
                     s.scheduleElement.forEach((se) => {
                         if (!se.$) {
-                            console.warn(
-                                "method=validateSchedulesStructure No schedule element attributes"
-                            );
+                            console.warn("method=validateSchedulesStructure No schedule element attributes");
                             //      validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                             return;
                         }
                         if (!se.$.eta && !se.$.etd) {
-                            console.warn(
-                                "method=validateSchedulesStructure No schedule ETA/ETD attributes"
-                            );
+                            console.warn("method=validateSchedulesStructure No schedule ETA/ETD attributes");
                             //    validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
                         }
                     });
@@ -165,17 +144,13 @@ export function validateSchedulesStructure(
             } else if (sched.manual && sched.manual.length) {
                 sched.manual.forEach((s) => {
                     if (!s.scheduleElement || !s.scheduleElement.length) {
-                        console.warn(
-                            "method=validateSchedulesStructure Missing schedule element"
-                        );
+                        console.warn("method=validateSchedulesStructure Missing schedule element");
                         //validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
                     }
                     s.scheduleElement.forEach((se) => {
                         if (!se.$) {
-                            console.warn(
-                                "method=validateSchedulesStructure No schedule element attributes"
-                            );
+                            console.warn("method=validateSchedulesStructure No schedule element attributes");
                             //  validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                             return;
                         }
@@ -194,15 +169,11 @@ export function validateContent(voyagePlan: RtzVoyagePlan): ValidationError[] {
     );
 }
 
-export function validateWaypointsContent(
-    wps: RtzWaypoint[]
-): ValidationError[] {
+export function validateWaypointsContent(wps: RtzWaypoint[]): ValidationError[] {
     const validationErrors: ValidationError[] = [];
     if (wps.length) {
         if (!anyWayPointInsideSpatialLimits(wps)) {
-            validationErrors.push(
-                ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS
-            );
+            validationErrors.push(ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS);
         }
     }
     return validationErrors;
@@ -211,20 +182,13 @@ export function validateWaypointsContent(
 function anyWayPointInsideSpatialLimits(rtzWaypoints: RtzWaypoint[]): boolean {
     const points = rtzWaypoints.flatMap((waypoints) =>
         waypoints.waypoint.map((w) =>
-            gf.createPoint(
-                new jsts.geom.Coordinate(
-                    Number(w.position[0].$.lon),
-                    Number(w.position[0].$.lat)
-                )
-            )
+            gf.createPoint(new jsts.geom.Coordinate(Number(w.position[0].$.lon), Number(w.position[0].$.lat)))
         )
     );
     return points.some((p) => SPATIAL_LIMITS.contains(p));
 }
 
-export function validateSchedulesContent(
-    rtzSchedules?: RtzSchedules[]
-): ValidationError[] {
+export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): ValidationError[] {
     if (!rtzSchedules) {
         console.warn("method=validateSchedulesContent No schedules element");
         return [];
@@ -236,18 +200,14 @@ export function validateSchedulesContent(
 
     rtzSchedules.forEach((schedules) => {
         if (!schedules) {
-            console.warn(
-                "method=validateSchedulesContent Empty schedule element"
-            );
+            console.warn("method=validateSchedulesContent Empty schedule element");
             return;
         }
         schedules.schedule?.forEach((sched) => {
             if (sched?.calculated && sched?.calculated.length) {
                 if (!anyTimestampInFuture(sched.calculated[0], now)) {
                     //validationErrors.push(ValidationError.NO_FUTURE_TIMESTAMPS);
-                    console.warn(
-                        "method=validateSchedulesContent No timestamps set in future"
-                    );
+                    console.warn("method=validateSchedulesContent No timestamps set in future");
                     return;
                 }
             }
@@ -258,14 +218,11 @@ export function validateSchedulesContent(
 }
 
 function anyTimestampInFuture(schedule: RtzSchedule, now: Moment): boolean {
-    const timestamps: Moment[] = schedule.scheduleElement.reduce(
-        (acc, curr) => {
-            const eta = curr.$.eta != null ? [moment(curr.$.eta)] : [];
-            const etd = curr.$.etd != null ? [moment(curr.$.etd)] : [];
-            return acc.concat(eta, etd);
-        },
-        [] as Moment[]
-    );
+    const timestamps: Moment[] = schedule.scheduleElement.reduce((acc, curr) => {
+        const eta = curr.$.eta !== null ? [moment(curr.$.eta)] : [];
+        const etd = curr.$.etd !== null ? [moment(curr.$.etd)] : [];
+        return acc.concat(eta, etd);
+    }, [] as Moment[]);
     return timestamps.some((ts) => validateTimestamp(ts, now));
 }
 

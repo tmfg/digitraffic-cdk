@@ -1,4 +1,4 @@
-export type VisMessageWithCallbackEndpoint = {
-    readonly callbackEndpoint: string
-    readonly message: string
+export interface VisMessageWithCallbackEndpoint {
+    readonly callbackEndpoint: string;
+    readonly message: string;
 }

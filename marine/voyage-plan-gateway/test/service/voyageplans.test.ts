@@ -4,26 +4,31 @@ import moment from "moment-timezone";
 import { ValidationError } from "../../lib/service/voyageplans";
 
 describe("voyageplans service", () => {
-    test("validateWaypointsStructure - no waypoints", () => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const validationErrors = VoyagePlansService.validateWaypointsStructure(
-            randomBoolean() ? undefined! : []
-        );
-
+    function assertValidationError(validationErrors: ValidationError[], expected: ValidationError): void {
         expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_WAYPOINTS);
+        expect(validationErrors[0]).toBe(expected);
+    }
+
+    test("validateWaypointsStructure - no waypoints - empty", () => {
+        const validationErrors = VoyagePlansService.validateWaypointsStructure([]);
+
+        assertValidationError(validationErrors, ValidationError.MISSING_WAYPOINTS);
     });
 
-    test("validateWaypointsStructure - no waypoint elements", () => {
+    test("validateWaypointsStructure - no waypoints - undefined", () => {
+        const validationErrors = VoyagePlansService.validateWaypointsStructure(undefined);
+
+        assertValidationError(validationErrors, ValidationError.MISSING_WAYPOINTS);
+    });
+
+    test("validateWaypointsStructure - no waypoint elements - empty", () => {
         const validationErrors = VoyagePlansService.validateWaypointsStructure([
             {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                waypoint: randomBoolean() ? undefined! : [],
-            },
+                waypoint: []
+            }
         ]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_WAYPOINT);
+        assertValidationError(validationErrors, ValidationError.MISSING_WAYPOINT);
     });
 
     test("validateWaypointsStructure - no position element", () => {
@@ -32,14 +37,13 @@ describe("voyageplans service", () => {
                 waypoint: [
                     {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        position: randomBoolean() ? undefined! : [],
-                    },
-                ],
-            },
+                        position: randomBoolean() ? undefined! : []
+                    }
+                ]
+            }
         ]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_POSITION);
+        assertValidationError(validationErrors, ValidationError.MISSING_POSITION);
     });
 
     test("validateWaypointsStructure - missing position attribute", () => {
@@ -50,18 +54,15 @@ describe("voyageplans service", () => {
                         position: [
                             {
                                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                $: undefined!,
-                            },
-                        ],
-                    },
-                ],
-            },
+                                $: undefined!
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(
-            ValidationError.NO_POSITION_ATTRIBUTES
-        );
+        assertValidationError(validationErrors, ValidationError.NO_POSITION_ATTRIBUTES);
     });
 
     test("validateWaypointsStructure - missing longitude", () => {
@@ -74,17 +75,16 @@ describe("voyageplans service", () => {
                                 $: {
                                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                                     lon: undefined!,
-                                    lat: 1,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: 1
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_LONGITUDE);
+        assertValidationError(validationErrors, ValidationError.MISSING_LONGITUDE);
     });
 
     test("validateWaypointsStructure - missing latitude", () => {
@@ -97,17 +97,16 @@ describe("voyageplans service", () => {
                                 $: {
                                     lon: 1,
                                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                    lat: undefined!,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: undefined!
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_LATITUDE);
+        assertValidationError(validationErrors, ValidationError.MISSING_LATITUDE);
     });
 
     test("validateWaypointsStructure - multiple errors", () => {
@@ -120,24 +119,22 @@ describe("voyageplans service", () => {
                                 $: {
                                     lon: 1,
                                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                    lat: undefined!,
-                                },
+                                    lat: undefined!
+                                }
                             },
                             {
                                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                $: undefined!,
-                            },
-                        ],
-                    },
-                ],
-            },
+                                $: undefined!
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(2);
         expect(validationErrors[0]).toBe(ValidationError.MISSING_LATITUDE);
-        expect(validationErrors[1]).toBe(
-            ValidationError.NO_POSITION_ATTRIBUTES
-        );
+        expect(validationErrors[1]).toBe(ValidationError.NO_POSITION_ATTRIBUTES);
     });
 
     test("validateWaypointsStructure - ok", () => {
@@ -149,13 +146,13 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 1,
-                                    lat: 2,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: 2
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -173,8 +170,8 @@ describe("voyageplans service", () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure([
             {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                schedule: randomBoolean() ? undefined! : [],
-            },
+                schedule: randomBoolean() ? undefined! : []
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -187,15 +184,12 @@ describe("voyageplans service", () => {
                     {
                         manual: [
                             {
-                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                scheduleElement: randomBoolean()
-                                    ? undefined!
-                                    : [],
-                            },
-                        ],
-                    },
-                ],
-            },
+                                scheduleElement: []
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -211,14 +205,14 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                        $: undefined!,
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
+                                        $: undefined!
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -236,13 +230,13 @@ describe("voyageplans service", () => {
                                     {
                                         $: {
                                             lon: 1,
-                                            lat: 2,
-                                        },
-                                    },
-                                ],
-                            },
-                        ],
-                    },
+                                            lat: 2
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 ],
                 schedules: [
                     {
@@ -254,38 +248,35 @@ describe("voyageplans service", () => {
                                             {
                                                 $: {
                                                     eta: new Date().toISOString(),
-                                                    etd: new Date().toISOString(),
-                                                },
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
+                                                    etd: new Date().toISOString()
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         });
 
         expect(validationErrors.length).toBe(0);
     });
 
     test("validateStructure - undefined", () => {
-        const validationErrors =
-            VoyagePlansService.validateStructure(undefined);
+        const validationErrors = VoyagePlansService.validateStructure(undefined);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.EMPTY_VOYAGE_PLAN);
+        assertValidationError(validationErrors, ValidationError.EMPTY_VOYAGE_PLAN);
     });
 
     test("validateStructure - no route", () => {
         const validationErrors = VoyagePlansService.validateStructure({
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            route: undefined!,
+            route: undefined!
         });
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_ROUTE);
+        assertValidationError(validationErrors, ValidationError.MISSING_ROUTE);
     });
 
     test("validateWaypointsContent - outside spatial limits", () => {
@@ -297,19 +288,16 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 1,
-                                    lat: 2,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: 2
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(
-            ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS
-        );
+        assertValidationError(validationErrors, ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS);
     });
 
     test("validateWaypointsContent - inside spatial limits - Bothnian Bay", () => {
@@ -321,13 +309,13 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 23.22,
-                                    lat: 64.84,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: 64.84
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -342,13 +330,13 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 27.61,
-                                    lat: 59.96,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: 59.96
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -363,12 +351,12 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 19.71,
-                                    lat: 58.58,
-                                },
-                            },
-                        ],
-                    },
-                ],
+                                    lat: 58.58
+                                }
+                            }
+                        ]
+                    }
+                ]
             },
             {
                 waypoint: [
@@ -377,13 +365,13 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 1,
-                                    lat: 2,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: 2
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -398,13 +386,13 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 19.71,
-                                    lat: 58.58,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
+                                    lat: 58.58
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -420,17 +408,15 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         $: {
-                                            eta: moment()
-                                                .subtract(5, "minutes")
-                                                .toISOString(),
-                                        },
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
+                                            eta: moment().subtract(5, "minutes").toISOString()
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -446,24 +432,20 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         $: {
-                                            eta: moment()
-                                                .subtract(5, "minutes")
-                                                .toISOString(),
-                                        },
+                                            eta: moment().subtract(5, "minutes").toISOString()
+                                        }
                                     },
                                     {
                                         $: {
-                                            etd: moment()
-                                                .add(1, "hours")
-                                                .toISOString(),
-                                        },
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
+                                            etd: moment().add(1, "hours").toISOString()
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);
@@ -479,23 +461,21 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         $: {
-                                            eta: moment()
-                                                .subtract(5, "days")
-                                                .toISOString(),
-                                        },
+                                            eta: moment().subtract(5, "days").toISOString()
+                                        }
                                     },
                                     {
-                                        $: {},
+                                        $: {}
                                     },
                                     {
-                                        $: {},
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
+                                        $: {}
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         ]);
 
         expect(validationErrors.length).toBe(0);

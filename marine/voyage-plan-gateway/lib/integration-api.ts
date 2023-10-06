@@ -3,7 +3,7 @@ import {
     LambdaIntegration,
     PassthroughBehavior,
     Resource,
-    ResponseType,
+    ResponseType
 } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode } from "aws-cdk-lib/aws-lambda";
 import { Stack } from "aws-cdk-lib";
@@ -17,32 +17,25 @@ import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_api
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
 export function create(
     secret: ISecret,
     notifyTopic: Topic,
     props: VoyagePlanGatewayProps,
     stack: DigitrafficStack
-) {
-    const integrationApi = createRestApi(
-        stack,
-        "VPGW-Integration",
-        "VPGW integration API"
-    );
+): void {
+    const integrationApi = createRestApi(stack, "VPGW-Integration", "VPGW integration API");
     // set response for missing auth token to 501 as desired by API registrar
     new GatewayResponse(stack, "MissingAuthenticationTokenResponse", {
         restApi: integrationApi,
         type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
         statusCode: "501",
         templates: {
-            "application/json": "Not implemented",
-        },
+            "application/json": "Not implemented"
+        }
     });
-    createUsagePlan(
-        integrationApi,
-        "VPGW CloudFront API Key",
-        "VPGW Faults CloudFront Usage Plan"
-    );
+    createUsagePlan(integrationApi, "VPGW CloudFront API Key", "VPGW Faults CloudFront Usage Plan");
     const resource = integrationApi.root.addResource("vpgw");
     createNotifyHandler(secret, stack, notifyTopic, resource, props);
 }
@@ -53,7 +46,7 @@ function createNotifyHandler(
     notifyTopic: Topic,
     api: Resource,
     props: VoyagePlanGatewayProps
-) {
+): void {
     const handler = createHandler(stack, notifyTopic, props);
     secret.grantRead(handler);
     const resource = api.addResource("notify");
@@ -66,16 +59,16 @@ function createIntegrationResource(
     props: VoyagePlanGatewayProps,
     resource: Resource,
     handler: MonitoredFunction
-) {
+): void {
     const integration = new LambdaIntegration(handler, {
         proxy: true,
         integrationResponses: [{ statusCode: "204" }],
-        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH, // because of proxy type integration
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH // because of proxy type integration
     });
 
     resource.addMethod("POST", integration, {
         apiKeyRequired: true,
-        methodResponses: [{ statusCode: "204" }],
+        methodResponses: [{ statusCode: "204" }]
     });
 }
 
@@ -83,10 +76,11 @@ function createHandler(
     stack: DigitrafficStack,
     notifyTopic: Topic,
     props: VoyagePlanGatewayProps
-) {
+): MonitoredFunction {
     const functionName = "VPGW-Notify";
-    const environment: any = {};
+    const environment: LambdaEnvironment = {};
     environment[VoyagePlanEnvKeys.TOPIC_ARN] = notifyTopic.topicArn;
+
     const handler = MonitoredFunction.create(
         stack,
         functionName,
@@ -96,7 +90,7 @@ function createHandler(
             handler: "lambda-notify.handler",
             timeout: 10,
             reservedConcurrentExecutions: 1,
-            environment,
+            environment
         })
     );
     notifyTopic.grantPublish(handler);

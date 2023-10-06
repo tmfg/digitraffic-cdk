@@ -1,41 +1,32 @@
 import axios from "axios";
-import { withSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
-import { VoyagePlanEnvKeys } from "../../keys";
-import {
-    ProxyLambdaRequest,
-    ProxyLambdaResponse,
-} from "@digitraffic/common/dist/aws/types/proxytypes";
+import { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
-const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
-
-type VoyagePlanSecret = {
+interface VoyagePlanSecret extends GenericSecret {
     readonly "vpgw.schedulesAccessToken": string;
     readonly "vpgw.schedulesUrl": string;
-};
+}
 
-export function handler(
-    event: ProxyLambdaRequest
-): Promise<ProxyLambdaResponse> {
-    return withSecret(secretId, async (secret: VoyagePlanSecret) => {
-        if (
-            event.queryStringParameters.auth !==
-            secret["vpgw.schedulesAccessToken"]
-        ) {
+const secretHolder = SecretHolder.create<VoyagePlanSecret>();
+
+export function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> {
+    return secretHolder.get().then(async (secret: VoyagePlanSecret) => {
+        if (event.queryStringParameters.auth !== secret["vpgw.schedulesAccessToken"]) {
             return {
                 statusCode: 403,
-                body: "Denied",
+                body: "Denied"
             };
         }
+
         let url = secret["vpgw.schedulesUrl"];
         if (event.queryStringParameters.direction) {
-            if (
-                ["east", "west"].includes(event.queryStringParameters.direction)
-            ) {
+            if (["east", "west"].includes(event.queryStringParameters.direction)) {
                 url += "/" + event.queryStringParameters.direction;
             } else {
                 return {
                     statusCode: 400,
-                    body: "Unknown direction",
+                    body: "Unknown direction"
                 };
             }
         }
@@ -55,19 +46,15 @@ export function handler(
         handleQueryParam("externalID", event.queryStringParameters, params);
 
         const fullUrl = url + (params.length ? "?" : "") + params.join("&");
-        const resp = await axios.get(fullUrl);
+        const resp = await axios.get<string>(fullUrl);
         return {
             statusCode: 200,
-            body: resp.data,
+            body: resp.data
         };
-    }) as Promise<ProxyLambdaResponse>;
+    });
 }
 
-function handleQueryParam(
-    param: string,
-    queryParams: Record<string, string>,
-    params: string[]
-) {
+function handleQueryParam(param: string, queryParams: Record<string, string>, params: string[]): void {
     if (queryParams[param]) {
         params.push(`${param}=${queryParams[param]}`);
     }

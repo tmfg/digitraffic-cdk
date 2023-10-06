@@ -3,57 +3,66 @@
  * https://www.seatrafficmanagement.info/developers-forum/vis/
  */
 
-import {SNS} from "aws-sdk";
-import {VoyagePlanEnvKeys} from "../../keys";
+import { SNS } from "aws-sdk";
+import { VoyagePlanEnvKeys } from "../../keys";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-const topicArn = process.env[VoyagePlanEnvKeys.TOPIC_ARN] as string;
+const topicArn = getEnvVariable(VoyagePlanEnvKeys.TOPIC_ARN);
 
 export enum NotificationType {
-    MESSAGE_WAITING = 'MESSAGE_WAITING',
-    UNAUTHORIZED_REQUEST = 'UNAUTHORIZED_REQUEST',
-    ACKNOWLEDGEMENT_RECEIVED = 'ACKNOWLEDGEMENT_RECEIVED',
-    ERROR_MESSAGE = 'ERROR_MESSAGE'
+    MESSAGE_WAITING = "MESSAGE_WAITING",
+    UNAUTHORIZED_REQUEST = "UNAUTHORIZED_REQUEST",
+    ACKNOWLEDGEMENT_RECEIVED = "ACKNOWLEDGEMENT_RECEIVED",
+    ERROR_MESSAGE = "ERROR_MESSAGE"
 }
 
-type NotifyEventWrapper = {
-    readonly body: string
+interface NotifyEventWrapper {
+    readonly body: string;
 }
 
-type NotifyEvent = {
+interface NotifyEvent {
     // Notification body, optional
-    readonly Body?: string
+    readonly Body?: string;
 
     // Identity of the notification and the stored message which can be retrieved with
     // "getMessage(dataId)"
-    readonly DataId: string
+    readonly DataId: string;
 
-    readonly FromId: string
+    readonly FromId: string;
 
     // Friendly name of sender for presentation
-    readonly FromName: string
+    readonly FromName: string;
 
     // >0 if a message is waiting in server, otherwise 0
-    readonly MessageWaiting: number
+    readonly MessageWaiting: number;
 
     // Notification created at date and time
-    readonly NotificationCreatedAt: string
+    readonly NotificationCreatedAt: string;
 
     // Type of notification by enumeration
-    readonly NotificationType: NotificationType
+    readonly NotificationType: NotificationType;
 
     // Date and time for the reception of the message
-    readonly ReceivedAt: string
+    readonly ReceivedAt: string;
 
     // Notification subject
-    readonly Subject: string
+    readonly Subject: string;
 }
 
-export function handlerFn(sns: SNS): (e: NotifyEventWrapper) => Promise<any> {
-    return async (wrapper: NotifyEventWrapper): Promise<{statusCode: string}> => {
-        const event: NotifyEvent = JSON.parse(wrapper.body);
+interface HandlerResponse {
+    statusCode: string;
+}
+
+export function handlerFn(sns: SNS): (e: NotifyEventWrapper) => HandlerResponse {
+    return (wrapper: NotifyEventWrapper): HandlerResponse => {
+        const event: NotifyEvent = JSON.parse(wrapper.body) as unknown as NotifyEvent;
 
         if (event.MessageWaiting > 50) {
-            console.warn('method=vpgwVisNotify More than 50 messages waiting, processing messages anyway');
+            logger.warn({
+                method: "vpgwVisNotify.handler",
+                message: "More than 50 messages waiting, processing messages anyway"
+            });
         }
 
         // trigger a Lambda invocation per message
@@ -64,9 +73,9 @@ export function handlerFn(sns: SNS): (e: NotifyEventWrapper) => Promise<any> {
         }).promise();
 */
         return {
-            statusCode: '204'
+            statusCode: "204"
         };
-    }
+    };
 }
 
 export const handler = handlerFn(new SNS());

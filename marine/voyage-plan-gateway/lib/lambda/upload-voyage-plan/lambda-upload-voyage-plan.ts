@@ -1,6 +1,5 @@
 import * as util from "util";
 import * as xml2js from "xml2js";
-import { withSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { VoyagePlanEnvKeys } from "../../keys";
 import * as VoyagePlansService from "../../service/voyageplans";
 import { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
@@ -8,131 +7,126 @@ import { VisMessageWithCallbackEndpoint } from "../../model/vismessage";
 import { VtsApi } from "../../api/vts";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { RtzStorageApi } from "../../api/rtzstorage";
-import { SecretFunction } from "@digitraffic/common/dist/aws/runtime/secrets/dbsecret";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const zlib = require("zlib");
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { gunzipSync } from "zlib";
 
-const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
-const bucketName = process.env[VoyagePlanEnvKeys.BUCKET_NAME] as string;
+interface VoyagePlanSecret extends GenericSecret {
+    readonly "vpgw.vtsUrl": string;
+    readonly "vpgw.slackUrl": string;
+}
 
-export type SnsEvent = {
+export interface SnsEvent {
     readonly Records: {
         readonly body: string;
     }[];
-};
+}
 
-type VoyagePlanSecrets = {
-    readonly "vpgw.vtsUrl"?: string;
-    readonly "vpgw.slackUrl"?: string;
-};
+const secretHolder = SecretHolder.create<VoyagePlanSecret>();
+const bucketName = getEnvVariable(VoyagePlanEnvKeys.BUCKET_NAME);
 
-let api: VtsApi | null = null;
-let slackApi: SlackApi | null = null;
-let rtzStorageApi: RtzStorageApi | null = null;
+let api: VtsApi | undefined;
+let slackApi: SlackApi | undefined;
+let rtzStorageApi: RtzStorageApi | undefined;
 
 /**
  * XML parsing and validation errors do not throw an error. This is to remove invalid messages from the queue.
  */
-export function handlerFn(
-    doWithSecret: SecretFunction<VoyagePlanSecrets, string>,
-    VtsApiClass: new (url: string) => VtsApi,
-    SlackApiClass: new (url: string) => SlackApi
-) {
-    return function (event: SnsEvent) {
-        return doWithSecret(secretId, async (secret: VoyagePlanSecrets) => {
-            if (event.Records.length > 1) {
-                console.error(
-                    "method=vpgwUploadVoyagePlan More than one record received! count=%d",
-                    event.Records.length
-                );
-            }
+export function handler(event: SnsEvent): Promise<string> {
+    return secretHolder.get().then(async (secret: VoyagePlanSecret) => {
+        if (event.Records.length > 1) {
+            logger.error({
+                method: "vpgwUploadVoyagePlan.handler",
+                message: "More than one record received!",
+                customCount: event.Records.length
+            });
+        }
 
-            // base64 decode message
-            const base64EventBody = Buffer.from(
-                event.Records[0].body,
-                "base64"
-            );
-            const gunzippedEventBody = zlib.gunzipSync(base64EventBody);
-            const visMessage = JSON.parse(
-                gunzippedEventBody.toString("utf-8")
-            ) as VisMessageWithCallbackEndpoint;
+        // base64 decode message
+        const base64EventBody = Buffer.from(event.Records[0].body, "base64");
+        const gunzippedEventBody: Buffer = gunzipSync(base64EventBody);
+        const visMessage = JSON.parse(gunzippedEventBody.toString("utf-8")) as VisMessageWithCallbackEndpoint;
 
-            console.info(
-                `method=vpgwUploadVoyagePlan received RTZ ${visMessage.message}`
-            );
-
-            let voyagePlan: RtzVoyagePlan;
-            try {
-                const parseXml = util.promisify(xml2js.parseString);
-                voyagePlan = (await parseXml(
-                    visMessage.message
-                )) as RtzVoyagePlan;
-            } catch (error) {
-                console.warn(
-                    "method=uploadVoyagePlan XML parsing failed",
-                    error
-                );
-                return Promise.resolve("XML parsing failed");
-            }
-
-            if (!rtzStorageApi) {
-                rtzStorageApi = new RtzStorageApi(bucketName);
-            }
-            await rtzStorageApi.storeVoyagePlan(visMessage.message);
-
-            if (!slackApi && secret["vpgw.slackUrl"]) {
-                slackApi = new SlackApiClass(secret["vpgw.slackUrl"]);
-            }
-
-            const structureValidationErrors =
-                VoyagePlansService.validateStructure(voyagePlan);
-            if (structureValidationErrors.length) {
-                console.warn(
-                    "method=uploadVoyagePlan XML structure validation failed",
-                    structureValidationErrors
-                );
-                await slackApi?.notify(
-                    "Failed validation, invalid structure :" +
-                        visMessage.message
-                );
-                return Promise.resolve("XML structure validation failed");
-            }
-
-            const contentValidationErrors =
-                VoyagePlansService.validateContent(voyagePlan);
-            if (contentValidationErrors.length) {
-                console.warn(
-                    "method=uploadVoyagePlan XML content validation failed",
-                    contentValidationErrors
-                );
-                await slackApi?.notify(
-                    "Failed validation, invalid content :" + visMessage.message
-                );
-                return Promise.resolve("XML content was not valid");
-            }
-
-            if (!api && secret["vpgw.vtsUrl"]) {
-                api = new VtsApiClass(secret["vpgw.vtsUrl"]);
-            }
-
-            if (api) {
-                console.info(
-                    "method=uploadVoyagePlan about to upload voyage plan to VTS"
-                );
-                await slackApi?.notify(
-                    "Passed validation :" + visMessage.message
-                );
-                await api.sendVoyagePlan(visMessage.message);
-                console.info("method=uploadVoyagePlan upload to VTS ok");
-            } else {
-                console.info(
-                    "method=uploadVoyagePlan No VTS API, voyage plan not sent"
-                );
-            }
-
-            return Promise.resolve("Voyage plan processed");
+        logger.info({
+            method: "vpgwUploadVoyagePlan.handler",
+            message: `received RTZ ${visMessage.message}`
         });
-    };
-}
 
-export const handler = handlerFn(withSecret, VtsApi, SlackApi);
+        let voyagePlan: RtzVoyagePlan;
+        try {
+            const parseXml = util.promisify(xml2js.parseString);
+            voyagePlan = (await parseXml(visMessage.message)) as RtzVoyagePlan;
+        } catch (error) {
+            logger.warn({
+                method: "vpgwUploadVoyagePlan.handler",
+                message: "XML parsing failed",
+                error: error
+            });
+
+            return Promise.resolve("XML parsing failed");
+        }
+
+        if (!rtzStorageApi) {
+            rtzStorageApi = new RtzStorageApi(bucketName);
+        }
+        await rtzStorageApi.storeVoyagePlan(visMessage.message);
+
+        if (!slackApi) {
+            slackApi = new SlackApi(secret["vpgw.slackUrl"]);
+        }
+
+        const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
+        if (structureValidationErrors.length) {
+            logger.warn({
+                method: "vpgwUploadVoyagePlan.handler",
+                message: "XML structure validation failed",
+                error: structureValidationErrors
+            });
+
+            await slackApi.notify("Failed validation, invalid structure :" + visMessage.message);
+
+            return Promise.resolve("XML structure validation failed");
+        }
+
+        const contentValidationErrors = VoyagePlansService.validateContent(voyagePlan);
+        if (contentValidationErrors.length) {
+            logger.warn({
+                method: "vpgwUploadVoyagePlan.handler",
+                message: "XML content validation failed",
+                error: contentValidationErrors
+            });
+
+            await slackApi.notify("Failed validation, invalid content :" + visMessage.message);
+
+            return Promise.resolve("XML content was not valid");
+        }
+
+        if (!api && secret["vpgw.vtsUrl"].length > 0) {
+            api = new VtsApi(secret["vpgw.vtsUrl"]);
+        }
+
+        if (api) {
+            logger.info({
+                method: "vpgwUploadVoyagePlan.handler",
+                message: "about to upload voyage plan to VTS"
+            });
+
+            await slackApi.notify("Passed validation :" + visMessage.message);
+            await api.sendVoyagePlan(visMessage.message);
+
+            logger.info({
+                method: "vpgwUploadVoyagePlan.handler",
+                message: "upload to VTS OK"
+            });
+        } else {
+            logger.info({
+                method: "vpgwUploadVoyagePlan.handler",
+                message: "No VTS API, voyage plan not sent"
+            });
+        }
+
+        return Promise.resolve("Voyage plan processed");
+    });
+}

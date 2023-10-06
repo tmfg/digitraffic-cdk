@@ -1,49 +1,77 @@
-import {
-    handlerFn,
-    SnsEvent,
-} from "../../lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 import * as sinon from "sinon";
 import moment from "moment-timezone";
 import { VisMessageWithCallbackEndpoint } from "../../lib/model/vismessage";
 import { VtsApi } from "../../lib/api/vts";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { RtzStorageApi } from "../../lib/api/rtzstorage";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const zlib = require("zlib");
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { gzipSync } from "zlib";
 
 const sandbox = sinon.createSandbox();
+process.env.SECRET_ID = "";
+process.env.BUCKET_NAME = "";
+
+import { handler, SnsEvent } from "../../lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 
 describe("upload-voyage-plan", () => {
-    const secretFn = async (secret: string, fn: any) => await fn({});
+    beforeEach(() => {
+        sandbox.stub(SecretHolder.prototype, "get").returns(
+            Promise.resolve({
+                "vpgw.vtsUrl": "TEST"
+            })
+        );
+        sandbox.stub(SlackApi.prototype, "notify").returns(Promise.resolve());
+    });
 
     afterEach(() => sandbox.restore());
 
     test("validation failure, some string", async () => {
         const uploadEvent = createSnsEvent("<foo bar");
 
-        await expect(
-            handlerFn(secretFn, VtsApi, SlackApi)(uploadEvent)
-        ).resolves.toMatch("XML parsing failed");
+        await expect(handler(uploadEvent)).resolves.toMatch("XML parsing failed");
+    });
+
+    test("validation failure, no route xml", async () => {
+        const uploadEvent = createSnsEvent('<?xml version="1.0" encoding="UTF-8"?>');
+
+        await expect(handler(uploadEvent)).resolves.toMatch("XML structure validation failed");
+    });
+
+    test("validation failure, no waypoints xml", async () => {
+        const uploadEvent = createSnsEvent(voyagePlanWithoutRoutes());
+
+        await expect(handler(uploadEvent)).resolves.toMatch("XML structure validation failed");
     });
 
     test("validation success with correct voyage plan", async () => {
-        sinon
-            .stub(VtsApi.prototype, "sendVoyagePlan")
-            .returns(Promise.resolve());
-        sinon
-            .stub(RtzStorageApi.prototype, "storeVoyagePlan")
-            .returns(Promise.resolve());
+        sinon.stub(VtsApi.prototype, "sendVoyagePlan").returns(Promise.resolve());
+        sinon.stub(RtzStorageApi.prototype, "storeVoyagePlan").returns(Promise.resolve());
 
         const uploadEvent = createSnsEvent(voyagePlan());
 
-        await expect(
-            handlerFn(secretFn, VtsApi, SlackApi)(uploadEvent)
-        ).resolves.not.toThrow();
+        await expect(handler(uploadEvent)).resolves.not.toThrow();
     });
 });
 
+function voyagePlanWithoutRoutes(): string {
+    return `
+  <?xml version="1.0" encoding="UTF-8"?>
+  <route version="1.2" xmlns="http://www.cirm.org/RTZ/1/2">
+    <routeInfo routeName="string" routeAuthor="string" routeStatus="string" validityPeriodStart="2008-09-29T04:49:45" validityPeriodStop="2014-09-19T02:18:33" vesselName="string" vesselMMSI="200" vesselIMO="200" vesselVoyage="string" vesselDisplacement="200" vesselCargo="200" vesselGM="1000.00" optimizationMethod="string" vesselMaxRoll="200" vesselMaxWave="1000.00" vesselMaxWind="1000.00" vesselSpeedMax="1000.00" vesselServiceMin="1000.00" vesselServiceMax="1000.00" routeChangesHistory="string">
+      <!--Optional:-->
+      <extensions>
+        <!--Zero or more repetitio-->
+        <extension manufacturer="string" name="string" version="string">
+          <!--You may enter ANY elements at this point-->
+          <AnyElement/>
+        </extension>
+      </extensions>
+    </routeInfo>
+  </route>`;
+}
+
 // generated with IntelliJ IDEA tool: XML from schema
-function voyagePlan() {
+function voyagePlan(): string {
     return `
 <?xml version="1.0" encoding="UTF-8"?>
 <route version="1.2" xmlns="http://www.cirm.org/RTZ/1/2">
@@ -221,15 +249,14 @@ function voyagePlan() {
 function createSnsEvent(xml: string): SnsEvent {
     const message: VisMessageWithCallbackEndpoint = {
         callbackEndpoint: "",
-        message: xml,
+        message: xml
     };
+
     return {
         Records: [
             {
-                body: zlib
-                    .gzipSync(Buffer.from(JSON.stringify(message)))
-                    .toString("base64"),
-            },
-        ],
+                body: gzipSync(Buffer.from(JSON.stringify(message))).toString("base64")
+            }
+        ]
     };
 }
