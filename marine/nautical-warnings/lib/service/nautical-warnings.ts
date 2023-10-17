@@ -11,7 +11,6 @@ import { parse } from "date-fns";
 import { Feature, FeatureCollection, GeoJsonProperties } from "geojson";
 import { isFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { utcToZonedTime } from "date-fns-tz";
 import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
 
 const EMPTY_FEATURE_COLLECTION: FeatureCollection = {

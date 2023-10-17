@@ -237,7 +237,7 @@ function createProcessDLQLambda(dlqBucket: Bucket, dlq: Queue, stack: Digitraffi
 
     const functionName = "PortActivity-ProcessTimestampsDLQ";
     const processDLQLambda = MonitoredFunction.create(stack, functionName, {
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_16_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
         code: new AssetCode("dist/lambda/process-dlq"),
