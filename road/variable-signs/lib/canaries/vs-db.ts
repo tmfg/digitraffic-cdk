@@ -12,7 +12,7 @@ export const handler = (): Promise<string> => {
 
     checker.expectOneOrMore(
         "datex2 data updated in last 12 hours",
-        `select count(*) from device_data_datex2 where updated_timestamp  > now() - interval '12 hours'`
+        `select count(*) from device_data_datex2 where modified > now() - interval '12 hours'`
     );
 
     return checker.expect();
