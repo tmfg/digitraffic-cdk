@@ -283,8 +283,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0
       zod:
-        specifier: 3.21.4
-        version: 3.21.4
+        specifier: 3.22.3
+        version: 3.22.3
     devDependencies:
       '@digitraffic-cdk/eslint-config':
         specifier: workspace:*
@@ -1694,8 +1694,8 @@ importers:
         specifier: ^0.5.21
         version: 0.5.21
       zod:
-        specifier: 3.21.4
-        version: 3.21.4
+        specifier: 3.22.3
+        version: 3.22.3
     devDependencies:
       '@digitraffic-cdk/eslint-config':
         specifier: workspace:*
@@ -1800,8 +1800,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0
       zod:
-        specifier: 3.21.4
-        version: 3.21.4
+        specifier: 3.22.3
+        version: 3.22.3
     devDependencies:
       '@babel/preset-env':
         specifier: ~7.22.5
@@ -2644,6 +2644,7 @@ packages:
   /@aws-cdk/aws-synthetics-alpha@2.50.0-alpha.0(aws-cdk-lib@2.85.0)(constructs@10.2.61):
     resolution: {integrity: sha512-sZQOZFZIMGYbYXI/1M9wIF9GGPXgwPwj7fhTg1HvOb4gJpaZFg5ND5KbTQz2+kjrUyJ+nvaVSg8gipLDts15jQ==}
     engines: {node: '>= 14.15.0'}
+    deprecated: This package has been stabilized and moved to aws-cdk-lib
     peerDependencies:
       aws-cdk-lib: ^2.50.0
       constructs: ^10.0.0
@@ -2655,6 +2656,7 @@ packages:
   /@aws-cdk/aws-synthetics-alpha@2.62.2-alpha.0(aws-cdk-lib@2.85.0)(constructs@10.2.61):
     resolution: {integrity: sha512-hwT6T6jZde31za7IPvWPru6HNTB7SAPwniq0ggnVwLIR3k+M1yTo/ggEhNgF0hU4wdvdA9zopU08DSDtQjegLQ==}
     engines: {node: '>= 14.15.0'}
+    deprecated: This package has been stabilized and moved to aws-cdk-lib
     peerDependencies:
       aws-cdk-lib: ^2.62.2
       constructs: ^10.0.0
@@ -15409,8 +15411,8 @@ packages:
     optionalDependencies:
       commander: 9.5.0
 
-  /zod@3.21.4:
-    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+  /zod@3.22.3:
+    resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
     dev: false
 
   /zx@7.2.3:
