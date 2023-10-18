@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { ApiContractData, ApiOperationData, ApiRouteData } from "../model/autori-api-data";
 import { DbDomainContract } from "../model/db-data";
@@ -24,6 +24,11 @@ class OAuthTokenResponse {
         this.expires = new Date(
             new Date().getTime() + (expires_in * 1000 - O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS)
         );
+        logger.info({
+            method: "OAuthTokenResponse.constructor",
+            customExpiresIn: expires_in,
+            customExpiresCalculated: this.expires.toISOString()
+        });
     }
 
     static createFromAuthResponse(partialToken: Partial<OAuthTokenResponse>): OAuthTokenResponse | undefined {
@@ -43,6 +48,15 @@ class OAuthTokenResponse {
      * @private
      */
     isActive(): boolean {
+        logger.debug({
+            method: "OAuthTokenResponse.isActive",
+            customResult: `expires=${this.expires.toISOString()} > now=${new Date().toISOString()} : ${JSON.stringify(
+                this.expires.getTime() > Date.now()
+            )}`,
+            customResultCalculation: `${this.expires.getTime()} > ${Date.now()} : ${JSON.stringify(
+                this.expires.getTime() > Date.now()
+            )}`
+        });
         return this.expires.getTime() > Date.now();
     }
 }
@@ -63,79 +77,65 @@ export class AutoriApi {
 
     /**
      *
-     * @param subMethod to log
+     * @param callerMethod to log
      * @param pathSuffix path after https://<server>/api/<productId>/. Ie. 'contracts'
      */
-    private async getFromServer<T>(subMethod: string, pathSuffix: string): Promise<T> {
+    private async getFromServer<T>(callerMethod: string, pathSuffix: string): Promise<T> {
         const start = Date.now();
         // https://<server>/api/<productId>/<action>
         const serverUrl = `${this.secret.url}/api/${this.secret.productId}/${pathSuffix}`;
         const method = "AutoriApi.getFromServer";
         logger.info({
             method,
-            message: `${subMethod} sending to url ${serverUrl}`
+            message: `${callerMethod} sending to url ${serverUrl}`
         });
 
         const token: OAuthTokenResponse = await this.getOAuthToken();
 
-        try {
-            const resp: AxiosResponse<T> = await axios
-                .get<T>(serverUrl, {
-                    // OAuth 2.0 Authorization headers
-                    headers: {
-                        accept: MediaType.APPLICATION_JSON,
-                        Authorization: `Bearer ${token.access_token}`
-                    }
-                })
-                .catch((reason: AxiosError) => {
-                    throw new Error(
-                        `method=${method} message="${subMethod} sending to url ${serverUrl} failed. Error ${
-                            reason.code ? reason.code : ""
-                        } ${reason.message}"`
-                    );
-                });
-            if (resp.status !== 200) {
-                const message = `${subMethod} returned status=${resp.status} data=${JSON.stringify(
-                    resp.data
-                )} for ${serverUrl}`;
+        return axios
+            .get<T>(serverUrl, {
+                // OAuth 2.0 Authorization headers
+                headers: {
+                    accept: MediaType.APPLICATION_JSON,
+                    Authorization: `Bearer ${token.access_token}`
+                },
+                validateStatus: function (status: number) {
+                    return status === 200; // Resolve only if the status code is 200
+                }
+            })
+            .then((value) => {
+                return value.data;
+            })
+            .catch((error: Error | AxiosError) => {
+                const isAxiosError = axios.isAxiosError(error);
+                const message =
+                    `method=${method} message=${callerMethod} ` +
+                    (isAxiosError
+                        ? `GET failed with message: ${error.message}`
+                        : `GET failed outside axios with message ${error.message}`);
                 logger.error({
                     method,
-                    message
+                    message,
+                    customCallerMethod: callerMethod,
+                    customUrl: serverUrl,
+                    customStatus: isAxiosError ? error.status : undefined,
+                    customCode: isAxiosError ? error.code : undefined,
+                    customResponseData: isAxiosError ? JSON.stringify(error.response?.data) : undefined,
+                    customResponseStatus: isAxiosError ? error.response?.status : undefined,
+                    stack: error.stack
                 });
-                return Promise.reject(`method=${method} message=${message}`);
-            }
-            return resp.data;
-        } catch (error) {
-            let message: string;
-            if (axios.isAxiosError(error)) {
-                const axiosError = error as AxiosError;
-                if (axiosError.response) {
-                    message = `${subMethod} GET failed for ${serverUrl}. Error response code: ${
-                        axiosError.response.status
-                    } and message: ${JSON.stringify(axiosError.response.data)}`;
-                } else if (axiosError.request) {
-                    message = `${subMethod} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`;
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    message = `${subMethod} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`;
-                }
-            } else {
-                message = `${subMethod} GET failed for ${serverUrl} outside axios. Error message: ${JSON.stringify(
-                    error
-                )}`;
-            }
-            logger.error({
-                method,
-                message
+                throw new Error(`${message} method=${method} callerMethod=${callerMethod} url=${serverUrl}`, {
+                    cause: error
+                });
+            })
+            .finally(() => {
+                logger.info({
+                    method,
+                    customCallerMethod: callerMethod,
+                    customUrl: serverUrl,
+                    tookMs: Date.now() - start
+                });
             });
-            throw new Error(`method=AutoriApi.getFromServer failed ${message}`);
-        } finally {
-            logger.info({
-                method,
-                message: `${subMethod} for ${serverUrl}`,
-                tookMs: Date.now() - start
-            });
-        }
     }
 
     public getContracts(): Promise<ApiContractData[]> {
@@ -220,12 +220,13 @@ export class AutoriApi {
      */
     public getOAuthToken(): Promise<OAuthTokenResponse> {
         const start = Date.now();
+        const method = "AutoriApi.getOAuthToken";
+
         if (this.oAuthResponse?.isActive()) {
-            logger.debug(
-                `method=AutoriApi.getOAuthToken from cache expires in ${
-                    this.oAuthResponse.expires_in
-                } s and calculated limit is ${this.oAuthResponse.expires.toISOString()}`
-            );
+            logger.debug({
+                method,
+                message: `get from cache expires ${this.oAuthResponse.expires.toISOString()} (safety margin ${O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS} ms)`
+            });
             return Promise.resolve(this.oAuthResponse);
         }
 
@@ -238,43 +239,49 @@ export class AutoriApi {
             grant_type: "client_credentials"
         };
 
+        const url = this.secret.oAuthTokenEndpoint;
         return axios
-            .post<Partial<OAuthTokenResponse>>(
-                this.secret.oAuthTokenEndpoint,
-                new URLSearchParams(postData).toString(),
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    }
+            .post<Partial<OAuthTokenResponse>>(url, new URLSearchParams(postData).toString(), {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                validateStatus: function (status: number) {
+                    return status === 200; // Resolve only if the status code is 200
                 }
-            )
+            })
             .then((response) => {
                 this.oAuthResponse = OAuthTokenResponse.createFromAuthResponse(response.data);
                 if (this.oAuthResponse === undefined) {
                     throw new Error("Invalid OAuth token");
                 }
                 logger.info({
-                    method: "AutoriApi.getOAuthToken",
+                    method,
                     message: `new token expires in ${
                         this.oAuthResponse.expires_in
                     } s and calculated limit is ${this.oAuthResponse.expires.toISOString()}`
                 });
                 return this.oAuthResponse;
             })
-            .catch((error: AxiosError) => {
-                // This will print i.e. "method=getOAuthToken failed, message: Request failed with status code 400, error: invalid_scope"
-                const message = `failed, message: ${error.message}, error: ${JSON.stringify(
-                    error.response?.data
-                )}`;
+            .catch((error: Error | AxiosError) => {
+                const isAxiosError = axios.isAxiosError(error);
+                const message = isAxiosError
+                    ? `POST failed with message: ${error.message}`
+                    : `POST failed outside axios with message ${error.message}`;
                 logger.error({
-                    method: "AutoriApi.getOAuthToken",
-                    message
+                    method,
+                    message,
+                    customUrl: url,
+                    customStatus: isAxiosError ? error.status : undefined,
+                    customCode: isAxiosError ? error.code : undefined,
+                    customResponseData: isAxiosError ? JSON.stringify(error.response?.data) : undefined,
+                    customResponseStatus: isAxiosError ? error.response?.status : undefined,
+                    stack: error.stack
                 });
-                throw new Error(`method=AutoriApi.getOAuthToken ${message}`);
+                throw new Error(`${message} method=${method} url=${url}`, { cause: error });
             })
             .finally(() => {
                 logger.info({
-                    method: "AutoriApi.getOAuthToken",
+                    method,
                     tookMs: Date.now() - start
                 });
             });

@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { parseISO } from "date-fns";
 import { ApiDevice, ApiWorkeventDevice } from "../model/paikannin-api-data";
@@ -26,73 +26,61 @@ export class PaikanninApi {
 
     /**
      *
-     * @param subMethod to append to log
+     * @param callerMethod to append to log
      * @param url after domain. Ie. /api/contracts
      */
-    private async getFromServer<T>(subMethod: string, url: string): Promise<T> {
+    private async getFromServer<T>(callerMethod: string, url: string): Promise<T> {
         const start = Date.now();
         const serverUrl = `${this.endpointUrl}${url}`;
         const method = "PaikanninApi.getFromServer";
-        let message: string;
 
         logger.info({
             method,
-            message: `${subMethod} Sending to url ${serverUrl}`
+            message: `${callerMethod} Sending to url ${serverUrl}`
         });
 
-        try {
-            const resp: AxiosResponse<T> = await axios
-                .get<T>(serverUrl, {
-                    headers: {
-                        accept: MediaType.APPLICATION_JSON,
-                        API_KEY: this.apikey
-                    }
-                })
-                .catch((reason: AxiosError) => {
-                    throw new Error(
-                        `method=${subMethod} PaikanninApi.${subMethod} Sending to url ${serverUrl} failed. Error ${
-                            reason.code ? reason.code : ""
-                        } ${reason.message}`
-                    );
-                });
-            if (resp.status !== 200) {
+        return axios
+            .get<T>(serverUrl, {
+                headers: {
+                    accept: MediaType.APPLICATION_JSON,
+                    API_KEY: this.apikey
+                },
+                validateStatus: function (status: number) {
+                    return status === 200; // Resolve only if the status code is 200
+                }
+            })
+            .then((value) => {
+                return value.data;
+            })
+            .catch((error: Error | AxiosError) => {
+                const isAxiosError = axios.isAxiosError(error);
+                const message =
+                    `method=${method} message=${callerMethod} ` +
+                    (isAxiosError
+                        ? `GET failed with message: ${error.message}`
+                        : `GET failed outside axios with message ${error.message}`);
                 logger.error({
                     method,
-                    message: `${subMethod} returned data=${JSON.stringify(resp.data)} for ${serverUrl}`,
-                    customStatus: resp.status
+                    message,
+                    customCallerMethod: callerMethod,
+                    customUrl: serverUrl,
+                    customStatus: isAxiosError ? error.status : undefined,
+                    customCode: isAxiosError ? error.code : undefined,
+                    customResponseData: isAxiosError ? JSON.stringify(error.response?.data) : undefined,
+                    customResponseStatus: isAxiosError ? error.response?.status : undefined,
+                    stack: error.stack
                 });
-                return Promise.reject(resp);
-            }
-            return resp.data;
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                const axiosError = error as AxiosError;
-                if (axiosError.response) {
-                    message = `${subMethod} GET failed for ${serverUrl}. Error response code: ${
-                        axiosError.response.status
-                    } and message: ${JSON.stringify(axiosError.response.data)}`;
-                } else if (axiosError.request) {
-                    message = `${subMethod} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`;
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    message = `${subMethod} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`;
-                }
-            } else {
-                message = `${subMethod} GET failed for ${serverUrl} outside axios.`;
-            }
-            logger.error({
-                method,
-                message,
-                error
+                throw new Error(`${message} method=${method} callerMethod=${callerMethod} url=${serverUrl}`, {
+                    cause: error
+                });
+            })
+            .finally(() => {
+                logger.info({
+                    method,
+                    message: `${callerMethod} for ${serverUrl}`,
+                    tookMs: Date.now() - start
+                });
             });
-            return Promise.reject(`method=${method} message="${message} ${JSON.stringify(error)}"`);
-        } finally {
-            logger.info({
-                method,
-                message: `${subMethod} for ${serverUrl}`,
-                tookMs: Date.now() - start
-            });
-        }
     }
 
     public getDevices(): Promise<ApiDevice[]> {
