@@ -9,7 +9,7 @@ FULL_ENV=${1:-"NONE"}
 echo "<app>-<env>: ${FULL_ENV}"
 
 SCRIPT_DIR=$(dirname "$0")
-. ${SCRIPT_DIR}/cdk-set-env.conf ${FULL_ENV}
+. ${SCRIPT_DIR}/cdk-env.conf ${FULL_ENV}
 
 OPERATION=${2:-"NONE"}
 STACK_NAME=${3:-"NONE"}

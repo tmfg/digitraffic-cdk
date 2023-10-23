@@ -12,13 +12,15 @@ import logger from "../../service/maintenance-logger";
 const domainName = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME);
 const domainPrefix = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX);
 
-const proxyHolder = ProxyHolder.create();
+const proxyHolder: ProxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<MaintenanceTrackingPaikanninSecret>(domainPrefix);
 let paikanninUpdateServiceHolder: PaikanninUpdate | undefined;
 
 export const handler = (): Promise<TrackingSaveResult> => {
     const start = Date.now();
     const method = "MaintenanceTrackingMunicipality.updateTrackingsForDomain";
+    const wasWarm = !!paikanninUpdateServiceHolder;
+
     return proxyHolder
         .setCredentials()
         .then(() => secretHolder.get())
@@ -66,6 +68,7 @@ export const handler = (): Promise<TrackingSaveResult> => {
                 method,
                 message: `finished`,
                 customDomain: domainName,
+                customLambdaWasWarm: wasWarm,
                 tookMs: Date.now() - start
             });
         });
@@ -75,11 +78,6 @@ function getPaikanninUpdateService(secret: MaintenanceTrackingPaikanninSecret): 
     if (paikanninUpdateServiceHolder) {
         return paikanninUpdateServiceHolder;
     }
-    logger.info({
-        method: "MaintenanceTrackingMunicipality.getPaikanninUpdateService",
-        message: `lambda was cold`,
-        customDomain: domainName
-    });
     const paikanninApi = new PaikanninApi(secret.apikey, secret.url);
     return new PaikanninUpdate(paikanninApi);
 }

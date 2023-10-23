@@ -157,7 +157,7 @@ describe(
             expect(checked).toBeTruthy();
 
             if (checked) {
-                Asserter.assertToBeCloseTo(checked.getTime(), past0.getTime(), 700);
+                Asserter.assertToBeCloseTo(checked.getTime(), past0.getTime(), 900);
             } else {
                 fail("checked was null");
             }

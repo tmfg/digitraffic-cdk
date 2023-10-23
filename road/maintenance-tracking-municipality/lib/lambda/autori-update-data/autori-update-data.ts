@@ -12,13 +12,14 @@ import logger from "../../service/maintenance-logger";
 const domainName = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME);
 const domainPrefix = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX);
 
-const proxyHolder = ProxyHolder.create();
+const proxyHolder: ProxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<MaintenanceTrackingAutoriSecret>(domainPrefix);
 let autoriUpdateServiceHolder: AutoriUpdate | undefined;
 
 export const handler = (): Promise<TrackingSaveResult> => {
     const start = Date.now();
     const method = "MaintenanceTrackingMunicipality.updateTrackingsForDomain";
+    const wasWarm = !!autoriUpdateServiceHolder;
 
     return proxyHolder
         .setCredentials()
@@ -67,6 +68,7 @@ export const handler = (): Promise<TrackingSaveResult> => {
                 method,
                 message: `finished`,
                 customDomain: domainName,
+                customLambdaWasWarm: wasWarm,
                 tookMs: Date.now() - start
             });
         });
@@ -76,10 +78,6 @@ function getAutoriUpdateService(secret: MaintenanceTrackingAutoriSecret): Autori
     if (autoriUpdateServiceHolder) {
         return autoriUpdateServiceHolder;
     }
-    logger.info({
-        method: "MaintenanceTrackingMunicipality.getAutoriUpdateService",
-        message: `domain=${domainName} lambda was cold`
-    });
     const autoriApi = new AutoriApi(secret);
     return new AutoriUpdate(autoriApi);
 }
