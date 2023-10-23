@@ -12,6 +12,9 @@ export interface Props {
         url: string;
     };
     allowFromIpAddresses: string[];
+
+    readonly publicApiKey?: string;
+    readonly integrationApiKey?: string;
 }
 export interface DbProps {
     username: string;

@@ -14,12 +14,14 @@ import {
 import { addDefaultValidator } from "@digitraffic/common/dist/utils/api-model";
 import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { Props } from "./app-props";
 
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
     const integrationApi = createApi(stack);
+
     createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
-    createUsagePlan(integrationApi);
+    createDefaultUsagePlan(integrationApi, "Integration", props.integrationApiKey);
 }
 
 function createApi(stack: Construct) {
@@ -128,15 +130,4 @@ function createDeleteRequestHandler(
         ]
     });
     createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);
-}
-
-function createUsagePlan(integrationApi: apigateway.RestApi) {
-    const apiKey = integrationApi.addApiKey("Integration API key");
-    const plan = integrationApi.addUsagePlan("Integration Usage Plan", {
-        name: "Integration Usage Plan"
-    });
-    plan.addApiStage({
-        stage: integrationApi.deploymentStage
-    });
-    plan.addApiKey(apiKey);
 }

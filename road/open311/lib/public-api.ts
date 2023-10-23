@@ -13,7 +13,7 @@ import {
     createArraySchema
 } from "@digitraffic/common/dist/utils/api-model";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
     corsMethod,
     defaultIntegration,
@@ -34,7 +34,7 @@ import { Props } from "./app-props";
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Stack, props: Props) {
     const publicApi = createApi(stack, props.allowFromIpAddresses);
 
-    createUsagePlan(publicApi, "Open311 CloudFront API Key", "Open311 CloudFront Usage Plan");
+    createDefaultUsagePlan(publicApi, "Open311 CloudFront", props.publicApiKey);
 
     const validator = addDefaultValidator(publicApi);
 
