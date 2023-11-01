@@ -2,6 +2,7 @@
   "name": "swagger-joiner",
   "version": "0.1.0",
   "private": true,
+  "type": "commonjs",
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "build": "tsc && npm run postbuild",
@@ -34,8 +35,7 @@
     "aws-sdk": "~2.1482.0",
     "axios": "^1.6.0",
     "constructs": "10.3.0",
-    "ramda": "~0.29.1",
-    "source-map-support": "^0.5.21",
+    "lodash": "~4.17.21",
     "zod": "3.22.4"
   },
   "devDependencies": {
@@ -44,8 +44,8 @@
     "@rushstack/eslint-config": "^3.4.1",
     "@types/aws-lambda": "8.10.125",
     "@types/jest": "29.5.6",
+    "@types/lodash": "4.14.200",
     "@types/node": "20.8.9",
-    "@types/ramda": "0.29.7",
     "@types/sinon": "10.0.20",
     "esbuild": "0.19.5",
     "eslint": "~8.52.0",
@@ -55,10 +55,6 @@
     "sinon": "17.0.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
-    "types-ramda": "0.29.5",
-    "typescript": "~5.2.2"
-  },
-  "externals": [
-    "aws-sdk"
-  ]
+    "typescript": "~4.9.5"
+  }
 }

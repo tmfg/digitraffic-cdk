@@ -22,7 +22,7 @@
     "@types/aws-lambda": "8.10.125",
     "@types/node": "20.8.9",
     "eslint": "~8.52.0",
-    "typescript": "~5.2.2"
+    "typescript": "~4.9.5"
   },
   "externals": [
     "aws-sdk"
