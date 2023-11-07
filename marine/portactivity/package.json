@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc && npm run postbuild",
+    "build": "npm run build:tsc && npm run postbuild",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
+    "build:tsc": "heft build --clean",
+    "build:watch": "heft build-watch --clean",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
@@ -16,9 +18,8 @@
     "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "jest --detectOpenHandles --forceExit",
-    "test_errors": "npm test 2>&1 | grep 'FAIL'",
-    "watch": "tsc -w"
+    "test": "heft test --clean",
+    "test:watch": "heft test-watch --clean"
   },
   "dependencies": {
     "@digitraffic/common": "2023.6.27-1",
@@ -41,11 +42,15 @@
   },
   "devDependencies": {
     "@aws-cdk/aws-synthetics-alpha": "2.85.0-alpha.0",
+    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.4.1",
+    "@rushstack/heft": "^0.62.3",
+    "@rushstack/heft-jest-plugin": "^0.10.1",
     "@types/amqplib": "0.10.3",
     "@types/aws-lambda": "8.10.125",
+    "@types/heft-jest": "1.0.5",
     "@types/jest": "29.5.6",
     "@types/lodash": "4.14.200",
     "@types/node": "20.8.9",

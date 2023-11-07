@@ -3,5 +3,5 @@ require("@rushstack/eslint-config/patch/modern-module-resolution");
 
 module.exports = {
     extends: ["@digitraffic-cdk/eslint-config/profile/allow-console-log"],
-    parserOptions: { project: "./tsconfig.eslint.json" }
+    parserOptions: { tsconfigRootDir: __dirname }
 };

@@ -1,0 +1,35 @@
+export const DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES = 15;
+
+export type Port = string;
+
+export const ports: Port[] = [
+    "FIOUL",
+    "FIPOR",
+    "FISKV",
+    "FIHKO",
+    "FIRAU",
+    "FIUKI",
+    "FIKOK",
+    "FIMUS",
+    "FIHEL",
+    "FIKJO",
+    "FIEJO",
+    "FITOR",
+    "FILPP",
+    "FIVRK",
+    "FIJOE",
+    "FIVAA",
+    "FIRAA",
+    "FIPRS",
+    "FIKAS",
+    "FINLI",
+    "FIKTK",
+    "FITRY",
+    "FIKUO",
+    "FITKU",
+    "FIKEM",
+    "FIMHQ",
+    "FILAN",
+    "FIINK",
+    "FILOV"
+];
