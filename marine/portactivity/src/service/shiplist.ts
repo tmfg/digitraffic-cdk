@@ -1,6 +1,6 @@
 import { getDisplayableNameForEventSource, mergeTimestamps } from "../event-sourceutil";
 import { DbPublicShiplist, findByLocodePublicShiplist } from "../dao/shiplist-public";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export function dbPublicShiplistToPublicApiTimestamp(ts: DbPublicShiplist, locode: string) {
     return Object.assign(ts, {

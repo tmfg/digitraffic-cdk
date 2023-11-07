@@ -1,8 +1,8 @@
 import { dbTestBase, insertPilotage, insertPortCall } from "../db-testutil";
 import { deletePilotages, findPortCallId, getTimestamps } from "../../dao/pilotages";
-import { Pilotage } from "../../model/pilotage";
-import { Location } from "../../model/timestamp";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { Pilotage } from "../../model/pilotage";
+import type { Location } from "../../model/timestamp";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { newPortCall, newTimestamp } from "../testdata";
 import { subHours } from "date-fns";
 

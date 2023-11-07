@@ -1,4 +1,4 @@
-import { URN } from "@digitraffic/common/dist/types/urn";
+import type { URN } from "@digitraffic/common/dist/types/urn";
 
 export enum AwakeAiZoneType {
     VTS_AREA = "vts",

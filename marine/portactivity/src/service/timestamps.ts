@@ -8,11 +8,11 @@ import {
 import { parseISO } from "date-fns";
 import * as R from "ramda";
 import * as TimestampsDB from "../dao/timestamps";
-import { DbETAShip, DbTimestamp, DbTimestampIdAndLocode, DbUpdatedTimestamp } from "../dao/timestamps";
+import type { DbETAShip, DbTimestamp, DbTimestampIdAndLocode, DbUpdatedTimestamp } from "../dao/timestamps";
 import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
 import { EventSource } from "../model/eventsource";
 import { ApiTimestamp, EventType, PublicApiTimestamp, Ship } from "../model/timestamp";
-import { Port } from "./portareas";
+import type { Port } from "./portareas";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean;

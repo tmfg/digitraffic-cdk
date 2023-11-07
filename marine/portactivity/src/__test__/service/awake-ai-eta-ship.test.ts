@@ -6,7 +6,7 @@ import {
     AwakeAiShipResponseType
 } from "../../api/awake-ai-ship";
 import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship";
-import { DbETAShip } from "../../dao/timestamps";
+import type { DbETAShip } from "../../dao/timestamps";
 import { ApiTimestamp, EventType } from "../../model/timestamp";
 import {
     AwakeAiPredictionMetadata,
@@ -18,7 +18,6 @@ import {
 import { getRandomInteger, randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { EventSource } from "../../model/eventsource";
 import { addHours } from "date-fns";
-import { LOCODE } from "../../model/locode";
 
 describe("AwakeAiETAShipService", () => {
     test("getAwakeAiTimestamps - creates both ETA and ETB for FIRAU", async () => {

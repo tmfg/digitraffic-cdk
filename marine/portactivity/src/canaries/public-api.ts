@@ -1,6 +1,6 @@
 import { UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import { getSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
-import { ShiplistSecret } from "../lambda/get-shiplist-public/get-shiplist-public";
+import type { ShiplistSecret } from "../lambda/get-shiplist-public/get-shiplist-public";
 import { ENV_HOSTNAME, ENV_SECRET } from "@digitraffic/common/dist/aws/infra/canaries/canary-keys";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 

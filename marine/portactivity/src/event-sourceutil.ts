@@ -1,7 +1,7 @@
 import { differenceInMinutes, parseISO } from "date-fns";
 import * as R from "ramda";
 import { EventSource } from "./model/eventsource";
-import { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
+import type { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
 
 export const VTS_A = "VTS A";
 export const VTS_O = "VTS O";
@@ -148,7 +148,7 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
                 ...{
                     eventTime: dateAverage(vtsAStamps.map((ts) => parseISO(ts.eventTime)))
                 }
-            });
+            } as PublicApiTimestamp);
         }
 
         ret.push(...addToList);

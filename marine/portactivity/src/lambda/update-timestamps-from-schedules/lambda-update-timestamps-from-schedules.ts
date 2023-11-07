@@ -1,5 +1,5 @@
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SchedulesApi } from "../../api/schedules";

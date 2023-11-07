@@ -12,10 +12,10 @@ import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentat
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { TimestampMetadata } from "./model/timestamp-metadata";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { IModel } from "aws-cdk-lib/aws-apigateway/lib/model";
+import type { IModel } from "aws-cdk-lib/aws-apigateway/lib/model";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
 

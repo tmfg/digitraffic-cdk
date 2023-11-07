@@ -1,10 +1,10 @@
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { AwakeAiETDPortService } from "../../service/awake-ai-etd-port";
 import { AwakeAiPortApi } from "../../api/awake-ai-port";
-import { SNSEvent } from "aws-lambda";
+import type { SNSEvent } from "aws-lambda";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { sendMessage } from "../../service/queue-service";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";

@@ -1,9 +1,10 @@
-process.env.SECRET_ID = "Test";
+// eslint-disable-next-line dot-notation
+process.env["SECRET_ID"] = "Test";
 
 import * as sinon from "sinon";
 import { dbTestBase, mockSecrets } from "../db-testutil";
 import { handler, ShiplistSecret } from "../../lambda/get-shiplist-public/get-shiplist-public";
-import { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
+import type { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 
 const AUTH = "test";
 

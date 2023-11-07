@@ -1,5 +1,5 @@
-import { AwakeAiPortApi } from "../api/awake-ai-port";
-import { ApiTimestamp } from "../model/timestamp";
+import type { AwakeAiPortApi } from "../api/awake-ai-port";
+import type { ApiTimestamp } from "../model/timestamp";
 import { AwakeAiZoneType } from "../api/awake-common";
 import {
     etdPredictionToTimestamp,

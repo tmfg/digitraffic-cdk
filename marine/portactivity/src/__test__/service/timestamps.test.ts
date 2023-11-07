@@ -13,7 +13,7 @@ import * as TimestampsService from "../../service/timestamps";
 import { ApiTimestamp, EventType } from "../../model/timestamp";
 import { EventSource } from "../../model/eventsource";
 import * as R from "ramda";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addHours, addMinutes, parseISO, subDays } from "date-fns";
 
 describe(

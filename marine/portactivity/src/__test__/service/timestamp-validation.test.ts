@@ -1,4 +1,4 @@
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as R from "ramda";
 import { NavStatus } from "../../model/ais-status";
 import { EventSource } from "../../model/eventsource";

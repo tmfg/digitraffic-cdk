@@ -1,5 +1,5 @@
 import { PreparedStatement } from "pg-promise";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 const FIND_DISTINCT_LOCODES_BY_TIMESTAMP_SOURCE = new PreparedStatement({
     name: "find-distinct-locodes-by-timestamp-source",

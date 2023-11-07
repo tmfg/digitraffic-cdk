@@ -1,11 +1,11 @@
-import { ApiTimestamp } from "../model/timestamp";
+import type { ApiTimestamp } from "../model/timestamp";
 import * as TimestampsDb from "../dao/timestamps";
-import { DbTimestamp } from "../dao/timestamps";
-import { PortAreaDetails, PortCall, Vessel } from "./testdata";
+import type { DbTimestamp } from "../dao/timestamps";
+import type { PortAreaDetails, PortCall, Vessel } from "./testdata";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import { updatePilotages } from "../dao/pilotages";
-import { Countable } from "@digitraffic/common/dist/database/models";
+import type { Countable } from "@digitraffic/common/dist/database/models";
 import * as sinon from "sinon";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";

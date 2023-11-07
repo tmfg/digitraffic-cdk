@@ -2,7 +2,7 @@ import { dbTestBase, insert } from "../db-testutil";
 import { newTimestamp } from "../testdata";
 import * as MetadataService from "../../service/metadata";
 import { PREDICTION_SOURCES } from "../../service/metadata";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 describe(
     "LOCODE metadata",

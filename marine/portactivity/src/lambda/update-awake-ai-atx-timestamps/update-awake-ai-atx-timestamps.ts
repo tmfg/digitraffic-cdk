@@ -2,11 +2,11 @@ import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
 import { sendMessage } from "../../service/queue-service";
 import { AwakeAiATXService } from "../../service/awake-ai-atx";
 import { AwakeAiATXApi } from "../../api/awake-ai-atx";
-import { Context } from "aws-lambda";
+import type { Context } from "aws-lambda";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import WebSocket from "ws";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

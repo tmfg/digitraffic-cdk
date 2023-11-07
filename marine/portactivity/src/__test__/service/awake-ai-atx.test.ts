@@ -7,7 +7,7 @@ import { ApiTimestamp, EventType } from "../../model/timestamp";
 import { randomBoolean, shuffle } from "@digitraffic/common/dist/test/testutils";
 import { EventSource } from "../../model/eventsource";
 import { AwakeAiZoneType } from "../../api/awake-common";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { WebSocket } from "ws";
 import { addHours, subHours } from "date-fns";
 

@@ -1,15 +1,15 @@
-import { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { ComparisonOperator, TreatMissingData } from "aws-cdk-lib/aws-cloudwatch";
 import { Schedule } from "@aws-cdk/aws-synthetics-alpha";
 import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
 import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { PortactivityConfiguration } from "./app-props";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { PortactivityConfiguration } from "./app-props";
 import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
-import { PublicApi } from "./public-api";
-import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import type { PublicApi } from "./public-api";
+import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, dlq: Queue, publicApi: PublicApi, secret: ISecret) {

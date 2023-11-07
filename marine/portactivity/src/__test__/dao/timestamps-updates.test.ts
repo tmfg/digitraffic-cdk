@@ -2,7 +2,7 @@ import { dbTestBase, findAll, insertPortAreaDetails, insertPortCall } from "../d
 import { newPortAreaDetails, newPortCall, newTimestamp, PortAreaDetails, PortCall } from "../testdata";
 import * as TimestampsDb from "../../dao/timestamps";
 import { ApiTimestamp, EventType } from "../../model/timestamp";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
 import * as R from "ramda";
 

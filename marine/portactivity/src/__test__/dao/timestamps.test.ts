@@ -8,13 +8,12 @@ import {
 } from "../db-testutil";
 import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata";
 import * as TimestampsDb from "../../dao/timestamps";
-import { DbTimestamp } from "../../dao/timestamps";
+import type { DbTimestamp } from "../../dao/timestamps";
 import { ApiTimestamp, EventType } from "../../model/timestamp";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../../model/eventsource";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { addDays, addHours, addMinutes, subDays, subHours, subMinutes } from "date-fns";
-import { saveTimestamp } from "../../service/timestamps";
+import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
 import _ from "lodash";
 
 const EVENT_SOURCE = "TEST";

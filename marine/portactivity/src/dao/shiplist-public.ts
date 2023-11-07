@@ -1,7 +1,7 @@
 import { PreparedStatement } from "pg-promise";
-import { EventType } from "../model/timestamp";
+import type { EventType } from "../model/timestamp";
 import { EventSource } from "../model/eventsource";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export interface DbPublicShiplist {
     readonly event_type: EventType;

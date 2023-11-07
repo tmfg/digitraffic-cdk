@@ -1,6 +1,6 @@
 import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
 import { Duration } from "aws-cdk-lib";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 
 export function createQueue(scope: Construct): QueueAndDLQ {
     const queueName = "PortActivity-Timestamps";

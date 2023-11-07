@@ -1,7 +1,7 @@
 import { saveTimestamp, UpdatedTimestamp } from "../../service/timestamps";
 import { validateTimestamp } from "../../service/timestamp-validation";
-import { ApiTimestamp } from "../../model/timestamp";
-import { SQSEvent } from "aws-lambda";
+import type { ApiTimestamp } from "../../model/timestamp";
+import type { SQSEvent } from "aws-lambda";
 import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";

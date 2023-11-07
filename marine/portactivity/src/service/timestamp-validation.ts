@@ -1,7 +1,7 @@
 import { EventSource } from "../model/eventsource";
 import { findVesselSpeedAndNavStatus } from "../dao/timestamps";
 import { ApiTimestamp, EventType } from "../model/timestamp";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { isValid, parseISO } from "date-fns";
 import { NavStatus } from "../model/ais-status";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";

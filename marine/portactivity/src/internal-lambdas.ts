@@ -6,11 +6,11 @@ import {
     LambdaEnvironment
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { Bucket } from "aws-cdk-lib/aws-s3";
+import type { Bucket } from "aws-cdk-lib/aws-s3";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { QueueAndDLQ } from "./sqs";
+import type { QueueAndDLQ } from "./sqs";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -20,8 +20,8 @@ import {
     MonitoredDBFunction,
     MonitoredFunction
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { PortactivityConfiguration } from "./app-props";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { PortactivityConfiguration } from "./app-props";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 

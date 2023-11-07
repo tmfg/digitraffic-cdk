@@ -1,5 +1,5 @@
-import { Location } from "../model/timestamp";
-import { PilotageRoute } from "../model/pilotage";
+import type { Location } from "../model/timestamp";
+import type { PilotageRoute } from "../model/pilotage";
 
 const pilotwebToPortnetLocodeMap: Record<string, string> = {};
 

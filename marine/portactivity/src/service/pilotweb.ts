@@ -4,7 +4,7 @@ import * as TimestampDAO from "../dao/timestamps";
 import * as LocationConverter from "./location-converter";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ApiTimestamp, EventType, Location } from "../model/timestamp";
-import { Pilotage } from "../model/pilotage";
+import type { Pilotage } from "../model/pilotage";
 import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../model/eventsource";
 

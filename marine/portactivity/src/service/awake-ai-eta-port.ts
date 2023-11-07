@@ -1,11 +1,11 @@
-import { ApiTimestamp } from "../model/timestamp";
+import type { ApiTimestamp } from "../model/timestamp";
 import {
     AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction
 } from "../api/awake-common";
-import { AwakeAiPortApi, AwakeAiPortSchedule } from "../api/awake-ai-port";
+import type { AwakeAiPortApi, AwakeAiPortSchedule } from "../api/awake-ai-port";
 import {
     etaPredictionToTimestamp,
     isAwakeEtaPrediction,

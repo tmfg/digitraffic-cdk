@@ -8,7 +8,7 @@ import {
     Vessel
 } from "../api/schedules";
 import { EventSource } from "../model/eventsource";
-import { Locode } from "../model/locode";
+import type { Locode } from "../model/locode";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports";
 import { ports } from "./portareas";

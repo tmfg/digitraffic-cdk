@@ -1,11 +1,12 @@
-process.env.SECRET_ID = "Test";
+// eslint-disable-next-line dot-notation
+process.env["SECRET_ID"] = "Test";
 
 import { dbTestBase, findAll, mockSecrets } from "../db-testutil";
 import { handlerFn } from "../../lambda/process-queue/process-queue";
-import { SQSRecord } from "aws-lambda";
-import { ApiTimestamp } from "../../model/timestamp";
+import type { SQSRecord } from "aws-lambda";
+import type { ApiTimestamp } from "../../model/timestamp";
 import { newTimestamp } from "../testdata";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as R from "ramda";
 import * as sinon from "sinon";
 

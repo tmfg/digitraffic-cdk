@@ -2,8 +2,8 @@ import { PreparedStatement } from "pg-promise";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES } from "../service/portareas";
 import { EventSource } from "../model/eventsource";
-import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
-import { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
+import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import type { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
 import { parseISO } from "date-fns";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;

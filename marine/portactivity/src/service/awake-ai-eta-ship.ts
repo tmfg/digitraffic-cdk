@@ -4,10 +4,15 @@ import {
     AwakeAiShipPredictability,
     AwakeAiShipVoyageSchedule
 } from "../api/awake-ai-ship";
-import { DbETAShip } from "../dao/timestamps";
+import type { DbETAShip } from "../dao/timestamps";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { retry } from "@digitraffic/common/dist/utils/retry";
-import { AwakeAiVoyageEtaPrediction, AwakeAiVoyageStatus, AwakeAiZoneType } from "../api/awake-common";
+import {
+    AwakeAiPredictedVoyage,
+    AwakeAiVoyageEtaPrediction,
+    AwakeAiVoyageStatus,
+    AwakeAiZoneType
+} from "../api/awake-common";
 import {
     AwakeDataState,
     etaPredictionToTimestamp,
@@ -16,7 +21,7 @@ import {
 } from "./awake-ai-etx-helper";
 import { EventSource } from "../model/eventsource";
 import { differenceInHours } from "date-fns";
-import { Locode } from "../model/locode";
+import type { Locode } from "../model/locode";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports";
 
@@ -169,7 +174,7 @@ export class AwakeAiETAShipService {
         }
 
         // we are only interested in the current voyage (ETA) for now
-        const eta = schedule.predictedVoyages[0];
+        const eta = schedule.predictedVoyages[0] as AwakeAiPredictedVoyage;
 
         if (eta.voyageStatus !== AwakeAiVoyageStatus.UNDER_WAY) {
             logger.warn({

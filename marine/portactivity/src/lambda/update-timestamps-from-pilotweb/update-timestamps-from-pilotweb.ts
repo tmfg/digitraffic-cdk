@@ -3,7 +3,7 @@ import * as PilotwebService from "../../service/pilotweb";
 import { PortactivityEnvKeys } from "../../keys";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";

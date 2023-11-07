@@ -2,11 +2,11 @@ import { getShiplist } from "../../service/shiplist";
 import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
+import type { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
-import { PublicApiTimestamp } from "../../model/timestamp";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { PublicApiTimestamp } from "../../model/timestamp";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>("shiplist");

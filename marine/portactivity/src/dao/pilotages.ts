@@ -1,7 +1,7 @@
-import { Location } from "../model/timestamp";
+import type { Location } from "../model/timestamp";
 import { PreparedStatement } from "pg-promise";
-import { Pilotage } from "../model/pilotage";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { Pilotage } from "../model/pilotage";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const PORTCALL_TIMESTAMP_AGE_LIMIT = `NOW() - INTERVAL '36 HOURS'`;

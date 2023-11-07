@@ -1,10 +1,10 @@
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { SNSEvent } from "aws-lambda";
+import type { SNSEvent } from "aws-lambda";
 import { parseISO } from "date-fns";
 import { AwakeAiETAShipApi } from "../../api/awake-ai-ship";
-import { DbETAShip } from "../../dao/timestamps";
+import type { DbETAShip } from "../../dao/timestamps";
 import { PortactivityEnvKeys } from "../../keys";
 import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship";
 import { sendMessage } from "../../service/queue-service";

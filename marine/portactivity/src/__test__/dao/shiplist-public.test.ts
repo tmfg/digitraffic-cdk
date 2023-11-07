@@ -4,7 +4,7 @@ import { newTimestamp } from "../testdata";
 import { EventType } from "../../model/timestamp";
 import { dbPublicShiplistToPublicApiTimestamp, getShiplist } from "../../service/shiplist";
 import { EventSource } from "../../model/eventsource";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO } from "date-fns";
 import { mergeTimestamps } from "../../event-sourceutil";

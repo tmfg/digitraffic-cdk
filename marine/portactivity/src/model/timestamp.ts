@@ -1,4 +1,4 @@
-import { NullableOptional } from "@digitraffic/common/dist/types/nullable";
+import type { NullableOptional } from "@digitraffic/common/dist/types/nullable";
 
 export enum EventType {
     ATA = "ATA",

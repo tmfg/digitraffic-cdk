@@ -1,9 +1,8 @@
-import { WebSocket } from "ws";
-import { AwakeAiZoneType } from "./awake-common";
+import type { WebSocket } from "ws";
+import type { AwakeAiZoneType } from "./awake-common";
 import { SSM } from "aws-sdk";
-import * as URL from "url";
 import { PortActivityParameterKeys } from "../keys";
-import { PutParameterResult } from "aws-sdk/clients/ssm";
+import type { PutParameterResult } from "aws-sdk/clients/ssm";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 
