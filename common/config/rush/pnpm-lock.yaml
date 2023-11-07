@@ -65,9 +65,6 @@ importers:
       '@types/node':
         specifier: 20.8.9
         version: 20.8.9
-      '@types/ramda':
-        specifier: 0.29.7
-        version: 0.29.7
       '@types/sinon':
         specifier: 10.0.20
         version: 10.0.20
@@ -86,9 +83,6 @@ importers:
       axios:
         specifier: ^1.6.0
         version: 1.6.0
-      change-case:
-        specifier: ^5.1.2
-        version: 5.1.2
       constructs:
         specifier: 10.3.0
         version: 10.3.0
@@ -140,9 +134,6 @@ importers:
       prettier:
         specifier: ^2.8.8
         version: 2.8.8
-      ramda:
-        specifier: ~0.29.1
-        version: 0.29.1
       rimraf:
         specifier: ^5.0.5
         version: 5.0.5
@@ -677,9 +668,6 @@ importers:
       '@types/node':
         specifier: 20.8.9
         version: 20.8.9
-      '@types/ramda':
-        specifier: 0.29.7
-        version: 0.29.7
       '@types/sinon':
         specifier: 10.0.20
         version: 10.0.20
@@ -746,6 +734,9 @@ importers:
       date-fns:
         specifier: ~2.30.0
         version: 2.30.0
+      lodash:
+        specifier: ~4.17.21
+        version: 4.17.21
       moment:
         specifier: ^2.29.4
         version: 2.29.4
@@ -789,12 +780,15 @@ importers:
       '@types/jest':
         specifier: 29.5.6
         version: 29.5.6
+      '@types/lodash':
+        specifier: 4.14.200
+        version: 4.14.200
       '@types/node':
         specifier: 20.8.9
         version: 20.8.9
       '@types/ramda':
-        specifier: 0.29.7
-        version: 0.29.7
+        specifier: 0.29.0
+        version: 0.29.0
       '@types/sinon':
         specifier: 10.0.20
         version: 10.0.20
@@ -832,8 +826,8 @@ importers:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.8.9)(typescript@4.9.5)
       types-ramda:
-        specifier: 0.29.5
-        version: 0.29.5
+        specifier: 0.29.1
+        version: 0.29.1
       typescript:
         specifier: ~4.9.5
         version: 4.9.5
@@ -858,9 +852,6 @@ importers:
       pg-promise:
         specifier: ^11.5.4
         version: 11.5.4(pg-native@3.0.1)
-      ramda:
-        specifier: ~0.29.1
-        version: 0.29.1
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -889,9 +880,6 @@ importers:
       '@types/node':
         specifier: 20.8.9
         version: 20.8.9
-      '@types/ramda':
-        specifier: 0.29.7
-        version: 0.29.7
       '@types/sinon':
         specifier: 10.0.20
         version: 10.0.20
@@ -1903,6 +1891,9 @@ importers:
       geojson-validation:
         specifier: ^1.0.2
         version: 1.0.2
+      lodash:
+        specifier: ~4.17.21
+        version: 4.17.21
       moment:
         specifier: ^2.29.4
         version: 2.29.4
@@ -1912,9 +1903,6 @@ importers:
       pg-promise:
         specifier: ^11.5.4
         version: 11.5.4(pg-native@3.0.1)
-      ramda:
-        specifier: ~0.29.1
-        version: 0.29.1
     devDependencies:
       '@digitraffic-cdk/eslint-config':
         specifier: workspace:*
@@ -1934,12 +1922,12 @@ importers:
       '@types/jest':
         specifier: 29.5.6
         version: 29.5.6
+      '@types/lodash':
+        specifier: 4.14.200
+        version: 4.14.200
       '@types/node':
         specifier: 20.8.9
         version: 20.8.9
-      '@types/ramda':
-        specifier: 0.29.7
-        version: 0.29.7
       '@types/sinon':
         specifier: 10.0.20
         version: 10.0.20
@@ -1967,9 +1955,6 @@ importers:
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.8.9)(typescript@4.9.5)
-      types-ramda:
-        specifier: 0.29.5
-        version: 0.29.5
       typescript:
         specifier: ~4.9.5
         version: 4.9.5
@@ -2070,15 +2055,15 @@ importers:
       dtsgenerator:
         specifier: ^3.19.1
         version: 3.19.1
+      lodash:
+        specifier: ~4.17.21
+        version: 4.17.21
       pg-native:
         specifier: ^3.0.1
         version: 3.0.1
       pg-promise:
         specifier: ^11.5.4
         version: 11.5.4(pg-native@3.0.1)
-      ramda:
-        specifier: ~0.29.1
-        version: 0.29.1
       sns-sqs-big-payload:
         specifier: ^0.1.4
         version: 0.1.4(aws-sdk@2.1482.0)
@@ -2104,12 +2089,12 @@ importers:
       '@types/jest':
         specifier: 29.5.6
         version: 29.5.6
+      '@types/lodash':
+        specifier: 4.14.200
+        version: 4.14.200
       '@types/node':
         specifier: 20.8.9
         version: 20.8.9
-      '@types/ramda':
-        specifier: 0.29.7
-        version: 0.29.7
       '@types/sinon':
         specifier: 10.0.20
         version: 10.0.20
@@ -2137,9 +2122,6 @@ importers:
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.8.9)(typescript@4.9.5)
-      types-ramda:
-        specifier: 0.29.5
-        version: 0.29.5
       typescript:
         specifier: ~4.9.5
         version: 4.9.5
@@ -6674,10 +6656,10 @@ packages:
     resolution: {integrity: sha512-J8IrehehphLtxpABSekURTw9jthrlLcM4llH1I2fZ0zKaxq8jI/O1+Q/tabAJgBY/ffoqDxPRNYBM1lFUXm0lw==}
     dev: false
 
-  /@types/ramda@0.29.7:
-    resolution: {integrity: sha512-IUl6U95qwlQtVvZkSX4ODj08oJVtPyWMFRtPVNqhxc2rt+Bh7lCzTrGMYMZ7dmRKcAjtot3xrPnYGwsjdt8gzQ==}
+  /@types/ramda@0.29.0:
+    resolution: {integrity: sha512-TY9eKsklU43CmAbFJPKDUyBjleZ4EFAkbJeQRF4e8byGkOw1CjDcwg5EGa0Bgf0Kgs9BE9OU4UzQWnQDHnvMtA==}
     dependencies:
-      types-ramda: 0.29.5
+      types-ramda: 0.29.1
     dev: true
 
   /@types/readable-stream@4.0.4:
@@ -7595,10 +7577,6 @@ packages:
       snake-case: 3.0.4
       tslib: 2.6.2
     dev: false
-
-  /change-case@5.1.2:
-    resolution: {integrity: sha512-CAtbGEDulyjzs05RXy3uKcwqeztz/dMEuAc1Xu9NQBsbrhuGMneL0u9Dj5SoutLKBFYun8txxYIwhjtLNfUmCA==}
-    dev: true
 
   /char-regex@1.0.2:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
@@ -10850,6 +10828,7 @@ packages:
 
   /ramda@0.29.1:
     resolution: {integrity: sha512-OfxIeWzd4xdUNxlWhgFazxsA/nl3mS4/jGZI5n00uWOoSSFRhC1b6gl6xvmzUamgmqELraWp0J/qqVlXYPDPyA==}
+    dev: false
 
   /range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -11668,8 +11647,8 @@ packages:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
     dev: false
 
-  /types-ramda@0.29.5:
-    resolution: {integrity: sha512-u+bAYXHDPJR+amB0qMrMU/NXRB2PG8QqpO2v6j7yK/0mPZhlaaZj++ynYjnVpkPEpCkZEGxNpWY3X7qyLCGE3w==}
+  /types-ramda@0.29.1:
+    resolution: {integrity: sha512-pdEF8VXcBTSu3fPupZahieG6Lh8eBWPtcaH/OB5QPCoN2hz4vBbspoMLB3X9kwzXRD3lwD4/j0hwj3Z/PAzzcA==}
     dependencies:
       ts-toolbelt: 9.6.0
     dev: true
