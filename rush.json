@@ -236,12 +236,6 @@
       "tags": ["cdk", "road"]
     },
     {
-      "packageName": "road-network-conditions",
-      "projectFolder": "road/road-network-conditions",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "road"]
-    },
-    {
       "packageName": "street-traffic-messages",
       "projectFolder": "road/street-traffic-message",
       "decoupledLocalDependencies": ["@digitraffic/common"],
