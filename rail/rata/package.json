@@ -10,6 +10,7 @@
     "clean:force": "rimraf dist cdk.out node_modules",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
+    "test": "echo 'No tests implemented'",
     "watch": "tsc -w"
   },
   "dependencies": {

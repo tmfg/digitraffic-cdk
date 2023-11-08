@@ -20,6 +20,13 @@
       "shellCommand": "pretty-quick --staged"
     },
     {
+      "name": "test",
+      "commandKind": "bulk",
+      "summary": "Run test for all projects in the monorepo.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false
+    },
+    {
       "name": "repo:check-dependencies",
       "commandKind": "global",
       "summary": "Checks if dependencies are declared correctly",
