@@ -18,7 +18,7 @@
    */
   "rushVersion": "5.100.1",
 
-  "pnpmVersion": "8.10.0",
+  "pnpmVersion": "8.10.2",
   "nodeSupportedVersionRange": ">=16.13.0 <17.0.0 || >=18.0.0 <19.0.0",
   "ensureConsistentVersions": false,
 
