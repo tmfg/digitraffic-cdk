@@ -10,9 +10,9 @@ import {
 } from "../db-testutil";
 import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata";
 import * as TimestampsService from "../../service/timestamps";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
+import { EventType } from "../../model/timestamp";
 import { EventSource } from "../../model/eventsource";
-import * as R from "ramda";
+import _ from "lodash";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addHours, addMinutes, parseISO, subDays } from "date-fns";
 import { assertDefined } from "../test-utils";
@@ -29,7 +29,7 @@ describe(
                 undefined,
                 undefined
             );
-            expect(timestamps.length).toBe(1);
+            expect(timestamps).toHaveLength(1);
             expect(timestamps[0]).toMatchObject({
                 ...timestamp,
                 eventTimeConfidenceLowerDiff: null,
@@ -47,7 +47,7 @@ describe(
                 undefined
             );
 
-            expect(timestamps.length).toBe(1);
+            expect(timestamps).toHaveLength(1);
             expect(timestamps[0]).toMatchObject({
                 ...timestamp,
                 eventTimeConfidenceLowerDiff: null,
@@ -65,7 +65,7 @@ describe(
                 timestamp.ship.imo
             );
 
-            expect(timestamps.length).toBe(1);
+            expect(timestamps).toHaveLength(1);
             expect(timestamps[0]).toMatchObject({
                 ...timestamp,
                 eventTimeConfidenceLowerDiff: null,
@@ -141,7 +141,7 @@ describe(
             const ret = await TimestampsService.saveTimestamp(newerTimestamp, db);
 
             expect(ret?.locodeChanged).toBe(false);
-            expect((await findAll(db)).length).toBe(2);
+            expect(await findAll(db)).toHaveLength(2);
         });
 
         test("saveTimestamp - Portnet timestamp with same portcallid, different locode is replaced ", async () => {
@@ -178,7 +178,7 @@ describe(
         });
 
         test("saveTimestamp - no IMO, timestamp not saved", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "imo"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "ship.imo");
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
@@ -186,7 +186,7 @@ describe(
         });
 
         test("saveTimestamp - no MMSI but IMO exists, timestamp saved", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "ship.mmsi");
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
@@ -198,7 +198,7 @@ describe(
             const vessel = newVessel(timestamp);
             await insertVessel(db, vessel);
 
-            const timestamp2 = R.dissocPath<ApiTimestamp>(["ship", "imo"], timestamp);
+            const timestamp2 = _.omit(timestamp, "ship.imo");
             const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
             expect(ret?.location_locode).toBe(timestamp2.location.port);
@@ -211,7 +211,7 @@ describe(
             const vessel = newVessel(timestamp);
             await insertVessel(db, vessel);
 
-            const timestamp2 = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
+            const timestamp2 = _.omit(timestamp, "ship.mmsi");
             const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
             expect(ret?.location_locode).toBe(timestamp.location.port);
@@ -224,10 +224,7 @@ describe(
                 Object.values(EventSource)
                     .filter((source) => source !== EventSource.AWAKE_AI_PRED)
                     .map(async (source) => {
-                        const timestamp = R.dissocPath<ApiTimestamp>(
-                            ["portcallId"],
-                            newTimestamp({ source })
-                        );
+                        const timestamp = _.omit(newTimestamp({ source }), "portcallId");
                         const ret = await TimestampsService.saveTimestamp(timestamp, db);
                         expect(ret).not.toBeDefined();
                     })
@@ -235,19 +232,13 @@ describe(
         });
 
         test("saveTimestamp - saved with missing portcallId when timestamp is PRED", async () => {
-            const predTimestamp = R.dissocPath<ApiTimestamp>(
-                ["portcallId"],
-                newTimestamp({
-                    source: EventSource.AWAKE_AI_PRED
-                })
-            );
+            const predTimestamp = _.omit(newTimestamp({ source: EventSource.AWAKE_AI_PRED }), "portcallId");
             const ret = await TimestampsService.saveTimestamp(predTimestamp, db);
             expect(ret).toBeDefined();
         });
 
         test("saveTimestamp - portcall id found for ETB timestamp from VTS A source", async () => {
-            const vtsTimestamp = R.dissocPath<ApiTimestamp>(
-                ["portcallId"],
+            const vtsTimestamp = _.omit(
                 newTimestamp({
                     eventType: EventType.ETB,
                     eventTime: addHours(Date.now(), 1),
@@ -255,7 +246,8 @@ describe(
                     imo: 1234567,
                     mmsi: 7654321,
                     source: EventSource.SCHEDULES_CALCULATED
-                })
+                }),
+                "portcallId"
             );
             const awakeTimestamp = {
                 ...vtsTimestamp,
@@ -277,7 +269,7 @@ describe(
             await TimestampsService.saveTimestamp(awakeTimestamp, db);
 
             const timestamps = await findAll(db);
-            expect(timestamps.length).toBe(2);
+            expect(timestamps).toHaveLength(2);
 
             const resultApiTimestamp = (
                 await TimestampsService.findAllTimestamps(vtsTimestamp.location.port, undefined, undefined)
@@ -375,7 +367,7 @@ describe(
 
             const ships = await TimestampsService.findETAShipsByLocode([locode]);
 
-            expect(ships.length).toBe(2);
+            expect(ships).toHaveLength(2);
         });
 
         test("deleteOldTimestampsAndPilotages - deletes both old timestamps and pilotages", async () => {
@@ -391,7 +383,7 @@ describe(
 
             await TimestampsService.deleteOldTimestampsAndPilotages();
 
-            expect((await findAll(db)).length).toBe(0);
+            expect(await findAll(db)).toHaveLength(0);
             expect(await getPilotagesCount(db)).toBe(0);
         });
     })

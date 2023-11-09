@@ -4,7 +4,7 @@ import * as TimestampsDb from "../../dao/timestamps";
 import { ApiTimestamp, EventType } from "../../model/timestamp";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
-import * as R from "ramda";
+import _ from "lodash";
 import { assertDefined } from "../test-utils";
 
 describe(
@@ -81,7 +81,7 @@ describe(
         });
 
         test("updateTimestamp - no duplicate rows with null mmsi", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "ship.mmsi");
 
             await TimestampsDb.updateTimestamp(db, timestamp);
             expect(await TimestampsDb.updateTimestamp(db, timestamp)).toBeNull();

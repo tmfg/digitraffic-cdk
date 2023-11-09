@@ -9,7 +9,7 @@ import { ApiTimestamp, EventType } from "../model/timestamp";
 import { EventSource } from "../model/eventsource";
 import { getRandomInteger, shuffle } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO, subMinutes } from "date-fns";
-import * as R from "ramda";
+import _ from "lodash";
 import { assertDefined } from "./test-utils";
 
 describe("event-sourceutil", () => {
@@ -219,11 +219,11 @@ describe("event-sourceutil", () => {
     });
 
     test("mergeTimestamps - discard duplicate PRED timestamp with missing portcallId", () => {
-        const predTimestampWithoutPortcallId = R.dissocPath<ApiTimestamp>(
-            ["portcallId"],
+        const predTimestampWithoutPortcallId = _.omit(
             newTimestamp({
                 source: EventSource.AWAKE_AI_PRED
-            })
+            }),
+            "portcallId"
         );
         const duplicateWithPortcallId = { ...predTimestampWithoutPortcallId, portcallId: 123 };
         const timestamps = [predTimestampWithoutPortcallId, duplicateWithPortcallId];

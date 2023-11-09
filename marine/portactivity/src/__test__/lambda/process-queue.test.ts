@@ -7,7 +7,7 @@ import type { SQSRecord } from "aws-lambda";
 import type { ApiTimestamp } from "../../model/timestamp";
 import { newTimestamp } from "../testdata";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import * as R from "ramda";
+import _ from "lodash";
 import * as sinon from "sinon";
 
 describe(
@@ -36,7 +36,7 @@ describe(
         });
 
         test("missing portcall id does not throw error", async () => {
-            const timestamp = R.omit(["portcallId"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "portcallId");
 
             await handlerFn()({
                 Records: [createRecord(timestamp)]
@@ -47,7 +47,7 @@ describe(
         });
 
         test("single invalid record", async () => {
-            const timestamp = R.omit(["eventType"], newTimestamp()) as ApiTimestamp;
+            const timestamp = _.omit(newTimestamp(), "eventType") as ApiTimestamp;
 
             await handlerFn()({
                 Records: [createRecord(timestamp)]
@@ -59,7 +59,7 @@ describe(
 
         test("both valid & invalid records return fulfilled promises", async () => {
             const validTimestamp = newTimestamp();
-            const invalidTimestamp = R.omit(["eventType"], newTimestamp()) as ApiTimestamp;
+            const invalidTimestamp = _.omit(newTimestamp(), "eventType") as ApiTimestamp;
 
             const promises = await handlerFn()({
                 Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)]

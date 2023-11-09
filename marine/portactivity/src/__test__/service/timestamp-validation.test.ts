@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import * as R from "ramda";
+import _ from "lodash";
 import { NavStatus } from "../../model/ais-status";
 import { EventSource } from "../../model/eventsource";
 import { ApiTimestamp, EventType } from "../../model/timestamp";
@@ -15,41 +15,37 @@ describe(
         });
 
         test("validateTimestamp - missing eventType", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["eventType"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "eventType");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing eventTime", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["eventTime"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "eventTime");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - invalid eventTime", async () => {
-            const timestamp = R.assoc("eventTime", "123456-qwerty", newTimestamp()) as Partial<ApiTimestamp>;
+            const timestamp = _.set(newTimestamp(), "eventTime", "123456-qwerty");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - invalid eventTimeConfidenceLowerDiff", async () => {
-            const timestamp = R.assoc(
+            const timestamp = _.set(
+                newTimestamp({ eventTimeConfidenceUpperDiff: 1000 }),
                 "eventTimeConfidenceLowerDiff",
-                "-1000a",
-                newTimestamp({
-                    eventTimeConfidenceUpperDiff: 1000
-                })
-            ) as unknown as Partial<ApiTimestamp>;
+                "-1000a"
+            );
 
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceLowerDiff");
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceUpperDiff");
         });
 
         test("validateTimestamp - invalid eventTimeConfidenceUpperDiff", async () => {
-            const timestamp = R.assoc(
+            const timestamp = _.set(
+                newTimestamp({ eventTimeConfidenceLowerDiff: 1000 }),
                 "eventTimeConfidenceUpperDiff",
-                "-1000a",
-                newTimestamp({
-                    eventTimeConfidenceLowerDiff: 1000
-                })
-            ) as unknown as Partial<ApiTimestamp>;
+                "-1000a"
+            );
 
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceLowerDiff");
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceUpperDiff");
@@ -88,40 +84,37 @@ describe(
         });
 
         test("validateTimestamp - missing recordTime", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["recordTime"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "recordTime");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - invalid recordTime", async () => {
-            const timestamp = R.assoc("recordTime", "123456-qwerty", newTimestamp()) as Partial<ApiTimestamp>;
+            const timestamp = _.set(newTimestamp(), "recordTime", "123456-qwerty");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing source", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["source"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "source");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing ship", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["ship"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "ship");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing mmsi & imo", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(
-                ["ship", "mmsi"],
-                R.dissocPath<ApiTimestamp>(["ship", "imo"], newTimestamp())
-            );
+            const timestamp = _.omit(newTimestamp(), ["ship.imo", "ship.mmsi"]);
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing location", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["location"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "location");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing port", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(["location", "port"], newTimestamp());
+            const timestamp = _.omit(newTimestamp(), "location", "port");
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
