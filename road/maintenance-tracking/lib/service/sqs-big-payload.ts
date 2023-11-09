@@ -1,7 +1,7 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SQS } from "aws-sdk";
 import { parseISO } from "date-fns";
-import * as R from "ramda";
+import _ from "lodash";
 import { SqsConsumer, SqsProducer } from "sns-sqs-big-payload";
 import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao";
 import { MaintenanceTrackingEnvKeys } from "../keys";
@@ -97,7 +97,7 @@ export async function handleMessage(
         });
     }
 
-    const sendingSystem = R.pathOr("UNKNOWN", ["otsikko", "lahettaja", "jarjestelma"], trackingJson);
+    const sendingSystem = _.get(trackingJson, ["otsikko", "lahettaja", "jarjestelma"], "UNKNOWN");
     const observationDatas: MaintenanceTrackingDb.DbObservationData[] = trackingJson.havainnot.map(
         (havainto: Havainto) =>
             MaintenanceTrackingService.convertToDbObservationData(havainto, sendingTime, sendingSystem, s3Uri)

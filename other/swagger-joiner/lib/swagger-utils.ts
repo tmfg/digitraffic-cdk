@@ -1,5 +1,5 @@
-import { mergeDeepLeft } from "ramda";
 import { OpenApiSchema } from "./model/openapi-schema";
+import _ from "lodash";
 
 export function constructSwagger(spec: object) {
     return `
@@ -39,27 +39,16 @@ export function constructSwagger(spec: object) {
 }
 
 export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
-    return allApis.reduce(
-        (acc, curr) => mergeDeepLeft(curr, acc) as OpenApiSchema
-    );
+    return allApis.reduce((acc, curr) => _.merge(curr, acc) as OpenApiSchema);
 }
 
-function methodIsDeprecated(
-    apiDescription: OpenApiSchema,
-    path: string,
-    method: string
-): boolean {
+function methodIsDeprecated(apiDescription: OpenApiSchema, path: string, method: string): boolean {
     const deprecationTextMatcher = /(W|w)ill be removed/;
-    const headerMatcher =
-        /(headers.*deprecation.*sunset|headers.*sunset.*deprecation)/i;
+    const headerMatcher = /(headers.*deprecation.*sunset|headers.*sunset.*deprecation)/i;
     return (
         typeof apiDescription.paths[path][method].summary === "string" &&
-        (deprecationTextMatcher.test(
-            apiDescription.paths[path][method].summary as string
-        ) ||
-            headerMatcher.test(
-                JSON.stringify(apiDescription.paths[path][method])
-            ))
+        (deprecationTextMatcher.test(apiDescription.paths[path][method].summary as string) ||
+            headerMatcher.test(JSON.stringify(apiDescription.paths[path][method])))
     );
 }
 

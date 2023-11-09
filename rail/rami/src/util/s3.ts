@@ -1,11 +1,7 @@
-import { PutObjectCommand, PutObjectCommandOutput, PutObjectRequest, S3 } from "@aws-sdk/client-s3";
+import { PutObjectCommand, PutObjectCommandOutput, S3 } from "@aws-sdk/client-s3";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-export async function uploadToS3<Body extends PutObjectRequest["Body"] | undefined>(
-    bucketName: string,
-    body: Body,
-    objectName: string
-): Promise<void> {
+export async function uploadToS3(bucketName: string, body: string, objectName: string): Promise<void> {
     const s3 = new S3({});
     try {
         await doUpload(s3, bucketName, body, objectName);
@@ -25,10 +21,10 @@ export async function uploadToS3<Body extends PutObjectRequest["Body"] | undefin
     }
 }
 
-function doUpload<Body extends PutObjectRequest["Body"] | undefined>(
+function doUpload(
     s3: S3,
     bucketName: string,
-    body: Body,
+    body: string,
     fileName: string
 ): Promise<PutObjectCommandOutput> {
     const command = new PutObjectCommand({

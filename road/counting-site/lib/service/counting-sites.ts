@@ -6,10 +6,11 @@ import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/databas
 import { ResultDomain } from "../model/domain";
 import { DbCsvData, ResponseData } from "../model/data";
 import { createObjectCsvStringifier } from "csv-writer";
-import * as R from "ramda";
 import { ResultUserTypes } from "../model/usertype";
 import { FeatureCollection } from "geojson";
 import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
+
+import _ from "lodash";
 
 export function getUserTypes(): Promise<[ResultUserTypes, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
@@ -60,7 +61,7 @@ export function getValuesForMonth(
 
         // overwrite timestamp to iso 8601
         const dataOut = data.map((row: DbCsvData) =>
-            R.assoc("timestamp", row.data_timestamp.toISOString(), row)
+            _.set(row, "timestamp", row.data_timestamp.toISOString())
         );
         const rows = data.length === 0 ? "" : csv.stringifyRecords(dataOut);
 
