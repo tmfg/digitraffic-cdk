@@ -1,5 +1,5 @@
+import _ from "lodash";
 import { getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
-import * as R from "ramda";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
 import { TyokoneenseurannanKirjaus } from "../lib/model/models";
 
@@ -108,7 +108,7 @@ export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
 ): string {
     const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
     const trackingJson = JSON.parse(validJson) as TyokoneenseurannanKirjaus;
-    return JSON.stringify(R.dissocPath(["otsikko", "lahettaja", "jarjestelma"], trackingJson));
+    return JSON.stringify(_.omit(trackingJson, "otsikko.lahettaja.jarjestelma"));
 }
 
 export function assertObservationData(
@@ -116,7 +116,7 @@ export function assertObservationData(
     results: DbObservationData[]
 ): void {
     results.forEach((resultObservation) => {
-        const resultObservationWithoutId = R.dissoc("id", resultObservation);
+        const resultObservationWithoutId = _.omit(resultObservation, "id");
 
         const foundSrcObservations = srcObservations.filter(
             (o) => o.observationTime.getTime() === resultObservationWithoutId.observationTime.getTime()

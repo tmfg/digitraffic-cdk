@@ -89,7 +89,7 @@ describe(
 
             const foundFault = await FaultsDb.getFaultById(db, fault.id + 1);
 
-            expect(foundFault).toBeNull();
+            expect(foundFault).toBeUndefined();
         });
 
         test("findAllFaults - empty", async () => {

@@ -12,7 +12,7 @@ const FAULT_KIRJATTU: FaultFeature = {
     type: "Feature",
     geometry: {
         type: "Point",
-        coordinates: [],
+        coordinates: []
     },
     properties: {
         ID: -2139947340,
@@ -28,15 +28,15 @@ const FAULT_KIRJATTU: FaultFeature = {
         VAYLA_NIMI_FI: "Haminan 12m väylä",
         VAYLA_NIMI_SE: "Haminan 12m väylä",
         MERIALUE_NRO: 5,
-        FAULT_FIXED: 0,
-    },
+        FAULT_FIXED: 0
+    }
 };
 
 const FAULT_OK: FaultFeature = {
     type: "Feature",
     geometry: {
         type: "Point",
-        coordinates: [10, 10],
+        coordinates: [10, 10]
     },
     properties: {
         ID: -2139947340,
@@ -52,8 +52,8 @@ const FAULT_OK: FaultFeature = {
         VAYLA_NIMI_FI: "Haminan 12m väylä",
         VAYLA_NIMI_SE: "Haminan 12m väylä",
         MERIALUE_NRO: 5,
-        FAULT_FIXED: 0,
-    },
+        FAULT_FIXED: 0
+    }
 };
 
 describe(
@@ -72,11 +72,9 @@ describe(
 
         test("updateFaults - 1 fault - Kirjattu", async () => {
             await assertFaultCount(db, 0);
-            sandbox
-                .stub(FaultsApi.prototype, "getFaults")
-                .resolves([FAULT_KIRJATTU]);
+            sandbox.stub(FaultsApi.prototype, "getFaults").resolves([FAULT_KIRJATTU]);
 
-            await UpdateFaultsService.updateFaults("", FAULT_DOMAIN);
+            await expect(() => UpdateFaultsService.updateFaults("", FAULT_DOMAIN)).rejects.toThrow();
 
             await assertFaultCount(db, 0);
         });
