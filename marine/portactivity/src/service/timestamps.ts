@@ -141,7 +141,7 @@ export async function findAllTimestamps(
 ): Promise<PublicApiTimestamp[]> {
     const start = Date.now();
 
-    const timestamps: PublicApiTimestamp[] = await inDatabaseReadonly(async (db: DTDatabase) => {
+    const timestamps = await inDatabaseReadonly(async (db: DTDatabase) => {
         if (locode) {
             return TimestampsDB.findByLocode(db, locode);
         } else if (mmsi && !imo) {
@@ -156,15 +156,16 @@ export async function findAllTimestamps(
             message: "no locode, mmsi, imo or source given"
         });
         return [];
-    })
-        .finally(() => {
-            logger.info({
-                method: "GetTimestamps.findAllTimestamps",
-                tookMs: Date.now() - start
-            });
-        })
-        .then((tss: DbTimestamp[]) => tss.map(dbTimestampToPublicApiTimestamp));
-    return mergeTimestamps(timestamps).map((timestamp) => ({
+    });
+
+    logger.info({
+        method: "GetTimestamps.findAllTimestamps",
+        tookMs: Date.now() - start
+    });
+
+    const tss = timestamps.map(dbTimestampToPublicApiTimestamp);
+
+    return mergeTimestamps(tss).map((timestamp) => ({
         ...timestamp,
         source: getDisplayableNameForEventSource(timestamp.source)
     }));
