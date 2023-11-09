@@ -1,8 +1,8 @@
 export const DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES = 15;
 
-export type Port = string;
+export type PortFormat = `FI${string}`;
 
-export const ports: Port[] = [
+export const ports = [
     "FIOUL",
     "FIPOR",
     "FISKV",
@@ -32,4 +32,7 @@ export const ports: Port[] = [
     "FILAN",
     "FIINK",
     "FILOV"
-];
+] as const satisfies Readonly<Array<PortFormat>>;
+
+export type Port = (typeof ports)[number];
+export type Ports = Readonly<Array<Port>>;

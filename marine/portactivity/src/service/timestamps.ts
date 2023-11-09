@@ -12,7 +12,7 @@ import type { DbETAShip, DbTimestamp, DbTimestampIdAndLocode, DbUpdatedTimestamp
 import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
 import { EventSource } from "../model/eventsource";
 import { ApiTimestamp, EventType, PublicApiTimestamp, Ship } from "../model/timestamp";
-import type { Port } from "./portareas";
+import type { Ports } from "./portareas";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean;
@@ -170,7 +170,7 @@ export async function findAllTimestamps(
     }));
 }
 
-export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
+export async function findETAShipsByLocode(ports: Ports): Promise<DbETAShip[]> {
     logger.info({
         method: "TimeStampsService.findETAShipsByLocode",
         message: `find for ${ports.toString()}`

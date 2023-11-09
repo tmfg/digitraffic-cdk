@@ -10,6 +10,7 @@ import { AwakeAiZoneType } from "../../api/awake-common";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { WebSocket } from "ws";
 import { addHours, subHours } from "date-fns";
+import { assertDefined } from "../test-utils";
 
 describe(
     "service Awake.AI ATx",
@@ -44,12 +45,16 @@ describe(
             const timestamps = await service.getATXs(0); // timeout is irrelevant
 
             expect(timestamps.length).toBe(1);
+
+            const locode = atxMessage.locodes[0];
+            assertDefined(locode);
+
             const expectedTimestamp: ApiTimestamp = {
                 eventType: zoneEventType === AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD,
                 eventTime: atxMessage.eventTimestamp,
                 recordTime: atxMessage.eventTimestamp,
                 location: {
-                    port: atxMessage.locodes[0]
+                    port: locode
                 },
                 ship: {
                     mmsi: atxMessage.mmsi,
@@ -80,6 +85,8 @@ describe(
         });
 
         function createPortcall(atxMessage: AwakeAIATXTimestampMessage, portcallId: number): Promise<void> {
+            const locode = atxMessage.locodes[0];
+            assertDefined(locode);
             return db.tx(async (t) => {
                 await insertPortCall(t, {
                     port_call_id: portcallId,
@@ -87,7 +94,7 @@ describe(
                     radio_call_sign_type: "fake",
                     vessel_name: atxMessage.shipName,
                     port_call_timestamp: new Date(),
-                    port_to_visit: atxMessage.locodes[0],
+                    port_to_visit: locode,
                     mmsi: atxMessage.mmsi,
                     imo_lloyds: atxMessage.imo
                 });

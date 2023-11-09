@@ -1,6 +1,6 @@
 import { PreparedStatement } from "pg-promise";
 import { ApiTimestamp, EventType } from "../model/timestamp";
-import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES } from "../service/portareas";
+import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, Ports } from "../service/portareas";
 import { EventSource } from "../model/eventsource";
 import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import type { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
@@ -456,7 +456,7 @@ export function findBySource(db: DTDatabase, source: string): Promise<DbTimestam
     return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findPortnetETAsByLocodes(db: DTDatabase, locodes: string[]): Promise<DbETAShip[]> {
+export function findPortnetETAsByLocodes(db: DTDatabase, locodes: Ports): Promise<DbETAShip[]> {
     // Prepared statement use not possible due to dynamic IN-list
     return db.tx((t) => t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
 }

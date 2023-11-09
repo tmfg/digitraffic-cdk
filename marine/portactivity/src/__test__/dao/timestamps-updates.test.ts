@@ -5,6 +5,7 @@ import { ApiTimestamp, EventType } from "../../model/timestamp";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
 import * as R from "ramda";
+import { assertDefined } from "../test-utils";
 
 describe(
     "db-timestamps - updates",
@@ -20,6 +21,7 @@ describe(
             const fetchedTimestamps = await findAll(db);
             expect(fetchedTimestamps.length).toBe(1);
             const e = fetchedTimestamps[0];
+            assertDefined(e);
             expect(e.location_locode).toBe(timestamp.location.port);
             expect(e.location_portarea).toBe(timestamp.location.portArea);
             expect(e.location_from_locode).toBe(timestamp.location.from);
@@ -64,6 +66,7 @@ describe(
             await TimestampsDb.updateTimestamp(db, timestamp);
 
             const e = (await findAll(db))[0];
+            assertDefined(e);
             expect(e.ship_mmsi).toBe(timestamp.ship.mmsi);
             expect(e.ship_imo).toBe(timestamp.ship.imo);
         });
@@ -120,7 +123,10 @@ describe(
 
             await TimestampsDb.updateTimestamp(db, timestamp);
 
-            expect((await findAll(db))[0].portcall_id).toBe(portcallId);
+            const result = (await findAll(db))[0];
+            assertDefined(result);
+
+            expect(result.portcall_id).toBe(portcallId);
         });
 
         test("findPortcallId - by nearest time", async () => {
@@ -136,6 +142,7 @@ describe(
                     const bDiff = b.eta ? Math.abs(differenceInMilliseconds(parseISO(b.eta), eventTime)) : 0;
                     return aDiff - bDiff;
                 })[0];
+            assertDefined(nearestTimestamp);
 
             const portcallId = await TimestampsDb.findPortcallId(
                 db,

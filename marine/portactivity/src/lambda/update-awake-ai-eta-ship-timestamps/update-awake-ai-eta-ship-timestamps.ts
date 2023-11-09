@@ -27,10 +27,12 @@ const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>("awake",
 
 export const handler = (event: SNSEvent): Promise<void> => {
     // always a single event, guaranteed by SNS
-    const ships = (JSON.parse(event.Records[0].Sns.Message) as SnsETAShip[]).map((ship) => ({
-        ...ship,
-        eta: parseISO(ship.eta)
-    }));
+    const ships = (JSON.parse(event.Records[0]?.Sns.Message as unknown as string) as SnsETAShip[]).map(
+        (ship) => ({
+            ...ship,
+            eta: parseISO(ship.eta)
+        })
+    );
 
     return secretHolder.get().then(async (secret) => {
         if (!service) {

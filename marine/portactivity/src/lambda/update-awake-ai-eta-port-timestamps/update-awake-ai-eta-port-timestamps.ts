@@ -24,11 +24,14 @@ export function handler(event: SNSEvent): Promise<void> {
         .then(() => secretHolder.get())
         .then(async (secret) => {
             // always a single event, guaranteed by SNS
-            const locode = event.Records[0].Sns.Message;
+            const locode = event.Records[0]?.Sns.Message as unknown as string;
 
             if (!service) {
                 service = new AwakeAiETAPortService(
-                    new AwakeAiPortApi(secret["awake.voyagesurl"], secret["awake.voyagesauth"])
+                    new AwakeAiPortApi(
+                        secret["awake.voyagesurl"] as unknown as string,
+                        secret["awake.voyagesauth"] as unknown as string
+                    )
                 );
             }
             const timestamps = await service.getAwakeAiTimestamps(locode);

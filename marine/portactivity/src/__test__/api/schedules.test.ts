@@ -1,6 +1,7 @@
 import { SchedulesApi, SchedulesDirection, SchedulesResponse } from "../../api/schedules";
 import * as sinon from "sinon";
 import axios from "axios";
+import { assertDefined } from "../test-utils";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -37,12 +38,13 @@ describe("api-schedules", () => {
 });
 
 function verifyXmlResponse(resp: SchedulesResponse): void {
-    const s = resp.schedules.schedule;
-    expect(s.length).toBe(1);
-    expect(s[0].$.UUID).toBe(uuid);
+    const s = resp.schedules.schedule[0];
+    assertDefined(s);
+    expect(s.$.UUID).toBe(uuid);
 
-    expect(s[0].timetable.length).toBe(1);
-    const tt = s[0].timetable[0];
+    expect(s.timetable.length).toBe(1);
+    const tt = s.timetable[0];
+    assertDefined(tt);
 
     expect(tt.eta?.length).toBe(1);
 
@@ -51,6 +53,7 @@ function verifyXmlResponse(resp: SchedulesResponse): void {
     }
 
     const eta = tt.eta[0];
+    assertDefined(eta);
     expect(eta.$.time).toBe(etaEventTime);
     expect(eta.$.uts).toBe(etaTimestamp);
 
@@ -58,10 +61,10 @@ function verifyXmlResponse(resp: SchedulesResponse): void {
     const dest = tt.destination?.[0];
     expect(dest?.$.locode).toBe(locode);
 
-    const v = s[0].vessel;
-    expect(v.length).toBe(1);
-    expect(v[0].$.vesselName).toBe(vesselName);
-    expect(v[0].$.callsign).toBe(callsign);
-    expect(v[0].$.mmsi).toBe(mmsi);
-    expect(v[0].$.imo).toBe(imo);
+    const v = s.vessel[0];
+    assertDefined(v);
+    expect(v.$.vesselName).toBe(vesselName);
+    expect(v.$.callsign).toBe(callsign);
+    expect(v.$.mmsi).toBe(mmsi);
+    expect(v.$.imo).toBe(imo);
 }

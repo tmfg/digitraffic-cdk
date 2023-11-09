@@ -11,7 +11,7 @@ import { EventSource } from "../model/eventsource";
 import type { Locode } from "../model/locode";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports";
-import { ports } from "./portareas";
+import { Port, ports } from "./portareas";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class SchedulesService {
@@ -39,7 +39,7 @@ export class SchedulesService {
 
     filterTimestamps(timestamps: ApiTimestamp[]): ApiTimestamp[] {
         return timestamps
-            .filter((ts) => ports.includes(ts.location.port))
+            .filter((ts) => ports.includes(ts.location.port as Port))
             .filter((ts) =>
                 ts.eventType === EventType.ETD
                     ? moment(ts.eventTime) >= moment().subtract(5, "minutes")
@@ -51,20 +51,20 @@ export class SchedulesService {
         return resp.schedules.schedule.flatMap((s) => {
             const timestamps: ApiTimestamp[] = [];
             const tt = s.timetable[0];
-            if (!tt.destination) {
+            if (!tt?.destination) {
                 return timestamps;
             }
             if (tt.eta) {
                 const timestamp = this.toTimestamp(
-                    tt.eta[0],
-                    tt.destination[0],
-                    s.vessel[0],
+                    tt.eta[0] as unknown as Timestamp,
+                    tt.destination[0] as unknown as Destination,
+                    s.vessel[0] as unknown as Vessel,
                     calculated,
                     EventType.ETA
                 );
                 timestamps.push(timestamp);
                 // also generate an ETB timestamp for VTS calculated ETA if destination is in list of locodes to be published as ETB timestamps
-                if (calculated && VTS_A_ETB_PORTS.includes(tt.destination[0].$.locode as Locode)) {
+                if (calculated && VTS_A_ETB_PORTS.includes(tt.destination[0]?.$.locode as Locode)) {
                     logger.debug(
                         "generated ETB timestamp for SCHEDULES_CALCULATED " +
                             JSON.stringify({
@@ -77,7 +77,13 @@ export class SchedulesService {
             }
             if (tt.etd) {
                 timestamps.push(
-                    this.toTimestamp(tt.etd[0], tt.destination[0], s.vessel[0], calculated, EventType.ETD)
+                    this.toTimestamp(
+                        tt.etd[0] as unknown as Timestamp,
+                        tt.destination[0] as unknown as Destination,
+                        s.vessel[0] as unknown as Vessel,
+                        calculated,
+                        EventType.ETD
+                    )
                 );
             }
             return timestamps;

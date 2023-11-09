@@ -174,7 +174,7 @@ export class AwakeAiETAShipService {
         }
 
         // we are only interested in the current voyage (ETA) for now
-        const eta = schedule.predictedVoyages[0] as AwakeAiPredictedVoyage;
+        const eta = schedule.predictedVoyages[0] as unknown as AwakeAiPredictedVoyage;
 
         if (eta.voyageStatus !== AwakeAiVoyageStatus.UNDER_WAY) {
             logger.warn({

@@ -62,7 +62,7 @@ function filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps: Publi
         (timestamp) =>
             !(
                 !timestamp.portcallId &&
-                timestamp.source == EventSource.AWAKE_AI_PRED &&
+                timestamp.source === EventSource.AWAKE_AI_PRED &&
                 timestamps.find((potentialDuplicate) =>
                     isDuplicateWithPortcallId(timestamp, potentialDuplicate)
                 )

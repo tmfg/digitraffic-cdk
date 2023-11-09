@@ -34,7 +34,7 @@ export class AwakeAiATXService {
                             message: `No locode for timestamp! IMO ${atx.imo}`
                         });
                     }
-                    const port = atx.locodes[0];
+                    const port = atx.locodes[0] as unknown as string;
                     const eventType =
                         atx.zoneEventType === AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD;
                     const eventTime = moment(atx.eventTimestamp).toDate();

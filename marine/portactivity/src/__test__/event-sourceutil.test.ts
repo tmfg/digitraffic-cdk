@@ -10,21 +10,23 @@ import { EventSource } from "../model/eventsource";
 import { getRandomInteger, shuffle } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO, subMinutes } from "date-fns";
 import * as R from "ramda";
+import { assertDefined } from "./test-utils";
 
 describe("event-sourceutil", () => {
     function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp): void {
         expect(mergedTimestamps.length).toBe(1);
         const merged = mergedTimestamps[0];
+        assertDefined(merged);
         expectTimestamp(timestamp, merged);
     }
 
-    function expectTimestamp(actual: ApiTimestamp, expected: ApiTimestamp): void {
-        expect(actual.portcallId).toBe(expected.portcallId);
-        expect(actual.source).toBe(expected.source);
-        expect(actual.eventType).toBe(expected.eventType);
-        expect(actual.recordTime).toBe(expected.recordTime);
-        expect(actual.ship).toMatchObject(expected.ship);
-        expect(actual.location).toMatchObject(expected.location);
+    function expectTimestamp(actual: ApiTimestamp | undefined, expected: ApiTimestamp): void {
+        expect(actual?.portcallId).toBe(expected.portcallId);
+        expect(actual?.source).toBe(expected.source);
+        expect(actual?.eventType).toBe(expected.eventType);
+        expect(actual?.recordTime).toBe(expected.recordTime);
+        expect(actual?.ship).toMatchObject(expected.ship);
+        expect(actual?.location).toMatchObject(expected.location);
     }
 
     test("dateAverage", () => {
@@ -120,9 +122,9 @@ describe("event-sourceutil", () => {
             const merged = mergeTimestamps(timestamps);
 
             expect(merged.length).toBe(3);
-            expect(merged[0].source).toBe(EventSource.SCHEDULES_CALCULATED);
-            expect(merged[1].source).toBe(EventSource.PORTNET);
-            expect(merged[2].source).toBe(EventSource.SCHEDULES_VTS_CONTROL);
+            expect(merged[0]?.source).toBe(EventSource.SCHEDULES_CALCULATED);
+            expect(merged[1]?.source).toBe(EventSource.PORTNET);
+            expect(merged[2]?.source).toBe(EventSource.SCHEDULES_VTS_CONTROL);
         }
     });
 

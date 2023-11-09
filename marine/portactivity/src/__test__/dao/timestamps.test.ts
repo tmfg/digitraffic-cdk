@@ -15,6 +15,7 @@ import { EventSource } from "../../model/eventsource";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
 import _ from "lodash";
+import { assertDefined } from "../test-utils";
 
 const EVENT_SOURCE = "TEST";
 
@@ -155,10 +156,11 @@ describe(
                 };
                 await insert(db, [timestamp, timestamp2]);
 
-                const foundTimestamp = await fn(timestamp);
+                const foundTimestamp = (await fn(timestamp))[0];
 
-                expect(foundTimestamp.length).toBe(1);
-                expect(foundTimestamp[0].record_time.toISOString()).toBe(timestamp2.recordTime);
+                assertDefined(foundTimestamp);
+
+                expect(foundTimestamp.record_time.toISOString()).toBe(timestamp2.recordTime);
             });
         }
 
@@ -193,7 +195,7 @@ describe(
                 const recordTime = new Date();
                 const eventTime = addHours(recordTime, 10);
 
-                const predTimestamp = _.omit<ApiTimestamp>(
+                const predTimestamp = _.omit(
                     newTimestamp({
                         source: EventSource.AWAKE_AI_PRED,
                         recordTime,
@@ -202,7 +204,7 @@ describe(
                         imo: 1234567,
                         locode: "FIHEL"
                     }),
-                    ["portcallId"]
+                    "portcallId"
                 );
 
                 const olderPredTimestamp = {
@@ -213,10 +215,10 @@ describe(
 
                 await insert(db, [predTimestamp, olderPredTimestamp]);
 
-                const foundTimestamps = await fn(predTimestamp);
+                const foundTimestamp = (await fn(predTimestamp))[0];
+                assertDefined(foundTimestamp);
 
-                expect(foundTimestamps.length).toBe(1);
-                expect(foundTimestamps[0].record_time.toISOString()).toBe(predTimestamp.recordTime);
+                expect(foundTimestamp.record_time.toISOString()).toBe(predTimestamp.recordTime);
             });
         }
 
@@ -246,7 +248,7 @@ describe(
                 const futureEventTime = addDays(date, 1);
                 const pastEventTime = subDays(date, 1);
 
-                const latestPredTimestamp = _.omit<ApiTimestamp>(
+                const latestPredTimestamp = _.omit(
                     newTimestamp({
                         source: EventSource.AWAKE_AI_PRED,
                         recordTime: latestRecordTime,
@@ -255,7 +257,7 @@ describe(
                         imo: 1234567,
                         locode: "FIHEL"
                     }),
-                    ["portcallId"]
+                    "portcallId"
                 );
 
                 const olderPredTimestamp = {
@@ -268,7 +270,7 @@ describe(
 
                 const foundTimestamps = await fn(latestPredTimestamp);
 
-                expect(foundTimestamps.length).toBe(0);
+                expect(foundTimestamps).toHaveLength(0);
             });
         }
 
@@ -371,7 +373,7 @@ describe(
 
         test("findByImo - null mmsi", async () => {
             const imo = 1234567;
-            const timestamp = _.omit<ApiTimestamp>(newTimestamp({ imo }), ["ship", "mmsi"]);
+            const timestamp = _.omit(newTimestamp({ imo }), "ship.mmsi");
 
             await insert(db, [timestamp]);
 
@@ -397,7 +399,7 @@ describe(
 
         test("findByLocode - null mmsi", async () => {
             const locode = "AA111";
-            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ locode }));
+            const timestamp = _.omit(newTimestamp({ locode }), "ship.mmsi");
 
             await insert(db, [timestamp]);
 
@@ -432,7 +434,7 @@ describe(
         });
 
         test("findPortnetETAsByLocodes - 23 h in future is found", async () => {
-            const locode = "AA123";
+            const locode = "FIHEL";
             const eventTime = addHours(new Date(), 23);
             const timestamp = newTimestamp({
                 eventType: EventType.ETA,
@@ -453,7 +455,7 @@ describe(
         });
 
         test("findPortnetETAsByLocodes - ETD not found", async () => {
-            const locode = "AA123";
+            const locode = "FIVAA";
             const eventTime = addHours(new Date(), 1);
             const timestamp = newTimestamp({
                 eventType: EventType.ETD,
@@ -470,7 +472,7 @@ describe(
         });
 
         test("findPortnetETAsByLocodes - non-matching locode not found", async () => {
-            const locode = "AA123";
+            const locode = "FIVAA";
             const eventTime = addHours(new Date(), 1);
             const timestamp = newTimestamp({
                 eventType: EventType.ETA,
@@ -487,7 +489,7 @@ describe(
         });
 
         test("findPortnetETAsByLocodes - only Portnet is found", async () => {
-            const locode = "AA123";
+            const locode = "FIVAA";
             const eventTime = addHours(new Date(), 1);
             const timestamp1 = newTimestamp({
                 eventType: EventType.ETA,
@@ -525,8 +527,8 @@ describe(
         });
 
         test("findPortnetETAsByLocodes - multiple locodes", async () => {
-            const locode1 = "AA123";
-            const locode2 = "BB456";
+            const locode1 = "FIPRS";
+            const locode2 = "FIKEM";
             const eventTime = addHours(new Date(), 1);
 
             const timestamp1 = newTimestamp({
@@ -638,7 +640,7 @@ describe(
 
         test("findBySource - null mmsi", async () => {
             const source = "Portnet";
-            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ source }));
+            const timestamp = _.omit(newTimestamp({ source }), "ship.mmsi");
 
             await insert(db, [timestamp]);
 

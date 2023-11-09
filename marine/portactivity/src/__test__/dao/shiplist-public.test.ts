@@ -9,6 +9,7 @@ import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO } from "date-fns";
 import { mergeTimestamps } from "../../event-sourceutil";
 import { findByLocodePublicShiplist } from "../../dao/shiplist-public";
+import { assertDefined } from "../test-utils";
 
 describe(
     "db-shiplist-public",
@@ -34,10 +35,10 @@ describe(
             });
             await insert(db, [timestamp1, timestamp2]);
 
-            const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
+            const foundTimestamp = (await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL))[0];
+            assertDefined(foundTimestamp);
 
-            expect(foundTimestamps.length).toBe(1);
-            expect(foundTimestamps[0].event_type).toBe(EventType.ATA);
+            expect(foundTimestamp.event_type).toBe(EventType.ATA);
         });
 
         test("findByLocodePublicShiplist - ETA without portcallId returned even if ATA exists", async () => {
@@ -59,10 +60,15 @@ describe(
             await insert(db, [timestamp1, timestamp2]);
 
             const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
+            expect(foundTimestamps).toHaveLength(2);
 
-            expect(foundTimestamps.length).toBe(2);
-            expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
-            expect(foundTimestamps[1].event_type).toBe(EventType.ATA);
+            const ata = foundTimestamps[0];
+            const eta = foundTimestamps[1];
+            assertDefined(ata);
+            assertDefined(eta);
+
+            expect(ata.event_type).toBe(EventType.ETA);
+            expect(eta.event_type).toBe(EventType.ATA);
         });
 
         test("findByLocodePublicShiplist - ETA and ETD", async () => {
@@ -85,10 +91,15 @@ describe(
             await insert(db, [timestamp1, timestamp2]);
 
             const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
+            expect(foundTimestamps).toHaveLength(2);
 
-            expect(foundTimestamps.length).toBe(2);
-            expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
-            expect(foundTimestamps[1].event_type).toBe(EventType.ETD);
+            const eta = foundTimestamps[0];
+            const etd = foundTimestamps[1];
+            assertDefined(eta);
+            assertDefined(etd);
+
+            expect(eta.event_type).toBe(EventType.ETA);
+            expect(etd.event_type).toBe(EventType.ETD);
         });
 
         test("findByLocodePublicShiplist - timestamps 4 days in the future", async () => {
@@ -149,16 +160,16 @@ describe(
             await insert(db, [vtsTimestamp, awakeTimestamp]);
 
             const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
-            const mergedTimestamps = mergeTimestamps(
+            const mergedTimestamp = mergeTimestamps(
                 foundTimestamps.map((ts) => dbPublicShiplistToPublicApiTimestamp(ts, locode))
-            );
+            )[0];
+            assertDefined(mergedTimestamp);
 
-            expect(foundTimestamps.length).toBe(2);
-            expect(mergedTimestamps.length).toBe(1);
-            expect(parseISO(mergedTimestamps[0].eventTime).valueOf()).toBeGreaterThan(
+            expect(foundTimestamps).toHaveLength(2);
+            expect(parseISO(mergedTimestamp.eventTime).valueOf()).toBeGreaterThan(
                 parseISO(vtsTimestamp.eventTime).valueOf()
             );
-            expect(parseISO(mergedTimestamps[0].eventTime).valueOf()).toBeLessThan(
+            expect(parseISO(mergedTimestamp.eventTime).valueOf()).toBeLessThan(
                 parseISO(awakeTimestamp.eventTime).valueOf()
             );
         });
@@ -182,13 +193,13 @@ describe(
             });
             await insert(db, [vtsTimestamp, awakeTimestamp]);
 
-            const shiplist = await getShiplist(db, locode, 100);
+            const shiplist = (await getShiplist(db, locode, 100))[0];
+            assertDefined(shiplist);
 
-            expect(shiplist.length).toBe(1);
-            expect(parseISO(shiplist[0].eventTime).valueOf()).toBeGreaterThan(
+            expect(parseISO(shiplist.eventTime).valueOf()).toBeGreaterThan(
                 parseISO(vtsTimestamp.eventTime).valueOf()
             );
-            expect(parseISO(shiplist[0].eventTime).valueOf()).toBeLessThan(
+            expect(parseISO(shiplist.eventTime).valueOf()).toBeLessThan(
                 parseISO(awakeTimestamp.eventTime).valueOf()
             );
         });

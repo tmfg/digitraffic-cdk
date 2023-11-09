@@ -15,6 +15,7 @@ import { EventSource } from "../../model/eventsource";
 import * as R from "ramda";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addHours, addMinutes, parseISO, subDays } from "date-fns";
+import { assertDefined } from "../test-utils";
 
 describe(
     "timestamps",
@@ -98,14 +99,14 @@ describe(
 
             await insert(db, timestamps);
 
-            const foundTimestamps = await TimestampsService.findAllTimestamps(undefined, undefined, imo);
+            const foundTimestamp = (await TimestampsService.findAllTimestamps(undefined, undefined, imo))[0];
 
-            expect(foundTimestamps.length).toBe(1);
+            assertDefined(foundTimestamp);
             // eventtime should be the average of the two eventtimes
-            expect(parseISO(foundTimestamps[0].eventTime).valueOf()).toBeGreaterThan(earlier.valueOf());
-            expect(parseISO(foundTimestamps[0].eventTime).valueOf()).toBeLessThan(later.valueOf());
+            expect(parseISO(foundTimestamp.eventTime).valueOf()).toBeGreaterThan(earlier.valueOf());
+            expect(parseISO(foundTimestamp.eventTime).valueOf()).toBeLessThan(later.valueOf());
             // recordtime should be from higher priority source
-            expect(parseISO(foundTimestamps[0].recordTime).valueOf()).toEqual(later.valueOf());
+            expect(parseISO(foundTimestamp.recordTime).valueOf()).toEqual(later.valueOf());
         });
 
         test("saveTimestamp - no conflict returns updated", async () => {
@@ -218,14 +219,19 @@ describe(
             expect(ret?.ship_imo).toBe(vessel.imo);
         });
 
-        test("saveTimestamp - not saved with missing portcallId when timestamp is not PRED", async () => {
-            Object.values(EventSource)
-                .filter((source) => source !== EventSource.AWAKE_AI_PRED)
-                .forEach(async (source) => {
-                    const timestamp = R.dissocPath<ApiTimestamp>(["portcallId"], newTimestamp({ source }));
-                    const ret = await TimestampsService.saveTimestamp(timestamp, db);
-                    expect(ret).not.toBeDefined();
-                });
+        test("saveTimestamp - not saved with missing portcallId when timestamp is not PRED", () => {
+            return Promise.all(
+                Object.values(EventSource)
+                    .filter((source) => source !== EventSource.AWAKE_AI_PRED)
+                    .map(async (source) => {
+                        const timestamp = R.dissocPath<ApiTimestamp>(
+                            ["portcallId"],
+                            newTimestamp({ source })
+                        );
+                        const ret = await TimestampsService.saveTimestamp(timestamp, db);
+                        expect(ret).not.toBeDefined();
+                    })
+            );
         });
 
         test("saveTimestamp - saved with missing portcallId when timestamp is PRED", async () => {
@@ -273,23 +279,22 @@ describe(
             const timestamps = await findAll(db);
             expect(timestamps.length).toBe(2);
 
-            const apiTimestamps = await TimestampsService.findAllTimestamps(
-                vtsTimestamp.location.port,
-                undefined,
-                undefined
-            );
+            const resultApiTimestamp = (
+                await TimestampsService.findAllTimestamps(vtsTimestamp.location.port, undefined, undefined)
+            )[0];
 
-            expect(apiTimestamps.length).toBe(1);
-            expect(parseISO(apiTimestamps[0].eventTime).getTime()).toBeGreaterThan(
+            assertDefined(resultApiTimestamp);
+
+            expect(parseISO(resultApiTimestamp.eventTime).getTime()).toBeGreaterThan(
                 parseISO(vtsTimestamp.eventTime).getTime()
             );
-            expect(parseISO(apiTimestamps[0].eventTime).getTime()).toBeLessThan(
+            expect(parseISO(resultApiTimestamp.eventTime).getTime()).toBeLessThan(
                 parseISO(awakeTimestamp.eventTime).getTime()
             );
         });
 
         test("findETAShipsByLocode - same port later in day - just one ETA", async () => {
-            const locode = "FILOL";
+            const locode = "FIRAU";
             const imo = 123456;
             const eta1 = newTimestamp({
                 imo,
@@ -317,8 +322,8 @@ describe(
         });
 
         test("findETAShipsByLocode - different port later in day - just ETA closest to NOW", async () => {
-            const locode1 = "FILOL";
-            const locode2 = "FIKEK";
+            const locode1 = "FIRAU";
+            const locode2 = "FIHKO";
             const imo = 123456;
             const eta1 = newTimestamp({
                 imo,
@@ -340,14 +345,14 @@ describe(
             await insertPortAreaDetails(db, newPortAreaDetails(eta2));
             await insert(db, [eta1, eta2]);
 
-            const ships = await TimestampsService.findETAShipsByLocode([locode1, locode2]);
+            const ship = (await TimestampsService.findETAShipsByLocode([locode1, locode2]))[0];
+            assertDefined(ship);
 
-            expect(ships.length).toBe(1);
-            expect(ships[0].locode).toBe(locode1);
+            expect(ship.locode).toBe(locode1);
         });
 
         test("findETAShipsByLocode - different ship - two ETAs", async () => {
-            const locode = "FILOL";
+            const locode = "FIRAU";
             const eta1 = newTimestamp({
                 imo: 123456,
                 locode,

@@ -3,11 +3,12 @@ import { AwakeAiATXEventType, AwakeAIATXTimestampMessage, AwakeATXZoneEventType 
 import { AwakeAiZoneType } from "../api/awake-common";
 import { v4 as uuidv4 } from "uuid";
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import type { Port } from "../service/portareas";
 
 export function newAwakeATXMessage(options?: {
     zoneEventType?: AwakeATXZoneEventType;
     zoneType?: AwakeAiZoneType;
-    locode?: string;
+    locode?: Port;
 }): AwakeAIATXTimestampMessage {
     return {
         eventType: "zone-event",
@@ -18,12 +19,12 @@ export function newAwakeATXMessage(options?: {
         eventId: "bar",
         msgType: AwakeAiATXEventType.EVENT,
         shipName: "someship",
-        locodes: [options?.locode ?? "FILOL"],
+        locodes: [options?.locode ?? "FIRAU"],
         location: [53.2, 40.3],
         zoneName: "somezone",
         zoneEventType: options?.zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH
-    };
+    } satisfies AwakeAIATXTimestampMessage;
 }
 
 export function someNumber(): number {

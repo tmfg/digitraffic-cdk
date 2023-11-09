@@ -5,6 +5,7 @@ import { PortActivityParameterKeys } from "../keys";
 import type { PutParameterResult } from "aws-sdk/clients/ssm";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import type { Ports } from "../service/portareas";
 
 interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType;
@@ -86,7 +87,7 @@ export interface AwakeAIATXTimestampMessage extends AwakeAiATXMessage {
     /**
      * Array of LOCODEs
      */
-    readonly locodes: string[];
+    readonly locodes: Ports;
 }
 
 export const SUBSCRIPTION_MESSAGE = {

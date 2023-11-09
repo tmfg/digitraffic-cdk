@@ -1,59 +1,55 @@
 import type { Location } from "../model/timestamp";
 import type { PilotageRoute } from "../model/pilotage";
 
-const pilotwebToPortnetLocodeMap: Record<string, string> = {};
+import _ from "lodash";
 
-function needInit(): boolean {
-    return Object.keys(pilotwebToPortnetLocodeMap).length === 0;
-}
+const pilotwebToPortnetLocodeMap = {
+    FIKOY: "FIKOK",
 
-function initMap(): void {
-    pilotwebToPortnetLocodeMap.FIKOY = "FIKOK";
+    FIPIE: "FIPRS",
 
-    pilotwebToPortnetLocodeMap.FIPIE = "FIPRS";
+    FIVAS: "FIVAA",
 
-    pilotwebToPortnetLocodeMap.FIVAS = "FIVAA";
+    FIKAK: "FIKAS",
 
-    pilotwebToPortnetLocodeMap.FIKAK = "FIKAS";
+    FIMAN: "FIPOR",
+    FITHK: "FIPOR",
 
-    pilotwebToPortnetLocodeMap.FIMAN = "FIPOR";
-    pilotwebToPortnetLocodeMap.FITHK = "FIPOR";
+    FIHEP: "FIUKI",
+    FIKMR: "FIUKI",
 
-    pilotwebToPortnetLocodeMap.FIHEP = "FIUKI";
-    pilotwebToPortnetLocodeMap.FIKMR = "FIUKI";
+    FILEV: "FIHKO",
+    FIKVH: "FIHKO",
 
-    pilotwebToPortnetLocodeMap.FILEV = "FIHKO";
-    pilotwebToPortnetLocodeMap.FIKVH = "FIHKO";
+    FIVUH: "FIHEL",
+    FI401: "FIHEL",
+    FI402: "FIHEL",
+    FI403: "FIHEL",
+    FI404: "FIHEL",
+    FI405: "FIHEL",
+    FIVAL: "FIHEL",
 
-    pilotwebToPortnetLocodeMap.FIVUH = "FIHEL";
-    pilotwebToPortnetLocodeMap.FI401 = "FIHEL";
-    pilotwebToPortnetLocodeMap.FI402 = "FIHEL";
-    pilotwebToPortnetLocodeMap.FI403 = "FIHEL";
-    pilotwebToPortnetLocodeMap.FI404 = "FIHEL";
-    pilotwebToPortnetLocodeMap.FI405 = "FIHEL";
-    pilotwebToPortnetLocodeMap.FIVAL = "FIHEL";
+    FIKHA: "FIKTK",
+    FIKMU: "FIKTK",
+    FIHMN: "FIKTK",
 
-    pilotwebToPortnetLocodeMap.FIKHA = "FIKTK";
-    pilotwebToPortnetLocodeMap.FIKMU = "FIKTK";
-    pilotwebToPortnetLocodeMap.FIHMN = "FIKTK";
+    FITRY: "FITOR",
 
-    pilotwebToPortnetLocodeMap.FITRY = "FITOR";
+    FIKAU: "FILPP",
+    FILPM: "FILPP",
+    FIMES: "FILPP",
+    FIMUS: "FILPP",
 
-    pilotwebToPortnetLocodeMap.FIKAU = "FILPP";
-    pilotwebToPortnetLocodeMap.FILPM = "FILPP";
-    pilotwebToPortnetLocodeMap.FIMES = "FILPP";
-    pilotwebToPortnetLocodeMap.FIMUS = "FILPP";
+    FILPP: "FINUI",
 
-    pilotwebToPortnetLocodeMap.FILPP = "FINUI";
+    FIVRA: "FIVRK",
 
-    pilotwebToPortnetLocodeMap.FIVRA = "FIVRK";
+    FIEUR: "FIEJO",
+    FIOLK: "FIEJO",
 
-    pilotwebToPortnetLocodeMap.FIEUR = "FIEJO";
-    pilotwebToPortnetLocodeMap.FIOLK = "FIEJO";
-
-    pilotwebToPortnetLocodeMap.FIKEA = "FIKEM";
-    pilotwebToPortnetLocodeMap.FIKEV = "FIKEM";
-}
+    FIKEA: "FIKEM",
+    FIKEV: "FIKEM"
+} as const;
 
 export function convertLocation(route: PilotageRoute): Location {
     return {
@@ -64,15 +60,5 @@ export function convertLocation(route: PilotageRoute): Location {
 }
 
 function convertPilotwebCodeToPortnetLocode(code: string): string {
-    if (needInit()) {
-        initMap();
-    }
-
-    const newCode = pilotwebToPortnetLocodeMap[code];
-
-    if (newCode) {
-        return newCode;
-    }
-
-    return code;
+    return _.get(pilotwebToPortnetLocodeMap, code, code);
 }
