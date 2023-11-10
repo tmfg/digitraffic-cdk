@@ -2,7 +2,7 @@ import * as MessagingUtil from "@digitraffic/common/dist/aws/runtime/messaging";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SNS } from "aws-sdk";
-import * as R from "ramda";
+import _ from "lodash";
 import { PortactivityEnvKeys } from "../../keys";
 import { ports } from "../../service/portareas";
 import * as TimestampService from "../../service/timestamps";
@@ -29,7 +29,7 @@ export function handlerFn(sns: SNS): () => Promise<void> {
                 });
             }
 
-            for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {
+            for (const chunk of _.chunk(ships, CHUNK_SIZE)) {
                 await MessagingUtil.snsPublish(JSON.stringify(chunk), publishTopic, sns);
             }
         });

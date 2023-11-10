@@ -6,7 +6,7 @@ import {
     inDatabaseReadonly
 } from "@digitraffic/common/dist/database/database";
 import { parseISO } from "date-fns";
-import * as R from "ramda";
+import _ from "lodash";
 import * as TimestampsDB from "../dao/timestamps";
 import type { DbETAShip, DbTimestamp, DbTimestampIdAndLocode, DbUpdatedTimestamp } from "../dao/timestamps";
 import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
@@ -188,9 +188,14 @@ export async function findETAShipsByLocode(ports: Ports): Promise<DbETAShip[]> {
     });
 
     // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
-    const shipsByImo = R.groupBy((s) => s.imo.toString(), portnetShips);
+    const shipsByImo = _.groupBy(portnetShips, (s) => s.imo.toString());
     const newestShips = Object.values(shipsByImo)
-        .flatMap((ships) => R.head(R.sortBy((ship: DbETAShip) => ship.eta, ships)))
+        .flatMap((ships) =>
+            _.chain(ships)
+                .sortBy((ship: DbETAShip) => ship.eta)
+                .head()
+                .value()
+        )
         .filter((ship): ship is DbETAShip => ship !== undefined);
     logger.info({
         method: "TimeStampsService.findETAShipsByLocode",

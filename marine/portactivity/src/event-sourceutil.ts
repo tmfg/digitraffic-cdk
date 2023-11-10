@@ -1,5 +1,5 @@
 import { differenceInMinutes, parseISO } from "date-fns";
-import * as R from "ramda";
+import _ from "lodash";
 import { EventSource } from "./model/eventsource";
 import type { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
 
@@ -95,10 +95,10 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
     const filteredTimestamps = filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps);
 
     // group by portcall id and event type
-    const byPortcallId: PublicApiTimestamp[][] = R.compose(
-        R.values,
-        R.groupBy((ts: PublicApiTimestamp) => (ts.portcallId ?? -1).toString() + ts.eventType)
-    )(filteredTimestamps);
+    const byPortcallId = _.chain(filteredTimestamps)
+        .groupBy((ts) => (ts.portcallId ?? -1).toString() + ts.eventType)
+        .values()
+        .value();
 
     // timestamps relating to specific port call
     for (const portcallTimestamps of byPortcallId) {
@@ -123,8 +123,8 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
                     ))
             ) {
                 // remove only VTS timestamp
-                addToList = addToList.filter((t) => !R.equals(t, vtsTimestamp));
-                vtsAStamps = vtsAStamps.filter((t) => !R.equals(t, vtsTimestamp));
+                addToList = addToList.filter((t) => !_.isEqual(t, vtsTimestamp));
+                vtsAStamps = vtsAStamps.filter((t) => !_.isEqual(t, vtsTimestamp));
             }
         }
 
@@ -154,5 +154,5 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
         ret.push(...addToList);
     }
 
-    return R.sortBy((ts) => parseISO(ts.eventTime).valueOf(), ret);
+    return _.sortBy(ret, (ts) => parseISO(ts.eventTime).valueOf());
 }
