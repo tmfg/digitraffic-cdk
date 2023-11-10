@@ -4,7 +4,7 @@
   "moduleResolution": "node16",
   "compilerOptions": {
     "declaration": true,
-    "outDir": "../../../../dist/out"
+    "outDir": "../../../../lib"
   },
   "include": ["../../../../src/**/*.ts"]
 }
