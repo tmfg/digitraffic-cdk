@@ -2,7 +2,7 @@
   "extends": "./tsconfig-default.json",
   "compilerOptions": {
     "declaration": true,
-    "outDir": "../../../../dist"
+    "outDir": "../../../../lib"
   },
   "include": ["../../../../src/**/*.ts"]
 }
