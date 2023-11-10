@@ -45,7 +45,7 @@ export interface ApiTimestamp {
 
 export type PublicApiTimestamp = NullableOptional<
     Omit<ApiTimestamp, "ship" | "location"> & {
-        ship: NullableOptional<Ship>;
-        location: NullableOptional<Location>;
+        readonly ship: NullableOptional<Ship>;
+        readonly location: NullableOptional<Location>;
     }
 >;
