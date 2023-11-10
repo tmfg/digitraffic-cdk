@@ -15,7 +15,7 @@ describe(
                 state: "TEST",
                 vessel: {
                     name: "test",
-                    mmsi: 123
+                    mmsi
                 },
                 route: {
                     start: {

@@ -2,6 +2,7 @@ import { differenceInMinutes, parseISO } from "date-fns";
 import _ from "lodash";
 import { EventSource } from "./model/eventsource";
 import type { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
+import type { ShiplistTimestamp } from "./service/shiplist";
 
 export const VTS_A = "VTS A";
 export const VTS_O = "VTS O";
@@ -53,7 +54,9 @@ function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number):
     return diffMinutes >= maxDiffMinutes;
 }
 
-function filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps: PublicApiTimestamp[]) {
+function filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(
+    timestamps: PublicApiTimestamp[]
+): PublicApiTimestamp[] {
     // timestamp is filtered out if:
     // it does not have a portcallId
     // AND
@@ -88,11 +91,16 @@ function isDuplicateWithPortcallId(
  * Checks if certain types of timestamps from an equivalent source can be merged.
  * @param timestamps
  */
-export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTimestamp[] {
+// export function mergeTimestamps(timestamps: ShiplistTimestamp[]): ShiplistTimestamp[];
+export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTimestamp[];
+export function mergeTimestamps(timestamps: ShiplistTimestamp[]): ShiplistTimestamp[];
+export function mergeTimestamps(ts: unknown[]): unknown[] {
     const ret: PublicApiTimestamp[] = [];
 
     // leave out duplicate PRED estimates with missing portcallId if they exist
-    const filteredTimestamps = filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps);
+    const filteredTimestamps = filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(
+        ts as PublicApiTimestamp[]
+    );
 
     // group by portcall id and event type
     const byPortcallId = _.chain(filteredTimestamps)

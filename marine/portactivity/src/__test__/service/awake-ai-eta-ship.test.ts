@@ -30,7 +30,7 @@ describe("AwakeAiETAShipService", () => {
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expectEtaAndEtb(ship, voyageTimestamp, timestamps);
+        expectEtaAndEtb(ship, timestamps);
     });
 
     test("getAwakeAiTimestamps - creates just ETA", async () => {
@@ -43,7 +43,7 @@ describe("AwakeAiETAShipService", () => {
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expectJustEta(ship, voyageTimestamp, timestamps);
+        expectJustEta(ship, timestamps);
     });
 
     test("getAwakeAiTimestamps - no timestamps when predicted locode differs and ETA is >= 24 h", async () => {
@@ -68,7 +68,7 @@ describe("AwakeAiETAShipService", () => {
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expectJustEta(ship, voyageTimestamp, timestamps);
+        expectJustEta(ship, timestamps);
     });
 
     test("getAwakeAiTimestamps - ship not under way", async () => {
@@ -212,7 +212,7 @@ describe("AwakeAiETAShipService", () => {
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expectJustEta(ship, voyageTimestamp, timestamps);
+        expectJustEta(ship, timestamps);
     });
 
     test("getAwakeAiTimestamps - destination set explicitly when original ETA is less than 24 h", async () => {
@@ -254,7 +254,7 @@ describe("AwakeAiETAShipService", () => {
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expectJustEta(ship, voyageTimestamp, timestamps);
+        expectJustEta(ship, timestamps);
     });
 
     test("getAwakeAiTimestamps - retry fail", async () => {
@@ -360,11 +360,7 @@ function awakeTimestampFromTimestamp(
     };
 }
 
-function expectJustEta(
-    ship: DbETAShip,
-    voyageTimestamp: AwakeAiShipApiResponse,
-    timestamps: ApiTimestamp[]
-): void {
+function expectJustEta(ship: DbETAShip, timestamps: ApiTimestamp[]): void {
     expect(timestamps.length).toBe(1);
     const etaTimestamp = timestamps.find((ts) => ts.eventType === EventType.ETA);
 
@@ -373,11 +369,7 @@ function expectJustEta(
     );
 }
 
-function expectEtaAndEtb(
-    ship: DbETAShip,
-    voyageTimestamp: AwakeAiShipApiResponse,
-    timestamps: ApiTimestamp[]
-): void {
+function expectEtaAndEtb(ship: DbETAShip, timestamps: ApiTimestamp[]): void {
     expect(timestamps.length).toBe(2);
     const etaTimestamp = timestamps.find((ts) => ts.eventType === EventType.ETA);
     const etbTimestamp = timestamps.find((ts) => ts.eventType === EventType.ETB);

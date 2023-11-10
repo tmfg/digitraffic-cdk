@@ -1,5 +1,5 @@
 import type { Construct } from "constructs";
-import * as InternalLambdas from "./internal-lambdas";
+import * as InternalLambdas from "./internal-lambdas-stack";
 import * as IntegrationApi from "./integration-api";
 import * as Sqs from "./sqs";
 import { PublicApi } from "./public-api";
@@ -7,7 +7,7 @@ import type { PortactivityConfiguration } from "./app-props";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import { DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget } from "aws-cdk-lib/aws-rds";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import { Canaries } from "./canaries";
+import { Canaries } from "./canaries-stack";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class PortActivityStack extends DigitrafficStack {

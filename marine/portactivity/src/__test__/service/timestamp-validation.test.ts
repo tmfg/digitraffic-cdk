@@ -2,7 +2,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import _ from "lodash";
 import { NavStatus } from "../../model/ais-status";
 import { EventSource } from "../../model/eventsource";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
+import { EventType } from "../../model/timestamp";
 import { SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS, validateTimestamp } from "../../service/timestamp-validation";
 import { dbTestBase, insertVesselLocation } from "../db-testutil";
 import { newTimestamp } from "../testdata";

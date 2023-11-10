@@ -27,7 +27,7 @@ const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
  */
 const SQS_SEND_TIME = 10000;
 
-export async function handler(event: unknown, context: Context): Promise<void> {
+export async function handler(__: unknown, context: Context): Promise<void> {
     await rdsHolder
         .setCredentials()
         .then(() => secretHolder.get())

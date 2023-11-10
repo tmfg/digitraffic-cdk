@@ -398,6 +398,7 @@ const DELETE_OLD_PILOTAGES_SQL = `
 export function updateTimestamp(
     db: DTDatabase | DTTransaction,
     timestamp: ApiTimestamp
+    // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: "update-timestamps",
@@ -500,6 +501,7 @@ export function findPortnetTimestampsForAnotherLocode(
     return db.manyOrNone(ps);
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function deleteById(db: DTDatabase | DTTransaction, id: number): Promise<null> {
     const ps = new PreparedStatement({
         name: "delete-by-id",

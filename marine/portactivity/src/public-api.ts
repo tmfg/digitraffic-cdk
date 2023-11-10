@@ -1,7 +1,7 @@
-import { LambdaIntegration, RequestValidator, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { LambdaIntegration, RequestValidator, Resource } from "aws-cdk-lib/aws-apigateway";
 import { createTimestampSchema, LocationSchema, ShipSchema } from "./model/timestamp-schema";
 import { LocodeMetadataSchema } from "./model/locode-metadata";
-import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addDefaultValidator,
     addServiceModel,
@@ -26,6 +26,7 @@ export class PublicApi {
     constructor(stack: DigitrafficStack) {
         this.publicApi = new DigitrafficRestApi(stack, "PortActivity-public", "PortActivity public API");
 
+        // eslint-disable-next-line deprecation/deprecation
         this.apiKeyId = createUsagePlan(
             this.publicApi,
             "PortActivity timestamps Api Key",
@@ -54,25 +55,23 @@ export class PublicApi {
             this.publicApi,
             LocodeMetadataSchema
         );
-        const errorResponseModel = this.publicApi.addModel("MessageResponseModel", MessageModel);
 
         const resource = this.publicApi.root.addResource("api").addResource("v1");
         const metadataResource = resource.addResource("metadata");
 
-        this.createTimestampsResource(stack, resource, timestampsModel, errorResponseModel, validator);
+        this.createTimestampsResource(stack, resource, timestampsModel, validator);
 
-        this.createShiplistResource(stack, this.publicApi);
+        this.createShiplistResource(stack);
 
-        this.createTimestampMetadataResource(stack, this.publicApi, metadataResource);
+        this.createTimestampMetadataResource(metadataResource);
 
-        this.createLocodeMetadataResource(stack, this.publicApi, metadataResource, locodeMetadataModel);
+        this.createLocodeMetadataResource(stack, metadataResource, locodeMetadataModel);
     }
 
     createTimestampsResource(
         stack: DigitrafficStack,
         resource: Resource,
         timestampsJsonModel: IModel,
-        errorResponseModel: IModel,
         validator: RequestValidator
     ): MonitoredDBFunction {
         const getTimestampsLambda = MonitoredDBFunction.create(
@@ -129,7 +128,7 @@ export class PublicApi {
         return getTimestampsLambda;
     }
 
-    createShiplistResource(stack: DigitrafficStack, publicApi: RestApi): MonitoredDBFunction {
+    createShiplistResource(stack: DigitrafficStack): MonitoredDBFunction {
         const lambda = MonitoredDBFunction.create(
             stack,
             "get-shiplist-public",
@@ -146,7 +145,7 @@ export class PublicApi {
             proxy: true
         });
 
-        const shiplistResource = publicApi.root.addResource("shiplist");
+        const shiplistResource = this.publicApi.root.addResource("shiplist");
         shiplistResource.addMethod("GET", integration, {
             apiKeyRequired: false
         });
@@ -164,11 +163,7 @@ export class PublicApi {
         return lambda;
     }
 
-    createTimestampMetadataResource(
-        stack: DigitrafficStack,
-        publicApi: RestApi,
-        metadataResource: Resource
-    ): void {
+    createTimestampMetadataResource(metadataResource: Resource): void {
         const timestampMetadataResource = metadataResource.addResource("timestamps");
 
         new DigitrafficStaticIntegration(
@@ -187,7 +182,6 @@ export class PublicApi {
 
     createLocodeMetadataResource(
         stack: DigitrafficStack,
-        publicApi: RestApi,
         metadataResource: Resource,
         locodeMetadataModel: IModel
     ): MonitoredDBFunction {
