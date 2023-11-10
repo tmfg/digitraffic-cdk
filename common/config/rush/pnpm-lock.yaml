@@ -470,9 +470,6 @@ importers:
       moment-timezone:
         specifier: 0.5.43
         version: 0.5.43
-      ramda:
-        specifier: ~0.29.1
-        version: 0.29.1
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -749,9 +746,6 @@ importers:
       pg-promise:
         specifier: ^11.5.4
         version: 11.5.4(pg-native@3.0.1)
-      ramda:
-        specifier: ~0.29.1
-        version: 0.29.1
       spex:
         specifier: ^3.3.0
         version: 3.3.0
@@ -762,6 +756,9 @@ importers:
       '@aws-cdk/aws-synthetics-alpha':
         specifier: 2.85.0-alpha.0
         version: 2.85.0-alpha.0(aws-cdk-lib@2.103.1)(constructs@10.3.0)
+      '@digitraffic-cdk/digitraffic-cdk-rig':
+        specifier: workspace:*
+        version: link:../../tools/rig
       '@digitraffic-cdk/eslint-config':
         specifier: workspace:*
         version: link:../../tools/eslint-config
@@ -771,12 +768,21 @@ importers:
       '@rushstack/eslint-config':
         specifier: ^3.4.1
         version: 3.4.1(eslint@8.52.0)(typescript@4.9.5)
+      '@rushstack/heft':
+        specifier: ^0.62.3
+        version: 0.62.3(@types/node@20.8.9)
+      '@rushstack/heft-jest-plugin':
+        specifier: ^0.10.1
+        version: 0.10.1(@rushstack/heft@0.62.3)(@types/node@20.8.9)(ts-node@10.9.1)
       '@types/amqplib':
         specifier: 0.10.3
         version: 0.10.3
       '@types/aws-lambda':
         specifier: 8.10.125
         version: 8.10.125
+      '@types/heft-jest':
+        specifier: 1.0.5
+        version: 1.0.5
       '@types/jest':
         specifier: 29.5.6
         version: 29.5.6
@@ -786,9 +792,6 @@ importers:
       '@types/node':
         specifier: 20.8.9
         version: 20.8.9
-      '@types/ramda':
-        specifier: 0.29.0
-        version: 0.29.0
       '@types/sinon':
         specifier: 10.0.20
         version: 10.0.20
@@ -825,9 +828,6 @@ importers:
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.8.9)(typescript@4.9.5)
-      types-ramda:
-        specifier: 0.29.1
-        version: 0.29.1
       typescript:
         specifier: ~4.9.5
         version: 4.9.5
@@ -1034,9 +1034,6 @@ importers:
       moment-timezone:
         specifier: 0.5.43
         version: 0.5.43
-      ramda:
-        specifier: ~0.29.1
-        version: 0.29.1
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -6586,12 +6583,6 @@ packages:
     resolution: {integrity: sha512-J8IrehehphLtxpABSekURTw9jthrlLcM4llH1I2fZ0zKaxq8jI/O1+Q/tabAJgBY/ffoqDxPRNYBM1lFUXm0lw==}
     dev: false
 
-  /@types/ramda@0.29.0:
-    resolution: {integrity: sha512-TY9eKsklU43CmAbFJPKDUyBjleZ4EFAkbJeQRF4e8byGkOw1CjDcwg5EGa0Bgf0Kgs9BE9OU4UzQWnQDHnvMtA==}
-    dependencies:
-      types-ramda: 0.29.1
-    dev: true
-
   /@types/readable-stream@4.0.4:
     resolution: {integrity: sha512-NSAiePj3Iq3kBArfpUWRNX/mRw8DibYD6YhNCIJDfUP/iIOQYsNJgtHyjpbuZlcbL7TxILS8qYjY/nXXvtcFQg==}
     dependencies:
@@ -10695,10 +10686,6 @@ packages:
     resolution: {integrity: sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw==}
     dev: false
 
-  /ramda@0.29.1:
-    resolution: {integrity: sha512-OfxIeWzd4xdUNxlWhgFazxsA/nl3mS4/jGZI5n00uWOoSSFRhC1b6gl6xvmzUamgmqELraWp0J/qqVlXYPDPyA==}
-    dev: false
-
   /range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
@@ -11395,10 +11382,6 @@ packages:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  /ts-toolbelt@9.6.0:
-    resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
-    dev: true
-
   /tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
 
@@ -11494,12 +11477,6 @@ packages:
   /typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
     dev: false
-
-  /types-ramda@0.29.1:
-    resolution: {integrity: sha512-pdEF8VXcBTSu3fPupZahieG6Lh8eBWPtcaH/OB5QPCoN2hz4vBbspoMLB3X9kwzXRD3lwD4/j0hwj3Z/PAzzcA==}
-    dependencies:
-      ts-toolbelt: 9.6.0
-    dev: true
 
   /typescript@4.9.5:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}

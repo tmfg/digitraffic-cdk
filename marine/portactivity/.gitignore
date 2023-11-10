@@ -21,9 +21,7 @@
 !/database/**/*.md
 !/database/**/*.sh
 !/database/**/*.conf
-!/lib/
-!/lib/**/
-!/lib/**/*.ts
-!/test/
-!/test/**/
-!/test/**/*.ts
+!/src/
+!/src/**/
+!/src/**/*.ts
+/src/bin

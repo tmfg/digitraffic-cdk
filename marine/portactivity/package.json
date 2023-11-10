@@ -4,21 +4,22 @@
   "private": true,
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc && npm run postbuild",
+    "build": "npm run build:tsc && npm run postbuild",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "build:tsc": "heft build --clean",
+    "build:watch": "heft build-watch --clean",
+    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "compile-canaries": "esbuild lib/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
-    "compile-lambdas": "esbuild lib/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
+    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "jest --detectOpenHandles --forceExit",
-    "test_errors": "npm test 2>&1 | grep 'FAIL'",
-    "watch": "tsc -w"
+    "test": "heft test --clean",
+    "test:watch": "heft test-watch --clean"
   },
   "dependencies": {
     "@digitraffic/common": "2023.6.27-1",
@@ -35,21 +36,23 @@
     "moment-timezone": "0.5.43",
     "pg-native": "^3.0.1",
     "pg-promise": "^11.5.4",
-    "ramda": "~0.29.1",
     "spex": "^3.3.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@aws-cdk/aws-synthetics-alpha": "2.85.0-alpha.0",
+    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.4.1",
+    "@rushstack/heft": "^0.62.3",
+    "@rushstack/heft-jest-plugin": "^0.10.1",
     "@types/amqplib": "0.10.3",
     "@types/aws-lambda": "8.10.125",
+    "@types/heft-jest": "1.0.5",
     "@types/jest": "29.5.6",
     "@types/lodash": "4.14.200",
     "@types/node": "20.8.9",
-    "@types/ramda": "0.29.0",
     "@types/sinon": "10.0.20",
     "@types/uuid": "9.0.6",
     "@types/ws": "8.5.8",
@@ -63,7 +66,6 @@
     "sinon": "17.0.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
-    "types-ramda": "0.29.1",
     "typescript": "~4.9.5"
   }
 }
