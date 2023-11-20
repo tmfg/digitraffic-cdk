@@ -19,7 +19,7 @@ export class IntegrationApi {
     constructor(stack: DigitrafficStack, sqs: Queue, dlq: Queue) {
         const apiName = "RAMI integration API";
         this.integrationApi = new DigitrafficRestApi(stack, "RAMI-integration", apiName, undefined, {
-            endpointTypes: [EndpointType.PRIVATE]
+            endpointTypes: [EndpointType.REGIONAL]
         });
 
         this.apiKeyId = createDefaultUsagePlan(this.integrationApi, apiName).keyId;
