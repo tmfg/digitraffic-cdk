@@ -1,3 +1,4 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import moment from "moment-timezone";
 import {
     Destination,
@@ -8,11 +9,8 @@ import {
     Vessel
 } from "../api/schedules";
 import { EventSource } from "../model/eventsource";
-import type { Locode } from "../model/locode";
 import { ApiTimestamp, EventType } from "../model/timestamp";
-import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports";
 import { Port, ports } from "./portareas";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class SchedulesService {
     private readonly api: SchedulesApi;
@@ -63,8 +61,8 @@ export class SchedulesService {
                     EventType.ETA
                 );
                 timestamps.push(timestamp);
-                // also generate an ETB timestamp for VTS calculated ETA if destination is in list of locodes to be published as ETB timestamps
-                if (calculated && VTS_A_ETB_PORTS.includes(tt.destination[0]?.$.locode as Locode)) {
+                // ETA timestamps from VTS A sources must also be published as ETB timestamps
+                if (calculated) {
                     logger.debug(
                         "generated ETB timestamp for SCHEDULES_CALCULATED " +
                             JSON.stringify({
