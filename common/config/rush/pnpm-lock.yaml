@@ -83,6 +83,9 @@ importers:
       axios:
         specifier: ^1.6.0
         version: 1.6.0
+      change-case:
+        specifier: 4.1.2
+        version: 4.1.2
       constructs:
         specifier: 10.3.0
         version: 10.3.0
@@ -705,8 +708,8 @@ importers:
   ../../marine/portactivity:
     dependencies:
       '@digitraffic/common':
-        specifier: 2023.6.27-1
-        version: 2023.6.27-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        specifier: 2023.11.21-1
+        version: 2023.11.21-1(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
         specifier: ^4.6.5
         version: 4.6.5
@@ -4618,6 +4621,39 @@ packages:
       pg-promise: 11.5.4(pg-native@3.0.1)
     dev: false
 
+  /@digitraffic/common@2023.11.21-1(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
+    resolution: {integrity: sha512-916SBVWBgN6WM7oCwwDuZhW9WjnbrvpcJmDdyQsE9tYa2tHtv3RAf1nHZvGfhnTtD5x80xlKea3ERX9MJ5EiyQ==}
+    engines: {node: '>=14 <17 || >=18 <19'}
+    peerDependencies:
+      '@types/geojson': ^7946.0.12
+      aws-cdk-lib: ^2.103.0
+      aws-sdk: ^2.1481.0
+      axios: ^1.5.1
+      change-case: 4.1.2
+      constructs: ^10.3.0
+      date-fns: ~2.30.0
+      date-fns-tz: ~2.0.0
+      etag: ^1.8.1
+      geojson-validation: ^1.0.2
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^11.5.4
+    dependencies:
+      '@types/geojson': 7946.0.12
+      aws-cdk-lib: 2.103.1(constructs@10.3.0)
+      aws-sdk: 2.1482.0
+      axios: 1.6.0
+      change-case: 4.1.2
+      constructs: 10.3.0
+      date-fns: 2.30.0
+      date-fns-tz: 2.0.0(date-fns@2.30.0)
+      etag: 1.8.1
+      geojson-validation: 1.0.2
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 11.5.4(pg-native@3.0.1)
+    dev: false
+
   /@digitraffic/common@2023.4.28-1(@aws-cdk/aws-synthetics-alpha@2.62.2-alpha.0)(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(geojson-validation@1.0.2)(moment@2.29.4)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
     resolution: {integrity: sha512-MGL432qEd9XgDBa9q7OoCAung2mFyKU5ya7OD88F4gvSMd5EdfsBgu1ZWZNEbp+c7yqhe3xdc8oVpEVeIuMcfQ==}
     engines: {node: '>=14 <17 || >=18 <19'}
@@ -7434,7 +7470,6 @@ packages:
     dependencies:
       pascal-case: 3.1.2
       tslib: 2.6.2
-    dev: false
 
   /camelcase@5.3.1:
     resolution: {integrity: sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==}
@@ -7457,7 +7492,6 @@ packages:
       no-case: 3.0.4
       tslib: 2.6.2
       upper-case-first: 2.0.2
-    dev: false
 
   /chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -7493,7 +7527,6 @@ packages:
       sentence-case: 3.0.4
       snake-case: 3.0.4
       tslib: 2.6.2
-    dev: false
 
   /char-regex@1.0.2:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
@@ -7640,7 +7673,6 @@ packages:
       no-case: 3.0.4
       tslib: 2.6.2
       upper-case: 2.0.2
-    dev: false
 
   /constructs@10.3.0:
     resolution: {integrity: sha512-vbK8i3rIb/xwZxSpTjz3SagHn1qq9BChLEfy5Hf6fB3/2eFbrwt2n9kHwQcS0CPTRBesreeAcsJfMq2229FnbQ==}
@@ -7855,7 +7887,6 @@ packages:
     dependencies:
       no-case: 3.0.4
       tslib: 2.6.2
-    dev: false
 
   /dotenv@16.3.1:
     resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
@@ -8747,7 +8778,6 @@ packages:
     dependencies:
       capital-case: 1.0.4
       tslib: 2.6.2
-    dev: false
 
   /help-me@4.2.0:
     resolution: {integrity: sha512-TAOnTB8Tz5Dw8penUuzHVrKNKlCIbwwbHnXraNJxPwf8LRtE2HlM84RYuezMFcwOJmoYOCWVDyJ8TQGxn9PgxA==}
@@ -9836,7 +9866,6 @@ packages:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
     dependencies:
       tslib: 2.6.2
-    dev: false
 
   /lru-cache@10.0.1:
     resolution: {integrity: sha512-IJ4uwUTi2qCccrioU6g9g/5rvvVl13bsdczUUcqbciD9iLr095yj8DQKdObriEvuNSx325N1rV1O0sJFszx75g==}
@@ -10114,7 +10143,6 @@ packages:
     dependencies:
       lower-case: 2.0.2
       tslib: 2.6.2
-    dev: false
 
   /nock@13.3.6:
     resolution: {integrity: sha512-lT6YuktKroUFM+27mubf2uqQZVy2Jf+pfGzuh9N6VwdHlFoZqvi4zyxFTVR1w/ChPqGY6yxGehHp6C3wqCASCw==}
@@ -10333,7 +10361,6 @@ packages:
     dependencies:
       dot-case: 3.0.4
       tslib: 2.6.2
-    dev: false
 
   /parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -10366,14 +10393,12 @@ packages:
     dependencies:
       no-case: 3.0.4
       tslib: 2.6.2
-    dev: false
 
   /path-case@3.0.4:
     resolution: {integrity: sha512-qO4qCFjXqVTrcbPt/hQfhTQ+VhFsqNKOPtytgNKkKxSoEp3XPUQ8ObFuePylOIok5gjn69ry8XiULxCwot3Wfg==}
     dependencies:
       dot-case: 3.0.4
       tslib: 2.6.2
-    dev: false
 
   /path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
@@ -10947,7 +10972,6 @@ packages:
       no-case: 3.0.4
       tslib: 2.6.2
       upper-case-first: 2.0.2
-    dev: false
 
   /seq-queue@0.0.5:
     resolution: {integrity: sha512-hr3Wtp/GZIc/6DAGPDcV4/9WoZhjrkXsi5B/07QgX8tsdc6ilr7BFM6PM6rbdAX1kFSDYeZGLipIZZKyQP0O5Q==}
@@ -11031,7 +11055,6 @@ packages:
     dependencies:
       dot-case: 3.0.4
       tslib: 2.6.2
-    dev: false
 
   /sns-sqs-big-payload@0.1.4(aws-sdk@2.1482.0):
     resolution: {integrity: sha512-JLb/8UhcYiiof0jq1+xqfojUDgNki83riWUGtfCObuyJReYd0jG+TKR3g5KQ2cEs61OeoY6rRgXrZ5XuL9Sgdw==}
@@ -11560,13 +11583,11 @@ packages:
     resolution: {integrity: sha512-514ppYHBaKwfJRK/pNC6c/OxfGa0obSnAl106u97Ed0I625Nin96KAjttZF6ZL3e1XLtphxnqrOi9iWgm+u+bg==}
     dependencies:
       tslib: 2.6.2
-    dev: false
 
   /upper-case@2.0.2:
     resolution: {integrity: sha512-KgdgDGJt2TpuwBUIjgG6lzw2GWFRCW9Qkfkiv0DxqHHLYJHmtmdUIKcZd8rHgFSjopVTlw6ggzCm1b8MFQwikg==}
     dependencies:
       tslib: 2.6.2
-    dev: false
 
   /uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
