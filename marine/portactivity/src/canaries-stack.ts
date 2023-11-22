@@ -27,6 +27,7 @@ export class Canaries {
                     hostname: publicApi.publicApi.hostname(),
                     handler: "public-api.handler",
                     secret: stack.configuration.secretId,
+                    apiKeyId: publicApi.apiKeyId,
                     alarm: {
                         alarmName: "PortActivity-PublicAPI-Alarm",
                         topicArn: stack.configuration.warningTopicArn

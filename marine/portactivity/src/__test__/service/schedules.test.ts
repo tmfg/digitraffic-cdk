@@ -87,23 +87,11 @@ describe("schedules", () => {
             .forEach((ts) => verifyStructure(ts, EventType.ETD, false));
     });
 
-    test("SchedulesService.schedulesToTimestamps - calculated FIRAU - [x] ETA [ ] ETD", () => {
-        const api = createApi();
-        const service = new SchedulesService(api);
-        const etaCount = 3;
-        const locode = "FIRAU";
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(etaCount, true, false, locode),
-            true
-        );
-        expect(timestamps.length).toBe(etaCount * 2);
-        timestamps
-            .filter((ts) => ts.eventType === EventType.ETA)
-            .forEach((ts) => verifyStructure(ts, EventType.ETA, true, locode));
-        timestamps
-            .filter((ts) => ts.eventType === EventType.ETB)
-            .forEach((ts) => verifyStructure(ts, EventType.ETB, true, locode));
-    });
+    /**
+     * Note: Since it is a source of VTS A type timestamps,
+     * all calculated ETA timestamps from VTS Schedules API should
+     * also be published as ETB timestamps.
+     */
 
     test("SchedulesService.schedulesToTimestamps - calculated - [x] ETA [ ] ETD", () => {
         const api = createApi();
@@ -113,8 +101,13 @@ describe("schedules", () => {
             createSchedulesResponse(etaCount, true, false),
             true
         );
-        expect(timestamps.length).toBe(etaCount);
-        timestamps.forEach((ts) => verifyStructure(ts, EventType.ETA, true));
+        expect(timestamps.length).toBe(etaCount * 2);
+        timestamps
+            .filter((ts) => ts.eventType === EventType.ETA)
+            .forEach((ts) => verifyStructure(ts, EventType.ETA, true));
+        timestamps
+            .filter((ts) => ts.eventType === EventType.ETB)
+            .forEach((ts) => verifyStructure(ts, EventType.ETB, true));
     });
 
     test("SchedulesService.schedulesToTimestamps - calculated - [ ] ETA [x] ETD", () => {
@@ -131,37 +124,22 @@ describe("schedules", () => {
         const api = createApi();
         const service = new SchedulesService(api);
 
-        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, true), true);
+        const timestampCount = 3;
+        const timestamps = service.schedulesToTimestamps(
+            createSchedulesResponse(timestampCount, true, true),
+            true
+        );
 
-        expect(timestamps.length).toBe(6);
+        expect(timestamps.length).toBe(timestampCount * 3);
         timestamps
             .filter((ts) => ts.eventType === EventType.ETA)
             .forEach((ts) => verifyStructure(ts, EventType.ETA, true));
         timestamps
+            .filter((ts) => ts.eventType === EventType.ETB)
+            .forEach((ts) => verifyStructure(ts, EventType.ETB, true));
+        timestamps
             .filter((ts) => ts.eventType === EventType.ETD)
             .forEach((ts) => verifyStructure(ts, EventType.ETD, true));
-    });
-
-    test("SchedulesService.schedulesToTimestamps - calculated FIRAU - [x] ETA [x] ETD", () => {
-        const api = createApi();
-        const service = new SchedulesService(api);
-        const schedulesCount = 3;
-        const locode = "FIRAU";
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(schedulesCount, true, true, locode),
-            true
-        );
-
-        expect(timestamps.length).toBe(3 * schedulesCount);
-        timestamps
-            .filter((ts) => ts.eventType === EventType.ETA)
-            .forEach((ts) => verifyStructure(ts, EventType.ETA, true, locode));
-        timestamps
-            .filter((ts) => ts.eventType === EventType.ETB)
-            .forEach((ts) => verifyStructure(ts, EventType.ETB, true, locode));
-        timestamps
-            .filter((ts) => ts.eventType === EventType.ETD)
-            .forEach((ts) => verifyStructure(ts, EventType.ETD, true, locode));
     });
 
     test("filterTimestamps - older than 5 minutes are filtered", () => {

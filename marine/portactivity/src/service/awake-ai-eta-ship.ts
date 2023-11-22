@@ -1,29 +1,28 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { retry } from "@digitraffic/common/dist/utils/retry";
+import { differenceInHours } from "date-fns";
 import {
     AwakeAiETAShipApi,
     AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
     AwakeAiShipVoyageSchedule
 } from "../api/awake-ai-ship";
-import type { DbETAShip } from "../dao/timestamps";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { retry } from "@digitraffic/common/dist/utils/retry";
 import {
     AwakeAiPredictedVoyage,
     AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageStatus,
     AwakeAiZoneType
 } from "../api/awake-common";
+import type { DbETAShip } from "../dao/timestamps";
+import { EventSource } from "../model/eventsource";
+import type { Locode } from "../model/locode";
+import { ApiTimestamp, EventType } from "../model/timestamp";
 import {
     AwakeDataState,
     etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction
 } from "./awake-ai-etx-helper";
-import { EventSource } from "../model/eventsource";
-import { differenceInHours } from "date-fns";
-import type { Locode } from "../model/locode";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports";
 
 interface AwakeAiETAResponseAndShip {
     readonly response: AwakeAiShipApiResponse;
@@ -55,11 +54,10 @@ export class AwakeAiETAShipService {
                 });
                 const timestamps = this.toTimeStamps(val);
 
-                // temporarily publish ETA also as ETB
+                // ETA timestamps from VTS A sources must also be published as ETB timestamps
                 const etbs = timestamps
-                    .filter((ts) => VTS_A_ETB_PORTS.includes(ts.location.port as Locode))
                     .filter((ts) => ts.eventType === EventType.ETA)
-                    .map((ts) => ({ ...ts, ...{ eventType: EventType.ETB } }));
+                    .map((ts) => ({ ...ts, eventType: EventType.ETB }));
 
                 return acc.concat(timestamps, etbs);
             }, [])
