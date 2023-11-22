@@ -59,9 +59,7 @@ describe("schedules", () => {
         const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, false), false);
 
         expect(timestamps.length).toBe(3);
-        timestamps
-            .filter((ts) => ts.eventType === EventType.ETA)
-            .forEach((ts) => verifyStructure(ts, EventType.ETA, false));
+        timestamps.forEach((ts) => verifyStructure(ts, EventType.ETA, false));
     });
 
     test("SchedulesService.schedulesToTimestamps - under VTS control - [ ] ETA [x] ETD", () => {
