@@ -21,10 +21,11 @@
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles --forceExit",
+    "test-watch": "jest --detectOpenHandles --forceExit --watch --coverage=false",
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.9.11-1",
+    "@digitraffic/common": "2023.11.21-1",
     "aws-cdk-lib": "~2.103.1",
     "axios": "^1.6.0",
     "constructs": "10.3.0",

@@ -89,9 +89,9 @@ interface DbCollection {
     collection: FeatureCollection;
 }
 
-export function findCounters(db: DTDatabase, domain: string, counterId: string): Promise<FeatureCollection> {
+export function findCounters(db: DTDatabase, domain: string, counterId?: number): Promise<FeatureCollection> {
     return db
-        .one<DbCollection>(PS_FIND_COUNTERS_FEATURE_COLLECTION, [nullString(domain), nullNumber(counterId)])
+        .one<DbCollection>(PS_FIND_COUNTERS_FEATURE_COLLECTION, [nullString(domain), counterId])
         .then((r) => r.collection);
 }
 
