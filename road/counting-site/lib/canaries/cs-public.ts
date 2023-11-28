@@ -102,6 +102,7 @@ export const handler = async (): Promise<string> => {
     await checker.expect200(COUNTERS_URL + "/13", GeoJsonChecker.validFeatureCollection());
     await checker.expect404(COUNTERS_URL + "/999999");
     await checker.expect404(COUNTERS_URL + "/bad_input");
+    await checker.expect404(COUNTERS_URL + "/.9");
 
     // csv values
     await checker.expect403WithoutApiKey(CSV_URL + "?year=2022&month=01&counter_id=15");
