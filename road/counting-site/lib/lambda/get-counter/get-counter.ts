@@ -12,7 +12,7 @@ export const handler = (event: Record<string, string>): Promise<LambdaResponse> 
     const start = Date.now();
     const counterId = Number.parseInt(event.counterId);
 
-    if (Number.isNaN(counterId)) {
+    if (Number.isNaN(counterId) || String(counterId) !== event.counterId) {
         return Promise.resolve(LambdaResponse.notFound().withTimestamp(EPOCH));
     }
 
