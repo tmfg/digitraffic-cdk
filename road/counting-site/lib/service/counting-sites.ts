@@ -100,7 +100,7 @@ export function findCounterValues(
 
 export function findCounters(
     domain: string = "",
-    counterId: string = ""
+    counterId?: number
 ): Promise<[FeatureCollection, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
         return CounterDAO.findCounters(db, domain, counterId).then((featureCollection) => {
