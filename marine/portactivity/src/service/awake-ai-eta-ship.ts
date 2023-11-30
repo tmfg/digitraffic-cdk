@@ -35,7 +35,17 @@ export class AwakeAiETAShipService {
 
     readonly overriddenDestinations: readonly Locode[] = ["FIHEL", "FIPOR", "FIHKO"];
 
-    readonly publishAsETPDestinations: readonly Locode[] = ["FIRAU", "FIKOK", "FIKAS", "FIPOR"];
+    static readonly publishAsETPDestinations: readonly Locode[] = [
+        "FIRAU",
+        "FIKOK",
+        "FIKAS",
+        "FIPOR",
+        "FIUKI",
+        "FIHKO",
+        "FIRAA",
+        "FIKEM",
+        "FIPRS"
+    ];
 
     constructor(api: AwakeAiETAShipApi) {
         this.api = api;
@@ -128,7 +138,7 @@ export class AwakeAiETAShipService {
                 // allow pilot boarding area ETAs (ETP) only for specific ports
                 if (
                     etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA &&
-                    !this.publishAsETPDestinations.includes(port as Locode)
+                    !AwakeAiETAShipService.publishAsETPDestinations.includes(port as Locode)
                 ) {
                     logger.warn({
                         method: "AwakeAiETAShipService.handleSchedule",
