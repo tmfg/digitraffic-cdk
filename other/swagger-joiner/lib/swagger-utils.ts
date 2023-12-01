@@ -28,7 +28,11 @@ export function constructSwagger(spec: object) {
                 plugins: [
                     SwaggerUIBundle.plugins.DownloadUrl
                 ],
-                layout: "StandaloneLayout"
+                layout: "StandaloneLayout",
+                requestInterceptor: (request) => {
+                  request.curlOptions = ['-H', 'Digitraffic-User: Nimimerkki/EsimerkkiApp 0.1', '--compressed'];
+                  return request;
+                }
                 })
                 // End Swagger UI call region
         
