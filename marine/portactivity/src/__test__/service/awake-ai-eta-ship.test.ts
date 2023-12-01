@@ -167,7 +167,7 @@ describe("AwakeAiETAShipService", () => {
     test("getAwakeAiTimestamps - pilotage ETP for ports in list", async () => {
         const api = createApi();
         const service = new AwakeAiETAShipService(api);
-        for (const locode of AwakeAiETAShipService.publishAsETPDestinations) {
+        for (const locode of service.publishAsETPDestinations) {
             const ship = newDbETAShip(locode);
             const response = createVoyageResponse(locode, ship.imo, 123456789, {
                 zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA
@@ -190,7 +190,7 @@ describe("AwakeAiETAShipService", () => {
         const service = new AwakeAiETAShipService(api);
         const locode: Locode = "FIHEL";
         const ship = newDbETAShip(locode);
-        expect(AwakeAiETAShipService.publishAsETPDestinations.includes(locode)).toBe(false);
+        expect(service.publishAsETPDestinations.includes(locode)).toBe(false);
         const response = createVoyageResponse(locode, ship.imo, 123456789, {
             zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA
         });
