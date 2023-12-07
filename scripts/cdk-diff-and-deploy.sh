@@ -89,7 +89,7 @@ then
   then
       # npx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
       # Use script too capture command output and save it to file
-      script /tmp/cdk_out.txt npx cdk@latest  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+      script /tmp/cdk_out.txt npx --yes cdk@latest  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
 
       read -p "Do you wanna see formatted diff in browser? " -n 1 -r
       echo    # move to a new line
@@ -101,10 +101,10 @@ then
         # first egrep takes lines without red, gsed removes ansi colour codes and last grep removes unwanted lines
         egrep -v '\x1b\[31m' /tmp/cdk_out.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > /tmp/cdk_new.txt
         # Make a diff with full context and convert it to html
-        diff -u -U 1000000 /tmp/cdk_old.txt /tmp/cdk_new.txt | npx diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
+        diff -u -U 1000000 /tmp/cdk_old.txt /tmp/cdk_new.txt | npx --yes diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
       fi
     else
-        npx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+        npx --yes cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
     fi
 fi
 

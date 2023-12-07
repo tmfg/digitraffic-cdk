@@ -2032,8 +2032,8 @@ importers:
   ../../road/maintenance-tracking:
     dependencies:
       '@digitraffic/common':
-        specifier: 2023.6.27-1
-        version: 2023.6.27-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        specifier: 2023.11.21-1
+        version: 2023.11.21-1(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
         specifier: ^4.6.5
         version: 4.6.5
@@ -2129,8 +2129,8 @@ importers:
   ../../road/maintenance-tracking-municipality:
     dependencies:
       '@digitraffic/common':
-        specifier: 2023.10.11-1
-        version: 2023.10.11-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        specifier: 2023.11.21-1
+        version: 2023.11.21-1(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       aws-cdk-lib:
         specifier: ~2.103.1
         version: 2.103.1(constructs@10.3.0)
@@ -4584,41 +4584,6 @@ packages:
       pg-native: 3.0.1
       pg-promise: 11.5.4(pg-native@3.0.1)
       spex: 3.3.0
-    dev: false
-
-  /@digitraffic/common@2023.10.11-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
-    resolution: {integrity: sha512-6jpPD/KiSd6OD1w/xRu64VwvAqx2hMwg1z9PWDJtWQhAcQ5LbpUPrl5xXeOUn/iSNZcKYhyqh5dJVARl3Ef7Bg==}
-    engines: {node: '>=14 <17 || >=18 <19'}
-    peerDependencies:
-      '@aws-cdk/aws-synthetics-alpha': ^2.85.0-alpha.0
-      '@types/geojson': ^7946.0.10
-      aws-cdk-lib: ^2.85.0
-      aws-sdk: ^2.1405.0
-      axios: ^1.2.6
-      change-case: ^4.1.2
-      constructs: ^10.2.17
-      date-fns: ~2.30.0
-      date-fns-tz: ~2.0.0
-      etag: ^1.8.1
-      geojson-validation: ^1.0.2
-      node-ttl: ^0.2.0
-      pg-native: ^3.0.1
-      pg-promise: ^11.5.0
-    dependencies:
-      '@aws-cdk/aws-synthetics-alpha': 2.85.0-alpha.0(aws-cdk-lib@2.103.1)(constructs@10.3.0)
-      '@types/geojson': 7946.0.12
-      aws-cdk-lib: 2.103.1(constructs@10.3.0)
-      aws-sdk: 2.1482.0
-      axios: 1.6.0
-      change-case: 4.1.2
-      constructs: 10.3.0
-      date-fns: 2.30.0
-      date-fns-tz: 2.0.0(date-fns@2.30.0)
-      etag: 1.8.1
-      geojson-validation: 1.0.2
-      node-ttl: 0.2.0
-      pg-native: 3.0.1
-      pg-promise: 11.5.4(pg-native@3.0.1)
     dev: false
 
   /@digitraffic/common@2023.11.21-1(@types/geojson@7946.0.12)(aws-cdk-lib@2.103.1)(aws-sdk@2.1482.0)(axios@1.6.0)(change-case@4.1.2)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):

@@ -15,13 +15,14 @@
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
+    "eslint-report": "npm run ci:eslint-report && open report.html",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles --forceExit",
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.6.27-1",
+    "@digitraffic/common": "2023.11.21-1",
     "@middy/core": "^4.6.5",
     "@middy/sqs-partial-batch-failure": "^4.6.5",
     "aws-cdk-lib": "~2.103.1",
