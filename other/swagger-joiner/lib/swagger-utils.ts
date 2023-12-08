@@ -43,7 +43,7 @@ export function constructSwagger(spec: object) {
 }
 
 export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
-    return allApis.reduce((acc, curr) => _.merge(curr, acc) as OpenApiSchema);
+    return allApis.reduce((acc, curr) => _.merge(acc, curr));
 }
 
 function methodIsDeprecated(apiDescription: OpenApiSchema, path: string, method: string): boolean {
