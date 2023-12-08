@@ -68,6 +68,7 @@ describe(
             const [counters, lastModified] = await CountingSitesService.findCounters("", 2);
 
             expect(counters.features).toHaveLength(0);
+            expect(lastModified).toEqual(EPOCH);
         });
 
         test("findCounters - not found", async () => {

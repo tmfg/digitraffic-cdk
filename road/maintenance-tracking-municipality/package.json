@@ -19,6 +19,7 @@
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "../../scripts/check-ts-files-exists-and-run.sh 'lib/canaries' 'esbuild lib/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16'",
     "compile-lambdas": "esbuild lib/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "eslint-report": "npm run ci:eslint-report && open report.html",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles --forceExit",

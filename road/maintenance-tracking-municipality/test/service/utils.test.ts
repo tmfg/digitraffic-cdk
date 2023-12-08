@@ -70,6 +70,5 @@ function createDbMaintenanceTracking(withLineString: boolean): DbMaintenanceTrac
         start_time: new Date(),
         tasks: [],
         work_machine_id: 0
-        /* eslint-enable */
     };
 }
