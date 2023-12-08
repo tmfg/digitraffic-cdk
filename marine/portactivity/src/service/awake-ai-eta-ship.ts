@@ -35,7 +35,17 @@ export class AwakeAiETAShipService {
 
     readonly overriddenDestinations: readonly Locode[] = ["FIHEL", "FIPOR", "FIHKO"];
 
-    readonly publishAsETPDestinations: readonly Locode[] = ["FIRAU", "FIKOK", "FIKAS", "FIPOR"];
+    readonly publishAsETPDestinations: readonly Locode[] = [
+        "FIRAU",
+        "FIKOK",
+        "FIKAS",
+        "FIPOR",
+        "FIUKI",
+        "FIHKO",
+        "FIRAA",
+        "FIKEM",
+        "FIPRS"
+    ];
 
     constructor(api: AwakeAiETAShipApi) {
         this.api = api;
@@ -114,7 +124,7 @@ export class AwakeAiETAShipService {
                             message: `state=${AwakeDataState.DIFFERING_LOCODE} not persisting, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`
                         });
                         return undefined;
-                    } else if (this.overriddenDestinations.includes(ship.locode as Locode)) {
+                    } else if (this.overridableDestination(ship.locode as Locode)) {
                         // less than 24 hours to ship arrival and port call LOCODE is in list of overridden destinations
                         // don't trust predicted destination, override destination with port call LOCODE
                         logger.warn({
@@ -128,7 +138,7 @@ export class AwakeAiETAShipService {
                 // allow pilot boarding area ETAs (ETP) only for specific ports
                 if (
                     etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA &&
-                    !this.publishAsETPDestinations.includes(port as Locode)
+                    !this.publishableAsETP(port as Locode)
                 ) {
                     logger.warn({
                         method: "AwakeAiETAShipService.handleSchedule",
@@ -148,6 +158,14 @@ export class AwakeAiETAShipService {
                 );
             })
             .filter((ts): ts is ApiTimestamp => !!ts);
+    }
+
+    private publishableAsETP(locode: Locode): boolean {
+        return this.publishAsETPDestinations.includes(locode);
+    }
+
+    private overridableDestination(locode: Locode): boolean {
+        return this.overriddenDestinations.includes(locode);
     }
 
     private getETAPredictions(schedule: AwakeAiShipVoyageSchedule): AwakeAiVoyageEtaPrediction[] {

@@ -19,6 +19,7 @@ import { getRandomInteger, randomBoolean } from "@digitraffic/common/dist/test/t
 import { EventSource } from "../../model/eventsource";
 import { addHours } from "date-fns";
 import _ from "lodash";
+import type { Locode } from "../../model/locode";
 
 /**
  * Note: Since it is a source of VTS A timestamps,
@@ -163,28 +164,34 @@ describe("AwakeAiETAShipService", () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test("getAwakeAiTimestamps - pilotage ETP only for FIRAU", async () => {
+    test("getAwakeAiTimestamps - pilotage ETP for ports in list", async () => {
         const api = createApi();
         const service = new AwakeAiETAShipService(api);
-        const ship = newDbETAShip();
-        const response = createVoyageResponse("FIRAU", ship.imo, 123456789, {
-            zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA
-        });
-        sinon.stub(api, "getETA").returns(Promise.resolve(response));
+        for (const locode of service.publishAsETPDestinations) {
+            const ship = newDbETAShip(locode);
+            const response = createVoyageResponse(locode, ship.imo, 123456789, {
+                zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA
+            });
+            const stub = sinon.stub(api, "getETA").returns(Promise.resolve(response));
 
-        const timestamps = await service.getAwakeAiTimestamps([ship]);
+            const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamps.length).toBe(1);
-        expect(timestamps[0]).toMatchObject(
-            awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code, EventType.ETP)
-        );
+            expect(timestamps.length).toBe(1);
+            expect(timestamps[0]).toMatchObject(
+                awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code, EventType.ETP)
+            );
+
+            stub.restore();
+        }
     });
 
-    test("getAwakeAiTimestamps - no pilotage ETP", async () => {
+    test("getAwakeAiTimestamps - no pilotage ETP if not in list", async () => {
         const api = createApi();
         const service = new AwakeAiETAShipService(api);
-        const ship = newDbETAShip();
-        const response = createVoyageResponse("FILOL", ship.imo, 123456789, {
+        const locode: Locode = "FIHEL";
+        const ship = newDbETAShip(locode);
+        expect(service.publishAsETPDestinations.includes(locode)).toBe(false);
+        const response = createVoyageResponse(locode, ship.imo, 123456789, {
             zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA
         });
         sinon.stub(api, "getETA").returns(Promise.resolve(response));

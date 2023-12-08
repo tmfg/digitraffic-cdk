@@ -91,7 +91,6 @@ function isDuplicateWithPortcallId(
  * Checks if certain types of timestamps from an equivalent source can be merged.
  * @param timestamps
  */
-// export function mergeTimestamps(timestamps: ShiplistTimestamp[]): ShiplistTimestamp[];
 export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTimestamp[];
 export function mergeTimestamps(timestamps: ShiplistTimestamp[]): ShiplistTimestamp[];
 export function mergeTimestamps(ts: unknown[]): unknown[] {
