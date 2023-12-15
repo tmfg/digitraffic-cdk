@@ -1,7 +1,7 @@
 import { OpenApiSchema } from "./model/openapi-schema";
 import _ from "lodash";
 
-export function constructSwagger(spec: object) {
+export function constructSwagger(spec: object): string {
     return `
         function showNotSupportedContent() {
             document.querySelector('html').innerHTML = '<div>Query parameters not supported</div>';
@@ -56,7 +56,7 @@ function methodIsDeprecated(apiDescription: OpenApiSchema, path: string, method:
     );
 }
 
-export function setDeprecatedPerMethod(apiDescription: OpenApiSchema) {
+export function setDeprecatedPerMethod(apiDescription: OpenApiSchema): void {
     Object.keys(apiDescription.paths).forEach((path) =>
         Object.keys(apiDescription.paths[path]).forEach((method) => {
             // set deprecated: true if field does not exist and conditions are met

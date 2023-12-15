@@ -1,12 +1,9 @@
-import {
-    mergeApiDescriptions,
-    setDeprecatedPerMethod,
-} from "../lib/swagger-utils";
+import { mergeApiDescriptions, setDeprecatedPerMethod } from "../lib/swagger-utils";
 import {
     getDeprecatedPathWithHeaders,
     getDeprecatedPathWithRemovalText,
     getOpenapiDescriptionWithPaths,
-    getSupportedPath,
+    getSupportedPath
 } from "./testdata";
 import { openapiSchema } from "../lib/model/openapi-schema";
 
@@ -14,19 +11,17 @@ describe("swagger-utils", () => {
     test("mergeApiDescriptions", () => {
         const appApi = getOpenapiDescriptionWithPaths({ "/app/path": {} });
         const apiGwApi1 = getOpenapiDescriptionWithPaths({
-            "/apigw1/path": {},
+            "/apigw1/path": {}
         });
         const apiGwApi2 = getOpenapiDescriptionWithPaths({
-            "/apigw2/path": {},
+            "/apigw2/path": {}
         });
 
-        expect(
-            mergeApiDescriptions([appApi, apiGwApi1, apiGwApi2])
-        ).toMatchObject(
+        expect(mergeApiDescriptions([appApi, apiGwApi1, apiGwApi2])).toMatchObject(
             getOpenapiDescriptionWithPaths({
                 "/app/path": {},
                 "/apigw1/path": {},
-                "/apigw2/path": {},
+                "/apigw2/path": {}
             })
         );
     });
@@ -39,13 +34,13 @@ describe("swagger-utils", () => {
         const apiDescription = getOpenapiDescriptionWithPaths({
             ...getSupportedPath(path1),
             ...getDeprecatedPathWithHeaders(path2),
-            ...getDeprecatedPathWithRemovalText(path3),
+            ...getDeprecatedPathWithRemovalText(path3)
         });
 
         // deprecated field not set in test data
-        expect("deprecated" in apiDescription.paths[path1]["get"]).toBe(false);
-        expect("deprecated" in apiDescription.paths[path2]["get"]).toBe(false);
-        expect("deprecated" in apiDescription.paths[path3]["get"]).toBe(false);
+        expect("deprecated" in apiDescription.paths[path1].get).toBe(false);
+        expect("deprecated" in apiDescription.paths[path2].get).toBe(false);
+        expect("deprecated" in apiDescription.paths[path3].get).toBe(false);
 
         // set fields
         setDeprecatedPerMethod(apiDescription);
@@ -54,11 +49,11 @@ describe("swagger-utils", () => {
         expect(openapiSchema.parse(apiDescription)).toBeTruthy();
 
         // deprecated field is set where required
-        expect("deprecated" in apiDescription.paths[path1]["get"]).toBe(false);
-        expect("deprecated" in apiDescription.paths[path2]["get"]).toBe(true);
-        expect("deprecated" in apiDescription.paths[path3]["get"]).toBe(true);
+        expect("deprecated" in apiDescription.paths[path1].get).toBe(false);
+        expect("deprecated" in apiDescription.paths[path2].get).toBe(true);
+        expect("deprecated" in apiDescription.paths[path3].get).toBe(true);
 
-        expect(apiDescription.paths[path2]["get"]["deprecated"]).toBe(true);
-        expect(apiDescription.paths[path3]["get"]["deprecated"]).toBe(true);
+        expect(apiDescription.paths[path2].get.deprecated).toBe(true);
+        expect(apiDescription.paths[path3].get.deprecated).toBe(true);
     });
 });

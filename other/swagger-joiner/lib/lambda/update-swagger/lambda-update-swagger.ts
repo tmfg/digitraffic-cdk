@@ -1,16 +1,10 @@
 import { config as AWSConfig } from "aws-sdk";
 import { AxiosRequestConfig, default as axios } from "axios";
-import {
-    constructSwagger,
-    mergeApiDescriptions,
-    setDeprecatedPerMethod,
-} from "../../swagger-utils";
+import { constructSwagger, mergeApiDescriptions, setDeprecatedPerMethod } from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
-import {
-    getEnvVariable,
-    getEnvVariableOrElse,
-} from "@digitraffic/common/dist/utils/utils";
+import { hasOwnPropertySafe } from "@digitraffic/common/dist/utils/utils";
+import { getEnvVariable, getEnvVariableOrElse } from "@digitraffic/common/dist/utils/utils";
 import { openapiSchema } from "../../model/openapi-schema";
 
 export const KEY_BUCKET_NAME = "BUCKET_NAME";
@@ -26,17 +20,15 @@ export const KEY_REMOVESECURITY = "REMOVESECURITY";
 
 const apiRequestHeaders: AxiosRequestConfig = {
     headers: {
-        "Accept-Encoding": "gzip",
-    },
+        "Accept-Encoding": "gzip"
+    }
 };
 
-export const handler = async () => {
+export const handler = async (): Promise<void> => {
     // should be defined in all stacks - throw error if undefined
     const bucketName = getEnvVariable(KEY_BUCKET_NAME);
     const region = getEnvVariable(KEY_REGION);
-    const apigatewayIds = JSON.parse(
-        getEnvVariable(KEY_APIGW_APPS)
-    ) as string[];
+    const apigatewayIds = JSON.parse(getEnvVariable(KEY_APIGW_APPS)) as string[];
 
     // may not be defined in some stacks
     const appUrl = getEnvVariableOrElse(KEY_APP_URL, undefined);
@@ -50,24 +42,12 @@ export const handler = async () => {
     AWSConfig.update({ region });
 
     const apiResponses = await Promise.all(apigatewayIds.map(exportSwaggerApi));
-    const apis = apiResponses.map((resp) =>
-        openapiSchema.parse(JSON.parse(resp.body as string))
-    );
+    const apis = apiResponses.map((resp) => openapiSchema.parse(JSON.parse(resp.body as string)));
 
-    const appApi = appUrl
-        ? [
-              openapiSchema.parse(
-                  (await axios.get(appUrl, apiRequestHeaders)).data
-              ),
-          ]
-        : [];
+    const appApi = appUrl ? [openapiSchema.parse((await axios.get(appUrl, apiRequestHeaders)).data)] : [];
 
     const appBetaApi = appBetaUrl
-        ? [
-              openapiSchema.parse(
-                  (await axios.get(appBetaUrl, apiRequestHeaders)).data
-              ),
-          ]
+        ? [openapiSchema.parse((await axios.get(appBetaUrl, apiRequestHeaders)).data)]
         : [];
 
     // order is crucial in order for beta for remain at the bottom
@@ -91,7 +71,9 @@ export const handler = async () => {
 
     if (removeSecurity === "true") {
         for (const path in merged.paths) {
+            if (!hasOwnPropertySafe(merged.paths, path)) continue;
             for (const method in merged.paths[path]) {
+                if (!hasOwnPropertySafe(merged.paths[path], method)) continue;
                 delete merged.paths[path][method].security;
             }
         }
@@ -99,6 +81,7 @@ export const handler = async () => {
 
     // remove HEAD methods used for health checks
     for (const path in merged.paths) {
+        if (!hasOwnPropertySafe(merged.paths, path)) continue;
         for (const method in merged.paths[path]) {
             if (method.toUpperCase() === "HEAD") {
                 delete merged.paths[path][method];
@@ -111,14 +94,10 @@ export const handler = async () => {
     setDeprecatedPerMethod(merged);
 
     const swaggerFilename = "dt-swagger.js";
-    const swaggerFilenameFinal = directory
-        ? `${directory}/${swaggerFilename}`
-        : swaggerFilename;
+    const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;
 
     const swaggerSpecFilename = "openapi.json";
-    const swaggerSpecFilenameFinal = directory
-        ? `${directory}/${swaggerSpecFilename}`
-        : swaggerSpecFilename;
+    const swaggerSpecFilenameFinal = directory ? `${directory}/${swaggerSpecFilename}` : swaggerSpecFilename;
 
     await Promise.all([
         uploadToS3(bucketName, constructSwagger(merged), swaggerFilenameFinal),
@@ -128,6 +107,6 @@ export const handler = async () => {
             swaggerSpecFilenameFinal,
             "private",
             "application/json"
-        ),
+        )
     ]);
 };
