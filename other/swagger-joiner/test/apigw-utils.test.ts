@@ -1,26 +1,22 @@
-import {
-    exportSwaggerApi,
-    getDocumentationVersion,
-    createDocumentationVersion,
-} from "../lib/apigw-utils";
-import * as AWS from "aws-sdk";
-
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const stubPromise = (x: unknown) => ({ promise: () => Promise.resolve() });
 const apiGWCreateDocumentationVersionStub = jest.fn(stubPromise);
 const apiGWGetDocumentationVersionsStub = jest.fn(stubPromise);
 const apiGWGetExportStub = jest.fn(stubPromise);
-
 jest.mock("aws-sdk", () => {
     return {
         APIGateway: jest.fn(() => {
             return {
                 getExport: apiGWGetExportStub,
                 getDocumentationVersions: apiGWGetDocumentationVersionsStub,
-                createDocumentationVersion: apiGWCreateDocumentationVersionStub,
+                createDocumentationVersion: apiGWCreateDocumentationVersionStub
             };
-        }),
+        })
     };
 });
+
+import { exportSwaggerApi, getDocumentationVersion, createDocumentationVersion } from "../lib/apigw-utils";
+import * as AWS from "aws-sdk";
 
 describe("apigw-utils", () => {
     const apiGateway = new AWS.APIGateway();
@@ -33,7 +29,7 @@ describe("apigw-utils", () => {
         expect(apiGWGetExportStub.mock.calls[0][0]).toMatchObject({
             exportType: "oas30",
             restApiId: apiId,
-            stageName: "prod",
+            stageName: "prod"
         });
     });
 
@@ -42,10 +38,8 @@ describe("apigw-utils", () => {
 
         await getDocumentationVersion(apiId, apiGateway);
 
-        expect(
-            apiGWGetDocumentationVersionsStub.mock.calls[0][0]
-        ).toMatchObject({
-            restApiId: apiId,
+        expect(apiGWGetDocumentationVersionsStub.mock.calls[0][0]).toMatchObject({
+            restApiId: apiId
         });
     });
 
@@ -55,12 +49,10 @@ describe("apigw-utils", () => {
 
         await createDocumentationVersion(apiId, docVersion, apiGateway);
 
-        expect(
-            apiGWCreateDocumentationVersionStub.mock.calls[0][0]
-        ).toMatchObject({
+        expect(apiGWCreateDocumentationVersionStub.mock.calls[0][0]).toMatchObject({
             restApiId: apiId,
             stageName: "prod",
-            documentationVersion: `${docVersion + 1}`,
+            documentationVersion: `${docVersion + 1}`
         });
     });
 });

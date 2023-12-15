@@ -11,7 +11,7 @@ interface ApiAndVersions {
     readonly versions: ListOfDocumentationVersion;
 }
 
-export const handler = async () => {
+export const handler = async (): Promise<void> => {
     const apigatewayIds = JSON.parse(getEnvVariable(KEY_APIGW_IDS)) as string[];
 
     AWSConfig.update({ region: getEnvVariable(KEY_REGION) });

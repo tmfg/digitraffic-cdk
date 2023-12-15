@@ -2,11 +2,7 @@ import { Props } from "./app-props";
 import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 import * as InternalLambdas from "./internal-lambdas";
 import { BlockPublicAccess, Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
-import {
-    CanonicalUserPrincipal,
-    Effect,
-    PolicyStatement,
-} from "aws-cdk-lib/aws-iam";
+import { CanonicalUserPrincipal, Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
@@ -18,7 +14,7 @@ export class SwaggerJoinerStack extends DigitrafficStack {
         InternalLambdas.create(this, bucket);
     }
 
-    private createBucket() {
+    private createBucket(): Bucket {
         const props = this.configuration as Props;
 
         const bucket = new Bucket(this, "SwaggerBucket", {
@@ -27,16 +23,16 @@ export class SwaggerJoinerStack extends DigitrafficStack {
             cors: [
                 {
                     allowedOrigins: ["*"],
-                    allowedMethods: [HttpMethods.GET],
-                },
-            ],
+                    allowedMethods: [HttpMethods.GET]
+                }
+            ]
         });
 
         new BucketDeployment(this, "SwaggerFiles", {
             destinationBucket: bucket,
             sources: [Source.asset("./resources")],
             destinationKeyPrefix: props.directory,
-            exclude: ["dt-swagger.js", "version.txt"],
+            exclude: ["dt-swagger.js", "version.txt"]
         });
 
         if (props.s3VpcEndpointId) {
@@ -45,10 +41,10 @@ export class SwaggerJoinerStack extends DigitrafficStack {
                 actions: ["s3:GetObject"],
                 conditions: {
                     StringEquals: {
-                        "aws:sourceVpce": props.s3VpcEndpointId,
-                    },
+                        "aws:sourceVpce": props.s3VpcEndpointId
+                    }
                 },
-                resources: [`${bucket.bucketArn}/*`],
+                resources: [`${bucket.bucketArn}/*`]
             });
             getObjectStatement.addAnyPrincipal();
             bucket.addToResourcePolicy(getObjectStatement);
@@ -58,12 +54,8 @@ export class SwaggerJoinerStack extends DigitrafficStack {
                 new PolicyStatement({
                     effect: Effect.ALLOW,
                     actions: ["s3:GetObject"],
-                    principals: [
-                        new CanonicalUserPrincipal(
-                            props.cloudFrontCanonicalUser
-                        ),
-                    ],
-                    resources: [`${bucket.bucketArn}/*`],
+                    principals: [new CanonicalUserPrincipal(props.cloudFrontCanonicalUser)],
+                    resources: [`${bucket.bucketArn}/*`]
                 })
             );
         }
