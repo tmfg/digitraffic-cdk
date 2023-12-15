@@ -10,16 +10,16 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "aws-cdk-lib": "~2.85.0",
-    "constructs": "10.2.61",
+    "aws-cdk-lib": "~2.103.1",
+    "constructs": "10.3.0",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.3.2",
-    "@types/node": "18.15.13",
-    "eslint": "~8.43.0",
+    "@rushstack/eslint-config": "^3.4.1",
+    "@types/node": "20.8.9",
+    "eslint": "~8.52.0",
     "ts-node": "^10.9.1",
     "typescript": "~4.9.5"
   }

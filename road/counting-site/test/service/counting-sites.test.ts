@@ -47,6 +47,30 @@ describe(
             expect(lastModified.getTime()).toBeDefined();
         });
 
+        test("findCounter", async () => {
+            await insertDomain(db, DOMAIN1);
+            await insertCounter(db, 1, DOMAIN1, 1);
+            await insertData(db, 1, 15);
+
+            const [counters, lastModified] = await CountingSitesService.findCounters("", 1);
+
+            expect(counters.features).toHaveLength(1);
+            expect(counters.features[0].properties?.id).toBe(1);
+            expect(counters.features[0].properties?.interval).toBe(15);
+            expect(lastModified.getTime()).toBeCloseTo(Date.now(), -4); // max 5 s diff
+        });
+
+        test("findCounter - not found", async () => {
+            await insertDomain(db, DOMAIN1);
+            await insertCounter(db, 1, DOMAIN1, 1);
+            await insertData(db, 1, 15);
+
+            const [counters, lastModified] = await CountingSitesService.findCounters("", 2);
+
+            expect(counters.features).toHaveLength(0);
+            expect(lastModified).toEqual(EPOCH);
+        });
+
         test("findCounters - not found", async () => {
             await insertDomain(db, DOMAIN1);
             await insertCounter(db, 1, DOMAIN1, 1);

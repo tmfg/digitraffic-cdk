@@ -1,9 +1,19 @@
 {
   "extends": "@rushstack/heft-jest-plugin/includes/jest-shared.config.json",
+  "maxWorkers": "1",
+  "roots": ["<rootDir>/lib"],
+  "testMatch": ["<rootDir>/lib/__test__/**/*.test.js"],
   "collectCoverage": true,
-  "roots": ["<rootDir>/dist/out"],
-  "testMatch": ["<rootDir>/dist/out/__test__/**/*.test.{js,tsx}"],
-  "modulePathIgnorePatterns": ["<rootDir>/src"],
+  "collectCoverageFrom": [
+    "lib/**/*.js",
+    "!lib/**/*.d.ts",
+    "!lib/**/*.test.js",
+    "!lib/**/__test__/**",
+    "!lib/**/__tests__/**",
+    "!lib/**/__fixtures__/**",
+    "!lib/**/__mocks__/**"
+  ],
+  "coveragePathIgnorePatterns": ["/node_modules/"],
   "coverageThreshold": {
     "global": {
       "branches": 50,

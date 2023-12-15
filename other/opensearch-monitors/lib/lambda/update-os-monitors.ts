@@ -2,7 +2,7 @@ import { STS } from "aws-sdk";
 import { OpenSearch } from "../api/opensearch";
 import { AwsCredentialIdentity } from "@aws-sdk/types";
 import { AssumeRoleRequest } from "aws-sdk/clients/sts";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 import { OSMonitor } from "../monitor/monitor";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";

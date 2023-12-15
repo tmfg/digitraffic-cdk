@@ -8,20 +8,21 @@
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "lint": "eslint --cache .",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "test": "echo 'No tests implemented'"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
-    "aws-cdk-lib": "~2.85.0",
-    "constructs": "10.2.61"
+    "aws-cdk-lib": "~2.103.1",
+    "constructs": "10.3.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.3.2",
-    "@types/aws-lambda": "~8.10.119",
-    "@types/node": "18.15.13",
-    "eslint": "~8.43.0",
+    "@rushstack/eslint-config": "^3.4.1",
+    "@types/aws-lambda": "8.10.125",
+    "@types/node": "20.8.9",
+    "eslint": "~8.52.0",
     "typescript": "~4.9.5"
   },
   "externals": [

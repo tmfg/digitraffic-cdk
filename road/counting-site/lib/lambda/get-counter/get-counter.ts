@@ -10,9 +10,9 @@ const proxyHolder = ProxyHolder.create();
 // TODO: API v2: return only Feature not featureCollection
 export const handler = (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
-    const counterId = event.counterId;
+    const counterId = Number.parseInt(event.counterId);
 
-    if (Number.isNaN(Number(counterId))) {
+    if (Number.isNaN(counterId) || String(counterId) !== event.counterId) {
         return Promise.resolve(LambdaResponse.notFound().withTimestamp(EPOCH));
     }
 

@@ -5,7 +5,7 @@ import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
 import { TriggerFunction } from "aws-cdk-lib/triggers";
 import { Construct } from "constructs";
 import { OSMonitor } from "./monitor/monitor";
-import { writeFileSync } from "fs";
+import { writeFileSync } from "node:fs";
 import { EnvKeys } from "./env";
 
 export interface OSMonitorsConfiguration {

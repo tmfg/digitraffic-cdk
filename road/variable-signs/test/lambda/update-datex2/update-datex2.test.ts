@@ -2,7 +2,7 @@ process.env.SECRET_ID = "SECRET";
 
 import { handler } from "../../../lib/lambda/update-datex2/update-datex2";
 import { dbTestBase, setup } from "../../db-testutil";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 import * as VariableSignsService from "../../../lib/service/variable-signs";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { StatusCodeValue } from "../../../lib/model/status-code-value";

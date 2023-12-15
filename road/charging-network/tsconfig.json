@@ -1,0 +1,18 @@
+{
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-cdk-old.json",
+  "compilerOptions": {
+    "lib": ["es2022"],
+    "target": "es2022",
+    "outDir": "dist/out",
+    "resolveJsonModule": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "strictPropertyInitialization": false,
+    "preserveSymlinks": true,
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["bin/**/*.ts", "lib/**/*.ts"]
+}

@@ -18,7 +18,7 @@
    */
   "rushVersion": "5.100.1",
 
-  "pnpmVersion": "8.2.0",
+  "pnpmVersion": "8.10.2",
   "nodeSupportedVersionRange": ">=16.13.0 <17.0.0 || >=18.0.0 <19.0.0",
   "ensureConsistentVersions": false,
 
@@ -206,6 +206,12 @@
 
     // road
     {
+      "packageName": "charging-network",
+      "projectFolder": "road/charging-network",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "road"]
+    },
+    {
       "packageName": "counting-sites",
       "projectFolder": "road/counting-site",
       "decoupledLocalDependencies": ["@digitraffic/common"],
@@ -232,12 +238,6 @@
     {
       "packageName": "open311-cdk",
       "projectFolder": "road/open311",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "road"]
-    },
-    {
-      "packageName": "road-network-conditions",
-      "projectFolder": "road/road-network-conditions",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "road"]
     },
