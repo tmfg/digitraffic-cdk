@@ -4,22 +4,36 @@ import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
 import { parseMessage, processMessage } from "../../service/process-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging.js";
+import { sendToSqs } from "../../util/sqs";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
+
+const DLQ_URL = getEnvVariable("DLQ_URL");
 
 export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return (event: SQSEvent) => {
         return Promise.allSettled(
             event.Records.map(async (r) => {
                 const start = Date.now();
-                const parsedRamiMessage = parseMessage(JSON.parse(r.body));
-                logger.info({
+                const recordBody = r.body;
+                const parsedRamiMessage = parseMessage(JSON.parse(recordBody));
+                logger.debug({
                     method: "RAMI-ProcessQueue.handler",
                     customParsedRamiMessage: JSON.stringify(parsedRamiMessage)
                 });
                 if (parsedRamiMessage) {
-                    await processMessage(parsedRamiMessage).catch((error): unknown => {
+                    try {
+                        await processMessage(parsedRamiMessage);
+                    } catch (error) {
                         logException(logger, error);
+                        // send original message to dlq on error
+                        await sendToSqs(
+                            DLQ_URL,
+                            2,
+                            `[{"errors":"${JSON.stringify(error)}"}, ${recordBody}}]`,
+                            parsedRamiMessage.id
+                        );
                         return Promise.reject(error);
-                    });
+                    }
                 }
                 logger.info({
                     method: "RAMI-ProcessQueue.handler",

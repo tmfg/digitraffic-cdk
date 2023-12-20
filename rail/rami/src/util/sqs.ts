@@ -11,7 +11,7 @@ export async function sendToSqs(
     const result = await doSendToSqs(queueUrl, message);
     if (result.MessageId) {
         logger.info({
-            method: "UploadRamiMessage.handler",
+            method: "rami.sendToSqs",
             customSentMessageId: messageId,
             customSqsMessageId: result.MessageId
         });
@@ -19,13 +19,13 @@ export async function sendToSqs(
         const delay = 500 * 2 ** retries;
         await setTimeout(delay);
         logger.debug({
-            method: "UploadRamiMessage.handler",
+            method: "rami.sendToSqs",
             message: `Retry sending to queue ${queueUrl} message id ${messageId}`
         });
         await sendToSqs(queueUrl, retries - 1, message, messageId);
     } else {
         logger.error({
-            method: "UploadRamiMessage.handler",
+            method: "rami.sendToSqs",
             message: `Failed to send to queue ${queueUrl} message id ${messageId}`
         });
     }
