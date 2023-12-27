@@ -71,9 +71,7 @@ export const handler = async (): Promise<void> => {
 
     if (removeSecurity === "true") {
         for (const path in merged.paths) {
-            if (!hasOwnPropertySafe(merged.paths, path)) continue;
             for (const method in merged.paths[path]) {
-                if (!hasOwnPropertySafe(merged.paths[path], method)) continue;
                 delete merged.paths[path][method].security;
             }
         }
