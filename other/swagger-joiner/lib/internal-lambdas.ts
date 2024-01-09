@@ -24,12 +24,12 @@ import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/moni
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
-export function create(stack: DigitrafficStack, bucket: Bucket) {
+export function create(stack: DigitrafficStack, bucket: Bucket): void {
     createUpdateSwaggerDescriptionsLambda(stack, bucket);
     createUpdateApiDocumentationLambda(stack);
 }
 
-function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
+function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
     const functionName = `${stack.stackName}-UpdateApiDocumentation`;
     const props = stack.configuration as Props;
 
@@ -60,7 +60,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
     createSubscription(updateDocsLambda, functionName, props.logsDestinationArn, stack);
 }
 
-function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: Bucket) {
+function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: Bucket): void {
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
     const props = stack.configuration as Props;
 

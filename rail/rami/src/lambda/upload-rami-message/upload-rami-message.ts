@@ -11,7 +11,7 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
     if (messageBody) {
         const validationResult = validateIncomingRamiMessage(messageBody);
         if (validationResult.valid) {
-            logger.debug({
+            logger.info({
                 method: "UploadRamiMessage.handler",
                 customValidRamiMessage: JSON.stringify(messageBody)
             });

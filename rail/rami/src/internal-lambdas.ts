@@ -12,7 +12,7 @@ import { RamiEnvKeys } from "./keys.js";
 
 export function create(stack: DigitrafficStack, sqs: Queue, dlq: Queue, dlqBucketName: string): void {
     const dlqBucket = createDLQBucket(stack, dlqBucketName);
-    createProcessQueueLambda(stack, sqs);
+    createProcessQueueLambda(stack, sqs, dlq);
     createProcessDLQLambda(stack, dlq, dlqBucket);
 }
 
@@ -23,10 +23,11 @@ function createDLQBucket(stack: DigitrafficStack, bucketName: string): Bucket {
     });
 }
 
-function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue): MonitoredFunction {
+function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Queue): MonitoredFunction {
     const lambdaEnv = {
         ...(stack.configuration.secretId && { SECRET_ID: stack.configuration.secretId }),
-        DB_APPLICATION: "avoindata"
+        DB_APPLICATION: "avoindata",
+        DLQ_URL: dlq.queueUrl
     };
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-queue", lambdaEnv, {
         memorySize: 256,
@@ -34,6 +35,7 @@ function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue): Monito
         timeout: 10
     });
     processQueueLambda.addEventSource(new SqsEventSource(queue));
+    dlq.grantSendMessages(processQueueLambda);
     return processQueueLambda;
 }
 
