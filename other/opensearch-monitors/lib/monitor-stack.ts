@@ -91,7 +91,7 @@ export class UpdateOSMonitorsStack extends Stack {
             securityGroups: [sg],
             timeout: Duration.seconds(30),
             functionName: "UpdateOSMonitors",
-            runtime: Runtime.NODEJS_16_X,
+            runtime: Runtime.NODEJS_20_X,
             handler: "update-os-monitors.handler",
             code: new AssetCode("dist/lambda"),
             environment: {

@@ -48,7 +48,7 @@ export class IntegrationApi {
             memorySize: 256,
             code: new AssetCode("dist/lambda/upload-rami-message"),
             handler: "upload-rami-message.handler",
-            runtime: Runtime.NODEJS_16_X,
+            runtime: Runtime.NODEJS_20_X,
             reservedConcurrentExecutions: 10,
             environment: { SQS_URL: sqs.queueUrl, DLQ_URL: dlq.queueUrl }
         });

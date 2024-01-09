@@ -65,7 +65,7 @@ function createUpdateStatusesLambda(
         functionName: functionName,
         code: new AssetCode("dist/lambda/update-status"),
         handler: "lambda-update-status.handler",
-        runtime: Runtime.NODEJS_16_X,
+        runtime: Runtime.NODEJS_20_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
@@ -102,7 +102,7 @@ function createHandleMaintenanceLambda(
         functionName: functionName,
         code: new AssetCode("dist/lambda/handle-maintenance"),
         handler: "lambda-handle-maintenance.handler",
-        runtime: Runtime.NODEJS_16_X,
+        runtime: Runtime.NODEJS_20_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {
@@ -142,7 +142,7 @@ function createCheckComponentStatesLambda(
         functionName: functionName,
         code: new AssetCode("dist/lambda/check-component-states"),
         handler: "lambda-check-component-states.handler",
-        runtime: Runtime.NODEJS_16_X,
+        runtime: Runtime.NODEJS_20_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {

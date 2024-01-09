@@ -4,6 +4,7 @@
 
 !/.editorconfig
 !/.gitattributes
+!/.lintstagedrc
 !/.node-version
 !/.prettierignore
 !/.prettierrc.js
@@ -27,6 +28,8 @@
 !/tools/
 !/tools/*/
 
+!/common/
+
 # Project folders
 !aviation/
 !aviation/*/
@@ -40,6 +43,7 @@
 !road/*/
 
 # Github
+!.github/
 !.github/**/
 !.github/workflows/**/**.yml
 !.github/CODEOWNERS
