@@ -21,7 +21,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.12.15-1",
+    "@digitraffic/common": "2024.1.10-1",
     "amazon-cognito-identity-js": "6.3.7",
     "aws-cdk-lib": "~2.118.0",
     "aws-sdk": "~2.1531.0",

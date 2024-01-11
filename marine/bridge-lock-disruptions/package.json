@@ -21,11 +21,11 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.12.15-1",
+    "@digitraffic/common": "2024.1.10-1",
     "aws-cdk-lib": "~2.118.0",
     "axios": "^1.6.5",
     "constructs": "10.3.0",
-    "date-fns": "~3.1.0",
+    "date-fns": "~2.30.0",
     "geojson-validation": "^1.0.2",
     "parse-link-header": "^2.0.0",
     "pg-native": "^3.0.1",

@@ -22,7 +22,7 @@
     "test:watch": "heft test-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.12.15-1",
+    "@digitraffic/common": "2024.1.10-1",
     "@middy/core": "^5.2.1",
     "@middy/sqs-partial-batch-failure": "^5.2.1",
     "amqplib": "^0.10.3",
@@ -30,7 +30,7 @@
     "aws-sdk": "~2.1482.0",
     "axios": "^1.6.5",
     "constructs": "10.3.0",
-    "date-fns": "~3.1.0",
+    "date-fns": "~2.30.0",
     "lodash": "~4.17.21",
     "moment": "^2.30.1",
     "moment-timezone": "0.5.44",
@@ -40,7 +40,6 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@aws-cdk/aws-synthetics-alpha": "2.85.0-alpha.0",
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",

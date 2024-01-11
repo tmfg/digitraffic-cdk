@@ -24,7 +24,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.12.15-1",
+    "@digitraffic/common": "2024.1.10-1",
     "@middy/core": "^5.2.1",
     "@middy/sqs-partial-batch-failure": "^5.2.1",
     "@turf/boolean-disjoint": "^6.5.0",
@@ -34,7 +34,7 @@
     "aws-sdk": "~2.1531.0",
     "axios": "^1.6.5",
     "constructs": "10.3.0",
-    "date-fns": "~3.1.0",
+    "date-fns": "~2.30.0",
     "date-fns-tz": "~2.0.0",
     "parse-link-header": "^2.0.0",
     "pg-native": "^3.0.1",
