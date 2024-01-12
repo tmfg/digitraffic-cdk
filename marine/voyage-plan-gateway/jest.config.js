@@ -1,5 +1,4 @@
 module.exports = {
-    modulePaths: ["<rootDir>"],
     roots: ["<rootDir>/test", "<rootDir>/lib"],
     collectCoverage: true,
     collectCoverageFrom: ["lib/**/*.ts"],

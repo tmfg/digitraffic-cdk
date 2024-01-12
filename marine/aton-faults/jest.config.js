@@ -1,5 +1,3 @@
-const esModules = ["@middy"].join("|")
-
 module.exports = {
     roots: ["<rootDir>/test", "<rootDir>/lib"],
     collectCoverage: true,
@@ -12,13 +10,7 @@ module.exports = {
     ],
     testMatch: ["**/*.test.ts"],
     transform: {
-        "^.+\\.ts?$": [
-            "ts-jest",
-            {
-                useESM: true
-            }
-        ]
+        "^.+\\.tsx?$": "ts-jest"
     },
-    transformIgnorePatterns: [`node_modules/(?!${esModules})`],
     testResultsProcessor: "jest-junit",
 };

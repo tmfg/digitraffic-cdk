@@ -715,11 +715,11 @@ importers:
         specifier: 2024.1.10-1
         version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1482.0)(axios@1.6.5)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       '@middy/sqs-partial-batch-failure':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       amqplib:
         specifier: ^0.10.3
         version: 0.10.3
@@ -927,8 +927,8 @@ importers:
         specifier: 2024.1.10-1
         version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1531.0)(axios@1.6.5)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -1747,11 +1747,11 @@ importers:
         specifier: 2024.1.10-1
         version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1531.0)(axios@1.6.5)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       '@middy/sqs-partial-batch-failure':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       ajv:
         specifier: ~8.12.0
         version: 8.12.0
@@ -5102,13 +5102,6 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  /@datastream/core@0.0.35:
-    resolution: {integrity: sha512-jmKFcDTYqtDy8DHPahaheg3MlLBiQboYX4jYX8oxE1tO5x7cfLl5M6bqR/o46RCEFZ3M9yMVfEEh0hy5raErEw==}
-    engines: {node: '>=18'}
-    dependencies:
-      cloneable-readable: 3.0.0
-    dev: false
-
   /@digitraffic/common@2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1482.0)(axios@1.6.5)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
     resolution: {integrity: sha512-Ta19KOfn26IEcJoezvIJMamItB7hHpe0+6+v5tEOek3YtBJ4twZvHog9UCiHqDGh5rmUpa7tDZjDOPnuriWO2g==}
     engines: {node: '>=20 <21'}
@@ -5817,21 +5810,9 @@ packages:
     engines: {node: '>=16'}
     dev: false
 
-  /@middy/core@5.2.1:
-    resolution: {integrity: sha512-2FUTtwVAsbzryY0mxuXfZYcL8j2oag06BffV+fK33rhe1EXuumagLJ1azWk99J/AqDVzHPAaqz0HuZyC1pnY+w==}
-    engines: {node: '>=18'}
-    dependencies:
-      '@datastream/core': 0.0.35
-    dev: false
-
   /@middy/sqs-partial-batch-failure@4.7.0:
     resolution: {integrity: sha512-kjnSBR+nJS1n908NcGZF3R42xGmNgNnl8Fz6II+pveepPjmb7Jo/efSB/+f0gFkVe9a6KZ5wigS73L0NGTZIbA==}
     engines: {node: '>=16'}
-    dev: false
-
-  /@middy/sqs-partial-batch-failure@5.2.1:
-    resolution: {integrity: sha512-7hXwd9MGqOvRVTqnH1hdyxGVcTBb3sWx3JTeSEABzMyzff0KmPQD4KX7ikSatC1AEGtPAkaMhTK7ndOup5bf5g==}
-    engines: {node: '>=18'}
     dev: false
 
   /@nodelib/fs.scandir@2.1.5:
@@ -8069,12 +8050,6 @@ packages:
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
     dev: true
-
-  /cloneable-readable@3.0.0:
-    resolution: {integrity: sha512-Lkfd9IRx1nfiBr7UHNxJSl/x7DOeUfYmxzCkxYJC2tyc/9vKgV75msgLGurGQsak/NvJDHMWcshzEXRlxfvhqg==}
-    dependencies:
-      readable-stream: 4.4.2
-    dev: false
 
   /co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}

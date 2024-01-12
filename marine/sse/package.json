@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@digitraffic/common": "2024.1.10-1",
-    "@middy/core": "^5.2.1",
+    "@middy/core": "^4.7.0",
     "aws-cdk-lib": "~2.118.0",
     "constructs": "10.3.0",
     "dtsgenerator": "^3.19.1",
