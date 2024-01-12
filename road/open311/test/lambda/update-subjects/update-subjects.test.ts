@@ -1,4 +1,3 @@
-import { handler } from "../../../lib/lambda/update-subjects/lambda-update-subjects";
 import { dbTestBase } from "../../db-testutil";
 import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as SubjectsDb from "../../../lib/db/subjects";
@@ -9,6 +8,8 @@ const SERVER_PORT = 8090;
 process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
+
+const lambda = require("../../../lib/lambda/update-subjects/lambda-update-subjects");
 
 describe(
     "update-subjects",
@@ -24,7 +25,7 @@ describe(
 
             try {
                 const expectedId = 2;
-                await handler();
+                await lambda.handler();
 
                 const foundSubjectsFi = await SubjectsDb.findAll(Locale.FINNISH, db);
                 expect(foundSubjectsFi.length).toBe(1);
@@ -38,7 +39,7 @@ describe(
                 expect(foundSubjectsEn.length).toBe(1);
                 expect(foundSubjectsEn[0].id).toBe(expectedId);
             } finally {
-                server.close();
+                await server.close();
             }
         });
     })

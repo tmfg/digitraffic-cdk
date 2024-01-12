@@ -24,7 +24,7 @@
     // Enable when migrating to 5.0
     // "verbatimModuleSyntax": true,
     "checkJs": true,
-    "importsNotUsedAsValues": "error"
+    "verbatimModuleSyntax": true
   },
   "exclude": ["../../../../node_modules", "../../../../dist"]
 }

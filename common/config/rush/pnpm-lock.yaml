@@ -233,11 +233,11 @@ importers:
         specifier: 2024.1.10-1
         version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1531.0)(axios@1.6.5)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       '@middy/sqs-partial-batch-failure':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       '@turf/boolean-disjoint':
         specifier: ^6.5.0
         version: 6.5.0
@@ -1030,8 +1030,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       jsts:
-        specifier: 2.11.0
-        version: 2.11.0
+        specifier: 2.7.2
+        version: 2.7.2
       moment:
         specifier: ^2.30.1
         version: 2.30.1
@@ -2139,11 +2139,11 @@ importers:
         specifier: 2024.1.10-1
         version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1531.0)(axios@1.6.5)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       '@middy/sqs-partial-batch-failure':
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^4.7.0
+        version: 4.7.0
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -2350,6 +2350,9 @@ importers:
       spex:
         specifier: ^3.3.0
         version: 3.3.0
+      xml2js:
+        specifier: 0.6.2
+        version: 0.6.2
     devDependencies:
       '@digitraffic-cdk/eslint-config':
         specifier: workspace:*
@@ -5809,11 +5812,21 @@ packages:
   /@microsoft/tsdoc@0.14.2:
     resolution: {integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==}
 
+  /@middy/core@4.7.0:
+    resolution: {integrity: sha512-yI++DmhDQ8+ugvY7+GrEnb2PF0M/6Wzbgu4Tf7QhOlhwKGDd4j6or+Ab7qYPWx+jnKf8F0tqlmh0gV4JLi0yHw==}
+    engines: {node: '>=16'}
+    dev: false
+
   /@middy/core@5.2.1:
     resolution: {integrity: sha512-2FUTtwVAsbzryY0mxuXfZYcL8j2oag06BffV+fK33rhe1EXuumagLJ1azWk99J/AqDVzHPAaqz0HuZyC1pnY+w==}
     engines: {node: '>=18'}
     dependencies:
       '@datastream/core': 0.0.35
+    dev: false
+
+  /@middy/sqs-partial-batch-failure@4.7.0:
+    resolution: {integrity: sha512-kjnSBR+nJS1n908NcGZF3R42xGmNgNnl8Fz6II+pveepPjmb7Jo/efSB/+f0gFkVe9a6KZ5wigS73L0NGTZIbA==}
+    engines: {node: '>=16'}
     dev: false
 
   /@middy/sqs-partial-batch-failure@5.2.1:
@@ -10173,9 +10186,9 @@ packages:
     resolution: {integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==}
     engines: {node: '>=10.0'}
 
-  /jsts@2.11.0:
-    resolution: {integrity: sha512-1++68krnA5CJ8DguYiqNWAtoDJl/4c6yLVKp+DylTKsOY73JERGRXYFT7ncPipHc33lgnjVWReKJO8+gpwm5ag==}
-    engines: {node: '>= 16'}
+  /jsts@2.7.2:
+    resolution: {integrity: sha512-KxKqYj3pDZ6i3BBVEnBWKUztbuv43Rq5SWsB4s4a/y64pE4/StbO4jbbXjslflj4N+KchlUoRwQC04OnayknJA==}
+    engines: {node: '>= 14'}
     dev: false
 
   /jsx-ast-utils@3.3.5:

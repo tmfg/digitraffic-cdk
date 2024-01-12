@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@digitraffic/common": "2024.1.10-1",
-    "@middy/core": "^5.2.1",
-    "@middy/sqs-partial-batch-failure": "^5.2.1",
+    "@middy/core": "^4.7.0",
+    "@middy/sqs-partial-batch-failure": "^4.7.0",
     "@turf/boolean-disjoint": "^6.5.0",
     "@turf/buffer": "^6.5.0",
     "@turf/helpers": "^6.5.0",

@@ -24,7 +24,8 @@
     "pg-native": "^3.0.1",
     "pg-promise": "^11.5.4",
     "source-map-support": "^0.5.21",
-    "spex": "^3.3.0"
+    "spex": "^3.3.0",
+    "xml2js": "0.6.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/eslint-config": "workspace:*",
