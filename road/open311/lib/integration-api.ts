@@ -1,30 +1,28 @@
 import apigateway = require("aws-cdk-lib/aws-apigateway");
 import iam = require("aws-cdk-lib/aws-iam");
-import * as lambda from "aws-cdk-lib/aws-lambda";
 import { EndpointType, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
-import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { dbLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction"
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import {
-    corsMethod,
-    defaultIntegration,
-    methodResponse
+    defaultIntegration
 } from "@digitraffic/common/dist/aws/infra/api/responses";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { addDefaultValidator } from "@digitraffic/common/dist/utils/api-model";
 import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { Props } from "./app-props";
+import {Open311Props} from "./app-props";
 
-export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
+export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: DigitrafficStack, props: Open311Props) {
     const integrationApi = createApi(stack);
 
     createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
     createDefaultUsagePlan(integrationApi, "Integration", props.integrationApiKey);
 }
 
-function createApi(stack: Construct) {
+function createApi(stack: DigitrafficStack) {
     return new apigateway.RestApi(stack, "Open311-integration", {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR
@@ -45,11 +43,11 @@ function createApi(stack: Construct) {
 }
 
 function createRequestsResource(
-    stack: Construct,
+    stack: DigitrafficStack,
     integrationApi: apigateway.RestApi,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props
+    props: Open311Props
 ) {
     const validator = addDefaultValidator(integrationApi);
     const apiResource = integrationApi.root.addResource("api");
@@ -58,27 +56,20 @@ function createRequestsResource(
     const requests = open311Resource.addResource("requests");
     const messageResponseModel = integrationApi.addModel("MessageResponseModel", MessageModel);
 
-    createUpdateRequestHandler(requests, stack, vpc, lambdaDbSg, props);
-    createDeleteRequestHandler(requests, messageResponseModel, validator, stack, vpc, lambdaDbSg, props);
+    createUpdateRequestHandler(requests, stack, props);
+    createDeleteRequestHandler(requests, messageResponseModel, validator, stack, props);
 }
 
 function createUpdateRequestHandler(
     requests: apigateway.Resource,
-    stack: Construct,
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    props: Props
+    stack: DigitrafficStack,
+    props: Open311Props
 ) {
     const updateRequestsId = "UpdateRequests";
-    const updateRequestsHandler = new lambda.Function(
-        stack,
-        updateRequestsId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: updateRequestsId,
-            code: new lambda.AssetCode("dist/lambda/update-requests"),
-            handler: "lambda-update-requests.handler"
-        })
-    );
+    const updateRequestsHandler = MonitoredDBFunction.create(
+      stack,
+      updateRequestsId
+    )
     requests.addMethod("POST", new LambdaIntegration(updateRequestsHandler), {
         apiKeyRequired: true
     });
@@ -89,20 +80,13 @@ function createDeleteRequestHandler(
     requests: apigateway.Resource,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct,
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    props: Props
+    stack: DigitrafficStack,
+    props: Open311Props
 ) {
     const deleteRequestId = "DeleteRequest";
-    const deleteRequestHandler = new lambda.Function(
-        stack,
-        deleteRequestId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: deleteRequestId,
-            code: new lambda.AssetCode("dist/lambda/delete-request"),
-            handler: "lambda-delete-request.handler"
-        })
+    const deleteRequestHandler = MonitoredDBFunction.create(
+      stack,
+      deleteRequestId,
     );
     const deleteRequestIntegration = defaultIntegration(deleteRequestHandler, {
         requestParameters: {
@@ -125,8 +109,8 @@ function createDeleteRequestHandler(
             "method.request.querystring.extensions": false
         },
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, messageResponseModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+            DigitrafficMethodResponse.response200(messageResponseModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
         ]
     });
     createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);

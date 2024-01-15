@@ -2,11 +2,10 @@ import apigateway = require("aws-cdk-lib/aws-apigateway");
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { EndpointType } from "aws-cdk-lib/aws-apigateway";
-import { Stack } from "aws-cdk-lib";
-import { Construct } from "constructs";
 
 import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction"
 import {
     addDefaultValidator,
     addServiceModel,
@@ -14,14 +13,13 @@ import {
 } from "@digitraffic/common/dist/utils/api-model";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
-    corsMethod,
     defaultIntegration,
     methodResponse
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { addTags } from "@digitraffic/common/dist/aws/infra/documentation";
 import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";
-import { dbLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 import { default as ServiceSchema } from "./model/service-schema";
@@ -29,9 +27,9 @@ import { default as RequestSchema } from "./model/request-schema";
 import { default as StateSchema } from "./model/state-schema";
 import { default as SubjectSchema } from "./model/subject-schema";
 import { default as SubSubjectSchema } from "./model/subsubject-schema";
-import { Props } from "./app-props";
+import {Open311Props} from "./app-props";
 
-export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Stack, props: Props) {
+export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: DigitrafficStack, props: Open311Props) {
     const publicApi = createApi(stack, props.allowFromIpAddresses);
 
     createDefaultUsagePlan(publicApi, "Open311 CloudFront", props.publicApiKey);
@@ -61,9 +59,7 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Sta
 
     createRequestsResource(
         open311Resource,
-        vpc,
         props,
-        lambdaDbSg,
         requestModel,
         requestsModel,
         messageResponseModel,
@@ -72,39 +68,28 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Sta
     );
     createStatesResource(
         open311Resource,
-        vpc,
         props,
-        lambdaDbSg,
         stateModel,
         messageResponseModel,
-        validator,
         stack
     );
     createSubjectsResource(
         open311Resource,
-        vpc,
         props,
-        lambdaDbSg,
         subjectModel,
         messageResponseModel,
-        validator,
         stack
     );
     createSubSubjectsResource(
         open311Resource,
-        vpc,
         props,
-        lambdaDbSg,
         subSubjectModel,
         messageResponseModel,
-        validator,
         stack
     );
     createServicesResource(
         open311Resource,
-        vpc,
         props,
-        lambdaDbSg,
         serviceModel,
         servicesModel,
         messageResponseModel,
@@ -115,30 +100,19 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Sta
 
 function createRequestsResource(
     open311Resource: apigateway.Resource,
-    vpc: ec2.IVpc,
-    props: Props,
-    lambdaDbSg: ec2.ISecurityGroup,
+    props: Open311Props,
     requestModel: apigateway.Model,
     requestsModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const requests = open311Resource.addResource("requests");
 
     const getRequestsId = "Open311-GetRequests";
-    const getRequestsHandler = new lambda.Function(
-        stack,
-        getRequestsId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: getRequestsId,
-            code: new lambda.AssetCode("dist/lambda/get-requests"),
-            handler: "lambda-get-requests.handler"
-        })
-    );
+    const getRequestsHandler = MonitoredDBFunction.create(stack, getRequestsId)
     createSubscription(getRequestsHandler, getRequestsId, props.logsDestinationArn, stack);
     createGetRequestsIntegration(
-        getRequestsId,
         requests,
         getRequestsHandler,
         requestsModel,
@@ -147,18 +121,12 @@ function createRequestsResource(
     );
 
     const getRequestId = "Open311-GetRequest";
-    const getRequestHandler = new lambda.Function(
+    const getRequestHandler = MonitoredDBFunction.create(
         stack,
         getRequestId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: getRequestId,
-            code: new lambda.AssetCode("dist/lambda/get-request"),
-            handler: "lambda-get-request.handler"
-        })
     );
     createSubscription(getRequestHandler, getRequestId, props.logsDestinationArn, stack);
     createGetRequestIntegration(
-        getRequestsId,
         requests,
         getRequestHandler,
         requestModel,
@@ -169,13 +137,12 @@ function createRequestsResource(
 }
 
 function createGetRequestIntegration(
-    getRequestsId: string,
     requests: apigateway.Resource,
     getRequestHandler: lambda.Function,
     requestModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const getRequestIntegration = defaultIntegration(getRequestHandler, {
         requestParameters: {
@@ -198,21 +165,20 @@ function createGetRequestIntegration(
             "method.request.querystring.extensions": false
         },
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, requestModel)),
-            corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, messageResponseModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+            DigitrafficMethodResponse.response200(requestModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response("404", messageResponseModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON)
         ]
     });
     addTags("GetRequest", DATA_V1_TAGS, request, stack);
 }
 
 function createGetRequestsIntegration(
-    getRequestsId: string,
     requests: apigateway.Resource,
     getRequestsHandler: lambda.Function,
     requestsModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const getRequestsIntegration = defaultIntegration(getRequestsHandler, {
         requestParameters: {
@@ -230,8 +196,8 @@ function createGetRequestsIntegration(
             "method.request.querystring.extensions": false
         },
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, requestsModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+            DigitrafficMethodResponse.response200(requestsModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON)
         ]
     });
     addTags("GetRequests", DATA_V1_TAGS, requests, stack);
@@ -239,25 +205,17 @@ function createGetRequestsIntegration(
 
 function createStatesResource(
     open311Resource: apigateway.Resource,
-    vpc: ec2.IVpc,
-    props: Props,
-    lambdaDbSg: ec2.ISecurityGroup,
+    props: Open311Props,
     stateModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
-    validator: apigateway.RequestValidator,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const states = open311Resource.addResource("states");
 
     const getStatesId = "Open311-GetStates";
-    const getStatesHandler = new lambda.Function(
+    const getStatesHandler = MonitoredDBFunction.create(
         stack,
         getStatesId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: getStatesId,
-            code: new lambda.AssetCode("dist/lambda/get-states"),
-            handler: "lambda-get-states.handler"
-        })
     );
     createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
@@ -272,24 +230,16 @@ function createStatesResource(
 
 function createSubjectsResource(
     open311Resource: apigateway.Resource,
-    vpc: ec2.IVpc,
-    props: Props,
-    lambdaDbSg: ec2.ISecurityGroup,
+    props: Open311Props,
     subjectModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
-    validator: apigateway.RequestValidator,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const subjects = open311Resource.addResource("subjects");
     const getSubjectsId = "Open311-GetSubjects";
-    const getSubjectsHandler = new lambda.Function(
+    const getSubjectsHandler = MonitoredDBFunction.create(
         stack,
         getSubjectsId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: getSubjectsId,
-            code: new lambda.AssetCode("dist/lambda/get-subjects"),
-            handler: "lambda-get-subjects.handler"
-        })
     );
     createSubscription(getSubjectsHandler, getSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
@@ -304,24 +254,16 @@ function createSubjectsResource(
 
 function createSubSubjectsResource(
     open311Resource: apigateway.Resource,
-    vpc: ec2.IVpc,
-    props: Props,
-    lambdaDbSg: ec2.ISecurityGroup,
+    props: Open311Props,
     subSubjectModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
-    validator: apigateway.RequestValidator,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const subSubjects = open311Resource.addResource("subsubjects");
     const getSubSubjectsId = "Open311-GetSubSubjects";
-    const getSubSubjectsHandler = new lambda.Function(
+    const getSubSubjectsHandler = MonitoredDBFunction.create(
         stack,
         getSubSubjectsId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: getSubSubjectsId,
-            code: new lambda.AssetCode("dist/lambda/get-subsubjects"),
-            handler: "lambda-get-subsubjects.handler"
-        })
     );
     createSubscription(getSubSubjectsHandler, getSubSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
@@ -336,26 +278,19 @@ function createSubSubjectsResource(
 
 function createServicesResource(
     open311Resource: apigateway.Resource,
-    vpc: ec2.IVpc,
-    props: Props,
-    lambdaDbSg: ec2.ISecurityGroup,
+    props: Open311Props,
     serviceModel: apigateway.Model,
     servicesModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const services = open311Resource.addResource("services");
 
     const getServicesId = "Open311-GetServices";
-    const getServicesHandler = new lambda.Function(
+    const getServicesHandler = MonitoredDBFunction.create(
         stack,
         getServicesId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: getServicesId,
-            code: new lambda.AssetCode("dist/lambda/get-services"),
-            handler: "lambda-get-services.handler"
-        })
     );
     createSubscription(getServicesHandler, getServicesId, props.logsDestinationArn, stack);
     createGetResourcesIntegration(
@@ -368,18 +303,12 @@ function createServicesResource(
     );
 
     const getServiceId = "Open311-GetService";
-    const getServiceHandler = new lambda.Function(
+    const getServiceHandler = MonitoredDBFunction.create(
         stack,
         getServiceId,
-        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: getServiceId,
-            code: new lambda.AssetCode("dist/lambda/get-service"),
-            handler: "lambda-get-service.handler"
-        })
     );
     createSubscription(getServiceHandler, getServiceId, props.logsDestinationArn, stack);
     createGetServiceIntegration(
-        getServiceId,
         services,
         getServiceHandler,
         serviceModel,
@@ -395,14 +324,14 @@ function createGetResourcesIntegration(
     model: apigateway.Model,
     messageResponseModel: apigateway.Model,
     tag: string,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const integration = defaultIntegration(handler);
     resource.addMethod("GET", integration, {
         apiKeyRequired: true,
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, model)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+            DigitrafficMethodResponse.response200(model, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
         ]
     });
     addTags(tag, DATA_V1_TAGS, resource, stack);
@@ -414,7 +343,7 @@ function createGetLocalizedResourceIntegration(
     handler: lambda.Function,
     model: apigateway.Model,
     messageResponseModel: apigateway.Model,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const integration = defaultIntegration(handler, {
         requestParameters: {
@@ -432,21 +361,20 @@ function createGetLocalizedResourceIntegration(
             "method.request.querystring.locale": false
         },
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, model)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+            DigitrafficMethodResponse.response200(model, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
         ]
     });
     addTags(id, DATA_V1_TAGS, resource, stack);
 }
 
 function createGetServiceIntegration(
-    getServiceId: string,
     services: apigateway.Resource,
     getServiceHandler: lambda.Function,
     serviceModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct
+    stack: DigitrafficStack
 ) {
     const getServiceIntegration = defaultIntegration(getServiceHandler, {
         requestParameters: {
@@ -466,15 +394,15 @@ function createGetServiceIntegration(
             "method.request.path.service_id": true
         },
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, serviceModel)),
-            corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, messageResponseModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
+            DigitrafficMethodResponse.response200(serviceModel, MediaType.APPLICATION_JSON),
+          DigitrafficMethodResponse.response("404", messageResponseModel, MediaType.APPLICATION_JSON),
+          DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
         ]
     });
     addTags("GetService", DATA_V1_TAGS, service, stack);
 }
 
-function createApi(stack: Construct, allowFromIpAddresses: string[]) {
+function createApi(stack: DigitrafficStack, allowFromIpAddresses: string[]) {
     return new apigateway.RestApi(stack, "Open311-public", {
         defaultCorsPreflightOptions: {
             allowOrigins: apigateway.Cors.ALL_ORIGINS

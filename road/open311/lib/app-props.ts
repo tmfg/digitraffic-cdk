@@ -1,23 +1,10 @@
-export interface Props {
-    vpcId: string;
-    privateSubnetIds: string[];
-    availabilityZones: string[];
-    lambdaDbSgId: string;
-    dbProps: DbProps;
-    defaultLambdaDurationSeconds: number;
-    logsDestinationArn: string;
-    integration: {
-        username: string;
-        password: string;
-        url: string;
-    };
-    allowFromIpAddresses: string[];
+import { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
+export interface Open311Props extends StackConfiguration {
+    readonly vpcId: string;
+    readonly lambdaDbSgId: string;
+    readonly availabilityZones: string[];
+    readonly allowFromIpAddresses: string[];
     readonly publicApiKey?: string;
     readonly integrationApiKey?: string;
-}
-export interface DbProps {
-    username: string;
-    password: string;
-    uri: string;
 }
