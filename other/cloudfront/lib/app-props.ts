@@ -143,8 +143,8 @@ export class CFDomain extends CFOrigin {
         this.domainName = domainName;
     }
 
-    static passAllDomain(domainName: string): CFDomain {
-        return new CFDomain(domainName, CFBehavior.passAll());
+    static passAllDomain(domainName: string, path: string = "*"): CFDomain {
+        return new CFDomain(domainName, CFBehavior.passAll(path));
     }
 
     static apiGateway(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
@@ -241,7 +241,7 @@ export interface DistributionProps {
     readonly distributionName: string;
     readonly environmentName: string;
     readonly aliasNames: string[];
-    readonly acmCertRef: string | null;
+    readonly acmCertRef?: string;
     readonly aclRules?: WafRules;
     readonly origins: CFOrigin[];
     readonly disableShieldAdvanced?: boolean;

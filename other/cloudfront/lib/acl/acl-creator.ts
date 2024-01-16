@@ -1,27 +1,55 @@
-import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import { IResolvable, Stack } from "aws-cdk-lib";
+import { CfnLoggingConfiguration, CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { ArnFormat, IResolvable, RemovalPolicy, Stack } from "aws-cdk-lib";
 import { WafRules } from "./waf-rules";
+import { LogGroup } from "aws-cdk-lib/aws-logs";
 
-const RESPONSEKEY_WITH_DIGITRAFFIC_USER = "DT_429_KEY_WITH_HEADER";
-const RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER = "DT_429_KEY_WITHOUT_HEADER";
+type ResponseKey =
+    | "WITH_DIGITRAFFIC_USER"
+    | "IPQUERY_WITH_DIGITRAFFIC_USER"
+    | "WITHOUT_DIGITRAFFIC_USER"
+    | "IPQUERY_WITHOUT_DIGITRAFFIC_USER";
 
-const BLOCK_429_WITH_DIGITRAFFIC_ACTION: CfnWebACL.RuleActionProperty = {
-    block: {
-        customResponse: {
-            responseCode: 429,
-            customResponseBodyKey: RESPONSEKEY_WITH_DIGITRAFFIC_USER
+const CUSTOM_KEYS_IP_AND_QUERY: CfnWebACL.RateBasedStatementCustomKeyProperty[] = [
+    {
+        uriPath: {
+            textTransformations: [
+                {
+                    priority: 1,
+                    type: "LOWERCASE"
+                },
+                {
+                    priority: 2,
+                    type: "NORMALIZE_PATH"
+                },
+                {
+                    priority: 3,
+                    type: "MD5"
+                }
+            ]
         }
+    },
+    {
+        ip: {}
     }
-};
+];
 
-const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION: CfnWebACL.RuleActionProperty = {
-    block: {
-        customResponse: {
-            responseCode: 429,
-            customResponseBodyKey: RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER
-        }
-    }
-};
+function createRuleAction(
+    customResponseBodyKey: ResponseKey,
+    block: boolean = true
+): CfnWebACL.RuleActionProperty {
+    return block
+        ? {
+              block: {
+                  customResponse: {
+                      responseCode: 429,
+                      customResponseBodyKey
+                  }
+              }
+          }
+        : {
+              count: {}
+          };
+}
 
 interface RuleProperty {
     action?: CfnWebACL.RuleActionProperty;
@@ -49,20 +77,32 @@ function createRuleProperty(
     };
 }
 
-type CustomResponseBodies = Record<string, CfnWebACL.CustomResponseBodyProperty | IResolvable>;
+type CustomResponseBodies = Partial<Record<ResponseKey, CfnWebACL.CustomResponseBodyProperty | IResolvable>>;
 
 function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
     const customResponseBodies: CustomResponseBodies = {};
 
     if (rules.withHeaderLimit) {
-        customResponseBodies[RESPONSEKEY_WITH_DIGITRAFFIC_USER] = {
+        customResponseBodies["WITH_DIGITRAFFIC_USER"] = {
             content: `Request rate is limited to ${rules.withHeaderLimit} requests in a 5 minute window.`,
             contentType: "TEXT_PLAIN"
         };
     }
     if (rules.withoutHeaderLimit) {
-        customResponseBodies[RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER] = {
+        customResponseBodies["WITHOUT_DIGITRAFFIC_USER"] = {
             content: `Request rate is limited to ${rules.withoutHeaderLimit} requests in a 5 minute window.`,
+            contentType: "TEXT_PLAIN"
+        };
+    }
+    if (rules.withHeaderIpQueryLimit) {
+        customResponseBodies["IPQUERY_WITH_DIGITRAFFIC_USER"] = {
+            content: `Request rate is limited to ${rules.withHeaderIpQueryLimit} requests in a 5 minute window.`,
+            contentType: "TEXT_PLAIN"
+        };
+    }
+    if (rules.withHeaderIpQueryLimit) {
+        customResponseBodies["IPQUERY_WITHOUT_DIGITRAFFIC_USER"] = {
+            content: `Request rate is limited to ${rules.withHeaderIpQueryLimit} requests in a 5 minute window.`,
             contentType: "TEXT_PLAIN"
         };
     }
@@ -74,7 +114,7 @@ export function createWebAcl(stack: Stack, environment: string, rules: WafRules)
     const generatedRules = createRules(rules);
     const customResponseBodies = createCustomResponseBodies(rules);
 
-    return new CfnWebACL(stack, `DefaultWebAcl-${environment}`, {
+    const acl = new CfnWebACL(stack, `DefaultWebAcl-${environment}`, {
         defaultAction: { allow: {} },
         scope: "CLOUDFRONT",
         visibilityConfig: {
@@ -85,6 +125,25 @@ export function createWebAcl(stack: Stack, environment: string, rules: WafRules)
         rules: generatedRules,
         customResponseBodies
     });
+
+    const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
+        // group name must begin with aws-waf-logs!!!!
+        logGroupName: `aws-waf-logs-${environment}`,
+        removalPolicy: RemovalPolicy.RETAIN
+    });
+
+    // logGroup.logGroupArn is not in the right format for this, so have to construct the arn manually
+    /*    new CfnLoggingConfiguration(stack, `AclLogConfig-${environment}`, {
+        logDestinationConfigs: [stack.formatArn({
+            arnFormat: ArnFormat.COLON_RESOURCE_NAME,
+            service: "logs",
+            resource: "log-group",
+            resourceName: logGroup.logGroupName
+          })],
+        resourceArn: acl.attrArn,
+    });*/
+
+    return acl;
 }
 
 function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
@@ -104,8 +163,22 @@ function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
                 "ThrottleRuleWithDigitrafficUser",
                 1,
                 {
-                    action: BLOCK_429_WITH_DIGITRAFFIC_ACTION,
-                    statement: createThrottleStatement(rules.withHeaderLimit, true)
+                    action: createRuleAction("WITH_DIGITRAFFIC_USER"),
+                    statement: createThrottleStatement(rules.withHeaderLimit, true, false)
+                },
+                false
+            )
+        );
+    }
+
+    if (rules.withHeaderIpQueryLimit) {
+        generatedRules.push(
+            createRuleProperty(
+                "ThrottleRuleIPQueryWithDigitrafficUser",
+                2,
+                {
+                    action: createRuleAction("IPQUERY_WITH_DIGITRAFFIC_USER"),
+                    statement: createThrottleStatement(rules.withHeaderIpQueryLimit, true, true)
                 },
                 false
             )
@@ -116,10 +189,24 @@ function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
         generatedRules.push(
             createRuleProperty(
                 "ThrottleRuleWithoutDigitrafficUser",
-                2,
+                3,
                 {
-                    action: BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION,
-                    statement: createThrottleStatement(rules.withoutHeaderLimit, false)
+                    action: createRuleAction("WITHOUT_DIGITRAFFIC_USER"),
+                    statement: createThrottleStatement(rules.withoutHeaderLimit, false, false)
+                },
+                false
+            )
+        );
+    }
+
+    if (rules.withoutHeaderIpQueryLimit) {
+        generatedRules.push(
+            createRuleProperty(
+                "ThrottleRuleIPQueryWithoutDigitrafficUser",
+                4,
+                {
+                    action: createRuleAction("IPQUERY_WITHOUT_DIGITRAFFIC_USER"),
+                    statement: createThrottleStatement(rules.withoutHeaderIpQueryLimit, false, true)
                 },
                 false
             )
@@ -178,7 +265,11 @@ function createAWSAntiSQLInjection(): CfnWebACL.RuleProperty {
     });
 }
 
-function createThrottleStatement(limit: number, headerMustBePresent: boolean): CfnWebACL.StatementProperty {
+function createThrottleStatement(
+    limit: number,
+    headerMustBePresent: boolean,
+    aggregateKey: boolean
+): CfnWebACL.StatementProperty {
     // this statement matches empty digitraffic-user -header
     const matchStatement: CfnWebACL.StatementProperty = {
         sizeConstraintStatement: {
@@ -195,6 +286,17 @@ function createThrottleStatement(limit: number, headerMustBePresent: boolean): C
 
     // header present       -> size > 0
     // header not present   -> NOT(size >= 0)
+
+    if (aggregateKey) {
+        return {
+            rateBasedStatement: {
+                aggregateKeyType: "CUSTOM_KEYS",
+                customKeys: CUSTOM_KEYS_IP_AND_QUERY,
+                limit: limit,
+                scopeDownStatement: headerMustBePresent ? matchStatement : notStatement(matchStatement)
+            }
+        };
+    }
 
     return {
         rateBasedStatement: {

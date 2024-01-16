@@ -44,10 +44,9 @@ export function createDistribution(
 ): CloudFrontWebDistribution {
     const { distributionProps } = createDistributionProps;
     const webAcl = doCreateWebAcl(stack, distributionProps);
-    const viewerCertificate =
-        distributionProps.acmCertRef === null
-            ? undefined
-            : createViewerCertificate(distributionProps.acmCertRef, distributionProps.aliasNames);
+    const viewerCertificate = distributionProps.acmCertRef
+        ? createViewerCertificate(distributionProps.acmCertRef, distributionProps.aliasNames)
+        : undefined;
 
     return createDistributionWithStreamingLogging(stack, createDistributionProps, viewerCertificate, webAcl);
 }
@@ -64,7 +63,7 @@ function createDistributionWithStreamingLogging(
         viewerCertificate,
         webACLId: webAcl?.attrArn,
         httpVersion: HttpVersion.HTTP2_AND_3,
-        defaultRootObject: ""
+        defaultRootObject: "index.html"
     });
 
     if (!distributionProps.disableShieldAdvanced) {
