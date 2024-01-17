@@ -4,7 +4,6 @@
 
 !/.editorconfig
 !/.gitattributes
-!/.lintstagedrc
 !/.node-version
 !/.prettierignore
 !/.prettierrc.js
