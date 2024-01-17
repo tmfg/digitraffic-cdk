@@ -64,6 +64,8 @@ export const handler = async (): Promise<void> => {
 
     if (host) {
         merged.servers = [{ url: host }];
+    } else {
+        delete merged.servers;
     }
 
     if (title) {
