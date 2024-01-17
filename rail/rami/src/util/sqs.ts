@@ -1,4 +1,4 @@
-import { SQSClient, SendMessageCommand, SendMessageCommandOutput } from "@aws-sdk/client-sqs";
+import { SQSClient, SendMessageCommand, type SendMessageCommandOutput } from "@aws-sdk/client-sqs";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { setTimeout } from "timers/promises";
 

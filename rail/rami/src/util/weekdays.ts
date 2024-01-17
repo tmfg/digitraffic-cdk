@@ -1,4 +1,4 @@
-import { WEEKDAYS, WeekDay } from "../model/dt-rami-message";
+import { WEEKDAYS, type WeekDay } from "../model/dt-rami-message";
 
 export type BitString = `${"0" | "1"}`;
 export type WeekDaysBitString =

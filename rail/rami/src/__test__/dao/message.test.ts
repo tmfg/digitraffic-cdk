@@ -7,7 +7,7 @@ import {
 } from "../../dao/message";
 import { dbTestBase } from "../db-testutil";
 import { createDtRamiMessage } from "../testdata-util";
-import { WeekDaysBitString, mapBitsToDays } from "../../util/weekdays";
+import { type WeekDaysBitString, mapBitsToDays } from "../../util/weekdays";
 
 describe(
     "dao",
