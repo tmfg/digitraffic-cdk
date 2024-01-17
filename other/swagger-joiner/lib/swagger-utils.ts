@@ -1,4 +1,4 @@
-import { OpenApiSchema } from "./model/openapi-schema";
+import { OpenApiSchema, OpenApiOperation, openapiOperation } from "./model/openapi-schema";
 import _ from "lodash";
 
 export function constructSwagger(spec: object): string {
@@ -46,26 +46,71 @@ export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
     return allApis.reduce((acc, curr) => _.merge(acc, curr));
 }
 
-function methodIsDeprecated(apiDescription: OpenApiSchema, path: string, method: string): boolean {
+function methodIsDeprecated(operation: OpenApiOperation): boolean {
     const deprecationTextMatcher = /(W|w)ill be removed/;
+    const summaryMatch = operation.summary && deprecationTextMatcher.test(operation.summary);
+
+    // I think this witchcraft probably tries to look into operation.response.headers.
     const headerMatcher = /(headers.*deprecation.*sunset|headers.*sunset.*deprecation)/i;
-    return (
-        typeof apiDescription.paths[path][method].summary === "string" &&
-        (deprecationTextMatcher.test(apiDescription.paths[path][method].summary as string) ||
-            headerMatcher.test(JSON.stringify(apiDescription.paths[path][method])))
-    );
+    const headerMatch = headerMatcher.test(JSON.stringify(operation));
+
+    return summaryMatch || headerMatch;
 }
 
-export function setDeprecatedPerMethod(apiDescription: OpenApiSchema): void {
-    Object.keys(apiDescription.paths).forEach((path) =>
-        Object.keys(apiDescription.paths[path]).forEach((method) => {
-            // set deprecated: true if field does not exist and conditions are met
-            if (
-                !("deprecated" in apiDescription.paths[path][method]) &&
-                methodIsDeprecated(apiDescription, path, method)
-            ) {
-                apiDescription.paths[path][method].deprecated = true;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isOperation(value: any): value is OpenApiOperation {
+    // Since all fields are optional, and more can be added, this doesn't discriminate very much.
+    // Just check that types of any defined fields in OpenApiOperation type are correct.
+    const parsed = openapiOperation.safeParse(value);
+    return parsed.success;
+}
+
+export function setDeprecatedPerMethod(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
+    const result = _.cloneDeep(paths);
+
+    Object.values(result).forEach((pathItem) => {
+        Object.values(pathItem)
+            .filter(isOperation)
+            .forEach((operation) => {
+                if (methodIsDeprecated(operation)) {
+                    operation.deprecated = true;
+                }
+            });
+    });
+
+    return result;
+}
+
+export function removeSecurityFromPaths(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
+    const result = _.cloneDeep(paths);
+
+    Object.values(result).forEach((pathItem) => {
+        Object.values(pathItem)
+            .filter(isOperation)
+            .forEach((operation) => {
+                delete operation.security;
+            });
+    });
+
+    return result;
+}
+
+export function removeMethodsFromPaths(
+    paths: OpenApiSchema["paths"],
+    keyTest: (key: string) => boolean
+): OpenApiSchema["paths"] {
+    const result = _.cloneDeep(paths);
+
+    Object.values(result).forEach((pathItem) => {
+        Object.keys(pathItem).forEach((key) => {
+            if (keyTest(key)) {
+                /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access --
+                 * Must cast to any to allow indexing object by string.
+                 **/
+                delete (pathItem as any)[key];
             }
-        })
-    );
+        });
+    });
+
+    return result;
 }

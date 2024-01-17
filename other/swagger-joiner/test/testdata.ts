@@ -18,12 +18,16 @@ export const getOpenapiDescriptionWithPaths = (
         },
         version: "2.92.0-"
     },
+    security: [{ api_key: [] }],
     paths
 });
 
-export const getSupportedPath = (path: string): Record<string, Record<string, Record<string, unknown>>> => ({
+export const getSupportedPath = (
+    path: string,
+    method: string = "get"
+): Record<string, Record<string, Record<string, unknown>>> => ({
     [path]: {
-        get: {
+        [method]: {
             summary: "Returns data",
             responses: {
                 "200": {
@@ -34,6 +38,15 @@ export const getSupportedPath = (path: string): Record<string, Record<string, Re
         }
     }
 });
+
+export function getPathWithSecurity(
+    path: string,
+    method: string = "get"
+): Record<string, Record<string, Record<string, unknown>>> {
+    const result = getSupportedPath(path);
+    result[path][method].security = [{ api_key: [] }];
+    return result;
+}
 
 export const getDeprecatedPathWithHeaders = (
     path: string

@@ -1,5 +1,62 @@
 import { z } from "zod";
 
+export const serverObject = z.object({
+    url: z.string(),
+    description: z.string().optional(),
+    variables: z.record(z.unknown()).optional()
+});
+
+export const parameterObject = z.object({
+    name: z.string(),
+    in: z.enum(["query", "header", "path", "cookie"]),
+    description: z.string().optional(),
+    required: z.boolean().optional(),
+    deprecated: z.boolean().optional()
+});
+
+export const referenceObject = z.object({
+    $ref: z.string(),
+    summary: z.string().optional(),
+    description: z.string().optional()
+});
+
+export const openapiOperation = z
+    .object({
+        tags: z.array(z.string()),
+        summary: z.string(),
+        description: z.string(),
+        externalDocs: z.unknown(),
+        operationId: z.string(),
+        parameters: z.array(parameterObject.or(referenceObject)),
+        requestBody: z.unknown(),
+        responses: z.unknown(),
+        callbacks: z.unknown(),
+        deprecated: z.boolean(),
+        security: z.array(z.record(z.array(z.string()))),
+        servers: z.array(z.unknown())
+    })
+    .partial();
+
+// Path items have some fixed fields but also allow for extended fields starting with "x-".
+//export const openapiPathItem = z.record(openapiOperation.or(serverObject).or(parameterObject));
+
+export const openapiPathItem = z
+    .object({
+        summary: z.string(),
+        description: z.string(),
+        get: openapiOperation,
+        put: openapiOperation,
+        post: openapiOperation,
+        delete: openapiOperation,
+        options: openapiOperation,
+        head: openapiOperation,
+        patch: openapiOperation,
+        trace: openapiOperation,
+        servers: serverObject,
+        parameters: z.array(parameterObject)
+    })
+    .partial();
+
 export const openapiSchema = z
     .object({
         openapi: z.string().regex(new RegExp("^3\\.0\\.\\d(-.+)?$")),
@@ -60,7 +117,7 @@ export const openapiSchema = z
                     .strict()
             )
             .optional(),
-        paths: z.record(z.record(z.record(z.unknown()))),
+        paths: z.record(openapiPathItem),
         components: z
             .object({
                 schemas: z.record(z.any()).optional(),
@@ -80,4 +137,6 @@ export const openapiSchema = z
         "The description of OpenAPI v3.0.x documents, as defined by https://spec.openapis.org/oas/v3.0.3"
     );
 
+export type OpenApiOperation = z.infer<typeof openapiOperation>;
+export type OpenApiPathItem = z.infer<typeof openapiPathItem>;
 export type OpenApiSchema = z.infer<typeof openapiSchema>;

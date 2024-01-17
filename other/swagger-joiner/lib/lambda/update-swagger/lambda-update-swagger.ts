@@ -1,9 +1,14 @@
 import { config as AWSConfig } from "aws-sdk";
 import { AxiosRequestConfig, default as axios } from "axios";
-import { constructSwagger, mergeApiDescriptions, setDeprecatedPerMethod } from "../../swagger-utils";
+import {
+    constructSwagger,
+    mergeApiDescriptions,
+    setDeprecatedPerMethod,
+    removeSecurityFromPaths,
+    removeMethodsFromPaths
+} from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
-import { hasOwnPropertySafe } from "@digitraffic/common/dist/utils/utils";
 import { getEnvVariable, getEnvVariableOrElse } from "@digitraffic/common/dist/utils/utils";
 import { openapiSchema } from "../../model/openapi-schema";
 
@@ -70,26 +75,15 @@ export const handler = async (): Promise<void> => {
     }
 
     if (removeSecurity === "true") {
-        for (const path in merged.paths) {
-            for (const method in merged.paths[path]) {
-                delete merged.paths[path][method].security;
-            }
-        }
+        merged.paths = removeSecurityFromPaths(merged.paths);
     }
 
     // remove HEAD methods used for health checks
-    for (const path in merged.paths) {
-        if (!hasOwnPropertySafe(merged.paths, path)) continue;
-        for (const method in merged.paths[path]) {
-            if (method.toUpperCase() === "HEAD") {
-                delete merged.paths[path][method];
-            }
-        }
-    }
+    merged.paths = removeMethodsFromPaths(merged.paths, (method) => method.toUpperCase() === "HEAD");
 
     // add "deprecated" fields where missing
     // api gateway drops these fields from exported descriptions
-    setDeprecatedPerMethod(merged);
+    merged.paths = setDeprecatedPerMethod(merged.paths);
 
     const swaggerFilename = "dt-swagger.js";
     const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;
