@@ -20,8 +20,6 @@
     "aws-sdk": "~2.1531.0",
     "axios": "^1.6.5",
     "constructs": "10.3.0",
-    "moment": "^2.30.1",
-    "moment-timezone": "0.5.44",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {

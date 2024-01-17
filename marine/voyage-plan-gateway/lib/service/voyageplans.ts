@@ -1,6 +1,7 @@
 import { RtzSchedule, RtzSchedules, RtzVoyagePlan, RtzWaypoint } from "@digitraffic/common/dist/marine/rtz";
 import * as jsts from "jsts";
-import moment, { Moment } from "moment-timezone";
+import {toDate} from "date-fns-tz"
+import {isValid, isAfter} from "date-fns"
 import GeometryFactory = jsts.geom.GeometryFactory;
 
 const gf = new GeometryFactory();
@@ -196,7 +197,7 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
 
     const validationErrors: ValidationError[] = [];
 
-    const now = moment();
+    const now = new Date();
 
     rtzSchedules.forEach((schedules) => {
         if (!schedules) {
@@ -217,15 +218,15 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
     return validationErrors;
 }
 
-function anyTimestampInFuture(schedule: RtzSchedule, now: Moment): boolean {
-    const timestamps: Moment[] = schedule.scheduleElement.reduce((acc, curr) => {
-        const eta = curr.$.eta !== null ? [moment(curr.$.eta)] : [];
-        const etd = curr.$.etd !== null ? [moment(curr.$.etd)] : [];
+function anyTimestampInFuture(schedule: RtzSchedule, now: Date): boolean {
+    const timestamps: Date[] = schedule.scheduleElement.reduce((acc, curr) => {
+        const eta = !curr?.$?.eta ? [toDate(curr.$.eta!)] : [];
+        const etd = !curr?.$?.etd ? [toDate(curr.$.etd!)] : [];
         return acc.concat(eta, etd);
-    }, [] as Moment[]);
+    }, [] as Date[]);
     return timestamps.some((ts) => validateTimestamp(ts, now));
 }
 
-function validateTimestamp(timestamp: Moment, now: Moment): boolean {
-    return timestamp.isValid() && timestamp.isAfter(now);
+function validateTimestamp(timestamp: Date, now: Date): boolean {
+    return isValid(timestamp) && isAfter(timestamp, now);
 }
