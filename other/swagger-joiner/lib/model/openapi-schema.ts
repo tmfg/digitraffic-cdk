@@ -12,21 +12,15 @@ export const openapiSchema = z
                     .object({
                         name: z.string().optional(),
                         url: z.string().optional(),
-                        email: z.string().email().optional(),
+                        email: z.string().email().optional()
                     })
                     .strict()
                     .optional(),
-                license: z
-                    .object({ name: z.string(), url: z.string().optional() })
-                    .strict()
-                    .optional(),
-                version: z.string(),
+                license: z.object({ name: z.string(), url: z.string().optional() }).strict().optional(),
+                version: z.string()
             })
             .strict(),
-        externalDocs: z
-            .object({ description: z.string().optional(), url: z.string() })
-            .strict()
-            .optional(),
+        externalDocs: z.object({ description: z.string().optional(), url: z.string() }).strict().optional(),
         servers: z
             .array(
                 z
@@ -39,11 +33,11 @@ export const openapiSchema = z
                                     .object({
                                         enum: z.array(z.string()).optional(),
                                         default: z.string(),
-                                        description: z.string().optional(),
+                                        description: z.string().optional()
                                     })
                                     .strict()
                             )
-                            .optional(),
+                            .optional()
                     })
                     .strict()
             )
@@ -58,10 +52,10 @@ export const openapiSchema = z
                         externalDocs: z
                             .object({
                                 description: z.string().optional(),
-                                url: z.string(),
+                                url: z.string()
                             })
                             .strict()
-                            .optional(),
+                            .optional()
                     })
                     .strict()
             )
@@ -77,10 +71,10 @@ export const openapiSchema = z
                 headers: z.record(z.any()).optional(),
                 securitySchemes: z.record(z.any()).optional(),
                 links: z.record(z.any()).optional(),
-                callbacks: z.record(z.any()).optional(),
+                callbacks: z.record(z.any()).optional()
             })
             .strict()
-            .optional(),
+            .optional()
     })
     .describe(
         "The description of OpenAPI v3.0.x documents, as defined by https://spec.openapis.org/oas/v3.0.3"
