@@ -83,6 +83,9 @@ export const handler = async (): Promise<void> => {
     // remove HEAD methods used for health checks
     merged.paths = withoutMethods(merged.paths, (method) => method.toUpperCase() === "HEAD");
 
+    // Remove OPTIONS methods added by apigw, as they are not interesting enough.
+    merged.paths = withoutMethods(merged.paths, (method) => method.toUpperCase() === "OPTIONS");
+
     // add "deprecated" fields where missing
     // api gateway drops these fields from exported descriptions
     merged.paths = withDeprecations(merged.paths);
