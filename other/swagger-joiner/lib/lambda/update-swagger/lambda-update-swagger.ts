@@ -3,9 +3,9 @@ import { AxiosRequestConfig, default as axios } from "axios";
 import {
     constructSwagger,
     mergeApiDescriptions,
-    setDeprecatedPerMethod,
-    removeSecurityFromPaths,
-    removeMethodsFromPaths
+    withDeprecations,
+    withoutSecurity,
+    withoutMethods
 } from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
@@ -77,15 +77,15 @@ export const handler = async (): Promise<void> => {
     }
 
     if (removeSecurity === "true") {
-        merged.paths = removeSecurityFromPaths(merged.paths);
+        merged.paths = withoutSecurity(merged.paths);
     }
 
     // remove HEAD methods used for health checks
-    merged.paths = removeMethodsFromPaths(merged.paths, (method) => method.toUpperCase() === "HEAD");
+    merged.paths = withoutMethods(merged.paths, (method) => method.toUpperCase() === "HEAD");
 
     // add "deprecated" fields where missing
     // api gateway drops these fields from exported descriptions
-    merged.paths = setDeprecatedPerMethod(merged.paths);
+    merged.paths = withDeprecations(merged.paths);
 
     const swaggerFilename = "dt-swagger.js";
     const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;

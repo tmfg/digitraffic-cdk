@@ -65,7 +65,7 @@ function isOperation(value: any): value is OpenApiOperation {
     return parsed.success;
 }
 
-export function setDeprecatedPerMethod(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
+export function withDeprecations(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
     const result = _.cloneDeep(paths);
 
     Object.values(result).forEach((pathItem) => {
@@ -81,7 +81,7 @@ export function setDeprecatedPerMethod(paths: OpenApiSchema["paths"]): OpenApiSc
     return result;
 }
 
-export function removeSecurityFromPaths(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
+export function withoutSecurity(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
     const result = _.cloneDeep(paths);
 
     Object.values(result).forEach((pathItem) => {
@@ -95,7 +95,7 @@ export function removeSecurityFromPaths(paths: OpenApiSchema["paths"]): OpenApiS
     return result;
 }
 
-export function removeMethodsFromPaths(
+export function withoutMethods(
     paths: OpenApiSchema["paths"],
     keyTest: (key: string) => boolean
 ): OpenApiSchema["paths"] {

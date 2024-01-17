@@ -1,8 +1,8 @@
 import {
     mergeApiDescriptions,
-    removeMethodsFromPaths,
-    removeSecurityFromPaths,
-    setDeprecatedPerMethod
+    withoutMethods,
+    withoutSecurity,
+    withDeprecations
 } from "../lib/swagger-utils";
 import {
     getDeprecatedPathWithHeaders,
@@ -54,7 +54,7 @@ describe("swagger-utils", () => {
         expect(apiDescription.paths[path3].get!.deprecated).toBe(undefined);
 
         // set fields
-        apiDescription.paths = setDeprecatedPerMethod(apiDescription.paths);
+        apiDescription.paths = withDeprecations(apiDescription.paths);
 
         // openapi description is still valid
         expect(openapiSchema.parse(apiDescription)).toBeTruthy();
@@ -74,7 +74,7 @@ describe("swagger-utils", () => {
             ...getPathWithSecurity(path2)
         });
 
-        const filteredPaths = removeSecurityFromPaths(api.paths);
+        const filteredPaths = withoutSecurity(api.paths);
 
         expect(api.paths[path1].get!.security).not.toBeDefined();
         expect(api.paths[path2].get!.security).toBeDefined();
@@ -91,7 +91,7 @@ describe("swagger-utils", () => {
             ...getSupportedPath(path2, "put")
         });
 
-        const filteredPaths = removeMethodsFromPaths(api.paths, (method) => method === "put");
+        const filteredPaths = withoutMethods(api.paths, (method) => method === "put");
 
         expect(api.paths[path1].get).toBeDefined();
         expect(api.paths[path2].put).toBeDefined();
