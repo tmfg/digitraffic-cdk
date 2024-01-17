@@ -1,4 +1,4 @@
-import { Arn, Duration, Stack } from "aws-cdk-lib";
+import { Duration, Stack } from "aws-cdk-lib";
 import {
     Behavior,
     LambdaFunctionAssociation,
@@ -99,7 +99,7 @@ function createBehavior(
             throw new Error("Swagger origin has cache headers!");
         }
         if (b.queryCacheKeys && b.queryCacheKeys.length > 0) {
-            throw new Error("Swagger origin has cache keys!" + b.queryCacheKeys);
+            throw new Error("Swagger origin has cache keys!" + JSON.stringify(b.queryCacheKeys));
         }
     }
 
