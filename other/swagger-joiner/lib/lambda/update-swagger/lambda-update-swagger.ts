@@ -1,9 +1,14 @@
 import { config as AWSConfig } from "aws-sdk";
 import { AxiosRequestConfig, default as axios } from "axios";
-import { constructSwagger, mergeApiDescriptions, setDeprecatedPerMethod } from "../../swagger-utils";
+import {
+    constructSwagger,
+    mergeApiDescriptions,
+    withDeprecations,
+    withoutSecurity,
+    withoutMethods
+} from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
-import { hasOwnPropertySafe } from "@digitraffic/common/dist/utils/utils";
 import { getEnvVariable, getEnvVariableOrElse } from "@digitraffic/common/dist/utils/utils";
 import { openapiSchema } from "../../model/openapi-schema";
 
@@ -55,10 +60,10 @@ export const handler = async (): Promise<void> => {
 
     const merged = mergeApiDescriptions(allApis);
 
-    delete merged.security; // always https
-
     if (host) {
         merged.servers = [{ url: host }];
+    } else {
+        delete merged.servers;
     }
 
     if (title) {
@@ -69,27 +74,28 @@ export const handler = async (): Promise<void> => {
         merged.info.description = description;
     }
 
+    delete merged.security; // always https
+
     if (removeSecurity === "true") {
-        for (const path in merged.paths) {
-            for (const method in merged.paths[path]) {
-                delete merged.paths[path][method].security;
-            }
+        // This defines the available security schemes, such as api-key in header. Having it adds a button in Swagger
+        // that lets you set the key for "Try it" calls.
+        if (merged.components?.securitySchemes) {
+            delete merged.components.securitySchemes;
         }
+
+        // These define which of the methods actually use the security scheme. Adds a lock icon to the method.
+        merged.paths = withoutSecurity(merged.paths);
     }
 
     // remove HEAD methods used for health checks
-    for (const path in merged.paths) {
-        if (!hasOwnPropertySafe(merged.paths, path)) continue;
-        for (const method in merged.paths[path]) {
-            if (method.toUpperCase() === "HEAD") {
-                delete merged.paths[path][method];
-            }
-        }
-    }
+    merged.paths = withoutMethods(merged.paths, (method) => method.toUpperCase() === "HEAD");
+
+    // Remove OPTIONS methods added by apigw, as they are not interesting enough.
+    merged.paths = withoutMethods(merged.paths, (method) => method.toUpperCase() === "OPTIONS");
 
     // add "deprecated" fields where missing
     // api gateway drops these fields from exported descriptions
-    setDeprecatedPerMethod(merged);
+    merged.paths = withDeprecations(merged.paths);
 
     const swaggerFilename = "dt-swagger.js";
     const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;
