@@ -60,8 +60,6 @@ export const handler = async (): Promise<void> => {
 
     const merged = mergeApiDescriptions(allApis);
 
-    delete merged.security; // always https
-
     if (host) {
         merged.servers = [{ url: host }];
     } else {
@@ -76,7 +74,16 @@ export const handler = async (): Promise<void> => {
         merged.info.description = description;
     }
 
+    delete merged.security; // always https
+
     if (removeSecurity === "true") {
+        // This defines the available security schemes, such as api-key in header. Having it adds a button in Swagger
+        // that lets you set the key for "Try it" calls.
+        if (merged.components?.securitySchemes) {
+            delete merged.components.securitySchemes;
+        }
+
+        // These define which of the methods actually use the security scheme. Adds a lock icon to the method.
         merged.paths = withoutSecurity(merged.paths);
     }
 
