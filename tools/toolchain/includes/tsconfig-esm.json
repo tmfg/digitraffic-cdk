@@ -3,17 +3,19 @@
   "compilerOptions": {
     "lib": ["es2022"],
     "types": ["heft-jest", "node"],
-    "module": "ES2022",
+    "module": "node16",
     "target": "es2022",
+    "outDir": "../../../../lib",
+    "declaration": true,
     "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
@@ -26,5 +28,6 @@
     "checkJs": true,
     "verbatimModuleSyntax": true
   },
-  "exclude": ["../../../../node_modules", "../../../../dist"]
+  "exclude": ["../../../../node_modules", "../../../../dist", "../../../../lib"],
+  "include": ["../../../../src/**/*.ts"]
 }
