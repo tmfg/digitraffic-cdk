@@ -1,5 +1,5 @@
 import { SQSClient, SendMessageCommand, type SendMessageCommandOutput } from "@aws-sdk/client-sqs";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
 import { setTimeout } from "timers/promises";
 
 export async function sendToSqs(

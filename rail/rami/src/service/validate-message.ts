@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { ramiMessageJsonSchema } from "../model/json-schema/rami-message";
+import { ramiMessageJsonSchema } from "../model/json-schema/rami-message.js";
 
 // we can assume id exists if message passes validation
 interface ValidatedRamiMessage {

@@ -1,6 +1,6 @@
 import _ from "lodash";
-import { validateIncomingRamiMessage } from "../../service/validate-message";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata";
+import { validateIncomingRamiMessage } from "../../service/validate-message.js";
+import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata.js";
 
 describe("validate incoming rami message", () => {
     test("validateIncomingRamiMessage - invalid scheduledMessage", () => {

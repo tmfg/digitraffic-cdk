@@ -1,8 +1,8 @@
-import { insertMessage } from "../../dao/message";
-import { handler } from "../../lambda/get-active-messages/get-active-messages";
-import { getActiveMessagesLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event";
-import { dbTestBase } from "../db-testutil";
-import { createDtRamiMessage } from "../testdata-util";
+import { insertMessage } from "../../dao/message.js";
+import { handler } from "../../lambda/get-active-messages/get-active-messages.js";
+import { getActiveMessagesLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event.js";
+import { dbTestBase } from "../db-testutil.js";
+import { createDtRamiMessage } from "../testdata-util.js";
 
 describe(
     "get-active-messages lambda",

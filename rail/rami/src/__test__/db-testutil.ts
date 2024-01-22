@@ -1,5 +1,5 @@
 import type { Connection } from "mysql2/promise";
-import * as mysql from "../util/database";
+import * as mysql from "../util/database.js";
 
 export type DbUnitTestFunction = (db: Connection) => void;
 
