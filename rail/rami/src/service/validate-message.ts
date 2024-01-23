@@ -1,6 +1,26 @@
-import Ajv from "ajv";
-import addFormats from "ajv-formats";
+import * as AjvOrig from "ajv";
+import * as addFormatsOrig from "ajv-formats";
+
+interface AjvType {
+    // eslint-disable-next-line @typescript-eslint/no-misused-new
+    new(options?: { allErrors: boolean }): AjvType;
+
+    addFormat(name: string, format?: string | RegExp): void;
+    addKeyword(name: string, definition?: unknown): void;
+    validate(schema: unknown, data: unknown): boolean;
+    errorsText(): string;
+};
+const Ajv: AjvType = AjvOrig.default as unknown as AjvType;
+
+type addFormats = (ajv: typeof Ajv) => void;
+
+// @ts-ignore
+// eslint-disable-next-line dot-notation
+const addFormats: addFormats = addFormatsOrig.default["addFormats"] as addFormats;
+
 import { ramiMessageJsonSchema } from "../model/json-schema/rami-message.js";
+
+
 
 // we can assume id exists if message passes validation
 interface ValidatedRamiMessage {
