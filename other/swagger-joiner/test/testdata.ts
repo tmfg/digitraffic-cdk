@@ -10,36 +10,47 @@ export const getOpenapiDescriptionWithPaths = (
         termsOfService: "https://www.digitraffic.fi/en/terms-of-service/",
         contact: {
             name: "Digitraffic / Fintraffic",
-            url: "https://www.digitraffic.fi/",
+            url: "https://www.digitraffic.fi/"
         },
         license: {
             name: "Digitraffic is an open data service. All content from the service and the service documentation is licenced under the Creative Commons 4.0 BY license.",
-            url: "https://creativecommons.org/licenses/by/4.0/",
+            url: "https://creativecommons.org/licenses/by/4.0/"
         },
-        version: "2.92.0-",
+        version: "2.92.0-"
     },
-    paths,
+    security: [{ api_key: [] }],
+    paths
 });
 
 export const getSupportedPath = (
-    path: string
+    path: string,
+    method: string = "get"
 ): Record<string, Record<string, Record<string, unknown>>> => ({
     [path]: {
-        get: {
+        [method]: {
             summary: "Returns data",
             responses: {
                 "200": {
                     description: "200 response",
-                    headers: {},
-                },
-            },
-        },
-    },
+                    headers: {}
+                }
+            }
+        }
+    }
 });
+
+export function getPathWithSecurity(
+    path: string,
+    method: string = "get"
+): Record<string, Record<string, Record<string, unknown>>> {
+    const result = getSupportedPath(path);
+    result[path][method].security = [{ api_key: [] }];
+    return result;
+}
 
 export const getDeprecatedPathWithHeaders = (
     path: string
-): Record<string, Record<string, Record<string, unknown>>> => ( {
+): Record<string, Record<string, Record<string, unknown>>> => ({
     [path]: {
         get: {
             summary: "Returns old data.",
@@ -48,37 +59,37 @@ export const getDeprecatedPathWithHeaders = (
                     headers: {
                         Sunset: {
                             schema: {
-                                type: "string",
-                            },
+                                type: "string"
+                            }
                         },
                         "Access-Control-Allow-Origin": {
                             schema: {
-                                type: "string",
-                            },
+                                type: "string"
+                            }
                         },
                         Deprecation: {
                             schema: {
-                                type: "string",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    },
+                                type: "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 });
 
 export const getDeprecatedPathWithRemovalText = (
     path: string
-): Record<string, Record<string, Record<string, unknown>>> => ( {
+): Record<string, Record<string, Record<string, unknown>>> => ({
     [path]: {
         get: {
             summary: "Also returns old data. Will be removed after 2023-06-01",
             responses: {
                 "200": {
-                    headers: {},
-                },
-            },
-        },
-    },
+                    headers: {}
+                }
+            }
+        }
+    }
 });

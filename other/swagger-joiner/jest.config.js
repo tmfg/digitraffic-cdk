@@ -6,7 +6,7 @@ module.exports = {
     coveragePathIgnorePatterns: ["<rootDir>/lib/.*.d.ts$"],
     testMatch: ["**/*.test.ts"],
     transform: {
-        "^.+\\.tsx?$": "ts-jest",
+        "^.+\\.tsx?$": "ts-jest"
     },
-    testResultsProcessor: "jest-junit",
+    testResultsProcessor: "jest-junit"
 };

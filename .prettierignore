@@ -12,5 +12,7 @@ shrinkwrap.json
 
 # Build outputs
 dist
+cdk.out
+output
 
 *.md
