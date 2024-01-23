@@ -19,7 +19,7 @@
   "rushVersion": "5.112.2",
 
   "pnpmVersion": "8.12.1",
-  "nodeSupportedVersionRange": ">=16.13.0",
+  "nodeSupportedVersionRange": ">=20.10.0 <21.0.0",
   "ensureConsistentVersions": false,
 
   "repository": {
