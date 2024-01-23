@@ -103,11 +103,21 @@ describe("swagger-utils", () => {
         // Sanity check on the openapiSchema accepts the actual json we output.
 
         // Throws error on failure indicating what is wrong.
-        const api = openapiSchema.passthrough().parse(digitrafficOpenApiJson);
+        const api = openapiSchema.parse(digitrafficOpenApiJson);
+
+        // Need to bypass the type system to check the actual structure of the objects.
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+        /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+        /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
         // Check that nothing got accidentally removed.
-        const normalizedOriginalJson = JSON.parse(JSON.stringify(digitrafficOpenApiJson));
         const normalizedParsedJson = JSON.parse(JSON.stringify(api));
+        const normalizedOriginalJson = JSON.parse(JSON.stringify(digitrafficOpenApiJson));
+        delete normalizedOriginalJson.default; // Added by import
+
+        expect(Object.keys(normalizedParsedJson)).toEqual(Object.keys(normalizedOriginalJson));
         expect(normalizedParsedJson).toEqual(normalizedOriginalJson);
+
+        /* eslint-enable */
     });
 });
