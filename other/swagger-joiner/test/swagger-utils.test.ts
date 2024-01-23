@@ -103,6 +103,11 @@ describe("swagger-utils", () => {
         // Sanity check on the openapiSchema accepts the actual json we output.
 
         // Throws error on failure indicating what is wrong.
-        openapiSchema.parse(digitrafficOpenApiJson);
+        const api = openapiSchema.passthrough().parse(digitrafficOpenApiJson);
+
+        // Check that nothing got accidentally removed.
+        const normalizedOriginalJson = JSON.parse(JSON.stringify(digitrafficOpenApiJson));
+        const normalizedParsedJson = JSON.parse(JSON.stringify(api));
+        expect(normalizedParsedJson).toEqual(normalizedOriginalJson);
     });
 });
