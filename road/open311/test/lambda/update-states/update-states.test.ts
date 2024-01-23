@@ -1,4 +1,3 @@
-import { handler } from "../../../lib/lambda/update-states/lambda-update-states";
 import { dbTestBase } from "../../db-testutil";
 import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as StatesDb from "../../../lib/db/states";
@@ -10,6 +9,8 @@ const SERVER_PORT = 8089;
 process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
+
+const lambda = require("../../../lib/lambda/update-states/lambda-update-states");
 
 describe(
     "update-states",
@@ -26,7 +27,7 @@ describe(
             try {
                 const expectedKey = 1;
 
-                await handler();
+                await lambda.handler();
 
                 const foundSubjectsFi = await StatesDb.findAll(Locale.FINNISH, db);
                 expect(foundSubjectsFi.length).toBe(1);

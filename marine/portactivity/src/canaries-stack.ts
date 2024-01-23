@@ -2,7 +2,7 @@ import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { ComparisonOperator, TreatMissingData } from "aws-cdk-lib/aws-cloudwatch";
-import { Schedule } from "@aws-cdk/aws-synthetics-alpha";
+import { Schedule } from "aws-cdk-lib/aws-synthetics";
 import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
 import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";

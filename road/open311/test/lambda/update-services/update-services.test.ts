@@ -1,4 +1,3 @@
-import { handler } from "../../../lib/lambda/update-services/lambda-update-services";
 import { dbTestBase } from "../../db-testutil";
 import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as ServicesDb from "../../../lib/db/services";
@@ -8,6 +7,8 @@ const SERVER_PORT = 8088;
 process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
+
+const lambda = require("../../../lib/lambda/update-services/lambda-update-services");
 
 describe(
     "update-services",
@@ -21,7 +22,7 @@ describe(
             });
 
             try {
-                await handler();
+                await lambda.handler();
                 expect(
                     (await ServicesDb.findAllServiceCodes(db)).map((s) =>
                         Number(s.service_code)

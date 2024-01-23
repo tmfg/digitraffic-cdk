@@ -4,10 +4,10 @@ import {
     findMessagesUpdatedAfter,
     insertMessage,
     setMessageDeleted
-} from "../../dao/message";
-import { dbTestBase } from "../db-testutil";
-import { createDtRamiMessage } from "../testdata-util";
-import { WeekDaysBitString, mapBitsToDays } from "../../util/weekdays";
+} from "../../dao/message.js";
+import { dbTestBase } from "../db-testutil.js";
+import { createDtRamiMessage } from "../testdata-util.js";
+import { type WeekDaysBitString, mapBitsToDays } from "../../util/weekdays.js";
 
 describe(
     "dao",

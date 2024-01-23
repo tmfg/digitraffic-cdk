@@ -1,11 +1,11 @@
 import * as PermitsService from "../../service/permits";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 
-const holder = SecretHolder.create();
+const holder = ProxyHolder.create();
 
 export const handler = async () => {
-    await holder.setDatabaseCredentials();
+    await holder.setCredentials();
 
     const start = Date.now();
 

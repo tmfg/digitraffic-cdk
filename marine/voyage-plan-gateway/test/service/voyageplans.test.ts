@@ -1,6 +1,6 @@
 import * as VoyagePlansService from "../../lib/service/voyageplans";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
-import moment from "moment-timezone";
+import { subMinutes, subDays, addHours } from "date-fns";
 import { ValidationError } from "../../lib/service/voyageplans";
 
 describe("voyageplans service", () => {
@@ -408,7 +408,7 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         $: {
-                                            eta: moment().subtract(5, "minutes").toISOString()
+                                            eta: subMinutes(new Date(),5).toISOString()
                                         }
                                     }
                                 ]
@@ -432,12 +432,12 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         $: {
-                                            eta: moment().subtract(5, "minutes").toISOString()
+                                            eta: subMinutes(new Date(), 5).toISOString()
                                         }
                                     },
                                     {
                                         $: {
-                                            etd: moment().add(1, "hours").toISOString()
+                                            etd: addHours(new Date(), 1).toISOString()
                                         }
                                     }
                                 ]
@@ -461,7 +461,7 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         $: {
-                                            eta: moment().subtract(5, "days").toISOString()
+                                            eta: subDays(new Date(), 5).toISOString()
                                         }
                                     },
                                     {

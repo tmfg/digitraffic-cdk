@@ -1,7 +1,7 @@
 import { addHours } from "date-fns";
-import type { DtRamiMessage } from "../model/dt-rami-message";
-import type { RamiMessageOperation } from "../model/rami-message";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata";
+import type { DtRamiMessage } from "../model/dt-rami-message.js";
+import type { RamiMessageOperation } from "../model/rami-message.js";
+import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata.js";
 
 export function createDtRamiMessage(properties: {
     created?: Date;

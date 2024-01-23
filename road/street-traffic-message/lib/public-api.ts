@@ -4,10 +4,10 @@ import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentat
 import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import {
-    corsMethod,
     defaultIntegration,
     methodResponse,
 } from "@digitraffic/common/dist/aws/infra/api/responses";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
     featureSchema,
@@ -108,20 +108,8 @@ export class PublicApi {
             this.messagesGeojsonResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_GEOJSON,
-                            this.messagesGeoJsonModel
-                        )
-                    ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                    DigitrafficMethodResponse.response200(this.messagesGeoJsonModel, MediaType.APPLICATION_JSON),
+                    DigitrafficMethodResponse.response500(Model.EMPTY_MODEL, MediaType.APPLICATION_JSON),
                 ],
             });
         });
@@ -140,20 +128,8 @@ export class PublicApi {
             this.messagesD2LightResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_JSON,
-                            this.messagesGeoJsonModel
-                        )
-                    ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                  DigitrafficMethodResponse.response200(this.messagesGeoJsonModel, MediaType.APPLICATION_JSON),
+                  DigitrafficMethodResponse.response500(Model.EMPTY_MODEL, MediaType.APPLICATION_JSON),
                 ],
             });
         });

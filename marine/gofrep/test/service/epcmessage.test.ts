@@ -1,5 +1,4 @@
 import * as EpcMessageService from "../../lib/service/epcmessage";
-import moment from 'moment';
 import {EpcMessage} from "../../lib/model/epcmessage";
 
 describe('epcmessage service', () => {
@@ -11,7 +10,7 @@ describe('epcmessage service', () => {
             },
         };
         const dateStr = '2021-07-29T10:20:30Z';
-        const date = moment(dateStr).toDate();
+        const date = new Date(dateStr);
 
         const resp = EpcMessageService.createEpcMessageResponse(epcMessage, date);
 

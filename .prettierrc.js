@@ -1,5 +1,5 @@
 module.exports = {
-    plugins: ["./common/autoinstallers/rush-prettier/node_modules/prettier-plugin-packagejson"],
+    plugins: ["./common/autoinstallers/rush-prettier/node_modules/prettier-plugin-packagejson/lib/index.js"],
 
     printWidth: 110,
     endOfLine: "auto",

@@ -4,7 +4,7 @@ import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
 import { parseMessage, processMessage } from "../../service/process-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging.js";
-import { sendToSqs } from "../../util/sqs";
+import { sendToSqs } from "../../util/sqs.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
 
 const DLQ_URL = getEnvVariable("DLQ_URL");

@@ -6,7 +6,7 @@ import {
     PermitType,
 } from "../model/permit";
 import { PermitElement, PermitResponse } from "../model/permit-xml";
-import moment from "moment";
+import { parse } from "date-fns";
 import * as xml2js from "xml2js";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as PermitsDAO from "../db/permit";
@@ -217,16 +217,18 @@ function convertPermit(permitElement: PermitElement): ApiPermit {
         permitSubject,
         permitType,
         gmlGeometryXmlString: jsToXml(permitObject["GIS:Geometry"]),
-        effectiveFrom: moment(
+        effectiveFrom: parse(
             `${permitObject["GIS:VoimassaolonAlkamispaiva"]} ${permitObject["GIS:VoimassaolonAlkamisaika"]}`,
-            "DD.MM.YYYY HH:mm"
-        ).toDate(),
+            "dd.MM.yyyy HH:mm",
+            new Date()
+        ),
         effectiveTo:
             permitObject["GIS:VoimassaolonPaattymispaiva"] != null
-                ? moment(
+                ? parse(
                       `${permitObject["GIS:VoimassaolonPaattymispaiva"]} ${permitObject["GIS:VoimassaolonPaattymissaika"]}`,
-                      "DD.MM.YYYY HH:mm"
-                  ).toDate()
+                      "dd.MM.yyyy HH:mm",
+                      new Date()
+                  )
                 : undefined,
     };
 }

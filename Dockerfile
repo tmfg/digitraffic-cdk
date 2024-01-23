@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:20-alpine
 
 RUN apk add --no-cache npm
 RUN npm install --global --omit=dev eslint typescript @typescript-eslint/eslint-plugin @typescript-eslint/parser
