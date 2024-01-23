@@ -148,6 +148,7 @@ function createUploadVoyagePlanLambda(
     );
     rtzBucket.grantPut(lambda);
 
+    // eslint-disable-next-line no-new
     new DigitrafficLogSubscriptions(stack, lambda);
 }
 
@@ -161,7 +162,7 @@ function createProcessDLQLambda(
     lambdaEnv[VoyagePlanEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
     const functionName = "VPGW-ProcessDLQ";
     const processDLQLambda = MonitoredFunction.create(stack, functionName, {
-        runtime: Runtime.NODEJS_16_X,
+        runtime: Runtime.NODEJS_18_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
         code: new AssetCode("dist/lambda/process-dlq"),
