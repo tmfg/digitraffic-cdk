@@ -11,7 +11,17 @@ export const parameterObject = z.object({
     in: z.enum(["query", "header", "path", "cookie"]),
     description: z.string().optional(),
     required: z.boolean().optional(),
-    deprecated: z.boolean().optional()
+    deprecated: z.boolean().optional(),
+    allowEmptyValue: z.boolean().optional(),
+    style: z
+        .enum(["matrix", "label", "form", "simple", "spaceDelimited", "pipeDelimited", "deepObject"])
+        .optional(),
+    explode: z.string().optional(),
+    allowReserved: z.boolean().optional(),
+    schema: z.unknown().optional(),
+    example: z.unknown().optional(),
+    examples: z.record(z.unknown()).optional(),
+    content: z.record(z.unknown()).optional()
 });
 
 export const referenceObject = z.object({
