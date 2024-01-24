@@ -68,7 +68,7 @@ export class StatisticsIntegrations {
 
     private createKibanaRedirectLambdaIntegration(stack: DigitrafficStatisticsStack) {
         const kibanaRedirectFunction = new lambda.Function(stack, "kibana-redirect", {
-            runtime: lambda.Runtime.NODEJS_16_X,
+            runtime: lambda.Runtime.NODEJS_20_X,
             handler: "kibana-redirect.handler",
             code: lambda.Code.fromAsset(path.join(__dirname, "/lambda")),
             environment: stack.statisticsProps.kibanaLambdaEnv

@@ -1,8 +1,8 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { validateIncomingRamiMessage } from "../../service/validate-message";
-import { sendToSqs } from "../../util/sqs";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
+import { validateIncomingRamiMessage } from "../../service/validate-message.js";
+import { sendToSqs } from "../../util/sqs.js";
 
 const SQS_URL = getEnvVariable("SQS_URL");
 const DLQ_URL = getEnvVariable("DLQ_URL");

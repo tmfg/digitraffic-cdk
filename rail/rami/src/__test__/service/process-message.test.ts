@@ -1,10 +1,10 @@
 import _ from "lodash";
-import { RamiMessageOperations } from "../../model/rami-message";
-import { getActiveMessages } from "../../service/get-message";
-import { parseMessage, processMessage } from "../../service/process-message";
-import { dbTestBase } from "../db-testutil";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata";
-import { createMonitoredJourneyScheduledMessage, createScheduledMessage } from "../testdata-util";
+import { RamiMessageOperations } from "../../model/rami-message.js";
+import { getActiveMessages } from "../../service/get-message.js";
+import { parseMessage, processMessage } from "../../service/process-message.js";
+import { dbTestBase } from "../db-testutil.js";
+import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata.js";
+import { createMonitoredJourneyScheduledMessage, createScheduledMessage } from "../testdata-util.js";
 
 describe("parse message", () => {
     test("parseMessage - valid monitoredJourneyScheduledMessage is correctly parsed", () => {

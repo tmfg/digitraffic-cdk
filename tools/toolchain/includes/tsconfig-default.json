@@ -21,10 +21,7 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    // Enable when migrating to 5.0
-    // "verbatimModuleSyntax": true,
-    "checkJs": true,
-    "importsNotUsedAsValues": "error"
+    "checkJs": true
   },
   "exclude": ["../../../../node_modules", "../../../../dist"]
 }

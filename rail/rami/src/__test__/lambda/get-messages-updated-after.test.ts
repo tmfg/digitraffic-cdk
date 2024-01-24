@@ -1,7 +1,7 @@
 import { parseISO } from "date-fns";
-import { handler } from "../../lambda/get-messages-updated-after/get-messages-updated-after";
-import { dbTestBase } from "../db-testutil";
-import { getMessagesUpdatedAfterLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event";
+import { handler } from "../../lambda/get-messages-updated-after/get-messages-updated-after.js";
+import { dbTestBase } from "../db-testutil.js";
+import { getMessagesUpdatedAfterLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event.js";
 
 describe(
     "get-messages-updated-after lambda",

@@ -1,5 +1,5 @@
-import type { WeekDay } from "../../model/dt-rami-message";
-import { mapBitsToDays, mapDaysToBits } from "../../util/weekdays";
+import type { WeekDay } from "../../model/dt-rami-message.js";
+import { mapBitsToDays, mapDaysToBits } from "../../util/weekdays.js";
 
 const weekDays = ["MONDAY", "THURSDAY", "SATURDAY"] as WeekDay[];
 const weekDaysAsBits = "1001010";

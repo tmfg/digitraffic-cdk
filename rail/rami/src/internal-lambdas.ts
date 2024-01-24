@@ -48,7 +48,7 @@ function createProcessDLQLambda(stack: DigitrafficStack, dlq: Queue, dlqBucket: 
         reservedConcurrentExecutions: 1,
         timeout: 10,
         memorySize: 256,
-        runtime: Runtime.NODEJS_16_X
+        runtime: Runtime.NODEJS_20_X
     });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));

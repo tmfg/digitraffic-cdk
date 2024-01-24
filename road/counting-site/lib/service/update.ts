@@ -1,7 +1,7 @@
 import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { EcoCounterApi } from "../api/eco-counter";
 import { ApiCounter, DbCounter } from "../model/counter";
-import moment from "moment";
+import { addDays, subDays, startOfDay, isBefore } from "date-fns";
 import { DataType, updateLastUpdated } from "@digitraffic/common/dist/database/last-updated";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import {
@@ -49,15 +49,15 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
                 if (isDataUpdateNeeded(counter)) {
                     // either last update timestamp + 1 day or ten days ago(for first time)
                     const fromStamp = counter.last_data_timestamp
-                        ? moment(counter.last_data_timestamp)
-                        : moment().subtract(10, "days").startOf("day");
-                    const endStamp = fromStamp.clone().add(1, "days");
+                        ? new Date(counter.last_data_timestamp)
+                        : startOfDay(subDays(new Date(),10));
+                    const endStamp = addDays(fromStamp, 1);
 
                     const data = await api.getDataForSite(
                         counter.site_id,
                         counter.interval,
-                        fromStamp.toDate(),
-                        endStamp.toDate()
+                        fromStamp,
+                        endStamp
                     );
 
                     logger.info({
@@ -67,7 +67,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
                     });
 
                     await insertCounterValues(db, counter.id, counter.interval, data);
-                    return updateCounterTimestamp(db, counter.id, endStamp.toDate());
+                    return updateCounterTimestamp(db, counter.id, endStamp);
                 }
 
                 logger.info({
@@ -86,7 +86,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
 function isDataUpdateNeeded(counter: DbCounter): boolean {
     return (
         !counter.last_data_timestamp ||
-        moment(counter.last_data_timestamp).isBefore(moment().subtract(2, "days"))
+        isBefore(new Date(counter.last_data_timestamp), subDays(new Date(), 2))
     );
 }
 
