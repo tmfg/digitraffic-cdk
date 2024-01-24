@@ -12,7 +12,7 @@ export const parameterObject = z.object({
     description: z.string().optional(),
     required: z.boolean().optional(),
     deprecated: z.boolean().optional(),
-    allowEmtyValue: z.boolean().optional(),
+    allowEmptyValue: z.boolean().optional(),
     style: z
         .enum(["matrix", "label", "form", "simple", "spaceDelimited", "pipeDelimited", "deepObject"])
         .optional(),
