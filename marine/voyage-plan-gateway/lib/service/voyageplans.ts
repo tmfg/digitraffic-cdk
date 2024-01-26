@@ -1,7 +1,7 @@
 import { RtzSchedule, RtzSchedules, RtzVoyagePlan, RtzWaypoint } from "@digitraffic/common/dist/marine/rtz";
 import * as jsts from "jsts";
-import {toDate} from "date-fns-tz"
-import {isValid, isAfter} from "date-fns"
+import { toDate } from "date-fns-tz";
+import { isValid, isAfter } from "date-fns";
 import GeometryFactory = jsts.geom.GeometryFactory;
 
 const gf = new GeometryFactory();

@@ -6,7 +6,7 @@ import { Construct } from "constructs";
 import { Aspects, Stack, StackProps, Tags } from "aws-cdk-lib";
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { SOLUTION_KEY, DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {Open311Props} from "./app-props";
+import { Open311Props } from "./app-props";
 
 export class Open311Stack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: Open311Props) {

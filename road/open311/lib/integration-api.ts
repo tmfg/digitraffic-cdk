@@ -2,20 +2,23 @@ import apigateway = require("aws-cdk-lib/aws-apigateway");
 import iam = require("aws-cdk-lib/aws-iam");
 import { EndpointType, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction"
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import {
-    defaultIntegration
-} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { addDefaultValidator } from "@digitraffic/common/dist/utils/api-model";
 import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import {Open311Props} from "./app-props";
+import { Open311Props } from "./app-props";
 
-export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: DigitrafficStack, props: Open311Props) {
+export function create(
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    stack: DigitrafficStack,
+    props: Open311Props
+) {
     const integrationApi = createApi(stack);
 
     createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
@@ -66,10 +69,7 @@ function createUpdateRequestHandler(
     props: Open311Props
 ) {
     const updateRequestsId = "UpdateRequests";
-    const updateRequestsHandler = MonitoredDBFunction.create(
-      stack,
-      updateRequestsId
-    )
+    const updateRequestsHandler = MonitoredDBFunction.create(stack, updateRequestsId);
     requests.addMethod("POST", new LambdaIntegration(updateRequestsHandler), {
         apiKeyRequired: true
     });
@@ -84,10 +84,7 @@ function createDeleteRequestHandler(
     props: Open311Props
 ) {
     const deleteRequestId = "DeleteRequest";
-    const deleteRequestHandler = MonitoredDBFunction.create(
-      stack,
-      deleteRequestId,
-    );
+    const deleteRequestHandler = MonitoredDBFunction.create(stack, deleteRequestId);
     const deleteRequestIntegration = defaultIntegration(deleteRequestHandler, {
         requestParameters: {
             "integration.request.path.request_id": "method.request.path.request_id",
@@ -110,7 +107,7 @@ function createDeleteRequestHandler(
         },
         methodResponses: [
             DigitrafficMethodResponse.response200(messageResponseModel, MediaType.APPLICATION_JSON),
-            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON)
         ]
     });
     createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);

@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "5.2.0",
+    "@aws-sdk/types": "3.485.0",
+    "@digitraffic/common": "2024.1.10-1",
     "@smithy/node-http-handler": "2.2.2",
     "@smithy/protocol-http": "3.0.12",
     "@smithy/signature-v4": "2.0.19",
-    "@aws-sdk/types": "3.485.0",
-    "@digitraffic/common": "2024.1.10-1",
     "aws-cdk": "^2.118.0",
     "aws-cdk-lib": "~2.118.0",
     "aws-sdk": "~2.1531.0",

@@ -18,15 +18,13 @@ describe(
             server.listen(SERVER_PORT, {
                 "/services.xml": () => {
                     return fakeServices();
-                },
+                }
             });
 
             try {
                 await lambda.handler();
                 expect(
-                    (await ServicesDb.findAllServiceCodes(db)).map((s) =>
-                        Number(s.service_code)
-                    )
+                    (await ServicesDb.findAllServiceCodes(db)).map((s) => Number(s.service_code))
                 ).toMatchObject([171, 198, 199]);
             } finally {
                 server.close();

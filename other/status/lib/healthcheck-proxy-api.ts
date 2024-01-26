@@ -5,7 +5,7 @@ import {
     LambdaIntegration,
     MethodLoggingLevel,
     Resource,
-    RestApi,
+    RestApi
 } from "aws-cdk-lib/aws-apigateway";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
@@ -18,45 +18,24 @@ import { ITopic } from "aws-cdk-lib/aws-sns";
 import { Construct } from "constructs";
 import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
-export function create(
-    stack: Stack,
-    alarmSnsTopic: ITopic,
-    warningSnsTopic: ITopic,
-    props: Props
-) {
+export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props) {
     const api = createApi(stack, props.allowFromIpAddresses);
 
     const resource = api.root.addResource("healthcheck-proxy");
 
-    createMqttProxyResource(
-        api,
-        resource,
-        "Meri",
-        props,
-        alarmSnsTopic,
-        warningSnsTopic,
-        stack
-    );
-    createMqttProxyResource(
-        api,
-        resource,
-        "Tie",
-        props,
-        alarmSnsTopic,
-        warningSnsTopic,
-        stack
-    );
+    createMqttProxyResource(api, resource, "Meri", props, alarmSnsTopic, warningSnsTopic, stack);
+    createMqttProxyResource(api, resource, "Tie", props, alarmSnsTopic, warningSnsTopic, stack);
 }
 
 function createApi(stack: Construct, allowFromIpAddresses: string[]) {
     return new RestApi(stack, "HC-Proxy", {
         endpointExportName: "HC-Proxy",
         deployOptions: {
-            loggingLevel: MethodLoggingLevel.ERROR,
+            loggingLevel: MethodLoggingLevel.ERROR
         },
         restApiName: "Healthcheck Proxy API",
         endpointTypes: [EndpointType.REGIONAL],
-        policy: createIpRestrictionPolicyDocument(allowFromIpAddresses),
+        policy: createIpRestrictionPolicyDocument(allowFromIpAddresses)
     });
 }
 
@@ -88,7 +67,7 @@ function createMqttProxyResource(
             timeout: Duration.seconds(10),
             memorySize: 128,
             environment: env,
-            logRetention: RetentionDays.ONE_YEAR,
+            logRetention: RetentionDays.ONE_YEAR
         },
         alarmSnsTopic,
         warningSnsTopic,
@@ -97,7 +76,7 @@ function createMqttProxyResource(
     );
 
     const integration = new LambdaIntegration(lambda, {
-        proxy: true,
+        proxy: true
     });
 
     const mqttProxyResource = resource.addResource(`${app.toLowerCase()}-mqtt`);

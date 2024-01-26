@@ -14,16 +14,11 @@ export const handler = async () => {
             return LambdaResponse.okJson(result);
         })
         .catch((error) => {
-            console.error(
-                "method=StreetTrafficMessage.GetPermitsGeoJson error " + error
-            );
+            console.error("method=StreetTrafficMessage.GetPermitsGeoJson error " + error);
 
             return LambdaResponse.internalError();
         })
         .finally(() => {
-            console.info(
-                "method=StreetTrafficMessage.GetPermitsGeoJson tookMs=%d",
-                Date.now() - start
-            );
+            console.info("method=StreetTrafficMessage.GetPermitsGeoJson tookMs=%d", Date.now() - start);
         });
 };

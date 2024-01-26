@@ -11,38 +11,11 @@ import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
-export function create(
-    stack: Stack,
-    alarmSnsTopic: ITopic,
-    warningSnsTopic: ITopic,
-    props: Props
-) {
-    const secret = Secret.fromSecretCompleteArn(
-        stack,
-        "Secret",
-        props.secretsManagerSecretArn
-    );
-    createUpdateStatusesLambda(
-        secret,
-        alarmSnsTopic,
-        warningSnsTopic,
-        stack,
-        props
-    );
-    createHandleMaintenanceLambda(
-        secret,
-        alarmSnsTopic,
-        warningSnsTopic,
-        stack,
-        props
-    );
-    createCheckComponentStatesLambda(
-        secret,
-        alarmSnsTopic,
-        warningSnsTopic,
-        stack,
-        props
-    );
+export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props) {
+    const secret = Secret.fromSecretCompleteArn(stack, "Secret", props.secretsManagerSecretArn);
+    createUpdateStatusesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
+    createHandleMaintenanceLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
+    createCheckComponentStatesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
 }
 
 function createUpdateStatusesLambda(
@@ -55,10 +28,8 @@ function createUpdateStatusesLambda(
     const environment: LambdaEnvironment = {};
     environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
     environment[StatusEnvKeys.SECRET_ID] = props.secretsManagerSecretArn;
-    environment[StatusEnvKeys.CHECK_TIMEOUT_SECONDS] =
-        props.nodePingTimeoutSeconds.toString();
-    environment[StatusEnvKeys.INTERVAL_MINUTES] =
-        props.nodePingCheckInterval.toString();
+    environment[StatusEnvKeys.CHECK_TIMEOUT_SECONDS] = props.nodePingTimeoutSeconds.toString();
+    environment[StatusEnvKeys.INTERVAL_MINUTES] = props.nodePingCheckInterval.toString();
 
     const functionName = "Status-UpdateStatuses";
     const lambdaConf: FunctionProps = {
@@ -70,7 +41,7 @@ function createUpdateStatusesLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
         logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: 1,
+        reservedConcurrentExecutions: 1
     };
 
     const lambda = new MonitoredFunction(
@@ -107,10 +78,10 @@ function createHandleMaintenanceLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {
             STATUSPAGE_URL: props.statusPageUrl,
-            SECRET_ARN: props.secretsManagerSecretArn,
+            SECRET_ARN: props.secretsManagerSecretArn
         },
         logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: 1,
+        reservedConcurrentExecutions: 1
     };
 
     const lambda = new MonitoredFunction(
@@ -147,10 +118,10 @@ function createCheckComponentStatesLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {
             STATUSPAGE_URL: props.statusPageUrl,
-            SECRET_ARN: props.secretsManagerSecretArn,
+            SECRET_ARN: props.secretsManagerSecretArn
         },
         logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: 1,
+        reservedConcurrentExecutions: 1
     };
 
     const lambda = new MonitoredFunction(

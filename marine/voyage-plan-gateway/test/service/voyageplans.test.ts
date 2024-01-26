@@ -408,7 +408,7 @@ describe("voyageplans service", () => {
                                 scheduleElement: [
                                     {
                                         $: {
-                                            eta: subMinutes(new Date(),5).toISOString()
+                                            eta: subMinutes(new Date(), 5).toISOString()
                                         }
                                     }
                                 ]

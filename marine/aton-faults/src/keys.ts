@@ -1,0 +1,4 @@
+export enum AtonEnvKeys {
+    SEND_S124_QUEUE_URL = "SEND_S124_QUEUE_URL",
+    INTEGRATIONS = "INTEGRATIONS"
+}

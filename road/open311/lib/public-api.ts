@@ -5,7 +5,7 @@ import { EndpointType } from "aws-cdk-lib/aws-apigateway";
 
 import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction"
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import {
     addDefaultValidator,
     addServiceModel,
@@ -14,10 +14,7 @@ import {
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {
-    defaultIntegration,
-    methodResponse
-} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { defaultIntegration, methodResponse } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { addTags } from "@digitraffic/common/dist/aws/infra/documentation";
 import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
@@ -27,9 +24,14 @@ import { default as RequestSchema } from "./model/request-schema";
 import { default as StateSchema } from "./model/state-schema";
 import { default as SubjectSchema } from "./model/subject-schema";
 import { default as SubSubjectSchema } from "./model/subsubject-schema";
-import {Open311Props} from "./app-props";
+import { Open311Props } from "./app-props";
 
-export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: DigitrafficStack, props: Open311Props) {
+export function create(
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    stack: DigitrafficStack,
+    props: Open311Props
+) {
     const publicApi = createApi(stack, props.allowFromIpAddresses);
 
     createDefaultUsagePlan(publicApi, "Open311 CloudFront", props.publicApiKey);
@@ -66,27 +68,9 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Dig
         validator,
         stack
     );
-    createStatesResource(
-        open311Resource,
-        props,
-        stateModel,
-        messageResponseModel,
-        stack
-    );
-    createSubjectsResource(
-        open311Resource,
-        props,
-        subjectModel,
-        messageResponseModel,
-        stack
-    );
-    createSubSubjectsResource(
-        open311Resource,
-        props,
-        subSubjectModel,
-        messageResponseModel,
-        stack
-    );
+    createStatesResource(open311Resource, props, stateModel, messageResponseModel, stack);
+    createSubjectsResource(open311Resource, props, subjectModel, messageResponseModel, stack);
+    createSubSubjectsResource(open311Resource, props, subSubjectModel, messageResponseModel, stack);
     createServicesResource(
         open311Resource,
         props,
@@ -110,21 +94,12 @@ function createRequestsResource(
     const requests = open311Resource.addResource("requests");
 
     const getRequestsId = "Open311-GetRequests";
-    const getRequestsHandler = MonitoredDBFunction.create(stack, getRequestsId)
+    const getRequestsHandler = MonitoredDBFunction.create(stack, getRequestsId);
     createSubscription(getRequestsHandler, getRequestsId, props.logsDestinationArn, stack);
-    createGetRequestsIntegration(
-        requests,
-        getRequestsHandler,
-        requestsModel,
-        messageResponseModel,
-        stack
-    );
+    createGetRequestsIntegration(requests, getRequestsHandler, requestsModel, messageResponseModel, stack);
 
     const getRequestId = "Open311-GetRequest";
-    const getRequestHandler = MonitoredDBFunction.create(
-        stack,
-        getRequestId,
-    );
+    const getRequestHandler = MonitoredDBFunction.create(stack, getRequestId);
     createSubscription(getRequestHandler, getRequestId, props.logsDestinationArn, stack);
     createGetRequestIntegration(
         requests,
@@ -213,10 +188,7 @@ function createStatesResource(
     const states = open311Resource.addResource("states");
 
     const getStatesId = "Open311-GetStates";
-    const getStatesHandler = MonitoredDBFunction.create(
-        stack,
-        getStatesId,
-    );
+    const getStatesHandler = MonitoredDBFunction.create(stack, getStatesId);
     createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetStates",
@@ -237,10 +209,7 @@ function createSubjectsResource(
 ) {
     const subjects = open311Resource.addResource("subjects");
     const getSubjectsId = "Open311-GetSubjects";
-    const getSubjectsHandler = MonitoredDBFunction.create(
-        stack,
-        getSubjectsId,
-    );
+    const getSubjectsHandler = MonitoredDBFunction.create(stack, getSubjectsId);
     createSubscription(getSubjectsHandler, getSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetSubjects",
@@ -261,10 +230,7 @@ function createSubSubjectsResource(
 ) {
     const subSubjects = open311Resource.addResource("subsubjects");
     const getSubSubjectsId = "Open311-GetSubSubjects";
-    const getSubSubjectsHandler = MonitoredDBFunction.create(
-        stack,
-        getSubSubjectsId,
-    );
+    const getSubSubjectsHandler = MonitoredDBFunction.create(stack, getSubSubjectsId);
     createSubscription(getSubSubjectsHandler, getSubSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetSubSubjects",
@@ -288,10 +254,7 @@ function createServicesResource(
     const services = open311Resource.addResource("services");
 
     const getServicesId = "Open311-GetServices";
-    const getServicesHandler = MonitoredDBFunction.create(
-        stack,
-        getServicesId,
-    );
+    const getServicesHandler = MonitoredDBFunction.create(stack, getServicesId);
     createSubscription(getServicesHandler, getServicesId, props.logsDestinationArn, stack);
     createGetResourcesIntegration(
         services,
@@ -303,10 +266,7 @@ function createServicesResource(
     );
 
     const getServiceId = "Open311-GetService";
-    const getServiceHandler = MonitoredDBFunction.create(
-        stack,
-        getServiceId,
-    );
+    const getServiceHandler = MonitoredDBFunction.create(stack, getServiceId);
     createSubscription(getServiceHandler, getServiceId, props.logsDestinationArn, stack);
     createGetServiceIntegration(
         services,
@@ -331,7 +291,7 @@ function createGetResourcesIntegration(
         apiKeyRequired: true,
         methodResponses: [
             DigitrafficMethodResponse.response200(model, MediaType.APPLICATION_JSON),
-            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON)
         ]
     });
     addTags(tag, DATA_V1_TAGS, resource, stack);
@@ -362,7 +322,7 @@ function createGetLocalizedResourceIntegration(
         },
         methodResponses: [
             DigitrafficMethodResponse.response200(model, MediaType.APPLICATION_JSON),
-            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON)
         ]
     });
     addTags(id, DATA_V1_TAGS, resource, stack);
@@ -395,8 +355,8 @@ function createGetServiceIntegration(
         },
         methodResponses: [
             DigitrafficMethodResponse.response200(serviceModel, MediaType.APPLICATION_JSON),
-          DigitrafficMethodResponse.response("404", messageResponseModel, MediaType.APPLICATION_JSON),
-          DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response("404", messageResponseModel, MediaType.APPLICATION_JSON),
+            DigitrafficMethodResponse.response500(messageResponseModel, MediaType.APPLICATION_JSON)
         ]
     });
     addTags("GetService", DATA_V1_TAGS, service, stack);

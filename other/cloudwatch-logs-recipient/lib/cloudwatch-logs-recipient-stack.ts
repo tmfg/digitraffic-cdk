@@ -1,10 +1,6 @@
 import { Stack, StackProps, Duration } from "aws-cdk-lib";
 import { Role, ServicePrincipal, PolicyStatement } from "aws-cdk-lib/aws-iam";
-import {
-    CrossAccountDestination,
-    CfnDestination,
-    RetentionDays,
-} from "aws-cdk-lib/aws-logs";
+import { CrossAccountDestination, CfnDestination, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Stream } from "aws-cdk-lib/aws-kinesis";
 import {
     Function,
@@ -12,7 +8,7 @@ import {
     AssetCode,
     Runtime,
     StartingPosition,
-    Architecture,
+    Architecture
 } from "aws-cdk-lib/aws-lambda";
 import { KinesisEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { ITopic, Topic } from "aws-cdk-lib/aws-sns";
@@ -22,27 +18,18 @@ import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/moni
 import { Props } from "./app-props";
 
 export class CloudWatchLogsRecipientStack extends Stack {
-    constructor(
-        scope: Construct,
-        id: string,
-        cwlrProps: Props,
-        props?: StackProps
-    ) {
+    constructor(scope: Construct, id: string, cwlrProps: Props, props?: StackProps) {
         super(scope, id, props);
 
         // stream for logs generated in lambdas
-        const lambdaLogsToESStream =
-            this.createKinesisStream("CWLRecipientStream");
+        const lambdaLogsToESStream = this.createKinesisStream("CWLRecipientStream");
         // stream for logs generated in applications(web/daemon)
-        const appLogsTOEsStream = this.createKinesisStream(
-            "AppLogRecipientStream"
-        );
+        const appLogsTOEsStream = this.createKinesisStream("AppLogRecipientStream");
 
-        const writeLambdaLogsToKinesisRole =
-            this.createWriteToKinesisStreamRole(
-                "CWLToKinesisRole",
-                lambdaLogsToESStream.streamArn
-            );
+        const writeLambdaLogsToKinesisRole = this.createWriteToKinesisStreamRole(
+            "CWLToKinesisRole",
+            lambdaLogsToESStream.streamArn
+        );
         const writeAppLogsToKinesisRole = this.createWriteToKinesisStreamRole(
             "AppLogsToKinesisRole",
             appLogsTOEsStream.streamArn
@@ -61,21 +48,13 @@ export class CloudWatchLogsRecipientStack extends Stack {
         );
 
         const emailSqsTopic = this.createEmailTopic(cwlrProps.errorEmail);
-        const alarmTopic = Topic.fromTopicArn(
-            this,
-            "AlarmTopic",
-            cwlrProps.alarmTopicArn
-        );
-        const warningTopic = Topic.fromTopicArn(
-            this,
-            "WarningTopic",
-            cwlrProps.warningTopicArn
-        );
+        const alarmTopic = Topic.fromTopicArn(this, "AlarmTopic", cwlrProps.alarmTopicArn);
+        const warningTopic = Topic.fromTopicArn(this, "WarningTopic", cwlrProps.warningTopicArn);
 
-        const lambdaRole = this.createWriteToElasticLambdaRole(
-            cwlrProps.elasticSearchDomainArn,
-            [lambdaLogsToESStream.streamArn, appLogsTOEsStream.streamArn]
-        );
+        const lambdaRole = this.createWriteToElasticLambdaRole(cwlrProps.elasticSearchDomainArn, [
+            lambdaLogsToESStream.streamArn,
+            appLogsTOEsStream.streamArn
+        ]);
         const lambdaLogsToESLambda = this.createWriteLambdaLogsToElasticLambda(
             lambdaRole,
             emailSqsTopic,
@@ -98,7 +77,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
                 parallelizationFactor: 2,
                 startingPosition: StartingPosition.TRIM_HORIZON,
                 batchSize: 200,
-                maxBatchingWindow: Duration.seconds(30),
+                maxBatchingWindow: Duration.seconds(30)
             })
         );
 
@@ -107,14 +86,14 @@ export class CloudWatchLogsRecipientStack extends Stack {
                 parallelizationFactor: 2,
                 startingPosition: StartingPosition.TRIM_HORIZON,
                 batchSize: 200,
-                maxBatchingWindow: Duration.seconds(30),
+                maxBatchingWindow: Duration.seconds(30)
             })
         );
     }
 
     createEmailTopic(email: string): Topic {
         const topic = new Topic(this, "KinesisErrorsToEmailTopic", {
-            topicName: "KinesisErrorsToEmailTopic",
+            topicName: "KinesisErrorsToEmailTopic"
         });
 
         topic.addSubscription(new EmailSubscription(email));
@@ -128,19 +107,13 @@ export class CloudWatchLogsRecipientStack extends Stack {
         writeToKinesisRole: Role,
         accountNumbers: string[]
     ) {
-        const crossAccountDestination = new CrossAccountDestination(
-            this,
-            crossAccountDestinationId,
-            {
-                destinationName: crossAccountDestinationId,
-                targetArn: streamArn,
-                role: writeToKinesisRole,
-            }
-        );
+        const crossAccountDestination = new CrossAccountDestination(this, crossAccountDestinationId, {
+            destinationName: crossAccountDestinationId,
+            targetArn: streamArn,
+            role: writeToKinesisRole
+        });
         crossAccountDestination.node.addDependency(writeToKinesisRole);
-        (
-            crossAccountDestination.node.defaultChild as CfnDestination
-        ).destinationPolicy = JSON.stringify({
+        (crossAccountDestination.node.defaultChild as CfnDestination).destinationPolicy = JSON.stringify({
             Version: "2012-10-17",
             Statement: [
                 {
@@ -148,39 +121,37 @@ export class CloudWatchLogsRecipientStack extends Stack {
                     Effect: "Allow",
                     Action: "logs:PutSubscriptionFilter",
                     Principal: {
-                        AWS: accountNumbers,
+                        AWS: accountNumbers
                     },
-                    Resource: `arn:aws:logs:${this.region}:${this.account}:destination:${crossAccountDestinationId}`,
-                },
-            ],
+                    Resource: `arn:aws:logs:${this.region}:${this.account}:destination:${crossAccountDestinationId}`
+                }
+            ]
         });
     }
 
     createKinesisStream(streamName: string) {
         return new Stream(this, streamName, {
             shardCount: 1,
-            streamName: streamName,
+            streamName: streamName
         });
     }
 
     createWriteToKinesisStreamRole(roleName: string, streamArn: string): Role {
         const cloudWatchLogsToKinesisRole = new Role(this, roleName, {
-            assumedBy: new ServicePrincipal(
-                `logs.${this.region}.amazonaws.com`
-            ),
-            roleName: roleName,
+            assumedBy: new ServicePrincipal(`logs.${this.region}.amazonaws.com`),
+            roleName: roleName
         });
 
         cloudWatchLogsToKinesisRole.addToPolicy(
             new PolicyStatement({
                 actions: ["kinesis:PutRecord"],
-                resources: [streamArn],
+                resources: [streamArn]
             })
         );
         cloudWatchLogsToKinesisRole.addToPolicy(
             new PolicyStatement({
                 actions: ["iam:PassRole"],
-                resources: [cloudWatchLogsToKinesisRole.roleArn],
+                resources: [cloudWatchLogsToKinesisRole.roleArn]
             })
         );
 
@@ -208,8 +179,8 @@ export class CloudWatchLogsRecipientStack extends Stack {
             environment: {
                 KNOWN_ACCOUNTS: JSON.stringify(props.accounts),
                 ES_ENDPOINT: props.elasticSearchEndpoint,
-                TOPIC_ARN: topic.topicArn,
-            },
+                TOPIC_ARN: topic.topicArn
+            }
         } as FunctionProps;
 
         return new MonitoredFunction(
@@ -244,8 +215,8 @@ export class CloudWatchLogsRecipientStack extends Stack {
             environment: {
                 KNOWN_ACCOUNTS: JSON.stringify(props.accounts),
                 ES_ENDPOINT: props.elasticSearchEndpoint,
-                TOPIC_ARN: topic.topicArn,
-            },
+                TOPIC_ARN: topic.topicArn
+            }
         } as FunctionProps;
 
         return new MonitoredFunction(
@@ -259,13 +230,10 @@ export class CloudWatchLogsRecipientStack extends Stack {
         );
     }
 
-    createWriteToElasticLambdaRole(
-        elasticSearchDomainArn: string,
-        streamArns: string[]
-    ): Role {
+    createWriteToElasticLambdaRole(elasticSearchDomainArn: string, streamArns: string[]): Role {
         const lambdaRole = new Role(this, "KinesisLambdaToElasticSearchRole", {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: "KinesisLambdaToElasticSearchRole",
+            roleName: "KinesisLambdaToElasticSearchRole"
         });
         lambdaRole.addToPolicy(
             new PolicyStatement({
@@ -274,12 +242,9 @@ export class CloudWatchLogsRecipientStack extends Stack {
                     "es:DescribeElasticsearchDomains",
                     "es:DescribeElasticsearchDomainConfig",
                     "es:ESHttpPost",
-                    "es:ESHttpPut",
+                    "es:ESHttpPut"
                 ],
-                resources: [
-                    elasticSearchDomainArn,
-                    `${elasticSearchDomainArn}/*`,
-                ],
+                resources: [elasticSearchDomainArn, `${elasticSearchDomainArn}/*`]
             })
         );
         lambdaRole.addToPolicy(
@@ -289,9 +254,9 @@ export class CloudWatchLogsRecipientStack extends Stack {
                     "logs:PutLogEvents",
                     "logs:CreateLogGroup",
                     "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams",
+                    "logs:DescribeLogStreams"
                 ],
-                resources: ["*"],
+                resources: ["*"]
             })
         );
         lambdaRole.addToPolicy(
@@ -303,9 +268,9 @@ export class CloudWatchLogsRecipientStack extends Stack {
                     "kinesis:GetShardIterator",
                     "kinesis:ListShards",
                     "kinesis:ListStreams",
-                    "kinesis:SubscribeToShard",
+                    "kinesis:SubscribeToShard"
                 ],
-                resources: streamArns,
+                resources: streamArns
             })
         );
 

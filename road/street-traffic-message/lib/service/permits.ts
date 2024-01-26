@@ -1,51 +1,30 @@
 import { PermitsApi } from "../api/permits";
-import {
-    ApiPermit,
-    DbPermit,
-    PermitDetailedType,
-    PermitType,
-} from "../model/permit";
+import { ApiPermit, DbPermit, PermitDetailedType, PermitType } from "../model/permit";
 import { PermitElement, PermitResponse } from "../model/permit-xml";
 import { parse } from "date-fns";
 import * as xml2js from "xml2js";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as PermitsDAO from "../db/permit";
-import {
-    FeatureCollection,
-    Geometry,
-    GeometryCollection,
-    Point,
-} from "geojson";
-import {
-    createGmlLineString,
-    positionToList,
-} from "@digitraffic/common/dist/utils/geometry";
+import { FeatureCollection, Geometry, GeometryCollection, Point } from "geojson";
+import { createGmlLineString, positionToList } from "@digitraffic/common/dist/utils/geometry";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
 const PERMIT_TYPE_MAP: Record<string, PermitType> = {
     "2": PermitType.CONSTRUCTION_WORKS,
     "41": PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS,
-    "60": PermitType.PUBLIC_EVENT,
+    "60": PermitType.PUBLIC_EVENT
 };
 
 const PERMIT_DETAILED_TYPE_MAP: Record<string, PermitDetailedType> = {
     [PermitType.CONSTRUCTION_WORKS]: PermitDetailedType.CONSTRUCTION_WORKS,
     [PermitType.PUBLIC_EVENT]: PermitDetailedType.OTHER,
-    [PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS]:
-        PermitDetailedType.OTHER,
+    [PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS]: PermitDetailedType.OTHER
 };
 
-const ALLOWED_PERMIT_PROCESSING_STAGES = [
-    "Lupa myönnetty",
-    "Jatkolupa",
-    "Alueen käyttölupa myönnetty",
-];
+const ALLOWED_PERMIT_PROCESSING_STAGES = ["Lupa myönnetty", "Jatkolupa", "Alueen käyttölupa myönnetty"];
 
-export async function getPermitsFromSource(
-    authKey: string,
-    url: string
-): Promise<ApiPermit[]> {
+export async function getPermitsFromSource(authKey: string, url: string): Promise<ApiPermit[]> {
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
     const jsonPermits = await xmlToJs(xmlPermits);
@@ -57,32 +36,24 @@ export async function getPermitsFromSource(
 
 export function findPermitsInGeojson() {
     return inDatabaseReadonly(async (db) => {
-        const geojsonPermits: FeatureCollection =
-            await PermitsDAO.getActivePermitsGeojson(db);
+        const geojsonPermits: FeatureCollection = await PermitsDAO.getActivePermitsGeojson(db);
         // return a separate permit object for each geometry instead of a GeometryCollection in one object
-        const separateObjectsPerGeometry = geojsonPermits.features.flatMap(
-            (permit) => {
-                const permitGeometryCollection =
-                    permit.geometry as GeometryCollection;
-                return permitGeometryCollection.geometries.flatMap(
-                    (singleGeometry) => {
-                        return { ...permit, geometry: singleGeometry };
-                    }
-                );
-            }
-        );
+        const separateObjectsPerGeometry = geojsonPermits.features.flatMap((permit) => {
+            const permitGeometryCollection = permit.geometry as GeometryCollection;
+            return permitGeometryCollection.geometries.flatMap((singleGeometry) => {
+                return { ...permit, geometry: singleGeometry };
+            });
+        });
         return {
             type: "FeatureCollection",
-            features: separateObjectsPerGeometry,
+            features: separateObjectsPerGeometry
         };
     });
 }
 
 export function findPermitsInD2Light() {
     return inDatabaseReadonly((db) => {
-        return PermitsDAO.getActivePermits(db).then((permits) =>
-            convertD2Light(permits)
-        );
+        return PermitsDAO.getActivePermits(db).then((permits) => convertD2Light(permits));
     });
 }
 
@@ -97,10 +68,10 @@ function convertD2Light(permits: DbPermit[]) {
             publicationTime,
             publicationCreator: {
                 country: "fi",
-                nationalIdentifier: "Fintraffic",
+                nationalIdentifier: "Fintraffic"
             },
-            situationRecord,
-        },
+            situationRecord
+        }
     };
 }
 
@@ -117,7 +88,7 @@ function createSituationRecords(permits: DbPermit[]) {
             endTime: permit.effectiveTo,
             type: permit.permitType,
             detailedType: {
-                value: detailedType,
+                value: detailedType
             },
             detailedTypeText: detailedType,
             severity: "Unknown",
@@ -125,16 +96,14 @@ function createSituationRecords(permits: DbPermit[]) {
             sourceName: permit.source,
             generalPublicComment: permit.permitSubject,
             situationId: permit.id,
-            location: createLocation(permit),
+            location: createLocation(permit)
         };
     });
 }
 
 function createLocation(permit: DbPermit) {
     if (permit.geometry.type != "GeometryCollection") {
-        throw new Error(
-            "GeometryCollection expected, got " + permit.geometry.type
-        );
+        throw new Error("GeometryCollection expected, got " + permit.geometry.type);
     }
 
     if (permit.geometry.geometries.length === 1) {
@@ -151,33 +120,31 @@ function convertGeometry(geometry: Geometry, centroid: Point) {
     if (geometry.type === "Point") {
         return {
             locationDescription,
-            coordinatesForDisplay,
+            coordinatesForDisplay
         };
     } else if (geometry.type === "LineString") {
         return {
             locationDescription,
             coordinatesForDisplay,
             line: {
-                gmlLinearRing: createGmlLineString(geometry),
-            },
+                gmlLinearRing: createGmlLineString(geometry)
+            }
         };
     } else if (geometry.type === "Polygon") {
         return {
             locationDescription,
             coordinatesForDisplay,
             area: {
-                gmlPolygon: [createGmlPolygon(geometry)],
-            },
+                gmlPolygon: [createGmlPolygon(geometry)]
+            }
         };
     } else if (geometry.type === "GeometryCollection") {
         return {
             locationDescription,
             coordinatesForDisplay,
             area: {
-                gmlPolygon: [
-                    geometry.geometries.map((g) => createGmlPolygon(g)),
-                ],
-            },
+                gmlPolygon: [geometry.geometries.map((g) => createGmlPolygon(g))]
+            }
         };
     }
 
@@ -186,19 +153,15 @@ function convertGeometry(geometry: Geometry, centroid: Point) {
 
 function createGmlPolygon(geometry: Geometry) {
     return {
-        exterior: createGmlLineString(geometry),
+        exterior: createGmlLineString(geometry)
     };
 }
 
 function isValidPermit(permitElement: PermitElement): boolean {
     return (
-        permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] !=
-            null &&
-        ALLOWED_PERMIT_PROCESSING_STAGES.includes(
-            permitElement["GIS:YlAlLuvat"]["GIS:Kasittelyvaihe"]
-        ) &&
-        mapLupatyyppi(permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi_koodi"]) !=
-            null
+        permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null &&
+        ALLOWED_PERMIT_PROCESSING_STAGES.includes(permitElement["GIS:YlAlLuvat"]["GIS:Kasittelyvaihe"]) &&
+        mapLupatyyppi(permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi_koodi"]) != null
     );
 }
 
@@ -229,15 +192,11 @@ function convertPermit(permitElement: PermitElement): ApiPermit {
                       "dd.MM.yyyy HH:mm",
                       new Date()
                   )
-                : undefined,
+                : undefined
     };
 }
 
-function convertSubject(
-    permitType: PermitType,
-    tarkoitus: string,
-    nimi: string
-) {
+function convertSubject(permitType: PermitType, tarkoitus: string, nimi: string) {
     if (permitType === PermitType.CONSTRUCTION_WORKS) {
         return tarkoitus;
     }
@@ -249,9 +208,7 @@ function mapLupatyyppi(lupatyyppiKoodi: string) {
     const mappedType = PERMIT_TYPE_MAP[lupatyyppiKoodi];
 
     if (lupatyyppiKoodi != "0" && mappedType == null) {
-        console.info(
-            "method=PermitsService unmapped lupatyyppi " + lupatyyppiKoodi
-        );
+        console.info("method=PermitsService unmapped lupatyyppi " + lupatyyppiKoodi);
     }
 
     return mappedType;
@@ -264,7 +221,7 @@ function xmlToJs(xml: string): Promise<PermitResponse> {
 function jsToXml(obj: Record<string, unknown>): string {
     const builder = new xml2js.Builder({
         headless: true,
-        renderOpts: { pretty: false },
+        renderOpts: { pretty: false }
     });
 
     return builder.buildObject(obj);

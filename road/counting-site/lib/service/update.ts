@@ -50,7 +50,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
                     // either last update timestamp + 1 day or ten days ago(for first time)
                     const fromStamp = counter.last_data_timestamp
                         ? new Date(counter.last_data_timestamp)
-                        : startOfDay(subDays(new Date(),10));
+                        : startOfDay(subDays(new Date(), 10));
                     const endStamp = addDays(fromStamp, 1);
 
                     const data = await api.getDataForSite(

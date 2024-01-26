@@ -3,17 +3,10 @@ import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/res
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import {
-    defaultIntegration,
-    methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { defaultIntegration, methodResponse } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import {
-    featureSchema,
-    geojsonSchema,
-    getModelReference,
-} from "@digitraffic/common/dist/utils/api-model";
+import { featureSchema, geojsonSchema, getModelReference } from "@digitraffic/common/dist/utils/api-model";
 import { permitProperties } from "./model/permit";
 import { DigitrafficIntegrationResponse } from "@digitraffic/common/dist/aws/runtime/digitraffic-integration-response";
 
@@ -50,26 +43,18 @@ export class PublicApi {
         const versionResource = stmResource.addResource("beta");
 
         this.messagesGeojsonResource = versionResource.addResource("messages");
-        this.messagesD2LightResource =
-            versionResource.addResource("messages.d2light");
+        this.messagesD2LightResource = versionResource.addResource("messages.d2light");
     }
 
     createModels(publicApi: DigitrafficRestApi) {
-        const messageModel = publicApi.addJsonModel(
-            "MessageModel",
-            permitProperties
-        );
+        const messageModel = publicApi.addJsonModel("MessageModel", permitProperties);
         const featureModel = publicApi.addJsonModel(
             "MessageFeatureModel",
-            featureSchema(
-                getModelReference(messageModel.modelId, publicApi.restApiId)
-            )
+            featureSchema(getModelReference(messageModel.modelId, publicApi.restApiId))
         );
         this.messagesGeoJsonModel = publicApi.addJsonModel(
             "MessagesGeoJSONModel",
-            geojsonSchema(
-                getModelReference(featureModel.modelId, publicApi.restApiId)
-            )
+            geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId))
         );
     }
 
@@ -97,20 +82,19 @@ export class PublicApi {
         const lambda = MonitoredDBFunction.create(stack, "get-permits-geojson");
 
         const integration = defaultIntegration(lambda, {
-            responses: [
-                DigitrafficIntegrationResponse.ok(
-                    MediaType.APPLICATION_GEOJSON
-                ),
-            ],
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)]
         });
 
         ["GET", "HEAD"].forEach((httpMethod) => {
             this.messagesGeojsonResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    DigitrafficMethodResponse.response200(this.messagesGeoJsonModel, MediaType.APPLICATION_JSON),
-                    DigitrafficMethodResponse.response500(Model.EMPTY_MODEL, MediaType.APPLICATION_JSON),
-                ],
+                    DigitrafficMethodResponse.response200(
+                        this.messagesGeoJsonModel,
+                        MediaType.APPLICATION_JSON
+                    ),
+                    DigitrafficMethodResponse.response500(Model.EMPTY_MODEL, MediaType.APPLICATION_JSON)
+                ]
             });
         });
     }
@@ -119,18 +103,19 @@ export class PublicApi {
         const lambda = MonitoredDBFunction.create(stack, "get-permits-datex2");
 
         const integration = defaultIntegration(lambda, {
-            responses: [
-                DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
-            ],
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)]
         });
 
         ["GET", "HEAD"].forEach((httpMethod) => {
             this.messagesD2LightResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                  DigitrafficMethodResponse.response200(this.messagesGeoJsonModel, MediaType.APPLICATION_JSON),
-                  DigitrafficMethodResponse.response500(Model.EMPTY_MODEL, MediaType.APPLICATION_JSON),
-                ],
+                    DigitrafficMethodResponse.response200(
+                        this.messagesGeoJsonModel,
+                        MediaType.APPLICATION_JSON
+                    ),
+                    DigitrafficMethodResponse.response500(Model.EMPTY_MODEL, MediaType.APPLICATION_JSON)
+                ]
             });
         });
     }

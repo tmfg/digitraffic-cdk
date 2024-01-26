@@ -1,9 +1,9 @@
 {
   "extends": "@rushstack/heft-jest-plugin/includes/jest-shared.config.json",
-  "maxWorkers": "1",
-  "roots": ["<rootDir>/lib"],
-  "testMatch": ["<rootDir>/lib/__test__/**/*.test.js"],
+  "roots": ["<rootDir>/lib/"],
+  "testMatch": ["<rootDir>/lib/__test__/**/*.test.[j]s"],
   "collectCoverage": true,
+  "maxWorkers": "1",
   "collectCoverageFrom": [
     "lib/**/*.js",
     "!lib/**/*.d.ts",
@@ -11,7 +11,10 @@
     "!lib/**/__test__/**",
     "!lib/**/__tests__/**",
     "!lib/**/__fixtures__/**",
-    "!lib/**/__mocks__/**"
+    "!lib/**/__mocks__/**",
+    "!lib/*.js",
+    "!lib/bin/**",
+    "!lib/canaries/**"
   ],
   "coveragePathIgnorePatterns": ["/node_modules/"],
   "coverageThreshold": {
@@ -21,5 +24,8 @@
       "lines": 50,
       "statements": 50
     }
+  },
+  "moduleNameMapper": {
+    "^axios$": "<rootDir>/node_modules/axios/dist/esm/axios.js"
   }
 }
