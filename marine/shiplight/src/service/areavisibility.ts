@@ -1,4 +1,4 @@
-import { AreaVisibilityApi } from "../api/areavisibility";
+import { type AreaVisibilityApi } from "../api/areavisibility.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 interface AreaVisibilityWrapper {

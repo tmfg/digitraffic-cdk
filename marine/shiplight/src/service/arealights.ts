@@ -1,5 +1,5 @@
-import { AreaLightsApi } from "../api/arealights";
-import { AreaTraffic } from "../model/areatraffic";
+import { type AreaLightsApi } from "../api/arealights.js";
+import type { AreaTraffic } from "../model/areatraffic.js";
 import { retry, RetryLogError } from "@digitraffic/common/dist/utils/retry";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

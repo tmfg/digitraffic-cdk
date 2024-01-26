@@ -1,7 +1,7 @@
-import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
-import * as AreaTrafficDb from "../db/areatraffic";
-import { DbAreaTraffic, DbAreaTrafficResult } from "../db/areatraffic";
-import { AreaTraffic } from "../model/areatraffic";
+import { type DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import * as AreaTrafficDb from "../db/areatraffic.js";
+import type { DbAreaTraffic, DbAreaTrafficResult } from "../db/areatraffic.js";
+import type { AreaTraffic } from "../model/areatraffic.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export async function updateAreaTrafficSendTime(areaId: number): Promise<unknown> {

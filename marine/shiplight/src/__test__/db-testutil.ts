@@ -1,6 +1,6 @@
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { ShipTypes } from "../lib/db/areatraffic";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { ShipTypes } from "../db/areatraffic.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(fn, truncate, "marine", "marine", "localhost:54321/marine");

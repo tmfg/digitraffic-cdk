@@ -1,5 +1,5 @@
-import { needToBrighten } from "../../lib/service/areatraffic";
-import { DbAreaTraffic } from "../../lib/db/areatraffic";
+import { needToBrighten } from "../../service/areatraffic.js";
+import type { DbAreaTraffic } from "../../db/areatraffic.js";
 
 describe("areatraffic service", () => {
     test("needToBrighten - never sent", () => {

@@ -1,22 +1,21 @@
-process.env.SECRET_ID = "TEST";
+process.env["SECRET_ID"] = "TEST";
 
-import { handlerFn } from "../../lib/lambda/update-lights/update-lights";
 import {
     assertArea,
     dbTestBase,
     insertAreaTraffic,
     insertVessel,
     insertVesselLocation
-} from "../db-testutil";
-import { ShiplightSecret } from "../../lib/model/shiplight-secret";
-import * as sinon from "sinon";
-import { AreaVisibilityService } from "../../lib/service/areavisibility";
-import { AreaVisibilityApi } from "../../lib/api/areavisibility";
-import { AreaLightsApi } from "../../lib/api/arealights";
-import { AreaLightsService } from "../../lib/service/arealights";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+} from "../db-testutil.js";
+import type { ShiplightSecret } from "../../model/shiplight-secret.js";
+import { AreaVisibilityService } from "../../service/areavisibility.js";
+import { AreaVisibilityApi } from "../../api/areavisibility.js";
+import { AreaLightsApi } from "../../api/arealights.js";
+import { AreaLightsService } from "../../service/arealights.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { jest } from "@jest/globals";
 
 const secret: ShiplightSecret = {
     lightsControlEndpointUrl: "test",
@@ -28,11 +27,11 @@ const secret: ShiplightSecret = {
 jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() => Promise.resolve());
 jest.spyOn(SecretHolder.prototype, "get").mockImplementation(() => Promise.resolve(secret));
 
+const { handlerFn } = await import("../../lambda/update-lights/update-lights.js");
+
 describe(
     "update-lights",
     dbTestBase((db: DTDatabase) => {
-        afterEach(() => sinon.verifyAndRestore());
-
         test("no areas", async () => {
             await handlerFn(AreaVisibilityService, AreaLightsService);
         });
@@ -41,18 +40,16 @@ describe(
             const durationInMinutes = 12;
             const areaId = 4;
             const visibilityInMeters = 1000;
-            sinon.stub(AreaVisibilityApi.prototype, "getVisibilityForArea").returns(
-                Promise.resolve({
-                    lastUpdated: new Date().toISOString(),
-                    visibilityInMeters
-                })
-            );
-            sinon.stub(AreaLightsApi.prototype, "updateLightsForArea").returns(
-                Promise.resolve({
-                    LightsSetSentFailed: [],
-                    LightsSetSentSuccessfully: []
-                })
-            );
+
+            jest.spyOn(AreaVisibilityApi.prototype, "getVisibilityForArea").mockResolvedValue({
+                lastUpdated: new Date().toISOString(),
+                visibilityInMeters
+            });
+            jest.spyOn(AreaLightsApi.prototype, "updateLightsForArea").mockResolvedValue({
+                LightsSetSentFailed: [],
+                LightsSetSentSuccessfully: []
+            });
+            
             await insertAreaTraffic(
                 db,
                 areaId,

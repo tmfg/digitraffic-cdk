@@ -1,10 +1,10 @@
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation } from "../db-testutil";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation } from "../db-testutil.js";
 import {
     getAreaTraffic,
     SHIP_SPEED_NOT_AVAILABLE,
     SHIP_SPEED_THRESHOLD_KNOTS
-} from "../../lib/db/areatraffic";
+} from "../../db/areatraffic.js";
 
 const OVER_MINIMUM_SPEED = SHIP_SPEED_THRESHOLD_KNOTS + 1;
 
@@ -27,8 +27,10 @@ describe(
             const traffic = await getAreaTraffic(db);
 
             expect(traffic).toHaveLength(1);
-            expect(traffic[0].ship_mmsi === mmsi);
-            expect(traffic[0].ship_name === shipName);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            expect(traffic[0]!.ship_mmsi === mmsi);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            expect(traffic[0]!.ship_name === shipName);
         });
 
         test("getAreaTraffic - two ships", async () => {
@@ -48,8 +50,10 @@ describe(
             // only return one area!
             expect(traffic).toHaveLength(1);
             // return only first ship in area by alphabetical order
-            expect(traffic[0].ship_name === shipName2);
-            expect(traffic[0].ship_mmsi === mmsi2);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            expect(traffic[0]!.ship_name === shipName2);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            expect(traffic[0]!.ship_mmsi === mmsi2);
         });
 
         test("getAreaTraffic - speed is equal to threshold - no traffic", async () => {

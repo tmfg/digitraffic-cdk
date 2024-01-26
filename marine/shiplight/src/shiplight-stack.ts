@@ -1,6 +1,6 @@
-import { Construct } from "constructs";
-import * as InternalLambdas from "./internal-lambdas";
-import { ShiplightProps } from "./app-props";
+import { type Construct } from "constructs";
+import * as InternalLambdas from "./internal-lambdas.js";
+import type { ShiplightProps } from "./app-props.js";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class ShiplightStack extends DigitrafficStack {
