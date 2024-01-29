@@ -22,8 +22,7 @@
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean",
-    "test_errors": "rushx test 2>&1 | grep 'FAIL'"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "3.499.0",
