@@ -1,3 +1,3 @@
 {
-  "app": "npx ts-node bin/variable-signs-app.ts"
+  "app": "node lib/bin/variable-signs-app.js"
 }

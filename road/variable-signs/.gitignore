@@ -12,13 +12,8 @@
 
 !/config/
 !/config/*.json
-!/lib/
-!/lib/**/
-!/lib/**/*.ts
-!/resources/
-!/resources/**/
-!/resources/**/*.json
-!/resources/**/*.xsd
-!/test/
-!/test/**/
-!/test/**/*.ts
+!/src/
+!/src/**/
+!/src/**/*.ts
+!/src/__test__/**/*.xml
+/src/bin

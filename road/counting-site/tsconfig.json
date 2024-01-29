@@ -1,15 +1,6 @@
 {
-  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-cdk-old.json",
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
   "compilerOptions": {
-    "outDir": "dist/out",
-    "resolveJsonModule": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": false,
-    "inlineSourceMap": false,
-    "inlineSources": false,
-    "strictPropertyInitialization": false,
-    "preserveSymlinks": true
-  },
-  "include": ["bin/**/*.ts", "lib/**/*.ts"]
+    "verbatimModuleSyntax": false
+  }
 }
