@@ -10,25 +10,25 @@ jobs:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Git config user
         uses: snow-actions/git-config-user@v1.0.0
         with:
           name: Digitraffic CI
           email: digitraffic@solita.fi
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Cache pnpm store cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
           path: |
             common/temp/pnpm-store
 
       - name: Cache rush build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-rush-build-${{ hashFiles('common/config/rush/repo-state.json') }}-${{ github.ref_name }}
           path: |
@@ -52,7 +52,7 @@ jobs:
         run: python ${{ env.CI_DIR }}/find-reports.py
 
       - name: Archive reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: reports
           path: ${{ github.ref_name }}/
@@ -61,10 +61,10 @@ jobs:
     needs: generate-reports
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download reports
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: reports
           path: ${{ github.ref_name }}/

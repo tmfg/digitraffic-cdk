@@ -9,7 +9,7 @@ jobs:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Git config user
@@ -17,12 +17,12 @@ jobs:
         with:
           name: digitraffic-ci
           email: digitraffic@solita.fi
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Cache pnpm store cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
           path: |
