@@ -11,7 +11,7 @@
     "build:watch": "heft build-watch --clean",
     "cdk": "npx cdk@latest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
-    "compile-lambdas": "esbuild src/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --target=node20",
+    "compile-lambdas": "esbuild src/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --target=node20 --log-level=error",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
