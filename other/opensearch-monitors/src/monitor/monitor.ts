@@ -1,5 +1,5 @@
-import { Query, Sort } from "./queries";
-import { OSTrigger } from "./triggers";
+import type { Query, Sort } from "./queries.js";
+import type { OSTrigger } from "./triggers.js";
 
 interface OSQueryData {
     readonly size?: number;

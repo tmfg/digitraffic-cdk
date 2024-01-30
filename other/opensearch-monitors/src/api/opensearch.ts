@@ -2,8 +2,8 @@ import { HttpRequest } from "@smithy/protocol-http";
 import { SignatureV4 } from "@smithy/signature-v4";
 import { Sha256 } from "@aws-crypto/sha256-browser";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
-import { AwsCredentialIdentity } from "@aws-sdk/types";
-import { OSMonitor, opensearchMonitor } from "../monitor/monitor";
+import type { AwsCredentialIdentity } from "@aws-sdk/types";
+import { type OSMonitor, opensearchMonitor } from "../monitor/monitor.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 

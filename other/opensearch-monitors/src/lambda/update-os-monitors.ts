@@ -1,13 +1,12 @@
-import { STS } from "aws-sdk";
-import { OpenSearch } from "../api/opensearch";
-import { AwsCredentialIdentity } from "@aws-sdk/types";
-import { AssumeRoleRequest } from "aws-sdk/clients/sts";
+import { OpenSearch } from "../api/opensearch.js";
+import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { readFileSync } from "node:fs";
-import { OSMonitor } from "../monitor/monitor";
+import type { OSMonitor } from "../monitor/monitor.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { EnvKeys } from "../env";
+import { EnvKeys } from "../env.js";
+import { STS, type AssumeRoleRequest } from "@aws-sdk/client-sts";
 
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
@@ -24,12 +23,14 @@ async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
 
     return await new Promise((resolve, reject) => {
         sts.assumeRole(roleToAssume, (err, data) => {
-            if (err || !data.Credentials) {
+            if (err || !data?.Credentials) {
                 reject(err);
             } else {
                 resolve({
-                    accessKeyId: data.Credentials.AccessKeyId,
-                    secretAccessKey: data.Credentials.SecretAccessKey,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    accessKeyId: data.Credentials.AccessKeyId!,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    secretAccessKey: data.Credentials.SecretAccessKey!,
                     sessionToken: data.Credentials.SessionToken
                 });
             }

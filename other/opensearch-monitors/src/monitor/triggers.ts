@@ -1,4 +1,4 @@
-import { sendSlackMessage, SlackEmoji, SlackMessage } from "./slack";
+import { sendSlackMessage, SlackEmoji, type SlackMessage } from "./slack.js";
 
 export interface OSAction {
     readonly destination: string;

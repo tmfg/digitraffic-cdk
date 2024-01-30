@@ -1,7 +1,7 @@
-import { OSLogField } from "./fields";
-import { OSMonitor } from "./monitor";
-import { BoolQuery, ExistsQuery, MatchPhraseQuery, Order, Query, RangeQuery, Sort } from "./queries";
-import { OSTrigger, triggerWhenLineCountOutside, triggerWhenLinesFound } from "./triggers";
+import type { OSLogField } from "./fields.js";
+import type { OSMonitor } from "./monitor.js";
+import type { BoolQuery, ExistsQuery, MatchPhraseQuery, Order, Query, RangeQuery, Sort } from "./queries.js";
+import { type OSTrigger, triggerWhenLineCountOutside, triggerWhenLinesFound } from "./triggers.js";
 
 export interface MonitorConfig {
     env: string;

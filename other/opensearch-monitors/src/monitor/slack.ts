@@ -1,4 +1,4 @@
-import { OSAction } from "./triggers";
+import type { OSAction } from "./triggers.js";
 
 export enum SlackEmoji {
     RED_CIRCLE = ":red_circle:",

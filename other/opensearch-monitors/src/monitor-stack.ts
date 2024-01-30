@@ -1,12 +1,12 @@
-import { Duration, Environment, Stack } from "aws-cdk-lib";
-import { ISecurityGroup, IVpc, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
+import { Duration, type Environment, Stack } from "aws-cdk-lib";
+import { type ISecurityGroup, type IVpc, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
 import { TriggerFunction } from "aws-cdk-lib/triggers";
-import { Construct } from "constructs";
-import { OSMonitor } from "./monitor/monitor";
+import type { Construct } from "constructs";
+import type { OSMonitor } from "./monitor/monitor.js";
 import { writeFileSync } from "node:fs";
-import { EnvKeys } from "./env";
+import { EnvKeys } from "./env.js";
 
 export interface OSMonitorsConfiguration {
     /** account */
