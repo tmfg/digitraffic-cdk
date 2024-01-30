@@ -9,7 +9,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 const IMPLEMENTATION_LAST_MODIFIED = new Date("2022-11-24T00:00:00Z");
 export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
     const text = event["text"]!;
 
     try {

@@ -7,6 +7,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 const proxyHolder = ProxyHolder.create();
 
 export const handler = (event: Record<string, string>): Promise<StatusCodeValue> => {
+    // eslint-disable-next-line dot-notation
     const jsonData = event["body"];
     const start = Date.now();
 
