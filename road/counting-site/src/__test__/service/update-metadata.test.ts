@@ -1,7 +1,6 @@
 import { updateMetadataForDomain } from "../../service/update.js";
 import { dbTestBase, insertCounter, insertDomain } from "../db-testutil.js";
 import * as CounterDAO from "../../dao/counter.js";
-import { URL_ALL_SITES } from "../../api/eco-counter.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { DbCounter } from "../../model/counter.js";
 import { jest } from "@jest/globals";

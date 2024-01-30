@@ -8,6 +8,7 @@ const proxyHolder = ProxyHolder.create();
 
 export const handler = (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
+    // eslint-disable-next-line dot-notation
     const domainName = event["domainName"];
 
     return proxyHolder

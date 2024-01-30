@@ -57,9 +57,9 @@ describe(
             const [counters, lastModified] = await CountingSitesService.findCounters("", 1);
 
             expect(counters.features).toHaveLength(1);
-             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
             expect(counters.features[0]!.properties?.["id"]).toBe(1);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
             expect(counters.features[0]!.properties?.["interval"]).toBe(15);
             expect(lastModified.getTime()).toBeCloseTo(Date.now(), -4); // max 5 s diff
         });
@@ -101,7 +101,7 @@ describe(
             // one counter on domain2
             const [counters2, lastModified2] = await CountingSitesService.findCounters(DOMAIN2);
             expect(counters2.features).toHaveLength(1);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
             expect((counters2.features[0]!.properties?.["lastDataTimestamp"] as string).toString()).toMatch(
                 new RegExp("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})Z")
             );

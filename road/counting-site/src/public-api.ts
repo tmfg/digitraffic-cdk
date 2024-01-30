@@ -17,21 +17,21 @@ const COUNTING_SITE_TAGS_V1 = ["Counting site V1"];
 export class PublicApi {
     publicApi: DigitrafficRestApi;
 
-    valuesResource: Resource;
-    csvValuesResource: Resource;
-    countersResource: Resource;
-    counterResource: Resource;
+    valuesResource!: Resource;
+    csvValuesResource!: Resource;
+    countersResource!: Resource;
+    counterResource!: Resource;
 
-    userTypesResource: Resource;
-    domainsResource: Resource;
-    directionsResource: Resource;
+    userTypesResource!: Resource;
+    domainsResource!: Resource;
+    directionsResource!: Resource;
 
-    userTypesResponseModel: Model;
-    domainsResponseModel: Model;
-    directionsResponseModel: Model;
-    jsonValuesResponseModel: Model;
-    geoJsonResponseModel: Model;
-    csvValuesResponseModel: Model;
+    userTypesResponseModel!: Model;
+    domainsResponseModel!: Model;
+    directionsResponseModel!: Model;
+    jsonValuesResponseModel!: Model;
+    geoJsonResponseModel!: Model;
+    csvValuesResponseModel!: Model;
 
     constructor(stack: DigitrafficStack) {
         this.publicApi = new DigitrafficRestApi(stack, "CountingSite-public", "Counting Site Public API");

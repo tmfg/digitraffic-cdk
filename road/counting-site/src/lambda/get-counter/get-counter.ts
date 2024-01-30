@@ -10,8 +10,10 @@ const proxyHolder = ProxyHolder.create();
 // TODO: API v2: return only Feature not featureCollection
 export const handler = (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
+    // eslint-disable-next-line dot-notation
     const counterId = Number.parseInt(event["counterId"] ?? "");
 
+    // eslint-disable-next-line dot-notation
     if (Number.isNaN(counterId) || String(counterId) !== event["counterId"]) {
         return Promise.resolve(LambdaResponse.notFound().withTimestamp(EPOCH));
     }

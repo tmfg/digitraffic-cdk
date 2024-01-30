@@ -14,10 +14,6 @@ describe(
     dbTestBase((db: DTDatabase) => {
         const EMPTY_DATA: ApiData[] = [];
 
-        function mockApiResponse(response: ApiData[]) {
-            return jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(response);
-        }
-
         async function assertDataInDb(expected: number, counterId: string): Promise<void> {
             const [data, lastModified] = await DataDAO.findValues(db, 2015, 9, counterId, "");
             expect(data).toHaveLength(expected);
@@ -26,7 +22,7 @@ describe(
 
         test("updateDataForDomain - no counters", async () => {
             await insertDomain(db, DOMAIN_NAME);
-            const counterApiResponse = mockApiResponse(EMPTY_DATA);
+            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(EMPTY_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 
@@ -36,7 +32,7 @@ describe(
         test("updateDataForDomain - one counter no data", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
-            const counterApiResponse = mockApiResponse(EMPTY_DATA);
+            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(EMPTY_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 
@@ -55,7 +51,7 @@ describe(
         test("updateDataForDomain - one counter and data", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
-            const counterApiResponse = mockApiResponse(RESPONSE_DATA);
+            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 
@@ -67,7 +63,7 @@ describe(
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await db.any("update counting_site_counter set last_data_timestamp=now() - interval '7 days'");
-            const counterApiResponse = mockApiResponse(RESPONSE_DATA);
+            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 
@@ -79,7 +75,7 @@ describe(
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await db.any("update counting_site_counter set last_data_timestamp=now()");
-            const counterApiResponse = mockApiResponse(RESPONSE_DATA);
+            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 

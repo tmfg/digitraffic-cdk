@@ -1,3 +1,4 @@
+// eslint-disable-next-line dot-notation
 process.env["SECRET_ID"] = "TEST";
 
 import {
