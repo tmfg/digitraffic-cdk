@@ -15,6 +15,7 @@ export const handler: () => Promise<string> = async () => {
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
         GeoJsonChecker.validFeatureCollection((json: FeatureCollection) => {
             Asserter.assertLengthGreaterThan(json.features, 1);
+            // eslint-disable-next-line dot-notation
             Asserter.assertGreaterThan(json.features[0]?.properties?.["id"] as number, 0);
         })
     );

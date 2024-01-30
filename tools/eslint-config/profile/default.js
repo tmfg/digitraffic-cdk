@@ -92,7 +92,9 @@ module.exports = {
                 // old way
                 "*-stack.ts",
                 "*-api.ts",
-                "internal-*.ts"
+                "*-app.ts",
+                "internal-*.ts",
+                "canaries.ts"
             ],
             rules: {
                 "no-new": "off"

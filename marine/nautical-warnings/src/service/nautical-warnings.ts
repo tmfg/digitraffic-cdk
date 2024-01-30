@@ -79,6 +79,7 @@ function validateAndUpdate(
         const fc = convertFeatureCollection(featureCollection);
         const lastModified = fc.features
             .map((f) =>
+            // eslint-disable-next-line dot-notation
                 getMaxDate(f.properties?.["publishingTime"] as Date, f.properties?.["creationTime"] as Date)
             )
             .reduce((a, b) => (a > b ? a : b), EPOCH);
