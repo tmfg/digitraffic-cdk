@@ -21,7 +21,6 @@ const EMPTY_FEATURECOLLECTION_FI: FeatureCollection = {
     type: "FeatureCollection"
 };
 
-// eslint-disable-next-line @rushstack/hoist-jest-mock
 jest.unstable_mockModule("../../service/faults.js", () => ({
     findAllFaults: jest.fn((language: Language) => {
         if (language === Language.FI) {

@@ -19,6 +19,7 @@ export function create(stack: DigitrafficStack, s124Queue: Queue): void {
     // set response for missing auth token to 501 as desired by API registrar
     //setReturnCodeForMissingAuthenticationToken(501, 'Not implemented', integrationApi, stack);
 
+    // eslint-disable-next-line deprecation/deprecation
     createUsagePlan(integrationApi, "ATON Faults CloudFront API Key", "ATON Faults CloudFront Usage Plan");
     const messageResponseModel = integrationApi.addModel("MessageResponseModel", MessageModel);
     createUploadVoyagePlanHandler(stack, messageResponseModel, s124Queue, integrationApi);
@@ -52,6 +53,7 @@ function createIntegrationResource(
     resource: Resource,
     handler: MonitoredFunction
 ): void {
+    // eslint-disable-next-line deprecation/deprecation
     const integration = defaultIntegration(handler, {
         passthroughBehavior: PassthroughBehavior.NEVER,
         disableCors: true,

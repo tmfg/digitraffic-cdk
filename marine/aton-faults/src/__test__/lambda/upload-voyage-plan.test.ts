@@ -23,13 +23,12 @@ import { SQS } from "@aws-sdk/client-sqs";
 const { handler }  = await import("../../lambda/upload-voyage-plan/upload-voyage-plan.js");
 
 // mock SecretHolder & SQS
-const sendStub = jest.fn(() => Promise.resolve());
 jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue(TEST_ATON_SECRET);
-jest.spyOn(SQS.prototype, "sendMessage").mockImplementation(sendStub);
+const sendStub = jest.spyOn(SQS.prototype, "sendMessage").mockReturnValue();
 
 describe(
     "upload-voyage-plan",
-    dbTestBase(async (db: DTDatabase) => {
+    dbTestBase((db: DTDatabase) => {
         test("publishes to SNS per fault id", async () => {
             const fault1 = newFaultWithGeometry(60.285807, 27.321659);
             const fault2 = newFaultWithGeometry(60.285817, 27.32166);
