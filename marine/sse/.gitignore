@@ -11,12 +11,11 @@
 !/*.sh
 
 !/config/
-!/config/*.json
-!/lib/
-!/lib/**/
-!/lib/**/*.ts
-!/lib/schemas/*.json
+!/config/**/
+!/config/**/*.json
+!/src/
+!/src/**/
+!/src/**/*.ts
+!/src/schemas/*.json
 /lib/generated
-!/test/
-!/test/**/
-!/test/**/*.ts
+/src/bin

@@ -10,7 +10,7 @@ interface MysqlOpts {
     database: string;
 }
 
-export enum DatabaseEnvironmentKeys {
+export enum DatabaseEnvironpmentKeys {
     DB_USER = "DB_USER",
     DB_PASS = "DB_PASS",
     DB_URI = "DB_URI",

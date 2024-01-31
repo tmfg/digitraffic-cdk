@@ -7,7 +7,7 @@ module.exports = {
             rules: {
                 // DT rules
                 "deprecation/deprecation": "warn",
-                "@typescript-eslint/no-non-null-assertion": "error",
+                "@typescript-eslint/no-non-null-assertion": "off",
                 "@typescript-eslint/non-nullable-type-assertion-style": "error",
                 "@typescript-eslint/no-explicit-any": "error",
 
