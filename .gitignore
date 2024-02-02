@@ -40,6 +40,8 @@
 !rail/*/
 !road/
 !road/*/
+!template/
+!template/esm/
 
 # Github
 !.github/
