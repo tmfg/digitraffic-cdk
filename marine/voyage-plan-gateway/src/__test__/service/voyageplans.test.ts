@@ -1,7 +1,7 @@
-import * as VoyagePlansService from "../../lib/service/voyageplans";
+import * as VoyagePlansService from "../../service/voyageplans.js";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { subMinutes, subDays, addHours } from "date-fns";
-import { ValidationError } from "../../lib/service/voyageplans";
+import { ValidationError } from "../../service/voyageplans.js";
 
 describe("voyageplans service", () => {
     function assertValidationError(validationErrors: ValidationError[], expected: ValidationError): void {

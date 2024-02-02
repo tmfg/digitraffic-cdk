@@ -2,28 +2,29 @@ import {
     EndpointType,
     LambdaIntegration,
     MethodLoggingLevel,
-    Resource,
+    type Resource,
     RestApi
 } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode } from "aws-cdk-lib/aws-lambda";
-import { Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { defaultLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import { VoyagePlanGatewayProps } from "./app-props";
-import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import type { VoyagePlanGatewayProps } from "./app-props.js";
+import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import {
     add404Support,
     createDefaultPolicyDocument
 } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { VoyagePlanEnvKeys } from "./keys";
+import { VoyagePlanEnvKeys } from "./keys.js";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export function create(secret: ISecret, props: VoyagePlanGatewayProps, stack: DigitrafficStack): void {
     const api = createRestApi(stack, "VPGW-Public", "VPGW public API");
 
     const resource = api.root.addResource("temp").addResource("schedules");
+    // eslint-disable-next-line deprecation/deprecation
     createUsagePlan(api, "VPGW Public CloudFront API Key", "VPGW Public CloudFront Usage Plan");
     createVtsProxyHandler(stack, resource, secret, props);
 }

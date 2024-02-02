@@ -1,7 +1,7 @@
 import axios from "axios";
-import { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
+import type { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 interface VoyagePlanSecret extends GenericSecret {
     readonly "vpgw.schedulesAccessToken": string;
@@ -12,7 +12,8 @@ const secretHolder = SecretHolder.create<VoyagePlanSecret>();
 
 export function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> {
     return secretHolder.get().then(async (secret: VoyagePlanSecret) => {
-        if (event.queryStringParameters.auth !== secret["vpgw.schedulesAccessToken"]) {
+        // eslint-disable-next-line dot-notation
+        if (event.queryStringParameters["auth"] !== secret["vpgw.schedulesAccessToken"]) {
             return {
                 statusCode: 403,
                 body: "Denied"
@@ -20,9 +21,12 @@ export function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaResponse>
         }
 
         let url = secret["vpgw.schedulesUrl"];
-        if (event.queryStringParameters.direction) {
-            if (["east", "west"].includes(event.queryStringParameters.direction)) {
-                url += "/" + event.queryStringParameters.direction;
+        // eslint-disable-next-line dot-notation
+        if (event.queryStringParameters["direction"]) {
+            // eslint-disable-next-line dot-notation
+            if (["east", "west"].includes(event.queryStringParameters["direction"])) {
+                // eslint-disable-next-line dot-notation
+                url += "/" + event.queryStringParameters["direction"];
             } else {
                 return {
                     statusCode: 400,
@@ -31,7 +35,8 @@ export function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaResponse>
             }
         }
 
-        const calculated = event.queryStringParameters.calculated === "true";
+        // eslint-disable-next-line dot-notation
+        const calculated = event.queryStringParameters["calculated"] === "true";
         if (calculated) {
             url += "/calculated";
         }

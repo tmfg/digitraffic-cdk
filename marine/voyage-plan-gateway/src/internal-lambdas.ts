@@ -1,18 +1,18 @@
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
-import { Duration, Stack } from "aws-cdk-lib";
+import { Duration, type Stack } from "aws-cdk-lib";
 import {
     defaultLambdaConfiguration,
-    LambdaEnvironment
+    type LambdaEnvironment
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import {
     createSubscription,
     DigitrafficLogSubscriptions
 } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { Topic } from "aws-cdk-lib/aws-sns";
+import type { Topic } from "aws-cdk-lib/aws-sns";
 import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import { VoyagePlanGatewayProps } from "./app-props";
-import { VoyagePlanEnvKeys } from "./keys";
+import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import type { VoyagePlanGatewayProps } from "./app-props.js";
+import { VoyagePlanEnvKeys } from "./keys.js";
 import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
@@ -23,7 +23,7 @@ import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export function create(
     secret: ISecret,
@@ -148,7 +148,6 @@ function createUploadVoyagePlanLambda(
     );
     rtzBucket.grantPut(lambda);
 
-    // eslint-disable-next-line no-new
     new DigitrafficLogSubscriptions(stack, lambda);
 }
 

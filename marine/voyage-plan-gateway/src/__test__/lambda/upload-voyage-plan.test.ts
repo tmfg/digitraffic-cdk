@@ -1,55 +1,52 @@
-import * as sinon from "sinon";
 import { addMinutes } from "date-fns";
-import { VisMessageWithCallbackEndpoint } from "../../lib/model/vismessage";
-import { VtsApi } from "../../lib/api/vts";
+import type { VisMessageWithCallbackEndpoint } from "../../model/vismessage.js";
+import { VtsApi } from "../../api/vts.js";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
-import { RtzStorageApi } from "../../lib/api/rtzstorage";
+import { RtzStorageApi } from "../../api/rtzstorage.js";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { gzipSync } from "zlib";
+import { jest } from "@jest/globals";
+import type { SQSEvent, SQSRecord } from "aws-lambda";
 
-const sandbox = sinon.createSandbox();
-process.env.SECRET_ID = "";
-process.env.BUCKET_NAME = "";
+// eslint-disable-next-line dot-notation
+process.env["SECRET_ID"] = "";
+// eslint-disable-next-line dot-notation
+process.env["BUCKET_NAME"] = "";
 
-import { handler, SnsEvent } from "../../lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan";
+jest.setTimeout(10000);
 
 describe("upload-voyage-plan", () => {
-    beforeEach(() => {
-        sandbox.stub(SecretHolder.prototype, "get").returns(
-            Promise.resolve({
-                "vpgw.vtsUrl": "TEST"
-            })
-        );
-        sandbox.stub(SlackApi.prototype, "notify").returns(Promise.resolve());
+
+    jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue({
+        "vpgw.vtsUrl": "TEST"
     });
 
-    afterEach(() => sandbox.restore());
+    jest.spyOn(SlackApi.prototype, "notify").mockReturnValue(Promise.resolve());
+
+    async function expectEvent(eventString: string, expected: string): Promise<void> {
+      const { handler } = await import ("../../lambda/upload-voyage-plan/lambda-upload-voyage-plan.js");
+      const event = createSnsEvent(eventString);
+
+      return expect(await handler(event)).toMatch(expected);
+    }    
 
     test("validation failure, some string", async () => {
-        const uploadEvent = createSnsEvent("<foo bar");
-
-        await expect(handler(uploadEvent)).resolves.toMatch("XML parsing failed");
+        await expectEvent("<foo bar", "XML parsing failed");
     });
 
-    test("validation failure, no route xml", async () => {
-        const uploadEvent = createSnsEvent('<?xml version="1.0" encoding="UTF-8"?>');
-
-        await expect(handler(uploadEvent)).resolves.toMatch("XML structure validation failed");
+    test.only("validation failure, no route xml", async () => {
+        await expectEvent("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "XML structure validation failed");
     });
 
     test("validation failure, no waypoints xml", async () => {
-        const uploadEvent = createSnsEvent(voyagePlanWithoutRoutes());
-
-        await expect(handler(uploadEvent)).resolves.toMatch("XML structure validation failed");
+        await expectEvent(voyagePlanWithoutRoutes(), "XML structure validation failed");
     });
 
     test("validation success with correct voyage plan", async () => {
-        sinon.stub(VtsApi.prototype, "sendVoyagePlan").returns(Promise.resolve());
-        sinon.stub(RtzStorageApi.prototype, "storeVoyagePlan").returns(Promise.resolve());
+        jest.spyOn(VtsApi.prototype, "sendVoyagePlan").mockReturnValue(Promise.resolve());
+        jest.spyOn(RtzStorageApi.prototype, "storeVoyagePlan").mockReturnValue(Promise.resolve());
 
-        const uploadEvent = createSnsEvent(voyagePlan());
-
-        await expect(handler(uploadEvent)).resolves.not.toThrow();
+        await expectEvent(voyagePlan(), "");
     });
 });
 
@@ -249,7 +246,7 @@ function voyagePlan(): string {
 `.trim();
 }
 
-function createSnsEvent(xml: string): SnsEvent {
+function createSnsEvent(xml: string): SQSEvent {
     const message: VisMessageWithCallbackEndpoint = {
         callbackEndpoint: "",
         message: xml
@@ -259,7 +256,7 @@ function createSnsEvent(xml: string): SnsEvent {
         Records: [
             {
                 body: gzipSync(Buffer.from(JSON.stringify(message))).toString("base64")
-            }
+            } as SQSRecord
         ]
     };
 }

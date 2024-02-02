@@ -2,22 +2,21 @@ import {
     GatewayResponse,
     LambdaIntegration,
     PassthroughBehavior,
-    Resource,
+    type Resource,
     ResponseType
 } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode } from "aws-cdk-lib/aws-lambda";
-import { Stack } from "aws-cdk-lib";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { defaultLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { VoyagePlanEnvKeys } from "./keys";
-import { VoyagePlanGatewayProps } from "./app-props";
-import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { VoyagePlanEnvKeys } from "./keys.js";
+import type { VoyagePlanGatewayProps } from "./app-props.js";
+import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { Topic } from "aws-cdk-lib/aws-sns";
+import type { Topic } from "aws-cdk-lib/aws-sns";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
 export function create(
     secret: ISecret,
@@ -35,6 +34,7 @@ export function create(
             "application/json": "Not implemented"
         }
     });
+    // eslint-disable-next-line deprecation/deprecation
     createUsagePlan(integrationApi, "VPGW CloudFront API Key", "VPGW Faults CloudFront Usage Plan");
     const resource = integrationApi.root.addResource("vpgw");
     createNotifyHandler(secret, stack, notifyTopic, resource, props);
@@ -50,13 +50,10 @@ function createNotifyHandler(
     const handler = createHandler(stack, notifyTopic, props);
     secret.grantRead(handler);
     const resource = api.addResource("notify");
-    createIntegrationResource(stack, secret, props, resource, handler);
+    createIntegrationResource(resource, handler);
 }
 
 function createIntegrationResource(
-    stack: Stack,
-    secret: ISecret,
-    props: VoyagePlanGatewayProps,
     resource: Resource,
     handler: MonitoredFunction
 ): void {

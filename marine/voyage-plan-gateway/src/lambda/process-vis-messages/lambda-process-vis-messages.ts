@@ -1,12 +1,12 @@
-import { SQS } from "aws-sdk";
-import { VoyagePlanEnvKeys, VoyagePlanSecretKeys } from "../../keys";
-import * as VisApi from "../../api/vis";
-import { VisMessageType } from "../../api/vis";
-import { VisMessageWithCallbackEndpoint } from "../../model/vismessage";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { VoyagePlanEnvKeys, VoyagePlanSecretKeys } from "../../keys.js";
+import * as VisApi from "../../api/vis.js";
+import { VisMessageType } from "../../api/vis.js";
+import type { VisMessageWithCallbackEndpoint } from "../../model/vismessage.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { gzipSync } from "zlib";
 import { createHash } from "crypto";
 
@@ -21,7 +21,7 @@ const queueUrl = getEnvVariable(VoyagePlanEnvKeys.QUEUE_URL);
 
 const MessageGroupId = "VPGW-MessageGroupId" as const;
 
-const sqs = new SQS();
+const sqs = new SQSClient();
 
 export function handler(): Promise<void> {
     return secretHolder.get().then(async (secret: VoyagePlanSecret) => {
@@ -67,15 +67,13 @@ export function handler(): Promise<void> {
             };
             // gzip data to avoid SQS 256 KB limit
             const gzippedMessage: Buffer = gzipSync(Buffer.from(JSON.stringify(message), "utf-8"));
-            await sqs
-                .sendMessage({
+            await sqs.send(new SendMessageCommand({
                     QueueUrl: queueUrl,
                     // SQS only allows character data so the message must also be base64 encoded
                     MessageBody: gzippedMessage.toString("base64"),
                     MessageGroupId,
                     MessageDeduplicationId: createRtzHash(routeMessage.stmMessage.message)
-                })
-                .promise();
+                }));
         }
     });
 }
