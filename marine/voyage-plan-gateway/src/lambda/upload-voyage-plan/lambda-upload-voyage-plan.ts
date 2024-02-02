@@ -1,27 +1,22 @@
 import * as util from "util";
 import * as xml2js from "xml2js";
-import { VoyagePlanEnvKeys } from "../../keys";
-import * as VoyagePlansService from "../../service/voyageplans";
-import { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
-import { VisMessageWithCallbackEndpoint } from "../../model/vismessage";
-import { VtsApi } from "../../api/vts";
+import { VoyagePlanEnvKeys } from "../../keys.js";
+import * as VoyagePlansService from "../../service/voyageplans.js";
+import type { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
+import type { VisMessageWithCallbackEndpoint } from "../../model/vismessage.js";
+import { VtsApi } from "../../api/vts.js";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
-import { RtzStorageApi } from "../../api/rtzstorage";
+import { RtzStorageApi } from "../../api/rtzstorage.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { gunzipSync } from "zlib";
+import type { SQSEvent } from "aws-lambda";
 
 interface VoyagePlanSecret extends GenericSecret {
     readonly "vpgw.vtsUrl": string;
     readonly "vpgw.slackUrl": string;
-}
-
-export interface SnsEvent {
-    readonly Records: {
-        readonly body: string;
-    }[];
 }
 
 const secretHolder = SecretHolder.create<VoyagePlanSecret>();
@@ -34,7 +29,7 @@ let rtzStorageApi: RtzStorageApi | undefined;
 /**
  * XML parsing and validation errors do not throw an error. This is to remove invalid messages from the queue.
  */
-export function handler(event: SnsEvent): Promise<string> {
+export function handler(event: SQSEvent): Promise<string> {
     return secretHolder.get().then(async (secret: VoyagePlanSecret) => {
         if (event.Records.length > 1) {
             logger.error({
@@ -45,7 +40,8 @@ export function handler(event: SnsEvent): Promise<string> {
         }
 
         // base64 decode message
-        const base64EventBody = Buffer.from(event.Records[0].body, "base64");
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const base64EventBody = Buffer.from(event.Records[0]!.body, "base64");
         const gunzippedEventBody: Buffer = gunzipSync(base64EventBody);
         const visMessage = JSON.parse(gunzippedEventBody.toString("utf-8")) as VisMessageWithCallbackEndpoint;
 

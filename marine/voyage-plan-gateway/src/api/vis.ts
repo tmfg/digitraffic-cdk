@@ -1,5 +1,5 @@
 import axios from "axios";
-import { generateHmacAuthorizationHeader } from "../service/authentication";
+import { generateHmacAuthorizationHeader } from "../service/authentication.js";
 
 export enum VisMessageType {
     RTZ = "RTZ",

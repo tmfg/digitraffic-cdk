@@ -1,8 +1,8 @@
-import { Construct } from "constructs";
-import * as IntegrationApi from "./integration-api";
-import * as InternalLambdas from "./internal-lambdas";
-import * as PublicApi from "./public-api";
-import { VoyagePlanGatewayProps } from "./app-props";
+import type { Construct } from "constructs";
+import * as IntegrationApi from "./integration-api.js";
+import * as InternalLambdas from "./internal-lambdas.js";
+import * as PublicApi from "./public-api.js";
+import type { VoyagePlanGatewayProps } from "./app-props.js";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";

@@ -1,4 +1,4 @@
-import { HmacSHA256, enc } from "crypto-js";
+import { createHmac } from "node:crypto";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -29,8 +29,13 @@ export function generateHmacAuthorizationHeader(url: string, appId: string, apiK
     const encodedUrl = encodeURIComponent(url).toLowerCase();
     const requestTimestamp = Math.trunc(new Date().getTime() / 1000);
     const signatureRaw = `${appId}GET${encodedUrl}${requestTimestamp}${nonce}`;
-    const hash = HmacSHA256(signatureRaw, apiKey);
-    const signature = hash.toString(enc.Base64);
+
+    const signature = createHmac("sha256", apiKey)
+        .update(signatureRaw)
+        .digest("base64");
+
+//    const hash = HmacSHA256(signatureRaw, apiKey);
+//    const signature = hash.toString(CryptoJS.enc.Base64);
 
     return `amx ${appId}:${signature}:${nonce}:${requestTimestamp}`;
 }

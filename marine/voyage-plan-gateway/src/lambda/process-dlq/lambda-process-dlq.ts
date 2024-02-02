@@ -1,8 +1,8 @@
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
-import { VoyagePlanEnvKeys } from "../../keys";
+import { VoyagePlanEnvKeys } from "../../keys.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { SQSEvent, SQSRecord } from "aws-lambda";
+import type { SQSEvent, SQSRecord } from "aws-lambda";
 
 const bucketName = getEnvVariable(VoyagePlanEnvKeys.BUCKET_NAME);
 
