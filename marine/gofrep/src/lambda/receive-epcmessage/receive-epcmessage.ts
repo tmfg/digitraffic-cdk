@@ -1,6 +1,6 @@
-import * as EpcMessageService from "../../service/epcmessage";
-import { EpcMessage } from "../../model/epcmessage";
-import { EpcMessageResponse } from "../../model/epcmessage_response";
+import * as EpcMessageService from "../../service/epcmessage.js";
+import type { EpcMessage } from "../../model/epcmessage.js";
+import type { EpcMessageResponse } from "../../model/epcmessage_response.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export function handler(epcMessage: EpcMessage): string | EpcMessageResponse {

@@ -1,5 +1,5 @@
-import * as EpcMessageService from "../../lib/service/epcmessage";
-import { EpcMessage } from "../../lib/model/epcmessage";
+import * as EpcMessageService from "../../service/epcmessage.js";
+import type { EpcMessage } from "../../model/epcmessage.js";
 
 describe("epcmessage service", () => {
     test("createEpcMessageResponse", () => {

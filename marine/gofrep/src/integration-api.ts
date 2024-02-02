@@ -1,19 +1,19 @@
 import {
     EndpointType,
-    IModel,
+    type IModel,
     MethodLoggingLevel,
     MockIntegration,
     PassthroughBehavior,
-    Resource,
+    type Resource,
     RestApi
 } from "aws-cdk-lib/aws-apigateway";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import {
     add404Support,
     createDefaultPolicyDocument
 } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { FormalityResponseJson } from "./model/formality";
+import { FormalityResponseJson } from "./model/formality.js";
 import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import {
@@ -26,9 +26,9 @@ import {
 import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { MessageModel, DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { EpcMessageSchema } from "./model/epcmessage_schema";
+import { EpcMessageSchema } from "./model/epcmessage_schema.js";
 
 export function create(stack: DigitrafficStack, apikey: string): void {
     const api = createRestApi(stack, "GOFREP-Public", "GOFREP public API");
@@ -105,6 +105,7 @@ function createReceiveMrsReportResource(
     );
     createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
 
+    // eslint-disable-next-line deprecation/deprecation
     const integration = defaultIntegration(handler, {
         passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
         disableCors: true,
