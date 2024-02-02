@@ -1,4 +1,3 @@
 {
-  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
-  "include": ["bin/**/*.ts", "lib/**/*.ts"]
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json"
 }
