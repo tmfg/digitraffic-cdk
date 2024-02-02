@@ -1,8 +1,8 @@
-import { DBConfiguration } from "./app-props";
-import { Stack } from "aws-cdk-lib";
+import type { DBConfiguration } from "./app-props.js";
+import type { Stack } from "aws-cdk-lib";
 import { CfnEventSubscription, DatabaseCluster, DatabaseClusterEngine } from "aws-cdk-lib/aws-rds";
-import { Topic } from "aws-cdk-lib/aws-sns";
-import { Alarm, ComparisonOperator, Metric } from "aws-cdk-lib/aws-cloudwatch";
+import type { Topic } from "aws-cdk-lib/aws-sns";
+import { Alarm, ComparisonOperator, type Metric } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 
 export class RdsMonitoring {

@@ -1,8 +1,8 @@
-import { Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
 import { Rule } from "aws-cdk-lib/aws-events";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
-import { Topic } from "aws-cdk-lib/aws-sns";
-import { Route53Configuration } from "./app-props";
+import type { Topic } from "aws-cdk-lib/aws-sns";
+import type { Route53Configuration } from "./app-props.js";
 
 export class Route53Monitoring {
     constructor(stack: Stack, alarmsTopic: Topic, config: Route53Configuration) {

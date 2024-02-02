@@ -1,9 +1,9 @@
 import { CfnAlarm } from "aws-cdk-lib/aws-cloudwatch";
 import { Rule, RuleTargetInput } from "aws-cdk-lib/aws-events";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
-import { Topic } from "aws-cdk-lib/aws-sns";
-import { Stack } from "aws-cdk-lib/core/lib/stack";
-import { CloudfrontConfiguration } from "./app-props";
+import type { Topic } from "aws-cdk-lib/aws-sns";
+import type { CloudfrontConfiguration } from "./app-props.js";
+import type { Stack } from "aws-cdk-lib";
 
 export class CloudfrontMonitoring {
     constructor(stack: Stack, alarmsTopic: Topic, config: CloudfrontConfiguration) {

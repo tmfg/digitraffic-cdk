@@ -2,13 +2,13 @@ import { Aspects, Stack } from "aws-cdk-lib";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { EmailSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
 import { Effect, PolicyStatement, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { MonitoringConfiguration } from "./app-props";
+import type { MonitoringConfiguration } from "./app-props.js";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { Construct } from "constructs";
-import { RdsMonitoring } from "./rds-monitoring";
+import type { Construct } from "constructs";
+import { RdsMonitoring } from "./rds-monitoring.js";
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { RegionMonitoringStack } from "./region-monitoring-stack";
+import { RegionMonitoringStack } from "./region-monitoring-stack.js";
 
 export class MonitoringStack extends Stack {
     constructor(scope: Construct, id: string, configuration: MonitoringConfiguration) {
