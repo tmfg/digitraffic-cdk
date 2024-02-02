@@ -2,23 +2,26 @@
   "name": "open311-cdk",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc && npm run postbuild",
-    "postbuild": "esbuild lib/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node20",
+    "build": "heft build --clean && npm run postbuild",
+    "postbuild": "npm run compile-lambdas",
+    "build:watch": "heft build-watch --clean",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node20",
     "cdk": "npx cdk@latest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
-    "clean": "rimraf dist cdk.out",
-    "clean:force": "rimraf dist cdk.out node_modules",
+    "clean": "rimraf dist lib cdk.out",
+    "clean:force": "rimraf dist lib cdk.out node_modules",
+    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node20",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "jest --runInBand --detectOpenHandles",
-    "watch": "tsc -w"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean --max-workers=1"
   },
   "dependencies": {
     "@digitraffic/common": "2024.1.30-1",
     "aws-cdk-lib": "~2.118.0",
+    "aws-sdk": "~2.1531.0",
     "axios": "^1.6.5",
     "constructs": "10.3.0",
     "pg-native": "^3.0.1",
@@ -28,10 +31,15 @@
     "xml2js": "0.6.2"
   },
   "devDependencies": {
+    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.5.1",
+    "@jest/globals": "29.7.0",
+    "@rushstack/eslint-config": "^3.6.1",
+    "@rushstack/heft": "^0.64.2",
+    "@rushstack/heft-jest-plugin": "^0.11.2",
     "@types/aws-lambda": "8.10.131",
+    "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.11",
     "@types/node": "20.10.7",
     "@types/sinon": "17.0.2",
@@ -43,11 +51,6 @@
     "parallelshell": "3.0.2",
     "querystring": "0.2.1",
     "sinon": "17.0.1",
-    "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.2",
     "typescript": "~5.3.3"
-  },
-  "externals": [
-    "aws-sdk"
-  ]
+  }
 }
