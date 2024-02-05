@@ -1,6 +1,7 @@
 import { dbTestBase } from "../../db-testutil.js";
-import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as ServicesDb from "../../../db/services.js";
+import { jest } from "@jest/globals";
+import axios, { type AxiosRequestConfig } from "axios";
 
 const SERVER_PORT = 8088;
 
@@ -14,21 +15,24 @@ describe(
     "update-services",
     dbTestBase((db) => {
         test("update", async () => {
-            const server = new TestHttpServer();
-            server.listen(SERVER_PORT, {
-                "/services.xml": () => {
-                    return fakeServices();
+            jest.spyOn(axios, "get").mockImplementation(
+                (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
+                    if (_url.match("/services.xml")) {
+                        return Promise.resolve({
+                            status: 200,
+                            data: fakeServices()
+                        });
+                    }
+                    return Promise.resolve({
+                        status: 404
+                    });
                 }
-            });
+            );
 
-            try {
-                await lambda.handler();
-                expect(
-                    (await ServicesDb.findAllServiceCodes(db)).map((s) => Number(s.service_code))
-                ).toMatchObject([171, 198, 199]);
-            } finally {
-                server.close();
-            }
+            await lambda.handler();
+            expect(
+                (await ServicesDb.findAllServiceCodes(db)).map((s) => Number(s.service_code))
+            ).toMatchObject([171, 198, 199]);
         });
     })
 );

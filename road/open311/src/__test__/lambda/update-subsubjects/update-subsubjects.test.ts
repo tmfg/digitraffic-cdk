@@ -1,8 +1,9 @@
 import { dbTestBase } from "../../db-testutil.js";
-import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as SubSubjectsDb from "../../../db/subsubjects.js";
 import { Locale } from "../../../model/locale.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { jest } from "@jest/globals";
+import axios, { type AxiosRequestConfig } from "axios";
 
 const SERVER_PORT = 8091;
 
@@ -16,32 +17,34 @@ describe(
     "update-subsubjects",
     dbTestBase((db: DTDatabase) => {
         test("update", async () => {
-            const server = new TestHttpServer();
-            server.listen(SERVER_PORT, {
-                "/subsubjects": (url) => {
-                    const locale = (url!.match(/\/.+=(.+)/) as string[])[1];
-                    return fakeSubSubjects(locale);
+            jest.spyOn(axios, "get").mockImplementation(
+                (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
+                    if (_url.match("/subsubjects")) {
+                        const locale = (_url!.match(/\/.+=(.+)/) as string[])[1];
+                        return Promise.resolve({
+                            status: 200,
+                            data: fakeSubSubjects(locale)
+                        });
+                    }
+                    return Promise.resolve({
+                        status: 404
+                    });
                 }
-            });
+            );
+            const expectedId = 305;
+            await lambda.handler();
 
-            try {
-                const expectedId = 305;
-                await lambda.handler();
+            const foundSubSubjectsFi = await SubSubjectsDb.findAll(Locale.FINNISH, db);
+            expect(foundSubSubjectsFi.length).toBe(1);
+            expect(foundSubSubjectsFi[0]!.id).toBe(expectedId);
 
-                const foundSubSubjectsFi = await SubSubjectsDb.findAll(Locale.FINNISH, db);
-                expect(foundSubSubjectsFi.length).toBe(1);
-                expect(foundSubSubjectsFi[0]!.id).toBe(expectedId);
+            const foundSubSubjectsSv = await SubSubjectsDb.findAll(Locale.SWEDISH, db);
+            expect(foundSubSubjectsSv.length).toBe(1);
+            expect(foundSubSubjectsSv[0]!.id).toBe(expectedId);
 
-                const foundSubSubjectsSv = await SubSubjectsDb.findAll(Locale.SWEDISH, db);
-                expect(foundSubSubjectsSv.length).toBe(1);
-                expect(foundSubSubjectsSv[0]!.id).toBe(expectedId);
-
-                const foundSubSubjectsEn = await SubSubjectsDb.findAll(Locale.ENGLISH, db);
-                expect(foundSubSubjectsEn.length).toBe(1);
-                expect(foundSubSubjectsEn[0]!.id).toBe(expectedId);
-            } finally {
-                server.close();
-            }
+            const foundSubSubjectsEn = await SubSubjectsDb.findAll(Locale.ENGLISH, db);
+            expect(foundSubSubjectsEn.length).toBe(1);
+            expect(foundSubSubjectsEn[0]!.id).toBe(expectedId);
         });
     })
 );

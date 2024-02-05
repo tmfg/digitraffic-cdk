@@ -1,8 +1,9 @@
 import { dbTestBase } from "../../db-testutil.js";
-import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as StatesDb from "../../../db/states.js";
 import { Locale } from "../../../model/locale.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { jest } from "@jest/globals";
+import axios, { type AxiosRequestConfig } from "axios";
 
 const SERVER_PORT = 8089;
 
@@ -16,29 +17,32 @@ describe(
     "update-states",
     dbTestBase((db: DTDatabase) => {
         test("update", async () => {
-            const server = new TestHttpServer();
-            server.listen(SERVER_PORT, {
-                "/states": (url) => {
-                    const locale = (url!.match(/\/.+=(.+)/) as string[])[1];
-                    return fakeStates(locale);
+            jest.spyOn(axios, "get").mockImplementation(
+                (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
+                    if (_url.match("/states")) {
+                        const locale = (_url!.match(/\/.+=(.+)/) as string[])[1];
+                        return Promise.resolve({
+                            status: 200,
+                            data: fakeStates(locale)
+                        });
+                    }
+                    return Promise.resolve({
+                        status: 404
+                    });
                 }
-            });
+            );
 
-            try {
-                const expectedKey = 1;
+            const expectedKey = 1;
 
-                await lambda.handler();
+            await lambda.handler();
 
-                const foundSubjectsFi = await StatesDb.findAll(Locale.FINNISH, db);
-                expect(foundSubjectsFi.length).toBe(1);
-                expect(foundSubjectsFi[0]!.key).toBe(expectedKey);
+            const foundSubjectsFi = await StatesDb.findAll(Locale.FINNISH, db);
+            expect(foundSubjectsFi.length).toBe(1);
+            expect(foundSubjectsFi[0]!.key).toBe(expectedKey);
 
-                const foundSubjectsEn = await StatesDb.findAll(Locale.ENGLISH, db);
-                expect(foundSubjectsEn.length).toBe(1);
-                expect(foundSubjectsEn[0]!.key).toBe(expectedKey);
-            } finally {
-                server.close();
-            }
+            const foundSubjectsEn = await StatesDb.findAll(Locale.ENGLISH, db);
+            expect(foundSubjectsEn.length).toBe(1);
+            expect(foundSubjectsEn[0]!.key).toBe(expectedKey);
         });
     })
 );
