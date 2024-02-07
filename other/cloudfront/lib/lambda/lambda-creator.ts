@@ -110,7 +110,7 @@ export function createFunction(
     functionBody: string
 ): AWSFunction {
     return new AWSFunction(stack, functionName, {
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_18_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
         handler: "index.handler",
