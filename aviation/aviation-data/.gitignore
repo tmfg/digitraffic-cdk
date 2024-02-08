@@ -12,7 +12,7 @@
 
 !/config/
 !/config/**/
-!/config/**/.json
+!/config/**/*.json
 !/src/
 !/src/**/
 !/src/**/*.ts
