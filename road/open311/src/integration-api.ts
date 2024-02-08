@@ -1,9 +1,9 @@
 import apigateway from "aws-cdk-lib/aws-apigateway";
 import iam from "aws-cdk-lib/aws-iam";
 import { EndpointType, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
+import type * as ec2 from "aws-cdk-lib/aws-ec2";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";

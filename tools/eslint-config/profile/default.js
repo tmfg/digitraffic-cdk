@@ -105,7 +105,8 @@ module.exports = {
             files: [
                 // Test files
                 "*.test.ts",
-                "*.test.tsx"
+                "*.test.tsx",
+                "src/__test__/**/*.ts"
             ],
             rules: {
                 // Allow console logging in unit tests

@@ -1,5 +1,5 @@
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import { PolicyStatement, User } from "aws-cdk-lib/aws-iam";
 import { type AviationDataProps } from "./app-props.js";

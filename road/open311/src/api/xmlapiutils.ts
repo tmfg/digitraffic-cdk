@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as util from "util";
 import * as xml2js from "xml2js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export async function getXml<T>(
     endpointUser: string,
@@ -19,7 +20,10 @@ export async function getXml<T>(
     });
 
     if (resp.status !== 200) {
-        console.error(`method=getXml query to ${path} failed status ${resp.status}`);
+        logger.error({
+            method: "open311ApiXMLApiUtils.getXml",
+            message: `Query to ${path} failed status ${resp.status}`
+        });
         throw Error(`Query to ${path} failed`);
     }
 

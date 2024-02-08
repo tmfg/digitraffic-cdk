@@ -1,6 +1,6 @@
 import pgPromise from "pg-promise";
 import type { Subject } from "../model/subject.js";
-import { Locale } from "../model/locale.js";
+import type { Locale } from "../model/locale.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 const { PreparedStatement } = pgPromise;

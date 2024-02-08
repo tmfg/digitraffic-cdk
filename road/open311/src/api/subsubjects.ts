@@ -1,4 +1,4 @@
-import { Locale } from "../model/locale.js";
+import type { Locale } from "../model/locale.js";
 import type { SubSubject } from "../model/subsubject.js";
 import { getXml } from "./xmlapiutils.js";
 import type { NonEmptyArray } from "../util-types.d.ts";

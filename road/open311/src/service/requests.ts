@@ -4,6 +4,7 @@ import {
     findAll as dbFindAll,
     update as dbUpdate
 } from "../db/requests.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type {
     ServiceRequest,
     ServiceRequestWithExtensions,
@@ -45,10 +46,17 @@ export function update(requests: ServiceRequestWithExtensions[]): Promise<void> 
     })
         .then((a) => {
             const end = Date.now();
-            console.info("method=updateRequests updatedCount=%d tookMs=%d", a.length, end - start);
+            logger.info({
+                method: "open311ServiceRequests.update",
+                customUpdatedCount: a.length,
+                customTookMs: end - start
+            });
         })
         .catch((error) => {
-            console.error("method=updateRequests", requests);
+            logger.error({
+                method: "open311ServiceRequests.update",
+                error: error
+            });
             throw error;
         });
 }

@@ -1,10 +1,10 @@
 import * as events from "aws-cdk-lib/aws-events";
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
+import type * as lambda from "aws-cdk-lib/aws-lambda";
+import type * as ec2 from "aws-cdk-lib/aws-ec2";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Duration } from "aws-cdk-lib";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import type { Open311Props } from "./app-props.js";
 

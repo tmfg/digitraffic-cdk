@@ -1,7 +1,8 @@
 import * as SubSubjectsDb from "../db/subsubjects.js";
 import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import type { SubSubject } from "../model/subsubject.js";
-import { Locale } from "../model/locale.js";
+import type { Locale } from "../model/locale.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export function findAll(locale: Locale): Promise<SubSubject[]> {
     return inDatabase((db: DTDatabase) => {
@@ -15,6 +16,10 @@ export function update(subSubjects: SubSubject[]): Promise<void> {
         return SubSubjectsDb.update(subSubjects, db);
     }).then((a) => {
         const end = Date.now();
-        console.info("method=updateSubSubjects updatedCount=%d tookMs=%d", a.length, end - start);
+        logger.info({
+            method: "open311ServiceSubSubjects.update",
+            customUpdatedCount: a.length,
+            customTookMs: end - start
+        });
     });
 }

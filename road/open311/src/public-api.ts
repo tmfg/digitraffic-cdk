@@ -1,6 +1,6 @@
 import apigateway = require("aws-cdk-lib/aws-apigateway");
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
+import type * as lambda from "aws-cdk-lib/aws-lambda";
+import type * as ec2 from "aws-cdk-lib/aws-ec2";
 import { EndpointType } from "aws-cdk-lib/aws-apigateway";
 
 import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
@@ -13,7 +13,7 @@ import {
 } from "@digitraffic/common/dist/utils/api-model";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { addTags } from "@digitraffic/common/dist/aws/infra/documentation";
 import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";

@@ -2,7 +2,7 @@ import * as IntegrationApi from "./integration-api.js";
 import * as PublicApi from "./public-api.js";
 import * as InternalLambdas from "./internal-lambdas.js";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import { Aspects, Tags } from "aws-cdk-lib";
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { SOLUTION_KEY, DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";

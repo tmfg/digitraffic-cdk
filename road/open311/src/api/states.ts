@@ -1,6 +1,6 @@
 import type { ServiceRequestState } from "../model/service-request-state.js";
 import { getXml } from "./xmlapiutils.js";
-import { Locale } from "../model/locale.js";
+import type { Locale } from "../model/locale.js";
 import type { NonEmptyArray } from "../util-types.d.ts";
 
 export async function getStates(

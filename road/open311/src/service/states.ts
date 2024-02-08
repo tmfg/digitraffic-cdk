@@ -1,7 +1,8 @@
 import * as StatesDb from "../db/states.js";
 import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import type { ServiceRequestState } from "../model/service-request-state.js";
-import { Locale } from "../model/locale.js";
+import type { Locale } from "../model/locale.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export function findAll(locale: Locale): Promise<ServiceRequestState[]> {
     return inDatabase((db: DTDatabase) => {
@@ -15,6 +16,10 @@ export function update(states: ServiceRequestState[]): Promise<void> {
         return StatesDb.update(states, db);
     }).then((a) => {
         const end = Date.now();
-        console.info("method=updateStates updatedCount=%d tookMs=%d", a.length, end - start);
+        logger.info({
+            method: "open311ServiceStates.update",
+            customUpdatedCount: a.length,
+            customTookMs: end - start
+        });
     });
 }
