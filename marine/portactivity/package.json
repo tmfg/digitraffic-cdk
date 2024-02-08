@@ -22,7 +22,7 @@
     "test:watch": "heft test-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.1.30-1",
+    "@digitraffic/common": "2024.1.10-1",
     "@middy/core": "^4.7.0",
     "@middy/sqs-partial-batch-failure": "^4.7.0",
     "amqplib": "^0.10.3",
