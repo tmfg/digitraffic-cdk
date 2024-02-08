@@ -1,0 +1,38 @@
+{
+  "name": "@digitraffic-cdk/esm-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "_build:bundle": "npm run compile-lambdas && npm run compile-canaries",
+    "build": "heft build --clean && npm run build:bundle",
+    "build:bundle": "echo 'enable bundling by replacing build:bundle content with _build:bundle in package.json scripts'",
+    "build:tsc": "heft build --clean",
+    "build:watch": "heft build-watch --clean",
+    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node20",
+    "cdk": "npx cdk@latest",
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
+    "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node18",
+    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node20",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
+  },
+  "dependencies": {
+    "@digitraffic/common": "workspace:*"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/eslint-config": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@jest/globals": "29.7.0",
+    "@rushstack/eslint-config": "^3.6.1",
+    "@rushstack/heft": "^0.64.2",
+    "@rushstack/heft-jest-plugin": "^0.11.2",
+    "@types/heft-jest": "1.0.6",
+    "@types/jest": "29.5.11",
+    "@types/node": "20.10.7",
+    "esbuild": "0.19.11",
+    "eslint": "~8.56.0",
+    "typescript": "~5.3.3"
+  }
+}

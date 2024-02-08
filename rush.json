@@ -256,6 +256,11 @@
 
     // internal / tools
     {
+      "packageName": "@digitraffic-cdk/esm-template",
+      "projectFolder": "template/esm",
+      "tags": ["internal"]
+    },
+    {
       "packageName": "@digitraffic-cdk/repo-scripts",
       "projectFolder": "lib/repo-scripts",
       "tags": ["internal"]
