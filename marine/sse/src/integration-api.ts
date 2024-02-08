@@ -1,9 +1,9 @@
-import { type IModel, type IntegrationResponse, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { IModel, IntegrationResponse, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
 import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { addDefaultValidator, addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 
 import * as SseSchema from "./model/sse-schema.js";
 import * as ApiResponseSchema from "./model/api-response-schema.js";
@@ -18,7 +18,7 @@ import {
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import { BAD_REQUEST_MESSAGE, ERROR_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 
 export function createIntegrationApiAndHandlerLambda(secret: ISecret, stack: DigitrafficStack) {
@@ -53,7 +53,7 @@ const RESPONSE_400_BAD_REQUEST: IntegrationResponse = {
     selectionPattern: `.*${BAD_REQUEST_MESSAGE}.*`,
     responseTemplates: {
         "application/json":
-          '{ "message" : "Bad request. $util.parseJson($input.path(\'$.errorMessage\')).errorMessage" }'
+            '{ "message" : "Bad request. $util.parseJson($input.path(\'$.errorMessage\')).errorMessage" }'
     }
 };
 
@@ -62,7 +62,7 @@ const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
     selectionPattern: `.*${ERROR_MESSAGE}.*`,
     responseTemplates: {
         "application/json":
-          '{ "message" : "Internal server error. $util.parseJson($input.path(\'$.errorMessage\')).errorMessage" }'
+            '{ "message" : "Internal server error. $util.parseJson($input.path(\'$.errorMessage\')).errorMessage" }'
     }
 };
 
