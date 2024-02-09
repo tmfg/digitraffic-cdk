@@ -15,9 +15,7 @@ const Ajv: AjvType = AjvOrig.default as unknown as AjvType;
 
 type addFormats = (ajv: typeof Ajv) => void;
 
-// @ts-ignore
-// eslint-disable-next-line dot-notation
-const addFormats: addFormats = addFormatsOrig.default as addFormats;
+const addFormats: addFormats = addFormatsOrig.default as unknown as addFormats;
 
 // we can assume id exists if message passes validation
 interface ValidatedRamiMessage {
