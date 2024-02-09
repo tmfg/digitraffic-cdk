@@ -16,4 +16,5 @@
 !/src/
 !/src/**/
 !/src/**/*.ts
+!/src/__test__/**/*.json
 /src/bin
