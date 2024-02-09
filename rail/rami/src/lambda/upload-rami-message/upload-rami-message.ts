@@ -13,16 +13,17 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         if (validationResult.valid) {
             logger.info({
                 method: "UploadRamiMessage.handler",
+                message: "Received valid RAMI message",
                 customValidRamiMessage: JSON.stringify(messageBody)
             });
             const messageId = validationResult.value.payload.messageId;
             await sendToSqs(SQS_URL, 2, JSON.stringify(validationResult.value), messageId);
             return LambdaResponse.ok("OK");
         } else {
-            logger.error({
+            logger.warn({
                 method: "UploadRamiMessage.handler",
                 message: "Received invalid RAMI message",
-                customInvalidMessage: JSON.stringify(messageBody),
+                customInvalidRamiMessage: JSON.stringify(messageBody),
                 customValidationErrors: validationResult.errors
             });
             // send invalid message and error report to dlq
