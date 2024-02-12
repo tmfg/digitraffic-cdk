@@ -18,11 +18,13 @@ import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans"
 const BRIDGE_LOCK_DISRUPTION_TAGS_V1 = ["Bridge Lock Disruption V1"];
 
 export class PublicApi {
+    // @ts-ignore
     disruptionsResource: Resource;
 
     constructor(stack: DigitrafficStack) {
         const publicApi = this.createApi(stack);
 
+        // eslint-disable-next-line deprecation/deprecation
         createUsagePlan(publicApi, "BridgeLock Api Key", "BridgeLock Usage Plan");
 
         const disruptionModel = addServiceModel("DisruptionModel", publicApi, DisruptionSchema);
@@ -38,7 +40,7 @@ export class PublicApi {
         );
 
         this.createResourcePaths(publicApi);
-        this.createDisruptionsResource(publicApi, disruptionsModel, stack);
+        this.createDisruptionsResource(disruptionsModel, stack);
 
         publicApi.documentResource(
             // @ts-ignore
@@ -51,11 +53,7 @@ export class PublicApi {
         );
     }
 
-    createDisruptionsResource(
-        publicApi: RestApi,
-        disruptionsJsonModel: IModel,
-        stack: DigitrafficStack
-    ): void {
+    createDisruptionsResource(disruptionsJsonModel: IModel, stack: DigitrafficStack): void {
         const getDisruptionsLambda = MonitoredDBFunction.create(stack, "get-disruptions");
         const getDisruptionsIntegration = new DigitrafficIntegration(
             getDisruptionsLambda,

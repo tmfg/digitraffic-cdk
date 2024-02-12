@@ -11,8 +11,6 @@
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node20",
     "cdk": "npx cdk@latest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
-    "clean": "rimraf dist lib cdk.out",
-    "clean:force": "rimraf dist lib cdk.out node_modules",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node20",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",

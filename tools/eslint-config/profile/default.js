@@ -80,7 +80,10 @@ module.exports = {
                 "@typescript-eslint/restrict-plus-operands": "error",
                 "@typescript-eslint/restrict-template-expressions": "error",
                 "@typescript-eslint/unbound-method": "error",
-                "@typescript-eslint/consistent-type-imports": "error"
+                "@typescript-eslint/consistent-type-imports": "error",
+
+                // Because of ts-config noPropertyAccessFromIndexSignature
+                "dot-notation": "off"
             }
         },
         {
@@ -130,7 +133,10 @@ module.exports = {
                 "@typescript-eslint/require-await": "warn",
                 "@typescript-eslint/restrict-plus-operands": "warn",
                 "@typescript-eslint/restrict-template-expressions": "warn",
-                "@typescript-eslint/unbound-method": "warn"
+                "@typescript-eslint/unbound-method": "warn",
+
+                // Because of ts-config noPropertyAccessFromIndexSignature
+                "dot-notation": "off"
             }
         }
     ],

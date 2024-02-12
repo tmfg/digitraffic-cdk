@@ -35,7 +35,7 @@ export class DisruptionsTestDriver {
         expect(this.timestamps[lastIndex - 1]!.checked).toBeLessThan(this.timestamps[lastIndex]!.checked);
     }
 
-    public async saveSeedData() {
+    public async saveSeedData(): Promise<void> {
         await saveDisruptions(DisruptionsTestDriver.createRandomDisruptions());
     }
 
