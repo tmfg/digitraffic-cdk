@@ -63,7 +63,6 @@ describe(
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
             // then update
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             metadata.laitteet[0]!.sijainti.ajorata = "vasen";
             await JsonUpdateService.updateJsonMetadata(metadata);
             const updated = await getUpdatedDate(db, "test");

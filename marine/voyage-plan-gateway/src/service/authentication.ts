@@ -30,12 +30,10 @@ export function generateHmacAuthorizationHeader(url: string, appId: string, apiK
     const requestTimestamp = Math.trunc(new Date().getTime() / 1000);
     const signatureRaw = `${appId}GET${encodedUrl}${requestTimestamp}${nonce}`;
 
-    const signature = createHmac("sha256", apiKey)
-        .update(signatureRaw)
-        .digest("base64");
+    const signature = createHmac("sha256", apiKey).update(signatureRaw).digest("base64");
 
-//    const hash = HmacSHA256(signatureRaw, apiKey);
-//    const signature = hash.toString(CryptoJS.enc.Base64);
+    //    const hash = HmacSHA256(signatureRaw, apiKey);
+    //    const signature = hash.toString(CryptoJS.enc.Base64);
 
     return `amx ${appId}:${signature}:${nonce}:${requestTimestamp}`;
 }

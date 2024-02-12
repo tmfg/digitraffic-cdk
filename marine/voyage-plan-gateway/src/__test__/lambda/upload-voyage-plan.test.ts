@@ -16,7 +16,6 @@ process.env["BUCKET_NAME"] = "";
 jest.setTimeout(10000);
 
 describe("upload-voyage-plan", () => {
-
     jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue({
         "vpgw.vtsUrl": "TEST"
     });
@@ -24,18 +23,18 @@ describe("upload-voyage-plan", () => {
     jest.spyOn(SlackApi.prototype, "notify").mockReturnValue(Promise.resolve());
 
     async function expectEvent(eventString: string, expected: string): Promise<void> {
-      const { handler } = await import ("../../lambda/upload-voyage-plan/lambda-upload-voyage-plan.js");
-      const event = createSnsEvent(eventString);
+        const { handler } = await import("../../lambda/upload-voyage-plan/lambda-upload-voyage-plan.js");
+        const event = createSnsEvent(eventString);
 
-      return expect(await handler(event)).toMatch(expected);
-    }    
+        return expect(await handler(event)).toMatch(expected);
+    }
 
     test("validation failure, some string", async () => {
         await expectEvent("<foo bar", "XML parsing failed");
     });
 
     test.only("validation failure, no route xml", async () => {
-        await expectEvent("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "XML structure validation failed");
+        await expectEvent('<?xml version="1.0" encoding="UTF-8"?>', "XML structure validation failed");
     });
 
     test("validation failure, no waypoints xml", async () => {

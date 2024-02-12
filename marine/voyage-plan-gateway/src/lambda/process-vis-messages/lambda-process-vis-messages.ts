@@ -67,13 +67,15 @@ export function handler(): Promise<void> {
             };
             // gzip data to avoid SQS 256 KB limit
             const gzippedMessage: Buffer = gzipSync(Buffer.from(JSON.stringify(message), "utf-8"));
-            await sqs.send(new SendMessageCommand({
+            await sqs.send(
+                new SendMessageCommand({
                     QueueUrl: queueUrl,
                     // SQS only allows character data so the message must also be base64 encoded
                     MessageBody: gzippedMessage.toString("base64"),
                     MessageGroupId,
                     MessageDeduplicationId: createRtzHash(routeMessage.stmMessage.message)
-                }));
+                })
+            );
         }
     });
 }

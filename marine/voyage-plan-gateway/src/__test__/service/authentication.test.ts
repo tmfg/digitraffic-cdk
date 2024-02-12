@@ -1,7 +1,6 @@
-import {generateHmacAuthorizationHeader} from "../../service/authentication.js";
+import { generateHmacAuthorizationHeader } from "../../service/authentication.js";
 
 describe("authentication service", () => {
-
     test("generateHmacAuthorizationHeader - empty URL", () => {
         expect(() => {
             generateHmacAuthorizationHeader("", "1", "2");
@@ -25,5 +24,4 @@ describe("authentication service", () => {
 
         expect(/amx \w+:[a-zA-Z0-9:=/+]+:[a-zA-Z0-9-]+:\w+/.test(header)).toBe(true);
     });
-
 });

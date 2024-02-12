@@ -1,8 +1,3 @@
 {
-  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-cdk-old.json",
-  "compilerOptions": {
-    "outDir": "dist/out",
-    "exactOptionalPropertyTypes": false
-  },
-  "include": ["bin/**/*.ts", "lib/**/*.ts"]
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
 }

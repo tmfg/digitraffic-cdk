@@ -64,7 +64,7 @@ export function handlerFn(_sns: SNSClient): (e: NotifyEventWrapper) => HandlerRe
         }
 
         // trigger a Lambda invocation per message
-        
+
         /*
         await _sns.send(new PublishCommand({
             TopicArn: topicArn,

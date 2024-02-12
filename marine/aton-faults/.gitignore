@@ -15,4 +15,5 @@
 !/src/
 !/src/**/
 !/src/**/*.ts
+!/src/__test__/**/*.xsd
 /src/bin

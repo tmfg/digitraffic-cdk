@@ -1,11 +1,17 @@
-import type { RtzSchedule, RtzSchedules, RtzVoyagePlan, RtzWaypoint } from "@digitraffic/common/dist/marine/rtz";
+import type {
+    RtzSchedule,
+    RtzSchedules,
+    RtzVoyagePlan,
+    RtzWaypoint
+} from "@digitraffic/common/dist/marine/rtz";
 import { toDate } from "date-fns-tz";
 import { isValid, isAfter } from "date-fns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { point, polygon, booleanPointInPolygon } from "@turf/turf";
 
 // roughly the Gulf of Finland, Bothnian Sea/Bay and Northern Baltic
-const SPATIAL_LIMITS = polygon([[
+const SPATIAL_LIMITS = polygon([
+    [
         [20.84, 68.82],
         [16.89, 61.7],
         [20.05, 58.01],
@@ -19,7 +25,8 @@ const SPATIAL_LIMITS = polygon([[
         [26.68, 71.28],
         [21.05, 69.78],
         [20.84, 68.82]
-    ]]);
+    ]
+]);
 
 export enum ValidationError {
     EMPTY_VOYAGE_PLAN = "Empty or null voyage plan",
@@ -240,7 +247,7 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
                         method: "VoyagePlansService.validateSchedulesContent",
                         message: "Not timestamps set in future"
                     });
-        
+
                     //validationErrors.push(ValidationError.NO_FUTURE_TIMESTAMPS);
                     return;
                 }

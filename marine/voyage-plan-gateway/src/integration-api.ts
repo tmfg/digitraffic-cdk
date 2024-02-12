@@ -53,10 +53,7 @@ function createNotifyHandler(
     createIntegrationResource(resource, handler);
 }
 
-function createIntegrationResource(
-    resource: Resource,
-    handler: MonitoredFunction
-): void {
+function createIntegrationResource(resource: Resource, handler: MonitoredFunction): void {
     const integration = new LambdaIntegration(handler, {
         proxy: true,
         integrationResponses: [{ statusCode: "204" }],

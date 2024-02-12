@@ -104,6 +104,7 @@ module.exports = {
                 "@typescript-eslint/no-explicit-any": "warn",
 
                 // typescript-eslint/strict
+                "@typescript-eslint/no-non-null-assertion": "off",
                 "@typescript-eslint/await-thenable": "warn",
                 "@typescript-eslint/no-floating-promises": "warn",
                 "@typescript-eslint/no-for-in-array": "warn",

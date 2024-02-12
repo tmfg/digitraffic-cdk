@@ -1,4 +1,6 @@
 *.js
 cdk.out
 dist
+lib
+temp
 output

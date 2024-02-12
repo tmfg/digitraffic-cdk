@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "heft build --clean && npm run build:bundle",
     "_build:bundle": "npm run compile-lambdas && npm run compile-canaries",
+    "build": "heft build --clean && npm run build:bundle",
     "build:bundle": "echo 'enable bundling by replacing build:bundle content with _build:bundle in package.json scripts'",
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",

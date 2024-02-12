@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "5.2.0",
-    "@aws-sdk/types": "3.485.0",
     "@aws-sdk/client-sts": "3.502.0",
+    "@aws-sdk/types": "3.485.0",
     "@digitraffic/common": "2024.1.24-3",
     "@smithy/node-http-handler": "2.2.2",
     "@smithy/protocol-http": "3.0.12",
