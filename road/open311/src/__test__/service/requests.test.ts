@@ -56,26 +56,51 @@ describe(
     })
 );
 
-function addNestedExtensionProps(r: any) {
+function addNestedExtensionProps(r: unknown): void {
+    // @ts-ignore
     r.extended_attributes = {
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         status_id: r.status_id,
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         vendor_status: r.vendor_status,
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         title: r.title,
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         service_object_id: r.service_object_id,
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         service_object_type: r.service_object_type,
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         media_urls: r.media_urls,
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         subject_id: r.subject_id,
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         subSubject_id: r.subSubject_id
     };
 }
 
-function deleteExtensionProps(r: ServiceRequestWithExtensions) {
-    delete (r as any).status_id;
-    delete (r as any).vendor_status;
-    delete (r as any).title;
-    delete (r as any).service_object_id;
-    delete (r as any).service_object_type;
-    delete (r as any).media_urls;
-    delete (r as any).subject_id;
-    delete (r as any).subSubject_id;
+function deleteExtensionProps(r: ServiceRequestWithExtensions): void {
+    // @ts-ignore
+    delete r.status_id;
+    // @ts-ignore
+    delete r.vendor_status;
+    // @ts-ignore
+    delete r.title;
+    // @ts-ignore
+    delete r.service_object_id;
+    // @ts-ignore
+    delete r.service_object_type;
+    // @ts-ignore
+    delete r.media_urls;
+    // @ts-ignore
+    delete r.subject_id;
+    // @ts-ignore
+    delete r.subSubject_id;
 }

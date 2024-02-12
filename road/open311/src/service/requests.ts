@@ -23,6 +23,7 @@ export function findAll(extensions: boolean): Promise<ServiceRequest[]> {
     });
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function find(serviceRequestId: string, extensions: boolean): Promise<ServiceRequest | null> {
     return inDatabase(async (db: DTDatabase) => {
         const r = await dbFind(serviceRequestId, db);
@@ -33,6 +34,7 @@ export function find(serviceRequestId: string, extensions: boolean): Promise<Ser
     });
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function doDelete(serviceRequestId: string): Promise<null> {
     return inDatabase((db: DTDatabase) => {
         return dbDelete(serviceRequestId, db);

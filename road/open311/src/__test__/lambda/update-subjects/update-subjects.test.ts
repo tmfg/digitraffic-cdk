@@ -6,8 +6,11 @@ import axios, { type AxiosRequestConfig } from "axios";
 
 const SERVER_PORT = 8090;
 
+// eslint-disable-next-line dot-notation
 process.env["ENDPOINT_USER"] = "some_user";
+// eslint-disable-next-line dot-notation
 process.env["ENDPOINT_PASS"] = "some_pass";
+// eslint-disable-next-line dot-notation
 process.env["ENDPOINT_URL"] = `http://localhost:${SERVER_PORT}`;
 
 const lambda = await import("../../../lambda/update-subjects/lambda-update-subjects.js");
@@ -19,7 +22,8 @@ describe(
             jest.spyOn(axios, "get").mockImplementation(
                 (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
                     if (_url.match("/subjects")) {
-                        const locale = (_url!.match(/\/.+=(.+)/) as string[])[1];
+                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+                        const locale = _url!.match(/\/.+=(.+)/)![1];
                         return Promise.resolve({
                             status: 200,
                             data: fakeSubjects(locale)

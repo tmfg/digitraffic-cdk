@@ -62,6 +62,7 @@ interface ServiceServiceCode {
     readonly service_code: string;
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function update(services: Service[], db: DTDatabase): Promise<null[]> {
     return db.tx(async (t) => {
         await t.none(DELETE_SERVICES_PS);
@@ -80,6 +81,7 @@ export function findAll(db: DTDatabase): Promise<Service[]> {
     return db.manyOrNone<Service>(SELECT_SERVICES_PS).then((requests) => requests.map((r) => toService(r)));
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function find(serviceRequestId: string, db: DTDatabase): Promise<Service | null> {
     return db
         .oneOrNone<Service>(SELECT_SERVICE_BY_CODE_PS, [serviceRequestId])

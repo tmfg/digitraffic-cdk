@@ -2,7 +2,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DbSseReport } from "../db/sse-db.js";
 
-export function dbTestBase(fn: (db: DTDatabase) => void): ReturnType<commonDbTestBase> {
+export function dbTestBase(fn: (db: DTDatabase) => void): ReturnType<typeof commonDbTestBase> {
     return commonDbTestBase(fn, truncate, "marine", "marine", "localhost:54321/marine");
 }
 

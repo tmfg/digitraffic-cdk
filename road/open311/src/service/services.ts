@@ -23,6 +23,7 @@ export function update(services: Service[]): Promise<void> {
     });
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function find(serviceRequestId: string): Promise<Service | null> {
     return inDatabase((db: DTDatabase) => {
         return ServicesDb.find(serviceRequestId, db);

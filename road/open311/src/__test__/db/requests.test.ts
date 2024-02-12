@@ -126,8 +126,10 @@ describe(
             await insertServiceRequest(db, [serviceRequest]);
 
             const updatingServiceRequest = Object.assign({}, serviceRequest);
-            delete (updatingServiceRequest as any).long;
-            delete (updatingServiceRequest as any).lat;
+            // @ts-ignore
+            delete updatingServiceRequest.long;
+            // @ts-ignore
+            delete updatingServiceRequest.lat;
 
             await RequestsDb.update([updatingServiceRequest], db);
         });
@@ -137,8 +139,10 @@ describe(
             await insertServiceRequest(db, [serviceRequest]);
 
             const updatingServiceRequest = Object.assign({}, serviceRequest);
-            (updatingServiceRequest as any).long = "";
-            (updatingServiceRequest as any).lat = "";
+            // @ts-ignore
+            updatingServiceRequest.long = "";
+            // @ts-ignore
+            updatingServiceRequest.lat = "";
 
             await RequestsDb.update([updatingServiceRequest], db);
 
@@ -162,16 +166,20 @@ describe(
 
         test("Insert - null geometry doesn't fail", async () => {
             const serviceRequest = newServiceRequest();
-            delete (serviceRequest as any).long;
-            delete (serviceRequest as any).lat;
+            // @ts-ignore
+            delete serviceRequest.long;
+            // @ts-ignore
+            delete serviceRequest.lat;
 
             await RequestsDb.update([serviceRequest], db);
         });
 
         test("insert - invalid geometry is not saved", async () => {
             const serviceRequest = newServiceRequest();
-            (serviceRequest as any).long = "";
-            (serviceRequest as any).lat = "";
+            // @ts-ignore
+            serviceRequest.long = "";
+            // @ts-ignore
+            serviceRequest.lat = "";
 
             await RequestsDb.update([serviceRequest], db);
 

@@ -15,7 +15,6 @@ export async function handler(apiGWRequest: SSE.TheSSEReportRootSchema | undefin
             method: "lambda-update-sse-data.handler",
             message: "Empty message content"
         });
-        // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw errorJson(BAD_REQUEST_MESSAGE, "Empty message content.");
     }
 
@@ -49,7 +48,6 @@ export async function handler(apiGWRequest: SSE.TheSSEReportRootSchema | undefin
             customTookMs: end - start,
             customData: JSON.stringify(apiGWRequest)
         });
-        // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw errorJson(ERROR_MESSAGE, `Error while updating sse data. Error ${JSON.stringify(e)}`);
     }
 }

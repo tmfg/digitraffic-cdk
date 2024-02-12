@@ -1,8 +1,11 @@
 import * as ServicesApi from "../../api/services.js";
 import { update } from "../../service/services.js";
 
+// eslint-disable-next-line dot-notation
 const endpointUser = process.env["ENDPOINT_USER"];
+// eslint-disable-next-line dot-notation
 const endpointPass = process.env["ENDPOINT_PASS"];
+// eslint-disable-next-line dot-notation
 const endpointUrl = process.env["ENDPOINT_URL"];
 
 export const handler = async (): Promise<void> => {

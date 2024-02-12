@@ -3,7 +3,7 @@ import * as RequestsDb from "../db/requests.js";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-export function dbTestBase(fn: (db: DTDatabase) => void) {
+export function dbTestBase(fn: (db: DTDatabase) => void): ReturnType<typeof commonDbTestBase> {
     return commonDbTestBase(fn, truncate, "road", "road", "127.0.0.1:54322/road");
 }
 

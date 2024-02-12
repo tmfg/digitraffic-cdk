@@ -2,8 +2,11 @@ import * as SubSubjectsApi from "../../api/subsubjects.js";
 import { update } from "../../service/subsubjects.js";
 import { Locale } from "../../model/locale.js";
 
+// eslint-disable-next-line dot-notation
 const endpointUser = process.env["ENDPOINT_USER"];
+// eslint-disable-next-line dot-notation
 const endpointPass = process.env["ENDPOINT_PASS"];
+// eslint-disable-next-line dot-notation
 const endpointUrl = process.env["ENDPOINT_URL"];
 
 export const handler = async (): Promise<void> => {

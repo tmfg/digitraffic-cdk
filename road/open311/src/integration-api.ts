@@ -1,7 +1,6 @@
 import apigateway from "aws-cdk-lib/aws-apigateway";
 import iam from "aws-cdk-lib/aws-iam";
 import { EndpointType, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
-import type * as ec2 from "aws-cdk-lib/aws-ec2";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
@@ -13,19 +12,14 @@ import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import type { Open311Props } from "./app-props.js";
 
-export function create(
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    stack: DigitrafficStack,
-    props: Open311Props
-) {
+export function create(stack: DigitrafficStack, props: Open311Props): void {
     const integrationApi = createApi(stack);
 
-    createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
+    createRequestsResource(stack, integrationApi, props);
     createDefaultUsagePlan(integrationApi, "Integration", props.integrationApiKey);
 }
 
-function createApi(stack: DigitrafficStack) {
+function createApi(stack: DigitrafficStack): apigateway.RestApi {
     return new apigateway.RestApi(stack, "Open311-integration", {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR
@@ -48,10 +42,8 @@ function createApi(stack: DigitrafficStack) {
 function createRequestsResource(
     stack: DigitrafficStack,
     integrationApi: apigateway.RestApi,
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
     props: Open311Props
-) {
+): void {
     const validator = addDefaultValidator(integrationApi);
     const apiResource = integrationApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
@@ -67,7 +59,7 @@ function createUpdateRequestHandler(
     requests: apigateway.Resource,
     stack: DigitrafficStack,
     props: Open311Props
-) {
+): void {
     const updateRequestsId = "UpdateRequests";
     const updateRequestsHandler = MonitoredDBFunction.create(stack, updateRequestsId);
     requests.addMethod("POST", new LambdaIntegration(updateRequestsHandler), {
@@ -82,9 +74,10 @@ function createDeleteRequestHandler(
     validator: apigateway.RequestValidator,
     stack: DigitrafficStack,
     props: Open311Props
-) {
+): void {
     const deleteRequestId = "DeleteRequest";
     const deleteRequestHandler = MonitoredDBFunction.create(stack, deleteRequestId);
+    // eslint-disable-next-line deprecation/deprecation
     const deleteRequestIntegration = defaultIntegration(deleteRequestHandler, {
         requestParameters: {
             "integration.request.path.request_id": "method.request.path.request_id",

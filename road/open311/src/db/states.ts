@@ -24,6 +24,7 @@ export function findAll(locale: Locale, db: DTDatabase): Promise<ServiceRequestS
     return db.manyOrNone(SELECT_STATES_PS, [locale]);
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function update(states: ServiceRequestState[], db: DTDatabase): Promise<null[]> {
     return db.tx(async (t) => {
         await t.none(DELETE_STATES_PS);

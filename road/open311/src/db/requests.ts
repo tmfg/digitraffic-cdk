@@ -128,6 +128,7 @@ export function findAll(db: DTDatabase): Promise<ServiceRequestWithExtensions[]>
 export function find(
     service_request_id: string,
     db: DTDatabase
+    // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<ServiceRequestWithExtensions | null> {
     const ps = new PreparedStatement({
         name: "find-service-request-by-id",
@@ -137,6 +138,7 @@ export function find(
     return db.oneOrNone(ps).then((r: DbServiceRequest) => (r === null ? null : toServiceRequest(r)));
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function update(serviceRequests: ServiceRequestWithExtensions[], db: DTDatabase): Promise<null[]> {
     return db.tx((t) => {
         const queries: Promise<null>[] = serviceRequests.map((serviceRequest) => {
@@ -150,6 +152,7 @@ export function update(serviceRequests: ServiceRequestWithExtensions[], db: DTDa
     });
 }
 
+// eslint-disable-next-line @rushstack/no-new-null
 export function doDelete(serviceRequestId: string, db: DTDatabase): Promise<null> {
     return db.tx((t) => {
         return t.none("DELETE FROM open311_service_request WHERE service_request_id = $1", serviceRequestId);

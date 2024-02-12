@@ -1,6 +1,5 @@
 import apigateway = require("aws-cdk-lib/aws-apigateway");
 import type * as lambda from "aws-cdk-lib/aws-lambda";
-import type * as ec2 from "aws-cdk-lib/aws-ec2";
 import { EndpointType } from "aws-cdk-lib/aws-apigateway";
 
 import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
@@ -26,12 +25,7 @@ import { default as SubjectSchema } from "./model/subject-schema.js";
 import { default as SubSubjectSchema } from "./model/subsubject-schema.js";
 import type { Open311Props } from "./app-props.js";
 
-export function create(
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    stack: DigitrafficStack,
-    props: Open311Props
-) {
+export function create(stack: DigitrafficStack, props: Open311Props): void {
     const publicApi = createApi(stack, props.allowFromIpAddresses);
 
     createDefaultUsagePlan(publicApi, "Open311 CloudFront", props.publicApiKey);
@@ -90,7 +84,7 @@ function createRequestsResource(
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
     stack: DigitrafficStack
-) {
+): void {
     const requests = open311Resource.addResource("requests");
 
     const getRequestsId = "Open311-GetRequests";
@@ -118,7 +112,8 @@ function createGetRequestIntegration(
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
     stack: DigitrafficStack
-) {
+): void {
+    // eslint-disable-next-line deprecation/deprecation
     const getRequestIntegration = defaultIntegration(getRequestHandler, {
         requestParameters: {
             "integration.request.path.request_id": "method.request.path.request_id",
@@ -154,7 +149,8 @@ function createGetRequestsIntegration(
     requestsModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
-) {
+): void {
+    // eslint-disable-next-line deprecation/deprecation
     const getRequestsIntegration = defaultIntegration(getRequestsHandler, {
         requestParameters: {
             "integration.request.querystring.extensions": "method.request.querystring.extensions"
@@ -184,7 +180,7 @@ function createStatesResource(
     stateModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
-) {
+): void {
     const states = open311Resource.addResource("states");
 
     const getStatesId = "Open311-GetStates";
@@ -206,7 +202,7 @@ function createSubjectsResource(
     subjectModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
-) {
+): void {
     const subjects = open311Resource.addResource("subjects");
     const getSubjectsId = "Open311-GetSubjects";
     const getSubjectsHandler = MonitoredDBFunction.create(stack, getSubjectsId);
@@ -227,7 +223,7 @@ function createSubSubjectsResource(
     subSubjectModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
-) {
+): void {
     const subSubjects = open311Resource.addResource("subsubjects");
     const getSubSubjectsId = "Open311-GetSubSubjects";
     const getSubSubjectsHandler = MonitoredDBFunction.create(stack, getSubSubjectsId);
@@ -250,7 +246,7 @@ function createServicesResource(
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
     stack: DigitrafficStack
-) {
+): void {
     const services = open311Resource.addResource("services");
 
     const getServicesId = "Open311-GetServices";
@@ -285,7 +281,8 @@ function createGetResourcesIntegration(
     messageResponseModel: apigateway.Model,
     tag: string,
     stack: DigitrafficStack
-) {
+): void {
+    // eslint-disable-next-line deprecation/deprecation
     const integration = defaultIntegration(handler);
     resource.addMethod("GET", integration, {
         apiKeyRequired: true,
@@ -304,7 +301,8 @@ function createGetLocalizedResourceIntegration(
     model: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
-) {
+): void {
+    // eslint-disable-next-line deprecation/deprecation
     const integration = defaultIntegration(handler, {
         requestParameters: {
             "integration.request.querystring.locale": "method.request.querystring.locale"
@@ -335,7 +333,8 @@ function createGetServiceIntegration(
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
     stack: DigitrafficStack
-) {
+): void {
+    // eslint-disable-next-line deprecation/deprecation
     const getServiceIntegration = defaultIntegration(getServiceHandler, {
         requestParameters: {
             "integration.request.path.service_id": "method.request.path.service_id"
@@ -362,7 +361,7 @@ function createGetServiceIntegration(
     addTags("GetService", DATA_V1_TAGS, service, stack);
 }
 
-function createApi(stack: DigitrafficStack, allowFromIpAddresses: string[]) {
+function createApi(stack: DigitrafficStack, allowFromIpAddresses: string[]): apigateway.RestApi {
     return new apigateway.RestApi(stack, "Open311-public", {
         defaultCorsPreflightOptions: {
             allowOrigins: apigateway.Cors.ALL_ORIGINS

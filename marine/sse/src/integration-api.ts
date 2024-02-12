@@ -3,7 +3,6 @@ import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { addDefaultValidator, addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import type { Construct } from "constructs";
 
 import * as SseSchema from "./model/sse-schema.js";
 import * as ApiResponseSchema from "./model/api-response-schema.js";

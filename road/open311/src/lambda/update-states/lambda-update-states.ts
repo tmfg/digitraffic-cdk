@@ -2,8 +2,11 @@ import * as StatesApi from "../../api/states.js";
 import { update } from "../../service/states.js";
 import { Locale } from "../../model/locale.js";
 
+// eslint-disable-next-line dot-notation
 const endpointUser = process.env["ENDPOINT_USER"];
+// eslint-disable-next-line dot-notation
 const endpointPass = process.env["ENDPOINT_PASS"];
+// eslint-disable-next-line dot-notation
 const endpointUrl = process.env["ENDPOINT_URL"];
 
 export const handler = async (): Promise<void> => {

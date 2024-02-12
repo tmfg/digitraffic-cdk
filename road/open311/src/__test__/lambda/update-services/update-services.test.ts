@@ -5,8 +5,11 @@ import axios, { type AxiosRequestConfig } from "axios";
 
 const SERVER_PORT = 8088;
 
+// eslint-disable-next-line dot-notation
 process.env["ENDPOINT_USER"] = "some_user";
+// eslint-disable-next-line dot-notation
 process.env["ENDPOINT_PASS"] = "some_pass";
+// eslint-disable-next-line dot-notation
 process.env["ENDPOINT_URL"] = `http://localhost:${SERVER_PORT}`;
 
 const lambda = await import("../../../lambda/update-services/lambda-update-services.js");
@@ -37,7 +40,7 @@ describe(
     })
 );
 
-function fakeServices() {
+function fakeServices(): string {
     return `
 <?xml version="1.0" encoding="UTF-8" ?>
 <services>

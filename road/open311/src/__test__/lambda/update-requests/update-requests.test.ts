@@ -30,7 +30,8 @@ describe(
 
         test("Invalid request", async () => {
             const req = newServiceRequestWithExtensionsDto();
-            (req as any).requested_datetime = "";
+            // @ts-ignore
+            req.requested_datetime = "";
 
             await expect(
                 handler({

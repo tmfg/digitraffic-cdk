@@ -1,6 +1,5 @@
 import * as events from "aws-cdk-lib/aws-events";
 import type * as lambda from "aws-cdk-lib/aws-lambda";
-import type * as ec2 from "aws-cdk-lib/aws-ec2";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Duration } from "aws-cdk-lib";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
@@ -8,18 +7,14 @@ import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import type { Open311Props } from "./app-props.js";
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type IntegrationEnv = {
     ENDPOINT_USER: string;
     ENDPOINT_PASS: string;
     ENDPOINT_URL: string;
 };
 // returns lambda names for log group subscriptions
-export function create(
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    stack: DigitrafficStack,
-    props: Open311Props
-): void {
+export function create(stack: DigitrafficStack, props: Open311Props): void {
     const integrationEnvVars: IntegrationEnv = {
         ENDPOINT_USER: stack.getSecret().secretValueFromJson("open311.integration.username").unsafeUnwrap(),
         ENDPOINT_PASS: stack

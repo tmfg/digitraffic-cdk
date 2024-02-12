@@ -1,6 +1,7 @@
 import { handler } from "../../../lambda/get-requests/lambda-get-requests.js";
 import { newServiceRequest } from "../../testdata.js";
 import { dbTestBase, insertServiceRequest } from "../../db-testutil.js";
+import type { ServiceRequest } from "../../../model/service-request.js";
 
 describe(
     "lambda-get-requests",
@@ -25,17 +26,21 @@ describe(
         test("extensions", async () => {
             await insertServiceRequest(db, [newServiceRequest()]);
 
-            const response = await handler({ extensions: "true" });
+            const response = (await handler({ extensions: "true" })) as unknown as (ServiceRequest & {
+                extended_attributes: unknown;
+            })[];
 
-            expect((response[0] as any).extended_attributes).toBeDefined();
+            expect(response[0]!.extended_attributes).toBeDefined();
         });
 
         test("no extensions", async () => {
             await insertServiceRequest(db, [newServiceRequest()]);
 
-            const response = await handler({ extensions: "false" });
+            const response = (await handler({ extensions: "false" })) as unknown as (ServiceRequest & {
+                extended_attributes: unknown;
+            })[];
 
-            expect((response[0] as any).extended_attributes).toBeUndefined();
+            expect(response[0]!.extended_attributes).toBeUndefined();
         });
     })
 );

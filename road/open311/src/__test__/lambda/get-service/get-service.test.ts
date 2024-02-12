@@ -8,6 +8,7 @@ describe(
     "lambda-get-service",
     dbTestBase((db) => {
         test("Unknown service throws error", () => {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             expect(handler({ service_id: "123" })).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
         });
 
