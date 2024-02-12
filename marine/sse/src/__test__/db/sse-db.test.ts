@@ -25,13 +25,14 @@ describe(
             await updateLatestAndInsertData([Testdata.site1, Testdata.site2]);
 
             // Expect to find first latest status as false and second latest status as true
-            const allAfter2ndUpdate: SseDb.DbSseReport[] =
-                await DbTestutil.findAllSseReports(db);
+            const allAfter2ndUpdate: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
             expect(allAfter2ndUpdate.length).toBe(4);
-            const site1ReportsAfter2ndUpdate: SseDb.DbSseReport[] =
-                allAfter2ndUpdate.filter((r) => r.siteNumber === siteNum1);
-            const site2Reports2ndUpdate: SseDb.DbSseReport[] =
-                allAfter2ndUpdate.filter((r) => r.siteNumber === siteNum2);
+            const site1ReportsAfter2ndUpdate: SseDb.DbSseReport[] = allAfter2ndUpdate.filter(
+                (r) => r.siteNumber === siteNum1
+            );
+            const site2Reports2ndUpdate: SseDb.DbSseReport[] = allAfter2ndUpdate.filter(
+                (r) => r.siteNumber === siteNum2
+            );
             expect(site1ReportsAfter2ndUpdate.length).toBe(2);
             expect(site2Reports2ndUpdate.length).toBe(2);
 
@@ -43,7 +44,7 @@ describe(
             expect(site2Reports2ndUpdate[0]!.latest).toBe(false);
         });
 
-        async function updateLatestAndInsertData(reports: TheItemsSchema[]) {
+        async function updateLatestAndInsertData(reports: TheItemsSchema[]): Promise<void> {
             // Update latest records to false
             await db.tx((t) => {
                 const promises: Promise<null>[] = reports.map((report) =>
@@ -54,10 +55,7 @@ describe(
             // Insert new latest records
             await db.tx((t) => {
                 const promises: Promise<null>[] = reports.map((report) =>
-                    SseDb.insertSseReportData(
-                        t,
-                        SseUpdateService.convertToDbSseReport(report)
-                    )
+                    SseDb.insertSseReportData(t, SseUpdateService.convertToDbSseReport(report))
                 );
                 return t.batch(promises);
             });

@@ -27,9 +27,7 @@ describe(
             const traffic = await getAreaTraffic(db);
 
             expect(traffic).toHaveLength(1);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(traffic[0]!.ship_mmsi === mmsi);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(traffic[0]!.ship_name === shipName);
         });
 
@@ -50,9 +48,7 @@ describe(
             // only return one area!
             expect(traffic).toHaveLength(1);
             // return only first ship in area by alphabetical order
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(traffic[0]!.ship_name === shipName2);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(traffic[0]!.ship_mmsi === mmsi2);
         });
 

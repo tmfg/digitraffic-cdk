@@ -44,7 +44,7 @@ describe(
 
         const RESPONSE_ONE_COUNTER = {
             status: 200,
-            data : [
+            data: [
                 {
                     name: "DOMAINNAME",
                     channels: [
@@ -59,8 +59,9 @@ describe(
                             sens: 1
                         }
                     ]
-                }]
-            };
+                }
+            ]
+        };
 
         test("updateMetadataForDomain - insert", async () => {
             await insertDomain(db, DOMAIN_NAME);
@@ -73,8 +74,7 @@ describe(
             expect(server).toHaveBeenCalled();
 
             await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            expect(counters[0]!.name).toEqual("DOMAINNAME COUNTERNAME");
+                expect(counters[0]!.name).toEqual("DOMAINNAME COUNTERNAME");
             });
 
             await assertCountersInDb("WRONG", 0);
@@ -105,8 +105,7 @@ describe(
             expect(server).toHaveBeenCalled();
 
             await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
-             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-             expect(counters[0]!.removed_timestamp).not.toBeNull();
+                expect(counters[0]!.removed_timestamp).not.toBeNull();
             });
         });
     })

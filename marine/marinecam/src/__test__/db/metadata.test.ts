@@ -74,7 +74,6 @@ describe(
 
             const cameras = await getAllCameras(db, [GROUP_SAIMAA]);
             expect(cameras.length).toEqual(1);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(cameras[0]!.lastUpdated).toBeDefined();
 
             const newDate = new Date();
@@ -83,7 +82,6 @@ describe(
 
             const cameras2 = await getAllCameras(db, [GROUP_SAIMAA]);
             expect(cameras2.length).toEqual(1);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(cameras2[0]!.lastUpdated).toEqual(newDate);
         });
     })

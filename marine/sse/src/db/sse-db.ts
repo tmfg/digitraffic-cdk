@@ -10,7 +10,7 @@ import type {
     TheSiteTypeSchema,
     TheTemperatureSchema,
     TheTrendSchema,
-    TheWindwavedirSchema,
+    TheWindwavedirSchema
 } from "../generated/tlsc-sse-reports-schema.js";
 import type { DTTransaction } from "@digitraffic/common/dist/database/database";
 
@@ -81,12 +81,13 @@ const INSERT_SSE_REPORT_SQL = `
 
 const psUpdateLatestSite = new PreparedStatement({
     name: "update-sse-report-latest-site",
-    text: UPDATE_LATEST_SITE_TO_FALSE_SQL,
+    text: UPDATE_LATEST_SITE_TO_FALSE_SQL
 });
 
 export function updateLatestSiteToFalse(
     db: DTTransaction,
     siteNumber: number
+    // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<null> {
     return db.none(psUpdateLatestSite, siteNumber);
 }
@@ -94,10 +95,11 @@ export function updateLatestSiteToFalse(
 export function insertSseReportData(
     db: DTTransaction,
     sseData: DbSseReport
+    // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<null> {
     const ps = new PreparedStatement({
         name: "update-sse-report",
-        text: INSERT_SSE_REPORT_SQL,
+        text: INSERT_SSE_REPORT_SQL
     });
     return db.none(ps, createInsertValuesArray(sseData));
 }
@@ -116,6 +118,6 @@ export function createInsertValuesArray(e: DbSseReport): unknown[] {
         e.temperature,
         e.longitude,
         e.latitude,
-        e.siteType,
+        e.siteType
     ];
 }

@@ -12,7 +12,6 @@ import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/sub
 import {
     defaultIntegration,
     getResponse,
-    methodResponse,
     RESPONSE_200_OK
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
@@ -21,14 +20,14 @@ import { BAD_REQUEST_MESSAGE, ERROR_MESSAGE } from "@digitraffic/common/dist/aws
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 
-export function createIntegrationApiAndHandlerLambda(secret: ISecret, stack: DigitrafficStack) {
+export function createIntegrationApiAndHandlerLambda(secret: ISecret, stack: DigitrafficStack): void {
     const integrationApi: RestApi = createRestApi(stack, "SSE-Integration", "SSE Data Integration API");
 
     const sseModel = addServiceModel("Sse", integrationApi, SseSchema.Sse);
     const okResponseModel = addServiceModel("OkResponseModel", integrationApi, ApiResponseSchema.OkResponse);
     const errorResponseModel = integrationApi.addModel("ErrorResponseModel", MessageModel);
 
-    const apiResource = createUpdateSseApiGatewayResource(stack, integrationApi);
+    const apiResource = createUpdateSseApiGatewayResource(integrationApi);
     const updateSseDataLambda = createUpdateRequestHandlerLambda(
         apiResource,
         sseModel,
@@ -41,7 +40,7 @@ export function createIntegrationApiAndHandlerLambda(secret: ISecret, stack: Dig
     createDefaultUsagePlan(integrationApi, "SSE - Sea State Estimate Integration");
 }
 
-function createUpdateSseApiGatewayResource(stack: Construct, integrationApi: RestApi): Resource {
+function createUpdateSseApiGatewayResource(integrationApi: RestApi): Resource {
     const apiResource = integrationApi.root.addResource("sse").addResource("v1").addResource("update");
 
     addDefaultValidator(integrationApi);
@@ -86,6 +85,7 @@ function createUpdateRequestHandlerLambda(
         })
     );
 
+    // eslint-disable-next-line deprecation/deprecation
     const lambdaIntegration = defaultIntegration(updateSseDataLambda, {
         responses: [
             getResponse(RESPONSE_200_OK),

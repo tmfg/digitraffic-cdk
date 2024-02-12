@@ -36,7 +36,6 @@ describe("voyageplans service", () => {
             {
                 waypoint: [
                     {
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         position: randomBoolean() ? undefined! : []
                     }
                 ]
@@ -53,7 +52,6 @@ describe("voyageplans service", () => {
                     {
                         position: [
                             {
-                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                                 $: undefined!
                             }
                         ]
@@ -73,7 +71,6 @@ describe("voyageplans service", () => {
                         position: [
                             {
                                 $: {
-                                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                                     lon: undefined!,
                                     lat: 1
                                 }
@@ -96,7 +93,6 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 1,
-                                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                                     lat: undefined!
                                 }
                             }
@@ -118,12 +114,10 @@ describe("voyageplans service", () => {
                             {
                                 $: {
                                     lon: 1,
-                                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                                     lat: undefined!
                                 }
                             },
                             {
-                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                                 $: undefined!
                             }
                         ]
@@ -169,7 +163,6 @@ describe("voyageplans service", () => {
     test("validateSchedulesStructure - missing schedule element passes validation", () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure([
             {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 schedule: randomBoolean() ? undefined! : []
             }
         ]);
@@ -204,7 +197,6 @@ describe("voyageplans service", () => {
                             {
                                 scheduleElement: [
                                     {
-                                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                                         $: undefined!
                                     }
                                 ]
@@ -272,7 +264,6 @@ describe("voyageplans service", () => {
 
     test("validateStructure - no route", () => {
         const validationErrors = VoyagePlansService.validateStructure({
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             route: undefined!
         });
 
