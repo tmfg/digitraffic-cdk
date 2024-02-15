@@ -1,29 +1,27 @@
-import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { SNSEvent } from "aws-lambda";
 import { parseISO } from "date-fns";
 import { AwakeAiETAShipApi } from "../../api/awake-ai-ship";
 import type { DbETAShip } from "../../dao/timestamps";
-import { PortactivityEnvKeys } from "../../keys";
+import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
+import { UpdateAwakeAiETXTimestampsSecret } from "../../model/secret";
 import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship";
 import { sendMessage } from "../../service/queue-service";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let service: AwakeAiETAShipService | undefined;
 
 const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
-interface UpdateAwakeAiTimestampsSecret extends GenericSecret {
-    readonly voyagesurl: string;
-    readonly voyagesauth: string;
-}
-
 interface SnsETAShip extends Omit<DbETAShip, "eta"> {
     readonly eta: string;
 }
 
-const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>("awake", ["url", "auth"]);
+const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>("awake", [
+    PortactivitySecretKeys.AWAKE_URL,
+    PortactivitySecretKeys.AWAKE_AUTH
+]);
 
 export const handler = (event: SNSEvent): Promise<void> => {
     // always a single event, guaranteed by SNS

@@ -6,14 +6,9 @@ import type { Context } from "aws-lambda";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import WebSocket from "ws";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-
-interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
-    readonly atxurl: string;
-    readonly atxauth: string;
-}
+import { UpdateAwakeAiATXTimestampsSecret } from "../../model/secret";
 
 const expectedKeys = [PortactivitySecretKeys.AWAKE_ATX_URL, PortactivitySecretKeys.AWAKE_ATX_AUTH];
 
