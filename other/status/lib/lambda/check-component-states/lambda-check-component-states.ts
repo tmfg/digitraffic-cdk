@@ -1,45 +1,48 @@
-import { SecretsManager } from "aws-sdk";
 import { UpdateStatusSecret } from "../../secret";
-import * as StatusService from "../../service/status";
+import * as StatusService from "../../service/status-service";
 import { StatuspageApi } from "../../api/statuspage";
-import { NodePingApi } from "../../api/nodeping";
-import { StatusReportApi } from "../../api/statusreport";
+import { NodePingApi } from "../../api/nodeping-api";
+import { StatusReportApi } from "../../api/statusreport-api";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { StatusEnvKeys } from "../../keys";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { CStateStatuspageApi } from "../../api/cstate-statuspage-api";
 
-const smClient = new SecretsManager({
-    region: process.env.AWS_REGION,
-});
+const secretHolder = SecretHolder.create<UpdateStatusSecret>();
+const STATUSPAGE_URL = getEnvVariable(StatusEnvKeys.STATUSPAGE_URL);
+// Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
+const DEFAULT_TIMEOUT_MS = 25000 as const;
+const checkTimeout = Number(getEnvVariable(StatusEnvKeys.CHECK_TIMEOUT_SECONDS));
+const checkInterval = Number(getEnvVariable(StatusEnvKeys.INTERVAL_MINUTES));
+const cStatePageUrl = getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL);
 
+let statuspageApi: StatuspageApi;
+let nodePingApi: NodePingApi;
+let statusReportApi: StatusReportApi;
+let cStateApi: CStateStatuspageApi;
 /**
  * Checks current status of StatusPage and NodePing and sends report to Slack
  */
 export const handler = async (): Promise<void> => {
-    const secretObj = await smClient
-        .getSecretValue({
-            SecretId: process.env.SECRET_ARN!,
-        })
-        .promise();
-    if (!secretObj.SecretString) {
-        throw new Error("No secret found!");
-    }
-    const secret: UpdateStatusSecret = JSON.parse(secretObj.SecretString);
-    const statuspageApi = new StatuspageApi(
-        secret.statuspagePageId,
-        secret.statuspageApiKey
-    );
-    const nodePingApi = new NodePingApi(
-        secret.nodePingToken,
-        secret.nodepingSubAccountId
-    );
+    init();
 
-    const componentStatuses =
-        await StatusService.getNodePingAndStatuspageComponentStatuses(
-            secret,
-            statuspageApi,
-            nodePingApi
-        );
+    const componentStatuses = await StatusService.getNodePingAndStatuspageComponentNotInSyncStatuses(
+        statuspageApi,
+        nodePingApi,
+        cStateApi
+    );
 
     if (componentStatuses.length) {
-        const statusReportApi = new StatusReportApi(secret.reportUrl);
         await statusReportApi.sendReport(componentStatuses);
     }
 };
+
+function init(): void {
+    if (!statuspageApi) {
+        statuspageApi = new StatuspageApi(secretHolder, STATUSPAGE_URL, DEFAULT_TIMEOUT_MS);
+        nodePingApi = new NodePingApi(secretHolder, DEFAULT_TIMEOUT_MS, checkTimeout, checkInterval);
+
+        cStateApi = new CStateStatuspageApi(cStatePageUrl);
+        statusReportApi = new StatusReportApi(secretHolder);
+    }
+}

@@ -11,11 +11,26 @@ import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
-export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props) {
-    const secret = Secret.fromSecretCompleteArn(stack, "Secret", props.secretsManagerSecretArn);
-    createUpdateStatusesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
-    createHandleMaintenanceLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
-    createCheckComponentStatesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
+export function create(
+    stack: Stack,
+    alarmSnsTopic: ITopic,
+    warningSnsTopic: ITopic,
+    configuration: Props
+): void {
+    const secret = Secret.fromSecretNameV2(stack, "Secret", configuration.secretId);
+    createUpdateStatusesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, configuration);
+    createHandleMaintenanceLambda(secret, alarmSnsTopic, warningSnsTopic, stack, configuration);
+    createCheckComponentStatesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, configuration);
+}
+
+function createCommonEnv(props: Props): LambdaEnvironment {
+    return {
+        [StatusEnvKeys.SECRET_ID]: props.secretId,
+        [StatusEnvKeys.STATUSPAGE_URL]: props.statusPageUrl,
+        [StatusEnvKeys.C_STATE_PAGE_URL]: props.cStatePageUrl,
+        [StatusEnvKeys.CHECK_TIMEOUT_SECONDS]: props.nodePingTimeoutSeconds.toString(),
+        [StatusEnvKeys.INTERVAL_MINUTES]: props.nodePingCheckInterval.toString()
+    };
 }
 
 function createUpdateStatusesLambda(
@@ -24,19 +39,20 @@ function createUpdateStatusesLambda(
     warningSnsTopic: ITopic,
     stack: Stack,
     props: Props
-) {
-    const environment: LambdaEnvironment = {};
+): void {
+    const environment: LambdaEnvironment = createCommonEnv(props);
     environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
-    environment[StatusEnvKeys.SECRET_ID] = props.secretsManagerSecretArn;
-    environment[StatusEnvKeys.CHECK_TIMEOUT_SECONDS] = props.nodePingTimeoutSeconds.toString();
-    environment[StatusEnvKeys.INTERVAL_MINUTES] = props.nodePingCheckInterval.toString();
+    environment[StatusEnvKeys.GITHUB_OWNER] = props.gitHubOwner;
+    environment[StatusEnvKeys.GITHUB_REPO] = props.gitHubRepo;
+    environment[StatusEnvKeys.GITHUB_BRANCH] = props.gitHubBranch;
+    environment[StatusEnvKeys.GITHUB_WORKFLOW_FILE] = props.gitHubWorkflowFile;
 
     const functionName = "Status-UpdateStatuses";
     const lambdaConf: FunctionProps = {
         functionName: functionName,
         code: new AssetCode("dist/lambda/update-status"),
         handler: "lambda-update-status.handler",
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
@@ -67,19 +83,19 @@ function createHandleMaintenanceLambda(
     warningSnsTopic: ITopic,
     stack: Stack,
     props: Props
-) {
-    const functionName = "Status-HandleMaintenance";
+): void {
+    const functionName = "Status-HandleMaintenance" as const;
+
+    const environment = createCommonEnv(props);
+
     const lambdaConf: FunctionProps = {
         functionName: functionName,
         code: new AssetCode("dist/lambda/handle-maintenance"),
         handler: "lambda-handle-maintenance.handler",
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
-        environment: {
-            STATUSPAGE_URL: props.statusPageUrl,
-            SECRET_ARN: props.secretsManagerSecretArn
-        },
+        environment,
         logRetention: RetentionDays.ONE_YEAR,
         reservedConcurrentExecutions: 1
     };
@@ -107,19 +123,17 @@ function createCheckComponentStatesLambda(
     warningSnsTopic: ITopic,
     stack: Stack,
     props: Props
-) {
+): void {
     const functionName = "Status-CheckComponentStates";
+    const environment = createCommonEnv(props);
     const lambdaConf: FunctionProps = {
         functionName: functionName,
         code: new AssetCode("dist/lambda/check-component-states"),
         handler: "lambda-check-component-states.handler",
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
-        environment: {
-            STATUSPAGE_URL: props.statusPageUrl,
-            SECRET_ARN: props.secretsManagerSecretArn
-        },
+        environment,
         logRetention: RetentionDays.ONE_YEAR,
         reservedConcurrentExecutions: 1
     };

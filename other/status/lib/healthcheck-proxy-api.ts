@@ -18,7 +18,7 @@ import { ITopic } from "aws-cdk-lib/aws-sns";
 import { Construct } from "constructs";
 import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
-export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props) {
+export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props): void {
     const api = createApi(stack, props.allowFromIpAddresses);
 
     const resource = api.root.addResource("healthcheck-proxy");
@@ -27,7 +27,7 @@ export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITo
     createMqttProxyResource(api, resource, "Tie", props, alarmSnsTopic, warningSnsTopic, stack);
 }
 
-function createApi(stack: Construct, allowFromIpAddresses: string[]) {
+function createApi(stack: Construct, allowFromIpAddresses: string[]): RestApi {
     return new RestApi(stack, "HC-Proxy", {
         endpointExportName: "HC-Proxy",
         deployOptions: {
@@ -62,7 +62,7 @@ function createMqttProxyResource(
             functionName,
             code: assetCode,
             handler: "lambda-mqtt-proxy-healthcheck.handler",
-            runtime: Runtime.NODEJS_20_X,
+            runtime: Runtime.NODEJS_16_X,
             reservedConcurrentExecutions: 1,
             timeout: Duration.seconds(10),
             memorySize: 128,

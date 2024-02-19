@@ -1,57 +1,45 @@
 import { MonitoredApp } from "../../app-props";
-import { SecretsManager } from "aws-sdk";
 import { UpdateStatusSecret } from "../../secret";
-import { NodePingApi } from "../../api/nodeping";
+import { NodePingApi } from "../../api/nodeping-api";
 import { StatuspageApi } from "../../api/statuspage";
-import * as StatusService from "../../service/status";
-import { DigitrafficApi } from "../../api/digitraffic";
+import * as StatusService from "../../service/status-service";
+import { DigitrafficApi } from "../../api/digitraffic-api";
 import { StatusEnvKeys } from "../../keys";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
-const smClient = new SecretsManager({
-    region: process.env.AWS_REGION,
-});
+// Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
+const DEFAULT_TIMEOUT_MS = 25000 as const;
 
-const secretId = process.env[StatusEnvKeys.SECRET_ID]!;
-const apps = JSON.parse(process.env[StatusEnvKeys.APPS]!) as MonitoredApp[];
-const checkTimeout = Number(process.env[StatusEnvKeys.CHECK_TIMEOUT_SECONDS]);
-const checkInterval = Number(process.env[StatusEnvKeys.INTERVAL_MINUTES]);
+const secretHolder = SecretHolder.create<UpdateStatusSecret>();
+
+const apps = JSON.parse(getEnvVariable(StatusEnvKeys.APPS)) as MonitoredApp[];
+const checkTimeout = Number(getEnvVariable(StatusEnvKeys.CHECK_TIMEOUT_SECONDS));
+const checkInterval = Number(getEnvVariable(StatusEnvKeys.INTERVAL_MINUTES));
+const statusPageUrl = getEnvVariable(StatusEnvKeys.STATUSPAGE_URL);
+
+const gitHubOwner = getEnvVariable(StatusEnvKeys.GITHUB_OWNER);
+const gitHubRepo = getEnvVariable(StatusEnvKeys.GITHUB_REPO);
+const gitHubBranch = getEnvVariable(StatusEnvKeys.GITHUB_BRANCH);
+const gitHubWorkflowFile = getEnvVariable(StatusEnvKeys.GITHUB_WORKFLOW_FILE);
 
 /**
  * Updates StatusPage components and NodePing checks
  */
-export const handler = async (): Promise<any> => {
-    const secretObj = await smClient
-        .getSecretValue({
-            SecretId: secretId,
-        })
-        .promise();
-    if (!secretObj.SecretString) {
-        throw new Error("No secret found!");
-    }
-    if (!checkTimeout) {
-        throw new Error("Check timeout not set");
-    }
-    if (!checkInterval) {
-        throw new Error("Check timeout not set");
-    }
-    const secret: UpdateStatusSecret = JSON.parse(secretObj.SecretString);
+export const handler = async (): Promise<void> => {
     const digitrafficApi = new DigitrafficApi();
-    const statuspageApi = new StatuspageApi(
-        secret.statuspagePageId,
-        secret.statuspageApiKey
-    );
-    const nodePingApi = new NodePingApi(
-        secret.nodePingToken,
-        secret.nodepingSubAccountId,
-        checkTimeout,
-        checkInterval
-    );
+    const statuspageApi = new StatuspageApi(secretHolder, statusPageUrl, DEFAULT_TIMEOUT_MS);
+    const nodePingApi = new NodePingApi(secretHolder, DEFAULT_TIMEOUT_MS, checkTimeout, checkInterval);
 
     await StatusService.updateComponentsAndChecks(
         apps,
         digitrafficApi,
         statuspageApi,
         nodePingApi,
-        secret
+        secretHolder,
+        gitHubOwner,
+        gitHubRepo,
+        gitHubBranch,
+        gitHubWorkflowFile
     );
 };

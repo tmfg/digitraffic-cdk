@@ -1,12 +1,12 @@
 export enum EndpointProtocol {
     HTTP,
-    WebSocket,
+    WebSocket
 }
 
 export enum EndpointHttpMethod {
     GET = "GET",
     HEAD = "HEAD",
-    POST = "POST",
+    POST = "POST"
 }
 
 export interface MonitoredEndpoint {
@@ -15,10 +15,13 @@ export interface MonitoredEndpoint {
     readonly protocol: EndpointProtocol;
     readonly method?: EndpointHttpMethod;
     readonly sendData?: string;
+    readonly contentstring?: string;
+    readonly invert?: boolean;
+    readonly regex?: boolean;
 }
 
 export interface MonitoredApp {
-    readonly name: string;
+    readonly name: string; // i.e. Road
     readonly hostPart: string;
     readonly url: string;
     readonly endpoints: MonitoredEndpoint[];
@@ -28,10 +31,15 @@ export interface MonitoredApp {
 export interface Props {
     readonly defaultLambdaDurationSeconds: number;
     readonly logsDestinationArn: string;
-    readonly secretsManagerSecretArn: string;
+    readonly secretId: string;
     readonly nodePingTimeoutSeconds: number;
     readonly nodePingCheckInterval: number;
     readonly monitoredApps: MonitoredApp[];
     readonly allowFromIpAddresses: string[];
     readonly statusPageUrl: string;
+    readonly cStatePageUrl: string;
+    readonly gitHubRepo: string;
+    readonly gitHubOwner: string;
+    readonly gitHubBranch: string;
+    readonly gitHubWorkflowFile: string;
 }

@@ -1,147 +1,41 @@
-import axios from "axios";
-import { SecretsManager } from "aws-sdk";
+import { handleMaintenance } from "../../service/maintenance-service";
 import { UpdateStatusSecret } from "../../secret";
+import { CStateStatuspageApi } from "../../api/cstate-statuspage-api";
+import { StatuspageApi } from "../../api/statuspage";
+import { NodePingApi } from "../../api/nodeping-api";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { StatusEnvKeys } from "../../keys";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
-let api: SlackApi;
-
-const NODEPING_API = "https://api.nodeping.com/api/1";
-const STATUSPAGE_URL = process.env.STATUSPAGE_URL!;
-
+const STATUSPAGE_URL = getEnvVariable(StatusEnvKeys.STATUSPAGE_URL);
+const C_STATE_PAGE_URL = getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL);
 // Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
-const DEFAULT_TIMEOUT_MS = 25000;
+const DEFAULT_TIMEOUT_MS = 25000 as const;
+const checkTimeout = Number(getEnvVariable(StatusEnvKeys.CHECK_TIMEOUT_SECONDS));
+const checkInterval = Number(getEnvVariable(StatusEnvKeys.INTERVAL_MINUTES));
 
-const smClient = new SecretsManager({
-    region: process.env.AWS_REGION,
-});
+const secretHolder = SecretHolder.create<UpdateStatusSecret>();
 
-interface StatuspageMaintenances {
-    readonly scheduled_maintenances: [
-        {
-            readonly scheduled_for: string;
-            readonly scheduled_until: string;
-        }
-    ];
-}
-
-interface NodePingCheck {
-    readonly enable: string;
-}
-
-async function getActiveStatusPageMaintenances(): Promise<StatuspageMaintenances> {
-    const r = await axios.get(
-        `${STATUSPAGE_URL}/api/v2/scheduled-maintenances/active.json`,
-        {
-            timeout: DEFAULT_TIMEOUT_MS,
-        }
-    );
-    if (r.status !== 200) {
-        throw new Error("Unable to get Statuspage maintenances");
-    }
-    return r.data as StatuspageMaintenances;
-}
-
-async function getEnabledNodePingChecks(
-    nodepingToken: string,
-    subaccountId: string
-): Promise<NodePingCheck[]> {
-    const r = await axios.get<NodePingCheck[]>(
-        `${NODEPING_API}/checks?token=${nodepingToken}&customerid=${subaccountId}`,
-        {
-            timeout: DEFAULT_TIMEOUT_MS,
-        }
-    );
-    if (r.status !== 200) {
-        throw new Error("Unable to fetch checks");
-    }
-    const checks: NodePingCheck[] = Object.values(r.data);
-    return checks.filter((c) => c.enable === "active");
-}
-
-async function setNodePingCheckStateToDisabled(
-    disabled: boolean,
-    nodepingToken: string,
-    subaccountId: string
-) {
-    console.info(
-        `method=setNodePingCheckStateToDisabled Setting NodePing checks disabled state to ${disabled}`
-    );
-    const r = await axios.put(
-        `${NODEPING_API}/checks?disableall=${disabled}&token=${nodepingToken}&customerid=${subaccountId}`,
-        {
-            timeout: DEFAULT_TIMEOUT_MS,
-        }
-    );
-    if (r.status !== 200) {
-        throw new Error("Unable to update checks");
-    }
-}
-
-async function enableNodePingChecks(
-    nodepingToken: string,
-    subaccountId: string
-) {
-    await setNodePingCheckStateToDisabled(false, nodepingToken, subaccountId);
-}
-
-async function disableNodePingChecks(
-    nodepingToken: string,
-    subaccountId: string
-) {
-    await setNodePingCheckStateToDisabled(true, nodepingToken, subaccountId);
-}
-
-async function handleMaintenance(secret: UpdateStatusSecret) {
-    const activeMaintenances = await getActiveStatusPageMaintenances();
-    const enabledNodePingChecks = await getEnabledNodePingChecks(
-        secret.nodePingToken,
-        secret.nodepingSubAccountId
-    );
-
-    if (activeMaintenances.scheduled_maintenances.length) {
-        if (enabledNodePingChecks.length) {
-            console.info(
-                "method=handleMaintenance Active maintenances found, disabling NodePing checks"
-            );
-            await disableNodePingChecks(
-                secret.nodePingToken,
-                secret.nodepingSubAccountId
-            );
-            await api.notify(
-                "NodePing checks disabled, maintenance has started!"
-            );
-        }
-    } else {
-        if (!enabledNodePingChecks.length) {
-            console.info(
-                "method=handleMaintenance No active maintenances found, enabling disabled NodePing checks"
-            );
-            await enableNodePingChecks(
-                secret.nodePingToken,
-                secret.nodepingSubAccountId
-            );
-            await api.notify("NodePing checks enabled, maintenance has ended!");
-        }
-    }
-}
+let slackNotifyApi: SlackApi | undefined;
+let cStateApi: CStateStatuspageApi | undefined;
+let statuspageApi: StatuspageApi | undefined;
+let nodePingApi: NodePingApi | undefined;
 
 /**
  * Checks StatusPage maintenances and disables NodePing checks if maintenance is active
+ * or re-enables checks if maintenance is over
  */
-export const handler = async () => {
-    const secretObj = await smClient
-        .getSecretValue({
-            SecretId: process.env.SECRET_ARN!,
-        })
-        .promise();
-    if (!secretObj.SecretString) {
-        throw new Error("No secret found!");
-    }
-    const secret: UpdateStatusSecret = JSON.parse(secretObj.SecretString);
+export const handler = async (): Promise<void> => {
+    const secret = await secretHolder.get();
+    slackNotifyApi = slackNotifyApi ? slackNotifyApi : new SlackApi(secret.reportUrl);
+    cStateApi = cStateApi ? cStateApi : new CStateStatuspageApi(C_STATE_PAGE_URL);
+    statuspageApi = statuspageApi
+        ? statuspageApi
+        : new StatuspageApi(secretHolder, STATUSPAGE_URL, DEFAULT_TIMEOUT_MS);
+    nodePingApi = nodePingApi
+        ? nodePingApi
+        : new NodePingApi(secretHolder, DEFAULT_TIMEOUT_MS, checkTimeout, checkInterval);
 
-    if (!api) {
-        api = new SlackApi(secret.reportUrl);
-    }
-
-    await handleMaintenance(secret);
+    await handleMaintenance(nodePingApi, cStateApi, slackNotifyApi, statuspageApi);
 };
