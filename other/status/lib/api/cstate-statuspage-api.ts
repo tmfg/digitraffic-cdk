@@ -84,7 +84,7 @@ export class CStateStatuspageApi {
 
     private hasStatusActiveMaintenances(cStatus: CStateStatus): boolean {
         const method = `${SERVICE}.hasStatusActiveMaintenances` as const satisfies LoggerMethodType;
-        // This is executed ever minute, so in worst case it will turn off one minute too late.
+        // This is executed ever minute, so in worst case it will turn off one minute late.
         // Make it turn on max one minute too early :)
         const now = Date.now() + MINUTE_MS;
 
