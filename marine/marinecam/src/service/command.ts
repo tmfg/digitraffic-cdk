@@ -189,3 +189,9 @@ export class CloseStreamCommand extends DefaultCommand {
         super("CloseStream");
     }
 }
+
+export class LogoutCommand extends DefaultCommand {
+    constructor() {
+        super("Disconnect");
+    }
+}

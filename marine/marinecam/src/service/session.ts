@@ -13,7 +13,8 @@ import {
     GetThumbnailByTimeCommand,
     GetThumbnailCommand,
     LoginCommand,
-    RequestStreamCommand
+    RequestStreamCommand,
+    LogoutCommand
 } from "./command.js";
 
 axiosRetry(axios, {
@@ -40,7 +41,7 @@ const agent = new Agent({
 
 const parse = util.promisify(parseString);
 
-export class Session {
+export class Session {    
     readonly communicationUrl: string;
     readonly videoUrl: string;
     readonly agent: Agent;
@@ -112,6 +113,12 @@ export class Session {
 
         // use a bit longer timeout for login
         return this.sendMessage(command, { timeout: 8000 });
+    }
+
+    disconnect() {
+        const command = new LogoutCommand();
+
+        return this.sendMessage(command);
     }
 
     getThumbnail(cameraId: string): Promise<string> {

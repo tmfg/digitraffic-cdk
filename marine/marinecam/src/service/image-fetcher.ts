@@ -39,6 +39,8 @@ async function updateAllImages(cameraIds: string[], session: Session, bucketName
         })
     );
 
+    await session.disconnect();
+
     return MetadataService.updateMetadataUpdated(updatedCameras, new Date());
 }
 
