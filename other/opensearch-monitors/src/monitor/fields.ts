@@ -1,4 +1,4 @@
-export type DefaultField = "@log_group" | "@log_stream" | "env";
+export type DefaultField = "@log_group" | "@log_stream" | "env" | "accountName";
 
 // prettier-ignore
 export type DefaultJavaField =  "@timestamp" | "app" | "level" | "log_line" | "logger_name" | "message" | "thread_name";
