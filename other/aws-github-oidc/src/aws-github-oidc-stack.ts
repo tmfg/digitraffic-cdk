@@ -1,5 +1,5 @@
-import { Duration, Stack, StackProps } from "aws-cdk-lib";
-import { Construct } from "constructs";
+import { Duration, Stack, type StackProps } from "aws-cdk-lib";
+import { type Construct } from "constructs";
 import {
     Effect,
     OpenIdConnectProvider,
@@ -8,7 +8,7 @@ import {
     WebIdentityPrincipal
 } from "aws-cdk-lib/aws-iam";
 import { Function } from "aws-cdk-lib/aws-lambda";
-import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
+import { type TrafficType } from "@digitraffic/common/dist/types/traffictype";
 
 export interface AwsGithubProps {
     readonly roles: {

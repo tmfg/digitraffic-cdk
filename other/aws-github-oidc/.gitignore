@@ -2,7 +2,6 @@
 
 !/.eslintignore
 !/.eslintrc.cjs
-!/.eslintrc.js
 !/.gitignore
 !/cdk.json
 !/jest.config.js
@@ -12,9 +11,7 @@
 
 !/config/
 !/config/*.json
-!/lib/
-!/lib/**/
-!/lib/**/*.ts
-!/test/
-!/test/**/
-!/test/**/*.ts
+!/src/
+!/src/**/
+!/src/**/*.ts
+/src/bin
