@@ -2,9 +2,10 @@
   "name": "patchmanager-cdk",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "cdk": "cdk",
+    "cdk": "npx cdk@latest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
@@ -18,9 +19,13 @@
     "constructs": "10.3.0"
   },
   "devDependencies": {
+    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.5.1",
+    "@rushstack/eslint-config": "^3.6.1",
+    "@rushstack/heft": "^0.64.2",
+    "@rushstack/heft-jest-plugin": "^0.11.2",
+    "@types/heft-jest": "1.0.6",
     "@types/node": "20.10.7",
     "eslint": "~8.56.0",
     "ts-node": "^10.9.2",
