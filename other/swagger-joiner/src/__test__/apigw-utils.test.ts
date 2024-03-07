@@ -3,6 +3,7 @@ import { jest } from "@jest/globals";
 import _ from "lodash";
 
 const mockSend = jest.fn(() => Promise.resolve({ items: [] }));
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 jest.spyOn(APIGatewayClient.prototype, "send").mockImplementation(mockSend);
 
 import { exportSwaggerApi, getDocumentationVersion, createDocumentationVersion } from "../apigw-utils.js";
