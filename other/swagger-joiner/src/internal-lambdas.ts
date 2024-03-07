@@ -1,28 +1,17 @@
-import { AssetCode, FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
+import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
 import { Duration } from "aws-cdk-lib";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { Props } from "./app-props";
+import { type Props } from "./app-props.js";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { Bucket } from "aws-cdk-lib/aws-s3";
-import {
-    KEY_APIGW_APPS,
-    KEY_APP_BETA_URL,
-    KEY_APP_URL,
-    KEY_BUCKET_NAME,
-    KEY_DESCRIPTION,
-    KEY_DIRECTORY,
-    KEY_HOST,
-    KEY_REGION,
-    KEY_REMOVESECURITY,
-    KEY_TITLE
-} from "./lambda/update-swagger/lambda-update-swagger";
-import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation";
+import { type Bucket } from "aws-cdk-lib/aws-s3";
+import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation.js";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { type LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { UPDATE_SWAGGER_KEYS } from "./model/keys.js";
 
 export function create(stack: DigitrafficStack, bucket: Bucket): void {
     createUpdateSwaggerDescriptionsLambda(stack, bucket);
@@ -34,7 +23,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
     const props = stack.configuration as Props;
 
     const lambdaEnv: LambdaEnvironment = {};
-    lambdaEnv[KEY_REGION] = stack.region;
+    lambdaEnv[UPDATE_SWAGGER_KEYS.REGION] = stack.region;
     lambdaEnv[KEY_APIGW_IDS] = JSON.stringify(props.apiGwAppIds);
 
     const lambdaConf: FunctionProps = {
@@ -65,29 +54,29 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
     const props = stack.configuration as Props;
 
     const lambdaEnv: LambdaEnvironment = {};
-    lambdaEnv[KEY_BUCKET_NAME] = bucket.bucketName;
-    lambdaEnv[KEY_REGION] = stack.region;
-    lambdaEnv[KEY_APIGW_APPS] = JSON.stringify(props.apiGwAppIds);
+    lambdaEnv[UPDATE_SWAGGER_KEYS.BUCKET_NAME] = bucket.bucketName;
+    lambdaEnv[UPDATE_SWAGGER_KEYS.REGION] = stack.region;
+    lambdaEnv[UPDATE_SWAGGER_KEYS.APIGW_APPS] = JSON.stringify(props.apiGwAppIds);
     if (props.appUrl) {
-        lambdaEnv[KEY_APP_URL] = props.appUrl;
+        lambdaEnv[UPDATE_SWAGGER_KEYS.APP_URL] = props.appUrl;
     }
     if (props.betaAppUrl) {
-        lambdaEnv[KEY_APP_BETA_URL] = props.betaAppUrl;
+        lambdaEnv[UPDATE_SWAGGER_KEYS.APP_BETA_URL] = props.betaAppUrl;
     }
     if (props.directory) {
-        lambdaEnv[KEY_DIRECTORY] = props.directory;
+        lambdaEnv[UPDATE_SWAGGER_KEYS.DIRECTORY] = props.directory;
     }
     if (props.host) {
-        lambdaEnv[KEY_HOST] = props.host;
+        lambdaEnv[UPDATE_SWAGGER_KEYS.HOST] = props.host;
     }
     if (props.title) {
-        lambdaEnv[KEY_TITLE] = props.title;
+        lambdaEnv[UPDATE_SWAGGER_KEYS.TITLE] = props.title;
     }
     if (props.description) {
-        lambdaEnv[KEY_DESCRIPTION] = props.description;
+        lambdaEnv[UPDATE_SWAGGER_KEYS.DESCRIPTION] = props.description;
     }
     if (props.removeSecurity) {
-        lambdaEnv[KEY_REMOVESECURITY] = "true";
+        lambdaEnv[UPDATE_SWAGGER_KEYS.REMOVESECURITY] = "true";
     }
 
     const lambdaConf: FunctionProps = {

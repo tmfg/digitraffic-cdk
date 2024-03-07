@@ -1,4 +1,4 @@
-import { OpenApiSchema } from "../lib/model/openapi-schema";
+import { type OpenApiSchema } from "../model/openapi-schema.js";
 
 export const getOpenapiDescriptionWithPaths = (
     paths: Record<string, Record<string, Record<string, unknown>>>
@@ -44,7 +44,8 @@ export function getPathWithSecurity(
     method: string = "get"
 ): Record<string, Record<string, Record<string, unknown>>> {
     const result = getSupportedPath(path);
-    result[path][method].security = [{ api_key: [] }];
+    // eslint-disable-next-line dot-notation
+    result[path]![method]!["security"] = [{ api_key: [] }];
     return result;
 }
 

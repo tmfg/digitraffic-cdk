@@ -1,22 +1,13 @@
-import {
-    mergeApiDescriptions,
-    withoutMethods,
-    withoutSecurity,
-    withDeprecations
-} from "../lib/swagger-utils";
+import { mergeApiDescriptions, withoutMethods, withoutSecurity, withDeprecations } from "../swagger-utils.js";
 import {
     getDeprecatedPathWithHeaders,
     getDeprecatedPathWithRemovalText,
     getOpenapiDescriptionWithPaths,
     getPathWithSecurity,
     getSupportedPath
-} from "./testdata";
-import { openapiSchema } from "../lib/model/openapi-schema";
-import * as digitrafficOpenApiJson from "./resources/digitraffic-road-test.json";
-
-/* eslint-disable @typescript-eslint/no-non-null-assertion --
- * Assertions are absolutely fine in tests.
- */
+} from "./testdata.js";
+import { openapiSchema } from "../model/openapi-schema.js";
+import { TEST } from "./resources/digitraffic-road-test.js";
 
 describe("swagger-utils", () => {
     test("mergeApiDescriptions", () => {
@@ -49,9 +40,9 @@ describe("swagger-utils", () => {
         });
 
         // deprecated field not set in test data
-        expect(apiDescription.paths[path1].get!.deprecated).toBe(undefined);
-        expect(apiDescription.paths[path2].get!.deprecated).toBe(undefined);
-        expect(apiDescription.paths[path3].get!.deprecated).toBe(undefined);
+        expect(apiDescription.paths[path1]!.get!.deprecated).toBe(undefined);
+        expect(apiDescription.paths[path2]!.get!.deprecated).toBe(undefined);
+        expect(apiDescription.paths[path3]!.get!.deprecated).toBe(undefined);
 
         // set fields
         apiDescription.paths = withDeprecations(apiDescription.paths);
@@ -60,9 +51,9 @@ describe("swagger-utils", () => {
         expect(openapiSchema.parse(apiDescription)).toBeTruthy();
 
         // deprecated field is set where required
-        expect(apiDescription.paths[path1].get!.deprecated).toBe(undefined);
-        expect(apiDescription.paths[path2].get!.deprecated).toBe(true);
-        expect(apiDescription.paths[path3].get!.deprecated).toBe(true);
+        expect(apiDescription.paths[path1]!.get!.deprecated).toBe(undefined);
+        expect(apiDescription.paths[path2]!.get!.deprecated).toBe(true);
+        expect(apiDescription.paths[path3]!.get!.deprecated).toBe(true);
     });
 
     test("removeSecurityFromPaths", () => {
@@ -76,10 +67,10 @@ describe("swagger-utils", () => {
 
         const filteredPaths = withoutSecurity(api.paths);
 
-        expect(api.paths[path1].get!.security).not.toBeDefined();
-        expect(api.paths[path2].get!.security).toBeDefined();
-        expect(filteredPaths[path1].get!.security).not.toBeDefined();
-        expect(filteredPaths[path2].get!.security).not.toBeDefined();
+        expect(api.paths[path1]!.get!.security).not.toBeDefined();
+        expect(api.paths[path2]!.get!.security).toBeDefined();
+        expect(filteredPaths[path1]!.get!.security).not.toBeDefined();
+        expect(filteredPaths[path2]!.get!.security).not.toBeDefined();
     });
 
     test("removeMethodsFromPaths", () => {
@@ -93,17 +84,17 @@ describe("swagger-utils", () => {
 
         const filteredPaths = withoutMethods(api.paths, (method) => method === "put");
 
-        expect(api.paths[path1].get).toBeDefined();
-        expect(api.paths[path2].put).toBeDefined();
-        expect(filteredPaths[path1].get).toBeDefined();
-        expect(filteredPaths[path2].put).not.toBeDefined();
+        expect(api.paths[path1]!.get).toBeDefined();
+        expect(api.paths[path2]!.put).toBeDefined();
+        expect(filteredPaths[path1]!.get).toBeDefined();
+        expect(filteredPaths[path2]!.put).not.toBeDefined();
     });
 
     test("OpenApi schema parses actual json", () => {
         // Sanity check on the openapiSchema accepts the actual json we output.
 
         // Throws error on failure indicating what is wrong.
-        const api = openapiSchema.parse(digitrafficOpenApiJson);
+        const api = openapiSchema.parse(TEST);
 
         // Need to bypass the type system to check the actual structure of the objects.
         /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -112,7 +103,7 @@ describe("swagger-utils", () => {
 
         // Check that nothing got accidentally removed.
         const normalizedParsedJson = JSON.parse(JSON.stringify(api));
-        const normalizedOriginalJson = JSON.parse(JSON.stringify(digitrafficOpenApiJson));
+        const normalizedOriginalJson = JSON.parse(JSON.stringify(TEST));
         delete normalizedOriginalJson.default; // Added by import
 
         expect(Object.keys(normalizedParsedJson)).toEqual(Object.keys(normalizedOriginalJson));

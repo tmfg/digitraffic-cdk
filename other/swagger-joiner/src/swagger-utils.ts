@@ -1,4 +1,4 @@
-import { OpenApiSchema, OpenApiOperation, openapiOperation } from "./model/openapi-schema";
+import { type OpenApiSchema, type OpenApiOperation, openapiOperation } from "./model/openapi-schema.js";
 import _ from "lodash";
 
 export function constructSwagger(spec: object): string {

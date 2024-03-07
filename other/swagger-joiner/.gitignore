@@ -2,7 +2,6 @@
 
 !/.eslintignore
 !/.eslintrc.cjs
-!/.eslintrc.js
 !/.gitignore
 !/cdk.json
 !/jest.config.js
@@ -10,19 +9,17 @@
 !/*.md
 !/*.sh
 
+!/resources/
+!/resources/*.png
+!/resources/*.css
+!/resources/*.html
+!/resources/*.js
+!/resources/version.txt
+!/resources/LICENSE
+/resources/dt-swagger.js
 !/config/
 !/config/*.json
-!/lib/
-!/lib/**/
-!/lib/**/*.ts
-!/test/
-!/test/**/
-!/test/**/*.ts
-
-!resources/
-!resources/*.css
-!resources/*.html
-!resources/*.png
-!resources/*.js
-!resources/LICENSE
-!resources/version.txt
+!/src/
+!/src/**/
+!/src/**/*.ts
+/src/bin
