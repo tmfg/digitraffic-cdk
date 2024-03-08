@@ -14,7 +14,7 @@
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node18",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node20",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
