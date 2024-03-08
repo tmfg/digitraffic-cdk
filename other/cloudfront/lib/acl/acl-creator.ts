@@ -1,13 +1,9 @@
-import { CfnLoggingConfiguration, CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import { ArnFormat, IResolvable, RemovalPolicy, Stack } from "aws-cdk-lib";
+import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { IResolvable, RemovalPolicy, Stack } from "aws-cdk-lib";
 import { WafRules } from "./waf-rules";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
-type ResponseKey =
-    | "WITH_DIGITRAFFIC_USER"
-    | "IPQUERY_WITH_DIGITRAFFIC_USER"
-    | "WITHOUT_DIGITRAFFIC_USER"
-    | "IPQUERY_WITHOUT_DIGITRAFFIC_USER";
+type ResponseKey = "IP_WITH_HEADER" | "IPQUERY_WITH_HEADER" | "IP_WITHOUT_HEADER" | "IPQUERY_WITHOUT_HEADER";
 
 const CUSTOM_KEYS_IP_AND_QUERY: CfnWebACL.RateBasedStatementCustomKeyProperty[] = [
     {
@@ -82,27 +78,27 @@ type CustomResponseBodies = Partial<Record<ResponseKey, CfnWebACL.CustomResponse
 function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
     const customResponseBodies: CustomResponseBodies = {};
 
-    if (rules.withHeaderLimit) {
-        customResponseBodies["WITH_DIGITRAFFIC_USER"] = {
-            content: `Request rate is limited to ${rules.withHeaderLimit} requests in a 5 minute window.`,
+    if (rules.perIpWithHeader) {
+        customResponseBodies.IP_WITH_HEADER = {
+            content: `Request rate is limited to ${rules.perIpWithHeader} requests in a 5 minute window.`,
             contentType: "TEXT_PLAIN"
         };
     }
-    if (rules.withoutHeaderLimit) {
-        customResponseBodies["WITHOUT_DIGITRAFFIC_USER"] = {
-            content: `Request rate is limited to ${rules.withoutHeaderLimit} requests in a 5 minute window.`,
+    if (rules.perIpWithoutHeader) {
+        customResponseBodies.IP_WITHOUT_HEADER = {
+            content: `Request rate is limited to ${rules.perIpWithoutHeader} requests in a 5 minute window.`,
             contentType: "TEXT_PLAIN"
         };
     }
-    if (rules.withHeaderIpQueryLimit) {
-        customResponseBodies["IPQUERY_WITH_DIGITRAFFIC_USER"] = {
-            content: `Request rate is limited to ${rules.withHeaderIpQueryLimit} requests in a 5 minute window.`,
+    if (rules.perIpAndQueryWithHeader) {
+        customResponseBodies.IPQUERY_WITH_HEADER = {
+            content: `Request rate is limited to ${rules.perIpAndQueryWithHeader} requests in a 5 minute window.`,
             contentType: "TEXT_PLAIN"
         };
     }
-    if (rules.withHeaderIpQueryLimit) {
-        customResponseBodies["IPQUERY_WITHOUT_DIGITRAFFIC_USER"] = {
-            content: `Request rate is limited to ${rules.withHeaderIpQueryLimit} requests in a 5 minute window.`,
+    if (rules.perIpAndQueryWithoutHeader) {
+        customResponseBodies.IPQUERY_WITHOUT_HEADER = {
+            content: `Request rate is limited to ${rules.perIpAndQueryWithoutHeader} requests in a 5 minute window.`,
             contentType: "TEXT_PLAIN"
         };
     }
@@ -157,56 +153,56 @@ function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
         generatedRules.push();
     }
 
-    if (rules.withHeaderLimit) {
+    if (rules.perIpWithHeader) {
         generatedRules.push(
             createRuleProperty(
                 "ThrottleRuleWithDigitrafficUser",
                 1,
                 {
-                    action: createRuleAction("WITH_DIGITRAFFIC_USER"),
-                    statement: createThrottleStatement(rules.withHeaderLimit, true, false)
+                    action: createRuleAction("IP_WITH_HEADER"),
+                    statement: createThrottleStatement(rules.perIpWithHeader, true, false)
                 },
                 false
             )
         );
     }
 
-    if (rules.withHeaderIpQueryLimit) {
+    if (rules.perIpAndQueryWithHeader) {
         generatedRules.push(
             createRuleProperty(
                 "ThrottleRuleIPQueryWithDigitrafficUser",
                 2,
                 {
-                    action: createRuleAction("IPQUERY_WITH_DIGITRAFFIC_USER"),
-                    statement: createThrottleStatement(rules.withHeaderIpQueryLimit, true, true)
+                    action: createRuleAction("IPQUERY_WITH_HEADER"),
+                    statement: createThrottleStatement(rules.perIpAndQueryWithHeader, true, true)
                 },
                 false
             )
         );
     }
 
-    if (rules.withoutHeaderLimit) {
+    if (rules.perIpWithoutHeader) {
         generatedRules.push(
             createRuleProperty(
                 "ThrottleRuleWithoutDigitrafficUser",
                 3,
                 {
-                    action: createRuleAction("WITHOUT_DIGITRAFFIC_USER"),
-                    statement: createThrottleStatement(rules.withoutHeaderLimit, false, false)
+                    action: createRuleAction("IP_WITHOUT_HEADER"),
+                    statement: createThrottleStatement(rules.perIpWithoutHeader, false, false)
                 },
                 false
             )
         );
     }
 
-    if (rules.withoutHeaderIpQueryLimit) {
+    if (rules.perIpAndQueryWithoutHeader) {
         generatedRules.push(
             createRuleProperty(
                 "ThrottleRuleIPQueryWithoutDigitrafficUser",
                 4,
                 {
-                    action: createRuleAction("IPQUERY_WITHOUT_DIGITRAFFIC_USER"),
-                    statement: createThrottleStatement(rules.withoutHeaderIpQueryLimit, false, true)
+                    action: createRuleAction("IPQUERY_WITHOUT_HEADER"),
+                    statement: createThrottleStatement(rules.perIpAndQueryWithoutHeader, false, true)
                 },
                 false
             )
