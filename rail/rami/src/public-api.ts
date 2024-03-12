@@ -1,18 +1,18 @@
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration.js";
-import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response.js";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation.js";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction.js";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis.js";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans.js";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes.js";
-import type { ModelWithReference } from "@digitraffic/common/dist/aws/types/model-with-reference.js";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import type { ModelWithReference } from "@digitraffic/common/dist/aws/types/model-with-reference";
 import {
     addDefaultValidator,
     addServiceModel,
     createArraySchema,
     getModelReference
-} from "@digitraffic/common/dist/utils/api-model.js";
+} from "@digitraffic/common/dist/utils/api-model";
 import { EndpointType, type IModel, type RequestValidator, type Resource } from "aws-cdk-lib/aws-apigateway";
 import {
     TextSchema,

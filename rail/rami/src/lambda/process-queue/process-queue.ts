@@ -1,11 +1,11 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
 import { parseMessage, processMessage } from "../../service/process-message.js";
-import { logException } from "@digitraffic/common/dist/utils/logging.js";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import { sendToSqs } from "../../util/sqs.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 const DLQ_URL = getEnvVariable("DLQ_URL");
 

@@ -2,7 +2,7 @@ import {
     getEnvVariable,
     getEnvVariableOrElse,
     getEnvVariableSafe
-} from "@digitraffic/common/dist/utils/utils.js";
+} from "@digitraffic/common/dist/utils/utils";
 import { SecretsManager } from "@aws-sdk/client-secrets-manager";
 
 export enum EnvKeys {

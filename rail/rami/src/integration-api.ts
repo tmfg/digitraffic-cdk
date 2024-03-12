@@ -1,12 +1,12 @@
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration.js";
-import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response.js";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     MonitoredDBFunction,
     MonitoredFunction
-} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction.js";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis.js";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans.js";
+} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { Duration } from "aws-cdk-lib";
 import { EndpointType, Model, type Resource } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";

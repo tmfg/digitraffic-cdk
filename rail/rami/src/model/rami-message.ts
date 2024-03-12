@@ -1,4 +1,4 @@
-import type { ValueOf } from "@digitraffic/common/dist/types/util-types.js";
+import type { ValueOf } from "@digitraffic/common/dist/types/util-types";
 import type { z } from "zod";
 import type { ramiMessageSchema } from "./zod-schema/rami-message.js";
 import type {

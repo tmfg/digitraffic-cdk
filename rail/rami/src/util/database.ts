@@ -1,4 +1,4 @@
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { Connection } from "mysql2/promise.js";
 import { type Pool, createPool } from "mysql2/promise.js";
 import { getFromEnvOrSecret } from "./secret.js";

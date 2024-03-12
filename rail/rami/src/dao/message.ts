@@ -1,5 +1,5 @@
 /* eslint-disable @rushstack/no-new-null */
-import { MYSQL_DATETIME_FORMAT, dateToUTCString } from "@digitraffic/common/dist/utils/date-utils.js";
+import { MYSQL_DATETIME_FORMAT, dateToUTCString } from "@digitraffic/common/dist/utils/date-utils";
 import type { Connection } from "mysql2/promise.js";
 import type { DtRamiMessage } from "../model/dt-rami-message.js";
 import { mapDaysToBits } from "../util/weekdays.js";

@@ -1,14 +1,14 @@
-import { ENV_API_KEY, ENV_HOSTNAME } from "@digitraffic/common/dist/aws/infra/canaries/canary-keys.js";
+import { ENV_API_KEY, ENV_HOSTNAME } from "@digitraffic/common/dist/aws/infra/canaries/canary-keys";
 import {
     ContentChecker,
     ContentTypeChecker,
     UrlChecker
-} from "@digitraffic/common/dist/aws/infra/canaries/url-checker.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
-import { Asserter } from "@digitraffic/common/dist/test/asserter.js";
+} from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import type { PassengerInformationMessage } from "../service/get-message.js";
 import { subHours } from "date-fns";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes.js";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 const hostname = getEnvVariable(ENV_HOSTNAME);
 const apiKeyId = getEnvVariable(ENV_API_KEY);
