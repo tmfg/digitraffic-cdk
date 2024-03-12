@@ -8,7 +8,7 @@ import {
     RestApi
 } from "aws-cdk-lib/aws-apigateway";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { AssetCode, LoggingFormat, Runtime } from "aws-cdk-lib/aws-lambda";
 import { Duration, type Stack } from "aws-cdk-lib";
 import { KEY_APP } from "./lambda/mqtt-proxy-healthcheck/lambda-mqtt-proxy-healthcheck.js";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
@@ -66,7 +66,8 @@ function createMqttProxyResource(
             timeout: Duration.seconds(10),
             memorySize: 128,
             environment: env,
-            logRetention: RetentionDays.ONE_YEAR
+            logRetention: RetentionDays.ONE_YEAR,
+            loggingFormat: LoggingFormat.JSON
         },
         alarmSnsTopic,
         warningSnsTopic,
