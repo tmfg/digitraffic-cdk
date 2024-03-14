@@ -1,5 +1,5 @@
 import { Duration, type Stack } from "aws-cdk-lib";
-import { AssetCode, type FunctionProps, LoggingFormat, Runtime } from "aws-cdk-lib/aws-lambda";
+import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { type ISecret, Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
@@ -57,7 +57,6 @@ function createUpdateStatusesLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
         logRetention: RetentionDays.ONE_YEAR,
-        loggingFormat: LoggingFormat.JSON,
         reservedConcurrentExecutions: 1
     };
 
@@ -98,7 +97,6 @@ function createHandleMaintenanceLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
         logRetention: RetentionDays.ONE_YEAR,
-        loggingFormat: LoggingFormat.JSON,
         reservedConcurrentExecutions: 1
     };
 
@@ -137,7 +135,6 @@ function createCheckComponentStatesLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
         logRetention: RetentionDays.ONE_YEAR,
-        loggingFormat: LoggingFormat.JSON,
         reservedConcurrentExecutions: 1
     };
 
