@@ -360,7 +360,8 @@ export async function updateChecks(
                 check.type,
                 correspondingExtraEndpoint?.method ?? EndpointHttpMethod.HEAD,
                 checksContactIds,
-                check.label
+                check.label,
+                correspondingExtraEndpoint
             );
         }
     }
