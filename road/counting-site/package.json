@@ -24,8 +24,8 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.1.24-3",
-    "aws-cdk-lib": "~2.118.0",
+    "@digitraffic/common": "workspace:*",
+    "aws-cdk-lib": "~2.133.0",
     "axios": "^1.6.5",
     "constructs": "10.3.0",
     "csv-writer": "^1.6.0",
