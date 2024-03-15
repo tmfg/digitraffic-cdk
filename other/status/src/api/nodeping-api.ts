@@ -448,12 +448,13 @@ export class NodePingApi {
         type: "WEBSOCKET" | "HTTPADV",
         checkMethod: EndpointHttpMethod,
         contactIds: string[],
-        checkLabel: string
+        checkLabel: string,
+        extraData?: MonitoredEndpoint
     ): Promise<void> {
         const method = `${SERVICE}.updateNodepingCheck` as const satisfies LoggerMethodType;
         const start = Date.now();
 
-        const data = {
+        const data: NodePingCheckPutData = {
             id,
             type,
             threshold: this.checkTimeoutSeconds,
@@ -462,6 +463,18 @@ export class NodePingApi {
             sendheaders: NODEPING_SENT_HEADERS,
             notifications: this.createNotificationsPostData(contactIds)
         } as const satisfies NodePingCheckPutData;
+
+        if (extraData?.sendData) {
+            data.postdata = extraData.sendData;
+            data.sendheaders["content-type"] = MediaType.APPLICATION_JSON;
+        }
+
+        if (extraData?.contentstring) {
+            data.contentstring = extraData.contentstring;
+            data.invert = extraData.invert ?? false;
+            data.regex = extraData.regex ?? false;
+        }
+
         const message = `Update NodePing check ${checkLabel} id ${id}, properties ${JSON.stringify(
             data
         )}` as const;
