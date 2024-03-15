@@ -32,9 +32,6 @@ export async function updateMetadataForDomain(
         await removeCounters(db, removedCounters);
         await updateCounters(db, updatedCounters);
 
-        if (newCounters.length > 0 || removedCounters.length > 0 || updatedCounters.length > 0) {
-            await updateLastUpdated(db, DataType.COUNTING_SITES_METADATA, updatedTimestamp);
-        }
         await updateLastUpdated(db, DataType.COUNTING_SITES_METADATA_CHECK, updatedTimestamp);
     });
 }
