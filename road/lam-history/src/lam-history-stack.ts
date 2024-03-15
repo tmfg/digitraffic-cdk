@@ -1,14 +1,10 @@
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {
-    CanonicalUserPrincipal,
-    Effect,
-    PolicyStatement,
-} from "aws-cdk-lib/aws-iam";
+import { CanonicalUserPrincipal, Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { BlockPublicAccess, Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
 import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
-import { Construct } from "constructs";
-import { LamHistoryProps } from "./app-props";
-import { InternalLambdas } from "./internal-lambdas";
+import type { Construct } from "constructs";
+import type { LamHistoryProps } from "./app-props.js";
+import { InternalLambdas } from "./internal-lambdas.js";
 
 export class LamHistoryStack extends DigitrafficStack {
     private readonly appProps: LamHistoryProps;
@@ -33,9 +29,9 @@ export class LamHistoryStack extends DigitrafficStack {
             cors: [
                 {
                     allowedOrigins: ["*"],
-                    allowedMethods: [HttpMethods.GET],
-                },
-            ],
+                    allowedMethods: [HttpMethods.GET]
+                }
+            ]
         });
 
         // Allow read from cloudfront
@@ -43,19 +39,15 @@ export class LamHistoryStack extends DigitrafficStack {
             new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: ["s3:GetObject"],
-                principals: [
-                    new CanonicalUserPrincipal(
-                        this.appProps.cloudFrontCanonicalUser
-                    ),
-                ],
-                resources: [`${bucket.bucketArn}/*`],
+                principals: [new CanonicalUserPrincipal(this.appProps.cloudFrontCanonicalUser)],
+                resources: [`${bucket.bucketArn}/*`]
             })
         );
 
         // Upload data
         new BucketDeployment(this, "LamHistoryFiles", {
             destinationBucket: bucket,
-            sources: [Source.asset("./lib/website")],
+            sources: [Source.asset("./src/website")]
         });
 
         return bucket;

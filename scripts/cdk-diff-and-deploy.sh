@@ -43,7 +43,7 @@ requireCmd gsed 'brew install gnu-sed'
 
 # Try to find app properties .ts -file in bin dir of working dir
 EXECUTE_DIR=$(pwd)
-ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/bin/*-app.ts" )
+ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/src/bin/*-app.ts" )
 # Take first .ts file and assume it is the app config file
 APP_TS=${ALL_TS_FILES_IN_BIN[0]}
 echo Found app config: $APP_TS
