@@ -1,16 +1,17 @@
-import { S3 } from "aws-sdk";
+import { PutObjectCommand, S3Client, type PutObjectCommandOutput } from "@aws-sdk/client-s3";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { ManagedUpload } from "aws-sdk/lib/s3/managed_upload.js";
 import { writeFile } from "fs/promises";
 
-const BASE64 = "base64";
+const BASE64 = "base64" as const;
+
+const s3 = new S3Client();
 
 export function storeImage(
     cameraId: string,
     image: string,
     bucketName: string
-): Promise<void | ManagedUpload.SendData> {
+): Promise<void | PutObjectCommandOutput> {
     const imageName = `${cameraId}.jpg`;
 
     logger.info({
@@ -39,16 +40,15 @@ export function uploadToS3(
     bucketName: string,
     body: Buffer,
     filename: string
-): Promise<ManagedUpload.SendData> {
-    const s3 = new S3();
-    return s3
-        .upload({
-            Bucket: bucketName,
-            Body: body,
-            Key: filename,
-            ACL: "private",
-            CacheControl: "max-age=120",
-            ContentType: MediaType.IMAGE_JPEG
-        })
-        .promise();
+): Promise<PutObjectCommandOutput> {
+    const upload = new PutObjectCommand({
+        Bucket: bucketName,
+        Body: body,
+        Key: filename,
+        ACL: "private",
+        CacheControl: "max-age=120",
+        ContentType: MediaType.IMAGE_JPEG
+    });
+
+    return s3.send(upload);
 }
