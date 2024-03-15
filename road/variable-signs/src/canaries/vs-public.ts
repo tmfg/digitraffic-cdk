@@ -1,9 +1,23 @@
 import { ContentTypeChecker, UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+//import { APIGatewayClient, GetApiKeyCommand } from "@aws-sdk/client-api-gateway";
 
 const V1_BASE = "/prod/api/variable-sign/v1";
 const V1_IMAGES = V1_BASE + "/images";
 const V1_DATEX2 = V1_BASE + "/signs.datex2";
+
+/*
+export const handler2 = async (): Promise<void> => {
+    const client = new APIGatewayClient();
+    const command = new GetApiKeyCommand({
+        apiKey: "nhfynsv81j",
+        includeValue: true,
+    });
+
+    const response = await client.send(command);
+
+    console.info("response " + JSON.stringify(response));
+}*/
 
 export const handler = async (): Promise<string> => {
     const checker = await UrlChecker.createV2();
