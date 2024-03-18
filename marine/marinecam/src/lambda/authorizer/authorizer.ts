@@ -40,8 +40,8 @@ export const handler: (
     }
 };
 
-// eslint-disable-next-line @rushstack/no-new-null
 function parseAuthentication(
+    // eslint-disable-next-line @rushstack/no-new-null
     headers: APIGatewayRequestAuthorizerEventHeaders | null
 ): [string, string] | undefined {
     // eslint-disable-next-line dot-notation
