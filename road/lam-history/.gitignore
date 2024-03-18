@@ -12,9 +12,13 @@
 
 !/config/
 !/config/*.json
-!/lib/
-!/lib/**/
-!/lib/**/*.ts
-!/test/
-!/test/**/
-!/test/**/*.ts
+!/src/
+!/src/**/
+!/src/**/*.ts
+!/src/website/**/*.ico
+!/src/website/**/*.html
+!/src/website/**/*.svg
+!/src/website/**/*.json
+!/src/website/**/*.js
+!/src/website/**/*.css
+/src/bin

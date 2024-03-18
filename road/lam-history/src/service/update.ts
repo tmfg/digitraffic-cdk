@@ -1,6 +1,4 @@
-import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { S3 } from "aws-sdk";
+import { PutObjectCommand, type PutObjectCommandOutput, S3 } from "@aws-sdk/client-s3";
 import axios, { AxiosError } from "axios";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -8,7 +6,7 @@ const SERVICE = "UpdateService";
 export async function handleMetadataUpdate(
     url: string,
     apikey: string,
-    s3: string,
+    bucketName: string,
     filename: string
 ): Promise<void> {
     const start = Date.now();
@@ -20,16 +18,9 @@ export async function handleMetadataUpdate(
 
     try {
         const resp = await getFromServer(url, apikey);
-
         // Store to bucket
-        await uploadToS3Internal(s3, resp, filename).catch((error: Error) => {
-            logger.error({
-                method: `${SERVICE}.handleMetadataUpdate`,
-                message: `uploadToS3Internal file=${filename} failed`,
-                error
-            });
-            throw error;
-        });
+        const s3 = new S3({});
+        await doUploadToS3(s3, bucketName, resp, filename);
     } catch (error) {
         logger.error({
             method: `${SERVICE}.handleMetadataUpdate`,
@@ -46,14 +37,25 @@ export async function handleMetadataUpdate(
     }
 }
 
-function uploadToS3Internal(bucketName: string, body: S3.Body, filename: string): Promise<void> {
-    return uploadToS3(
-        bucketName,
-        body,
-        filename,
-        "private", // cannedAcl
-        MediaType.APPLICATION_JSON
-    );
+function doUploadToS3(
+    s3: S3,
+    bucketName: string,
+    body: string,
+    fileName: string
+): Promise<PutObjectCommandOutput> {
+    const command = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: fileName,
+        Body: body
+    });
+    return s3.send(command).catch((error: Error) => {
+        logger.error({
+            method: `${SERVICE}.doUploadToS3`,
+            message: `s3.send with file=${fileName} failed`,
+            error
+        });
+        throw error;
+    });
 }
 
 async function getFromServer(url: string, apikey: string): Promise<string> {

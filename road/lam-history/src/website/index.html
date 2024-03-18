@@ -1,8 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fi">
     <head>
+        <meta about="test" />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- The initial config of Consent Mode -->
+        <script type="text/javascript">
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("consent", "default", {
+                ad_storage: "denied",
+                analytics_storage: "denied",
+                wait_for_update: 1500
+            });
+            gtag("set", "ads_data_redaction", true);
+
+            function askConsent() {
+                let langCode = "EN";
+                if (navigator.language.substring(0, 2) === "fi") {
+                    langCode = "FI";
+                }
+                if (window.location.host.endsWith("digitraffic.fi")) {
+                    const script = document.createElement("script");
+                    script.type = "text/javascript";
+                    script.id = "CookieConsent";
+                    script.setAttribute("data-culture", langCode);
+                    script.src = "https://policy.app.cookieinformation.com/uc.js";
+                    document.getElementsByTagName("head")[0].appendChild(script);
+                }
+            }
+
+            // Ask consent when dom is fully loaded
+            document.addEventListener("DOMContentLoaded", askConsent);
+            // Document already fully loaded?
+            // Just ask as event won't be fired anymore
+            if (document.readyState === "complete") {
+                askConsent();
+            }
+        </script>
 
         <!-- Bootstrap CSS -->
         <link
@@ -71,15 +109,23 @@
                     pad(now.getUTCHours() + 1)
                 );
             }
-            var _mtm = (window._mtm = window._mtm || []);
-            _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
-            var d = document,
-                g = d.createElement("script"),
-                s = d.getElementsByTagName("script")[0];
-            g.async = true;
-            g.src =
-                "https://cdn.matomo.cloud/fintraffic.matomo.cloud/container_70Mrsp3P.js?c=" + cacheParam();
-            s.parentNode.insertBefore(g, s);
+
+            // Wait for statistics cookie consent
+            // https://support.cookieinformation.com/en/articles/5444629-third-party-cookie-blocking
+            window.addEventListener("CookieInformationConsentGiven", function (event) {
+                if (CookieInformation.getConsentGivenFor("cookie_cat_statistic")) {
+                    var _mtm = (window._mtm = window._mtm || []);
+                    _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
+                    var d = document,
+                        g = d.createElement("script"),
+                        s = d.getElementsByTagName("script")[0];
+                    g.async = true;
+                    g.src =
+                        "https://cdn.matomo.cloud/fintraffic.matomo.cloud/container_70Mrsp3P.js?c=" +
+                        cacheParam();
+                    s.parentNode.insertBefore(g, s);
+                }
+            });
         </script>
         <!-- End Matomo Tag Manager -->
 

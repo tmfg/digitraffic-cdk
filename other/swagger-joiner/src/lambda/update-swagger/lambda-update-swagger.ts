@@ -3,11 +3,17 @@ import {
     constructSwagger,
     mergeApiDescriptions,
     withDeprecations,
-    withoutSecurity,
-    withoutMethods
+    withoutMethods,
+    withoutSecurity
 } from "../../swagger-utils.js";
 import { exportSwaggerApi } from "../../apigw-utils.js";
-import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
+import {
+    ObjectCannedACL,
+    PutObjectCommand,
+    type PutObjectCommandInput,
+    type PutObjectCommandOutput,
+    S3
+} from "@aws-sdk/client-s3";
 import { getEnvVariable, getEnvVariableOrElse } from "@digitraffic/common/dist/utils/utils";
 import { openapiSchema, type OpenApiSchema } from "../../model/openapi-schema.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -33,6 +39,8 @@ const title = getEnvVariableOrElse(UPDATE_SWAGGER_KEYS.TITLE, undefined);
 const description = getEnvVariableOrElse(UPDATE_SWAGGER_KEYS.DESCRIPTION, undefined);
 const removeSecurity = getEnvVariableOrElse(UPDATE_SWAGGER_KEYS.REMOVESECURITY, undefined);
 
+const SERVICE = "UpdateSwagger" as const;
+
 async function getAppData(appUrl: string | undefined): Promise<OpenApiSchema[]> {
     if (!appUrl) {
         return [];
@@ -41,7 +49,7 @@ async function getAppData(appUrl: string | undefined): Promise<OpenApiSchema[]> 
     const response = await ky.get(appUrl, apiRequestHeaders).json();
 
     logger.info({
-        method: "UpdateSwagger.handler",
+        method: `${SERVICE}.handler`,
         customResponse: JSON.stringify(response)
     });
 
@@ -116,14 +124,50 @@ export const handler = async (): Promise<void> => {
     const swaggerSpecFilename = "openapi.json";
     const swaggerSpecFilenameFinal = directory ? `${directory}/${swaggerSpecFilename}` : swaggerSpecFilename;
 
+    const s3: S3 = new S3({});
     await Promise.all([
-        uploadToS3(bucketName, constructSwagger(merged), swaggerFilenameFinal),
-        uploadToS3(
+        doUploadToS3(s3, bucketName, constructSwagger(merged), swaggerFilenameFinal),
+        doUploadToS3(
+            s3,
             bucketName,
             JSON.stringify(merged),
             swaggerSpecFilenameFinal,
-            "private",
+            ObjectCannedACL.private,
             "application/json"
         )
     ]);
 };
+
+function doUploadToS3(
+    s3: S3,
+    bucketName: string,
+    body: string,
+    fileName: string,
+    cannedAcl?: ObjectCannedACL,
+    contentType?: string
+): Promise<PutObjectCommandOutput> {
+    const commandInput: PutObjectCommandInput = {
+        Bucket: bucketName,
+        Key: fileName,
+        Body: body
+    };
+    if (cannedAcl) {
+        commandInput.ACL = ObjectCannedACL.private;
+    }
+    if (contentType) {
+        commandInput.ContentType = contentType;
+    }
+    const command = new PutObjectCommand(commandInput);
+    logger.info({
+        method: `${SERVICE}.doUploadToS3`,
+        message: `commandInput: ${JSON.stringify(commandInput)}`
+    });
+    return s3.send(command).catch((error: Error) => {
+        logger.error({
+            method: `${SERVICE}.doUploadToS3`,
+            message: `s3.send with file=${fileName} failed`,
+            error
+        });
+        throw error;
+    });
+}

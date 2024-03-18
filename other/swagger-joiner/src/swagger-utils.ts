@@ -13,26 +13,26 @@ export function constructSwagger(spec: object): string {
         } else {
             window.onload = function() {
                 const ui = SwaggerUIBundle({
-                spec: ${JSON.stringify(spec)},
-                dom_id: '#swagger-ui',
-                deepLinking: true,
-                defaultModelRendering: 'model',
-                defaultModelExpandDepth: 6,
-                docExpansion: 'none',
-                operationsSorter: 'alpha',
-                tagsSorter: 'alpha',
-                presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset.slice(1) // remove top bar plugin
-                ],
-                plugins: [
-                    SwaggerUIBundle.plugins.DownloadUrl
-                ],
-                layout: "StandaloneLayout",
-                requestInterceptor: (request) => {
-                  request.curlOptions = ['-H', 'Digitraffic-User: Nimimerkki/EsimerkkiApp 0.1', '--compressed'];
-                  return request;
-                }
+                    spec: ${JSON.stringify(spec)},
+                    dom_id: '#swagger-ui',
+                    deepLinking: true,
+                    defaultModelRendering: 'model',
+                    defaultModelExpandDepth: 6,
+                    docExpansion: 'none',
+                    operationsSorter: 'alpha',
+                    tagsSorter: 'alpha',
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset.slice(1) // remove top bar plugin
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl
+                    ],
+                    layout: "StandaloneLayout",
+                    requestInterceptor: (request) => {
+                      request.curlOptions = ['-H', 'Digitraffic-User: Nimimerkki/EsimerkkiApp 0.1', '--compressed'];
+                      return request;
+                    }
                 })
                 // End Swagger UI call region
         
