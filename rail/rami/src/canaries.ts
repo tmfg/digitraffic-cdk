@@ -1,6 +1,6 @@
-import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role.js";
-import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary.js";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
+import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
+import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { ComparisonOperator, TreatMissingData } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
