@@ -10,7 +10,7 @@ const GROUP_SEPARATOR = ",";
 export const handler: (event: Record<string, string>) => Promise<Camera[]> = (
     event: Record<string, string>
 ) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
     const usersGroups = getUserGroups(event["groups"]!);
 
     if (usersGroups.length === 0) {
