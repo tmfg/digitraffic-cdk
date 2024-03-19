@@ -28,6 +28,7 @@
     "axios": "^1.6.7",
     "axios-retry": "^4.0.0",
     "constructs": "10.3.0",
+    "p-limit": "5.0.0",
     "pg-native": "^3.0.1",
     "pg-promise": "^11.5.4",
     "xml2js": "^0.6.2"

@@ -598,6 +598,9 @@ importers:
       constructs:
         specifier: 10.3.0
         version: 10.3.0
+      p-limit:
+        specifier: 5.0.0
+        version: 5.0.0
       pg-native:
         specifier: ^3.0.1
         version: 3.0.1
@@ -1185,7 +1188,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.1.24-3
-        version: 2024.1.24-3(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        version: 2024.1.24-3(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -1356,7 +1359,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.1.10-1
-        version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -1521,7 +1524,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.1.30-1
-        version: 2024.1.30-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        version: 2024.1.30-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -2087,7 +2090,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.1.24-3
-        version: 2024.1.24-3(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        version: 2024.1.24-3(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -2348,7 +2351,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.1.10-1
-        version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -2533,7 +2536,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.1.10-1
-        version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        version: 2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       aws-cdk-lib:
         specifier: ~2.118.0
         version: 2.118.0(constructs@10.3.0)
@@ -7757,7 +7760,7 @@ packages:
       - aws-crt
     dev: false
 
-  /@digitraffic/common@2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
+  /@digitraffic/common@2024.1.10-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
     resolution: {integrity: sha512-Ta19KOfn26IEcJoezvIJMamItB7hHpe0+6+v5tEOek3YtBJ4twZvHog9UCiHqDGh5rmUpa7tDZjDOPnuriWO2g==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -7779,7 +7782,7 @@ packages:
       '@aws-sdk/lib-storage': 3.472.0(@aws-sdk/client-s3@3.472.0)
       '@types/geojson': 7946.0.13
       aws-cdk-lib: 2.118.0(constructs@10.3.0)
-      aws-sdk: 2.1577.0
+      aws-sdk: 2.1579.0
       axios: 1.6.8
       change-case: 5.0.0
       constructs: 10.3.0
@@ -7833,7 +7836,7 @@ packages:
       - aws-crt
     dev: false
 
-  /@digitraffic/common@2024.1.24-3(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
+  /@digitraffic/common@2024.1.24-3(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
     resolution: {integrity: sha512-B6FtnGCeIPRO4c557grN7JI128kpKynmBzDP4KS7q+C7swt7qhN/a7yFDyAIsxhyX1np5tidxlirFhP21HgIFA==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -7856,7 +7859,7 @@ packages:
       '@aws-sdk/lib-storage': 3.472.0(@aws-sdk/client-s3@3.472.0)
       '@types/geojson': 7946.0.13
       aws-cdk-lib: 2.118.0(constructs@10.3.0)
-      aws-sdk: 2.1577.0
+      aws-sdk: 2.1579.0
       axios: 1.6.8
       change-case: 5.0.0
       constructs: 10.3.0
@@ -7911,7 +7914,7 @@ packages:
       - aws-crt
     dev: false
 
-  /@digitraffic/common@2024.1.30-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1577.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
+  /@digitraffic/common@2024.1.30-1(@types/geojson@7946.0.13)(aws-cdk-lib@2.118.0)(aws-sdk@2.1579.0)(axios@1.6.8)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
     resolution: {integrity: sha512-u2b8TY/bZmj81ZZ++KUndLA6Rfsy7GxUl4ScU4BX/DarQl29SJsZJYX7G5i5F+hwWDxkgwppVbGk2G0R0u2Aow==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -7934,7 +7937,7 @@ packages:
       '@aws-sdk/lib-storage': 3.472.0(@aws-sdk/client-s3@3.472.0)
       '@types/geojson': 7946.0.13
       aws-cdk-lib: 2.118.0(constructs@10.3.0)
-      aws-sdk: 2.1577.0
+      aws-sdk: 2.1579.0
       axios: 1.6.8
       change-case: 5.0.0
       constructs: 10.3.0
