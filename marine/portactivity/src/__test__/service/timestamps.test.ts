@@ -7,15 +7,15 @@ import {
     insertPortAreaDetails,
     insertPortCall,
     insertVessel
-} from "../db-testutil";
-import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata";
-import * as TimestampsService from "../../service/timestamps";
-import { EventType } from "../../model/timestamp";
-import { EventSource } from "../../model/eventsource";
+} from "../db-testutil.js";
+import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata.js";
+import * as TimestampsService from "../../service/timestamps.js";
+import { EventType } from "../../model/timestamp.js";
+import { EventSource } from "../../model/eventsource.js";
 import _ from "lodash";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addHours, addMinutes, parseISO, subDays } from "date-fns";
-import { assertDefined } from "../test-utils";
+import { assertDefined } from "../test-utils.js";
 
 describe(
     "timestamps",

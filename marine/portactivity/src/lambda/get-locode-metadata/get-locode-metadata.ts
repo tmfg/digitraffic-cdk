@@ -1,4 +1,4 @@
-import * as MetadataService from "../../service/metadata";
+import * as MetadataService from "../../service/metadata.js";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";

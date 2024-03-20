@@ -1,5 +1,5 @@
-import type { Location } from "../model/timestamp";
-import type { PilotageRoute } from "../model/pilotage";
+import type { Location } from "../model/timestamp.js";
+import type { PilotageRoute } from "../model/pilotage.js";
 
 import _ from "lodash";
 

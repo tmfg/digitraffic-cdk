@@ -1,6 +1,7 @@
-import { LambdaIntegration, RequestValidator, Resource } from "aws-cdk-lib/aws-apigateway";
-import { createTimestampSchema, LocationSchema, ShipSchema } from "./model/timestamp-schema";
-import { LocodeMetadataSchema } from "./model/locode-metadata";
+import type { RequestValidator, Resource } from "aws-cdk-lib/aws-apigateway";
+import { LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
+import { createTimestampSchema, LocationSchema, ShipSchema } from "./model/timestamp-schema.js";
+import { LocodeMetadataSchema } from "./model/locode-metadata.js";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addDefaultValidator,
@@ -11,11 +12,11 @@ import {
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { TimestampMetadata } from "./model/timestamp-metadata";
+import { TimestampMetadata } from "./model/timestamp-metadata.js";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { IModel } from "aws-cdk-lib/aws-apigateway/lib/model";
+import type { IModel } from "aws-cdk-lib/aws-apigateway";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
 

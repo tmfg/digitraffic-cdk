@@ -1,11 +1,12 @@
 import type { WebSocket } from "ws";
-import type { AwakeAiZoneType } from "./awake-common";
+import type { AwakeAiZoneType } from "./awake-common.js";
 import { SSM } from "aws-sdk";
-import { PortActivityParameterKeys } from "../keys";
-import type { PutParameterResult } from "aws-sdk/clients/ssm";
+import { PortActivityParameterKeys } from "../keys.js";
+// TODO: v3
+import type { PutParameterResult } from "aws-sdk/clients/ssm.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import type { Ports } from "../service/portareas";
+import type { Ports } from "../service/portareas.js";
 
 interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType;

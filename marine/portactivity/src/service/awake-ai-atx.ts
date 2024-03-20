@@ -1,10 +1,14 @@
-import { AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType } from "../api/awake-ai-atx";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import * as TimestampDAO from "../dao/timestamps";
-import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
+import {
+    type AwakeAiATXApi,
+    type AwakeAIATXTimestampMessage,
+    AwakeATXZoneEventType
+} from "../api/awake-ai-atx.js";
+import { type ApiTimestamp, EventType } from "../model/timestamp.js";
+import * as TimestampDAO from "../dao/timestamps.js";
+import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import moment from "moment-timezone";
-import { EventSource } from "../model/eventsource";
-import { AwakeAiZoneType } from "../api/awake-common";
+import { EventSource } from "../model/eventsource.js";
+import { AwakeAiZoneType } from "../api/awake-common.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class AwakeAiATXService {

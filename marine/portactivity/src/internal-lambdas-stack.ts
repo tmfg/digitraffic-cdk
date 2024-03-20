@@ -1,27 +1,28 @@
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
-import { Duration, Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
+import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import {
     databaseFunctionProps,
-    defaultLambdaConfiguration,
-    LambdaEnvironment
+    defaultLambdaConfiguration
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import type { QueueAndDLQ } from "./sqs";
+import type { QueueAndDLQ } from "./sqs.js";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import { PortactivityEnvKeys, PortActivityParameterKeys } from "./keys";
+import { PortactivityEnvKeys, PortActivityParameterKeys } from "./keys.js";
 import {
     MonitoredDBFunction,
     MonitoredFunction
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import type { PortactivityConfiguration } from "./app-props";
+import type { PortactivityConfiguration } from "./app-props.js";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 

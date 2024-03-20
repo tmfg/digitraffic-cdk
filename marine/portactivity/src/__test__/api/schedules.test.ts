@@ -1,7 +1,8 @@
-import { SchedulesApi, SchedulesDirection, SchedulesResponse } from "../../api/schedules";
+import type { SchedulesResponse } from "../../api/schedules.js";
+import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
 import * as sinon from "sinon";
 import axios from "axios";
-import { assertDefined } from "../test-utils";
+import { assertDefined } from "../test-utils.js";
 
 const uuid = "123123123";
 const vesselName = "TEST";

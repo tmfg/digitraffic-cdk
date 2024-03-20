@@ -1,25 +1,21 @@
 import * as sinon from "sinon";
+import type { AwakeAiShipApiResponse } from "../../api/awake-ai-ship.js";
 import {
     AwakeAiETAShipApi,
-    AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
     AwakeAiShipResponseType
-} from "../../api/awake-ai-ship";
-import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship";
-import type { DbETAShip } from "../../dao/timestamps";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
-import {
-    AwakeAiPredictionMetadata,
-    AwakeAiPredictionType,
-    AwakeAiVoyageEtaPrediction,
-    AwakeAiVoyageStatus,
-    AwakeAiZoneType
-} from "../../api/awake-common";
+} from "../../api/awake-ai-ship.js";
+import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship.js";
+import type { DbETAShip } from "../../dao/timestamps.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
+import type { AwakeAiPredictionMetadata, AwakeAiVoyageEtaPrediction } from "../../api/awake-common.js";
+import { AwakeAiPredictionType, AwakeAiVoyageStatus, AwakeAiZoneType } from "../../api/awake-common.js";
 import { getRandomInteger, randomBoolean } from "@digitraffic/common/dist/test/testutils";
-import { EventSource } from "../../model/eventsource";
+import { EventSource } from "../../model/eventsource.js";
 import { addHours } from "date-fns";
 import _ from "lodash";
-import type { Locode } from "../../model/locode";
+import type { Locode } from "../../model/locode.js";
 
 /**
  * Note: Since it is a source of VTS A timestamps,

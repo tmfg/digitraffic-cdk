@@ -1,12 +1,14 @@
-import * as PilotwebAPI from "../api/pilotweb";
-import * as PilotagesDAO from "../dao/pilotages";
-import * as TimestampDAO from "../dao/timestamps";
-import * as LocationConverter from "./location-converter";
+import * as PilotwebAPI from "../api/pilotweb.js";
+import * as PilotagesDAO from "../dao/pilotages.js";
+import * as TimestampDAO from "../dao/timestamps.js";
+import * as LocationConverter from "./location-converter.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { ApiTimestamp, EventType, Location } from "../model/timestamp";
-import type { Pilotage } from "../model/pilotage";
-import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
-import { EventSource } from "../model/eventsource";
+import type { ApiTimestamp, Location } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import type { Pilotage } from "../model/pilotage.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
+import { EventSource } from "../model/eventsource.js";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
     const message = await PilotwebAPI.getMessages(host, authHeader);

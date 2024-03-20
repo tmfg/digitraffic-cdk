@@ -1,16 +1,18 @@
-import { newAwakeATXMessage, someNumber } from "../testdata";
+import { newAwakeATXMessage, someNumber } from "../testdata.js";
 import * as sinon from "sinon";
-import { AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType } from "../../api/awake-ai-atx";
-import { AwakeAiATXService } from "../../service/awake-ai-atx";
-import { dbTestBase, insertPortAreaDetails, insertPortCall } from "../db-testutil";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
+import type { AwakeAIATXTimestampMessage } from "../../api/awake-ai-atx.js";
+import { AwakeAiATXApi, AwakeATXZoneEventType } from "../../api/awake-ai-atx.js";
+import { AwakeAiATXService } from "../../service/awake-ai-atx.js";
+import { dbTestBase, insertPortAreaDetails, insertPortCall } from "../db-testutil.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
 import { randomBoolean, shuffle } from "@digitraffic/common/dist/test/testutils";
-import { EventSource } from "../../model/eventsource";
-import { AwakeAiZoneType } from "../../api/awake-common";
+import { EventSource } from "../../model/eventsource.js";
+import { AwakeAiZoneType } from "../../api/awake-common.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { WebSocket } from "ws";
 import { addHours, subHours } from "date-fns";
-import { assertDefined } from "../test-utils";
+import { assertDefined } from "../test-utils.js";
 
 describe(
     "service Awake.AI ATx",

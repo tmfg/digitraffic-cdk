@@ -1,17 +1,16 @@
 import * as sinon from "sinon";
-import { AwakeAiETAPortService } from "../../service/awake-ai-eta-port";
-import { AwakeAiPortApi, AwakeAiPortResponse } from "../../api/awake-ai-port";
-import {
+import { AwakeAiETAPortService } from "../../service/awake-ai-eta-port.js";
+import type { AwakeAiPortResponse } from "../../api/awake-ai-port.js";
+import { AwakeAiPortApi } from "../../api/awake-ai-port.js";
+import type {
     AwakeAiPrediction,
     AwakeAiPredictionMetadata,
-    AwakeAiPredictionType,
-    AwakeAiVoyageEtaPrediction,
-    AwakeAiVoyageStatus,
-    AwakeAiZoneType
-} from "../../api/awake-common";
+    AwakeAiVoyageEtaPrediction
+} from "../../api/awake-common.js";
+import { AwakeAiPredictionType, AwakeAiVoyageStatus, AwakeAiZoneType } from "../../api/awake-common.js";
 import { getRandomNumber, randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { addHours, subHours } from "date-fns";
-import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil";
+import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil.js";
 
 describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - no schedule", async () => {

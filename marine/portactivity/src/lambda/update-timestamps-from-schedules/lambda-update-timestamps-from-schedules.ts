@@ -2,10 +2,10 @@ import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-hold
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { SchedulesApi } from "../../api/schedules";
-import { PortactivityEnvKeys } from "../../keys";
-import { sendMessage } from "../../service/queue-service";
-import { SchedulesService } from "../../service/schedules";
+import { SchedulesApi } from "../../api/schedules.js";
+import { PortactivityEnvKeys } from "../../keys.js";
+import { sendMessage } from "../../service/queue-service.js";
+import { SchedulesService } from "../../service/schedules.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);

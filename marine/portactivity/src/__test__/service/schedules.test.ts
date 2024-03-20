@@ -1,10 +1,12 @@
-import { SchedulesApi, SchedulesDirection, SchedulesResponse } from "../../api/schedules";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
-import { newTimestamp } from "../testdata";
+import type { SchedulesResponse } from "../../api/schedules.js";
+import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
+import { newTimestamp } from "../testdata.js";
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import { ports } from "../../service/portareas";
-import { EventSource } from "../../model/eventsource";
-import { SchedulesService } from "../../service/schedules";
+import { ports } from "../../service/portareas.js";
+import { EventSource } from "../../model/eventsource.js";
+import { SchedulesService } from "../../service/schedules.js";
 import { subHours, subMinutes } from "date-fns";
 
 const uuid = "123123123";

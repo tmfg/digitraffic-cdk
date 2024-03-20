@@ -1,6 +1,7 @@
-import * as MetadataDB from "../dao/metadata";
-import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
-import { EventSource } from "../model/eventsource";
+import * as MetadataDB from "../dao/metadata.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import { EventSource } from "../model/eventsource.js";
 
 export const PREDICTION_SOURCES = [
     EventSource.SCHEDULES_CALCULATED,

@@ -1,20 +1,20 @@
-import type { ApiTimestamp } from "../model/timestamp";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { addHours, isBefore, parseISO } from "date-fns";
+import type { AwakeAiPortApi, AwakeAiPortSchedule } from "../api/awake-ai-port.js";
 import {
     AwakeAiPredictionType,
-    AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
-    AwakeArrivalPortCallPrediction
-} from "../api/awake-common";
-import type { AwakeAiPortApi, AwakeAiPortSchedule } from "../api/awake-ai-port";
+    type AwakeAiVoyageEtaPrediction,
+    type AwakeArrivalPortCallPrediction
+} from "../api/awake-common.js";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
 import {
     etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction,
     voyageUnderwayOrNotStarted
-} from "./awake-ai-etx-helper";
-import { EventSource } from "../model/eventsource";
-import { addHours, isBefore, parseISO } from "date-fns";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+} from "./awake-ai-etx-helper.js";
 
 export class AwakeAiETAPortService {
     private readonly api: AwakeAiPortApi;

@@ -3,9 +3,9 @@ import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-hold
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SNS } from "aws-sdk";
 import _ from "lodash";
-import { PortactivityEnvKeys } from "../../keys";
-import { ports } from "../../service/portareas";
-import * as TimestampService from "../../service/timestamps";
+import { PortactivityEnvKeys } from "../../keys.js";
+import { ports } from "../../service/portareas.js";
+import * as TimestampService from "../../service/timestamps.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const publishTopic = getEnvVariable(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);

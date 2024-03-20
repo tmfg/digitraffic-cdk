@@ -1,16 +1,12 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import moment from "moment-timezone";
-import {
-    Destination,
-    SchedulesApi,
-    SchedulesDirection,
-    SchedulesResponse,
-    Timestamp,
-    Vessel
-} from "../api/schedules";
-import { EventSource } from "../model/eventsource";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { Port, ports } from "./portareas";
+import type { Destination, SchedulesApi, SchedulesResponse, Timestamp, Vessel } from "../api/schedules.js";
+import { SchedulesDirection } from "../api/schedules.js";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import type { Port } from "./portareas.js";
+import { ports } from "./portareas.js";
 
 export class SchedulesService {
     private readonly api: SchedulesApi;

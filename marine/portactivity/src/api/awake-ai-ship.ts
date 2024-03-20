@@ -1,6 +1,6 @@
 import axios from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common";
+import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum AwakeAiShipResponseType {

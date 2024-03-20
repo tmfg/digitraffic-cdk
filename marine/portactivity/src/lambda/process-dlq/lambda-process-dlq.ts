@@ -1,5 +1,5 @@
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
-import { PortactivityEnvKeys } from "../../keys";
+import { PortactivityEnvKeys } from "../../keys.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

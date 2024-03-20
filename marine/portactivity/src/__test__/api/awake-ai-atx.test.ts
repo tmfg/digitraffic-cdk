@@ -1,5 +1,5 @@
-import { newAwakeATXMessage } from "../testdata";
-import * as API from "../../api/awake-ai-atx";
+import { newAwakeATXMessage } from "../testdata.js";
+import * as API from "../../api/awake-ai-atx.js";
 
 const NO_OP = jest.fn();
 

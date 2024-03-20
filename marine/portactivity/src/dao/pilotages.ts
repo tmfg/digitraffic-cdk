@@ -1,6 +1,6 @@
-import type { Location } from "../model/timestamp";
+import type { Location } from "../model/timestamp.js";
 import { PreparedStatement } from "pg-promise";
-import type { Pilotage } from "../model/pilotage";
+import type { Pilotage } from "../model/pilotage.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

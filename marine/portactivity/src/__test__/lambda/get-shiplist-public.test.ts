@@ -2,8 +2,9 @@
 process.env["SECRET_ID"] = "Test";
 
 import * as sinon from "sinon";
-import { dbTestBase, mockSecrets } from "../db-testutil";
-import { handler, ShiplistSecret } from "../../lambda/get-shiplist-public/get-shiplist-public";
+import { dbTestBase, mockSecrets } from "../db-testutil.js";
+import type { ShiplistSecret } from "../../lambda/get-shiplist-public/get-shiplist-public.js";
+import { handler } from "../../lambda/get-shiplist-public/get-shiplist-public.js";
 import type { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 
 const AUTH = "test";

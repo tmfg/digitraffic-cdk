@@ -1,4 +1,4 @@
-import * as TimestampsService from "../../service/timestamps";
+import * as TimestampsService from "../../service/timestamps.js";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 
 const rdsHolder = RdsHolder.create();

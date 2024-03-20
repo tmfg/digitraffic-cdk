@@ -1,28 +1,28 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { retry } from "@digitraffic/common/dist/utils/retry";
 import { differenceInHours } from "date-fns";
+import type { AwakeAiETAShipApi } from "../api/awake-ai-ship.js";
 import {
-    AwakeAiETAShipApi,
-    AwakeAiShipApiResponse,
+    type AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
-    AwakeAiShipVoyageSchedule
-} from "../api/awake-ai-ship";
+    type AwakeAiShipVoyageSchedule
+} from "../api/awake-ai-ship.js";
 import {
-    AwakeAiPredictedVoyage,
-    AwakeAiVoyageEtaPrediction,
+    type AwakeAiPredictedVoyage,
+    type AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageStatus,
     AwakeAiZoneType
-} from "../api/awake-common";
-import type { DbETAShip } from "../dao/timestamps";
-import { EventSource } from "../model/eventsource";
-import type { Locode } from "../model/locode";
-import { ApiTimestamp, EventType } from "../model/timestamp";
+} from "../api/awake-common.js";
+import type { DbETAShip } from "../dao/timestamps.js";
+import { EventSource } from "../model/eventsource.js";
+import type { Locode } from "../model/locode.js";
+import { type ApiTimestamp, EventType } from "../model/timestamp.js";
 import {
     AwakeDataState,
     etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction
-} from "./awake-ai-etx-helper";
+} from "./awake-ai-etx-helper.js";
 
 interface AwakeAiETAResponseAndShip {
     readonly response: AwakeAiShipApiResponse;

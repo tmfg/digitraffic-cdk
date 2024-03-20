@@ -1,7 +1,7 @@
 import { PreparedStatement } from "pg-promise";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, Ports } from "../service/portareas";
-import { EventSource } from "../model/eventsource";
+import { type ApiTimestamp, EventType } from "../model/timestamp.js";
+import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, type Ports } from "../service/portareas.js";
+import { EventSource } from "../model/eventsource.js";
 import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import type { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
 import { parseISO } from "date-fns";

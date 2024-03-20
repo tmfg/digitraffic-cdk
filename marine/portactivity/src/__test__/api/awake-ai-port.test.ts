@@ -1,4 +1,4 @@
-import { AwakeAiPortApi, AwakeAiPortResponseType } from "../../api/awake-ai-port";
+import { AwakeAiPortApi, AwakeAiPortResponseType } from "../../api/awake-ai-port.js";
 
 describe("Awake.AI ETA port API", () => {
     test("handleError - no response", () => {

@@ -1,4 +1,4 @@
-import { AwakeAiETAShipApi, AwakeAiShipResponseType } from "../../api/awake-ai-ship";
+import { AwakeAiETAShipApi, AwakeAiShipResponseType } from "../../api/awake-ai-ship.js";
 
 describe("Awake.AI ETA ship API", () => {
     test("handleError - no response", () => {

@@ -1,15 +1,15 @@
 import moment from "moment";
-import { dbTestBase, insert } from "../db-testutil";
-import { newTimestamp } from "../testdata";
-import { EventType } from "../../model/timestamp";
-import { dbPublicShiplistToPublicApiTimestamp, getShiplist } from "../../service/shiplist";
-import { EventSource } from "../../model/eventsource";
+import { dbTestBase, insert } from "../db-testutil.js";
+import { newTimestamp } from "../testdata.js";
+import { EventType } from "../../model/timestamp.js";
+import { dbPublicShiplistToPublicApiTimestamp, getShiplist } from "../../service/shiplist.js";
+import { EventSource } from "../../model/eventsource.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO } from "date-fns";
-import { mergeTimestamps } from "../../event-sourceutil";
-import { findByLocodePublicShiplist } from "../../dao/shiplist-public";
-import { assertDefined } from "../test-utils";
+import { mergeTimestamps } from "../../event-sourceutil.js";
+import { findByLocodePublicShiplist } from "../../dao/shiplist-public.js";
+import { assertDefined } from "../test-utils.js";
 
 describe(
     "db-shiplist-public",

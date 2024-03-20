@@ -1,5 +1,5 @@
 import { DatabaseCountChecker } from "@digitraffic/common/dist/aws/infra/canaries/database-checker";
-import { EventSource } from "../model/eventsource";
+import { EventSource } from "../model/eventsource.js";
 
 export const handler = (): Promise<string> => {
     const checker = DatabaseCountChecker.createForRds();

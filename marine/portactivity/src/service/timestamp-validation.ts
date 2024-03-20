@@ -1,9 +1,9 @@
-import { EventSource } from "../model/eventsource";
-import { findVesselSpeedAndNavStatus } from "../dao/timestamps";
-import { ApiTimestamp, EventType } from "../model/timestamp";
+import { EventSource } from "../model/eventsource.js";
+import { findVesselSpeedAndNavStatus } from "../dao/timestamps.js";
+import { type ApiTimestamp, EventType } from "../model/timestamp.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { isValid, parseISO } from "date-fns";
-import { NavStatus } from "../model/ais-status";
+import { NavStatus } from "../model/ais-status.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS = 2;

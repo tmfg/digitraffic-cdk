@@ -1,6 +1,6 @@
 import { PreparedStatement } from "pg-promise";
-import type { EventType } from "../model/timestamp";
-import { EventSource } from "../model/eventsource";
+import type { EventType } from "../model/timestamp.js";
+import { EventSource } from "../model/eventsource.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export interface DbPublicShiplist {

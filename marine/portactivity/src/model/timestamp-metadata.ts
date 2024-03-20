@@ -1,4 +1,4 @@
-import { EventType } from "./timestamp";
+import { EventType } from "./timestamp.js";
 
 export enum S211TimeType {
     Actual = "Actual",
