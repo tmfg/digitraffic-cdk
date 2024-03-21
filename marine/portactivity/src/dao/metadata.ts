@@ -1,7 +1,7 @@
-import { PreparedStatement } from "pg-promise";
+import pgPromise from "pg-promise";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-const FIND_DISTINCT_LOCODES_BY_TIMESTAMP_SOURCE = new PreparedStatement({
+const FIND_DISTINCT_LOCODES_BY_TIMESTAMP_SOURCE = new pgPromise.PreparedStatement({
     name: "find-distinct-locodes-by-timestamp-source",
     text: `
         SELECT DISTINCT location_locode
