@@ -30,7 +30,7 @@ export function getDomains(): Promise<[ResultDomain[], Date]> {
                     addedTimestamp: d.created,
                     removedTimestamp: d.removed_timestamp,
                     dataUpdatedTime: d.modified
-                } satisfies ResultDomain)
+                }) satisfies ResultDomain
         );
         const lastModified = results.map((r) => r.dataUpdatedTime).reduce((a, b) => (a > b ? a : b), EPOCH);
 
@@ -92,7 +92,7 @@ export function findCounterValues(
                     interval: row.interval,
                     count: row.count,
                     status: row.status
-                } satisfies ResponseData)
+                }) satisfies ResponseData
         ),
         lastModified
     ]);
@@ -102,7 +102,9 @@ export function findCounters(domain: string = "", counterId?: number): Promise<[
     return inDatabaseReadonly((db: DTDatabase) => {
         return CounterDAO.findCounters(db, domain, counterId).then((featureCollection) => {
             // FeatureCollection has un standard dataUpdatedTime field in sql query
-            const collectionWithDataUpdatedTime = featureCollection as unknown as { dataUpdatedTime: string };
+            const collectionWithDataUpdatedTime = featureCollection as FeatureCollection & {
+                dataUpdatedTime: string;
+            };
             const lastModified = new Date(collectionWithDataUpdatedTime.dataUpdatedTime);
             return [featureCollection, lastModified];
         });

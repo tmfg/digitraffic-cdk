@@ -3,7 +3,7 @@ include .env
 python := python3.11
 
 create_venv:
-	$(python) -m virtualenv venv
+	$(python) -m venv venv
 
 install_venv:
 	venv/bin/pip install -r requirements.txt
