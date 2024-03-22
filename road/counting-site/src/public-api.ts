@@ -34,7 +34,7 @@ export class PublicApi {
     csvValuesResponseModel!: Model;
 
     constructor(stack: DigitrafficStack) {
-        this.publicApi = DigitrafficRestApi.withPublicCors(stack, "CountingSite-public", "Counting Site Public API");
+        this.publicApi = new DigitrafficRestApi(stack, "CountingSite-public", "Counting Site Public API");
         this.publicApi.createUsagePlan("CS Api Key", "CS Usage Plan");
 
         this.createResources(this.publicApi);
@@ -107,7 +107,7 @@ export class PublicApi {
     createResources(publicApi: DigitrafficRestApi): void {
         const apiResource = publicApi.root.addResource("api");
         const csResource = apiResource.addResource("counting-site");
-        const versionResource = csResource.addResource("v1");
+        const versionResource = publicApi.addResourceWithCorsOptionsSubTree(csResource, "v1");
 
         this.valuesResource = versionResource.addResource("values");
         this.csvValuesResource = versionResource.addResource("values.csv");
