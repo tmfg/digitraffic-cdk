@@ -1858,8 +1858,8 @@ importers:
         specifier: ~3.529.1
         version: 3.529.1
       '@digitraffic/common':
-        specifier: 2024.3.13-1
-        version: 2024.3.13-1(@aws-sdk/client-api-gateway@3.533.0)(@aws-sdk/client-s3@3.529.1)(@aws-sdk/client-secrets-manager@3.529.1)(@aws-sdk/client-sns@3.504.0)(@aws-sdk/lib-storage@3.496.0)(@types/geojson@7946.0.13)(aws-cdk-lib@2.132.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
+        specifier: 2024.3.14-1
+        version: 2024.3.14-1(@aws-sdk/client-api-gateway@3.533.0)(@aws-sdk/client-s3@3.529.1)(@aws-sdk/client-secrets-manager@3.529.1)(@aws-sdk/client-sns@3.535.0)(@aws-sdk/lib-storage@3.535.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.132.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4)
       '@middy/core':
         specifier: ^4.7.0
         version: 4.7.0
@@ -5210,8 +5210,8 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /@aws-sdk/lib-storage@3.496.0(@aws-sdk/client-s3@3.529.1):
-    resolution: {integrity: sha512-droXPy2AqFSd7MzKADJXny7/bRxYsdbCcCvtlWHzVSURa8XZsq2hw/m/SG4WrIdhT+AxrZwKp0JJOOHRDl+I1g==}
+  /@aws-sdk/lib-storage@3.535.0(@aws-sdk/client-s3@3.529.1):
+    resolution: {integrity: sha512-JlamsgeokOPq3lRBH6yQBkjJQ/ak4sBCvZjs4yl2sGpzcOzq75x5qL9Ms1skY9nShPv+UeowzI7K9ia11rNDnw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@aws-sdk/client-s3': ^3.0.0
@@ -7953,16 +7953,16 @@ packages:
       - aws-crt
     dev: false
 
-  /@digitraffic/common@2024.3.13-1(@aws-sdk/client-api-gateway@3.533.0)(@aws-sdk/client-s3@3.529.1)(@aws-sdk/client-secrets-manager@3.529.1)(@aws-sdk/client-sns@3.504.0)(@aws-sdk/lib-storage@3.496.0)(@types/geojson@7946.0.13)(aws-cdk-lib@2.132.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
-    resolution: {integrity: sha512-9MvDQHwcmXUL9WhKUpBuG7ymfLC2KmUid7GjvC32UEYs9wdnMvv44PoV3h4OUutrW1auwo3kqbTkM971sGJPsg==}
+  /@digitraffic/common@2024.3.14-1(@aws-sdk/client-api-gateway@3.533.0)(@aws-sdk/client-s3@3.529.1)(@aws-sdk/client-secrets-manager@3.529.1)(@aws-sdk/client-sns@3.535.0)(@aws-sdk/lib-storage@3.535.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.132.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.4):
+    resolution: {integrity: sha512-7oVYTeEmeVYNHYXhsGCJsFuBCih2xsV7DizriMHJ73HO0xdqTIwSHKJs8g/xVhgbQ+YE8KNjhHqaGQUG6EhZVQ==}
     engines: {node: '>=20 <21'}
     peerDependencies:
-      '@aws-sdk/client-api-gateway': ^3.496.0
-      '@aws-sdk/client-s3': ^3.496.0
-      '@aws-sdk/client-secrets-manager': ^3.496.0
-      '@aws-sdk/client-sns': ^3.496.0
-      '@aws-sdk/lib-storage': ^3.496.0
-      '@types/geojson': ^7946.0.12
+      '@aws-sdk/client-api-gateway': ^3.533.0
+      '@aws-sdk/client-s3': ^3.533.0
+      '@aws-sdk/client-secrets-manager': ^3.533.0
+      '@aws-sdk/client-sns': ^3.533.0
+      '@aws-sdk/lib-storage': ^3.533.0
+      '@types/geojson': ^7946.0.14
       aws-cdk-lib: ^2.132.1
       change-case: 5.0.0
       constructs: ^10.3.0
@@ -7970,7 +7970,7 @@ packages:
       date-fns-tz: ~2.0.0
       etag: ^1.8.1
       geojson-validation: ^1.0.2
-      ky: ^1.2.0
+      ky: ^1.2.2
       lodash: ~4.17.21
       node-ttl: ^0.2.0
       pg-native: ^3.0.1
@@ -7979,9 +7979,9 @@ packages:
       '@aws-sdk/client-api-gateway': 3.533.0
       '@aws-sdk/client-s3': 3.529.1
       '@aws-sdk/client-secrets-manager': 3.529.1
-      '@aws-sdk/client-sns': 3.504.0
-      '@aws-sdk/lib-storage': 3.496.0(@aws-sdk/client-s3@3.529.1)
-      '@types/geojson': 7946.0.13
+      '@aws-sdk/client-sns': 3.535.0
+      '@aws-sdk/lib-storage': 3.535.0(@aws-sdk/client-s3@3.529.1)
+      '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.132.1(constructs@10.3.0)
       change-case: 5.0.0
       constructs: 10.3.0
