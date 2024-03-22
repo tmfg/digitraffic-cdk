@@ -41,12 +41,14 @@ export const handler: (
 };
 
 function parseAuthentication(
+    // eslint-disable-next-line @rushstack/no-new-null
     headers: APIGatewayRequestAuthorizerEventHeaders | null
 ): [string, string] | undefined {
+    // eslint-disable-next-line dot-notation
     if (!headers?.["authorization"]) {
         return undefined;
     } else {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
         const encodedCreds = headers["authorization"].split(" ")[1]!;
         const plainCreds = Buffer.from(encodedCreds, "base64").toString().split(":");
 

@@ -1,6 +1,6 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
-import type { ValueOf } from "@digitraffic/common/dist/types/util-types.js";
-import { logException } from "@digitraffic/common/dist/utils/logging.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { ValueOf } from "@digitraffic/common/dist/types/util-types";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import { parseISO } from "date-fns";
 import { insertMessage, setMessageDeleted } from "../dao/message.js";
 import type { DtAudioContent, DtRamiMessage, DtVideoContent } from "../model/dt-rami-message.js";

@@ -41,7 +41,7 @@ const agent = new Agent({
 
 const parse = util.promisify(parseString);
 
-export class Session {    
+export class Session {
     readonly communicationUrl: string;
     readonly videoUrl: string;
     readonly agent: Agent;
@@ -115,7 +115,7 @@ export class Session {
         return this.sendMessage(command, { timeout: 8000 });
     }
 
-    disconnect() {
+    disconnect(): Promise<void> {
         const command = new LogoutCommand();
 
         return this.sendMessage(command);

@@ -1,6 +1,6 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { validateIncomingRamiMessage } from "../../service/validate-message.js";
 import { sendToSqs } from "../../util/sqs.js";
 

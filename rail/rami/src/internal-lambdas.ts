@@ -1,8 +1,8 @@
 import {
     MonitoredDBFunction,
     MonitoredFunction
-} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction.js";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
+} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
@@ -31,7 +31,7 @@ function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Qu
     };
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-queue", lambdaEnv, {
         memorySize: 256,
-        reservedConcurrentExecutions: 5,
+        reservedConcurrentExecutions: 10,
         timeout: 10
     });
     processQueueLambda.addEventSource(new SqsEventSource(queue));
@@ -45,7 +45,7 @@ function createProcessDLQLambda(stack: DigitrafficStack, dlq: Queue, dlqBucket: 
     };
 
     const processDLQLambda = MonitoredFunction.createV2(stack, "process-dlq", lambdaEnv, {
-        reservedConcurrentExecutions: 1,
+        reservedConcurrentExecutions: 5,
         timeout: 10,
         memorySize: 256,
         runtime: Runtime.NODEJS_20_X

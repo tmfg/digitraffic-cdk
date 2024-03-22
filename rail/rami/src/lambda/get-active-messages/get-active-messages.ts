@@ -1,4 +1,4 @@
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response.js";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { getActiveMessagesLambdaEvent } from "../../model/zod-schema/lambda-event.js";
 import { getActiveMessages } from "../../service/get-message.js";
 

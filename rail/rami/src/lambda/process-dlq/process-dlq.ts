@@ -1,8 +1,8 @@
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { RamiEnvKeys } from "../../keys.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { uploadToS3 } from "../../util/s3.js";
-import { logException } from "@digitraffic/common/dist/utils/logging.js";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const bucketName = getEnvVariable(RamiEnvKeys.SQS_DLQ_BUCKET_NAME);
 

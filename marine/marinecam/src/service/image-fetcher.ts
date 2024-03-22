@@ -1,9 +1,12 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { Session } from "./session.js";
+import pLimit from "p-limit";
 import * as ImageStore from "./image-store.js";
 import * as MetadataService from "./metadata.js";
 
 export const CAMERA_GROUP_ID = "Saimaa";
+
+const updateLimit = pLimit(5);
 
 export async function updateAllCameras(
     url: string,
@@ -22,21 +25,23 @@ async function updateAllImages(cameraIds: string[], session: Session, bucketName
     const updatedCameras = [] as string[];
 
     await Promise.allSettled(
-        cameraIds.map(async (cameraId) => {
-            const image = await getImageFromCamera(session, cameraId);
+        cameraIds.map(async (cameraId) =>
+            updateLimit(async () => {
+                const image = await getImageFromCamera(session, cameraId);
 
-            if (!image) {
-                logger.info({
-                    method: "ImageFetcher.updateAllImages",
-                    message: "empty picture from camera " + cameraId
-                });
-            } else {
-                updatedCameras.push(cameraId);
-                return ImageStore.storeImage(cameraId, image, bucketName);
-            }
+                if (!image) {
+                    logger.info({
+                        method: "ImageFetcher.updateAllImages",
+                        message: "empty picture from camera " + cameraId
+                    });
+                } else {
+                    updatedCameras.push(cameraId);
+                    return ImageStore.storeImage(cameraId, image, bucketName);
+                }
 
-            return Promise.resolve();
-        })
+                return Promise.resolve();
+            })
+        )
     );
 
     await session.disconnect();
