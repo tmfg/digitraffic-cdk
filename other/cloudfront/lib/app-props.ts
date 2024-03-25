@@ -1,6 +1,6 @@
-import { CloudFrontAllowedMethods, OriginProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
-import { WafRules } from "./acl/waf-rules";
-import { FunctionType, LambdaType } from "./lambda/lambda-creator";
+import {CloudFrontAllowedMethods, OriginProtocolPolicy} from "aws-cdk-lib/aws-cloudfront";
+import {WafRules} from "./acl/waf-rules";
+import {FunctionType, LambdaType} from "./lambda/lambda-creator";
 
 export class CFBehavior {
     readonly path: string;
@@ -117,6 +117,10 @@ export class CFBehavior {
 
     public withIndexHtmlFunction(): this {
         return this.withFunction(FunctionType.INDEX_HTML);
+    }
+
+    public withHistorySlashFunction():this {
+        return this.withFunction(FunctionType.HISTORY_SLASH);
     }
 }
 
