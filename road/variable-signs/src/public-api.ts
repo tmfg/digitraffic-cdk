@@ -32,7 +32,7 @@ export class PublicApi {
         this.apiResource = this.restApi.root.addResource("api");
 
         const vsResource = this.apiResource.addResource("variable-sign");
-        const v1Resource = vsResource.addResource("v1");
+        const v1Resource = this.restApi.addResourceWithCorsOptionsSubTree(vsResource,"v1");
 
         const imagesResource = v1Resource.addResource("images");
 
