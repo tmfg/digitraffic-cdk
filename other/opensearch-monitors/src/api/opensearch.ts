@@ -93,6 +93,7 @@ export class OpenSearch {
         if (response.statusCode > 201) {
             logger.error({
                 method: "OpenSearch.send",
+                customMethod: method,
                 customStatusCode: response.statusCode,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                 customStatusMessage: response.body.statusMessage

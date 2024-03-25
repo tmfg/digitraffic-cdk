@@ -42,7 +42,13 @@ export interface RangeQuery {
     };
 }
 
-export type Query = BoolQuery | MatchPhraseQuery | RangeQuery | ExistsQuery;
+export interface ScriptQuery {
+    script: {
+        script: string;
+    };
+}
+
+export type Query = BoolQuery | MatchPhraseQuery | RangeQuery | ExistsQuery | ScriptQuery;
 
 export type Order = "asc" | "desc";
 
