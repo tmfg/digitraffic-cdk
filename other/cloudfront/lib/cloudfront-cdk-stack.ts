@@ -1,5 +1,5 @@
-import {StackCheckingAspect} from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
-import {Annotations, Aspects, Stack, StackProps} from "aws-cdk-lib";
+import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
+import { Annotations, Aspects, Stack, StackProps } from "aws-cdk-lib";
 import {
     CachePolicy,
     CfnDistribution,
@@ -8,11 +8,11 @@ import {
     OriginRequestPolicy,
     ResponseHeadersPolicy
 } from "aws-cdk-lib/aws-cloudfront";
-import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
-import {Construct} from "constructs";
-import {CFLambdaParameters, CFOrigin, CFProps, DistributionProps, ElasticProps} from "./app-props";
-import {createDistribution} from "./distribution-util";
-import {LambdaHolder} from "./lambda-holder";
+import { CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
+import { CFLambdaParameters, CFOrigin, CFProps, DistributionProps, ElasticProps } from "./app-props";
+import { createDistribution } from "./distribution-util";
+import { LambdaHolder } from "./lambda-holder";
 import {
     createGzipRequirement, createHistoryPath,
     createHttpHeaders,
@@ -25,8 +25,8 @@ import {
     FunctionType,
     LambdaType
 } from "./lambda/lambda-creator";
-import {createOriginConfig} from "./origin-configs";
-import {createRealtimeLogging} from "./streaming-util";
+import { createOriginConfig } from "./origin-configs";
+import { createRealtimeLogging } from "./streaming-util";
 
 type ViewerPolicyMap = Record<string, string>;
 
