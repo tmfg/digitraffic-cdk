@@ -23,6 +23,7 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "~3.54.0",
     "@digitraffic/common": "workspace:*",
     "@middy/core": "^4.7.0",
     "@middy/sqs-partial-batch-failure": "^4.7.0",
