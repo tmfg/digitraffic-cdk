@@ -40,7 +40,7 @@ async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
 
 export const handler = async (): Promise<void> => {
     try {
-        const monitors = JSON.parse(readFileSync("./monitors.txt").toString()) as unknown as OSMonitor[];
+        const monitors = JSON.parse(readFileSync("./monitors.json").toString()) as unknown as OSMonitor[];
 
         if (!monitors || monitors.length === 0) {
             logger.error({

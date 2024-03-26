@@ -49,7 +49,7 @@ export class UpdateOSMonitorsStack extends Stack {
         const lambdaSg = this.createSecurityGroups(vpc);
 
         if (config.createLambda) {
-            writeFileSync("./dist/lambda/monitors.txt", JSON.stringify(config.monitors));
+            writeFileSync("./dist/lambda/monitors.json", JSON.stringify(config.monitors, null, 2));
 
             this.createLambda(vpc, lambdaSg, config.osHost, config.osVpcEndpoint, config.osRoleArn);
         }

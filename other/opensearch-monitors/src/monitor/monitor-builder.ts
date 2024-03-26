@@ -1,6 +1,15 @@
 import type { OSLogField } from "./fields.js";
 import type { OSMonitor } from "./monitor.js";
-import type { BoolQuery, ExistsQuery, MatchPhraseQuery, Order, Query, RangeQuery, Sort } from "./queries.js";
+import type {
+    BoolQuery,
+    ExistsQuery,
+    MatchPhraseQuery,
+    Order,
+    Query,
+    RangeQuery,
+    ScriptQuery,
+    Sort
+} from "./queries.js";
 import { type OSTrigger, triggerWhenLineCountOutside, triggerWhenLinesFound } from "./triggers.js";
 
 export interface MonitorConfig {
@@ -16,6 +25,11 @@ export interface MonitorConfig {
 
 export function matchPhrase(field: OSLogField, query: string): MatchPhraseQuery {
     return { match_phrase: { [field]: { query } } };
+}
+
+/* { "script" : { "script" : "doc['record.metrics.memorySizeMB'].value - doc['record.metrics.maxMemoryUsedMB'].value < 20" }} */
+export function script(script: string): ScriptQuery {
+    return { script: { script: script } };
 }
 
 export function exists(field: string): ExistsQuery {
