@@ -6,9 +6,13 @@ function handler(event) {
     var request = event.request;
     var uri = request.uri;
 
-    if (uri.endsWith('/history')) {
+    if (uri.match(/^https?:\/\/([a-zA-Z_-]{1,256}\.)?([a-zA-Z_-]{1,256}\.)?digitraffic\.fi\/history$/)) {
         request.uri += '/';
     }
 
     return request;
 }
+
+module.exports = {
+    handler
+};
