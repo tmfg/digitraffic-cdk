@@ -1,10 +1,6 @@
 import { IVersion } from "aws-cdk-lib/aws-lambda";
 import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
-import {
-    FunctionEventType,
-    LambdaEdgeEventType,
-    LambdaFunctionAssociation
-} from "aws-cdk-lib/aws-cloudfront";
+import { FunctionEventType, LambdaEdgeEventType, LambdaFunctionAssociation } from "aws-cdk-lib/aws-cloudfront";
 import { FunctionType, LambdaType } from "./lambda/lambda-creator";
 import { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
 
@@ -49,6 +45,8 @@ export class LambdaHolder {
     private static getFunctionEventType(functionType: FunctionType): FunctionEventType {
         switch (functionType) {
             case FunctionType.INDEX_HTML:
+                return FunctionEventType.VIEWER_REQUEST;
+            case FunctionType.HISTORY_SLASH:
                 return FunctionEventType.VIEWER_REQUEST;
         }
     }
