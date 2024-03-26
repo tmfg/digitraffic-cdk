@@ -1,9 +1,8 @@
 import type { WebSocket } from "ws";
 import type { AwakeAiZoneType } from "./awake-common.js";
-import { SSM } from "aws-sdk";
+import type { PutParameterResult } from "@aws-sdk/client-ssm";
+import { GetParameterCommand, PutParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 import { PortActivityParameterKeys } from "../keys.js";
-// TODO: v3
-import type { PutParameterResult } from "aws-sdk/clients/ssm.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { Ports } from "../service/portareas.js";
@@ -101,13 +100,13 @@ export const SUBSCRIPTION_MESSAGE = {
     ]
 };
 
+const ssm = new SSMClient({});
+
 export const getFromParameterStore = async (name: string): Promise<string | undefined> => {
-    const ssmParams = {
-        Name: name
-    };
     try {
-        const parameter = await new SSM().getParameter(ssmParams).promise();
-        return Promise.resolve(parameter.Parameter?.Value);
+        const command = new GetParameterCommand({ Name: name });
+        const response = await ssm.send(command);
+        return Promise.resolve(response.Parameter?.Value);
     } catch (error: unknown) {
         logException(logger, error);
         return Promise.reject();
@@ -115,13 +114,8 @@ export const getFromParameterStore = async (name: string): Promise<string | unde
 };
 
 export const putInParameterStore = (name: string, value: string): Promise<PutParameterResult> => {
-    const ssmParams = {
-        Name: name,
-        Overwrite: true,
-        Type: "String",
-        Value: value
-    };
-    return new SSM().putParameter(ssmParams).promise();
+    const command = new PutParameterCommand({ Name: name, Overwrite: true, Type: "String", Value: value });
+    return ssm.send(command);
 };
 
 export class AwakeAiATXApi {
