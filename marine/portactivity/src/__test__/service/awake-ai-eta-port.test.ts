@@ -1,4 +1,3 @@
-import * as sinon from "sinon";
 import { AwakeAiETAPortService } from "../../service/awake-ai-eta-port.js";
 import type { AwakeAiPortResponse } from "../../api/awake-ai-port.js";
 import { AwakeAiPortApi } from "../../api/awake-ai-port.js";
@@ -11,6 +10,7 @@ import { AwakeAiPredictionType, AwakeAiVoyageStatus, AwakeAiZoneType } from "../
 import { getRandomNumber, randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { addHours, subHours } from "date-fns";
 import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil.js";
+import { jest } from "@jest/globals";
 
 describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - no schedule", async () => {
@@ -20,8 +20,7 @@ describe("AwakeAiETAPortService(", () => {
             excludeSchedule: true,
             includePortCallPrediction: true
         });
-
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(voyageTimestamp);
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -35,7 +34,7 @@ describe("AwakeAiETAPortService(", () => {
             voyageStatus: AwakeAiVoyageStatus.STOPPED,
             includePortCallPrediction: true
         });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(voyageTimestamp);
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -50,7 +49,7 @@ describe("AwakeAiETAPortService(", () => {
                 ? AwakeAiPredictionType.TRAVEL_TIME
                 : AwakeAiPredictionType.DESTINATION
         });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(voyageTimestamp);
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -66,7 +65,7 @@ describe("AwakeAiETAPortService(", () => {
             predictionType: AwakeAiPredictionType.ETA,
             includePortCallPrediction: true
         });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(voyageTimestamp);
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -84,7 +83,7 @@ describe("AwakeAiETAPortService(", () => {
                 source: "urn:awake:digitraffic-portcall:2959158"
             }
         });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(voyageTimestamp);
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -94,9 +93,9 @@ describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - correct with port call prediction", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        sinon
-            .stub(api, "getETAs")
-            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: true })));
+        jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
+            createEtaResponse({ includePortCallPrediction: true })
+        );
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -106,9 +105,9 @@ describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - correct without port call prediction", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        sinon
-            .stub(api, "getETAs")
-            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: false })));
+        jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
+            createEtaResponse({ includePortCallPrediction: true })
+        );
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 

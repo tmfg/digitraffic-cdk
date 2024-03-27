@@ -1,5 +1,4 @@
 import { newAwakeATXMessage, someNumber } from "../testdata.js";
-import * as sinon from "sinon";
 import type { AwakeAIATXTimestampMessage } from "../../api/awake-ai-atx.js";
 import { AwakeAiATXApi, AwakeATXZoneEventType } from "../../api/awake-ai-atx.js";
 import { AwakeAiATXService } from "../../service/awake-ai-atx.js";
@@ -13,6 +12,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { WebSocket } from "ws";
 import { addHours, subHours } from "date-fns";
 import { assertDefined } from "../test-utils.js";
+import { jest } from "@jest/globals";
 
 describe(
     "service Awake.AI ATx",
@@ -24,7 +24,7 @@ describe(
         test("getATXs - no portcall found for ATx", async () => {
             const atxMessage = newAwakeATXMessage();
             const api = createAiATXApi();
-            sinon.stub(api, "getATXs").returns(Promise.resolve([atxMessage]));
+            jest.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([atxMessage]);
             const service = new AwakeAiATXService(api);
 
             const timestamps = await service.getATXs(0); // timeout is irrelevant
@@ -41,7 +41,7 @@ describe(
             await createPortcall(atxMessage, portcallId);
 
             const api = createAiATXApi();
-            sinon.stub(api, "getATXs").returns(Promise.resolve([atxMessage]));
+            jest.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([atxMessage]);
             const service = new AwakeAiATXService(api);
 
             const timestamps = await service.getATXs(0); // timeout is irrelevant
@@ -78,7 +78,7 @@ describe(
             await createPortcall(atxMessage, portcallId);
 
             const api = createAiATXApi();
-            sinon.stub(api, "getATXs").returns(Promise.resolve([atxMessage]));
+            jest.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([atxMessage]);
             const service = new AwakeAiATXService(api);
 
             const timestamps = await service.getATXs(0); // timeout is irrelevant

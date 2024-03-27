@@ -8,13 +8,13 @@ import type { ApiTimestamp } from "../../model/timestamp.js";
 import { newTimestamp } from "../testdata.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import _ from "lodash";
-import * as sinon from "sinon";
+import { jest } from "@jest/globals";
 
 describe(
     "process-queue",
     dbTestBase((db: DTDatabase) => {
         beforeEach(() => {
-            sinon.restore();
+            jest.restoreAllMocks();
             mockSecrets({});
         });
 

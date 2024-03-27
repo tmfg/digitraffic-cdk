@@ -1,11 +1,11 @@
 import type { WebSocket } from "ws";
 import type { AwakeAiZoneType } from "./awake-common.js";
-import type { PutParameterResult } from "@aws-sdk/client-ssm";
-import { GetParameterCommand, PutParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 import { PortActivityParameterKeys } from "../keys.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { Ports } from "../service/portareas.js";
+import type { PutParameterResult } from "@aws-sdk/client-ssm";
+import { GetParameterCommand, PutParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 
 interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType;
@@ -102,22 +102,6 @@ export const SUBSCRIPTION_MESSAGE = {
 
 const ssm = new SSMClient({});
 
-export const getFromParameterStore = async (name: string): Promise<string | undefined> => {
-    try {
-        const command = new GetParameterCommand({ Name: name });
-        const response = await ssm.send(command);
-        return Promise.resolve(response.Parameter?.Value);
-    } catch (error: unknown) {
-        logException(logger, error);
-        return Promise.reject();
-    }
-};
-
-export const putInParameterStore = (name: string, value: string): Promise<PutParameterResult> => {
-    const command = new PutParameterCommand({ Name: name, Overwrite: true, Type: "String", Value: value });
-    return ssm.send(command);
-};
-
 export class AwakeAiATXApi {
     private readonly url: string;
     private readonly apiKey: string;
@@ -130,7 +114,8 @@ export class AwakeAiATXApi {
     }
 
     async getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
-        const subscriptionId = await getFromParameterStore(
+        const subscriptionId = await this.getFromParameterStore(
+            ssm,
             PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID
         );
 
@@ -151,7 +136,8 @@ export class AwakeAiATXApi {
                 case AwakeAiATXEventType.SUBSCRIPTION_STATUS: {
                     const receivedSubscriptionId = (message as AwakeAISubscriptionMessage).subscriptionId;
                     if (receivedSubscriptionId !== subscriptionId) {
-                        putInParameterStore(
+                        this.putInParameterStore(
+                            ssm,
                             PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
                             receivedSubscriptionId
                         )
@@ -200,5 +186,30 @@ export class AwakeAiATXApi {
             msgType: "subscribe",
             resume: subscriptionId
         };
+    }
+
+    async getFromParameterStore(ssm: SSMClient, parameterName: string): Promise<string | undefined> {
+        try {
+            const command = new GetParameterCommand({ Name: parameterName });
+            const response = await ssm.send(command);
+            return Promise.resolve(response.Parameter?.Value);
+        } catch (error: unknown) {
+            logException(logger, error);
+            return Promise.reject();
+        }
+    }
+
+    async putInParameterStore(
+        ssm: SSMClient,
+        parameterName: string,
+        parameterValue: string
+    ): Promise<PutParameterResult> {
+        const command = new PutParameterCommand({
+            Name: parameterName,
+            Overwrite: true,
+            Type: "String",
+            Value: parameterValue
+        });
+        return ssm.send(command);
     }
 }

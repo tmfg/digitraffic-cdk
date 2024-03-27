@@ -8,6 +8,7 @@ import { ports } from "../../service/portareas.js";
 import { EventSource } from "../../model/eventsource.js";
 import { SchedulesService } from "../../service/schedules.js";
 import { subHours, subMinutes } from "date-fns";
+import { jest } from "@jest/globals";
 
 const uuid = "123123123";
 const vesselName = "TEST";
