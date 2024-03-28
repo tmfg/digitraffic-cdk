@@ -223,8 +223,8 @@ export class CloudfrontCdkStack extends Stack {
             lambdaMap.addFunction(FunctionType.INDEX_HTML, createIndexHtml(this));
         }
 
-        if (types.functionTypes.has(FunctionType.HISTORY_SLASH)) {
-            lambdaMap.addFunction(FunctionType.HISTORY_SLASH, createHistoryPath(this))
+        if (types.functionTypes.has(FunctionType.HISTORY_REDIRECT)) {
+            lambdaMap.addFunction(FunctionType.HISTORY_REDIRECT, createHistoryPath(this))
         }
 
         // handle ip restrictions

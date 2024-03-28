@@ -46,7 +46,7 @@ export class LambdaHolder {
         switch (functionType) {
             case FunctionType.INDEX_HTML:
                 return FunctionEventType.VIEWER_REQUEST;
-            case FunctionType.HISTORY_SLASH:
+            case FunctionType.HISTORY_REDIRECT:
                 return FunctionEventType.VIEWER_REQUEST;
         }
     }
