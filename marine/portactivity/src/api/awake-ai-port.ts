@@ -1,7 +1,7 @@
-import axios from "axios";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { type AwakeAiPredictedVoyage, AwakeAiPredictionType, type AwakeAiShip } from "./awake-common.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import ky, { HTTPError } from "ky";
+import { AwakeAiPredictionType, type AwakeAiPredictedVoyage, type AwakeAiShip } from "./awake-common.js";
 
 export enum AwakeAiPortResponseType {
     OK = "OK",
@@ -56,19 +56,21 @@ export class AwakeAiPortApi {
                 method: "AwakeAiPortApi.getPredictions",
                 message: `calling URL ${url}`
             });
-            const resp = await axios.get(url, {
-                headers: {
-                    Authorization: this.apiKey,
-                    Accept: MediaType.APPLICATION_JSON
-                },
-                validateStatus: (status) => status === 200
-            });
+            const response = await ky
+                .get(url, {
+                    headers: {
+                        Authorization: this.apiKey,
+                        Accept: MediaType.APPLICATION_JSON
+                    },
+                    retry: 0
+                })
+                .json();
             return {
                 type: AwakeAiPortResponseType.OK,
-                schedule: resp.data as unknown as AwakeAiPortSchedule[]
+                schedule: response as AwakeAiPortSchedule[]
             };
         } catch (error) {
-            if (axios.isAxiosError(error)) {
+            if (error instanceof HTTPError) {
                 return AwakeAiPortApi.handleError(error);
             }
             throw error;
@@ -98,7 +100,7 @@ export class AwakeAiPortApi {
         );
     }
 
-    static handleError(error: { response?: { status: number } }): AwakeAiPortResponse {
+    static handleError(error: HTTPError): AwakeAiPortResponse {
         if (!error.response) {
             return {
                 type: AwakeAiPortResponseType.NO_RESPONSE

@@ -1,4 +1,4 @@
-import axios from "axios";
+import ky, { HTTPError } from "ky";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -54,19 +54,21 @@ export class AwakeAiETAShipApi {
                 method: "AwakeAiETAShipApi.getETA",
                 message: `calling URL ${url}`
             });
-            const resp = await axios.get(url, {
-                headers: {
-                    Authorization: this.apiKey,
-                    Accept: MediaType.APPLICATION_JSON
-                },
-                validateStatus: (status) => status === 200
-            });
+            const response = await ky
+                .get(url, {
+                    headers: {
+                        Authorization: this.apiKey,
+                        Accept: MediaType.APPLICATION_JSON
+                    },
+                    retry: 0
+                })
+                .json();
             return {
                 type: AwakeAiShipResponseType.OK,
-                schedule: resp.data as unknown as AwakeAiShipVoyageSchedule
+                schedule: response as AwakeAiShipVoyageSchedule
             };
         } catch (error) {
-            if (axios.isAxiosError(error)) {
+            if (error instanceof HTTPError) {
                 return AwakeAiETAShipApi.handleError(error);
             }
             throw error;
@@ -78,7 +80,7 @@ export class AwakeAiETAShipApi {
         }
     }
 
-    static handleError(error: { response?: { status: number } }): AwakeAiShipApiResponse {
+    static handleError(error: HTTPError): AwakeAiShipApiResponse {
         if (!error.response) {
             return {
                 type: AwakeAiShipResponseType.NO_RESPONSE

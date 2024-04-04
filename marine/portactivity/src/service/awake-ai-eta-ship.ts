@@ -3,20 +3,20 @@ import { retry } from "@digitraffic/common/dist/utils/retry";
 import { differenceInHours } from "date-fns";
 import type { AwakeAiETAShipApi } from "../api/awake-ai-ship.js";
 import {
-    type AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
+    type AwakeAiShipApiResponse,
     type AwakeAiShipVoyageSchedule
 } from "../api/awake-ai-ship.js";
 import {
-    type AwakeAiPredictedVoyage,
-    type AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageStatus,
-    AwakeAiZoneType
+    AwakeAiZoneType,
+    type AwakeAiPredictedVoyage,
+    type AwakeAiVoyageEtaPrediction
 } from "../api/awake-common.js";
 import type { DbETAShip } from "../dao/timestamps.js";
 import { EventSource } from "../model/eventsource.js";
 import type { Locode } from "../model/locode.js";
-import { type ApiTimestamp, EventType } from "../model/timestamp.js";
+import { EventType, type ApiTimestamp } from "../model/timestamp.js";
 import {
     AwakeDataState,
     etaPredictionToTimestamp,
