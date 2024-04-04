@@ -1,5 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import moment from "moment-timezone";
+import { parseISO, subMinutes } from "date-fns";
 import type { Destination, SchedulesApi, SchedulesResponse, Timestamp, Vessel } from "../api/schedules.js";
 import { SchedulesDirection } from "../api/schedules.js";
 import { EventSource } from "../model/eventsource.js";
@@ -35,9 +35,7 @@ export class SchedulesService {
         return timestamps
             .filter((ts) => ports.includes(ts.location.port as Port))
             .filter((ts) =>
-                ts.eventType === EventType.ETD
-                    ? moment(ts.eventTime) >= moment().subtract(5, "minutes")
-                    : true
+                ts.eventType === EventType.ETD ? parseISO(ts.eventTime) >= subMinutes(Date.now(), 5) : true
             );
     }
 

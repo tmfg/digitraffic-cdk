@@ -218,7 +218,6 @@ describe("AwakeAiETAShipService", () => {
 
         await service.getAwakeAiTimestamps([ship]);
 
-        // expect(getETAStub.calledWith(ship.imo, locode)).toBe(true);
         expect(getETAStub).toHaveBeenCalledWith(ship.imo, locode);
     });
 

@@ -6,7 +6,7 @@ import {
 import { type ApiTimestamp, EventType } from "../model/timestamp.js";
 import * as TimestampDAO from "../dao/timestamps.js";
 import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
-import moment from "moment-timezone";
+import { toDate } from "date-fns-tz";
 import { EventSource } from "../model/eventsource.js";
 import { AwakeAiZoneType } from "../api/awake-common.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -41,7 +41,7 @@ export class AwakeAiATXService {
                     const port = atx.locodes[0] as unknown as string;
                     const eventType =
                         atx.zoneEventType === AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD;
-                    const eventTime = moment(atx.eventTimestamp).toDate();
+                    const eventTime = toDate(atx.eventTimestamp);
                     const portcallId = await TimestampDAO.findPortcallId(
                         db,
                         port,
