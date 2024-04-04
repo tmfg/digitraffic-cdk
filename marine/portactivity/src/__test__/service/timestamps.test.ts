@@ -371,6 +371,7 @@ describe(
         });
 
         test("deleteOldTimestampsAndPilotages - deletes both old timestamps and pilotages", async () => {
+            // this test fails if a change to daylight saving time has happened during the interval
             const olderThanAWeek = subDays(Date.now(), 7);
             await insert(db, [
                 newTimestamp({
