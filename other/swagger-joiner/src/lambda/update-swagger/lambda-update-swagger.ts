@@ -3,8 +3,10 @@ import {
     constructSwagger,
     mergeApiDescriptions,
     withDeprecations,
+    withoutApisWithoutHttpMethods,
     withoutMethods,
-    withoutSecurity
+    withoutSecurity,
+    type HttpMethod
 } from "../../swagger-utils.js";
 import { exportSwaggerApi } from "../../apigw-utils.js";
 import {
@@ -108,11 +110,16 @@ export const handler = async (): Promise<void> => {
         merged.paths = withoutSecurity(merged.paths);
     }
 
-    // remove HEAD methods used for health checks
-    merged.paths = withoutMethods(merged.paths, (method) => method.toUpperCase() === "HEAD");
+    // Remove HEAD method used for health checks and OPTIONS method added by apigw, as they are not interesting enough.
+    merged.paths = withoutMethods(
+        merged.paths,
+        (method) =>
+            method.toLowerCase() === ("head" satisfies HttpMethod) ||
+            method.toLowerCase() === ("options" satisfies HttpMethod)
+    );
 
-    // Remove OPTIONS methods added by apigw, as they are not interesting enough.
-    merged.paths = withoutMethods(merged.paths, (method) => method.toUpperCase() === "OPTIONS");
+    // Remove APIs that don't have any http methods defined, as they cannot be called anyway
+    merged.paths = withoutApisWithoutHttpMethods(merged.paths);
 
     // add "deprecated" fields where missing
     // api gateway drops these fields from exported descriptions

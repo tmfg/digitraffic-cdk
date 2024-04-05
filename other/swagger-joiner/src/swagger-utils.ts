@@ -1,5 +1,11 @@
-import { type OpenApiSchema, type OpenApiOperation, openapiOperation } from "./model/openapi-schema.js";
+import { type OpenApiOperation, openapiOperation, type OpenApiSchema } from "./model/openapi-schema.js";
 import _ from "lodash";
+import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+
+const HttpMethods = ["get", "head", "post", "put", "delete", "connect", "options", "trace", "patch"] as const;
+export type HttpMethod = (typeof HttpMethods)[number];
+
+const SERVICE = "swagger-utils" as const;
 
 export function constructSwagger(spec: object): string {
     return `
@@ -95,6 +101,11 @@ export function withoutSecurity(paths: OpenApiSchema["paths"]): OpenApiSchema["p
     return result;
 }
 
+/**
+ * Deletes eachs paths methods that matches the keyTest
+ * @param paths openapi paths
+ * @param keyTest test to perform
+ */
 export function withoutMethods(
     paths: OpenApiSchema["paths"],
     keyTest: (key: string) => boolean
@@ -112,5 +123,37 @@ export function withoutMethods(
         });
     });
 
+    return result;
+}
+
+/**
+ * Removes api paths that doesn't have any http methods defined
+ * @param paths Open Api paths to check
+ */
+export function withoutApisWithoutHttpMethods(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
+    const result = _.cloneDeep(paths);
+    const method = `${SERVICE}."withoutApisWithoutHttpMethods` as const satisfies LoggerMethodType;
+    try {
+        return _.chain(result)
+            .toPairs()
+            .filter(([path, pathItem]) => {
+                const pathItemKeys = Object.keys(pathItem);
+                // Check that pathItemKeys contains at least one http method, otherwise delete path
+                const containsHttpMethod = pathItemKeys.some((m) => HttpMethods.includes(m as HttpMethod));
+                logger.info({
+                    method,
+                    message: `path: ${path}, pathItemKeys: ${pathItemKeys.join(",")}, containsHttpMethod: ${containsHttpMethod}`
+                });
+                return containsHttpMethod;
+            })
+            .fromPairs()
+            .value();
+    } catch (error) {
+        logger.error({
+            method,
+            message: "Failed to remove apis without any http methods. Fallback to current value.",
+            error
+        });
+    }
     return result;
 }

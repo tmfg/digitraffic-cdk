@@ -26,7 +26,6 @@ export function create(
 function createCommonEnv(props: Props): LambdaEnvironment {
     return {
         [StatusEnvKeys.SECRET_ID]: props.secretId,
-        [StatusEnvKeys.STATUSPAGE_URL]: props.statusPageUrl,
         [StatusEnvKeys.C_STATE_PAGE_URL]: props.cStatePageUrl,
         [StatusEnvKeys.CHECK_TIMEOUT_SECONDS]: props.nodePingTimeoutSeconds.toString(),
         [StatusEnvKeys.INTERVAL_MINUTES]: props.nodePingCheckInterval.toString()

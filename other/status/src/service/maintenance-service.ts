@@ -1,7 +1,6 @@
 import type { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { CStateStatuspageApi } from "../api/cstate-statuspage-api.js";
-import type { StatuspageApi } from "../api/statuspage.js";
 import type { NodePingApi } from "../api/nodeping-api.js";
 
 const SERVICE = "MaintenanceService" as const;
@@ -9,8 +8,7 @@ const SERVICE = "MaintenanceService" as const;
 export async function handleMaintenance(
     nodePingApi: NodePingApi,
     cStateApi: CStateStatuspageApi,
-    slackNotifyApi: SlackApi,
-    statuspageApi: StatuspageApi
+    slackNotifyApi: SlackApi
 ): Promise<void> {
     const method = `${SERVICE}.handleMaintenance` as const satisfies LoggerMethodType;
     logger.info({
@@ -18,17 +16,13 @@ export async function handleMaintenance(
         message: "Read maintenance from status page"
     });
 
-    const activeMaintenances = await statuspageApi.getActiveStatusPageMaintenances();
-
-    const isCStateActiveMaintenances = await cStateApi.isActiveMaintenances();
-
+    const maintenanceIsOn = await cStateApi.isActiveMaintenances();
     const checks = await nodePingApi.getNodePingChecks();
     const enabledChecks = nodePingApi.getEnabledNodePingChecks(checks);
     const enabledChecksCount = enabledChecks.length;
     const disabledChecks = nodePingApi.getDisabledNodePingChecks(checks);
     const disabledChecksCount = disabledChecks.length;
-    const maintenanceIsOn: boolean =
-        isCStateActiveMaintenances || activeMaintenances.scheduled_maintenances.length > 0;
+
     // Active maintenance found and there is enabled checks -> disable checks
     if (maintenanceIsOn && enabledChecksCount) {
         logger.info({

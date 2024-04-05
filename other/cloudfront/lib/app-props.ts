@@ -118,6 +118,10 @@ export class CFBehavior {
     public withIndexHtmlFunction(): this {
         return this.withFunction(FunctionType.INDEX_HTML);
     }
+
+    public withHistoryRedirectFunction():this {
+        return this.withFunction(FunctionType.HISTORY_REDIRECT);
+    }
 }
 
 export class CFOrigin {
