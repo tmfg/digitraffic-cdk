@@ -1,4 +1,4 @@
-import type { Model, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { faultsSchema } from "./model/fault-schema.js";
 import { featureSchema, geojsonSchema, getModelReference } from "@digitraffic/common/dist/utils/api-model";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
@@ -47,7 +47,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     return publicApi;
 }
 
-function createFaultsResource(stack: DigitrafficStack, publicApi: RestApi, faultsJsonModel: Model): Resource {
+function createFaultsResource(stack: DigitrafficStack, publicApi: DigitrafficRestApi, faultsJsonModel: Model): Resource {
     const getFaultsLambda = MonitoredDBFunction.create(stack, "get-faults", undefined, {
         memorySize: 256,
         reservedConcurrentExecutions: 6
@@ -55,7 +55,7 @@ function createFaultsResource(stack: DigitrafficStack, publicApi: RestApi, fault
 
     const apiResource = publicApi.root.addResource("api");
     const atonResource = apiResource.addResource("aton");
-    const v1Resource = atonResource.addResource("v1");
+    const v1Resource = publicApi.addResourceWithCorsOptionsSubTree(atonResource,"v1");
     const faultsResource = v1Resource.addResource("faults");
 
     const getFaultsIntegration = new DigitrafficIntegration(getFaultsLambda, MediaType.APPLICATION_GEOJSON)

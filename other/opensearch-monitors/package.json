@@ -28,19 +28,19 @@
     "@smithy/node-http-handler": "~2.5.0",
     "@smithy/protocol-http": "~3.3.0",
     "@smithy/signature-v4": "~2.2.0",
-    "aws-cdk-lib": "~2.133.0",
+    "aws-cdk-lib": "~2.135.0",
     "constructs": "~10.3.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "~3.6.4",
-    "@rushstack/heft": "~0.66.1",
-    "@rushstack/heft-jest-plugin": "~0.11.22",
+    "@rushstack/eslint-config": "^3.6.8",
+    "@rushstack/heft": "^0.66.2",
+    "@rushstack/heft-jest-plugin": "^0.11.23",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "20.11.28",
+    "@types/node": "20.12.4",
     "esbuild": "~0.20.2",
-    "typescript": "~5.4.2"
+    "typescript": "~5.4.4"
   }
 }
