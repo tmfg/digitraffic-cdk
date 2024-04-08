@@ -22,5 +22,7 @@ function createUpdateImagesLambda(stack: DigitrafficStack, bucket: Bucket): AWSF
     const environment = stack.createLambdaEnvironment();
     environment[MarinecamEnvKeys.BUCKET_NAME] = bucket.bucketName;
 
-    return MonitoredDBFunction.create(stack, "update-images", environment);
+    return MonitoredDBFunction.create(stack, "update-images", environment, {
+        memorySize: 256
+    });
 }
