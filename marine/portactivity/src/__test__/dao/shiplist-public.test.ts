@@ -113,8 +113,6 @@ describe(
             });
             await insert(db, [timestamp]);
 
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-
             const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL + 1);
 
             expect(foundTimestamps.length).toBe(1);

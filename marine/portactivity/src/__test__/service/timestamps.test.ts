@@ -384,8 +384,6 @@ describe(
             await insertPilotage(db, 1, "ACTIVE", new Date(), olderThanAWeek);
             await insertPilotage(db, 2, "ACTIVE", new Date(), youngerThanAWeek);
 
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-
             await TimestampsService.deleteOldTimestampsAndPilotages();
 
             expect(await findAll(db)).toHaveLength(1);
