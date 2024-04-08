@@ -371,21 +371,25 @@ describe(
         });
 
         test("deleteOldTimestampsAndPilotages - deletes both old timestamps and pilotages", async () => {
-            // this test fails if a change to daylight saving time has happened during the interval
-            const olderThanAWeek = subDays(Date.now(), 7);
+            const olderThanAWeek = subDays(Date.now(), 8);
+            const youngerThanAWeek = subDays(Date.now(), 6);
             await insert(db, [
                 newTimestamp({
                     eventTime: olderThanAWeek
+                }),
+                newTimestamp({
+                    eventTime: youngerThanAWeek
                 })
             ]);
             await insertPilotage(db, 1, "ACTIVE", new Date(), olderThanAWeek);
+            await insertPilotage(db, 2, "ACTIVE", new Date(), youngerThanAWeek);
 
             await new Promise((resolve) => setTimeout(resolve, 1500));
 
             await TimestampsService.deleteOldTimestampsAndPilotages();
 
-            expect(await findAll(db)).toHaveLength(0);
-            expect(await getPilotagesCount(db)).toBe(0);
+            expect(await findAll(db)).toHaveLength(1);
+            expect(await getPilotagesCount(db)).toBe(1);
         });
     })
 );
