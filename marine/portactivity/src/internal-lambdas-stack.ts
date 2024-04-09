@@ -189,11 +189,11 @@ function createDeleteOldTimestampsLambda(stack: DigitrafficStack): MonitoredFunc
 // ATTENTION!
 // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
 // The reason for this is IP based restriction in another system's firewall.
-function createUpdateTimestampsFromSchedules(stack: DigitrafficStack, queue: Queue): MonitoredFunction {
+function createUpdateTimestampsFromSchedules(stack: PortActivityStack, queue: Queue): MonitoredFunction {
     const functionName = "PortActivity-UpdateTimestampsFromSchedules";
     const environment = stack.createLambdaEnvironment();
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
-
+    environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig.enableETBForAllPorts.toString();
     const lambda = MonitoredFunction.create(
         stack,
         functionName,
