@@ -140,16 +140,11 @@ export function create(stack: PortActivityStack, queueAndDLQ: QueueAndDLQ, dlqBu
     Scheduler.everyMinutes(stack, "PortActivity-PilotwebScheduler", 1, updateTimestampsFromPilotwebLambda);
     Scheduler.everyDay(stack, "PortActivity-DeleteOldTimestampsScheduler", deleteOldTimestampsLambda);
 
-    if ((stack.configuration as PortactivityConfiguration).awakeATx) {
-        const updateAwakeAiATXTimestampsLambda = createUpdateAwakeAiATXTimestampsLambda(
-            stack,
-            queueAndDLQ.queue
-        );
-        const updateATXSchedulingRule = createATXScheduler(stack);
-        updateATXSchedulingRule.addTarget(new LambdaFunction(updateAwakeAiATXTimestampsLambda));
-        stack.grantSecret(updateAwakeAiATXTimestampsLambda);
-        new DigitrafficLogSubscriptions(stack, updateAwakeAiATXTimestampsLambda);
-    }
+    const updateAwakeAiATXTimestampsLambda = createUpdateAwakeAiATXTimestampsLambda(stack, queueAndDLQ.queue);
+    const updateATXSchedulingRule = createATXScheduler(stack);
+    updateATXSchedulingRule.addTarget(new LambdaFunction(updateAwakeAiATXTimestampsLambda));
+    stack.grantSecret(updateAwakeAiATXTimestampsLambda);
+    new DigitrafficLogSubscriptions(stack, updateAwakeAiATXTimestampsLambda);
 }
 
 function createTriggerAwakeAiETXTimestampsLambda(
