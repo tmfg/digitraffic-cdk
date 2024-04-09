@@ -13,4 +13,5 @@ export type PortactivityConfiguration = StackConfiguration & {
     readonly documentationBucketName: string;
     readonly awakeATx: boolean;
     readonly awakeETD: boolean;
+    readonly enableETBForAllPorts: boolean;
 };

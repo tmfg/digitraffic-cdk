@@ -25,8 +25,9 @@ import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/
 import type { PortactivityConfiguration } from "./app-props.js";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import type { PortActivityStack } from "./portactivity-stack.js";
 
-export function create(stack: DigitrafficStack, queueAndDLQ: QueueAndDLQ, dlqBucket: Bucket): void {
+export function create(stack: PortActivityStack, queueAndDLQ: QueueAndDLQ, dlqBucket: Bucket): void {
     createProcessQueueLambda(queueAndDLQ.queue, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stack);
 
@@ -269,7 +270,7 @@ function createATXScheduler(stack: Stack): Rule {
 }
 
 function createUpdateAwakeAiETXTimestampsLambda(
-    stack: DigitrafficStack,
+    stack: PortActivityStack,
     topic: Topic,
     queue: Queue,
     functionName: string,
@@ -277,6 +278,7 @@ function createUpdateAwakeAiETXTimestampsLambda(
 ): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
+    environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig.enableETBForAllPorts.toString();
     const lambdaConf = databaseFunctionProps(stack, environment, functionName, lambdaName, {
         timeout: 30,
         reservedConcurrentExecutions: 20

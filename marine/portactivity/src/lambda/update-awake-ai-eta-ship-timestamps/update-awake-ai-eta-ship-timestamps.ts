@@ -13,6 +13,7 @@ import { sendMessage } from "../../service/queue-service.js";
 let service: AwakeAiETAShipService | undefined;
 
 const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const enableETBForAllPorts = getEnvVariable(PortactivityEnvKeys.ENABLE_ETB);
 
 interface SnsETAShip extends Omit<DbETAShip, "eta"> {
     readonly eta: string;
@@ -34,7 +35,10 @@ export const handler = (event: SNSEvent): Promise<void> => {
 
     return secretHolder.get().then(async (secret) => {
         if (!service) {
-            service = new AwakeAiETAShipService(new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth));
+            service = new AwakeAiETAShipService(
+                new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth),
+                enableETBForAllPorts.toLowerCase() === "true"
+            );
         }
         const timestamps = await service.getAwakeAiTimestamps(ships);
 

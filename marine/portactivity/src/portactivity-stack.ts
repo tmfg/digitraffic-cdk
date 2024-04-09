@@ -11,8 +11,11 @@ import { Canaries } from "./canaries-stack.js";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class PortActivityStack extends DigitrafficStack {
+    readonly portActivityConfig: PortactivityConfiguration;
+
     constructor(scope: Construct, id: string, config: PortactivityConfiguration) {
         super(scope, id, config);
+        this.portActivityConfig = config;
 
         if (!this.secret) {
             throw new Error("Secret is required!");
