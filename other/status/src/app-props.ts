@@ -41,4 +41,5 @@ export interface Props {
     readonly gitHubOwner: string;
     readonly gitHubBranch: string;
     readonly gitHubWorkflowFile: string;
+    readonly gitHubUpdateMaintenanceWorkflowFile: string;
 }

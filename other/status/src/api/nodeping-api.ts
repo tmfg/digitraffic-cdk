@@ -253,6 +253,7 @@ export class NodePingApi {
         });
 
         // https://nodeping.com/docs-api-contacts.html
+        // -d '{"ref":"topic-branch","inputs":{"name":"Mona the Octocat","home":"San Francisco, CA"}}'
         const url = `${this.nodePingApi}/contacts`;
         const data = {
             name: `${nodepingContactName}`,

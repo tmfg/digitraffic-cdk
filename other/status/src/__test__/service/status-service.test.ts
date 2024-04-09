@@ -29,6 +29,7 @@ let secretHolder: SecretHolder<UpdateStatusSecret>;
 const defaultApiLabel = "/api/foo/v1/bar" as const;
 const defaultCStateApiLabel = `road${defaultApiLabel}` as const;
 const emptyCStateStatus: CStateStatus = {
+    baseURL: "cStatePageUrl",
     pinnedIssues: [] satisfies PinnedIssue[],
     systems: [] satisfies CStateSystem[]
 } as const satisfies CStateStatus;
@@ -45,7 +46,14 @@ describe("StatusServiceTest", () => {
         setTestEnv();
         secretHolder = mockSecretHolder();
         nodePingApi = new NodePingApi(secretHolder, 1000, 1000, 1);
-        cStateApi = new CStateStatuspageApi("cStatePageUrl");
+        cStateApi = new CStateStatuspageApi(
+            "cStatePageUrl",
+            "gitHubOwner",
+            "gitHubRepo",
+            "gitHubBranch",
+            "gitHubWorkflowFile",
+            secretHolder
+        );
         digitrafficApi = new DigitrafficApi();
     });
 

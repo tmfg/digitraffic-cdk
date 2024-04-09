@@ -16,7 +16,7 @@ export async function handleMaintenance(
         message: "Read maintenance from status page"
     });
 
-    const maintenanceIsOn = await cStateApi.isActiveMaintenances();
+    const activeMaintenance = await cStateApi.findActiveMaintenance();
     const checks = await nodePingApi.getNodePingChecks();
     const enabledChecks = nodePingApi.getEnabledNodePingChecks(checks);
     const enabledChecksCount = enabledChecks.length;
@@ -24,7 +24,7 @@ export async function handleMaintenance(
     const disabledChecksCount = disabledChecks.length;
 
     // Active maintenance found and there is enabled checks -> disable checks
-    if (maintenanceIsOn && enabledChecksCount) {
+    if (activeMaintenance && enabledChecksCount) {
         logger.info({
             method: method,
             message: `Active maintenances found, disabling ${enabledChecksCount} NodePing checks`
@@ -37,11 +37,14 @@ export async function handleMaintenance(
             message: `NodePing checks disabled ${enabledChecksCount}, maintenance has started!\nDisabled: ${checksToDisable}`
         });
 
+        await cStateApi.triggerUpdateMaintenanceGithubAction(activeMaintenance);
+
         await slackNotifyApi.notify(
-            `NodePing checks disabled ${enabledChecksCount}, maintenance has started!`
+            `NodePing checks disabled ${enabledChecksCount} and cStateStatus maintenance triggered. Maintenance has started!`
         );
+
         // No active maintenance found and there is disabled checks -> enable checks
-    } else if (!maintenanceIsOn && disabledChecksCount) {
+    } else if (!activeMaintenance && disabledChecksCount) {
         logger.info({
             method: method,
             message: `No active maintenances found, enabling ${disabledChecksCount} disabled NodePing checks`
@@ -54,11 +57,11 @@ export async function handleMaintenance(
             message: `NodePing checks enabled ${disabledChecksCount}, maintenance has ended!\n(Enabled: ${checksToEnable})`
         });
 
-        await slackNotifyApi.notify(`NodePing checks enabled ${disabledChecksCount}, maintenance has ended!`);
+        await slackNotifyApi.notify(`NodePing checks enabled ${disabledChecksCount}. Maintenance has ended!`);
     } else {
         logger.info({
             method: method,
-            message: `No change in maintenance status, maintenance active: ${JSON.stringify(maintenanceIsOn)}`
+            message: `No change in maintenance status, activeMaintenance: ${JSON.stringify(activeMaintenance)}`
         });
     }
 }
