@@ -6,7 +6,6 @@ import {
     databaseFunctionProps,
     defaultLambdaConfiguration
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
@@ -98,18 +97,6 @@ export function create(stack: PortActivityStack, queueAndDLQ: QueueAndDLQ, dlqBu
         updateTimestampsFromPilotwebLambda,
         deleteOldTimestampsLambda
     );
-    new DigitrafficLogSubscriptions(
-        stack,
-        triggerAwakeAiETAShipTimestampsLambda,
-        triggerAwakeAiETAPortTimestampsLambda,
-        triggerAwakeAiETDPortTimestampsLambda,
-        updateAwakeAiETAShipTimestampsLambda,
-        updateAwakeAiETAPortTimestampsLambda,
-        updateAwakeAiETDPortTimestampsLambda,
-        updateScheduleTimestampsLambda,
-        updateTimestampsFromPilotwebLambda,
-        deleteOldTimestampsLambda
-    );
 
     Scheduler.everyMinutes(
         stack,
@@ -144,7 +131,6 @@ export function create(stack: PortActivityStack, queueAndDLQ: QueueAndDLQ, dlqBu
     const updateATXSchedulingRule = createATXScheduler(stack);
     updateATXSchedulingRule.addTarget(new LambdaFunction(updateAwakeAiATXTimestampsLambda));
     stack.grantSecret(updateAwakeAiATXTimestampsLambda);
-    new DigitrafficLogSubscriptions(stack, updateAwakeAiATXTimestampsLambda);
 }
 
 function createTriggerAwakeAiETXTimestampsLambda(
