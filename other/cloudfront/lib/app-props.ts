@@ -119,7 +119,7 @@ export class CFBehavior {
         return this.withFunction(FunctionType.INDEX_HTML);
     }
 
-    public withHistoryRedirectFunction():this {
+    public withHistoryRedirectFunction(): this {
         return this.withFunction(FunctionType.HISTORY_REDIRECT);
     }
 }

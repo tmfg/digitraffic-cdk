@@ -1,7 +1,8 @@
-import { getDisplayableNameForEventSource, mergeTimestamps } from "../event-sourceutil";
-import { DbPublicShiplist, findByLocodePublicShiplist } from "../dao/shiplist-public";
+import { getDisplayableNameForEventSource, mergeTimestamps } from "../event-sourceutil.js";
+import type { DbPublicShiplist } from "../dao/shiplist-public.js";
+import { findByLocodePublicShiplist } from "../dao/shiplist-public.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { PublicApiTimestamp } from "../model/timestamp";
+import type { PublicApiTimestamp } from "../model/timestamp.js";
 
 export type ShiplistTimestamp = PublicApiTimestamp & DbPublicShiplist;
 
@@ -40,6 +41,6 @@ export async function getShiplist(
             ({
                 ...ts,
                 source: getDisplayableNameForEventSource(ts.source)
-            } as ShiplistTimestamp)
+            }) as ShiplistTimestamp
     );
 }

@@ -1,14 +1,22 @@
-import { newAwakeATXMessage } from "../testdata";
-import * as API from "../../api/awake-ai-atx";
+import { jest } from "@jest/globals";
+import { newAwakeATXMessage } from "../testdata.js";
+import type { WebSocket } from "ws";
+import { AwakeAiATXApi, AwakeAiATXEventType, SUBSCRIPTION_MESSAGE } from "../../api/awake-ai-atx.js";
 
 const NO_OP = jest.fn();
 
 const mockSubscriptionId = "abc";
-jest.spyOn(API, "getFromParameterStore").mockResolvedValue(mockSubscriptionId);
-jest.spyOn(API, "putInParameterStore").mockImplementation(jest.fn());
+
+jest.spyOn(AwakeAiATXApi.prototype, "getFromParameterStore").mockResolvedValue(mockSubscriptionId);
+jest.spyOn(AwakeAiATXApi.prototype, "putInParameterStore").mockResolvedValue({});
 
 describe("api-awake-ai-atx", () => {
     test("getATXs - no existing session subscribes to zone events", async () => {
+        jest.spyOn(AwakeAiATXApi.prototype, "getFromParameterStore")
+            // assume parameter store to not contain subscriptionId on first call
+            .mockResolvedValueOnce(undefined)
+            .mockResolvedValue(mockSubscriptionId);
+
         const sendMock = jest.fn();
         const WebSocket = jest.fn().mockImplementation(() => ({
             on: (event: string, callback: () => void) => {
@@ -18,17 +26,16 @@ describe("api-awake-ai-atx", () => {
             },
             send: sendMock,
             close: NO_OP
-        }));
+        })) as new (url: string | URL) => WebSocket;
 
-        // assume parameter store to not contain subscriptionId on first run
-        (API.getFromParameterStore as unknown as jest.MockedFn<jest.Mock>).mockReturnValueOnce(undefined);
-
-        const api = new API.AwakeAiATXApi("", "", WebSocket);
-
+        const api = new AwakeAiATXApi("", "", WebSocket);
         await api.getATXs(10);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(sendMock.mock.calls[0][0]).toEqual(JSON.stringify(API.SUBSCRIPTION_MESSAGE));
+        if (sendMock.mock.calls[0]) {
+            expect(sendMock.mock.calls[0][0]).toEqual(JSON.stringify(SUBSCRIPTION_MESSAGE));
+        } else {
+            fail();
+        }
     });
 
     test("getATXs - existing session resumes with subscription id", async () => {
@@ -42,23 +49,26 @@ describe("api-awake-ai-atx", () => {
                     callback(
                         JSON.stringify({
                             subscriptionId,
-                            msgType: API.AwakeAiATXEventType.SUBSCRIPTION_STATUS
+                            msgType: AwakeAiATXEventType.SUBSCRIPTION_STATUS
                         })
                     );
                 }
             },
             send: sendMock,
             close: NO_OP
-        }));
-        const api = new API.AwakeAiATXApi("", "", WebSocket);
+        })) as new (url: string | URL) => WebSocket;
+        const api = new AwakeAiATXApi("", "", WebSocket);
 
         await api.getATXs(10);
         await api.getATXs(10);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(sendMock.mock.calls[1][0]).toEqual(
-            JSON.stringify(API.AwakeAiATXApi.createResumeMessage(subscriptionId))
-        );
+        if (sendMock.mock.calls[1]) {
+            expect(sendMock.mock.calls[1][0]).toEqual(
+                JSON.stringify(AwakeAiATXApi.createResumeMessage(subscriptionId))
+            );
+        } else {
+            fail();
+        }
     });
 
     test("getATXs - received ATxs", async () => {
@@ -73,8 +83,8 @@ describe("api-awake-ai-atx", () => {
             },
             send: jest.fn(),
             close: NO_OP
-        }));
-        const api = new API.AwakeAiATXApi("", "", WebSocket);
+        })) as new (url: string | URL) => WebSocket;
+        const api = new AwakeAiATXApi("", "", WebSocket);
 
         const atxs = await api.getATXs(10);
 
@@ -91,8 +101,8 @@ describe("api-awake-ai-atx", () => {
             },
             send: jest.fn(),
             close: NO_OP
-        }));
-        const api = new API.AwakeAiATXApi("", "", WebSocket);
+        })) as new (url: string | URL) => WebSocket;
+        const api = new AwakeAiATXApi("", "", WebSocket);
 
         await expect(api.getATXs(10)).rejects.toEqual("Error");
     });

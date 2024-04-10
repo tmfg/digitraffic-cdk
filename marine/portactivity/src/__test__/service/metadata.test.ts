@@ -1,7 +1,7 @@
-import { dbTestBase, insert } from "../db-testutil";
-import { newTimestamp } from "../testdata";
-import * as MetadataService from "../../service/metadata";
-import { PREDICTION_SOURCES } from "../../service/metadata";
+import { dbTestBase, insert } from "../db-testutil.js";
+import { newTimestamp } from "../testdata.js";
+import * as MetadataService from "../../service/metadata.js";
+import { PREDICTION_SOURCES } from "../../service/metadata.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 describe(

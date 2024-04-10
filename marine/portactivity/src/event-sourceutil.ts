@@ -1,8 +1,8 @@
 import { differenceInMinutes, parseISO } from "date-fns";
 import _ from "lodash";
-import { EventSource } from "./model/eventsource";
-import type { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
-import type { ShiplistTimestamp } from "./service/shiplist";
+import { EventSource } from "./model/eventsource.js";
+import type { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp.js";
+import type { ShiplistTimestamp } from "./service/shiplist.js";
 
 export const VTS_A = "VTS A";
 export const VTS_O = "VTS O";

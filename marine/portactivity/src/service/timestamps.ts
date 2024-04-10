@@ -1,18 +1,24 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import {
-    DTDatabase,
-    DTTransaction,
-    inDatabase,
-    inDatabaseReadonly
-} from "@digitraffic/common/dist/database/database";
+import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import { inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { parseISO } from "date-fns";
 import _ from "lodash";
-import * as TimestampsDB from "../dao/timestamps";
-import type { DbETAShip, DbTimestamp, DbTimestampIdAndLocode, DbUpdatedTimestamp } from "../dao/timestamps";
-import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
-import { EventSource } from "../model/eventsource";
-import { ApiTimestamp, EventType, PublicApiTimestamp, Ship } from "../model/timestamp";
-import type { Ports } from "./portareas";
+import * as TimestampsDB from "../dao/timestamps.js";
+import type {
+    DbETAShip,
+    DbTimestamp,
+    DbTimestampIdAndLocode,
+    DbUpdatedTimestamp
+} from "../dao/timestamps.js";
+import {
+    getDisplayableNameForEventSource,
+    isPortnetTimestamp,
+    mergeTimestamps
+} from "../event-sourceutil.js";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp, PublicApiTimestamp, Ship } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import type { Ports } from "./portareas.js";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean;

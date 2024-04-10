@@ -1,9 +1,11 @@
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { AwakeAiATXEventType, AwakeAIATXTimestampMessage, AwakeATXZoneEventType } from "../api/awake-ai-atx";
-import { AwakeAiZoneType } from "../api/awake-common";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import type { AwakeAIATXTimestampMessage } from "../api/awake-ai-atx.js";
+import { AwakeAiATXEventType, AwakeATXZoneEventType } from "../api/awake-ai-atx.js";
+import { AwakeAiZoneType } from "../api/awake-common.js";
 import { v4 as uuidv4 } from "uuid";
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import type { Port } from "../service/portareas";
+import type { Port } from "../service/portareas.js";
 
 export function newAwakeATXMessage(options?: {
     zoneEventType?: AwakeATXZoneEventType;

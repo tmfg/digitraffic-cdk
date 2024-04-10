@@ -1,6 +1,6 @@
 // lists of ports for which ETA and ETD predictions should be fetched from Voyages port API
 
-import type { Locode } from "./locode";
+import type { Locode } from "./locode.js";
 
 export const ETA_PORTS: readonly Locode[] = [
     "FIKOK",

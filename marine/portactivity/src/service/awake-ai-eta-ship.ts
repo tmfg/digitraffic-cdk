@@ -1,28 +1,29 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { retry } from "@digitraffic/common/dist/utils/retry";
 import { differenceInHours } from "date-fns";
+import type { AwakeAiETAShipApi } from "../api/awake-ai-ship.js";
 import {
-    AwakeAiETAShipApi,
-    AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
-    AwakeAiShipVoyageSchedule
-} from "../api/awake-ai-ship";
+    type AwakeAiShipApiResponse,
+    type AwakeAiShipVoyageSchedule
+} from "../api/awake-ai-ship.js";
 import {
-    AwakeAiPredictedVoyage,
-    AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageStatus,
-    AwakeAiZoneType
-} from "../api/awake-common";
-import type { DbETAShip } from "../dao/timestamps";
-import { EventSource } from "../model/eventsource";
-import type { Locode } from "../model/locode";
-import { ApiTimestamp, EventType } from "../model/timestamp";
+    AwakeAiZoneType,
+    type AwakeAiPredictedVoyage,
+    type AwakeAiVoyageEtaPrediction
+} from "../api/awake-common.js";
+import type { DbETAShip } from "../dao/timestamps.js";
+import { EventSource } from "../model/eventsource.js";
+import type { Locode } from "../model/locode.js";
+import { EventType, type ApiTimestamp } from "../model/timestamp.js";
 import {
     AwakeDataState,
     etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction
-} from "./awake-ai-etx-helper";
+} from "./awake-ai-etx-helper.js";
+import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports.js";
 
 interface AwakeAiETAResponseAndShip {
     readonly response: AwakeAiShipApiResponse;
@@ -47,8 +48,11 @@ export class AwakeAiETAShipService {
         "FIPRS"
     ];
 
-    constructor(api: AwakeAiETAShipApi) {
+    readonly enableETBForAllPorts: boolean;
+
+    constructor(api: AwakeAiETAShipApi, enableETBForAllPorts: boolean = false) {
         this.api = api;
+        this.enableETBForAllPorts = enableETBForAllPorts;
     }
 
     getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
@@ -65,8 +69,13 @@ export class AwakeAiETAShipService {
                 const timestamps = this.toTimeStamps(val);
 
                 // ETA timestamps from VTS A sources must also be published as ETB timestamps
+                // for the moment only timestamps related to specific ports may be published as ETB in production
                 const etbs = timestamps
                     .filter((ts) => ts.eventType === EventType.ETA)
+                    .filter(
+                        (ts) =>
+                            this.enableETBForAllPorts || VTS_A_ETB_PORTS.includes(ts.location.port as Locode)
+                    )
                     .map((ts) => ({ ...ts, eventType: EventType.ETB }));
 
                 return acc.concat(timestamps, etbs);

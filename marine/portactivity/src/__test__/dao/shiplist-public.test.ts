@@ -1,15 +1,14 @@
-import moment from "moment";
-import { dbTestBase, insert } from "../db-testutil";
-import { newTimestamp } from "../testdata";
-import { EventType } from "../../model/timestamp";
-import { dbPublicShiplistToPublicApiTimestamp, getShiplist } from "../../service/shiplist";
-import { EventSource } from "../../model/eventsource";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
-import { addMinutes, parseISO } from "date-fns";
-import { mergeTimestamps } from "../../event-sourceutil";
-import { findByLocodePublicShiplist } from "../../dao/shiplist-public";
-import { assertDefined } from "../test-utils";
+import { addDays, addHours, addMinutes, parseISO } from "date-fns";
+import { findByLocodePublicShiplist } from "../../dao/shiplist-public.js";
+import { mergeTimestamps } from "../../event-sourceutil.js";
+import { EventSource } from "../../model/eventsource.js";
+import { EventType } from "../../model/timestamp.js";
+import { dbPublicShiplistToPublicApiTimestamp, getShiplist } from "../../service/shiplist.js";
+import { dbTestBase, insert } from "../db-testutil.js";
+import { assertDefined } from "../test-utils.js";
+import { newTimestamp } from "../testdata.js";
 
 describe(
     "db-shiplist-public",
@@ -29,7 +28,7 @@ describe(
             const timestamp2 = newTimestamp({
                 eventType: EventType.ATA,
                 locode,
-                eventTime: moment().add(1, "hours").toDate(),
+                eventTime: addHours(Date.now(), 1),
                 source: "S1",
                 portcallId
             });
@@ -53,7 +52,7 @@ describe(
             const timestamp2 = newTimestamp({
                 eventType: EventType.ATA,
                 locode,
-                eventTime: moment().add(1, "hours").toDate(),
+                eventTime: addHours(Date.now(), 1),
                 source: "S1",
                 portcallId
             });
@@ -84,7 +83,7 @@ describe(
             const timestamp2 = newTimestamp({
                 eventType: EventType.ETD,
                 locode,
-                eventTime: moment().add(1, "hours").toDate(),
+                eventTime: addHours(Date.now(), 1),
                 source: "S1",
                 portcallId
             });
@@ -108,13 +107,11 @@ describe(
             const timestamp = newTimestamp({
                 eventType: randomBoolean() ? EventType.ETA : EventType.ETD,
                 locode,
-                eventTime: moment().add(4, "day").toDate(),
+                eventTime: addDays(Date.now(), 4),
                 source: EventSource.PORTNET,
                 portcallId
             });
             await insert(db, [timestamp]);
-
-            await new Promise((resolve) => setTimeout(resolve, 1500));
 
             const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL + 1);
 

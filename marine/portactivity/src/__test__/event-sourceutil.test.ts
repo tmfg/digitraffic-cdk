@@ -3,14 +3,15 @@ import {
     mergeTimestamps,
     VTS_TIMESTAMP_DIFF_MINUTES,
     VTS_TIMESTAMP_TOO_OLD_MINUTES
-} from "../event-sourceutil";
-import { newTimestamp } from "./testdata";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { EventSource } from "../model/eventsource";
+} from "../event-sourceutil.js";
+import { newTimestamp } from "./testdata.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import { EventSource } from "../model/eventsource.js";
 import { getRandomInteger, shuffle } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO, subMinutes } from "date-fns";
 import _ from "lodash";
-import { assertDefined } from "./test-utils";
+import { assertDefined } from "./test-utils.js";
 
 describe("event-sourceutil", () => {
     function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp): void {

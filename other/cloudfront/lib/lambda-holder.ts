@@ -1,6 +1,10 @@
 import { IVersion } from "aws-cdk-lib/aws-lambda";
 import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
-import { FunctionEventType, LambdaEdgeEventType, LambdaFunctionAssociation } from "aws-cdk-lib/aws-cloudfront";
+import {
+    FunctionEventType,
+    LambdaEdgeEventType,
+    LambdaFunctionAssociation
+} from "aws-cdk-lib/aws-cloudfront";
 import { FunctionType, LambdaType } from "./lambda/lambda-creator";
 import { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
 

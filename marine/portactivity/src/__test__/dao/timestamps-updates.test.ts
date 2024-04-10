@@ -1,11 +1,13 @@
-import { dbTestBase, findAll, insertPortAreaDetails, insertPortCall } from "../db-testutil";
-import { newPortAreaDetails, newPortCall, newTimestamp, PortAreaDetails, PortCall } from "../testdata";
-import * as TimestampsDb from "../../dao/timestamps";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
+import { dbTestBase, findAll, insertPortAreaDetails, insertPortCall } from "../db-testutil.js";
+import type { PortAreaDetails, PortCall } from "../testdata.js";
+import { newPortAreaDetails, newPortCall, newTimestamp } from "../testdata.js";
+import * as TimestampsDb from "../../dao/timestamps.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
 import _ from "lodash";
-import { assertDefined } from "../test-utils";
+import { assertDefined } from "../test-utils.js";
 
 describe(
     "db-timestamps - updates",

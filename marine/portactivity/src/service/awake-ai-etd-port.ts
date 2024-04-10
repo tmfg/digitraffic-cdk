@@ -1,13 +1,13 @@
-import type { AwakeAiPortApi } from "../api/awake-ai-port";
-import type { ApiTimestamp } from "../model/timestamp";
-import { AwakeAiZoneType } from "../api/awake-common";
+import type { AwakeAiPortApi } from "../api/awake-ai-port.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { AwakeAiZoneType } from "../api/awake-common.js";
 import {
     etdPredictionToTimestamp,
     isAwakeEtdPrediction,
     isDigitrafficEtdPrediction,
     voyageUnderwayOrNotStarted
-} from "./awake-ai-etx-helper";
-import { EventSource } from "../model/eventsource";
+} from "./awake-ai-etx-helper.js";
+import { EventSource } from "../model/eventsource.js";
 import { isBefore, parseISO } from "date-fns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

@@ -10,11 +10,11 @@ function handler(event) {
         return {
             statusCode: 301,
             headers: {
-                "location": {
-                    "value": `${uri}/`
+                location: {
+                    value: `${uri}/`
                 }
             }
-        }
+        };
     }
 
     return request;

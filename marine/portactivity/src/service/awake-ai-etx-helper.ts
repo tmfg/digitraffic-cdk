@@ -1,17 +1,20 @@
-import {
-    AwakeAiPrediction,
-    AwakeAiPredictionType,
-    AwakeAiVoyageEtaPrediction,
+import type {
     AwakeAiVoyageEtdPrediction,
+    AwakeArrivalPortCallPrediction,
+    AwakeURN
+} from "../api/awake-common.js";
+import {
+    type AwakeAiPrediction,
+    AwakeAiPredictionType,
+    type AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageStatus,
     AwakeAiZoneType,
-    AwakeArrivalPortCallPrediction,
-    AwakeURN,
     digitrafficPortCallString
-} from "../api/awake-common";
-import { ApiTimestamp, EventType, Location, Ship } from "../model/timestamp";
-import type { EventSource } from "../model/eventsource";
-import type { AwakeAiPortSchedule } from "../api/awake-ai-port";
+} from "../api/awake-common.js";
+import type { ApiTimestamp, Location, Ship } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import type { EventSource } from "../model/eventsource.js";
+import type { AwakeAiPortSchedule } from "../api/awake-ai-port.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum AwakeDataState {

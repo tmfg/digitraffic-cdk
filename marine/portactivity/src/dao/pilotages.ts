@@ -1,6 +1,6 @@
-import type { Location } from "../model/timestamp";
-import { PreparedStatement } from "pg-promise";
-import type { Pilotage } from "../model/pilotage";
+import type { Location } from "../model/timestamp.js";
+import pgPromise from "pg-promise";
+import type { Pilotage } from "../model/pilotage.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -8,7 +8,7 @@ export const PORTCALL_TIMESTAMP_AGE_LIMIT = `NOW() - INTERVAL '36 HOURS'`;
 
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL =
     "select id, schedule_updated from pilotage where state != 'FINISHED'";
-const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
+const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new pgPromise.PreparedStatement({
     name: "get-active-pilotage-timestamps",
     text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL
 });
