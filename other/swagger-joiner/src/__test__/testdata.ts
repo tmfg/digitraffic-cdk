@@ -1,8 +1,8 @@
 import { type OpenApiSchema } from "../model/openapi-schema.js";
+import type { HttpMethod } from "../swagger-utils.js";
+import _ from "lodash";
 
-export const getOpenapiDescriptionWithPaths = (
-    paths: Record<string, Record<string, Record<string, unknown>>>
-): OpenApiSchema => ({
+export const getOpenapiDescriptionWithPaths = (paths: OpenApiSchema["paths"]): OpenApiSchema => ({
     openapi: "3.0.1",
     info: {
         title: "Digitraffic API",
@@ -22,36 +22,40 @@ export const getOpenapiDescriptionWithPaths = (
     paths
 });
 
-export const getSupportedPath = (
-    path: string,
-    method: string = "get"
-): Record<string, Record<string, Record<string, unknown>>> => ({
-    [path]: {
-        [method]: {
-            summary: "Returns data",
-            responses: {
-                "200": {
-                    description: "200 response",
-                    headers: {}
+export const getSupportedPath = (path: string, methods: HttpMethod[] = ["get"]): OpenApiSchema["paths"] => {
+    const methodRecords = Object.fromEntries(
+        methods.map((m) => [
+            m,
+            {
+                summary: `Api ${path} method ${m}`,
+                description: `Description for api ${path} method ${m}`,
+                responses: {
+                    "200": {
+                        description: "200 response",
+                        headers: {}
+                    }
                 }
             }
+        ])
+    );
+    return {
+        [path]: {
+            ...methodRecords,
+            ...{
+                summary: `Summary for api ${path}`,
+                description: `Description for api ${path}`
+            }
         }
-    }
-});
+    };
+};
 
-export function getPathWithSecurity(
-    path: string,
-    method: string = "get"
-): Record<string, Record<string, Record<string, unknown>>> {
+export function getPathWithSecurity(path: string, method: string = "get"): OpenApiSchema["paths"] {
     const result = getSupportedPath(path);
-    // eslint-disable-next-line dot-notation
-    result[path]![method]!["security"] = [{ api_key: [] }];
+    _.set<OpenApiSchema["paths"]>(result, [path, method, "security"], [{ api_key: [] }]);
     return result;
 }
 
-export const getDeprecatedPathWithHeaders = (
-    path: string
-): Record<string, Record<string, Record<string, unknown>>> => ({
+export const getDeprecatedPathWithHeaders = (path: string): OpenApiSchema["paths"] => ({
     [path]: {
         get: {
             summary: "Returns old data.",
@@ -80,9 +84,7 @@ export const getDeprecatedPathWithHeaders = (
     }
 });
 
-export const getDeprecatedPathWithRemovalText = (
-    path: string
-): Record<string, Record<string, Record<string, unknown>>> => ({
+export const getDeprecatedPathWithRemovalText = (path: string): OpenApiSchema["paths"] => ({
     [path]: {
         get: {
             summary: "Also returns old data. Will be removed after 2023-06-01",

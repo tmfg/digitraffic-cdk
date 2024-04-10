@@ -26,10 +26,15 @@ export function create(
 function createCommonEnv(props: Props): LambdaEnvironment {
     return {
         [StatusEnvKeys.SECRET_ID]: props.secretId,
-        [StatusEnvKeys.STATUSPAGE_URL]: props.statusPageUrl,
         [StatusEnvKeys.C_STATE_PAGE_URL]: props.cStatePageUrl,
         [StatusEnvKeys.CHECK_TIMEOUT_SECONDS]: props.nodePingTimeoutSeconds.toString(),
-        [StatusEnvKeys.INTERVAL_MINUTES]: props.nodePingCheckInterval.toString()
+        [StatusEnvKeys.INTERVAL_MINUTES]: props.nodePingCheckInterval.toString(),
+        [StatusEnvKeys.GITHUB_OWNER]: props.gitHubOwner.toString(),
+        [StatusEnvKeys.GITHUB_REPO]: props.gitHubRepo.toString(),
+        [StatusEnvKeys.GITHUB_BRANCH]: props.gitHubBranch.toString(),
+        [StatusEnvKeys.GITHUB_WORKFLOW_FILE]: props.gitHubWorkflowFile.toString(),
+        [StatusEnvKeys.GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE]:
+            props.gitHubUpdateMaintenanceWorkflowFile.toString()
     };
 }
 
@@ -42,10 +47,6 @@ function createUpdateStatusesLambda(
 ): void {
     const environment: LambdaEnvironment = createCommonEnv(props);
     environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
-    environment[StatusEnvKeys.GITHUB_OWNER] = props.gitHubOwner;
-    environment[StatusEnvKeys.GITHUB_REPO] = props.gitHubRepo;
-    environment[StatusEnvKeys.GITHUB_BRANCH] = props.gitHubBranch;
-    environment[StatusEnvKeys.GITHUB_WORKFLOW_FILE] = props.gitHubWorkflowFile;
 
     const functionName = "Status-UpdateStatuses";
     const lambdaConf: FunctionProps = {

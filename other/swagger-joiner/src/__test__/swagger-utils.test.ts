@@ -1,4 +1,10 @@
-import { mergeApiDescriptions, withoutMethods, withoutSecurity, withDeprecations } from "../swagger-utils.js";
+import {
+    mergeApiDescriptions,
+    withoutMethods,
+    withoutSecurity,
+    withDeprecations,
+    withoutApisWithoutHttpMethods
+} from "../swagger-utils.js";
 import {
     getDeprecatedPathWithHeaders,
     getDeprecatedPathWithRemovalText,
@@ -76,18 +82,49 @@ describe("swagger-utils", () => {
     test("removeMethodsFromPaths", () => {
         const path1 = "/api/one";
         const path2 = "/api/two";
+        const path3 = "/api/three";
 
         const api = getOpenapiDescriptionWithPaths({
-            ...getSupportedPath(path1, "get"),
-            ...getSupportedPath(path2, "put")
+            ...getSupportedPath(path1, ["get"]),
+            ...getSupportedPath(path2, ["put"]),
+            ...getSupportedPath(path3, ["options", "put"])
         });
 
-        const filteredPaths = withoutMethods(api.paths, (method) => method === "put");
+        console.log("api:\n" + JSON.stringify(api, null, 2));
 
-        expect(api.paths[path1]!.get).toBeDefined();
-        expect(api.paths[path2]!.put).toBeDefined();
+        const filteredPaths = withoutMethods(api.paths, (method) => method === "put" || method === "options");
+        const filteredApis = withoutApisWithoutHttpMethods(filteredPaths);
+
+        console.log("filteredPaths:\n" + JSON.stringify(filteredPaths, null, 2));
+        console.log("filteredApis:\n" + JSON.stringify(filteredApis, null, 2));
+
+        // Initial data
+        expect(api.paths[path1]?.get).toBeDefined();
+        expect(api.paths[path2]?.put).toBeDefined();
+        expect(api.paths[path3]?.options).toBeDefined();
+        expect(api.paths[path3]?.put).toBeDefined();
+
+        // Apis after filtered methods should still exists
+        expect(filteredPaths[path1]).toBeDefined();
+        expect(filteredPaths[path2]).toBeDefined();
+        expect(filteredPaths[path3]).toBeDefined();
+
+        // Filtered methods should not exist
         expect(filteredPaths[path1]!.get).toBeDefined();
         expect(filteredPaths[path2]!.put).not.toBeDefined();
+        expect(filteredPaths[path3]!.put).not.toBeDefined();
+        expect(filteredPaths[path3]!.options).not.toBeDefined();
+
+        // Apis after withoutApisWithoutHttpMethods
+        expect(filteredApis[path1]).toBeDefined();
+        expect(filteredApis[path2]).not.toBeDefined();
+        expect(filteredApis[path3]).not.toBeDefined();
+
+        // Filtered methods should not exist
+        expect(filteredApis[path1]?.get).toBeDefined();
+        expect(filteredApis[path2]?.put).not.toBeDefined();
+        expect(filteredApis[path3]?.put).not.toBeDefined();
+        expect(filteredApis[path3]?.options).not.toBeDefined();
     });
 
     test("OpenApi schema parses actual json", () => {

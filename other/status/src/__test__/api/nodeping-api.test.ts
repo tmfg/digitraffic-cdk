@@ -10,7 +10,7 @@ import {
 } from "../../api/nodeping-api.js";
 import { randomString } from "@digitraffic/common/dist/test/testutils";
 import { EndpointHttpMethod, EndpointProtocol, type MonitoredEndpoint } from "../../app-props.js";
-import { HOST_URL, mockSecretHolder, setTestEnv } from "../testutils.js";
+import { NODEPING_API, mockSecretHolder, setTestEnv } from "../testutils.js";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { UpdateStatusSecret } from "../../secret.js";
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
@@ -19,8 +19,8 @@ import { jest } from "@jest/globals";
 let secretHolder: SecretHolder<UpdateStatusSecret>;
 let nodepingApi: NodePingApi;
 
-const CHECK_INTERVAL_MIN = 1;
-const CHECK_TIMEOUT_SEC = 30;
+const CHECK_INTERVAL_MIN = 1 as const;
+const CHECK_TIMEOUT_SEC = 30 as const;
 
 describe("NodePing API test", () => {
     beforeAll(() => {
@@ -185,7 +185,7 @@ describe("NodePing API test", () => {
         const spy = jest
             .spyOn(axios, "get")
             .mockImplementation((_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                expect(_url).toEqual(`${HOST_URL}/api/1/checks?customerid=${secret.nodePingSubAccountId}`);
+                expect(_url).toEqual(`${NODEPING_API}/checks?customerid=${secret.nodePingSubAccountId}`);
                 return Promise.resolve({
                     status: 200,
                     data: getNodepinChecksJson()
@@ -201,7 +201,7 @@ describe("NodePing API test", () => {
         const spy = jest
             .spyOn(axios, "get")
             .mockImplementation((_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                expect(_url).toEqual(`${HOST_URL}/api/1/contacts?customerid=${secret.nodePingSubAccountId}`);
+                expect(_url).toEqual(`${NODEPING_API}/contacts?customerid=${secret.nodePingSubAccountId}`);
                 return Promise.resolve({
                     status: 200,
                     data: getNodepinContactsJson()
@@ -229,7 +229,7 @@ describe("NodePing API test", () => {
             .spyOn(axios, "post")
             .mockImplementation(
                 (_url: string, data?: unknown, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                    expect(_url).toEqual(`${HOST_URL}/api/1/contacts`);
+                    expect(_url).toEqual(`${NODEPING_API}/contacts`);
 
                     const body: NodePingContactPostPutData =
                         data as NodePingContactPostPutData satisfies NodePingContactPostPutData;
@@ -312,7 +312,7 @@ describe("NodePing API test", () => {
 });
 
 async function testNodePingChecksDisableall(disableall: boolean, fail: boolean = false): Promise<void> {
-    const url = `${HOST_URL}/api/1/checks?disableall=${JSON.stringify(disableall)}`;
+    const url = `${NODEPING_API}/checks?disableall=${JSON.stringify(disableall)}`;
 
     const spy = jest
         .spyOn(axios, "put")
@@ -373,7 +373,7 @@ async function testCreateNodepingCheck(
         .spyOn(axios, "post")
         .mockImplementation(
             async (_url: string, data?: unknown, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                expect(_url).toEqual(`${HOST_URL}/api/1/checks`);
+                expect(_url).toEqual(`${NODEPING_API}/checks`);
 
                 const postData = data as NodePingCheckPostPutData;
 
@@ -415,8 +415,7 @@ function makeApi(options?: { timeout?: number; interval?: number }): NodePingApi
         secretHolder,
         1000,
         options?.timeout ?? CHECK_TIMEOUT_SEC,
-        options?.interval ?? CHECK_INTERVAL_MIN,
-        `${HOST_URL}/api/1`
+        options?.interval ?? CHECK_INTERVAL_MIN
     );
 }
 

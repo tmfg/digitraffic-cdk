@@ -5,7 +5,6 @@ import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runt
 import type { UpdateStatusSecret } from "../secret.js";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { converToError, type ErrorOrAxiosError } from "./api-tools.js";
-import { removeAppAndTrim } from "../service/utils.js";
 import _ from "lodash";
 
 const SERVICE = "NodePingApi" as const;
@@ -224,59 +223,6 @@ export class NodePingApi {
             );
     }
 
-    createStatuspageContact(
-        endpoint: string,
-        app: string,
-        statuspageApiKey: string,
-        statuspagePageId: string,
-        statuspageComponentId: string
-    ): Promise<void> {
-        const method = `${SERVICE}.createNodepingContact` as const satisfies LoggerMethodType;
-        const start = Date.now();
-        const endpointWithoutApp = removeAppAndTrim(endpoint);
-        const message = `Create NodePing contact for ${app} endpoint ${endpointWithoutApp}`;
-        logger.info({
-            method,
-            message
-        });
-
-        const url = `${this.nodePingApi}/contacts`;
-        const data = {
-            name: `${app} ${endpointWithoutApp}`, // Marine /api/ais/v1/locations, Rail Last Updated
-            custrole: "notify",
-            newaddresses: [
-                {
-                    address: `https://api.statuspage.io/v1/pages/${statuspagePageId}/components/${statuspageComponentId}.json`,
-                    type: "webhook",
-                    action: "patch",
-                    headers: {
-                        Authorization: `OAuth ${statuspageApiKey}`
-                    },
-                    data: {
-                        "component[status]": "{if success}operational{else}major_outage{/if}"
-                    }
-                }
-            ]
-        } satisfies NodePingContactPostPutData;
-
-        return this.doPost<NodePingContactPostPutData>(url, data)
-            .catch((reason) => {
-                const errorMessage = `${message} failed with reason: ${JSON.stringify(reason)}` as const;
-                logger.error({
-                    method,
-                    message: errorMessage
-                });
-                throw new Error(`${method} ${errorMessage}`);
-            })
-            .finally(() =>
-                logger.info({
-                    method,
-                    message: `${message} created`,
-                    tookMs: Date.now() - start
-                })
-            );
-    }
-
     /**
      *
      * @param owner action repo owner
@@ -307,6 +253,7 @@ export class NodePingApi {
         });
 
         // https://nodeping.com/docs-api-contacts.html
+        // -d '{"ref":"topic-branch","inputs":{"name":"Mona the Octocat","home":"San Francisco, CA"}}'
         const url = `${this.nodePingApi}/contacts`;
         const data = {
             name: `${nodepingContactName}`,

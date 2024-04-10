@@ -32,7 +32,7 @@ export class PublicApi {
             "NauticalWarning Public API"
         );
         this.apiKeyId = this.publicApi.createUsagePlanV2(
-            "NauticalWarning Api Key",
+            "NauticalWarning",
             (stack.configuration as NauticalWarningConfiguration).apiKey
         );
 

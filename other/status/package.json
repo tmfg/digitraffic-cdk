@@ -17,18 +17,20 @@
     "compile-canaries": "echo 'No canaries'",
     "compile-canaries_": "esbuild src/canaries/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node18,es2020",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/lambda --target=node20,es2022 --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --out-extension:.js=.mjs",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
+    "test-build": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.534.0",
-    "@digitraffic/common": "2024.3.14-1",
-    "aws-cdk-lib": "~2.133.0",
-    "axios": "~1.6.7",
+    "@aws-sdk/client-secrets-manager": "~3.543.0",
+    "@digitraffic/common": "2024.3.28-1",
+    "aws-cdk-lib": "~2.135.0",
+    "axios": "~1.6.8",
     "constructs": "~10.3.0",
     "date-fns": "~2.30.0",
+    "ky": "~1.2.3",
     "lodash": "~4.17.21",
-    "mqtt": "~5.3.6",
+    "mqtt": "~5.5.0",
     "ws": "~8.16.0"
   },
   "devDependencies": {
@@ -36,17 +38,17 @@
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "~29.7.0",
-    "@rushstack/eslint-config": "~3.6.4",
-    "@rushstack/heft": "~0.66.0",
-    "@rushstack/heft-jest-plugin": "~0.11.21",
+    "@rushstack/eslint-config": "~3.6.8",
+    "@rushstack/heft": "~0.66.2",
+    "@rushstack/heft-jest-plugin": "~0.11.23",
     "@types/aws-lambda": "8.10.136",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
-    "@types/lodash": "4.14.202",
-    "@types/node": "20.11.25",
+    "@types/lodash": "4.17.0",
+    "@types/node": "20.12.4",
     "date-fns-tz": "~2.0.1",
-    "esbuild": "~0.20.1",
+    "esbuild": "~0.20.2",
     "eslint": "~8.57.0",
-    "typescript": "~5.4.2"
+    "typescript": "~5.4.3"
   }
 }

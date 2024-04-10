@@ -21,6 +21,7 @@ import { createDistribution } from "./distribution-util";
 import { LambdaHolder } from "./lambda-holder";
 import {
     createGzipRequirement,
+    createHistoryPath,
     createHttpHeaders,
     createIndexHtml,
     createIpRestriction,
@@ -227,6 +228,10 @@ export class CloudfrontCdkStack extends Stack {
 
         if (types.functionTypes.has(FunctionType.INDEX_HTML)) {
             lambdaMap.addFunction(FunctionType.INDEX_HTML, createIndexHtml(this));
+        }
+
+        if (types.functionTypes.has(FunctionType.HISTORY_REDIRECT)) {
+            lambdaMap.addFunction(FunctionType.HISTORY_REDIRECT, createHistoryPath(this));
         }
 
         // handle ip restrictions

@@ -16,7 +16,8 @@ export enum LambdaType {
 }
 
 export enum FunctionType {
-    INDEX_HTML
+    INDEX_HTML,
+    HISTORY_REDIRECT
 }
 
 function readBodyWithVersion(fileName: string): string {
@@ -63,6 +64,12 @@ export function createIndexHtml(stack: Stack): Cloudfront.Function {
     const body = readBodyWithVersion("lib/lambda/lambda-index-html.js");
 
     return createCloudfrontFunction(stack, "index-html", body);
+}
+
+export function createHistoryPath(stack: Stack): Cloudfront.Function {
+    const body = readBodyWithVersion("lib/lambda/lambda-redirect-history.js");
+
+    return createCloudfrontFunction(stack, "history-redirect", body);
 }
 
 export function createIpRestriction(
