@@ -98,7 +98,7 @@ describe("schedules", () => {
 
     test("SchedulesService.schedulesToTimestamps - calculated - [x] ETA [ ] ETD", () => {
         const api = createApi();
-        const service = new SchedulesService(api);
+        const service = new SchedulesService(api, true);
         const etaCount = 3;
         const timestamps = service.schedulesToTimestamps(
             createSchedulesResponse(etaCount, true, false),
@@ -115,7 +115,7 @@ describe("schedules", () => {
 
     test("SchedulesService.schedulesToTimestamps - calculated - [ ] ETA [x] ETD", () => {
         const api = createApi();
-        const service = new SchedulesService(api);
+        const service = new SchedulesService(api, true);
 
         const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, false, true), true);
 
@@ -125,7 +125,7 @@ describe("schedules", () => {
 
     test("SchedulesService.schedulesToTimestamps - calculated - [x] ETA [x] ETD", () => {
         const api = createApi();
-        const service = new SchedulesService(api);
+        const service = new SchedulesService(api, true);
 
         const timestampCount = 3;
         const timestamps = service.schedulesToTimestamps(

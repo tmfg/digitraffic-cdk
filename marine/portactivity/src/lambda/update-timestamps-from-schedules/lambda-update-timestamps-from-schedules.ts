@@ -9,6 +9,7 @@ import { SchedulesService } from "../../service/schedules.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const enableETBForAllPorts = getEnvVariable(PortactivityEnvKeys.ENABLE_ETB);
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<SchedulesSecret>("schedules");
@@ -25,7 +26,10 @@ export const handler = (): Promise<void> => {
         .then(() => secretHolder.get())
         .then(async (secret) => {
             if (!service) {
-                service = new SchedulesService(new SchedulesApi(secret.url));
+                service = new SchedulesService(
+                    new SchedulesApi(secret.url),
+                    enableETBForAllPorts.toLowerCase() === "true"
+                );
             }
 
             const vtsControlTimestamps = await service.getTimestampsUnderVtsControl();

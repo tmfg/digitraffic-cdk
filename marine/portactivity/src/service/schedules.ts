@@ -7,12 +7,16 @@ import type { ApiTimestamp } from "../model/timestamp.js";
 import { EventType } from "../model/timestamp.js";
 import type { Port } from "./portareas.js";
 import { ports } from "./portareas.js";
+import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports.js";
+import type { Locode } from "../model/locode.js";
 
 export class SchedulesService {
     private readonly api: SchedulesApi;
+    private readonly enableETBForAllPorts: boolean;
 
-    constructor(api: SchedulesApi) {
+    constructor(api: SchedulesApi, enableETBForAllPorts: boolean = false) {
         this.api = api;
+        this.enableETBForAllPorts = enableETBForAllPorts;
     }
 
     getTimestampsUnderVtsControl(): Promise<ApiTimestamp[]> {
@@ -56,7 +60,11 @@ export class SchedulesService {
                 );
                 timestamps.push(timestamp);
                 // ETA timestamps from VTS A sources must also be published as ETB timestamps
-                if (calculated) {
+                if (
+                    calculated &&
+                    (this.enableETBForAllPorts ||
+                        VTS_A_ETB_PORTS.includes(tt.destination[0]?.$.locode as Locode))
+                ) {
                     logger.debug(
                         "generated ETB timestamp for SCHEDULES_CALCULATED " +
                             JSON.stringify({
