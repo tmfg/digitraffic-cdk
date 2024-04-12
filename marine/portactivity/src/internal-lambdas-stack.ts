@@ -189,6 +189,7 @@ function createUpdateTimestampsFromSchedules(stack: PortActivityStack, queue: Qu
             code: new AssetCode("dist/lambda/update-timestamps-from-schedules"),
             handler: "lambda-update-timestamps-from-schedules.handler",
             environment,
+            memorySize: 256,
             reservedConcurrentExecutions: 1,
             vpc: stack.vpc,
             vpcSubnets: {
@@ -227,7 +228,7 @@ function createProcessDLQLambda(dlqBucket: Bucket, dlq: Queue, stack: Digitraffi
         timeout: Duration.seconds(10),
         handler: "lambda-process-dlq.handler",
         reservedConcurrentExecutions: 3,
-        memorySize: 128,
+        memorySize: 256,
         environment
     });
 
@@ -262,7 +263,8 @@ function createUpdateAwakeAiETXTimestampsLambda(
     environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig.enableETBForAllPorts.toString();
     const lambdaConf = databaseFunctionProps(stack, environment, functionName, lambdaName, {
         timeout: 30,
-        reservedConcurrentExecutions: 20
+        reservedConcurrentExecutions: 20,
+        memorySize: 256
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     topic.addSubscription(new LambdaSubscription(lambda));
@@ -281,7 +283,8 @@ function createUpdateAwakeAiATXTimestampsLambda(stack: DigitrafficStack, queue: 
         functionName,
         "update-awake-ai-atx-timestamps",
         {
-            timeout: 40
+            timeout: 40,
+            memorySize: 256
         }
     );
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, {
