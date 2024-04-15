@@ -55,7 +55,7 @@ async function getSubmoduleStatus(): Promise<GitSubmoduleStatus[]> {
     return _.chain(submoduleStrings)
         .map(
             (str) =>
-                /^(?<status>[ +-U])(?<sha>[^ ]+) (?<path>[^ ]+)(?: \((?<tag>[^)]+)\))?$/.exec(str)?.groups
+                /^(?<status>[ +U-])(?<sha>[^ ]+) (?<path>[^ ]+)(?: \((?<tag>[^)]+)\))?$/.exec(str)?.groups
         )
         .filter(isValue)
         .map((statusGroup) => {
