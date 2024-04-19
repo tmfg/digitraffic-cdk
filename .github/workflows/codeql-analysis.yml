@@ -30,6 +30,13 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
+        # Digitraffic-common has its own repo.
+        # Common/scripts and swagger-joiner/resources are 3rd party code.
+        config: |
+          paths-ignore:
+            - lib/digitraffic-common
+            - common/scripts
+            - other/swagger-joiner/resources
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
