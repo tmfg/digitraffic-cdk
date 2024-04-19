@@ -41,7 +41,7 @@
     "@rushstack/eslint-config": "~3.6.8",
     "@rushstack/heft": "~0.66.2",
     "@rushstack/heft-jest-plugin": "~0.11.23",
-    "@types/aws-lambda": "8.10.136",
+    "@types/aws-lambda": "8.10.137",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
     "@types/lodash": "4.17.0",
@@ -49,6 +49,6 @@
     "date-fns-tz": "~2.0.1",
     "esbuild": "~0.20.2",
     "eslint": "~8.57.0",
-    "typescript": "~5.4.3"
+    "typescript": "~5.4.4"
   }
 }

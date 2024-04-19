@@ -32,12 +32,12 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
-    "@aws-sdk/client-api-gateway": "3.533.0",
-    "@aws-sdk/client-s3": "~3.534.0",
+    "@aws-sdk/client-api-gateway": "3.549.0",
+    "@aws-sdk/client-s3": "~3.549.0",
     "@digitraffic/common": "2024.3.28-1",
-    "aws-cdk-lib": "~2.133.0",
+    "aws-cdk-lib": "~2.135.0",
     "constructs": "~10.3.0",
-    "ky": "~1.2.2",
+    "ky": "~1.2.3",
     "lodash": "~4.17.21",
     "zod": "~3.22.4"
   },
@@ -46,15 +46,15 @@
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "~29.7.0",
-    "@rushstack/eslint-config": "~3.6.4",
-    "@rushstack/heft": "~0.66.1",
-    "@rushstack/heft-jest-plugin": "~0.11.22",
-    "@types/aws-lambda": "8.10.136",
+    "@rushstack/eslint-config": "^3.6.8",
+    "@rushstack/heft": "^0.66.2",
+    "@rushstack/heft-jest-plugin": "^0.11.23",
+    "@types/aws-lambda": "8.10.137",
     "@types/heft-jest": "1.0.6",
     "@types/lodash": "4.17.0",
-    "@types/node": "20.11.27",
+    "@types/node": "20.12.4",
     "esbuild": "~0.20.2",
     "eslint": "~8.57.0",
-    "typescript": "~5.4.2"
+    "typescript": "~5.4.4"
   }
 }

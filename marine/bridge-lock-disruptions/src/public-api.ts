@@ -1,4 +1,4 @@
-import type { IModel, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { IModel, Resource } from "aws-cdk-lib/aws-apigateway";
 import { default as DisruptionSchema } from "./model/disruption-schema.js";
 import {
     addServiceModel,
@@ -75,12 +75,12 @@ export class PublicApi {
         });
     }
 
-    createResourcePaths(publicApi: RestApi): void {
+    createResourcePaths(publicApi: DigitrafficRestApi): void {
         const apiResource = publicApi.root.addResource("api");
 
         // new paths
         const bridgeLockResource = apiResource.addResource("bridge-lock");
-        const v1Resource = bridgeLockResource.addResource("v1");
+        const v1Resource = publicApi.addResourceWithCorsOptionsSubTree(bridgeLockResource,"v1");
         this.disruptionsResource = v1Resource.addResource("disruptions");
     }
 

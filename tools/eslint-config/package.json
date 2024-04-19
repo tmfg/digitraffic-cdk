@@ -10,12 +10,12 @@
     "test": ""
   },
   "dependencies": {
-    "@rushstack/eslint-config": "^3.5.1",
+    "@rushstack/eslint-config": "^3.6.8",
     "@typescript-eslint/eslint-plugin": "~6.18.0",
     "eslint-plugin-deprecation": "~2.0.0"
   },
   "devDependencies": {
-    "eslint": "~8.56.0",
-    "typescript": "~5.3.3"
+    "eslint": "~8.57.0",
+    "typescript": "~5.4.4"
   }
 }

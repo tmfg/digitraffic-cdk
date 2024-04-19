@@ -107,7 +107,7 @@ export class PublicApi {
     createResources(publicApi: DigitrafficRestApi): void {
         const apiResource = publicApi.root.addResource("api");
         const csResource = apiResource.addResource("counting-site");
-        const versionResource = csResource.addResource("v1");
+        const versionResource = publicApi.addResourceWithCorsOptionsSubTree(csResource, "v1");
 
         this.valuesResource = versionResource.addResource("values");
         this.csvValuesResource = versionResource.addResource("values.csv");
