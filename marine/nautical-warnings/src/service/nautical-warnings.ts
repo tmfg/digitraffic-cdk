@@ -12,11 +12,14 @@ import type { Feature, FeatureCollection, GeoJsonProperties } from "geojson";
 import { isFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
+import { updateUpdatedTimestamp } from "@digitraffic/common/dist/database/last-updated";
 
 const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
     type: "FeatureCollection",
     features: []
 };
+
+const NAUTICAL_WARNINGS_CHECK = "NAUTICAL_WARNINGS_CHECK" as const;
 
 export function getActiveWarnings(): Promise<[FeatureCollection, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
@@ -64,7 +67,8 @@ export async function updateNauticalWarnings(url: string): Promise<void> {
         return db.tx((tx) => {
             return Promise.allSettled([
                 validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active),
-                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived)
+                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived),
+                updateUpdatedTimestamp(tx, NAUTICAL_WARNINGS_CHECK, new Date())
             ]);
         });
     });
@@ -79,7 +83,7 @@ function validateAndUpdate(
         const fc = convertFeatureCollection(featureCollection);
         const lastModified = fc.features
             .map((f) =>
-            // eslint-disable-next-line dot-notation
+                // eslint-disable-next-line dot-notation
                 getMaxDate(f.properties?.["publishingTime"] as Date, f.properties?.["creationTime"] as Date)
             )
             .reduce((a, b) => (a > b ? a : b), EPOCH);
