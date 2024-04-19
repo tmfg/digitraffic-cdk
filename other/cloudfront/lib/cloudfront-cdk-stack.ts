@@ -8,13 +8,20 @@ import {
     OriginRequestPolicy,
     ResponseHeadersPolicy
 } from "aws-cdk-lib/aws-cloudfront";
-import { CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import {
+    CompositePrincipal,
+    ManagedPolicy,
+    PolicyStatement,
+    Role,
+    ServicePrincipal
+} from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { CFLambdaParameters, CFOrigin, CFProps, DistributionProps, ElasticProps } from "./app-props";
 import { createDistribution } from "./distribution-util";
 import { LambdaHolder } from "./lambda-holder";
 import {
-    createGzipRequirement, createHistoryPath,
+    createGzipRequirement,
+    createHistoryPath,
     createHttpHeaders,
     createIndexHtml,
     createIpRestriction,
@@ -224,7 +231,7 @@ export class CloudfrontCdkStack extends Stack {
         }
 
         if (types.functionTypes.has(FunctionType.HISTORY_REDIRECT)) {
-            lambdaMap.addFunction(FunctionType.HISTORY_REDIRECT, createHistoryPath(this))
+            lambdaMap.addFunction(FunctionType.HISTORY_REDIRECT, createHistoryPath(this));
         }
 
         // handle ip restrictions

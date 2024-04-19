@@ -1,49 +1,42 @@
 import type { UpdateStatusSecret } from "../secret.js";
-import type { CStateStatus, PinnedIssue } from "../api/cstate-statuspage-api.js";
+import type { ActiveMaintenance, CStateStatus, PinnedIssue } from "../api/cstate-statuspage-api.js";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { jest } from "@jest/globals";
 import { formatInTimeZone } from "date-fns-tz";
+import { StatusEnvKeys } from "../keys.js";
 
-export const SERVER_PORT = 8091;
-export const HOST_URL = `http://localhost:${SERVER_PORT}`;
-export const STATUSPAGE_PATH = `/statuspage-status`;
-export const C_STATE_PATH = `/cstate-status`;
-export const C_STATE_PAGE_URL = `${HOST_URL}${C_STATE_PATH}`;
-export const STATUSPAGE_URL = `${HOST_URL}${STATUSPAGE_PATH}`;
-export const CHECK_TIMEOUT_SECONDS = 30;
-export const CHECK_INTERVAL_MINUTES = 1;
+const SERVER_PORT = 8091 as const;
+export const C_STATE_PAGE_URL = `http://localhost:${SERVER_PORT}`;
+export const NODEPING_API = "https://api.nodeping.com/api/1" as const;
+export const CHECK_TIMEOUT_SECONDS = 30 as const;
+export const CHECK_INTERVAL_MINUTES = 1 as const;
 
 // 2024-02-20 08:36:51.671186 +0000 UTC
 const C_STATE_JSON_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS xxxx 'Z";
 
 export function setTestEnv(): void {
     setEnvVariable("AWS_REGION", "eu-west-1");
-    setEnvVariable("SECRET_ID", "TEST_SECRET");
-    setEnvVariable("CHECK_TIMEOUT_SECONDS", CHECK_TIMEOUT_SECONDS.toString());
-    setEnvVariable("INTERVAL_MINUTES", CHECK_INTERVAL_MINUTES.toString());
-    setEnvVariable("GITHUB_WORKFLOW_FILE", "update_status_from_nodeping.yml");
-    setEnvVariable("GITHUB_BRANCH", "feature/plaa");
-    setEnvVariable("GITHUB_OWNER", "test");
-    setEnvVariable("GITHUB_REPO", "status-test");
-    setEnvVariable("STATUSPAGE_URL", STATUSPAGE_URL);
+    setEnvVariable(StatusEnvKeys.SECRET_ID, "TEST_SECRET");
+    setEnvVariable(StatusEnvKeys.CHECK_TIMEOUT_SECONDS, CHECK_TIMEOUT_SECONDS.toString());
+    setEnvVariable(StatusEnvKeys.INTERVAL_MINUTES, CHECK_INTERVAL_MINUTES.toString());
+    setEnvVariable(StatusEnvKeys.GITHUB_WORKFLOW_FILE, "update_status_from_nodeping.yml");
+    setEnvVariable(StatusEnvKeys.GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE, "update_started_maintenance.yml");
+    setEnvVariable(StatusEnvKeys.GITHUB_BRANCH, "feature/plaa");
+    setEnvVariable(StatusEnvKeys.GITHUB_OWNER, "test");
+    setEnvVariable(StatusEnvKeys.GITHUB_REPO, "status-test");
     // /index.json will be added to end
-    setEnvVariable("C_STATE_PAGE_URL", C_STATE_PAGE_URL);
+    setEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL, C_STATE_PAGE_URL);
 }
 
 export const DEFAULT_SECRET_VALUE = {
     nodePingToken: "nodePingToken",
     nodePingSubAccountId: "nodepingSubAccountId",
-    statuspagePageId: "statuspagePageId",
-    statuspageApiKey: "statuspageApiKey",
-    statusPageRoadComponentGroupId: "statusPageRoadComponentGroupId",
-    statusPageMarineComponentGroupId: "statusPageMarineComponentGroupId",
-    statusPageRailComponentGroupId: "statusPageRailComponentGroupId",
     nodePingContactIdSlack1: "Slack1",
     nodePingContactIdSlack2: "Slack2",
-    reportUrl: `http://localhost:${SERVER_PORT}`,
+    reportUrl: `http://localhost:${SERVER_PORT}/status-report`,
     gitHubPat: "github_pat_plaa"
-} as UpdateStatusSecret;
+} satisfies UpdateStatusSecret;
 
 export function mockSecretHolder(
     secretValue: UpdateStatusSecret = DEFAULT_SECRET_VALUE
@@ -80,7 +73,7 @@ export function getCstateIndexJson(
         title: "Digitraffic Status",
         languageCodeHTML: "en",
         languageCode: "en",
-        baseURL: `https://localhost:${SERVER_PORT}`,
+        baseURL: C_STATE_PAGE_URL,
         description:
             "We continuously monitor the status of our services and if there are any interruptions, a note will be posted here.",
         summaryStatus: "ok",
@@ -136,6 +129,14 @@ export function getCstateIndexJson(
 
     console.log(`CState index.json:\n${JSON.stringify(json)}`);
     return json;
+}
+
+export function getActiveMaintenance(start: Date = new Date()): ActiveMaintenance {
+    const index = getCstateIndexJson([{ disableNodeping: true, start }]);
+    return {
+        baseURL: index.baseURL,
+        issue: index.pinnedIssues[0]!
+    };
 }
 
 function toISOStringWOZ(date: Date): string {

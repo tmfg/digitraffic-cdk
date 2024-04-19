@@ -3,16 +3,17 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { SNSEvent } from "aws-lambda";
 import { parseISO } from "date-fns";
-import { AwakeAiETAShipApi } from "../../api/awake-ai-ship";
-import type { DbETAShip } from "../../dao/timestamps";
-import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
-import { UpdateAwakeAiETXTimestampsSecret } from "../../model/secret";
-import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship";
-import { sendMessage } from "../../service/queue-service";
+import { AwakeAiETAShipApi } from "../../api/awake-ai-ship.js";
+import type { DbETAShip } from "../../dao/timestamps.js";
+import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
+import { type UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
+import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship.js";
+import { sendMessage } from "../../service/queue-service.js";
 
 let service: AwakeAiETAShipService | undefined;
 
 const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const enableETBForAllPorts = getEnvVariable(PortactivityEnvKeys.ENABLE_ETB);
 
 interface SnsETAShip extends Omit<DbETAShip, "eta"> {
     readonly eta: string;
@@ -34,7 +35,10 @@ export const handler = (event: SNSEvent): Promise<void> => {
 
     return secretHolder.get().then(async (secret) => {
         if (!service) {
-            service = new AwakeAiETAShipService(new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth));
+            service = new AwakeAiETAShipService(
+                new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth),
+                enableETBForAllPorts.toLowerCase() === "true"
+            );
         }
         const timestamps = await service.getAwakeAiTimestamps(ships);
 

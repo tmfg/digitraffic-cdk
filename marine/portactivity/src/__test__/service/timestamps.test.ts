@@ -7,15 +7,15 @@ import {
     insertPortAreaDetails,
     insertPortCall,
     insertVessel
-} from "../db-testutil";
-import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata";
-import * as TimestampsService from "../../service/timestamps";
-import { EventType } from "../../model/timestamp";
-import { EventSource } from "../../model/eventsource";
+} from "../db-testutil.js";
+import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata.js";
+import * as TimestampsService from "../../service/timestamps.js";
+import { EventType } from "../../model/timestamp.js";
+import { EventSource } from "../../model/eventsource.js";
 import _ from "lodash";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addHours, addMinutes, parseISO, subDays } from "date-fns";
-import { assertDefined } from "../test-utils";
+import { assertDefined } from "../test-utils.js";
 
 describe(
     "timestamps",
@@ -371,20 +371,23 @@ describe(
         });
 
         test("deleteOldTimestampsAndPilotages - deletes both old timestamps and pilotages", async () => {
-            const olderThanAWeek = subDays(Date.now(), 7);
+            const olderThanAWeek = subDays(Date.now(), 8);
+            const youngerThanAWeek = subDays(Date.now(), 6);
             await insert(db, [
                 newTimestamp({
                     eventTime: olderThanAWeek
+                }),
+                newTimestamp({
+                    eventTime: youngerThanAWeek
                 })
             ]);
             await insertPilotage(db, 1, "ACTIVE", new Date(), olderThanAWeek);
-
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            await insertPilotage(db, 2, "ACTIVE", new Date(), youngerThanAWeek);
 
             await TimestampsService.deleteOldTimestampsAndPilotages();
 
-            expect(await findAll(db)).toHaveLength(0);
-            expect(await getPilotagesCount(db)).toBe(0);
+            expect(await findAll(db)).toHaveLength(1);
+            expect(await getPilotagesCount(db)).toBe(1);
         });
     })
 );

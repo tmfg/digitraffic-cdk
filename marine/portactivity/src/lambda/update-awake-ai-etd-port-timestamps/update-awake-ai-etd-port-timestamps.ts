@@ -1,13 +1,13 @@
-import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
+import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { AwakeAiETDPortService } from "../../service/awake-ai-etd-port";
-import { AwakeAiPortApi } from "../../api/awake-ai-port";
+import { AwakeAiETDPortService } from "../../service/awake-ai-etd-port.js";
+import { AwakeAiPortApi } from "../../api/awake-ai-port.js";
 import type { SNSEvent } from "aws-lambda";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { sendMessage } from "../../service/queue-service";
+import { sendMessage } from "../../service/queue-service.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { UpdateAwakeAiETXTimestampsSecret } from "../../model/secret";
+import { type UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
 
 const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 

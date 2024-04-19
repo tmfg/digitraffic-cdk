@@ -1,18 +1,21 @@
 import type { Construct } from "constructs";
-import * as InternalLambdas from "./internal-lambdas-stack";
-import * as IntegrationApi from "./integration-api";
-import * as Sqs from "./sqs";
-import { PublicApi } from "./public-api";
-import type { PortactivityConfiguration } from "./app-props";
+import * as InternalLambdas from "./internal-lambdas-stack.js";
+import * as IntegrationApi from "./integration-api.js";
+import * as Sqs from "./sqs.js";
+import { PublicApi } from "./public-api.js";
+import type { PortactivityConfiguration } from "./app-props.js";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import { DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget } from "aws-cdk-lib/aws-rds";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import { Canaries } from "./canaries-stack";
+import { Canaries } from "./canaries-stack.js";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class PortActivityStack extends DigitrafficStack {
+    readonly portActivityConfig: PortactivityConfiguration;
+
     constructor(scope: Construct, id: string, config: PortactivityConfiguration) {
         super(scope, id, config);
+        this.portActivityConfig = config;
 
         if (!this.secret) {
             throw new Error("Secret is required!");

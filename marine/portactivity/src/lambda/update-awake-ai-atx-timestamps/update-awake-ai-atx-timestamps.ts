@@ -1,14 +1,14 @@
-import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
-import { sendMessage } from "../../service/queue-service";
-import { AwakeAiATXService } from "../../service/awake-ai-atx";
-import { AwakeAiATXApi } from "../../api/awake-ai-atx";
+import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
+import { sendMessage } from "../../service/queue-service.js";
+import { AwakeAiATXService } from "../../service/awake-ai-atx.js";
+import { AwakeAiATXApi } from "../../api/awake-ai-atx.js";
 import type { Context } from "aws-lambda";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import WebSocket from "ws";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { UpdateAwakeAiATXTimestampsSecret } from "../../model/secret";
+import { type UpdateAwakeAiATXTimestampsSecret } from "../../model/secret.js";
 
 const expectedKeys = [PortactivitySecretKeys.AWAKE_ATX_URL, PortactivitySecretKeys.AWAKE_ATX_AUTH];
 

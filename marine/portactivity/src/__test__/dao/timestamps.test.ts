@@ -5,17 +5,18 @@ import {
     insertPortAreaDetails,
     insertPortCall,
     insertVessel
-} from "../db-testutil";
-import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata";
-import * as TimestampsDb from "../../dao/timestamps";
-import type { DbTimestamp } from "../../dao/timestamps";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
+} from "../db-testutil.js";
+import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata.js";
+import * as TimestampsDb from "../../dao/timestamps.js";
+import type { DbTimestamp } from "../../dao/timestamps.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { EventSource } from "../../model/eventsource";
+import { EventSource } from "../../model/eventsource.js";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
 import _ from "lodash";
-import { assertDefined } from "../test-utils";
+import { assertDefined } from "../test-utils.js";
 
 const EVENT_SOURCE = "TEST";
 

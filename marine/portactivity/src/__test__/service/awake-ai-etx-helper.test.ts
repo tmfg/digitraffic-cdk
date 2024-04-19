@@ -1,17 +1,16 @@
-import * as AwakeAiETAHelper from "../../service/awake-ai-etx-helper";
-import { isPortcallPrediction } from "../../service/awake-ai-etx-helper";
-import {
+import * as AwakeAiETAHelper from "../../service/awake-ai-etx-helper.js";
+import { isPortcallPrediction } from "../../service/awake-ai-etx-helper.js";
+import type {
     AwakeAiPredictionMetadata,
-    AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
-    AwakeAiZoneType,
     AwakeDigitrafficPortCallURN,
     AwakeURN
-} from "../../api/awake-common";
-import { EventSource } from "../../model/eventsource";
-import { randomIMO, randomMMSI } from "../testdata";
+} from "../../api/awake-common.js";
+import { AwakeAiPredictionType, AwakeAiZoneType } from "../../api/awake-common.js";
+import { EventSource } from "../../model/eventsource.js";
+import { randomIMO, randomMMSI } from "../testdata.js";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
-import { EventType } from "../../model/timestamp";
+import { EventType } from "../../model/timestamp.js";
 
 describe("Awake.AI ETA helper", () => {
     test("destinationIsFinnish - correct", () => {

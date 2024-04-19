@@ -1,18 +1,14 @@
 import axios, { type AxiosError } from "axios";
 import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { add, isBefore, parseJSON } from "date-fns";
+import ky, { HTTPError } from "ky";
+import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { UpdateStatusSecret } from "../secret.js";
 
 const STATUS_JSON_PATH = "/index.json" as const;
+const MAINTENANCE_ISSUE_PATH = "/digitraffic-maintenance/" as const;
 
 const SERVICE = "CStateStatuspageApi" as const;
-
-export enum StatuspageComponentStatus {
-    operational = "operational",
-    under_maintenance = "under_maintenance",
-    degraded_performance = "degraded_performance",
-    partial_outage = "partial_outage",
-    major_outage = "major_outage"
-}
 
 export interface CStateSystem extends Record<string, unknown> {
     readonly name: string; // "marine/api/ais/v1/locations",
@@ -22,6 +18,7 @@ export interface CStateSystem extends Record<string, unknown> {
 }
 
 export interface CStateStatus extends Record<string, unknown> {
+    readonly baseURL: string;
     readonly pinnedIssues: PinnedIssue[];
     readonly systems: CStateSystem[];
 }
@@ -36,11 +33,41 @@ export interface PinnedIssue {
     readonly filename: string;
 }
 
+export interface ActiveMaintenance {
+    readonly issue: PinnedIssue;
+    readonly baseURL: string;
+}
+
+export interface GithubActionPostData {
+    readonly ref: string;
+    readonly inputs: {
+        readonly baseUrl: string;
+        readonly permalink: string;
+    };
+}
+
 export class CStateStatuspageApi {
     private readonly cStatePageUrl: string;
+    private gitHubOwner: string;
+    private gitHubRepo: string;
+    private gitHubBranch: string;
+    private gitHubWorkflowFile: string;
+    private secretHolder: SecretHolder<UpdateStatusSecret>;
 
-    constructor(cStatePageUrl: string) {
+    constructor(
+        cStatePageUrl: string,
+        gitHubOwner: string,
+        gitHubRepo: string,
+        gitHubBranch: string,
+        gitHubWorkflowFile: string,
+        secretHolder: SecretHolder<UpdateStatusSecret>
+    ) {
         this.cStatePageUrl = cStatePageUrl;
+        this.gitHubOwner = gitHubOwner;
+        this.gitHubRepo = gitHubRepo;
+        this.gitHubBranch = gitHubBranch;
+        this.gitHubWorkflowFile = gitHubWorkflowFile;
+        this.secretHolder = secretHolder;
     }
 
     async getStatus(): Promise<CStateStatus> {
@@ -95,7 +122,7 @@ export class CStateStatuspageApi {
                 method,
                 message: `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${isBefore(starts, now)} issue: ${issue.permalink}`
             });
-            if (issue.permalink.includes("/digitraffic-maintenance/") && isBefore(starts, now)) {
+            if (issue.permalink.includes(MAINTENANCE_ISSUE_PATH) && isBefore(starts, now)) {
                 logger.info({
                     method,
                     message: `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`
@@ -109,5 +136,106 @@ export class CStateStatuspageApi {
             message: "No active maintenance found"
         });
         return false;
+    }
+
+    async findActiveMaintenance(): Promise<ActiveMaintenance | undefined> {
+        const status = await this.getStatus();
+        const issue = this.findActiveMaintenanceFromStatus(status);
+        if (issue) {
+            return {
+                issue,
+                baseURL: status.baseURL
+            };
+        }
+        return undefined;
+    }
+
+    private findActiveMaintenanceFromStatus(cStatus: CStateStatus): PinnedIssue | undefined {
+        const method = `${SERVICE}.findActiveMaintenance` as const satisfies LoggerMethodType;
+        // This is executed ever minute, so in worst case it will turn off one minute late.
+        // Make it turn on max one minute too early :)
+        const now = add(new Date(), { minutes: 1 });
+
+        for (const issue of cStatus.pinnedIssues) {
+            // CState has "2024-02-20 08:36:51.671186 +0000 UTC" date format in JSONs
+            const starts = parseJSON(issue.createdAt);
+            logger.debug({
+                method,
+                message: `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${isBefore(starts, now)} issue: ${issue.permalink}`
+            });
+            if (issue.permalink.includes(MAINTENANCE_ISSUE_PATH) && isBefore(starts, now)) {
+                logger.info({
+                    method,
+                    message: `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`
+                });
+                return issue;
+            }
+        }
+
+        logger.info({
+            method,
+            message: "No active maintenance found"
+        });
+        return undefined;
+    }
+
+    async triggerUpdateMaintenanceGithubAction(maintenance: ActiveMaintenance): Promise<void> {
+        const method = `${SERVICE}.triggerUpdateMaintenanceGithubAction` as const satisfies LoggerMethodType;
+
+        const secret = await this.secretHolder.get();
+        const data = {
+            ref: `refs/heads/${this.gitHubBranch}`,
+            inputs: { baseUrl: maintenance.baseURL, permalink: maintenance.issue.permalink }
+        } satisfies GithubActionPostData;
+        const headers = {
+            Accept: "application/vnd.github+json",
+            "Content-Type": "application/vnd.github+json",
+            Authorization: `token ${secret.gitHubPat}`
+        };
+        const githubApi =
+            `https://api.github.com/repos/${this.gitHubOwner}/${this.gitHubRepo}/actions/workflows/${this.gitHubWorkflowFile}/dispatches` as const;
+        logger.info({
+            method,
+            message: "Trigger GitHub action",
+            customActionUrl: githubApi
+        });
+        const options = { json: data, headers: headers };
+
+        try {
+            const response = await ky.post(githubApi, options);
+            if (response.ok) {
+                logger.info({
+                    method,
+                    message: "Trigger GitHub action response",
+                    customActionUrl: githubApi,
+                    customResponseCode: response.status,
+                    customResponseText: response.statusText
+                });
+            } else {
+                logger.error({
+                    method,
+                    message: "Trigger GitHub action response failed.",
+                    customActionUrl: githubApi,
+                    customResponseCode: response.status,
+                    customResponseText: response.statusText
+                });
+            }
+        } catch (error) {
+            const message = "Triggering GitHub action throw error.";
+            let errorMessage = JSON.stringify(error);
+            if (error instanceof HTTPError) {
+                const serverMessage = await error.response.text();
+                errorMessage = `${error.response.status} ${error.response.statusText} ${serverMessage}`;
+            } else {
+                errorMessage = `${errorMessage} Not HTTPError.`;
+            }
+            logger.error({
+                method,
+                message,
+                customActionUrl: githubApi,
+                customError: errorMessage
+            });
+            throw new Error(`${method} ${message} ${errorMessage}`);
+        }
     }
 }

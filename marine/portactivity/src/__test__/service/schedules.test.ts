@@ -1,11 +1,14 @@
-import { SchedulesApi, SchedulesDirection, SchedulesResponse } from "../../api/schedules";
-import { ApiTimestamp, EventType } from "../../model/timestamp";
-import { newTimestamp } from "../testdata";
+import type { SchedulesResponse } from "../../api/schedules.js";
+import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
+import { newTimestamp } from "../testdata.js";
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import { ports } from "../../service/portareas";
-import { EventSource } from "../../model/eventsource";
-import { SchedulesService } from "../../service/schedules";
+import { ports } from "../../service/portareas.js";
+import { EventSource } from "../../model/eventsource.js";
+import { SchedulesService } from "../../service/schedules.js";
 import { subHours, subMinutes } from "date-fns";
+import { jest } from "@jest/globals";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -95,7 +98,7 @@ describe("schedules", () => {
 
     test("SchedulesService.schedulesToTimestamps - calculated - [x] ETA [ ] ETD", () => {
         const api = createApi();
-        const service = new SchedulesService(api);
+        const service = new SchedulesService(api, true);
         const etaCount = 3;
         const timestamps = service.schedulesToTimestamps(
             createSchedulesResponse(etaCount, true, false),
@@ -112,7 +115,7 @@ describe("schedules", () => {
 
     test("SchedulesService.schedulesToTimestamps - calculated - [ ] ETA [x] ETD", () => {
         const api = createApi();
-        const service = new SchedulesService(api);
+        const service = new SchedulesService(api, true);
 
         const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, false, true), true);
 
@@ -122,7 +125,7 @@ describe("schedules", () => {
 
     test("SchedulesService.schedulesToTimestamps - calculated - [x] ETA [x] ETD", () => {
         const api = createApi();
-        const service = new SchedulesService(api);
+        const service = new SchedulesService(api, true);
 
         const timestampCount = 3;
         const timestamps = service.schedulesToTimestamps(

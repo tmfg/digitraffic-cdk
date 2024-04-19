@@ -1,7 +1,7 @@
-import axios from "axios";
 import * as util from "util";
 import * as xml2js from "xml2js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import ky from "ky";
 
 export enum SchedulesDirection {
     EAST = "east",
@@ -25,13 +25,13 @@ export class SchedulesApi {
             method: "SchedulesApi.getSchedulesTimestamp",
             message: `calling URL ${fullUrl}`
         });
-        const resp = await axios.get<string>(fullUrl);
+        const response = await ky.get(fullUrl).text();
         const parse = util.promisify(xml2js.parseString);
         logger.info({
             method: "SchedulesApi.getSchedulesTimestamp",
             tookMs: Date.now() - start
         });
-        return (await parse(resp.data)) as SchedulesResponse;
+        return (await parse(response)) as SchedulesResponse;
     }
 
     private createUrl(direction: SchedulesDirection, calculated: boolean): string {

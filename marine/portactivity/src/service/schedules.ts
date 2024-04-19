@@ -1,22 +1,22 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import moment from "moment-timezone";
-import {
-    Destination,
-    SchedulesApi,
-    SchedulesDirection,
-    SchedulesResponse,
-    Timestamp,
-    Vessel
-} from "../api/schedules";
-import { EventSource } from "../model/eventsource";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { Port, ports } from "./portareas";
+import { parseISO, subMinutes } from "date-fns";
+import type { Destination, SchedulesApi, SchedulesResponse, Timestamp, Vessel } from "../api/schedules.js";
+import { SchedulesDirection } from "../api/schedules.js";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import type { Port } from "./portareas.js";
+import { ports } from "./portareas.js";
+import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports.js";
+import type { Locode } from "../model/locode.js";
 
 export class SchedulesService {
     private readonly api: SchedulesApi;
+    private readonly enableETBForAllPorts: boolean;
 
-    constructor(api: SchedulesApi) {
+    constructor(api: SchedulesApi, enableETBForAllPorts: boolean = false) {
         this.api = api;
+        this.enableETBForAllPorts = enableETBForAllPorts;
     }
 
     getTimestampsUnderVtsControl(): Promise<ApiTimestamp[]> {
@@ -39,9 +39,7 @@ export class SchedulesService {
         return timestamps
             .filter((ts) => ports.includes(ts.location.port as Port))
             .filter((ts) =>
-                ts.eventType === EventType.ETD
-                    ? moment(ts.eventTime) >= moment().subtract(5, "minutes")
-                    : true
+                ts.eventType === EventType.ETD ? parseISO(ts.eventTime) >= subMinutes(Date.now(), 5) : true
             );
     }
 
@@ -62,7 +60,11 @@ export class SchedulesService {
                 );
                 timestamps.push(timestamp);
                 // ETA timestamps from VTS A sources must also be published as ETB timestamps
-                if (calculated) {
+                if (
+                    calculated &&
+                    (this.enableETBForAllPorts ||
+                        VTS_A_ETB_PORTS.includes(tt.destination[0]?.$.locode as Locode))
+                ) {
                     logger.debug(
                         "generated ETB timestamp for SCHEDULES_CALCULATED " +
                             JSON.stringify({

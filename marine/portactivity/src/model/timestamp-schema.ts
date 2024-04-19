@@ -1,5 +1,5 @@
-import { JsonSchema, JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
-import { EventType } from "./timestamp";
+import { type JsonSchema, JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
+import { EventType } from "./timestamp.js";
 
 export const ShipSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,

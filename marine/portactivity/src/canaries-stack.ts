@@ -6,9 +6,9 @@ import { Schedule } from "aws-cdk-lib/aws-synthetics";
 import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
 import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import type { PortactivityConfiguration } from "./app-props";
+import type { PortactivityConfiguration } from "./app-props.js";
 import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
-import type { PublicApi } from "./public-api";
+import type { PublicApi } from "./public-api.js";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 
 export class Canaries {

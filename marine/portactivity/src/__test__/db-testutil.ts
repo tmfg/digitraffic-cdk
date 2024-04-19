@@ -1,14 +1,14 @@
-import type { ApiTimestamp } from "../model/timestamp";
-import * as TimestampsDb from "../dao/timestamps";
-import type { DbTimestamp } from "../dao/timestamps";
-import type { PortAreaDetails, PortCall, Vessel } from "./testdata";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import * as TimestampsDb from "../dao/timestamps.js";
+import type { DbTimestamp } from "../dao/timestamps.js";
+import type { PortAreaDetails, PortCall, Vessel } from "./testdata.js";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
-import { updatePilotages } from "../dao/pilotages";
+import { updatePilotages } from "../dao/pilotages.js";
 import type { Countable } from "@digitraffic/common/dist/database/models";
-import * as sinon from "sinon";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { jest } from "@jest/globals";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(fn, truncate, "portactivity", "portactivity", "localhost:54321/marine");
@@ -250,6 +250,6 @@ export async function insertVesselLocation(
 }
 
 export function mockSecrets<T>(secret: T): void {
-    sinon.stub(RdsHolder.prototype, "setCredentials").resolves();
-    sinon.stub(SecretHolder.prototype, "get").resolves(secret);
+    jest.spyOn(RdsHolder.prototype, "setCredentials").mockResolvedValue();
+    jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue(secret);
 }

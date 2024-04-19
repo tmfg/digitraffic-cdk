@@ -1,14 +1,9 @@
-import { SQS } from "aws-sdk";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
-const sqs = new SQS();
+const sqs = new SQSClient({});
 
 export async function sendMessage(ts: unknown, sqsQueueUrl: string): Promise<void> {
     if (ts) {
-        await sqs
-            .sendMessage({
-                MessageBody: JSON.stringify(ts),
-                QueueUrl: sqsQueueUrl
-            })
-            .promise();
+        await sqs.send(new SendMessageCommand({ MessageBody: JSON.stringify(ts), QueueUrl: sqsQueueUrl }));
     }
 }

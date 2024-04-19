@@ -13,7 +13,7 @@
     "strictPropertyInitialization": false,
     "preserveSymlinks": true,
     "exactOptionalPropertyTypes": false,
-    "allowJs": true,
+    "allowJs": true
   },
   "include": ["bin/**/*.ts", "lib/**/*.ts"]
 }

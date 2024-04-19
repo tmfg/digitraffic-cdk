@@ -1,8 +1,8 @@
-import { saveTimestamp, UpdatedTimestamp } from "../../service/timestamps";
-import { validateTimestamp } from "../../service/timestamp-validation";
-import type { ApiTimestamp } from "../../model/timestamp";
+import { saveTimestamp, type UpdatedTimestamp } from "../../service/timestamps.js";
+import { validateTimestamp } from "../../service/timestamp-validation.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
 import type { SQSEvent } from "aws-lambda";
-import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";

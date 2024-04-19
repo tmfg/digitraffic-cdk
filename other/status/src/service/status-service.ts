@@ -85,7 +85,7 @@ function fillSpacesAndTrim(label: string): string {
     return trimmed.replace(new RegExp(" ", "g"), "-");
 }
 
-async function updateComponentsAndChecksForApp(
+async function updateNodePingChecksForApp(
     appWithEndpoints: AppWithEndpoints,
     secretHolder: SecretHolder<UpdateStatusSecret>,
     nodePingApi: NodePingApi,
@@ -95,7 +95,7 @@ async function updateComponentsAndChecksForApp(
     gitHubWorkflowFile: string
 ): Promise<void> {
     const start = Date.now();
-    const method = `${SERVICE}.updateComponentsAndChecksForApp` as const satisfies LoggerMethodType;
+    const method = `${SERVICE}.updateNodePingChecksForApp` as const satisfies LoggerMethodType;
     logger.info({
         method,
         message: `Updating components and checks for app ${appWithEndpoints.app}`
@@ -226,7 +226,7 @@ export async function updateChecks(
 }
 
 /**
- * Updates checks for apps to NodePing and StatusPage
+ * Updates checks for apps to NodePing
  */
 export async function updateComponentsAndChecks(
     apps: MonitoredApp[],
@@ -243,7 +243,7 @@ export async function updateComponentsAndChecks(
     );
 
     for (const endpoint of endpoints) {
-        await updateComponentsAndChecksForApp(
+        await updateNodePingChecksForApp(
             endpoint,
             secret,
             nodePingApi,

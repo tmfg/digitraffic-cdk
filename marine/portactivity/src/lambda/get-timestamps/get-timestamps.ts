@@ -1,4 +1,4 @@
-import * as TimestampsService from "../../service/timestamps";
+import * as TimestampsService from "../../service/timestamps.js";
 import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";

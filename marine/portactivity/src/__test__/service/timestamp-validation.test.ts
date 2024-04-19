@@ -1,11 +1,14 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import _ from "lodash";
-import { NavStatus } from "../../model/ais-status";
-import { EventSource } from "../../model/eventsource";
-import { EventType } from "../../model/timestamp";
-import { SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS, validateTimestamp } from "../../service/timestamp-validation";
-import { dbTestBase, insertVesselLocation } from "../db-testutil";
-import { newTimestamp } from "../testdata";
+import { NavStatus } from "../../model/ais-status.js";
+import { EventSource } from "../../model/eventsource.js";
+import { EventType } from "../../model/timestamp.js";
+import {
+    SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS,
+    validateTimestamp
+} from "../../service/timestamp-validation.js";
+import { dbTestBase, insertVesselLocation } from "../db-testutil.js";
+import { newTimestamp } from "../testdata.js";
 
 describe(
     "timestamp model",

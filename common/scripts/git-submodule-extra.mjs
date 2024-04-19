@@ -37,9 +37,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/error.js
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/error.js
 var require_error = __commonJS({
-  "../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/error.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/error.js"(exports) {
     var CommanderError2 = class extends Error {
       /**
        * Constructs the CommanderError class
@@ -74,9 +74,9 @@ var require_error = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/argument.js
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/argument.js
 var require_argument = __commonJS({
-  "../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/argument.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/argument.js"(exports) {
     var { InvalidArgumentError: InvalidArgumentError2 } = require_error();
     var Argument2 = class {
       /**
@@ -133,7 +133,7 @@ var require_argument = __commonJS({
       /**
        * Set the default value, and optionally supply the description to be displayed in the help.
        *
-       * @param {any} value
+       * @param {*} value
        * @param {string} [description]
        * @return {Argument}
        */
@@ -195,9 +195,9 @@ var require_argument = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/help.js
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/help.js
 var require_help = __commonJS({
-  "../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/help.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/help.js"(exports) {
     var { humanReadableArgName } = require_argument();
     var Help2 = class {
       constructor() {
@@ -278,8 +278,8 @@ var require_help = __commonJS({
         if (!this.showGlobalOptions)
           return [];
         const globalOptions = [];
-        for (let parentCmd = cmd.parent; parentCmd; parentCmd = parentCmd.parent) {
-          const visibleOptions = parentCmd.options.filter((option) => !option.hidden);
+        for (let ancestorCmd = cmd.parent; ancestorCmd; ancestorCmd = ancestorCmd.parent) {
+          const visibleOptions = ancestorCmd.options.filter((option) => !option.hidden);
           globalOptions.push(...visibleOptions);
         }
         if (this.sortOptions) {
@@ -295,12 +295,12 @@ var require_help = __commonJS({
        */
       visibleArguments(cmd) {
         if (cmd._argsDescription) {
-          cmd._args.forEach((argument) => {
+          cmd.registeredArguments.forEach((argument) => {
             argument.description = argument.description || cmd._argsDescription[argument.name()] || "";
           });
         }
-        if (cmd._args.find((argument) => argument.description)) {
-          return cmd._args;
+        if (cmd.registeredArguments.find((argument) => argument.description)) {
+          return cmd.registeredArguments;
         }
         return [];
       }
@@ -311,7 +311,7 @@ var require_help = __commonJS({
        * @returns {string}
        */
       subcommandTerm(cmd) {
-        const args = cmd._args.map((arg) => humanReadableArgName(arg)).join(" ");
+        const args = cmd.registeredArguments.map((arg) => humanReadableArgName(arg)).join(" ");
         return cmd._name + (cmd._aliases[0] ? "|" + cmd._aliases[0] : "") + (cmd.options.length ? " [options]" : "") + // simplistic check for non-help option
         (args ? " " + args : "");
       }
@@ -392,11 +392,11 @@ var require_help = __commonJS({
         if (cmd._aliases[0]) {
           cmdName = cmdName + "|" + cmd._aliases[0];
         }
-        let parentCmdNames = "";
-        for (let parentCmd = cmd.parent; parentCmd; parentCmd = parentCmd.parent) {
-          parentCmdNames = parentCmd.name() + " " + parentCmdNames;
+        let ancestorCmdNames = "";
+        for (let ancestorCmd = cmd.parent; ancestorCmd; ancestorCmd = ancestorCmd.parent) {
+          ancestorCmdNames = ancestorCmd.name() + " " + ancestorCmdNames;
         }
-        return parentCmdNames + cmdName + " " + cmd.usage();
+        return ancestorCmdNames + cmdName + " " + cmd.usage();
       }
       /**
        * Get the description for the command.
@@ -582,9 +582,9 @@ var require_help = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/option.js
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/option.js
 var require_option = __commonJS({
-  "../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/option.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/option.js"(exports) {
     var { InvalidArgumentError: InvalidArgumentError2 } = require_error();
     var Option2 = class {
       /**
@@ -620,7 +620,7 @@ var require_option = __commonJS({
       /**
        * Set the default value, and optionally supply the description to be displayed in the help.
        *
-       * @param {any} value
+       * @param {*} value
        * @param {string} [description]
        * @return {Option}
        */
@@ -637,7 +637,7 @@ var require_option = __commonJS({
        * new Option('--color').default('GREYSCALE').preset('RGB');
        * new Option('--donate [amount]').preset('20').argParser(parseFloat);
        *
-       * @param {any} arg
+       * @param {*} arg
        * @return {Option}
        */
       preset(arg) {
@@ -818,7 +818,7 @@ var require_option = __commonJS({
       /**
        * Did the value come from the option, and not from possible matching dual option?
        *
-       * @param {any} value
+       * @param {*} value
        * @param {Option} option
        * @returns {boolean}
        */
@@ -855,9 +855,9 @@ var require_option = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/suggestSimilar.js
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/suggestSimilar.js
 var require_suggestSimilar = __commonJS({
-  "../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/suggestSimilar.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/suggestSimilar.js"(exports) {
     var maxDistance = 3;
     function editDistance(a, b) {
       if (Math.abs(a.length - b.length) > maxDistance)
@@ -937,9 +937,9 @@ var require_suggestSimilar = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/command.js
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/command.js
 var require_command = __commonJS({
-  "../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/lib/command.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/lib/command.js"(exports) {
     var EventEmitter = __require("events").EventEmitter;
     var childProcess = __require("child_process");
     var path2 = __require("path");
@@ -963,7 +963,8 @@ var require_command = __commonJS({
         this.parent = null;
         this._allowUnknownOption = false;
         this._allowExcessArguments = true;
-        this._args = [];
+        this.registeredArguments = [];
+        this._args = this.registeredArguments;
         this.args = [];
         this.rawArgs = [];
         this.processedArgs = [];
@@ -1034,6 +1035,17 @@ var require_command = __commonJS({
         this._showHelpAfterError = sourceCommand._showHelpAfterError;
         this._showSuggestionAfterError = sourceCommand._showSuggestionAfterError;
         return this;
+      }
+      /**
+       * @returns {Command[]}
+       * @api private
+       */
+      _getCommandAndAncestors() {
+        const result = [];
+        for (let command = this; command; command = command.parent) {
+          result.push(command);
+        }
+        return result;
       }
       /**
        * Define a command.
@@ -1252,14 +1264,14 @@ var require_command = __commonJS({
        * @return {Command} `this` command for chaining
        */
       addArgument(argument) {
-        const previousArgument = this._args.slice(-1)[0];
+        const previousArgument = this.registeredArguments.slice(-1)[0];
         if (previousArgument && previousArgument.variadic) {
           throw new Error(`only the last argument can be variadic '${previousArgument.name()}'`);
         }
         if (argument.required && argument.defaultValue !== void 0 && argument.parseArg === void 0) {
           throw new Error(`a default value for a required argument is never used: '${argument.name()}'`);
         }
-        this._args.push(argument);
+        this.registeredArguments.push(argument);
         return this;
       }
       /**
@@ -1364,7 +1376,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
        */
       action(fn) {
         const listener = (args) => {
-          const expectedArgsCount = this._args.length;
+          const expectedArgsCount = this.registeredArguments.length;
           const actionArgs = args.slice(0, expectedArgsCount);
           if (this._storeOptionsAsProperties) {
             actionArgs[expectedArgsCount] = this;
@@ -1391,6 +1403,26 @@ Expecting one of '${allowedValues.join("', '")}'`);
         return new Option2(flags, description);
       }
       /**
+       * Wrap parseArgs to catch 'commander.invalidArgument'.
+       *
+       * @param {Option | Argument} target
+       * @param {string} value
+       * @param {*} previous
+       * @param {string} invalidArgumentMessage
+       * @api private
+       */
+      _callParseArg(target, value, previous, invalidArgumentMessage) {
+        try {
+          return target.parseArg(value, previous);
+        } catch (err) {
+          if (err.code === "commander.invalidArgument") {
+            const message = `${invalidArgumentMessage} ${err.message}`;
+            this.error(message, { exitCode: err.exitCode, code: err.code });
+          }
+          throw err;
+        }
+      }
+      /**
        * Add an option.
        *
        * @param {Option} option
@@ -1414,15 +1446,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
           }
           const oldValue = this.getOptionValue(name);
           if (val !== null && option.parseArg) {
-            try {
-              val = option.parseArg(val, oldValue);
-            } catch (err) {
-              if (err.code === "commander.invalidArgument") {
-                const message = `${invalidValueMessage} ${err.message}`;
-                this.error(message, { exitCode: err.exitCode, code: err.code });
-              }
-              throw err;
-            }
+            val = this._callParseArg(option, val, oldValue, invalidValueMessage);
           } else if (val !== null && option.variadic) {
             val = option._concatValue(val, oldValue);
           }
@@ -1475,56 +1499,28 @@ Expecting one of '${allowedValues.join("', '")}'`);
         return this.addOption(option);
       }
       /**
-       * Define option with `flags`, `description` and optional
-       * coercion `fn`.
+       * Define option with `flags`, `description`, and optional argument parsing function or `defaultValue` or both.
        *
-       * The `flags` string contains the short and/or long flags,
-       * separated by comma, a pipe or space. The following are all valid
-       * all will output this way when `--help` is used.
+       * The `flags` string contains the short and/or long flags, separated by comma, a pipe or space. A required
+       * option-argument is indicated by `<>` and an optional option-argument by `[]`.
        *
-       *     "-p, --pepper"
-       *     "-p|--pepper"
-       *     "-p --pepper"
+       * See the README for more details, and see also addOption() and requiredOption().
        *
        * @example
-       * // simple boolean defaulting to undefined
-       * program.option('-p, --pepper', 'add pepper');
-       *
-       * program.pepper
-       * // => undefined
-       *
-       * --pepper
-       * program.pepper
-       * // => true
-       *
-       * // simple boolean defaulting to true (unless non-negated option is also defined)
-       * program.option('-C, --no-cheese', 'remove cheese');
-       *
-       * program.cheese
-       * // => true
-       *
-       * --no-cheese
-       * program.cheese
-       * // => false
-       *
-       * // required argument
-       * program.option('-C, --chdir <path>', 'change the working directory');
-       *
-       * --chdir /tmp
-       * program.chdir
-       * // => "/tmp"
-       *
-       * // optional argument
-       * program.option('-c, --cheese [type]', 'add cheese [marble]');
+       * program
+       *     .option('-p, --pepper', 'add pepper')
+       *     .option('-p, --pizza-type <TYPE>', 'type of pizza') // required option-argument
+       *     .option('-c, --cheese [CHEESE]', 'add extra cheese', 'mozzarella') // optional option-argument with default
+       *     .option('-t, --tip <VALUE>', 'add tip to purchase cost', parseFloat) // custom parse function
        *
        * @param {string} flags
        * @param {string} [description]
-       * @param {Function|*} [fn] - custom option processing function or default value
+       * @param {Function|*} [parseArg] - custom option processing function or default value
        * @param {*} [defaultValue]
        * @return {Command} `this` command for chaining
        */
-      option(flags, description, fn, defaultValue) {
-        return this._optionEx({}, flags, description, fn, defaultValue);
+      option(flags, description, parseArg, defaultValue) {
+        return this._optionEx({}, flags, description, parseArg, defaultValue);
       }
       /**
       * Add a required option which must have a value after parsing. This usually means
@@ -1534,12 +1530,12 @@ Expecting one of '${allowedValues.join("', '")}'`);
       *
       * @param {string} flags
       * @param {string} [description]
-      * @param {Function|*} [fn] - custom option processing function or default value
+      * @param {Function|*} [parseArg] - custom option processing function or default value
       * @param {*} [defaultValue]
       * @return {Command} `this` command for chaining
       */
-      requiredOption(flags, description, fn, defaultValue) {
-        return this._optionEx({ mandatory: true }, flags, description, fn, defaultValue);
+      requiredOption(flags, description, parseArg, defaultValue) {
+        return this._optionEx({ mandatory: true }, flags, description, parseArg, defaultValue);
       }
       /**
        * Alter parsing of short flags with optional values.
@@ -1610,10 +1606,10 @@ Expecting one of '${allowedValues.join("', '")}'`);
         * @return {Command} `this` command for chaining
         */
       storeOptionsAsProperties(storeAsProperties = true) {
-        this._storeOptionsAsProperties = !!storeAsProperties;
         if (this.options.length) {
           throw new Error("call .storeOptionsAsProperties() before adding options");
         }
+        this._storeOptionsAsProperties = !!storeAsProperties;
         return this;
       }
       /**
@@ -1674,7 +1670,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
         */
       getOptionValueSourceWithGlobals(key) {
         let source;
-        getCommandAndParents(this).forEach((cmd) => {
+        this._getCommandAndAncestors().forEach((cmd) => {
           if (cmd.getOptionValueSource(key) !== void 0) {
             source = cmd.getOptionValueSource(key);
           }
@@ -1873,16 +1869,16 @@ Expecting one of '${allowedValues.join("', '")}'`);
         const subCommand = this._findCommand(commandName);
         if (!subCommand)
           this.help({ error: true });
-        let hookResult;
-        hookResult = this._chainOrCallSubCommandHook(hookResult, subCommand, "preSubcommand");
-        hookResult = this._chainOrCall(hookResult, () => {
+        let promiseChain;
+        promiseChain = this._chainOrCallSubCommandHook(promiseChain, subCommand, "preSubcommand");
+        promiseChain = this._chainOrCall(promiseChain, () => {
           if (subCommand._executableHandler) {
             this._executeSubCommand(subCommand, operands.concat(unknown));
           } else {
             return subCommand._parseCommand(operands, unknown);
           }
         });
-        return hookResult;
+        return promiseChain;
       }
       /**
        * Invoke help directly if possible, or dispatch if necessary.
@@ -1898,28 +1894,30 @@ Expecting one of '${allowedValues.join("', '")}'`);
         if (subCommand && !subCommand._executableHandler) {
           subCommand.help();
         }
-        return this._dispatchSubcommand(subcommandName, [], [this._helpLongFlag]);
+        return this._dispatchSubcommand(subcommandName, [], [
+          this._helpLongFlag || this._helpShortFlag
+        ]);
       }
       /**
-       * Check this.args against expected this._args.
+       * Check this.args against expected this.registeredArguments.
        *
        * @api private
        */
       _checkNumberOfArguments() {
-        this._args.forEach((arg, i) => {
+        this.registeredArguments.forEach((arg, i) => {
           if (arg.required && this.args[i] == null) {
             this.missingArgument(arg.name());
           }
         });
-        if (this._args.length > 0 && this._args[this._args.length - 1].variadic) {
+        if (this.registeredArguments.length > 0 && this.registeredArguments[this.registeredArguments.length - 1].variadic) {
           return;
         }
-        if (this.args.length > this._args.length) {
+        if (this.args.length > this.registeredArguments.length) {
           this._excessArguments(this.args);
         }
       }
       /**
-       * Process this.args using this._args and save as this.processedArgs!
+       * Process this.args using this.registeredArguments and save as this.processedArgs!
        *
        * @api private
        */
@@ -1927,21 +1925,14 @@ Expecting one of '${allowedValues.join("', '")}'`);
         const myParseArg = (argument, value, previous) => {
           let parsedValue = value;
           if (value !== null && argument.parseArg) {
-            try {
-              parsedValue = argument.parseArg(value, previous);
-            } catch (err) {
-              if (err.code === "commander.invalidArgument") {
-                const message = `error: command-argument value '${value}' is invalid for argument '${argument.name()}'. ${err.message}`;
-                this.error(message, { exitCode: err.exitCode, code: err.code });
-              }
-              throw err;
-            }
+            const invalidValueMessage = `error: command-argument value '${value}' is invalid for argument '${argument.name()}'.`;
+            parsedValue = this._callParseArg(argument, value, previous, invalidValueMessage);
           }
           return parsedValue;
         };
         this._checkNumberOfArguments();
         const processedArgs = [];
-        this._args.forEach((declaredArg, index) => {
+        this.registeredArguments.forEach((declaredArg, index) => {
           let value = declaredArg.defaultValue;
           if (declaredArg.variadic) {
             if (index < this.args.length) {
@@ -1988,7 +1979,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
       _chainOrCallHooks(promise, event) {
         let result = promise;
         const hooks = [];
-        getCommandAndParents(this).reverse().filter((cmd) => cmd._lifeCycleHooks[event] !== void 0).forEach((hookedCommand) => {
+        this._getCommandAndAncestors().reverse().filter((cmd) => cmd._lifeCycleHooks[event] !== void 0).forEach((hookedCommand) => {
           hookedCommand._lifeCycleHooks[event].forEach((callback) => {
             hooks.push({ hookedCommand, callback });
           });
@@ -2060,16 +2051,16 @@ Expecting one of '${allowedValues.join("', '")}'`);
         if (this._actionHandler) {
           checkForUnknownOptions();
           this._processArguments();
-          let actionResult;
-          actionResult = this._chainOrCallHooks(actionResult, "preAction");
-          actionResult = this._chainOrCall(actionResult, () => this._actionHandler(this.processedArgs));
+          let promiseChain;
+          promiseChain = this._chainOrCallHooks(promiseChain, "preAction");
+          promiseChain = this._chainOrCall(promiseChain, () => this._actionHandler(this.processedArgs));
           if (this.parent) {
-            actionResult = this._chainOrCall(actionResult, () => {
+            promiseChain = this._chainOrCall(promiseChain, () => {
               this.parent.emit(commandEvent, operands, unknown);
             });
           }
-          actionResult = this._chainOrCallHooks(actionResult, "postAction");
-          return actionResult;
+          promiseChain = this._chainOrCallHooks(promiseChain, "postAction");
+          return promiseChain;
         }
         if (this.parent && this.parent.listenerCount(commandEvent)) {
           checkForUnknownOptions();
@@ -2122,13 +2113,13 @@ Expecting one of '${allowedValues.join("', '")}'`);
        * @api private
        */
       _checkForMissingMandatoryOptions() {
-        for (let cmd = this; cmd; cmd = cmd.parent) {
+        this._getCommandAndAncestors().forEach((cmd) => {
           cmd.options.forEach((anOption) => {
             if (anOption.mandatory && cmd.getOptionValue(anOption.attributeName()) === void 0) {
               cmd.missingMandatoryOptionValue(anOption);
             }
           });
-        }
+        });
       }
       /**
        * Display an error message if conflicting options are used together in this.
@@ -2164,9 +2155,9 @@ Expecting one of '${allowedValues.join("', '")}'`);
        * @api private
        */
       _checkForConflictingOptions() {
-        for (let cmd = this; cmd; cmd = cmd.parent) {
+        this._getCommandAndAncestors().forEach((cmd) => {
           cmd._checkForConflictingLocalOptions();
-        }
+        });
       }
       /**
        * Parse options from `argv` removing known options,
@@ -2300,7 +2291,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
        * @return {Object}
        */
       optsWithGlobals() {
-        return getCommandAndParents(this).reduce(
+        return this._getCommandAndAncestors().reduce(
           (combinedOptions, cmd) => Object.assign(combinedOptions, cmd.opts()),
           {}
         );
@@ -2456,7 +2447,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
       _excessArguments(receivedArgs) {
         if (this._allowExcessArguments)
           return;
-        const expected = this._args.length;
+        const expected = this.registeredArguments.length;
         const s = expected === 1 ? "" : "s";
         const forSubcommand = this.parent ? ` for '${this.name()}'` : "";
         const message = `error: too many arguments${forSubcommand}. Expected ${expected} argument${s} but got ${receivedArgs.length}.`;
@@ -2483,17 +2474,16 @@ Expecting one of '${allowedValues.join("', '")}'`);
         this.error(message, { code: "commander.unknownCommand" });
       }
       /**
-       * Set the program version to `str`.
+       * Get or set the program version.
        *
-       * This method auto-registers the "-V, --version" flag
-       * which will print the version number when passed.
+       * This method auto-registers the "-V, --version" option which will print the version number.
        *
-       * You can optionally supply the  flags and description to override the defaults.
+       * You can optionally supply the flags and description to override the defaults.
        *
-       * @param {string} str
+       * @param {string} [str]
        * @param {string} [flags]
        * @param {string} [description]
-       * @return {this | string} `this` command for chaining, or version string if no arguments
+       * @return {this | string | undefined} `this` command for chaining, or version string if no arguments
        */
       version(str, flags, description) {
         if (str === void 0)
@@ -2583,13 +2573,13 @@ Expecting one of '${allowedValues.join("', '")}'`);
         if (str === void 0) {
           if (this._usage)
             return this._usage;
-          const args = this._args.map((arg) => {
+          const args = this.registeredArguments.map((arg) => {
             return humanReadableArgName(arg);
           });
           return [].concat(
             this.options.length || this._hasHelpOption ? "[options]" : [],
             this.commands.length ? "[command]" : [],
-            this._args.length ? args : []
+            this.registeredArguments.length ? args : []
           ).join(" ");
         }
         this._usage = str;
@@ -2632,7 +2622,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
        * program.executableDir('subcommands');
        *
        * @param {string} [path]
-       * @return {string|Command}
+       * @return {string|null|Command}
        */
       executableDir(path3) {
         if (path3 === void 0)
@@ -2683,7 +2673,7 @@ Expecting one of '${allowedValues.join("', '")}'`);
           contextOptions = void 0;
         }
         const context = this._getHelpContext(contextOptions);
-        getCommandAndParents(this).reverse().forEach((command) => command.emit("beforeAllHelp", context));
+        this._getCommandAndAncestors().reverse().forEach((command) => command.emit("beforeAllHelp", context));
         this.emit("beforeHelp", context);
         let helpInformation = this.helpInformation(context);
         if (deprecatedCallback) {
@@ -2693,9 +2683,11 @@ Expecting one of '${allowedValues.join("', '")}'`);
           }
         }
         context.write(helpInformation);
-        this.emit(this._helpLongFlag);
+        if (this._helpLongFlag) {
+          this.emit(this._helpLongFlag);
+        }
         this.emit("afterHelp", context);
-        getCommandAndParents(this).forEach((command) => command.emit("afterAllHelp", context));
+        this._getCommandAndAncestors().forEach((command) => command.emit("afterAllHelp", context));
       }
       /**
        * You can pass in flags and a description to override the help
@@ -2801,20 +2793,13 @@ Expecting one of '${allowedValues.join("', '")}'`);
         return arg;
       });
     }
-    function getCommandAndParents(startCommand) {
-      const result = [];
-      for (let command = startCommand; command; command = command.parent) {
-        result.push(command);
-      }
-      return result;
-    }
     exports.Command = Command2;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/index.js
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/index.js
 var require_commander = __commonJS({
-  "../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/index.js"(exports, module) {
     var { Argument: Argument2 } = require_argument();
     var { Command: Command2 } = require_command();
     var { CommanderError: CommanderError2, InvalidArgumentError: InvalidArgumentError2 } = require_error();
@@ -2822,19 +2807,19 @@ var require_commander = __commonJS({
     var { Option: Option2 } = require_option();
     exports = module.exports = new Command2();
     exports.program = exports;
-    exports.Argument = Argument2;
     exports.Command = Command2;
-    exports.CommanderError = CommanderError2;
+    exports.Option = Option2;
+    exports.Argument = Argument2;
     exports.Help = Help2;
+    exports.CommanderError = CommanderError2;
     exports.InvalidArgumentError = InvalidArgumentError2;
     exports.InvalidOptionArgumentError = InvalidArgumentError2;
-    exports.Option = Option2;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/universalify@2.0.0/node_modules/universalify/index.js
+// ../../common/temp/node_modules/.pnpm/universalify@2.0.1/node_modules/universalify/index.js
 var require_universalify = __commonJS({
-  "../../common/temp/node_modules/.pnpm/universalify@2.0.0/node_modules/universalify/index.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/universalify@2.0.1/node_modules/universalify/index.js"(exports) {
     "use strict";
     exports.fromCallback = function(fn) {
       return Object.defineProperty(function(...args) {
@@ -2842,11 +2827,8 @@ var require_universalify = __commonJS({
           fn.apply(this, args);
         else {
           return new Promise((resolve, reject) => {
-            fn.call(
-              this,
-              ...args,
-              (err, res) => err != null ? reject(err) : resolve(res)
-            );
+            args.push((err, res) => err != null ? reject(err) : resolve(res));
+            fn.apply(this, args);
           });
         }
       }, "name", { value: fn.name });
@@ -2856,8 +2838,10 @@ var require_universalify = __commonJS({
         const cb = args[args.length - 1];
         if (typeof cb !== "function")
           return fn.apply(this, args);
-        else
-          fn.apply(this, args.slice(0, -1)).then((r) => cb(null, r), cb);
+        else {
+          args.pop();
+          fn.apply(this, args).then((r) => cb(null, r), cb);
+        }
       }, "name", { value: fn.name });
     };
   }
@@ -2978,7 +2962,7 @@ var require_polyfills = __commonJS({
           Object.setPrototypeOf(read, fs$read);
         return read;
       }(fs5.read);
-      fs5.readSync = typeof fs5.readSync !== "function" ? fs5.readSync : function(fs$readSync) {
+      fs5.readSync = typeof fs5.readSync !== "function" ? fs5.readSync : /* @__PURE__ */ function(fs$readSync) {
         return function(fd, buffer, offset, length, position) {
           var eagCounter = 0;
           while (true) {
@@ -3671,9 +3655,9 @@ var require_graceful_fs = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/fs/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/fs/index.js
 var require_fs = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/fs/index.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/fs/index.js"(exports) {
     "use strict";
     var u = require_universalify().fromCallback;
     var fs5 = require_graceful_fs();
@@ -3787,9 +3771,9 @@ var require_fs = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/utils.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/mkdirs/utils.js
 var require_utils = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/utils.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/mkdirs/utils.js"(exports, module) {
     "use strict";
     var path2 = __require("path");
     module.exports.checkPath = function checkPath(pth) {
@@ -3805,9 +3789,9 @@ var require_utils = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/make-dir.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/mkdirs/make-dir.js
 var require_make_dir = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports, module) {
     "use strict";
     var fs5 = require_fs();
     var { checkPath } = require_utils();
@@ -3834,9 +3818,9 @@ var require_make_dir = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/mkdirs/index.js
 var require_mkdirs = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/mkdirs/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/mkdirs/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var { makeDir: _makeDir, makeDirSync } = require_make_dir();
@@ -3853,9 +3837,9 @@ var require_mkdirs = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/path-exists/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/path-exists/index.js
 var require_path_exists = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/path-exists/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/path-exists/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var fs5 = require_fs();
@@ -3869,22 +3853,27 @@ var require_path_exists = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/utimes.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/util/utimes.js
 var require_utimes = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/utimes.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/util/utimes.js"(exports, module) {
     "use strict";
-    var fs5 = require_graceful_fs();
-    function utimesMillis(path2, atime, mtime, callback) {
-      fs5.open(path2, "r+", (err, fd) => {
-        if (err)
-          return callback(err);
-        fs5.futimes(fd, atime, mtime, (futimesErr) => {
-          fs5.close(fd, (closeErr) => {
-            if (callback)
-              callback(futimesErr || closeErr);
-          });
-        });
-      });
+    var fs5 = require_fs();
+    var u = require_universalify().fromPromise;
+    async function utimesMillis(path2, atime, mtime) {
+      const fd = await fs5.open(path2, "r+");
+      let closeErr = null;
+      try {
+        await fs5.futimes(fd, atime, mtime);
+      } finally {
+        try {
+          await fs5.close(fd);
+        } catch (e) {
+          closeErr = e;
+        }
+      }
+      if (closeErr) {
+        throw closeErr;
+      }
     }
     function utimesMillisSync(path2, atime, mtime) {
       const fd = fs5.openSync(path2, "r+");
@@ -3892,19 +3881,19 @@ var require_utimes = __commonJS({
       return fs5.closeSync(fd);
     }
     module.exports = {
-      utimesMillis,
+      utimesMillis: u(utimesMillis),
       utimesMillisSync
     };
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/stat.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/util/stat.js
 var require_stat = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/util/stat.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/util/stat.js"(exports, module) {
     "use strict";
     var fs5 = require_fs();
     var path2 = __require("path");
-    var util = __require("util");
+    var u = require_universalify().fromPromise;
     function getStats(src, dest, opts) {
       const statFunc = opts.dereference ? (file) => fs5.stat(file, { bigint: true }) : (file) => fs5.lstat(file, { bigint: true });
       return Promise.all([
@@ -3929,32 +3918,28 @@ var require_stat = __commonJS({
       }
       return { srcStat, destStat };
     }
-    function checkPaths(src, dest, funcName, opts, cb) {
-      util.callbackify(getStats)(src, dest, opts, (err, stats) => {
-        if (err)
-          return cb(err);
-        const { srcStat, destStat } = stats;
-        if (destStat) {
-          if (areIdentical(srcStat, destStat)) {
-            const srcBaseName = path2.basename(src);
-            const destBaseName = path2.basename(dest);
-            if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
-              return cb(null, { srcStat, destStat, isChangingCase: true });
-            }
-            return cb(new Error("Source and destination must not be the same."));
+    async function checkPaths(src, dest, funcName, opts) {
+      const { srcStat, destStat } = await getStats(src, dest, opts);
+      if (destStat) {
+        if (areIdentical(srcStat, destStat)) {
+          const srcBaseName = path2.basename(src);
+          const destBaseName = path2.basename(dest);
+          if (funcName === "move" && srcBaseName !== destBaseName && srcBaseName.toLowerCase() === destBaseName.toLowerCase()) {
+            return { srcStat, destStat, isChangingCase: true };
           }
-          if (srcStat.isDirectory() && !destStat.isDirectory()) {
-            return cb(new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`));
-          }
-          if (!srcStat.isDirectory() && destStat.isDirectory()) {
-            return cb(new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`));
-          }
+          throw new Error("Source and destination must not be the same.");
         }
-        if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
-          return cb(new Error(errMsg(src, dest, funcName)));
+        if (srcStat.isDirectory() && !destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`);
         }
-        return cb(null, { srcStat, destStat });
-      });
+        if (!srcStat.isDirectory() && destStat.isDirectory()) {
+          throw new Error(`Cannot overwrite directory '${dest}' with non-directory '${src}'.`);
+        }
+      }
+      if (srcStat.isDirectory() && isSrcSubdir(src, dest)) {
+        throw new Error(errMsg(src, dest, funcName));
+      }
+      return { srcStat, destStat };
     }
     function checkPathsSync(src, dest, funcName, opts) {
       const { srcStat, destStat } = getStatsSync(src, dest, opts);
@@ -3979,22 +3964,23 @@ var require_stat = __commonJS({
       }
       return { srcStat, destStat };
     }
-    function checkParentPaths(src, srcStat, dest, funcName, cb) {
+    async function checkParentPaths(src, srcStat, dest, funcName) {
       const srcParent = path2.resolve(path2.dirname(src));
       const destParent = path2.resolve(path2.dirname(dest));
       if (destParent === srcParent || destParent === path2.parse(destParent).root)
-        return cb();
-      fs5.stat(destParent, { bigint: true }, (err, destStat) => {
-        if (err) {
-          if (err.code === "ENOENT")
-            return cb();
-          return cb(err);
-        }
-        if (areIdentical(srcStat, destStat)) {
-          return cb(new Error(errMsg(src, dest, funcName)));
-        }
-        return checkParentPaths(src, srcStat, destParent, funcName, cb);
-      });
+        return;
+      let destStat;
+      try {
+        destStat = await fs5.stat(destParent, { bigint: true });
+      } catch (err) {
+        if (err.code === "ENOENT")
+          return;
+        throw err;
+      }
+      if (areIdentical(srcStat, destStat)) {
+        throw new Error(errMsg(src, dest, funcName));
+      }
+      return checkParentPaths(src, srcStat, destParent, funcName);
     }
     function checkParentPathsSync(src, srcStat, dest, funcName) {
       const srcParent = path2.resolve(path2.dirname(src));
@@ -4020,42 +4006,39 @@ var require_stat = __commonJS({
     function isSrcSubdir(src, dest) {
       const srcArr = path2.resolve(src).split(path2.sep).filter((i) => i);
       const destArr = path2.resolve(dest).split(path2.sep).filter((i) => i);
-      return srcArr.reduce((acc, cur, i) => acc && destArr[i] === cur, true);
+      return srcArr.every((cur, i) => destArr[i] === cur);
     }
     function errMsg(src, dest, funcName) {
       return `Cannot ${funcName} '${src}' to a subdirectory of itself, '${dest}'.`;
     }
     module.exports = {
-      checkPaths,
+      // checkPaths
+      checkPaths: u(checkPaths),
       checkPathsSync,
-      checkParentPaths,
+      // checkParent
+      checkParentPaths: u(checkParentPaths),
       checkParentPathsSync,
+      // Misc
       isSrcSubdir,
       areIdentical
     };
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/copy/copy.js
 var require_copy = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/copy/copy.js"(exports, module) {
     "use strict";
-    var fs5 = require_graceful_fs();
+    var fs5 = require_fs();
     var path2 = __require("path");
-    var mkdirs = require_mkdirs().mkdirs;
-    var pathExists = require_path_exists().pathExists;
-    var utimesMillis = require_utimes().utimesMillis;
+    var { mkdirs } = require_mkdirs();
+    var { pathExists } = require_path_exists();
+    var { utimesMillis } = require_utimes();
     var stat = require_stat();
-    function copy(src, dest, opts, cb) {
-      if (typeof opts === "function" && !cb) {
-        cb = opts;
-        opts = {};
-      } else if (typeof opts === "function") {
+    async function copy(src, dest, opts = {}) {
+      if (typeof opts === "function") {
         opts = { filter: opts };
       }
-      cb = cb || function() {
-      };
-      opts = opts || {};
       opts.clobber = "clobber" in opts ? !!opts.clobber : true;
       opts.overwrite = "overwrite" in opts ? !!opts.overwrite : opts.clobber;
       if (opts.preserveTimestamps && process.arch === "ia32") {
@@ -4065,212 +4048,119 @@ var require_copy = __commonJS({
           "fs-extra-WARN0001"
         );
       }
-      stat.checkPaths(src, dest, "copy", opts, (err, stats) => {
-        if (err)
-          return cb(err);
-        const { srcStat, destStat } = stats;
-        stat.checkParentPaths(src, srcStat, dest, "copy", (err2) => {
-          if (err2)
-            return cb(err2);
-          runFilter(src, dest, opts, (err3, include) => {
-            if (err3)
-              return cb(err3);
-            if (!include)
-              return cb();
-            checkParentDir(destStat, src, dest, opts, cb);
-          });
-        });
-      });
-    }
-    function checkParentDir(destStat, src, dest, opts, cb) {
+      const { srcStat, destStat } = await stat.checkPaths(src, dest, "copy", opts);
+      await stat.checkParentPaths(src, srcStat, dest, "copy");
+      const include = await runFilter(src, dest, opts);
+      if (!include)
+        return;
       const destParent = path2.dirname(dest);
-      pathExists(destParent, (err, dirExists) => {
-        if (err)
-          return cb(err);
-        if (dirExists)
-          return getStats(destStat, src, dest, opts, cb);
-        mkdirs(destParent, (err2) => {
-          if (err2)
-            return cb(err2);
-          return getStats(destStat, src, dest, opts, cb);
-        });
-      });
-    }
-    function runFilter(src, dest, opts, cb) {
-      if (!opts.filter)
-        return cb(null, true);
-      Promise.resolve(opts.filter(src, dest)).then((include) => cb(null, include), (error) => cb(error));
-    }
-    function getStats(destStat, src, dest, opts, cb) {
-      const stat2 = opts.dereference ? fs5.stat : fs5.lstat;
-      stat2(src, (err, srcStat) => {
-        if (err)
-          return cb(err);
-        if (srcStat.isDirectory())
-          return onDir(srcStat, destStat, src, dest, opts, cb);
-        else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice())
-          return onFile(srcStat, destStat, src, dest, opts, cb);
-        else if (srcStat.isSymbolicLink())
-          return onLink(destStat, src, dest, opts, cb);
-        else if (srcStat.isSocket())
-          return cb(new Error(`Cannot copy a socket file: ${src}`));
-        else if (srcStat.isFIFO())
-          return cb(new Error(`Cannot copy a FIFO pipe: ${src}`));
-        return cb(new Error(`Unknown file: ${src}`));
-      });
-    }
-    function onFile(srcStat, destStat, src, dest, opts, cb) {
-      if (!destStat)
-        return copyFile(srcStat, src, dest, opts, cb);
-      return mayCopyFile(srcStat, src, dest, opts, cb);
-    }
-    function mayCopyFile(srcStat, src, dest, opts, cb) {
-      if (opts.overwrite) {
-        fs5.unlink(dest, (err) => {
-          if (err)
-            return cb(err);
-          return copyFile(srcStat, src, dest, opts, cb);
-        });
-      } else if (opts.errorOnExist) {
-        return cb(new Error(`'${dest}' already exists`));
-      } else
-        return cb();
-    }
-    function copyFile(srcStat, src, dest, opts, cb) {
-      fs5.copyFile(src, dest, (err) => {
-        if (err)
-          return cb(err);
-        if (opts.preserveTimestamps)
-          return handleTimestampsAndMode(srcStat.mode, src, dest, cb);
-        return setDestMode(dest, srcStat.mode, cb);
-      });
-    }
-    function handleTimestampsAndMode(srcMode, src, dest, cb) {
-      if (fileIsNotWritable(srcMode)) {
-        return makeFileWritable(dest, srcMode, (err) => {
-          if (err)
-            return cb(err);
-          return setDestTimestampsAndMode(srcMode, src, dest, cb);
-        });
+      const dirExists = await pathExists(destParent);
+      if (!dirExists) {
+        await mkdirs(destParent);
       }
-      return setDestTimestampsAndMode(srcMode, src, dest, cb);
+      await getStatsAndPerformCopy(destStat, src, dest, opts);
+    }
+    async function runFilter(src, dest, opts) {
+      if (!opts.filter)
+        return true;
+      return opts.filter(src, dest);
+    }
+    async function getStatsAndPerformCopy(destStat, src, dest, opts) {
+      const statFn = opts.dereference ? fs5.stat : fs5.lstat;
+      const srcStat = await statFn(src);
+      if (srcStat.isDirectory())
+        return onDir(srcStat, destStat, src, dest, opts);
+      if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice())
+        return onFile(srcStat, destStat, src, dest, opts);
+      if (srcStat.isSymbolicLink())
+        return onLink(destStat, src, dest, opts);
+      if (srcStat.isSocket())
+        throw new Error(`Cannot copy a socket file: ${src}`);
+      if (srcStat.isFIFO())
+        throw new Error(`Cannot copy a FIFO pipe: ${src}`);
+      throw new Error(`Unknown file: ${src}`);
+    }
+    async function onFile(srcStat, destStat, src, dest, opts) {
+      if (!destStat)
+        return copyFile(srcStat, src, dest, opts);
+      if (opts.overwrite) {
+        await fs5.unlink(dest);
+        return copyFile(srcStat, src, dest, opts);
+      }
+      if (opts.errorOnExist) {
+        throw new Error(`'${dest}' already exists`);
+      }
+    }
+    async function copyFile(srcStat, src, dest, opts) {
+      await fs5.copyFile(src, dest);
+      if (opts.preserveTimestamps) {
+        if (fileIsNotWritable(srcStat.mode)) {
+          await makeFileWritable(dest, srcStat.mode);
+        }
+        const updatedSrcStat = await fs5.stat(src);
+        await utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
+      }
+      return fs5.chmod(dest, srcStat.mode);
     }
     function fileIsNotWritable(srcMode) {
       return (srcMode & 128) === 0;
     }
-    function makeFileWritable(dest, srcMode, cb) {
-      return setDestMode(dest, srcMode | 128, cb);
+    function makeFileWritable(dest, srcMode) {
+      return fs5.chmod(dest, srcMode | 128);
     }
-    function setDestTimestampsAndMode(srcMode, src, dest, cb) {
-      setDestTimestamps(src, dest, (err) => {
-        if (err)
-          return cb(err);
-        return setDestMode(dest, srcMode, cb);
-      });
-    }
-    function setDestMode(dest, srcMode, cb) {
-      return fs5.chmod(dest, srcMode, cb);
-    }
-    function setDestTimestamps(src, dest, cb) {
-      fs5.stat(src, (err, updatedSrcStat) => {
-        if (err)
-          return cb(err);
-        return utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime, cb);
-      });
-    }
-    function onDir(srcStat, destStat, src, dest, opts, cb) {
-      if (!destStat)
-        return mkDirAndCopy(srcStat.mode, src, dest, opts, cb);
-      return copyDir(src, dest, opts, cb);
-    }
-    function mkDirAndCopy(srcMode, src, dest, opts, cb) {
-      fs5.mkdir(dest, (err) => {
-        if (err)
-          return cb(err);
-        copyDir(src, dest, opts, (err2) => {
-          if (err2)
-            return cb(err2);
-          return setDestMode(dest, srcMode, cb);
-        });
-      });
-    }
-    function copyDir(src, dest, opts, cb) {
-      fs5.readdir(src, (err, items) => {
-        if (err)
-          return cb(err);
-        return copyDirItems(items, src, dest, opts, cb);
-      });
-    }
-    function copyDirItems(items, src, dest, opts, cb) {
-      const item = items.pop();
-      if (!item)
-        return cb();
-      return copyDirItem(items, item, src, dest, opts, cb);
-    }
-    function copyDirItem(items, item, src, dest, opts, cb) {
-      const srcItem = path2.join(src, item);
-      const destItem = path2.join(dest, item);
-      runFilter(srcItem, destItem, opts, (err, include) => {
-        if (err)
-          return cb(err);
+    async function onDir(srcStat, destStat, src, dest, opts) {
+      if (!destStat) {
+        await fs5.mkdir(dest);
+      }
+      const items = await fs5.readdir(src);
+      await Promise.all(items.map(async (item) => {
+        const srcItem = path2.join(src, item);
+        const destItem = path2.join(dest, item);
+        const include = await runFilter(srcItem, destItem, opts);
         if (!include)
-          return copyDirItems(items, src, dest, opts, cb);
-        stat.checkPaths(srcItem, destItem, "copy", opts, (err2, stats) => {
-          if (err2)
-            return cb(err2);
-          const { destStat } = stats;
-          getStats(destStat, srcItem, destItem, opts, (err3) => {
-            if (err3)
-              return cb(err3);
-            return copyDirItems(items, src, dest, opts, cb);
-          });
-        });
-      });
+          return;
+        const { destStat: destStat2 } = await stat.checkPaths(srcItem, destItem, "copy", opts);
+        return getStatsAndPerformCopy(destStat2, srcItem, destItem, opts);
+      }));
+      if (!destStat) {
+        await fs5.chmod(dest, srcStat.mode);
+      }
     }
-    function onLink(destStat, src, dest, opts, cb) {
-      fs5.readlink(src, (err, resolvedSrc) => {
-        if (err)
-          return cb(err);
-        if (opts.dereference) {
-          resolvedSrc = path2.resolve(process.cwd(), resolvedSrc);
-        }
-        if (!destStat) {
-          return fs5.symlink(resolvedSrc, dest, cb);
-        } else {
-          fs5.readlink(dest, (err2, resolvedDest) => {
-            if (err2) {
-              if (err2.code === "EINVAL" || err2.code === "UNKNOWN")
-                return fs5.symlink(resolvedSrc, dest, cb);
-              return cb(err2);
-            }
-            if (opts.dereference) {
-              resolvedDest = path2.resolve(process.cwd(), resolvedDest);
-            }
-            if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
-              return cb(new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`));
-            }
-            if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
-              return cb(new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`));
-            }
-            return copyLink(resolvedSrc, dest, cb);
-          });
-        }
-      });
-    }
-    function copyLink(resolvedSrc, dest, cb) {
-      fs5.unlink(dest, (err) => {
-        if (err)
-          return cb(err);
-        return fs5.symlink(resolvedSrc, dest, cb);
-      });
+    async function onLink(destStat, src, dest, opts) {
+      let resolvedSrc = await fs5.readlink(src);
+      if (opts.dereference) {
+        resolvedSrc = path2.resolve(process.cwd(), resolvedSrc);
+      }
+      if (!destStat) {
+        return fs5.symlink(resolvedSrc, dest);
+      }
+      let resolvedDest = null;
+      try {
+        resolvedDest = await fs5.readlink(dest);
+      } catch (e) {
+        if (e.code === "EINVAL" || e.code === "UNKNOWN")
+          return fs5.symlink(resolvedSrc, dest);
+        throw e;
+      }
+      if (opts.dereference) {
+        resolvedDest = path2.resolve(process.cwd(), resolvedDest);
+      }
+      if (stat.isSrcSubdir(resolvedSrc, resolvedDest)) {
+        throw new Error(`Cannot copy '${resolvedSrc}' to a subdirectory of itself, '${resolvedDest}'.`);
+      }
+      if (stat.isSrcSubdir(resolvedDest, resolvedSrc)) {
+        throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
+      }
+      await fs5.unlink(dest);
+      return fs5.symlink(resolvedSrc, dest);
     }
     module.exports = copy;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy-sync.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/copy/copy-sync.js
 var require_copy_sync = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/copy-sync.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/copy/copy-sync.js"(exports, module) {
     "use strict";
     var fs5 = require_graceful_fs();
     var path2 = __require("path");
@@ -4409,11 +4299,11 @@ var require_copy_sync = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/copy/index.js
 var require_copy2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/copy/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/copy/index.js"(exports, module) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     module.exports = {
       copy: u(require_copy()),
       copySync: require_copy_sync()
@@ -4421,9 +4311,9 @@ var require_copy2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/remove/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/remove/index.js
 var require_remove = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/remove/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/remove/index.js"(exports, module) {
     "use strict";
     var fs5 = require_graceful_fs();
     var u = require_universalify().fromCallback;
@@ -4440,9 +4330,9 @@ var require_remove = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/empty/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/empty/index.js
 var require_empty = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/empty/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/empty/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var fs5 = require_fs();
@@ -4479,47 +4369,40 @@ var require_empty = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/file.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/file.js
 var require_file = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/file.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/file.js"(exports, module) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     var path2 = __require("path");
-    var fs5 = require_graceful_fs();
+    var fs5 = require_fs();
     var mkdir = require_mkdirs();
-    function createFile(file, callback) {
-      function makeFile() {
-        fs5.writeFile(file, "", (err) => {
-          if (err)
-            return callback(err);
-          callback();
-        });
+    async function createFile(file) {
+      let stats;
+      try {
+        stats = await fs5.stat(file);
+      } catch {
       }
-      fs5.stat(file, (err, stats) => {
-        if (!err && stats.isFile())
-          return callback();
-        const dir = path2.dirname(file);
-        fs5.stat(dir, (err2, stats2) => {
-          if (err2) {
-            if (err2.code === "ENOENT") {
-              return mkdir.mkdirs(dir, (err3) => {
-                if (err3)
-                  return callback(err3);
-                makeFile();
-              });
-            }
-            return callback(err2);
-          }
-          if (stats2.isDirectory())
-            makeFile();
-          else {
-            fs5.readdir(dir, (err3) => {
-              if (err3)
-                return callback(err3);
-            });
-          }
-        });
-      });
+      if (stats && stats.isFile())
+        return;
+      const dir = path2.dirname(file);
+      let dirStats = null;
+      try {
+        dirStats = await fs5.stat(dir);
+      } catch (err) {
+        if (err.code === "ENOENT") {
+          await mkdir.mkdirs(dir);
+          await fs5.writeFile(file, "");
+          return;
+        } else {
+          throw err;
+        }
+      }
+      if (dirStats.isDirectory()) {
+        await fs5.writeFile(file, "");
+      } else {
+        await fs5.readdir(dir);
+      }
     }
     function createFileSync(file) {
       let stats;
@@ -4549,46 +4432,37 @@ var require_file = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/link.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/link.js
 var require_link = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/link.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/link.js"(exports, module) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     var path2 = __require("path");
-    var fs5 = require_graceful_fs();
+    var fs5 = require_fs();
     var mkdir = require_mkdirs();
-    var pathExists = require_path_exists().pathExists;
+    var { pathExists } = require_path_exists();
     var { areIdentical } = require_stat();
-    function createLink(srcpath, dstpath, callback) {
-      function makeLink(srcpath2, dstpath2) {
-        fs5.link(srcpath2, dstpath2, (err) => {
-          if (err)
-            return callback(err);
-          callback(null);
-        });
+    async function createLink(srcpath, dstpath) {
+      let dstStat;
+      try {
+        dstStat = await fs5.lstat(dstpath);
+      } catch {
       }
-      fs5.lstat(dstpath, (_4, dstStat) => {
-        fs5.lstat(srcpath, (err, srcStat) => {
-          if (err) {
-            err.message = err.message.replace("lstat", "ensureLink");
-            return callback(err);
-          }
-          if (dstStat && areIdentical(srcStat, dstStat))
-            return callback(null);
-          const dir = path2.dirname(dstpath);
-          pathExists(dir, (err2, dirExists) => {
-            if (err2)
-              return callback(err2);
-            if (dirExists)
-              return makeLink(srcpath, dstpath);
-            mkdir.mkdirs(dir, (err3) => {
-              if (err3)
-                return callback(err3);
-              makeLink(srcpath, dstpath);
-            });
-          });
-        });
-      });
+      let srcStat;
+      try {
+        srcStat = await fs5.lstat(srcpath);
+      } catch (err) {
+        err.message = err.message.replace("lstat", "ensureLink");
+        throw err;
+      }
+      if (dstStat && areIdentical(srcStat, dstStat))
+        return;
+      const dir = path2.dirname(dstpath);
+      const dirExists = await pathExists(dir);
+      if (!dirExists) {
+        await mkdir.mkdirs(dir);
+      }
+      await fs5.link(srcpath, dstpath);
     }
     function createLinkSync(srcpath, dstpath) {
       let dstStat;
@@ -4618,109 +4492,102 @@ var require_link = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-paths.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/symlink-paths.js
 var require_symlink_paths = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports, module) {
     "use strict";
     var path2 = __require("path");
-    var fs5 = require_graceful_fs();
-    var pathExists = require_path_exists().pathExists;
-    function symlinkPaths(srcpath, dstpath, callback) {
+    var fs5 = require_fs();
+    var { pathExists } = require_path_exists();
+    var u = require_universalify().fromPromise;
+    async function symlinkPaths(srcpath, dstpath) {
       if (path2.isAbsolute(srcpath)) {
-        return fs5.lstat(srcpath, (err) => {
-          if (err) {
-            err.message = err.message.replace("lstat", "ensureSymlink");
-            return callback(err);
-          }
-          return callback(null, {
-            toCwd: srcpath,
-            toDst: srcpath
-          });
-        });
-      } else {
-        const dstdir = path2.dirname(dstpath);
-        const relativeToDst = path2.join(dstdir, srcpath);
-        return pathExists(relativeToDst, (err, exists) => {
-          if (err)
-            return callback(err);
-          if (exists) {
-            return callback(null, {
-              toCwd: relativeToDst,
-              toDst: srcpath
-            });
-          } else {
-            return fs5.lstat(srcpath, (err2) => {
-              if (err2) {
-                err2.message = err2.message.replace("lstat", "ensureSymlink");
-                return callback(err2);
-              }
-              return callback(null, {
-                toCwd: srcpath,
-                toDst: path2.relative(dstdir, srcpath)
-              });
-            });
-          }
-        });
+        try {
+          await fs5.lstat(srcpath);
+        } catch (err) {
+          err.message = err.message.replace("lstat", "ensureSymlink");
+          throw err;
+        }
+        return {
+          toCwd: srcpath,
+          toDst: srcpath
+        };
       }
+      const dstdir = path2.dirname(dstpath);
+      const relativeToDst = path2.join(dstdir, srcpath);
+      const exists = await pathExists(relativeToDst);
+      if (exists) {
+        return {
+          toCwd: relativeToDst,
+          toDst: srcpath
+        };
+      }
+      try {
+        await fs5.lstat(srcpath);
+      } catch (err) {
+        err.message = err.message.replace("lstat", "ensureSymlink");
+        throw err;
+      }
+      return {
+        toCwd: srcpath,
+        toDst: path2.relative(dstdir, srcpath)
+      };
     }
     function symlinkPathsSync(srcpath, dstpath) {
-      let exists;
       if (path2.isAbsolute(srcpath)) {
-        exists = fs5.existsSync(srcpath);
-        if (!exists)
+        const exists2 = fs5.existsSync(srcpath);
+        if (!exists2)
           throw new Error("absolute srcpath does not exist");
         return {
           toCwd: srcpath,
           toDst: srcpath
         };
-      } else {
-        const dstdir = path2.dirname(dstpath);
-        const relativeToDst = path2.join(dstdir, srcpath);
-        exists = fs5.existsSync(relativeToDst);
-        if (exists) {
-          return {
-            toCwd: relativeToDst,
-            toDst: srcpath
-          };
-        } else {
-          exists = fs5.existsSync(srcpath);
-          if (!exists)
-            throw new Error("relative srcpath does not exist");
-          return {
-            toCwd: srcpath,
-            toDst: path2.relative(dstdir, srcpath)
-          };
-        }
       }
+      const dstdir = path2.dirname(dstpath);
+      const relativeToDst = path2.join(dstdir, srcpath);
+      const exists = fs5.existsSync(relativeToDst);
+      if (exists) {
+        return {
+          toCwd: relativeToDst,
+          toDst: srcpath
+        };
+      }
+      const srcExists = fs5.existsSync(srcpath);
+      if (!srcExists)
+        throw new Error("relative srcpath does not exist");
+      return {
+        toCwd: srcpath,
+        toDst: path2.relative(dstdir, srcpath)
+      };
     }
     module.exports = {
-      symlinkPaths,
+      symlinkPaths: u(symlinkPaths),
       symlinkPathsSync
     };
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-type.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/symlink-type.js
 var require_symlink_type = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink-type.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/symlink-type.js"(exports, module) {
     "use strict";
-    var fs5 = require_graceful_fs();
-    function symlinkType(srcpath, type, callback) {
-      callback = typeof type === "function" ? type : callback;
-      type = typeof type === "function" ? false : type;
-      if (type)
-        return callback(null, type);
-      fs5.lstat(srcpath, (err, stats) => {
-        if (err)
-          return callback(null, "file");
-        type = stats && stats.isDirectory() ? "dir" : "file";
-        callback(null, type);
-      });
-    }
-    function symlinkTypeSync(srcpath, type) {
-      let stats;
+    var fs5 = require_fs();
+    var u = require_universalify().fromPromise;
+    async function symlinkType(srcpath, type) {
       if (type)
         return type;
+      let stats;
+      try {
+        stats = await fs5.lstat(srcpath);
+      } catch {
+        return "file";
+      }
+      return stats && stats.isDirectory() ? "dir" : "file";
+    }
+    function symlinkTypeSync(srcpath, type) {
+      if (type)
+        return type;
+      let stats;
       try {
         stats = fs5.lstatSync(srcpath);
       } catch {
@@ -4729,69 +4596,46 @@ var require_symlink_type = __commonJS({
       return stats && stats.isDirectory() ? "dir" : "file";
     }
     module.exports = {
-      symlinkType,
+      symlinkType: u(symlinkType),
       symlinkTypeSync
     };
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/symlink.js
 var require_symlink = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/symlink.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/symlink.js"(exports, module) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     var path2 = __require("path");
     var fs5 = require_fs();
-    var _mkdirs = require_mkdirs();
-    var mkdirs = _mkdirs.mkdirs;
-    var mkdirsSync = _mkdirs.mkdirsSync;
-    var _symlinkPaths = require_symlink_paths();
-    var symlinkPaths = _symlinkPaths.symlinkPaths;
-    var symlinkPathsSync = _symlinkPaths.symlinkPathsSync;
-    var _symlinkType = require_symlink_type();
-    var symlinkType = _symlinkType.symlinkType;
-    var symlinkTypeSync = _symlinkType.symlinkTypeSync;
-    var pathExists = require_path_exists().pathExists;
+    var { mkdirs, mkdirsSync } = require_mkdirs();
+    var { symlinkPaths, symlinkPathsSync } = require_symlink_paths();
+    var { symlinkType, symlinkTypeSync } = require_symlink_type();
+    var { pathExists } = require_path_exists();
     var { areIdentical } = require_stat();
-    function createSymlink(srcpath, dstpath, type, callback) {
-      callback = typeof type === "function" ? type : callback;
-      type = typeof type === "function" ? false : type;
-      fs5.lstat(dstpath, (err, stats) => {
-        if (!err && stats.isSymbolicLink()) {
-          Promise.all([
-            fs5.stat(srcpath),
-            fs5.stat(dstpath)
-          ]).then(([srcStat, dstStat]) => {
-            if (areIdentical(srcStat, dstStat))
-              return callback(null);
-            _createSymlink(srcpath, dstpath, type, callback);
-          });
-        } else
-          _createSymlink(srcpath, dstpath, type, callback);
-      });
-    }
-    function _createSymlink(srcpath, dstpath, type, callback) {
-      symlinkPaths(srcpath, dstpath, (err, relative) => {
-        if (err)
-          return callback(err);
-        srcpath = relative.toDst;
-        symlinkType(relative.toCwd, type, (err2, type2) => {
-          if (err2)
-            return callback(err2);
-          const dir = path2.dirname(dstpath);
-          pathExists(dir, (err3, dirExists) => {
-            if (err3)
-              return callback(err3);
-            if (dirExists)
-              return fs5.symlink(srcpath, dstpath, type2, callback);
-            mkdirs(dir, (err4) => {
-              if (err4)
-                return callback(err4);
-              fs5.symlink(srcpath, dstpath, type2, callback);
-            });
-          });
-        });
-      });
+    async function createSymlink(srcpath, dstpath, type) {
+      let stats;
+      try {
+        stats = await fs5.lstat(dstpath);
+      } catch {
+      }
+      if (stats && stats.isSymbolicLink()) {
+        const [srcStat, dstStat] = await Promise.all([
+          fs5.stat(srcpath),
+          fs5.stat(dstpath)
+        ]);
+        if (areIdentical(srcStat, dstStat))
+          return;
+      }
+      const relative = await symlinkPaths(srcpath, dstpath);
+      srcpath = relative.toDst;
+      const toType = await symlinkType(relative.toCwd, type);
+      const dir = path2.dirname(dstpath);
+      if (!await pathExists(dir)) {
+        await mkdirs(dir);
+      }
+      return fs5.symlink(srcpath, dstpath, toType);
     }
     function createSymlinkSync(srcpath, dstpath, type) {
       let stats;
@@ -4822,9 +4666,9 @@ var require_symlink = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/index.js
 var require_ensure = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/ensure/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/ensure/index.js"(exports, module) {
     "use strict";
     var { createFile, createFileSync } = require_file();
     var { createLink, createLinkSync } = require_link();
@@ -4939,9 +4783,9 @@ var require_jsonfile = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/jsonfile.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/jsonfile.js
 var require_jsonfile2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/jsonfile.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/jsonfile.js"(exports, module) {
     "use strict";
     var jsonFile = require_jsonfile();
     module.exports = {
@@ -4954,39 +4798,27 @@ var require_jsonfile2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/output-file/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/output-file/index.js
 var require_output_file = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/output-file/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/output-file/index.js"(exports, module) {
     "use strict";
-    var u = require_universalify().fromCallback;
-    var fs5 = require_graceful_fs();
+    var u = require_universalify().fromPromise;
+    var fs5 = require_fs();
     var path2 = __require("path");
     var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
-    function outputFile(file, data, encoding, callback) {
-      if (typeof encoding === "function") {
-        callback = encoding;
-        encoding = "utf8";
-      }
+    async function outputFile(file, data, encoding = "utf-8") {
       const dir = path2.dirname(file);
-      pathExists(dir, (err, itDoes) => {
-        if (err)
-          return callback(err);
-        if (itDoes)
-          return fs5.writeFile(file, data, encoding, callback);
-        mkdir.mkdirs(dir, (err2) => {
-          if (err2)
-            return callback(err2);
-          fs5.writeFile(file, data, encoding, callback);
-        });
-      });
+      if (!await pathExists(dir)) {
+        await mkdir.mkdirs(dir);
+      }
+      return fs5.writeFile(file, data, encoding);
     }
     function outputFileSync(file, ...args) {
       const dir = path2.dirname(file);
-      if (fs5.existsSync(dir)) {
-        return fs5.writeFileSync(file, ...args);
+      if (!fs5.existsSync(dir)) {
+        mkdir.mkdirsSync(dir);
       }
-      mkdir.mkdirsSync(dir);
       fs5.writeFileSync(file, ...args);
     }
     module.exports = {
@@ -4996,9 +4828,9 @@ var require_output_file = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/output-json.js
 var require_output_json = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/output-json.js"(exports, module) {
     "use strict";
     var { stringify: stringify2 } = require_utils2();
     var { outputFile } = require_output_file();
@@ -5010,9 +4842,9 @@ var require_output_json = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json-sync.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/output-json-sync.js
 var require_output_json_sync = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/output-json-sync.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/output-json-sync.js"(exports, module) {
     "use strict";
     var { stringify: stringify2 } = require_utils2();
     var { outputFileSync } = require_output_file();
@@ -5024,9 +4856,9 @@ var require_output_json_sync = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/index.js
 var require_json = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/json/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/json/index.js"(exports, module) {
     "use strict";
     var u = require_universalify().fromPromise;
     var jsonFile = require_jsonfile2();
@@ -5042,92 +4874,61 @@ var require_json = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/move/move.js
 var require_move = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/move/move.js"(exports, module) {
     "use strict";
-    var fs5 = require_graceful_fs();
+    var fs5 = require_fs();
     var path2 = __require("path");
-    var copy = require_copy2().copy;
-    var remove = require_remove().remove;
-    var mkdirp = require_mkdirs().mkdirp;
-    var pathExists = require_path_exists().pathExists;
+    var { copy } = require_copy2();
+    var { remove } = require_remove();
+    var { mkdirp } = require_mkdirs();
+    var { pathExists } = require_path_exists();
     var stat = require_stat();
-    function move(src, dest, opts, cb) {
-      if (typeof opts === "function") {
-        cb = opts;
-        opts = {};
-      }
-      opts = opts || {};
+    async function move(src, dest, opts = {}) {
       const overwrite = opts.overwrite || opts.clobber || false;
-      stat.checkPaths(src, dest, "move", opts, (err, stats) => {
-        if (err)
-          return cb(err);
-        const { srcStat, isChangingCase = false } = stats;
-        stat.checkParentPaths(src, srcStat, dest, "move", (err2) => {
-          if (err2)
-            return cb(err2);
-          if (isParentRoot(dest))
-            return doRename(src, dest, overwrite, isChangingCase, cb);
-          mkdirp(path2.dirname(dest), (err3) => {
-            if (err3)
-              return cb(err3);
-            return doRename(src, dest, overwrite, isChangingCase, cb);
-          });
-        });
-      });
-    }
-    function isParentRoot(dest) {
-      const parent = path2.dirname(dest);
-      const parsedPath = path2.parse(parent);
-      return parsedPath.root === parent;
-    }
-    function doRename(src, dest, overwrite, isChangingCase, cb) {
-      if (isChangingCase)
-        return rename(src, dest, overwrite, cb);
-      if (overwrite) {
-        return remove(dest, (err) => {
-          if (err)
-            return cb(err);
-          return rename(src, dest, overwrite, cb);
-        });
+      const { srcStat, isChangingCase = false } = await stat.checkPaths(src, dest, "move", opts);
+      await stat.checkParentPaths(src, srcStat, dest, "move");
+      const destParent = path2.dirname(dest);
+      const parsedParentPath = path2.parse(destParent);
+      if (parsedParentPath.root !== destParent) {
+        await mkdirp(destParent);
       }
-      pathExists(dest, (err, destExists) => {
-        if (err)
-          return cb(err);
-        if (destExists)
-          return cb(new Error("dest already exists."));
-        return rename(src, dest, overwrite, cb);
-      });
+      return doRename(src, dest, overwrite, isChangingCase);
     }
-    function rename(src, dest, overwrite, cb) {
-      fs5.rename(src, dest, (err) => {
-        if (!err)
-          return cb();
-        if (err.code !== "EXDEV")
-          return cb(err);
-        return moveAcrossDevice(src, dest, overwrite, cb);
-      });
+    async function doRename(src, dest, overwrite, isChangingCase) {
+      if (!isChangingCase) {
+        if (overwrite) {
+          await remove(dest);
+        } else if (await pathExists(dest)) {
+          throw new Error("dest already exists.");
+        }
+      }
+      try {
+        await fs5.rename(src, dest);
+      } catch (err) {
+        if (err.code !== "EXDEV") {
+          throw err;
+        }
+        await moveAcrossDevice(src, dest, overwrite);
+      }
     }
-    function moveAcrossDevice(src, dest, overwrite, cb) {
+    async function moveAcrossDevice(src, dest, overwrite) {
       const opts = {
         overwrite,
         errorOnExist: true,
         preserveTimestamps: true
       };
-      copy(src, dest, opts, (err) => {
-        if (err)
-          return cb(err);
-        return remove(src, cb);
-      });
+      await copy(src, dest, opts);
+      return remove(src);
     }
     module.exports = move;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move-sync.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/move/move-sync.js
 var require_move_sync = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/move-sync.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/move/move-sync.js"(exports, module) {
     "use strict";
     var fs5 = require_graceful_fs();
     var path2 = __require("path");
@@ -5182,11 +4983,11 @@ var require_move_sync = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/move/index.js
 var require_move2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/move/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/move/index.js"(exports, module) {
     "use strict";
-    var u = require_universalify().fromCallback;
+    var u = require_universalify().fromPromise;
     module.exports = {
       move: u(require_move()),
       moveSync: require_move_sync()
@@ -5194,9 +4995,9 @@ var require_move2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/index.js
+// ../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/index.js
 var require_lib = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fs-extra@11.1.1/node_modules/fs-extra/lib/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/index.js"(exports, module) {
     "use strict";
     module.exports = {
       // Export promiseified graceful-fs:
@@ -6279,9 +6080,9 @@ var require_merge2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/array.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/array.js
 var require_array = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/array.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/array.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.splitWhen = exports.flatten = void 0;
@@ -6306,9 +6107,9 @@ var require_array = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/errno.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/errno.js
 var require_errno = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/errno.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/errno.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isEnoentCodeError = void 0;
@@ -6319,9 +6120,9 @@ var require_errno = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/fs.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/fs.js
 var require_fs2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/fs.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/fs.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createDirentFromStats = void 0;
@@ -6344,9 +6145,9 @@ var require_fs2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/path.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/path.js
 var require_path = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/path.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/path.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.convertPosixPathToPattern = exports.convertWindowsPathToPattern = exports.convertPathToPattern = exports.escapePosixPath = exports.escapeWindowsPath = exports.escape = exports.removeLeadingDotSegment = exports.makeAbsolute = exports.unixify = void 0;
@@ -6355,9 +6156,9 @@ var require_path = __commonJS({
     var IS_WINDOWS_PLATFORM = os2.platform() === "win32";
     var LEADING_DOT_SEGMENT_CHARACTERS_COUNT = 2;
     var POSIX_UNESCAPED_GLOB_SYMBOLS_RE = /(\\?)([()*?[\]{|}]|^!|[!+@](?=\()|\\(?![!()*+?@[\]{|}]))/g;
-    var WINDOWS_UNESCAPED_GLOB_SYMBOLS_RE = /(\\?)([(){}]|^!|[!+@](?=\())/g;
+    var WINDOWS_UNESCAPED_GLOB_SYMBOLS_RE = /(\\?)([()[\]{}]|^!|[!+@](?=\())/g;
     var DOS_DEVICE_PATH_RE = /^\\\\([.?])/;
-    var WINDOWS_BACKSLASHES_RE = /\\(?![!()+@{}])/g;
+    var WINDOWS_BACKSLASHES_RE = /\\(?![!()+@[\]{}])/g;
     function unixify(filepath) {
       return filepath.replace(/\\/g, "/");
     }
@@ -9368,9 +9169,9 @@ var require_micromatch = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/pattern.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/pattern.js
 var require_pattern = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/pattern.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/pattern.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.removeDuplicateSlashes = exports.matchAny = exports.convertPatternsToRe = exports.makeRe = exports.getPatternParts = exports.expandBraceExpansion = exports.expandPatternsWithBraceExpansion = exports.isAffectDepthOfReadingPattern = exports.endsWithSlashGlobStar = exports.hasGlobStar = exports.getBaseDirectory = exports.isPatternRelatedToParentDirectory = exports.getPatternsOutsideCurrentDirectory = exports.getPatternsInsideCurrentDirectory = exports.getPositivePatterns = exports.getNegativePatterns = exports.isPositivePattern = exports.isNegativePattern = exports.convertToNegativePattern = exports.convertToPositivePattern = exports.isDynamicPattern = exports.isStaticPattern = void 0;
@@ -9480,7 +9281,7 @@ var require_pattern = __commonJS({
     }
     exports.expandPatternsWithBraceExpansion = expandPatternsWithBraceExpansion;
     function expandBraceExpansion(pattern) {
-      const patterns = micromatch.braces(pattern, { expand: true, nodupes: true });
+      const patterns = micromatch.braces(pattern, { expand: true, nodupes: true, keepEscaping: true });
       patterns.sort((a, b) => a.length - b.length);
       return patterns.filter((pattern2) => pattern2 !== "");
     }
@@ -9516,9 +9317,9 @@ var require_pattern = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/stream.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/stream.js
 var require_stream = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/stream.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/stream.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.merge = void 0;
@@ -9539,9 +9340,9 @@ var require_stream = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/string.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/string.js
 var require_string = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/string.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/string.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isEmpty = exports.isString = void 0;
@@ -9556,9 +9357,9 @@ var require_string = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/index.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/index.js
 var require_utils5 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/utils/index.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/utils/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.string = exports.stream = exports.pattern = exports.path = exports.fs = exports.errno = exports.array = void 0;
@@ -9579,9 +9380,9 @@ var require_utils5 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/managers/tasks.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/managers/tasks.js
 var require_tasks = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/managers/tasks.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/managers/tasks.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.convertPatternGroupToTask = exports.convertPatternGroupsToTasks = exports.groupPatternsByBaseDirectory = exports.getNegativePatternsAsPositive = exports.getPositivePatterns = exports.convertPatternsToTasks = exports.generate = void 0;
@@ -10244,19 +10045,19 @@ var require_reusify = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fastq@1.15.0/node_modules/fastq/queue.js
+// ../../common/temp/node_modules/.pnpm/fastq@1.17.1/node_modules/fastq/queue.js
 var require_queue = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fastq@1.15.0/node_modules/fastq/queue.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fastq@1.17.1/node_modules/fastq/queue.js"(exports, module) {
     "use strict";
     var reusify = require_reusify();
-    function fastqueue(context, worker, concurrency) {
+    function fastqueue(context, worker, _concurrency) {
       if (typeof context === "function") {
-        concurrency = worker;
+        _concurrency = worker;
         worker = context;
         context = null;
       }
-      if (concurrency < 1) {
-        throw new Error("fastqueue concurrency must be greater than 1");
+      if (!(_concurrency >= 1)) {
+        throw new Error("fastqueue concurrency must be equal to or greater than 1");
       }
       var cache = reusify(Task);
       var queueHead = null;
@@ -10269,7 +10070,21 @@ var require_queue = __commonJS({
         saturated: noop2,
         pause,
         paused: false,
-        concurrency,
+        get concurrency() {
+          return _concurrency;
+        },
+        set concurrency(value) {
+          if (!(value >= 1)) {
+            throw new Error("fastqueue concurrency must be equal to or greater than 1");
+          }
+          _concurrency = value;
+          if (self2.paused)
+            return;
+          for (; queueHead && _running < _concurrency; ) {
+            _running++;
+            release();
+          }
+        },
         running,
         resume,
         idle,
@@ -10310,7 +10125,12 @@ var require_queue = __commonJS({
         if (!self2.paused)
           return;
         self2.paused = false;
-        for (var i = 0; i < self2.concurrency; i++) {
+        if (queueHead === null) {
+          _running++;
+          release();
+          return;
+        }
+        for (; queueHead && _running < _concurrency; ) {
           _running++;
           release();
         }
@@ -10325,7 +10145,7 @@ var require_queue = __commonJS({
         current.value = value;
         current.callback = done || noop2;
         current.errorHandler = errorHandler;
-        if (_running === self2.concurrency || self2.paused) {
+        if (_running >= _concurrency || self2.paused) {
           if (queueTail) {
             queueTail.next = current;
             queueTail = current;
@@ -10345,7 +10165,8 @@ var require_queue = __commonJS({
         current.release = release;
         current.value = value;
         current.callback = done || noop2;
-        if (_running === self2.concurrency || self2.paused) {
+        current.errorHandler = errorHandler;
+        if (_running >= _concurrency || self2.paused) {
           if (queueHead) {
             current.next = queueHead;
             queueHead = current;
@@ -10364,7 +10185,7 @@ var require_queue = __commonJS({
           cache.release(holder);
         }
         var next = queueHead;
-        if (next) {
+        if (next && _running <= _concurrency) {
           if (!self2.paused) {
             if (queueTail === queueHead) {
               queueTail = null;
@@ -10420,9 +10241,9 @@ var require_queue = __commonJS({
         self2.release(self2);
       };
     }
-    function queueAsPromised(context, worker, concurrency) {
+    function queueAsPromised(context, worker, _concurrency) {
       if (typeof context === "function") {
-        concurrency = worker;
+        _concurrency = worker;
         worker = context;
         context = null;
       }
@@ -10431,7 +10252,7 @@ var require_queue = __commonJS({
           cb(null, res);
         }, cb);
       }
-      var queue = fastqueue(context, asyncWrapper, concurrency);
+      var queue = fastqueue(context, asyncWrapper, _concurrency);
       var pushCb = queue.push;
       var unshiftCb = queue.unshift;
       queue.push = push;
@@ -10872,9 +10693,9 @@ var require_out3 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/reader.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/reader.js
 var require_reader2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/reader.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/reader.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var path2 = __require("path");
@@ -10911,9 +10732,9 @@ var require_reader2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/stream.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/stream.js
 var require_stream3 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/stream.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/stream.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var stream_1 = __require("stream");
@@ -10968,9 +10789,9 @@ var require_stream3 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/async.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/async.js
 var require_async5 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/async.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/async.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var fsWalk = require_out3();
@@ -11007,9 +10828,9 @@ var require_async5 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/matchers/matcher.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/matchers/matcher.js
 var require_matcher = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/matchers/matcher.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/matchers/matcher.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var utils = require_utils5();
@@ -11058,9 +10879,9 @@ var require_matcher = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/matchers/partial.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/matchers/partial.js
 var require_partial = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/matchers/partial.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/matchers/partial.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var matcher_1 = require_matcher();
@@ -11095,9 +10916,9 @@ var require_partial = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/filters/deep.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/filters/deep.js
 var require_deep = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/filters/deep.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/filters/deep.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var utils = require_utils5();
@@ -11160,9 +10981,9 @@ var require_deep = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/filters/entry.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/filters/entry.js
 var require_entry = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/filters/entry.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/filters/entry.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var utils = require_utils5();
@@ -11226,9 +11047,9 @@ var require_entry = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/filters/error.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/filters/error.js
 var require_error2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/filters/error.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/filters/error.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var utils = require_utils5();
@@ -11247,9 +11068,9 @@ var require_error2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/transformers/entry.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/transformers/entry.js
 var require_entry2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/transformers/entry.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/transformers/entry.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var utils = require_utils5();
@@ -11279,9 +11100,9 @@ var require_entry2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/provider.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/provider.js
 var require_provider = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/provider.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/provider.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var path2 = __require("path");
@@ -11333,9 +11154,9 @@ var require_provider = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/async.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/async.js
 var require_async6 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/async.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/async.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var async_1 = require_async5();
@@ -11362,9 +11183,9 @@ var require_async6 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/stream.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/stream.js
 var require_stream4 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/stream.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/stream.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var stream_1 = __require("stream");
@@ -11396,9 +11217,9 @@ var require_stream4 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/sync.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/sync.js
 var require_sync5 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/readers/sync.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/readers/sync.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var fsStat = require_out();
@@ -11444,9 +11265,9 @@ var require_sync5 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/sync.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/sync.js
 var require_sync6 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/providers/sync.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/providers/sync.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var sync_1 = require_sync5();
@@ -11473,9 +11294,9 @@ var require_sync6 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/settings.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/settings.js
 var require_settings4 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/settings.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/settings.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DEFAULT_FILE_SYSTEM_ADAPTER = void 0;
@@ -11533,9 +11354,9 @@ var require_settings4 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/index.js
+// ../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/index.js
 var require_out4 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.1/node_modules/fast-glob/out/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fast-glob@3.3.2/node_modules/fast-glob/out/index.js"(exports, module) {
     "use strict";
     var taskManager = require_tasks();
     var async_1 = require_async6();
@@ -11739,9 +11560,9 @@ var require_dir_glob = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/ignore@5.2.4/node_modules/ignore/index.js
+// ../../common/temp/node_modules/.pnpm/ignore@5.3.1/node_modules/ignore/index.js
 var require_ignore = __commonJS({
-  "../../common/temp/node_modules/.pnpm/ignore@5.2.4/node_modules/ignore/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/ignore@5.3.1/node_modules/ignore/index.js"(exports, module) {
     function makeArray(subject) {
       return Array.isArray(subject) ? subject : [subject];
     }
@@ -11772,6 +11593,13 @@ var require_ignore = __commonJS({
       return slashes.slice(0, length - length % 2);
     };
     var REPLACERS = [
+      [
+        // remove BOM
+        // TODO:
+        // Other similar zero-width characters?
+        /^\uFEFF/,
+        () => EMPTY
+      ],
       // > Trailing spaces are ignored unless they are quoted with backslash ("\")
       [
         // (a\ ) -> (a )
@@ -12334,9 +12162,9 @@ var require_minimist = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/identity.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/identity.js
 var require_identity = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/identity.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/identity.js"(exports) {
     "use strict";
     var ALIAS = Symbol.for("yaml.alias");
     var DOC = Symbol.for("yaml.document");
@@ -12391,9 +12219,9 @@ var require_identity = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/visit.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/visit.js
 var require_visit = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/visit.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/visit.js"(exports) {
     "use strict";
     var identity = require_identity();
     var BREAK = Symbol("break visit");
@@ -12549,9 +12377,9 @@ var require_visit = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/directives.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/directives.js
 var require_directives = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/directives.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/directives.js"(exports) {
     "use strict";
     var identity = require_identity();
     var visit = require_visit();
@@ -12664,12 +12492,18 @@ var require_directives = __commonJS({
             onError("Verbatim tags must end with a >");
           return verbatim;
         }
-        const [, handle, suffix] = source.match(/^(.*!)([^!]*)$/);
+        const [, handle, suffix] = source.match(/^(.*!)([^!]*)$/s);
         if (!suffix)
           onError(`The ${source} tag has no suffix`);
         const prefix = this.tags[handle];
-        if (prefix)
-          return prefix + decodeURIComponent(suffix);
+        if (prefix) {
+          try {
+            return prefix + decodeURIComponent(suffix);
+          } catch (error) {
+            onError(String(error));
+            return null;
+          }
+        }
         if (handle === "!")
           return source;
         onError(`Could not resolve tag: ${source}`);
@@ -12714,9 +12548,9 @@ var require_directives = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/anchors.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/anchors.js
 var require_anchors = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/anchors.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/anchors.js"(exports) {
     "use strict";
     var identity = require_identity();
     var visit = require_visit();
@@ -12785,9 +12619,9 @@ var require_anchors = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/applyReviver.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/applyReviver.js
 var require_applyReviver = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/applyReviver.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/applyReviver.js"(exports) {
     "use strict";
     function applyReviver(reviver, obj, key, val) {
       if (val && typeof val === "object") {
@@ -12835,9 +12669,9 @@ var require_applyReviver = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/toJS.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/toJS.js
 var require_toJS = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/toJS.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/toJS.js"(exports) {
     "use strict";
     var identity = require_identity();
     function toJS(value, arg, ctx) {
@@ -12865,9 +12699,9 @@ var require_toJS = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Node.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Node.js
 var require_Node = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Node.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Node.js"(exports) {
     "use strict";
     var applyReviver = require_applyReviver();
     var identity = require_identity();
@@ -12906,9 +12740,9 @@ var require_Node = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Alias.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Alias.js
 var require_Alias = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Alias.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Alias.js"(exports) {
     "use strict";
     var anchors = require_anchors();
     var visit = require_visit();
@@ -13008,9 +12842,9 @@ var require_Alias = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Scalar.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Scalar.js
 var require_Scalar = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Scalar.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Scalar.js"(exports) {
     "use strict";
     var identity = require_identity();
     var Node = require_Node();
@@ -13038,9 +12872,9 @@ var require_Scalar = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/createNode.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/createNode.js
 var require_createNode = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/createNode.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/createNode.js"(exports) {
     "use strict";
     var Alias = require_Alias();
     var identity = require_identity();
@@ -13114,9 +12948,9 @@ var require_createNode = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Collection.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Collection.js
 var require_Collection = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Collection.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Collection.js"(exports) {
     "use strict";
     var createNode = require_createNode();
     var identity = require_identity();
@@ -13258,9 +13092,9 @@ var require_Collection = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyComment.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyComment.js
 var require_stringifyComment = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyComment.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyComment.js"(exports) {
     "use strict";
     var stringifyComment = (str) => str.replace(/^(?!$)(?: $)?/gm, "#");
     function indentComment(comment, indent) {
@@ -13275,9 +13109,9 @@ var require_stringifyComment = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/foldFlowLines.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/foldFlowLines.js
 var require_foldFlowLines = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/foldFlowLines.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/foldFlowLines.js"(exports) {
     "use strict";
     var FOLD_FLOW = "flow";
     var FOLD_BLOCK = "block";
@@ -13304,7 +13138,7 @@ var require_foldFlowLines = __commonJS({
       let escStart = -1;
       let escEnd = -1;
       if (mode === FOLD_BLOCK) {
-        i = consumeMoreIndentedLines(text, i);
+        i = consumeMoreIndentedLines(text, i, indent.length);
         if (i !== -1)
           end = i + endStep;
       }
@@ -13328,8 +13162,8 @@ var require_foldFlowLines = __commonJS({
         }
         if (ch === "\n") {
           if (mode === FOLD_BLOCK)
-            i = consumeMoreIndentedLines(text, i);
-          end = i + endStep;
+            i = consumeMoreIndentedLines(text, i, indent.length);
+          end = i + indent.length + endStep;
           split = void 0;
         } else {
           if (ch === " " && prev && prev !== " " && prev !== "\n" && prev !== "	") {
@@ -13384,15 +13218,23 @@ ${indent}${text.slice(fold + 1, end2)}`;
       }
       return res;
     }
-    function consumeMoreIndentedLines(text, i) {
-      let ch = text[i + 1];
+    function consumeMoreIndentedLines(text, i, indent) {
+      let end = i;
+      let start = i + 1;
+      let ch = text[start];
       while (ch === " " || ch === "	") {
-        do {
-          ch = text[i += 1];
-        } while (ch && ch !== "\n");
-        ch = text[i + 1];
+        if (i < start + indent) {
+          ch = text[++i];
+        } else {
+          do {
+            ch = text[++i];
+          } while (ch && ch !== "\n");
+          end = i;
+          start = i + 1;
+          ch = text[start];
+        }
       }
-      return i;
+      return end;
     }
     exports.FOLD_BLOCK = FOLD_BLOCK;
     exports.FOLD_FLOW = FOLD_FLOW;
@@ -13401,9 +13243,9 @@ ${indent}${text.slice(fold + 1, end2)}`;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyString.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyString.js
 var require_stringifyString = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyString.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyString.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var foldFlowLines = require_foldFlowLines();
@@ -13676,9 +13518,9 @@ ${indent}`);
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringify.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringify.js
 var require_stringify2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringify.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringify.js"(exports) {
     "use strict";
     var anchors = require_anchors();
     var identity = require_identity();
@@ -13795,9 +13637,9 @@ ${ctx.indent}${str}`;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyPair.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyPair.js
 var require_stringifyPair = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyPair.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyPair.js"(exports) {
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
@@ -13928,9 +13770,9 @@ ${ctx.indent}`;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/log.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/log.js
 var require_log = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/log.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/log.js"(exports) {
     "use strict";
     function debug(logLevel, ...messages) {
       if (logLevel === "debug")
@@ -13949,9 +13791,9 @@ var require_log = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/addPairToJSMap.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/addPairToJSMap.js
 var require_addPairToJSMap = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/addPairToJSMap.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/addPairToJSMap.js"(exports) {
     "use strict";
     var log2 = require_log();
     var stringify2 = require_stringify2();
@@ -14043,9 +13885,9 @@ var require_addPairToJSMap = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Pair.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Pair.js
 var require_Pair = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/Pair.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/Pair.js"(exports) {
     "use strict";
     var createNode = require_createNode();
     var stringifyPair = require_stringifyPair();
@@ -14083,11 +13925,10 @@ var require_Pair = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyCollection.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyCollection.js
 var require_stringifyCollection = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyCollection.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyCollection.js"(exports) {
     "use strict";
-    var Collection = require_Collection();
     var identity = require_identity();
     var stringify2 = require_stringify2();
     var stringifyComment = require_stringifyComment();
@@ -14145,7 +13986,7 @@ ${indent}${line}` : "\n";
         onChompKeep();
       return str;
     }
-    function stringifyFlowCollection({ comment, items }, ctx, { flowChars, itemIndent, onComment }) {
+    function stringifyFlowCollection({ items }, ctx, { flowChars, itemIndent }) {
       const { indent, indentStep, flowCollectionPadding: fcPadding, options: { commentString } } = ctx;
       itemIndent += indentStep;
       const itemCtx = Object.assign({}, ctx, {
@@ -14158,13 +13999,13 @@ ${indent}${line}` : "\n";
       const lines = [];
       for (let i = 0; i < items.length; ++i) {
         const item = items[i];
-        let comment2 = null;
+        let comment = null;
         if (identity.isNode(item)) {
           if (item.spaceBefore)
             lines.push("");
           addCommentBefore(ctx, lines, item.commentBefore, false);
           if (item.comment)
-            comment2 = item.comment;
+            comment = item.comment;
         } else if (identity.isPair(item)) {
           const ik = identity.isNode(item.key) ? item.key : null;
           if (ik) {
@@ -14177,51 +14018,44 @@ ${indent}${line}` : "\n";
           const iv = identity.isNode(item.value) ? item.value : null;
           if (iv) {
             if (iv.comment)
-              comment2 = iv.comment;
+              comment = iv.comment;
             if (iv.commentBefore)
               reqNewline = true;
           } else if (item.value == null && ik?.comment) {
-            comment2 = ik.comment;
+            comment = ik.comment;
           }
         }
-        if (comment2)
+        if (comment)
           reqNewline = true;
-        let str2 = stringify2.stringify(item, itemCtx, () => comment2 = null);
+        let str = stringify2.stringify(item, itemCtx, () => comment = null);
         if (i < items.length - 1)
-          str2 += ",";
-        if (comment2)
-          str2 += stringifyComment.lineComment(str2, itemIndent, commentString(comment2));
-        if (!reqNewline && (lines.length > linesAtValue || str2.includes("\n")))
+          str += ",";
+        if (comment)
+          str += stringifyComment.lineComment(str, itemIndent, commentString(comment));
+        if (!reqNewline && (lines.length > linesAtValue || str.includes("\n")))
           reqNewline = true;
-        lines.push(str2);
+        lines.push(str);
         linesAtValue = lines.length;
       }
-      let str;
       const { start, end } = flowChars;
       if (lines.length === 0) {
-        str = start + end;
+        return start + end;
       } else {
         if (!reqNewline) {
           const len = lines.reduce((sum, line) => sum + line.length + 2, 2);
-          reqNewline = len > Collection.Collection.maxFlowStringSingleLineLength;
+          reqNewline = ctx.options.lineWidth > 0 && len > ctx.options.lineWidth;
         }
         if (reqNewline) {
-          str = start;
+          let str = start;
           for (const line of lines)
             str += line ? `
 ${indentStep}${indent}${line}` : "\n";
-          str += `
+          return `${str}
 ${indent}${end}`;
         } else {
-          str = `${start}${fcPadding}${lines.join(" ")}${fcPadding}${end}`;
+          return `${start}${fcPadding}${lines.join(" ")}${fcPadding}${end}`;
         }
       }
-      if (comment) {
-        str += stringifyComment.lineComment(str, indent, commentString(comment));
-        if (onComment)
-          onComment();
-      }
-      return str;
     }
     function addCommentBefore({ indent, options: { commentString } }, lines, comment, chompKeep) {
       if (comment && chompKeep)
@@ -14235,9 +14069,9 @@ ${indent}${end}`;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/YAMLMap.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/YAMLMap.js
 var require_YAMLMap = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/YAMLMap.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/YAMLMap.js"(exports) {
     "use strict";
     var stringifyCollection = require_stringifyCollection();
     var addPairToJSMap = require_addPairToJSMap();
@@ -14379,9 +14213,9 @@ var require_YAMLMap = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/map.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/map.js
 var require_map = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/map.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/map.js"(exports) {
     "use strict";
     var identity = require_identity();
     var YAMLMap = require_YAMLMap();
@@ -14401,9 +14235,9 @@ var require_map = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/YAMLSeq.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/YAMLSeq.js
 var require_YAMLSeq = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/nodes/YAMLSeq.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/nodes/YAMLSeq.js"(exports) {
     "use strict";
     var createNode = require_createNode();
     var stringifyCollection = require_stringifyCollection();
@@ -14517,9 +14351,9 @@ var require_YAMLSeq = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/seq.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/seq.js
 var require_seq = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/seq.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/seq.js"(exports) {
     "use strict";
     var identity = require_identity();
     var YAMLSeq = require_YAMLSeq();
@@ -14539,9 +14373,9 @@ var require_seq = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/string.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/string.js
 var require_string2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/string.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/string.js"(exports) {
     "use strict";
     var stringifyString = require_stringifyString();
     var string = {
@@ -14558,9 +14392,9 @@ var require_string2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/null.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/null.js
 var require_null = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/common/null.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/common/null.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var nullTag = {
@@ -14576,9 +14410,9 @@ var require_null = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/bool.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/bool.js
 var require_bool = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/bool.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/bool.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var boolTag = {
@@ -14600,9 +14434,9 @@ var require_bool = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyNumber.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyNumber.js
 var require_stringifyNumber = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyNumber.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyNumber.js"(exports) {
     "use strict";
     function stringifyNumber({ format, minFractionDigits, tag, value }) {
       if (typeof value === "bigint")
@@ -14627,9 +14461,9 @@ var require_stringifyNumber = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/float.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/float.js
 var require_float = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/float.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/float.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var stringifyNumber = require_stringifyNumber();
@@ -14673,9 +14507,9 @@ var require_float = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/int.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/int.js
 var require_int = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/int.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/int.js"(exports) {
     "use strict";
     var stringifyNumber = require_stringifyNumber();
     var intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -14718,9 +14552,9 @@ var require_int = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/schema.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/schema.js
 var require_schema = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/core/schema.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/core/schema.js"(exports) {
     "use strict";
     var map = require_map();
     var _null = require_null();
@@ -14746,9 +14580,9 @@ var require_schema = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/json/schema.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/json/schema.js
 var require_schema2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/json/schema.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/json/schema.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var map = require_map();
@@ -14813,14 +14647,15 @@ var require_schema2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/binary.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/binary.js
 var require_binary = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/binary.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/binary.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var stringifyString = require_stringifyString();
     var binary = {
       identify: (value) => value instanceof Uint8Array,
+      // Buffer inherits from Uint8Array
       default: false,
       tag: "tag:yaml.org,2002:binary",
       /**
@@ -14876,9 +14711,9 @@ var require_binary = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/pairs.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/pairs.js
 var require_pairs = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/pairs.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/pairs.js"(exports) {
     "use strict";
     var identity = require_identity();
     var Pair = require_Pair();
@@ -14954,9 +14789,9 @@ ${cn.comment}` : item.comment;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/omap.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/omap.js
 var require_omap = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/omap.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/omap.js"(exports) {
     "use strict";
     var identity = require_identity();
     var toJS = require_toJS();
@@ -15032,9 +14867,9 @@ var require_omap = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/bool.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/bool.js
 var require_bool2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/bool.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/bool.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     function boolStringify({ value, source }, ctx) {
@@ -15064,9 +14899,9 @@ var require_bool2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/float.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/float.js
 var require_float2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/float.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/float.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var stringifyNumber = require_stringifyNumber();
@@ -15113,9 +14948,9 @@ var require_float2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/int.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/int.js
 var require_int2 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/int.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/int.js"(exports) {
     "use strict";
     var stringifyNumber = require_stringifyNumber();
     var intIdentify = (value) => typeof value === "bigint" || Number.isInteger(value);
@@ -15192,9 +15027,9 @@ var require_int2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/set.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/set.js
 var require_set = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/set.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/set.js"(exports) {
     "use strict";
     var identity = require_identity();
     var Pair = require_Pair();
@@ -15281,9 +15116,9 @@ var require_set = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js
 var require_timestamp = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/timestamp.js"(exports) {
     "use strict";
     var stringifyNumber = require_stringifyNumber();
     function parseSexagesimal(str, asBigInt) {
@@ -15369,9 +15204,9 @@ var require_timestamp = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/schema.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/schema.js
 var require_schema3 = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/yaml-1.1/schema.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/yaml-1.1/schema.js"(exports) {
     "use strict";
     var map = require_map();
     var _null = require_null();
@@ -15411,9 +15246,9 @@ var require_schema3 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/tags.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/tags.js
 var require_tags = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/tags.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/tags.js"(exports) {
     "use strict";
     var map = require_map();
     var _null = require_null();
@@ -15494,9 +15329,9 @@ var require_tags = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/Schema.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/Schema.js
 var require_Schema = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/schema/Schema.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/schema/Schema.js"(exports) {
     "use strict";
     var identity = require_identity();
     var map = require_map();
@@ -15527,9 +15362,9 @@ var require_Schema = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyDocument.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyDocument.js
 var require_stringifyDocument = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/stringify/stringifyDocument.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/stringify/stringifyDocument.js"(exports) {
     "use strict";
     var identity = require_identity();
     var stringify2 = require_stringify2();
@@ -15607,9 +15442,9 @@ var require_stringifyDocument = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/Document.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/Document.js
 var require_Document = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/doc/Document.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/doc/Document.js"(exports) {
     "use strict";
     var Alias = require_Alias();
     var Collection = require_Collection();
@@ -15915,9 +15750,9 @@ var require_Document = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/errors.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/errors.js
 var require_errors = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/errors.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/errors.js"(exports) {
     "use strict";
     var YAMLError = class extends Error {
       constructor(name, pos, code, message) {
@@ -15980,9 +15815,9 @@ ${pointer}
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-props.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-props.js
 var require_resolve_props = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-props.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-props.js"(exports) {
     "use strict";
     function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnNewline }) {
       let spaceBefore = false;
@@ -16104,9 +15939,9 @@ var require_resolve_props = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-contains-newline.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-contains-newline.js
 var require_util_contains_newline = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-contains-newline.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-contains-newline.js"(exports) {
     "use strict";
     function containsNewline(key) {
       if (!key)
@@ -16146,9 +15981,9 @@ var require_util_contains_newline = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-flow-indent-check.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-flow-indent-check.js
 var require_util_flow_indent_check = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-flow-indent-check.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-flow-indent-check.js"(exports) {
     "use strict";
     var utilContainsNewline = require_util_contains_newline();
     function flowIndentCheck(indent, fc, onError) {
@@ -16164,9 +15999,9 @@ var require_util_flow_indent_check = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-map-includes.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-map-includes.js
 var require_util_map_includes = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-map-includes.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-map-includes.js"(exports) {
     "use strict";
     var identity = require_identity();
     function mapIncludes(ctx, items, search) {
@@ -16180,9 +16015,9 @@ var require_util_map_includes = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-block-map.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-block-map.js
 var require_resolve_block_map = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-block-map.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-block-map.js"(exports) {
     "use strict";
     var Pair = require_Pair();
     var YAMLMap = require_YAMLMap();
@@ -16284,9 +16119,9 @@ var require_resolve_block_map = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-block-seq.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-block-seq.js
 var require_resolve_block_seq = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-block-seq.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-block-seq.js"(exports) {
     "use strict";
     var YAMLSeq = require_YAMLSeq();
     var resolveProps = require_resolve_props();
@@ -16332,9 +16167,9 @@ var require_resolve_block_seq = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-end.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-end.js
 var require_resolve_end = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-end.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-end.js"(exports) {
     "use strict";
     function resolveEnd(end, offset, reqSpace, onError) {
       let comment = "";
@@ -16375,9 +16210,9 @@ var require_resolve_end = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-flow-collection.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-flow-collection.js
 var require_resolve_flow_collection = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-flow-collection.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-flow-collection.js"(exports) {
     "use strict";
     var identity = require_identity();
     var Pair = require_Pair();
@@ -16562,9 +16397,9 @@ var require_resolve_flow_collection = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-collection.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-collection.js
 var require_compose_collection = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-collection.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-collection.js"(exports) {
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
@@ -16618,9 +16453,9 @@ var require_compose_collection = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-block-scalar.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-block-scalar.js
 var require_resolve_block_scalar = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-block-scalar.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-block-scalar.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     function resolveBlockScalar(scalar, strict, onError) {
@@ -16795,9 +16630,9 @@ var require_resolve_block_scalar = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-flow-scalar.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-flow-scalar.js
 var require_resolve_flow_scalar = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/resolve-flow-scalar.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/resolve-flow-scalar.js"(exports) {
     "use strict";
     var Scalar = require_Scalar();
     var resolveEnd = require_resolve_end();
@@ -16966,18 +16801,31 @@ var require_resolve_flow_scalar = __commonJS({
     }
     var escapeCodes = {
       "0": "\0",
+      // null character
       a: "\x07",
+      // bell character
       b: "\b",
+      // backspace
       e: "\x1B",
+      // escape character
       f: "\f",
+      // form feed
       n: "\n",
+      // line feed
       r: "\r",
+      // carriage return
       t: "	",
+      // horizontal tab
       v: "\v",
+      // vertical tab
       N: "\x85",
+      // Unicode next line
       _: "\xA0",
+      // Unicode non-breaking space
       L: "\u2028",
+      // Unicode line separator
       P: "\u2029",
+      // Unicode paragraph separator
       " ": " ",
       '"': '"',
       "/": "/",
@@ -16999,9 +16847,9 @@ var require_resolve_flow_scalar = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-scalar.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-scalar.js
 var require_compose_scalar = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-scalar.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-scalar.js"(exports) {
     "use strict";
     var identity = require_identity();
     var Scalar = require_Scalar();
@@ -17072,9 +16920,9 @@ var require_compose_scalar = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-empty-scalar-position.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-empty-scalar-position.js
 var require_util_empty_scalar_position = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/util-empty-scalar-position.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/util-empty-scalar-position.js"(exports) {
     "use strict";
     function emptyScalarPosition(offset, before, pos) {
       if (before) {
@@ -17103,9 +16951,9 @@ var require_util_empty_scalar_position = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-node.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-node.js
 var require_compose_node = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-node.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-node.js"(exports) {
     "use strict";
     var Alias = require_Alias();
     var composeCollection = require_compose_collection();
@@ -17198,9 +17046,9 @@ var require_compose_node = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-doc.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-doc.js
 var require_compose_doc = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/compose-doc.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/compose-doc.js"(exports) {
     "use strict";
     var Document = require_Document();
     var composeNode = require_compose_node();
@@ -17239,9 +17087,9 @@ var require_compose_doc = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/composer.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/composer.js
 var require_composer = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/compose/composer.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/compose/composer.js"(exports) {
     "use strict";
     var directives = require_directives();
     var Document = require_Document();
@@ -17444,9 +17292,9 @@ ${end.comment}` : end.comment;
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst-scalar.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst-scalar.js
 var require_cst_scalar = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst-scalar.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst-scalar.js"(exports) {
     "use strict";
     var resolveBlockScalar = require_resolve_block_scalar();
     var resolveFlowScalar = require_resolve_flow_scalar();
@@ -17629,9 +17477,9 @@ var require_cst_scalar = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst-stringify.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst-stringify.js
 var require_cst_stringify = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst-stringify.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst-stringify.js"(exports) {
     "use strict";
     var stringify2 = (cst) => "type" in cst ? stringifyToken(cst) : stringifyItem(cst);
     function stringifyToken(token) {
@@ -17690,9 +17538,9 @@ var require_cst_stringify = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst-visit.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst-visit.js
 var require_cst_visit = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst-visit.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst-visit.js"(exports) {
     "use strict";
     var BREAK = Symbol("break visit");
     var SKIP = Symbol("skip children");
@@ -17752,9 +17600,9 @@ var require_cst_visit = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst.js
 var require_cst = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/cst.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/cst.js"(exports) {
     "use strict";
     var cstScalar = require_cst_scalar();
     var cstStringify = require_cst_stringify();
@@ -17854,9 +17702,9 @@ var require_cst = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/lexer.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/lexer.js
 var require_lexer = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/lexer.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/lexer.js"(exports) {
     "use strict";
     var cst = require_cst();
     function isEmpty(ch) {
@@ -18417,9 +18265,9 @@ var require_lexer = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/line-counter.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/line-counter.js
 var require_line_counter = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/line-counter.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/line-counter.js"(exports) {
     "use strict";
     var LineCounter = class {
       constructor() {
@@ -18448,9 +18296,9 @@ var require_line_counter = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/parser.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/parser.js
 var require_parser = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/parse/parser.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/parse/parser.js"(exports) {
     "use strict";
     var cst = require_cst();
     var lexer = require_lexer();
@@ -18895,7 +18743,7 @@ var require_parser = __commonJS({
             return;
         }
         if (this.indent >= map.indent) {
-          const atNextItem = !this.onKeyLine && this.indent === map.indent && it.sep;
+          const atNextItem = !this.onKeyLine && this.indent === map.indent && it.sep && this.type !== "seq-item-ind";
           let start = [];
           if (atNextItem && it.sep && !it.value) {
             const nl = [];
@@ -19298,9 +19146,9 @@ var require_parser = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/public-api.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/public-api.js
 var require_public_api = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/public-api.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/public-api.js"(exports) {
     "use strict";
     var composer = require_composer();
     var Document = require_Document();
@@ -19392,9 +19240,9 @@ var require_public_api = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/index.js
+// ../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/index.js
 var require_dist = __commonJS({
-  "../../common/temp/node_modules/.pnpm/yaml@2.3.2/node_modules/yaml/dist/index.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/yaml@2.4.1/node_modules/yaml/dist/index.js"(exports) {
     "use strict";
     var composer = require_composer();
     var Document = require_Document();
@@ -20178,7 +20026,7 @@ var require_lodash = __commonJS({
           }
           return new LodashWrapper(value);
         }
-        var baseCreate = function() {
+        var baseCreate = /* @__PURE__ */ function() {
           function object() {
           }
           return function(proto2) {
@@ -23485,7 +23333,7 @@ var require_lodash = __commonJS({
         var gte = createRelationalOperation(function(value, other) {
           return value >= other;
         });
-        var isArguments = baseIsArguments(function() {
+        var isArguments = baseIsArguments(/* @__PURE__ */ function() {
           return arguments;
         }()) ? baseIsArguments : function(value) {
           return isObjectLike(value) && hasOwnProperty.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
@@ -24924,7 +24772,7 @@ var require_lodash = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/commander@11.0.0/node_modules/commander/esm.mjs
+// ../../common/temp/node_modules/.pnpm/commander@11.1.0/node_modules/commander/esm.mjs
 var import_index = __toESM(require_commander(), 1);
 var {
   program,
@@ -26466,7 +26314,7 @@ async function getSubmoduleStatus() {
   const { stdout } = await $`git submodule status`;
   const submoduleStrings = stdout.split("\n");
   return import_lodash3.default.chain(submoduleStrings).map(
-    (str) => /^(?<status>[ +-U])(?<sha>[^ ]+) (?<path>[^ ]+)(?: \((?<tag>[^)]+)\))?$/.exec(str)?.groups
+    (str) => /^(?<status>[ +U-])(?<sha>[^ ]+) (?<path>[^ ]+)(?: \((?<tag>[^)]+)\))?$/.exec(str)?.groups
   ).filter(isValue).map((statusGroup) => {
     const statusOrig = statusGroup["status"];
     return { ...statusGroup, status: gitSubmoduleStatuses[statusOrig] };

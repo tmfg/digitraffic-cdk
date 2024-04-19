@@ -1,7 +1,7 @@
-import { PreparedStatement } from "pg-promise";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, Ports } from "../service/portareas";
-import { EventSource } from "../model/eventsource";
+import pgPromise from "pg-promise";
+import { type ApiTimestamp, EventType } from "../model/timestamp.js";
+import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, type Ports } from "../service/portareas.js";
+import { EventSource } from "../model/eventsource.js";
 import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import type { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
 import { parseISO } from "date-fns";
@@ -400,7 +400,7 @@ export function updateTimestamp(
     timestamp: ApiTimestamp
     // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<DbUpdatedTimestamp | null> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "update-timestamps",
         text: INSERT_ESTIMATE_SQL
     });
@@ -422,7 +422,7 @@ export function removeTimestamps(
 }
 
 export function findByLocode(db: DTDatabase, locode: string): Promise<DbTimestamp[]> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "find-by-locode",
         text: SELECT_BY_LOCODE,
         values: [locode.toUpperCase()]
@@ -431,7 +431,7 @@ export function findByLocode(db: DTDatabase, locode: string): Promise<DbTimestam
 }
 
 export function findByMmsi(db: DTDatabase, mmsi: number): Promise<DbTimestamp[]> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "find-by-mmsi",
         text: SELECT_BY_MMSI,
         values: [mmsi]
@@ -440,7 +440,7 @@ export function findByMmsi(db: DTDatabase, mmsi: number): Promise<DbTimestamp[]>
 }
 
 export function findByImo(db: DTDatabase, imo: number): Promise<DbTimestamp[]> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "find-by-imo",
         text: SELECT_BY_IMO,
         values: [imo]
@@ -449,7 +449,7 @@ export function findByImo(db: DTDatabase, imo: number): Promise<DbTimestamp[]> {
 }
 
 export function findBySource(db: DTDatabase, source: string): Promise<DbTimestamp[]> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "find-by-source",
         text: SELECT_BY_SOURCE,
         values: [source]
@@ -493,7 +493,7 @@ export function findPortnetTimestampsForAnotherLocode(
     portcallId: number,
     locode: string
 ): Promise<DbTimestampIdAndLocode[]> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "find-by-portcall-id-and-locode",
         text: SELECT_BY_PORTCALL_ID_AND_LOCODE,
         values: [portcallId, locode]
@@ -503,7 +503,7 @@ export function findPortnetTimestampsForAnotherLocode(
 
 // eslint-disable-next-line @rushstack/no-new-null
 export function deleteById(db: DTDatabase | DTTransaction, id: number): Promise<null> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "delete-by-id",
         text: DELETE_BY_ID,
         values: [id]
@@ -519,7 +519,7 @@ export async function findPortcallId(
     mmsi?: number,
     imo?: number
 ): Promise<number | undefined> {
-    const ps = new PreparedStatement({
+    const ps = new pgPromise.PreparedStatement({
         name: "find-portcall-id",
         text: FIND_PORTCALL_ID_SQL,
         values: [mmsi, imo, locode, eventType, eventTime]

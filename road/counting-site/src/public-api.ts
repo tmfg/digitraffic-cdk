@@ -274,12 +274,14 @@ export class PublicApi {
         });
     }
 
-    // TODO implement static last-updated ie. 2022-01-27T00:00:00Z
     createDirectionsEndpoint(): void {
-        DigitrafficStaticIntegration.json(this.directionsResource, {
+        const response = {
             1: "In",
             2: "Out",
             3: "No directions"
-        });
+        };
+        const headers = { "Last-Modified": new Date().toUTCString() };
+
+        DigitrafficStaticIntegration.json(this.directionsResource, response, true, true, headers);
     }
 }

@@ -1,7 +1,9 @@
-import { SchedulesApi, SchedulesDirection, SchedulesResponse } from "../../api/schedules";
-import * as sinon from "sinon";
-import axios from "axios";
-import { assertDefined } from "../test-utils";
+import ky from "ky";
+import type { SchedulesResponse } from "../../api/schedules.js";
+import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
+import { assertDefined } from "../test-utils.js";
+import { jest } from "@jest/globals";
+import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -26,12 +28,12 @@ const fakeSchedules = `
 
 describe("api-schedules", () => {
     afterEach(() => {
-        sinon.restore();
+        jest.restoreAllMocks();
     });
 
     test("getSchedulesTimestamps - in VTS control", async () => {
         const api = new SchedulesApi(`http:/something/schedules`);
-        sinon.stub(axios, "get").returns(Promise.resolve({ data: fakeSchedules }));
+        jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, fakeSchedules));
         const resp = await api.getSchedulesTimestamps(SchedulesDirection.EAST, false);
         verifyXmlResponse(resp);
     });

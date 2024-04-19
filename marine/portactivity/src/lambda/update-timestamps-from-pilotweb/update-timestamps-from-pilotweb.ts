@@ -1,6 +1,6 @@
-import { sendMessage } from "../../service/queue-service";
-import * as PilotwebService from "../../service/pilotweb";
-import { PortactivityEnvKeys } from "../../keys";
+import { sendMessage } from "../../service/queue-service.js";
+import * as PilotwebService from "../../service/pilotweb.js";
+import { PortactivityEnvKeys } from "../../keys.js";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
