@@ -1,6 +1,6 @@
 import { addHours } from "date-fns";
 import type { DtRamiMessage } from "../model/dt-rami-message.js";
-import type { RamiMessageOperation } from "../model/rami-message.js";
+import type { RosmMessageOperation } from "../model/rosm-message.js";
 import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata.js";
 
 export function createDtRamiMessage(properties: {
@@ -35,7 +35,7 @@ export function createDtRamiMessage(properties: {
 }
 
 export function createMonitoredJourneyScheduledMessage(properties: {
-    operation?: RamiMessageOperation;
+    operation?: RosmMessageOperation;
     start?: Date;
     end?: Date;
     trainNumber?: number;
@@ -74,7 +74,7 @@ export function createMonitoredJourneyScheduledMessage(properties: {
 }
 
 export function createScheduledMessage(properties: {
-    operation?: RamiMessageOperation;
+    operation?: RosmMessageOperation;
     start?: Date;
     end?: Date;
     trainNumber?: number;

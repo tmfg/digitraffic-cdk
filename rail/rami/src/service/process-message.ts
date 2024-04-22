@@ -5,15 +5,15 @@ import { parseISO } from "date-fns";
 import { insertMessage, setMessageDeleted } from "../dao/message.js";
 import type { DtAudioContent, DtRamiMessage, DtVideoContent } from "../model/dt-rami-message.js";
 import {
-    type RamiMessage,
-    RamiMessageOperations,
-    type RamiMessagePayload,
-    RamiMessageTypes,
+    type RosmMessage,
+    RosmMessageOperations,
+    type RosmMessagePayload,
+    RosmMessageTypes,
     type RamiMonitoredJourneyScheduledMessageAudio,
     type RamiScheduledMessageAudio,
     type RamiScheduledMessageVideo
-} from "../model/rami-message.js";
-import { ramiMessageSchema } from "../model/zod-schema/rami-message.js";
+} from "../model/rosm-message.js";
+import { ramiRosmMessageSchema } from "../model/zod-schema/rosm-message.js";
 
 interface DeliveryPoint {
     readonly id: string;
@@ -37,15 +37,15 @@ type LanguageCode = ValueOf<typeof LanguageCodes>;
 
 export function processMessage(message: DtRamiMessage): Promise<void> {
     if (
-        message.operation === RamiMessageOperations.INSERT ||
-        message.operation === RamiMessageOperations.UPDATE
+        message.operation === RosmMessageOperations.INSERT ||
+        message.operation === RosmMessageOperations.UPDATE
     ) {
         logger.info({
             method: "RamiMessageService.processMessage",
             message: `Persisting RAMI message id: ${message.id}, version: ${message.version}`
         });
         return insertMessage(message);
-    } else if (message.operation === RamiMessageOperations.DELETE) {
+    } else if (message.operation === RosmMessageOperations.DELETE) {
         logger.info({
             method: "RamiMessageService.processMessage",
             message: `Deleting RAMI message id: ${message.id}`
@@ -57,7 +57,7 @@ export function processMessage(message: DtRamiMessage): Promise<void> {
 
 export function parseMessage(message: unknown): DtRamiMessage | undefined {
     try {
-        const parsedMessage = ramiMessageSchema.parse(message);
+        const parsedMessage = ramiRosmMessageSchema.parse(message);
         return ramiMessageToDtRamiMessage(parsedMessage);
     } catch (e) {
         logException(logger, e);
@@ -65,7 +65,7 @@ export function parseMessage(message: unknown): DtRamiMessage | undefined {
     return undefined;
 }
 
-export function ramiMessageToDtRamiMessage({ payload }: RamiMessage): DtRamiMessage {
+export function ramiMessageToDtRamiMessage({ payload }: RosmMessage): DtRamiMessage {
     return {
         id: payload.messageId,
         version: payload.messageVersion,
@@ -85,15 +85,15 @@ export function ramiMessageToDtRamiMessage({ payload }: RamiMessage): DtRamiMess
     };
 }
 
-function getAudioContent(payload: RamiMessagePayload): DtAudioContent | undefined {
+function getAudioContent(payload: RosmMessagePayload): DtAudioContent | undefined {
     if (
-        payload.messageType === RamiMessageTypes.SCHEDULED_MESSAGE &&
+        payload.messageType === RosmMessageTypes.SCHEDULED_MESSAGE &&
         payload.scheduledMessage?.onGroundRecipient?.recipientAudioMessagesToDeliver
     ) {
         const audioMessage = payload.scheduledMessage?.onGroundRecipient?.recipientAudioMessagesToDeliver;
         return parseScheduledMessageAudio(audioMessage);
     } else if (
-        payload.messageType === RamiMessageTypes.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
+        payload.messageType === RosmMessageTypes.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
         payload.monitoredJourneyScheduledMessage?.audioMessageContents
     ) {
         const audioMessage = payload.monitoredJourneyScheduledMessage.audioMessageContents;
@@ -144,15 +144,15 @@ function parseScheduledMessageAudio(audioMessage: RamiScheduledMessageAudio): Dt
     };
 }
 
-function getVideoContent(payload: RamiMessagePayload): DtVideoContent | undefined {
+function getVideoContent(payload: RosmMessagePayload): DtVideoContent | undefined {
     if (
-        payload.messageType === RamiMessageTypes.SCHEDULED_MESSAGE &&
+        payload.messageType === RosmMessageTypes.SCHEDULED_MESSAGE &&
         payload.scheduledMessage?.onGroundRecipient?.recipientVideoMessagesToDeliver
     ) {
         const videoMessage = payload.scheduledMessage.onGroundRecipient.recipientVideoMessagesToDeliver;
         return parseScheduledMessageVideo(videoMessage);
     } else if (
-        payload.messageType === RamiMessageTypes.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
+        payload.messageType === RosmMessageTypes.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
         payload.monitoredJourneyScheduledMessage?.videoTexts
     ) {
         const videoTexts = payload.monitoredJourneyScheduledMessage.videoTexts as TextContent[];
@@ -196,15 +196,15 @@ function getTextInLanguage(texts: TextContent[], languageCode: LanguageCode): st
     );
 }
 
-function getDeliveryPoints(payload: RamiMessagePayload): string[] | undefined {
+function getDeliveryPoints(payload: RosmMessagePayload): string[] | undefined {
     if (
-        payload.messageType === RamiMessageTypes.SCHEDULED_MESSAGE &&
+        payload.messageType === RosmMessageTypes.SCHEDULED_MESSAGE &&
         payload.scheduledMessage?.onGroundRecipient?.deliveryPoints
     ) {
         return mapDeliveryPointsToStationCodes(payload.scheduledMessage.onGroundRecipient.deliveryPoints);
     }
     if (
-        payload.messageType === RamiMessageTypes.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
+        payload.messageType === RosmMessageTypes.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
         payload.monitoredJourneyScheduledMessage?.deliveryPoints
     ) {
         return mapDeliveryPointsToStationCodes(payload.monitoredJourneyScheduledMessage.deliveryPoints);

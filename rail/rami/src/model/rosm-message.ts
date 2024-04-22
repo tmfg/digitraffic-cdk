@@ -1,23 +1,23 @@
 import type { ValueOf } from "@digitraffic/common/dist/types/util-types";
 import type { z } from "zod";
-import type { ramiMessageSchema } from "./zod-schema/rami-message.js";
+import type { ramiRosmMessageSchema } from "./zod-schema/rosm-message.js";
 import type {
     recipientAudioMessagesToDeliver,
     recipientVideoMessagesToDeliver
 } from "./zod-schema/scheduled-message.js";
 import type { monitoredJourneyScheduledMessage } from "./zod-schema/monitored-journey-scheduled-message.js";
 
-export type RamiMessage = z.infer<typeof ramiMessageSchema>;
-export type RamiMessagePayload = Pick<RamiMessage, "payload">["payload"];
+export type RosmMessage = z.infer<typeof ramiRosmMessageSchema>;
+export type RosmMessagePayload = Pick<RosmMessage, "payload">["payload"];
 
-export const RamiMessageTypes = {
+export const RosmMessageTypes = {
     MONITORED_JOURNEY_SCHEDULED_MESSAGE: "MONITORED_JOURNEY_SCHEDULED_MESSAGE",
     SCHEDULED_MESSAGE: "SCHEDULED_MESSAGE"
 } as const;
-export type RamiMessageType = ValueOf<typeof RamiMessageTypes>;
+export type RosmMessageType = ValueOf<typeof RosmMessageTypes>;
 
-export const RamiMessageOperations = { INSERT: "INSERT", UPDATE: "UPDATE", DELETE: "DELETE" } as const;
-export type RamiMessageOperation = ValueOf<typeof RamiMessageOperations>;
+export const RosmMessageOperations = { INSERT: "INSERT", UPDATE: "UPDATE", DELETE: "DELETE" } as const;
+export type RosmMessageOperation = ValueOf<typeof RosmMessageOperations>;
 
 export type RamiScheduledMessageVideo = NonNullable<z.infer<typeof recipientVideoMessagesToDeliver>>;
 export type RamiScheduledMessageAudio = NonNullable<z.infer<typeof recipientAudioMessagesToDeliver>>;
