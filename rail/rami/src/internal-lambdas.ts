@@ -29,7 +29,7 @@ function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Qu
         DB_APPLICATION: "avoindata",
         DLQ_URL: dlq.queueUrl
     };
-    const processQueueLambda = MonitoredDBFunction.create(stack, "process-queue", lambdaEnv, {
+    const processQueueLambda = MonitoredDBFunction.create(stack, "process-rosm-queue", lambdaEnv, {
         memorySize: 256,
         reservedConcurrentExecutions: 10,
         timeout: 10

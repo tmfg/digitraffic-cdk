@@ -1,6 +1,6 @@
 import * as AjvOrig from "ajv";
 import * as addFormatsOrig from "ajv-formats";
-import { ramiMessageJsonSchema } from "../model/json-schema/rami-message.js";
+import { ramiRosmMessageJsonSchema } from "../model/json-schema/rosm-message.js";
 
 interface AjvType {
     // eslint-disable-next-line @typescript-eslint/no-misused-new
@@ -41,7 +41,7 @@ export function validateIncomingRamiMessage(message: unknown): ValidationResult<
     ajv.addKeyword("example");
     // allow custom format "HH:MM" used in the schema
     ajv.addFormat("HH:MM", /^\d{2}:\d{2}$/);
-    return ajv.validate(ramiMessageJsonSchema, message)
+    return ajv.validate(ramiRosmMessageJsonSchema, message)
         ? { valid: true, value: message as ValidatedRamiMessage }
         : { valid: false, errors: ajv.errorsText() };
 }

@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { RamiMessageOperations } from "../../model/rami-message.js";
+import { RosmMessageOperations } from "../../model/rosm-message.js";
 import { getActiveMessages } from "../../service/get-message.js";
 import { parseMessage, processMessage } from "../../service/process-message.js";
 import { dbTestBase } from "../db-testutil.js";
@@ -50,11 +50,11 @@ describe(
             expect(activeMessages[0]?.id).toEqual(message.id);
         });
         test("processMessage - update valid message", async () => {
-            const message = parseMessage(createScheduledMessage({ operation: RamiMessageOperations.INSERT }));
+            const message = parseMessage(createScheduledMessage({ operation: RosmMessageOperations.INSERT }));
             if (!message) fail();
             const updatedMessage = {
                 ...message,
-                operation: RamiMessageOperations.UPDATE,
+                operation: RosmMessageOperations.UPDATE,
                 version: message.version + 1
             };
             await processMessage(message);
@@ -66,7 +66,7 @@ describe(
             expect(activeMessages[0]?.version).toEqual(updatedMessage.version);
         });
         test("processMessage - delete message", async () => {
-            const message = parseMessage(createScheduledMessage({ operation: RamiMessageOperations.INSERT }));
+            const message = parseMessage(createScheduledMessage({ operation: RosmMessageOperations.INSERT }));
             if (!message) fail();
             await processMessage(message);
 
@@ -76,7 +76,7 @@ describe(
 
             const deletedMessage = {
                 ...message,
-                operation: RamiMessageOperations.DELETE
+                operation: RosmMessageOperations.DELETE
             };
             await processMessage(deletedMessage);
 
