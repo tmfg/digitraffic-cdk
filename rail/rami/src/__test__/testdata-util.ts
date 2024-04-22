@@ -1,10 +1,7 @@
 import { addHours } from "date-fns";
 import type { DtRamiMessage } from "../model/dt-rami-message.js";
-import type { RamiMessageOperation } from "../model/rami-message.js";
-import {
-  validRamiMonitoredJourneyScheduledMessage,
-  validRamiScheduledMessage,
-} from "./testdata.js";
+import type { RosmMessageOperation } from "../model/rosm-message.js";
+import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata.js";
 
 export function createDtRamiMessage(properties: {
   created?: Date;
@@ -40,13 +37,13 @@ export function createDtRamiMessage(properties: {
 }
 
 export function createMonitoredJourneyScheduledMessage(properties: {
-  operation?: RamiMessageOperation;
-  start?: Date;
-  end?: Date;
-  trainNumber?: number;
-  trainDepartureDate?: string;
-  station?: string;
-  messageId?: string;
+    operation?: RosmMessageOperation;
+    start?: Date;
+    end?: Date;
+    trainNumber?: number;
+    trainDepartureDate?: string;
+    station?: string;
+    messageId?: string;
 }): unknown {
   const payload = validRamiMonitoredJourneyScheduledMessage.payload;
   return {
@@ -81,13 +78,13 @@ export function createMonitoredJourneyScheduledMessage(properties: {
 }
 
 export function createScheduledMessage(properties: {
-  operation?: RamiMessageOperation;
-  start?: Date;
-  end?: Date;
-  trainNumber?: number;
-  trainDepartureDate?: string;
-  station?: string;
-  messageId?: string;
+    operation?: RosmMessageOperation;
+    start?: Date;
+    end?: Date;
+    trainNumber?: number;
+    trainDepartureDate?: string;
+    station?: string;
+    messageId?: string;
 }): unknown {
   return {
     ...validRamiScheduledMessage,

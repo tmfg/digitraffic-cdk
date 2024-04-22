@@ -54,11 +54,11 @@ export const payload = z
     "Object containing the information of a scheduled message inserted by an operator",
   );
 
-export const ramiMessageSchema = z
-  .object({
-    headers,
-    payload,
-    extraPayload: z.object({}).describe("Optional extention of payload object")
-      .optional().nullable(),
-  })
-  .strict();
+// RamiOperatorScheduledMessage
+export const ramiRosmMessageSchema = z
+    .object({
+        headers,
+        payload,
+        extraPayload: z.object({}).describe("Optional extention of payload object").optional().nullable()
+    })
+    .strict();

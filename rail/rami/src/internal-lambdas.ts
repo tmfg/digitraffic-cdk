@@ -28,30 +28,20 @@ function createDLQBucket(stack: DigitrafficStack, bucketName: string): Bucket {
   });
 }
 
-function createProcessQueueLambda(
-  stack: DigitrafficStack,
-  queue: Queue,
-  dlq: Queue,
-): MonitoredFunction {
-  const lambdaEnv = {
-    ...(stack.configuration.secretId &&
-      { SECRET_ID: stack.configuration.secretId }),
-    DB_APPLICATION: "avoindata",
-    DLQ_URL: dlq.queueUrl,
-  };
-  const processQueueLambda = MonitoredDBFunction.create(
-    stack,
-    "process-queue",
-    lambdaEnv,
-    {
-      memorySize: 256,
-      reservedConcurrentExecutions: 10,
-      timeout: 10,
-    },
-  );
-  processQueueLambda.addEventSource(new SqsEventSource(queue));
-  dlq.grantSendMessages(processQueueLambda);
-  return processQueueLambda;
+function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Queue): MonitoredFunction {
+    const lambdaEnv = {
+        ...(stack.configuration.secretId && { SECRET_ID: stack.configuration.secretId }),
+        DB_APPLICATION: "avoindata",
+        DLQ_URL: dlq.queueUrl
+    };
+    const processQueueLambda = MonitoredDBFunction.create(stack, "process-rosm-queue", lambdaEnv, {
+        memorySize: 256,
+        reservedConcurrentExecutions: 10,
+        timeout: 10
+    });
+    processQueueLambda.addEventSource(new SqsEventSource(queue));
+    dlq.grantSendMessages(processQueueLambda);
+    return processQueueLambda;
 }
 
 function createProcessDLQLambda(

@@ -1,19 +1,19 @@
-import type { RamiMessageOperation, RamiMessageType } from "./rami-message.js";
+import type { RosmMessageOperation, RosmMessageType } from "./rosm-message.js";
 
 export interface DtRamiMessage {
-  readonly id: string;
-  readonly version: number;
-  readonly messageType: RamiMessageType;
-  readonly operation: RamiMessageOperation;
-  readonly created: Date;
-  readonly startValidity: Date;
-  readonly endValidity: Date;
-  readonly trainNumber?: number;
-  readonly trainDepartureLocalDate?: string;
-  readonly journeyRef?: string;
-  readonly stations?: string[];
-  readonly video?: DtVideoContent;
-  readonly audio?: DtAudioContent;
+    readonly id: string;
+    readonly version: number;
+    readonly messageType: RosmMessageType;
+    readonly operation: RosmMessageOperation;
+    readonly created: Date;
+    readonly startValidity: Date;
+    readonly endValidity: Date;
+    readonly trainNumber?: number;
+    readonly trainDepartureLocalDate?: string;
+    readonly journeyRef?: string;
+    readonly stations?: string[];
+    readonly video?: DtVideoContent;
+    readonly audio?: DtAudioContent;
 }
 
 export interface DtVideoContent {

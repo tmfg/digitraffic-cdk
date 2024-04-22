@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { RamiMessageOperations } from "../../model/rami-message.js";
+import { RosmMessageOperations } from "../../model/rosm-message.js";
 import { getActiveMessages } from "../../service/get-message.js";
 import { parseMessage, processMessage } from "../../service/process-message.js";
 import { dbTestBase } from "../db-testutil.js";
@@ -57,44 +57,40 @@ describe(
       if (!message) fail();
       await processMessage(message);
 
-      const activeMessages = await getActiveMessages();
-      expect(activeMessages.length).toEqual(1);
-      expect(activeMessages[0]?.id).toEqual(message.id);
-    });
-    test("processMessage - update valid message", async () => {
-      const message = parseMessage(
-        createScheduledMessage({ operation: RamiMessageOperations.INSERT }),
-      );
-      if (!message) fail();
-      const updatedMessage = {
-        ...message,
-        operation: RamiMessageOperations.UPDATE,
-        version: message.version + 1,
-      };
-      await processMessage(message);
-      await processMessage(updatedMessage);
+            const activeMessages = await getActiveMessages();
+            expect(activeMessages.length).toEqual(1);
+            expect(activeMessages[0]?.id).toEqual(message.id);
+        });
+        test("processMessage - update valid message", async () => {
+            const message = parseMessage(createScheduledMessage({ operation: RosmMessageOperations.INSERT }));
+            if (!message) fail();
+            const updatedMessage = {
+                ...message,
+                operation: RosmMessageOperations.UPDATE,
+                version: message.version + 1
+            };
+            await processMessage(message);
+            await processMessage(updatedMessage);
 
-      const activeMessages = await getActiveMessages();
-      expect(activeMessages.length).toEqual(1);
-      expect(activeMessages[0]?.id).toEqual(message.id);
-      expect(activeMessages[0]?.version).toEqual(updatedMessage.version);
-    });
-    test("processMessage - delete message", async () => {
-      const message = parseMessage(
-        createScheduledMessage({ operation: RamiMessageOperations.INSERT }),
-      );
-      if (!message) fail();
-      await processMessage(message);
+            const activeMessages = await getActiveMessages();
+            expect(activeMessages.length).toEqual(1);
+            expect(activeMessages[0]?.id).toEqual(message.id);
+            expect(activeMessages[0]?.version).toEqual(updatedMessage.version);
+        });
+        test("processMessage - delete message", async () => {
+            const message = parseMessage(createScheduledMessage({ operation: RosmMessageOperations.INSERT }));
+            if (!message) fail();
+            await processMessage(message);
 
       const activeMessages = await getActiveMessages();
       expect(activeMessages.length).toEqual(1);
       expect(activeMessages[0]?.id).toEqual(message.id);
 
-      const deletedMessage = {
-        ...message,
-        operation: RamiMessageOperations.DELETE,
-      };
-      await processMessage(deletedMessage);
+            const deletedMessage = {
+                ...message,
+                operation: RosmMessageOperations.DELETE
+            };
+            await processMessage(deletedMessage);
 
       const activeMessagesAfterDelete = await getActiveMessages();
       expect(activeMessagesAfterDelete.length).toEqual(0);

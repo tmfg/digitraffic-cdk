@@ -1,20 +1,47 @@
 /* eslint-disable max-lines */
-export const ramiMessageJsonSchema = {
-  $schema: "http://json-schema.org/draft-07/schema#",
-  title: "RamiOperatorScheduledMessage",
-  additionalProperties: false,
-  type: "object",
-  properties: {
-    headers: {
-      required: ["e2eId", "eventType", "recordedAtTime", "source"],
-      type: "object",
-      properties: {
-        e2eId: {
-          type: "string",
-          description:
-            "Correlational event unique identifier for logging and instrumentation",
-          format: "uuid",
-          example: "c45c7f92-5f96-4059-b0b3-20295388e4f6",
+export const ramiRosmMessageJsonSchema = {
+    $schema: "http://json-schema.org/draft-07/schema#",
+    title: "RamiOperatorScheduledMessage",
+    additionalProperties: false,
+    type: "object",
+    properties: {
+        headers: {
+            required: ["e2eId", "eventType", "recordedAtTime", "source"],
+            type: "object",
+            properties: {
+                e2eId: {
+                    type: "string",
+                    description: "Correlational event unique identifier for logging and instrumentation",
+                    format: "uuid",
+                    example: "c45c7f92-5f96-4059-b0b3-20295388e4f6"
+                },
+                organisation: {
+                    type: "string",
+                    description: "Data Type for Identifier of an OrganisationCode.",
+                    example: "MOOVA"
+                },
+                source: {
+                    type: "string",
+                    description: "Module identifier that publishes the message",
+                    example: "scheduledmessagepublisher-adapter"
+                },
+                partitionKey: {
+                    type: ["string", "null"],
+                    description:
+                        "kafka partition key where the message is sent in the specific topic. The message id is used"
+                },
+                eventType: {
+                    type: ["string", "null"],
+                    description: "Type of event",
+                    example: "RamiOperatorScheduledMessage"
+                },
+                recordedAtTime: {
+                    type: "string",
+                    description: "Registration date",
+                    format: "date-time"
+                }
+            },
+            description: "Mandatory header of the message"
         },
         organisation: {
           type: "string",
