@@ -156,55 +156,6 @@ function parseScheduledMessageAudio(
   };
 }
 
-function getVideoContent(
-  payload: RamiMessagePayload,
-): DtVideoContent | undefined {
-  if (
-    payload.messageType === RamiMessageTypes.SCHEDULED_MESSAGE &&
-    payload.scheduledMessage?.onGroundRecipient?.recipientVideoMessagesToDeliver
-  ) {
-    const videoMessage = payload.scheduledMessage.onGroundRecipient
-      .recipientVideoMessagesToDeliver;
-    return parseScheduledMessageVideo(videoMessage);
-  } else if (
-    payload.messageType ===
-      RamiMessageTypes.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
-    payload.monitoredJourneyScheduledMessage?.videoTexts
-  ) {
-    const videoTexts = payload.monitoredJourneyScheduledMessage
-      .videoTexts as TextContent[];
-    return {
-      textFi: getTextInLanguage(videoTexts, LanguageCodes.FI),
-      textSv: getTextInLanguage(videoTexts, LanguageCodes.SV),
-      textEn: getTextInLanguage(videoTexts, LanguageCodes.EN),
-    };
-  }
-  return undefined;
-}
-
-function parseScheduledMessageVideo(
-  videoMessage: RamiScheduledMessageVideo,
-): DtVideoContent {
-  const videoTexts = videoMessage.videoTexts as TextContent[];
-  return {
-    textFi: getTextInLanguage(videoTexts, LanguageCodes.FI),
-    textSv: getTextInLanguage(videoTexts, LanguageCodes.SV),
-    textEn: getTextInLanguage(videoTexts, LanguageCodes.EN),
-    ...(videoMessage.deliveryRules && {
-      daysOfWeek: videoMessage.deliveryRules.daysOfWeek ?? undefined,
-      deliveryType: videoMessage.deliveryRules.videoSchedulationType,
-      startDateTime: videoMessage.deliveryRules.startDateTime
-        ? parseISO(videoMessage.deliveryRules.startDateTime)
-        : undefined,
-      endDateTime: videoMessage.deliveryRules.endDateTime
-        ? parseISO(videoMessage.deliveryRules.endDateTime)
-        : undefined,
-      startTime: videoMessage.deliveryRules.startTime ?? undefined,
-      endTime: videoMessage.deliveryRules.endTime ?? undefined,
-    }),
-  };
-}
-
 function getVideoContent(payload: RosmMessagePayload): DtVideoContent | undefined {
     if (
         payload.messageType === RosmMessageTypes.SCHEDULED_MESSAGE &&
