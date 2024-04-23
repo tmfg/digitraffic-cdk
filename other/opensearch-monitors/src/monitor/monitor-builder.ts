@@ -82,6 +82,7 @@ export class OsMonitorBuilder {
     readonly notPhrases: Query[];
 
     messageSubject: string;
+    messageLink?: string;
     rangeInMinutes: number;
     trigger: OSTrigger;
 
@@ -131,8 +132,12 @@ export class OsMonitorBuilder {
     }
 
     /** recreate trigger after you call this! */
-    withMessageSubject(subject: string): this {
+    withMessage(subject: string, link: string | undefined = undefined ): this {
         this.messageSubject = subject;
+
+        if(link) {
+            this.messageSubject+= ` <${link}|Opensearch>`;
+        }
 
         return this;
     }
