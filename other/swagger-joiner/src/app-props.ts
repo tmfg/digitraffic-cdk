@@ -8,7 +8,7 @@ export interface Props extends StackConfiguration {
     // API Gateway API ids
     readonly apiGwAppIds: string[];
     // log destination ARN
-    readonly logsDestinationArn: string;
+    readonly logsDestinationArn?: string;
     // bucket where merged Swagger description is stored
     readonly bucketName: string;
     // S3 VPC endpoint id
