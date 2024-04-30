@@ -51,25 +51,19 @@ export class Session {
     // this is received after successful connect and must be used in every command after that
     connectionId: string | undefined = undefined;
 
-    constructor(url: string, acceptSelfSignedCertificate: boolean = false, certificate?: string) {
+    constructor(url: string, certificate?: string) {
         this.communicationUrl = url + COMMUNICATION_URL_PART;
         this.videoUrl = url + VIDEO_URL_PART;
         this.sequenceId = 1;
 
-        if (acceptSelfSignedCertificate) {
-            this.agent = new Agent({
-                rejectUnauthorized: false
-            });
-        } else {
-            if (!certificate) {
-                throw new Error("No certificate!");
-            }
 
-            this.agent = new Agent({
-                rejectUnauthorized: false,
-                cert: certificate
-            });
-        }
+        this.agent = new Agent({
+            cert: certificate
+        });
+
+        this.agent = new Agent({
+            cert: certificate
+        });
     }
 
     post<T>(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<T>> {

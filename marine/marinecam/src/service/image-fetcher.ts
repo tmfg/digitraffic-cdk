@@ -55,7 +55,7 @@ async function loginToCameraServer(
     password: string,
     certificate: string
 ): Promise<Session> {
-    const session = new Session(url, false, certificate);
+    const session = new Session(url, certificate);
     await session.connect();
     await session.login(username, password);
 
