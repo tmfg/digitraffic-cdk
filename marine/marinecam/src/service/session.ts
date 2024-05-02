@@ -35,10 +35,6 @@ const AXIOS_TIMEOUT_MILLIS = 2000 as const;
 const COMMUNICATION_URL_PART = "/Communication";
 const VIDEO_URL_PART = "/Video/";
 
-const agent = new Agent({
-    rejectUnauthorized: false
-});
-
 const parse = util.promisify(parseString);
 
 export class Session {
