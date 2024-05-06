@@ -13,7 +13,8 @@ import { newFault } from "../testdata.js";
 import type { SQSEvent } from "aws-lambda";
 import { S124Type, type SendS124Event } from "../../model/upload-voyageplan-event.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import axios, { type AxiosRequestConfig } from "axios";
+import ky from "ky";
+import type { Options, Input, ResponsePromise } from "ky";
 
 describe(
     "send-fault",
@@ -23,12 +24,12 @@ describe(
 
             let receivedData: string | undefined;
 
-            jest.spyOn(axios, "post").mockImplementation((_url: string, data?: unknown, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                receivedData = data as string;
+            jest.spyOn(ky, "post").mockImplementation((_url: Input, options?: Options): ResponsePromise => {
+                receivedData = options!.body as string;
 
                 return Promise.resolve({
                     status: 200
-                });
+                }) as ResponsePromise;
             });
 
             const fault = newFault({

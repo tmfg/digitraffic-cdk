@@ -1,7 +1,7 @@
-import axios from "axios";
-import { Agent } from "https";
+import { Agent } from "undici";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import ky from "ky";
 
 export async function postDocument(
     faultS124: string,
@@ -17,11 +17,14 @@ export async function postDocument(
 
     // try-catch so axios won't log keys/certs
     try {
-        const resp = await axios.post(url, faultS124, {
-            httpsAgent: new Agent({
-                ca,
-                cert: clientCertificate,
-                key: privateKey
+        const resp = await ky.post(url, {
+            body: faultS124,
+            dispatcher: new Agent({
+                connect: {
+                    ca,
+                    cert: clientCertificate,
+                    key: privateKey
+                }
             }),
             headers: {
                 "Content-Type": "text/xml;charset=utf-8"
@@ -56,7 +59,7 @@ export async function query(imo: string, url: string): Promise<string | undefine
     });
 
     try {
-        const resp = await axios.get<InstanceUri[] | undefined>(queryUrl);
+        const resp = await ky.get(queryUrl);
         if (resp.status !== 200) {
             logger.error({
                 method: "VisApi.query",
@@ -66,7 +69,7 @@ export async function query(imo: string, url: string): Promise<string | undefine
             return Promise.reject();
         }
 
-        const instanceList = resp.data;
+        const instanceList = await resp.json<InstanceUri[] | undefined>();
 
         if (!instanceList) {
             logger.info({
