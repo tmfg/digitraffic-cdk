@@ -13,6 +13,7 @@
 !/Dockerfile
 !/LICENCE
 !/rush.json
+!/dependabot.yml
 
 # for creating empty directories
 !.git-create
