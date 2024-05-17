@@ -47,24 +47,23 @@ export class Session {
     // this is received after successful connect and must be used in every command after that
     connectionId: string | undefined = undefined;
 
-    constructor(url: string, certificate?: string) {
+    constructor(url: string, certificate: string, ca: string) {
         this.communicationUrl = url + COMMUNICATION_URL_PART;
         this.videoUrl = url + VIDEO_URL_PART;
         this.sequenceId = 1;
 
-
         this.agent = new Agent({
-            cert: certificate
-        });
-
-        this.agent = new Agent({
-            cert: certificate
+            cert: Buffer.from(certificate, "base64").toString(),
+            ca: Buffer.from(ca, "base64").toString()
         });
     }
 
     post<T>(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
         return axios.post<T>(url, xml, {
-            ...{ httpsAgent: agent, timeout: AXIOS_TIMEOUT_MILLIS },
+            ...{ headers: {
+                host: "VideoOSLogServer"
+            }},
+            ...{ httpsAgent: this.agent, timeout: AXIOS_TIMEOUT_MILLIS },
             ...configuration
         });
     }

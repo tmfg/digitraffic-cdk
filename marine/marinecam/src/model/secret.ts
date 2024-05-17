@@ -5,4 +5,5 @@ export interface MarinecamSecret extends GenericSecret {
     readonly username: string;
     readonly password: string;
     readonly certificate: string;
+    readonly ca: string;
 }

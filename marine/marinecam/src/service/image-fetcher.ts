@@ -13,10 +13,11 @@ export async function updateAllCameras(
     username: string,
     password: string,
     bucketName: string,
-    certificate: string
+    certificate: string,
+    ca: string
 ): Promise<void> {
     const cameraIds = await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
-    const session = await loginToCameraServer(url, username, password, certificate);
+    const session = await loginToCameraServer(url, username, password, certificate, ca);
 
     return updateAllImages(cameraIds, session, bucketName);
 }
@@ -53,9 +54,10 @@ async function loginToCameraServer(
     url: string,
     username: string,
     password: string,
-    certificate: string
+    certificate: string,
+    ca: string
 ): Promise<Session> {
-    const session = new Session(url, certificate);
+    const session = new Session(url, certificate, ca);
     await session.connect();
     await session.login(username, password);
 
