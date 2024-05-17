@@ -26,12 +26,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -229,12 +229,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -335,12 +335,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -441,12 +441,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -520,12 +520,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -620,12 +620,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -711,12 +711,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -832,12 +832,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -935,12 +935,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -1026,12 +1026,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -1129,12 +1129,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -1211,12 +1211,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1260,12 +1260,12 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1330,12 +1330,12 @@ importers:
         specifier: ^0.5.21
         version: 0.5.21
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1388,12 +1388,12 @@ importers:
         specifier: 10.3.0
         version: 10.3.0
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1422,12 +1422,12 @@ importers:
         specifier: ^0.5.21
         version: 0.5.21
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1474,12 +1474,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1556,12 +1556,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -1635,12 +1635,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1675,12 +1675,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1742,12 +1742,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: ~29.7.0
         version: 29.7.0
@@ -1818,12 +1818,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: ~29.7.0
         version: 29.7.0
@@ -1915,12 +1915,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -1973,12 +1973,12 @@ importers:
         specifier: 10.3.0
         version: 10.3.0
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -2031,12 +2031,12 @@ importers:
         specifier: ^9.0.0
         version: 9.0.1
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -2137,12 +2137,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -2222,12 +2222,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: ~29.7.0
         version: 29.7.0
@@ -2307,12 +2307,12 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -2392,12 +2392,12 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -2489,12 +2489,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -2568,12 +2568,12 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
     devDependencies:
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@rushstack/eslint-config':
         specifier: ^3.6.8
         version: 3.6.9(eslint@8.57.0)(typescript@5.4.5)
@@ -2644,12 +2644,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -2711,12 +2711,12 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
         version: link:../../tools/rig
-      '@digitraffic-cdk/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
