@@ -2,6 +2,6 @@
 require("@rushstack/eslint-config/patch/modern-module-resolution");
 
 module.exports = {
-    extends: ["@digitraffic-cdk/eslint-config/profile/default"],
+    extends: ["@digitraffic/eslint-config/profile/default"],
     parserOptions: { tsconfigRootDir: __dirname }
 };

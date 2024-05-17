@@ -32,7 +32,7 @@
     "wkx": "^0.5.0"
   },
   "devDependencies": {
-    "@digitraffic-cdk/eslint-config": "workspace:*",
+    "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.6.8",
     "@types/aws-lambda": "8.10.137",

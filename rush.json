@@ -266,7 +266,7 @@
       "tags": ["internal"]
     },
     {
-      "packageName": "@digitraffic-cdk/eslint-config",
+      "packageName": "@digitraffic/eslint-config",
       "projectFolder": "tools/eslint-config",
       "tags": ["internal"]
     },

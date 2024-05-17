@@ -1,6 +1,6 @@
 {
-  "name": "@digitraffic-cdk/eslint-config",
-  "version": "1.0.0",
+  "name": "@digitraffic/eslint-config",
+  "version": "1.0.1",
   "description": "",
   "keywords": [],
   "main": "index.js",
