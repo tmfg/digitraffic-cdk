@@ -17,11 +17,11 @@ export const TEST_TIMES = [
 function getChild(element: XmlElement, name: string): XmlElement {
     for (const child of element.children) {
         if (child instanceof XmlElement && child.name === name) {
-          return child;
+            return child;
         }
-      }
+    }
   
-      throw new Error("Missing element " + name);
+    throw new Error("Missing element " + name);
 }
 
 function isTestTime(time: Date): boolean {
@@ -43,16 +43,14 @@ export function isProductionMessage(datex2: string): boolean {
             return true;
         }
         
-        const publication = getChild(xml, "payloadPublication");
-        const situation = getChild(publication, "situation");
-
-        // check if the device is test device
+        const situationRecord = getChild(xml, "situationRecord");
+  
+          // check if the device is test device
         // eslint-disable-next-line dot-notation
-        if(!TEST_DEVICES.has(situation.attributes["id"] || "")) {
-            return true;
+        if(!TEST_DEVICES.has(situationRecord.attributes["id"] || "")) {
+          return true;
         }
-
-        const situationRecord = getChild(situation, "situationRecord");
+  
         const validity = getChild(situationRecord, "validity");
         const validityTimeSpecification = getChild(validity, "validityTimeSpecification");
         const overallStartTime = getChild(validityTimeSpecification, "overallStartTime");
@@ -62,7 +60,7 @@ export function isProductionMessage(datex2: string): boolean {
         logger.error({
             method: "FilteringService.isProductionMessage",
             message: "Error",
-            error: t
+            error: (t as Error).message,
         });
     }
 
