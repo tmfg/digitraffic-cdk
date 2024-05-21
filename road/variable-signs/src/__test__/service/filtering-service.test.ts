@@ -34,11 +34,11 @@ function createTestXml(id: string, interval: number): string {
 
 describe("filtering-service-tests", (() => {   
     test.each`
-        name                   | id             | interval  | success
-        ${"filter before"}     | ${"VME01K502"} | ${-1}     | ${true}
-        ${"filter start"}      | ${"VME01K502"} | ${0}      | ${false}
-        ${"filter middle"}     | ${"VME01K502"} | ${2}      | ${false}
-        ${"filter wrong id"}   | ${"wrong"}     | ${2}      | ${true}
+        name                   | id                 | interval  | success
+        ${"filter before"}     | ${"VME/TIO01K502"} | ${-1}     | ${true}
+        ${"filter start"}      | ${"VME/TIO01K502"} | ${0}      | ${false}
+        ${"filter middle"}     | ${"VME/TIO01K502"} | ${2}      | ${false}
+        ${"filter wrong id"}   | ${"wrong"}         | ${2}      | ${true}
     `("isProductionMessage - $name", ({ id, interval, success }) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         const value = isProductionMessage(createTestXml(id, interval));
