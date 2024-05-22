@@ -44,6 +44,7 @@
     "@babel/preset-env": "~7.24.4",
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace: *",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.6.8",
     "@rushstack/heft": "^0.66.2",

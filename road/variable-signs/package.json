@@ -35,6 +35,7 @@
     "@aws-sdk/client-api-gateway": "3.574.0",
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "29.7.0",
     "@rushstack/eslint-config": "^3.6.9",
