@@ -2,7 +2,10 @@ import { parseXml, XmlElement } from "@rgrove/parse-xml";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const TEST_DEVICES = new Set<string>([
-    "VME01K502", "TIO01K502", "VME01K500", "TIO01K500", "VME015111", "TIO015111", "VME015152", "TIO015152"
+  "VME/TIO01K502",
+  "VME/TIO01K500",
+  "VME/TIO015111",
+  "VME/TIO015152"
 ]);
 
 export const TEST_TIMES = [
