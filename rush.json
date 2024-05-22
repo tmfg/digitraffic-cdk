@@ -279,6 +279,11 @@
       "packageName": "@digitraffic-cdk/toolchain",
       "projectFolder": "tools/toolchain",
       "tags": ["internal"]
+    },
+    {
+      "packageName": "@digitraffic-cdk/testing",
+      "projectFolder": "tools/testing",
+      "tags": ["internal"]
     }
   ]
 }
