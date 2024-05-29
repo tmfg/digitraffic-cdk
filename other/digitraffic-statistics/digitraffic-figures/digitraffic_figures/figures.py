@@ -72,7 +72,7 @@ class Figures:
         pivot = dff.pivot(
             index="from", columns=["name", "liikennemuoto"], values="value"
         )
-        resample = pivot.tail(n=6).resample("3M", closed="left").sum()
+        resample = pivot.tail(n=6).resample("3ME", closed="left").sum()
         change = resample.pct_change()
 
         latest_values = resample.tail(n=1).stack()
