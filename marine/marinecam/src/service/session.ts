@@ -41,12 +41,12 @@ export class Session {
         this.videoUrl = url + VIDEO_URL_PART;
         this.sequenceId = 1;
 
-        this.agent = new Agent({
+        this.agent = new Agent({            
             connect: {
                 cert: Buffer.from(certificate, "base64").toString(),
-                ca: Buffer.from(ca, "base64").toString(),
-                keepAlive: true,
-            },
+                ca: Buffer.from(ca, "base64").toString()                
+            },            
+            pipelining: 6,
         });
     }
 
@@ -54,11 +54,12 @@ export class Session {
         try {
             return await request(url, {            
                 method: "POST",
+                throwOnError: false,
                 body: xml,
                 headers: {
                     host: "VideoOSLogServer",
                     "accept": "application/json"
-                },
+                },                
                 dispatcher: this.agent,
                 bodyTimeout: AXIOS_TIMEOUT_MILLIS,
                 ...configuration
