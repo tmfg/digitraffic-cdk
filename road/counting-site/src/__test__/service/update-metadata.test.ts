@@ -4,18 +4,14 @@ import * as CounterDAO from "../../dao/counter.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { DbCounter } from "../../model/counter.js";
 import { jest } from "@jest/globals";
-import axios from "axios";
+import ky from "ky";
+import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
 
 const DOMAIN_NAME = "TEST_DOMAIN";
 
 describe(
     "update tests",
     dbTestBase((db: DTDatabase) => {
-        const EMPTY_DATA = {
-            status: 200,
-            data: []
-        };
-
         async function assertCountersInDb(
             domain: string,
             expected: number,
@@ -33,7 +29,7 @@ describe(
             await assertCountersInDb(DOMAIN_NAME, 0);
             await insertDomain(db, DOMAIN_NAME);
 
-            const server = jest.spyOn(axios, "get").mockResolvedValue(EMPTY_DATA);
+            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
 
             await updateMetadataForDomain(DOMAIN_NAME, "", "");
 
@@ -42,9 +38,7 @@ describe(
             await assertCountersInDb(DOMAIN_NAME, 0);
         });
 
-        const RESPONSE_ONE_COUNTER = {
-            status: 200,
-            data: [
+        const RESPONSE_ONE_COUNTER = [
                 {
                     name: "DOMAINNAME",
                     channels: [
@@ -60,14 +54,13 @@ describe(
                         }
                     ]
                 }
-            ]
-        };
+            ] as const;        
 
         test("updateMetadataForDomain - insert", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await assertCountersInDb(DOMAIN_NAME, 0);
 
-            const server = jest.spyOn(axios, "get").mockResolvedValue(RESPONSE_ONE_COUNTER);
+            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify(RESPONSE_ONE_COUNTER)));
 
             await updateMetadataForDomain(DOMAIN_NAME, "", "");
 
@@ -85,7 +78,7 @@ describe(
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await assertCountersInDb(DOMAIN_NAME, 1);
 
-            const server = jest.spyOn(axios, "get").mockResolvedValue(RESPONSE_ONE_COUNTER);
+            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify(RESPONSE_ONE_COUNTER)));
 
             await updateMetadataForDomain(DOMAIN_NAME, "", "");
 
@@ -98,7 +91,7 @@ describe(
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await assertCountersInDb(DOMAIN_NAME, 1);
 
-            const server = jest.spyOn(axios, "get").mockResolvedValue(EMPTY_DATA);
+            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
 
             await updateMetadataForDomain(DOMAIN_NAME, "", "");
 
