@@ -13,24 +13,24 @@ import { newFault } from "../testdata.js";
 import type { SQSEvent } from "aws-lambda";
 import { S124Type, type SendS124Event } from "../../model/upload-voyageplan-event.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import ky from "ky";
-import type { Options, Input, ResponsePromise } from "ky";
+
+const TEST_ADDRESS = "http://localhost:3000";
 
 describe(
     "send-fault",
     dbTestBase((db: DTDatabase) => {
         test("faults are sent to endpoint", async () => {
-            const { handlerFn } = await import("../../lambda/send-s124/send-s124.js");
-
             let receivedData: string | undefined;
 
-            jest.spyOn(ky, "post").mockImplementation((_url: Input, options?: Options): ResponsePromise => {
-                receivedData = options!.body as string;
+            jest.unstable_mockModule("../../api/vis.js", () => ({
+                postDocument: jest.fn((faultS124: string, _url: string, _ca: string, _clientCertificate: string, _privateKey: string) => {
+                    receivedData = faultS124;
 
-                return Promise.resolve({
-                    status: 200
-                }) as ResponsePromise;
-            });
+                    return Promise.resolve();
+                })
+            }));
+
+            const { handlerFn } = await import("../../lambda/send-s124/send-s124.js");
 
             const fault = newFault({
                 geometry: {
@@ -42,7 +42,7 @@ describe(
             const s124Event: SendS124Event = {
                 type: S124Type.FAULT,
                 id: fault.id,
-                callbackEndpoint: "does_not_really_matter"
+                callbackEndpoint: TEST_ADDRESS
             };
 
             await handlerFn()(createSqsEvent(s124Event));

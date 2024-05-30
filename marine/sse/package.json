@@ -23,12 +23,9 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.1.30-1",
-    "@middy/core": "^4.7.0",
-    "aws-cdk-lib": "~2.135.0",
-    "axios": "^1.6.2",
+    "@digitraffic/common": "2024.5.13-1",
+    "aws-cdk-lib": "~2.142.1",
     "constructs": "10.3.0",
-    "dtsgenerator": "^3.19.1",
     "pg-native": "^3.0.1",
     "pg-promise": "^11.5.4"
   },
@@ -47,7 +44,6 @@
     "@types/node": "20.12.4",
     "@types/sinon": "17.0.2",
     "@types/xml2js": "0.4.14",
-    "aws-sdk": "~2.1593.0",
     "esbuild": "0.19.11",
     "eslint": "~8.57.0",
     "json-schema-to-typescript": "^13.1.1",

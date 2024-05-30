@@ -1,4 +1,4 @@
-import axios from "axios";
+import ky from "ky";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
@@ -21,7 +21,7 @@ export class AreaVisibilityApi {
     async getVisibilityForArea(area: string): Promise<AreaVisibilityResponse> {
         const start = Date.now();
         try {
-            const resp = await axios.get(`${this.url}/${area}`, {
+            const resp = await ky.get(`${this.url}/${area}`, {
                 headers: {
                     token: this.token,
                     Accept: MediaType.APPLICATION_JSON
@@ -35,7 +35,7 @@ export class AreaVisibilityApi {
                 });
                 return Promise.reject();
             }
-            return resp.data as AreaVisibilityResponse;
+            return resp.json<AreaVisibilityResponse>();
         } catch (error) {
             logException(logger, error);
 
