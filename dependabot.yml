@@ -1,54 +1,195 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directories:
-      - "aviation/aviation-data"
-      - "common/autoinstallers/rush-prettier"
-      - "marine/aton-faults"
-      - "marine/bridge-lock-disruptions"
-      - "marine/gofrep"
-      - "marine/marinecam"
-      - "marine/nautical-warnings"
-      - "marine/portactivity"
-      - "marine/shiplight"
-      - "marine/sse"
-      - "marine/voyage-plan-gateway"
-      - "other/aws-github-oidc"
-      - "other/cloudfront"
-      - "other/cloudwatch-logs-recipient"
-      - "other/digitraffic-statistics"
-      - "other/elasticsearch"
-      - "other/es-key-figures"
-      - "other/monitoring"
-      - "other/opensearch-monitors"
-      - "other/patchmanager"
-      - "other/status"
-      - "other/swagger-joiner"
-      - "rail/rami"
-      - "rail/rata"
-      - "road/charging-network"
-      - "road/counting-site"
-      - "road/lam-history"
-      - "road/maintenance-tracking-municipality"
-      - "road/maintenance-tracking"
-      - "road/open311"
-      - "road/street-traffic-message"
-      - "road/variable-signs"
-      - "template/esm"
-      - "tools/eslint-config"
-      - "tools/rig"
-      - "tools/toolchain"
+    directory: "aviation/aviation-data"
     schedule:
       interval: "daily"
     versioning-strategy: increase
-
+  - package-ecosystem: "npm"
+    directory: "common/autoinstallers/rush-prettier"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "lib/digitraffic-common"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "lib/repo-scripts"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/bridge-lock-disruptions"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/gofrep"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/marinecam"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/nautical-warnings"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/portactivity"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/shiplight"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/sse"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "marine/voyage-plan-gateway"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/aws-github-oidc"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/cloudfront"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/cloudwatch-logs-recipient"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/digitraffic-statistics"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/elasticsearch"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/es-key-figures"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/monitoring"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/opensearch-monitors"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/patchmanager"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/status"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "other/swagger-joiner"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "rail/rami"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "rail/rata"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/charging-network"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/counting-site"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/lam-history"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/maintenance-tracking-municipality"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/maintenance-tracking"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/open311"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/street-traffic-message"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "road/variable-signs"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "template/esm"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "tools/eslint-config"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "tools/rig"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
+    directory: "tools/toolchain"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
   - package-ecosystem: "pip"
-    directories:
-      - "other/digitraffic-statistics/digitraffic-figures"
+    directory: "other/digitraffic-statistics/digitraffic-figures"
     schedule:
       interval: "daily"
     versioning-strategy: increase
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
