@@ -78,23 +78,10 @@ export function createWebAcl(stack: Stack, environment: string, rules: WafRules)
     const aclBuilder = new AclBuilder(stack)
 
     aclBuilder.withAWSManagedRules(rules.awsCommonRules)
-
-
-    if (rules.perIpWithHeader) {
-        aclBuilder.withThrottleDigitrafficUserIp(rules.perIpWithHeader)
-    }
-
-    if (rules.perIpAndQueryWithHeader) {
-        aclBuilder.withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
-    }
-
-    if (rules.perIpWithoutHeader) {
-        aclBuilder.withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
-    }
-
-    if (rules.perIpAndQueryWithoutHeader) {
-        aclBuilder.withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader)
-    }
+      .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
+      .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
+      .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
+      .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader)
 
     const acl = aclBuilder.build();
 
