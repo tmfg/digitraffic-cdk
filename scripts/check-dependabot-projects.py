@@ -2,7 +2,6 @@
 
 import yaml
 import json
-import os
 import re
 import sys
 
