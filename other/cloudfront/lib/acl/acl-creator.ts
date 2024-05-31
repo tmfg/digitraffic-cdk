@@ -1,5 +1,6 @@
 import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import { IResolvable, RemovalPolicy, Stack } from "aws-cdk-lib";
+import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder.mjs";
 import { WafRules } from "./waf-rules";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
@@ -73,54 +74,29 @@ function createRuleProperty(
     };
 }
 
-type CustomResponseBodies = Partial<Record<ResponseKey, CfnWebACL.CustomResponseBodyProperty | IResolvable>>;
+export function createWebAcl(stack: Stack, environment: string, rules: WafRules): CfnWebACL {
+    const aclBuilder = new AclBuilder(stack)
 
-function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
-    const customResponseBodies: CustomResponseBodies = {};
+    aclBuilder.withAWSManagedRules(rules.awsCommonRules)
+
 
     if (rules.perIpWithHeader) {
-        customResponseBodies.IP_WITH_HEADER = {
-            content: `Request rate is limited to ${rules.perIpWithHeader} requests in a 5 minute window.`,
-            contentType: "TEXT_PLAIN"
-        };
+        aclBuilder.withThrottleDigitrafficUserIp(rules.perIpWithHeader)
     }
-    if (rules.perIpWithoutHeader) {
-        customResponseBodies.IP_WITHOUT_HEADER = {
-            content: `Request rate is limited to ${rules.perIpWithoutHeader} requests in a 5 minute window.`,
-            contentType: "TEXT_PLAIN"
-        };
-    }
+
     if (rules.perIpAndQueryWithHeader) {
-        customResponseBodies.IPQUERY_WITH_HEADER = {
-            content: `Request rate is limited to ${rules.perIpAndQueryWithHeader} requests in a 5 minute window.`,
-            contentType: "TEXT_PLAIN"
-        };
+        aclBuilder.withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
     }
+
+    if (rules.perIpWithoutHeader) {
+        aclBuilder.withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
+    }
+
     if (rules.perIpAndQueryWithoutHeader) {
-        customResponseBodies.IPQUERY_WITHOUT_HEADER = {
-            content: `Request rate is limited to ${rules.perIpAndQueryWithoutHeader} requests in a 5 minute window.`,
-            contentType: "TEXT_PLAIN"
-        };
+        aclBuilder.withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader)
     }
 
-    return customResponseBodies;
-}
-
-export function createWebAcl(stack: Stack, environment: string, rules: WafRules): CfnWebACL {
-    const generatedRules = createRules(rules);
-    const customResponseBodies = createCustomResponseBodies(rules);
-
-    const acl = new CfnWebACL(stack, `DefaultWebAcl-${environment}`, {
-        defaultAction: { allow: {} },
-        scope: "CLOUDFRONT",
-        visibilityConfig: {
-            cloudWatchMetricsEnabled: true,
-            metricName: "WAF-Blocked",
-            sampledRequestsEnabled: false
-        },
-        rules: generatedRules,
-        customResponseBodies
-    });
+    const acl = aclBuilder.build();
 
     const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
         // group name must begin with aws-waf-logs!!!!
@@ -140,76 +116,6 @@ export function createWebAcl(stack: Stack, environment: string, rules: WafRules)
     });*/
 
     return acl;
-}
-
-function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
-    const generatedRules: CfnWebACL.RuleProperty[] = [];
-
-    if (rules.awsCommonRules) {
-        generatedRules.push(createRuleAWSCommonRuleSet());
-        generatedRules.push(createAWSReputationList());
-        generatedRules.push(createAWSKnownBadInput());
-        generatedRules.push(createAWSAntiSQLInjection());
-        generatedRules.push();
-    }
-
-    if (rules.perIpWithHeader) {
-        generatedRules.push(
-            createRuleProperty(
-                "ThrottleRuleWithDigitrafficUser",
-                1,
-                {
-                    action: createRuleAction("IP_WITH_HEADER"),
-                    statement: createThrottleStatement(rules.perIpWithHeader, true, false)
-                },
-                false
-            )
-        );
-    }
-
-    if (rules.perIpAndQueryWithHeader) {
-        generatedRules.push(
-            createRuleProperty(
-                "ThrottleRuleIPQueryWithDigitrafficUser",
-                2,
-                {
-                    action: createRuleAction("IPQUERY_WITH_HEADER"),
-                    statement: createThrottleStatement(rules.perIpAndQueryWithHeader, true, true)
-                },
-                false
-            )
-        );
-    }
-
-    if (rules.perIpWithoutHeader) {
-        generatedRules.push(
-            createRuleProperty(
-                "ThrottleRuleWithoutDigitrafficUser",
-                3,
-                {
-                    action: createRuleAction("IP_WITHOUT_HEADER"),
-                    statement: createThrottleStatement(rules.perIpWithoutHeader, false, false)
-                },
-                false
-            )
-        );
-    }
-
-    if (rules.perIpAndQueryWithoutHeader) {
-        generatedRules.push(
-            createRuleProperty(
-                "ThrottleRuleIPQueryWithoutDigitrafficUser",
-                4,
-                {
-                    action: createRuleAction("IPQUERY_WITHOUT_HEADER"),
-                    statement: createThrottleStatement(rules.perIpAndQueryWithoutHeader, false, true)
-                },
-                false
-            )
-        );
-    }
-
-    return generatedRules;
 }
 
 function createRuleAWSCommonRuleSet(): CfnWebACL.RuleProperty {

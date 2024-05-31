@@ -1,5 +1,7 @@
+import { AWSManagedWafRule } from "@digitraffic/common/dist/aws/infra/acl-builder.mjs";
+
 export class WafRules {
-    readonly awsCommonRules: boolean;
+    readonly awsCommonRules: "all" | AWSManagedWafRule[];
     readonly digitrafficHeaderRules: boolean;
 
     readonly perIpWithHeader: number;
@@ -8,7 +10,7 @@ export class WafRules {
     readonly perIpAndQueryWithoutHeader?: number;
 
     constructor(
-        awsCommonRules: boolean,
+        awsCommonRules: "all" | AWSManagedWafRule[],
         digitrafficHeaderRules: boolean,
         perIpWithHeader: number,
         perIpWithoutHeader: number,
@@ -39,7 +41,7 @@ export class WafRules {
         }
 
         return new WafRules(
-            true,
+            "all",
             true,
             perIpWithHeader,
             perIpWithoutHeader,
