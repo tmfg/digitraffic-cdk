@@ -181,6 +181,11 @@ updates:
       interval: "daily"
     versioning-strategy: increase
   - package-ecosystem: "npm"
+    directory: "tools/testing"
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+  - package-ecosystem: "npm"
     directory: "tools/rig"
     schedule:
       interval: "daily"
