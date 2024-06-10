@@ -1,39 +1,37 @@
 import { addHours } from "date-fns";
-import type { DtRamiMessage } from "../model/dt-rami-message.js";
+import type { DtRosmMessage } from "../model/dt-rami-message.js";
 import type { RosmMessageOperation } from "../model/rosm-message.js";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata.js";
+import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata-rosm.js";
 
-export function createDtRamiMessage(properties: {
-  created?: Date;
-  start?: Date;
-  end?: Date;
-  trainNumber?: number;
-  trainDepartureLocalDate?: string;
-  stations?: string[];
-  id?: string;
-}): DtRamiMessage {
-  return {
-    id: properties.id ?? "abc",
-    version: 1,
-    messageType: properties.trainNumber
-      ? "MONITORED_JOURNEY_SCHEDULED_MESSAGE"
-      : "SCHEDULED_MESSAGE",
-    operation: "INSERT",
-    trainNumber: properties.trainNumber,
-    trainDepartureLocalDate: properties.trainDepartureLocalDate,
-    stations: properties.stations ?? ["PSL"],
-    created: properties.created ?? properties.start ?? new Date(),
-    startValidity: properties.start ?? new Date(),
-    endValidity: properties.end ?? addHours(new Date(), 1),
-    audio: {
-      textFi: "audioteksti",
-      daysOfWeek: ["MONDAY", "WEDNESDAY"],
-    },
-    video: {
-      textFi: "videoteksti",
-      daysOfWeek: ["TUESDAY", "FRIDAY"],
-    },
-  };
+export function createDtRosmMessage(properties: {
+    created?: Date;
+    start?: Date;
+    end?: Date;
+    trainNumber?: number;
+    trainDepartureLocalDate?: string;
+    stations?: string[];
+    id?: string;
+}): DtRosmMessage {
+    return {
+        id: properties.id ?? "abc",
+        version: 1,
+        messageType: properties.trainNumber ? "MONITORED_JOURNEY_SCHEDULED_MESSAGE" : "SCHEDULED_MESSAGE",
+        operation: "INSERT",
+        trainNumber: properties.trainNumber,
+        trainDepartureLocalDate: properties.trainDepartureLocalDate,
+        stations: properties.stations ?? ["PSL"],
+        created: properties.created ?? properties.start ?? new Date(),
+        startValidity: properties.start ?? new Date(),
+        endValidity: properties.end ?? addHours(new Date(), 1),
+        audio: {
+            textFi: "audioteksti",
+            daysOfWeek: ["MONDAY", "WEDNESDAY"]
+        },
+        video: {
+            textFi: "videoteksti",
+            daysOfWeek: ["TUESDAY", "FRIDAY"]
+        }
+    };
 }
 
 export function createMonitoredJourneyScheduledMessage(properties: {

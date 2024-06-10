@@ -4,7 +4,7 @@ import {
   MYSQL_DATETIME_FORMAT,
 } from "@digitraffic/common/dist/utils/date-utils";
 import type { Connection } from "mysql2/promise.js";
-import type { DtRamiMessage } from "../model/dt-rami-message.js";
+import type { DtRosmMessage } from "../model/dt-rami-message.js";
 import { mapDaysToBits } from "../util/weekdays.js";
 import { inDatabase, inTransaction } from "../util/database.js";
 
@@ -303,25 +303,13 @@ export async function findMessagesUpdatedAfter(
   return rows as DbRamiMessage[];
 }
 
-export async function insertMessage(message: DtRamiMessage): Promise<void> {
-  return inTransaction(async (conn: Connection): Promise<void> => {
-    await conn.query(
-      INSERT_RAMI_MESSAGE,
-      createDtRamiMessageInsertValues(message),
-    );
-    await conn.query(
-      INSERT_RAMI_MESSAGE_STATIONS,
-      createDtRamiMessageStationInsertValues(message),
-    );
-    await conn.query(
-      INSERT_RAMI_MESSAGE_AUDIO,
-      createDtRamiMessageAudioInsertValues(message),
-    );
-    await conn.query(
-      INSERT_RAMI_MESSAGE_VIDEO,
-      createDtRamiMessageVideoInsertValues(message),
-    );
-  });
+export async function insertMessage(message: DtRosmMessage): Promise<void> {
+    return inTransaction(async (conn: Connection): Promise<void> => {
+        await conn.query(INSERT_RAMI_MESSAGE, createDtRamiMessageInsertValues(message));
+        await conn.query(INSERT_RAMI_MESSAGE_STATIONS, createDtRamiMessageStationInsertValues(message));
+        await conn.query(INSERT_RAMI_MESSAGE_AUDIO, createDtRamiMessageAudioInsertValues(message));
+        await conn.query(INSERT_RAMI_MESSAGE_VIDEO, createDtRamiMessageVideoInsertValues(message));
+    });
 }
 
 export async function setMessageDeleted(messageId: string): Promise<void> {
@@ -330,77 +318,66 @@ export async function setMessageDeleted(messageId: string): Promise<void> {
   });
 }
 
-function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown {
-  return {
-    id: message.id,
-    version: message.version,
-    messageType: message.messageType,
-    created: dateToUTCString(message.created, MYSQL_DATETIME_FORMAT),
-    startValidity: dateToUTCString(
-      message.startValidity,
-      MYSQL_DATETIME_FORMAT,
-    ),
-    endValidity: dateToUTCString(message.endValidity, MYSQL_DATETIME_FORMAT),
-    trainNumber: message.trainNumber ?? null,
-    trainDepartureDate: message.trainDepartureLocalDate ?? null,
-    journeyRef: message.journeyRef ?? null,
-  };
+function createDtRamiMessageInsertValues(message: DtRosmMessage): unknown {
+    return {
+        id: message.id,
+        version: message.version,
+        messageType: message.messageType,
+        created: dateToUTCString(message.created, MYSQL_DATETIME_FORMAT),
+        startValidity: dateToUTCString(message.startValidity, MYSQL_DATETIME_FORMAT),
+        endValidity: dateToUTCString(message.endValidity, MYSQL_DATETIME_FORMAT),
+        trainNumber: message.trainNumber ?? null,
+        trainDepartureDate: message.trainDepartureLocalDate ?? null,
+        journeyRef: message.journeyRef ?? null
+    };
 }
 
-function createDtRamiMessageStationInsertValues(
-  message: DtRamiMessage,
-): (string | number)[][][] | null {
-  return message.stations
-    ? [
-      message.stations.map((station) => [message.id, message.version, station]),
-    ]
-    : null;
+function createDtRamiMessageStationInsertValues(message: DtRosmMessage): (string | number)[][][] | null {
+    return message.stations
+        ? [message.stations.map((station) => [message.id, message.version, station])]
+        : null;
 }
 
-function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown {
-  return {
-    id: message.id,
-    version: message.version,
-    textFi: message.video?.textFi ?? null,
-    textSv: message.video?.textSv ?? null,
-    textEn: message.video?.textEn ?? null,
-    deliveryType: message.video?.deliveryType ?? null,
-    startDateTime: message.video?.startDateTime
-      ? dateToUTCString(message.video.startDateTime, MYSQL_DATETIME_FORMAT)
-      : null,
-    endDateTime: message.video?.endDateTime
-      ? dateToUTCString(message.video.endDateTime, MYSQL_DATETIME_FORMAT)
-      : null,
-    startTime: message.video?.startTime ?? null,
-    endTime: message.video?.endTime ?? null,
-    days: message.video?.daysOfWeek
-      ? mapDaysToBits(message.video.daysOfWeek)
-      : "0000000",
-  };
+function createDtRamiMessageVideoInsertValues(message: DtRosmMessage): unknown {
+    return {
+        id: message.id,
+        version: message.version,
+        textFi: message.video?.textFi ?? null,
+        textSv: message.video?.textSv ?? null,
+        textEn: message.video?.textEn ?? null,
+        deliveryType: message.video?.deliveryType ?? null,
+        startDateTime: message.video?.startDateTime
+            ? dateToUTCString(message.video.startDateTime, MYSQL_DATETIME_FORMAT)
+            : null,
+        endDateTime: message.video?.endDateTime
+            ? dateToUTCString(message.video.endDateTime, MYSQL_DATETIME_FORMAT)
+            : null,
+        startTime: message.video?.startTime ?? null,
+        endTime: message.video?.endTime ?? null,
+        days: message.video?.daysOfWeek ? mapDaysToBits(message.video.daysOfWeek) : "0000000"
+    };
 }
 
-function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown {
-  return {
-    id: message.id,
-    version: message.version,
-    textFi: message.audio?.textFi ?? null,
-    textSv: message.audio?.textSv ?? null,
-    textEn: message.audio?.textEn ?? null,
-    deliveryType: message.audio?.deliveryType ?? null,
-    startDateTime: message.audio?.startDateTime
-      ? dateToUTCString(message.audio.startDateTime, MYSQL_DATETIME_FORMAT)
-      : null,
-    endDateTime: message.audio?.endDateTime
-      ? dateToUTCString(message.audio.endDateTime, MYSQL_DATETIME_FORMAT)
-      : null,
-    startTime: message.audio?.startTime ?? null,
-    endTime: message.audio?.endTime ?? null,
-    days: message.audio?.daysOfWeek
-      ? mapDaysToBits(message.audio.daysOfWeek)
-      : "0000000",
-    eventType: message.audio?.eventType ?? null,
-    deliveryAt: message.audio?.deliveryAt ?? null,
-    repetitions: message.audio?.repetitions ?? null,
-    repeatEvery: message.audio?.repeatEvery ?? null,
-  };
+function createDtRamiMessageAudioInsertValues(message: DtRosmMessage): unknown {
+    return {
+        id: message.id,
+        version: message.version,
+        textFi: message.audio?.textFi ?? null,
+        textSv: message.audio?.textSv ?? null,
+        textEn: message.audio?.textEn ?? null,
+        deliveryType: message.audio?.deliveryType ?? null,
+        startDateTime: message.audio?.startDateTime
+            ? dateToUTCString(message.audio.startDateTime, MYSQL_DATETIME_FORMAT)
+            : null,
+        endDateTime: message.audio?.endDateTime
+            ? dateToUTCString(message.audio.endDateTime, MYSQL_DATETIME_FORMAT)
+            : null,
+        startTime: message.audio?.startTime ?? null,
+        endTime: message.audio?.endTime ?? null,
+        days: message.audio?.daysOfWeek ? mapDaysToBits(message.audio.daysOfWeek) : "0000000",
+        eventType: message.audio?.eventType ?? null,
+        deliveryAt: message.audio?.deliveryAt ?? null,
+        repetitions: message.audio?.repetitions ?? null,
+        repeatEvery: message.audio?.repeatEvery ?? null
+    };
 }

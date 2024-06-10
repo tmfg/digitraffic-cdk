@@ -2,7 +2,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
-import { parseMessage, processMessage } from "../../service/process-message.js";
+import { parseRosmMessage, processRosmMessage } from "../../service/process-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { sendToSqs } from "../../util/sqs.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
@@ -15,14 +15,14 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
             event.Records.map(async (r) => {
                 const start = Date.now();
                 const recordBody = r.body;
-                const parsedRamiMessage = parseMessage(JSON.parse(recordBody));
+                const parsedRamiMessage = parseRosmMessage(JSON.parse(recordBody));
                 logger.debug({
-                    method: "RAMI-ProcessQueue.handler",
+                    method: "RAMI-ProcessRosmQueue.handler",
                     customParsedRamiMessage: JSON.stringify(parsedRamiMessage)
                 });
                 if (parsedRamiMessage) {
                     try {
-                        await processMessage(parsedRamiMessage);
+                        await processRosmMessage(parsedRamiMessage);
                     } catch (error) {
                         logException(logger, error);
                         // send original message to dlq on error
@@ -36,7 +36,7 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                     }
                 }
                 logger.info({
-                    method: "RAMI-ProcessQueue.handler",
+                    method: "RAMI-ProcessRosmQueue.handler",
                     tookMs: Date.now() - start
                 });
                 return Promise.resolve();

@@ -1,6 +1,6 @@
 import type { RosmMessageOperation, RosmMessageType } from "./rosm-message.js";
 
-export interface DtRamiMessage {
+export interface DtRosmMessage {
     readonly id: string;
     readonly version: number;
     readonly messageType: RosmMessageType;

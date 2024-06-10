@@ -10,15 +10,10 @@ import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { RamiEnvKeys } from "./keys.js";
 
-export function create(
-  stack: DigitrafficStack,
-  sqs: Queue,
-  dlq: Queue,
-  dlqBucketName: string,
-): void {
-  const dlqBucket = createDLQBucket(stack, dlqBucketName);
-  createProcessQueueLambda(stack, sqs, dlq);
-  createProcessDLQLambda(stack, dlq, dlqBucket);
+export function create(stack: DigitrafficStack, sqs: Queue, dlq: Queue, dlqBucketName: string): void {
+    const dlqBucket = createDLQBucket(stack, dlqBucketName);
+    createProcessRosmQueueLambda(stack, sqs, dlq);
+    createProcessDLQLambda(stack, dlq, dlqBucket);
 }
 
 function createDLQBucket(stack: DigitrafficStack, bucketName: string): Bucket {
@@ -28,7 +23,7 @@ function createDLQBucket(stack: DigitrafficStack, bucketName: string): Bucket {
   });
 }
 
-function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Queue): MonitoredFunction {
+function createProcessRosmQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Queue): MonitoredFunction {
     const lambdaEnv = {
         ...(stack.configuration.secretId && { SECRET_ID: stack.configuration.secretId }),
         DB_APPLICATION: "avoindata",
