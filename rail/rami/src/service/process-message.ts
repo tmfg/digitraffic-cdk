@@ -3,7 +3,7 @@ import type { ValueOf } from "@digitraffic/common/dist/types/util-types";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { parseISO } from "date-fns";
 import { insertMessage, setMessageDeleted } from "../dao/message.js";
-import type { DtAudioContent, DtRamiMessage, DtVideoContent } from "../model/dt-rami-message.js";
+import type { DtAudioContent, DtRosmMessage, DtVideoContent } from "../model/dt-rami-message.js";
 import {
     type RosmMessage,
     RosmMessageOperations,
@@ -35,19 +35,19 @@ const LanguageCodes = {
 
 type LanguageCode = ValueOf<typeof LanguageCodes>;
 
-export function processMessage(message: DtRamiMessage): Promise<void> {
+export function processRosmMessage(message: DtRosmMessage): Promise<void> {
     if (
         message.operation === RosmMessageOperations.INSERT ||
         message.operation === RosmMessageOperations.UPDATE
     ) {
         logger.info({
-            method: "RamiMessageService.processMessage",
+            method: "RamiMessageService.processRosmMessage",
             message: `Persisting RAMI message id: ${message.id}, version: ${message.version}`
         });
         return insertMessage(message);
     } else if (message.operation === RosmMessageOperations.DELETE) {
         logger.info({
-            method: "RamiMessageService.processMessage",
+            method: "RamiMessageService.processRosmMessage",
             message: `Deleting RAMI message id: ${message.id}`
         });
         return setMessageDeleted(message.id);
@@ -55,7 +55,7 @@ export function processMessage(message: DtRamiMessage): Promise<void> {
     return Promise.reject();
 }
 
-export function parseMessage(message: unknown): DtRamiMessage | undefined {
+export function parseRosmMessage(message: unknown): DtRosmMessage | undefined {
     try {
         const parsedMessage = ramiRosmMessageSchema.parse(message);
         return ramiMessageToDtRamiMessage(parsedMessage);
@@ -65,7 +65,7 @@ export function parseMessage(message: unknown): DtRamiMessage | undefined {
     return undefined;
 }
 
-export function ramiMessageToDtRamiMessage({ payload }: RosmMessage): DtRamiMessage {
+export function ramiMessageToDtRamiMessage({ payload }: RosmMessage): DtRosmMessage {
     return {
         id: payload.messageId,
         version: payload.messageVersion,

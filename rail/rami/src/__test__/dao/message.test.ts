@@ -6,14 +6,14 @@ import {
     setMessageDeleted
 } from "../../dao/message.js";
 import { dbTestBase } from "../db-testutil.js";
-import { createDtRamiMessage } from "../testdata-util.js";
+import { createDtRosmMessage } from "../testdata-util.js";
 import { type WeekDaysBitString, mapBitsToDays } from "../../util/weekdays.js";
 
 describe(
     "dao",
     dbTestBase(() => {
         test("insertMessage - insert valid DtRamiMessage", async () => {
-            const message = createDtRamiMessage({});
+            const message = createDtRosmMessage({});
             await insertMessage(message);
 
             const result = await findActiveMessages();
@@ -24,8 +24,8 @@ describe(
             );
         });
         test("findActiveMessages - only active is found", async () => {
-            const activeMessage = createDtRamiMessage({ id: "abc" });
-            const inactiveMessage = createDtRamiMessage({
+            const activeMessage = createDtRosmMessage({ id: "abc" });
+            const inactiveMessage = createDtRosmMessage({
                 id: "def",
                 start: subHours(new Date(), 2),
                 end: subHours(new Date(), 1)
@@ -40,11 +40,11 @@ describe(
         });
         test("findActiveMessages - find by station", async () => {
             const stations = ["HKI", "LPR"] as const;
-            const message = createDtRamiMessage({
+            const message = createDtRosmMessage({
                 id: "abc",
                 stations: [...stations]
             });
-            const anotherMessage = createDtRamiMessage({
+            const anotherMessage = createDtRosmMessage({
                 id: "def",
                 stations: ["PSL", "LH"]
             });
@@ -59,11 +59,11 @@ describe(
         });
         test("findActiveMessages - find by train number", async () => {
             const trainNumber = 666;
-            const message = createDtRamiMessage({
+            const message = createDtRosmMessage({
                 id: "abc",
                 trainNumber
             });
-            const anotherMessage = createDtRamiMessage({
+            const anotherMessage = createDtRosmMessage({
                 id: "def",
                 trainNumber: trainNumber - 1
             });
@@ -77,11 +77,11 @@ describe(
         });
         test("findActiveMessages - find by train departure date", async () => {
             const trainDepartureLocalDate = "2023-06-06";
-            const message = createDtRamiMessage({
+            const message = createDtRosmMessage({
                 id: "abc",
                 trainDepartureLocalDate
             });
-            const anotherMessage = createDtRamiMessage({
+            const anotherMessage = createDtRosmMessage({
                 id: "def",
                 trainDepartureLocalDate: "2023-06-05"
             });
@@ -94,10 +94,10 @@ describe(
             expect(result[0]?.train_departure_date).toEqual(trainDepartureLocalDate);
         });
         test("findActiveMessages - filter by only general", async () => {
-            const generalMessage = createDtRamiMessage({
+            const generalMessage = createDtRosmMessage({
                 id: "abc"
             });
-            const trainRelatedMessage = createDtRamiMessage({
+            const trainRelatedMessage = createDtRosmMessage({
                 id: "def",
                 trainNumber: 1
             });
@@ -112,19 +112,19 @@ describe(
             const stations = ["HKI", "LPR"] as const;
             const trainNumber = 666;
             const trainDepartureLocalDate = "2023-06-06";
-            const message = createDtRamiMessage({
+            const message = createDtRosmMessage({
                 id: "abc",
                 trainNumber,
                 trainDepartureLocalDate,
                 stations: [...stations]
             });
-            const anotherMessage = createDtRamiMessage({
+            const anotherMessage = createDtRosmMessage({
                 id: "def",
                 trainNumber: trainNumber - 1,
                 trainDepartureLocalDate,
                 stations: [...stations]
             });
-            const thirdMessage = createDtRamiMessage({
+            const thirdMessage = createDtRosmMessage({
                 id: "ghi",
                 stations: [...stations]
             });
@@ -142,8 +142,8 @@ describe(
         });
         test("findMessagesUpdatedAfter - correct", async () => {
             const date = subDays(new Date(), 2);
-            const messageBeforeDate = createDtRamiMessage({ id: "abc", created: subDays(date, 1) });
-            const messageAfterDate = createDtRamiMessage({
+            const messageBeforeDate = createDtRosmMessage({ id: "abc", created: subDays(date, 1) });
+            const messageAfterDate = createDtRosmMessage({
                 id: "def",
                 created: addDays(date, 1)
             });
@@ -158,8 +158,8 @@ describe(
         });
         test("findMessagesUpdatedAfter - only active messages by default", async () => {
             const date = subDays(new Date(), 2);
-            const messageBeforeDate = createDtRamiMessage({ id: "abc", created: subDays(date, 1) });
-            const inactiveMessageAfterDate = createDtRamiMessage({
+            const messageBeforeDate = createDtRosmMessage({ id: "abc", created: subDays(date, 1) });
+            const inactiveMessageAfterDate = createDtRosmMessage({
                 id: "def",
                 start: addHours(date, 24),
                 end: addHours(date, 26),
@@ -175,8 +175,8 @@ describe(
         });
         test("findMessagesUpdatedAfter - inactive messages returned if parameter set", async () => {
             const date = subDays(new Date(), 2);
-            const messageBeforeDate = createDtRamiMessage({ id: "abc", created: subDays(date, 1) });
-            const inactiveMessageAfterDate = createDtRamiMessage({
+            const messageBeforeDate = createDtRosmMessage({ id: "abc", created: subDays(date, 1) });
+            const inactiveMessageAfterDate = createDtRosmMessage({
                 id: "def",
                 start: addHours(date, 24),
                 end: addHours(date, 26),
@@ -192,7 +192,7 @@ describe(
             expect(result[0]?.id).toEqual(inactiveMessageAfterDate.id);
         });
         test("setMessageDeleted - not found in active messages anymore", async () => {
-            const message = createDtRamiMessage({});
+            const message = createDtRosmMessage({});
             await insertMessage(message);
 
             const result = await findActiveMessages();
@@ -203,7 +203,7 @@ describe(
             expect(resultAfterDelete.length).toEqual(0);
         });
         test("insert and get - weekday bits are correctly mapped", async () => {
-            const message = createDtRamiMessage({});
+            const message = createDtRosmMessage({});
             await insertMessage(message);
             const result = await findActiveMessages();
             expect(mapBitsToDays(result[0]?.video?.delivery_rules?.days as WeekDaysBitString).sort()).toEqual(

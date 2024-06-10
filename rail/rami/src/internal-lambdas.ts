@@ -12,7 +12,7 @@ import { RamiEnvKeys } from "./keys.js";
 
 export function create(stack: DigitrafficStack, sqs: Queue, dlq: Queue, dlqBucketName: string): void {
     const dlqBucket = createDLQBucket(stack, dlqBucketName);
-    createProcessQueueLambda(stack, sqs, dlq);
+    createProcessRosmQueueLambda(stack, sqs, dlq);
     createProcessDLQLambda(stack, dlq, dlqBucket);
 }
 
@@ -23,7 +23,7 @@ function createDLQBucket(stack: DigitrafficStack, bucketName: string): Bucket {
     });
 }
 
-function createProcessQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Queue): MonitoredFunction {
+function createProcessRosmQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Queue): MonitoredFunction {
     const lambdaEnv = {
         ...(stack.configuration.secretId && { SECRET_ID: stack.configuration.secretId }),
         DB_APPLICATION: "avoindata",

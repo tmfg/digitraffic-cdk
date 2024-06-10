@@ -17,9 +17,12 @@ export class RamiStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
         super(scope, id, configuration);
         const dlq = this.createDLQ(this);
-        const sqs = this.createSQS(this, dlq);
-        new IntegrationApi(this, sqs, dlq);
-        InternalLambdas.create(this, sqs, dlq, configuration.dlqBucketName);
+        const rosmSqs = this.createRosmSqs(this, dlq);
+        const smSqs = this.createSmSqs(this, dlq);
+
+        new IntegrationApi(this, rosmSqs, smSqs, dlq);
+        
+        InternalLambdas.create(this, rosmSqs, dlq, configuration.dlqBucketName);
         if (configuration.enablePublicApi === true) {
             const publicApi = new PublicApi(this);
             if (!this.secret) throw new Error("secret not found");
@@ -27,8 +30,16 @@ export class RamiStack extends DigitrafficStack {
         }
     }
 
-    createSQS(stack: DigitrafficStack, dlq: Queue): DigitrafficSqsQueue {
-        return DigitrafficSqsQueue.create(stack, "SQS", {
+    createRosmSqs(stack: DigitrafficStack, dlq: Queue): DigitrafficSqsQueue {
+        return DigitrafficSqsQueue.create(stack, "RosmSqs", {
+            receiveMessageWaitTime: Duration.seconds(5),
+            visibilityTimeout: Duration.seconds(60),
+            deadLetterQueue: { queue: dlq, maxReceiveCount: 2 }
+        });
+    }
+
+    createSmSqs(stack: DigitrafficStack, dlq: Queue): DigitrafficSqsQueue {
+        return DigitrafficSqsQueue.create(stack, "SmSqs", {
             receiveMessageWaitTime: Duration.seconds(5),
             visibilityTimeout: Duration.seconds(60),
             deadLetterQueue: { queue: dlq, maxReceiveCount: 2 }

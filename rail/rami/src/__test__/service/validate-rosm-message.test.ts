@@ -1,21 +1,14 @@
 import _ from "lodash";
-import { validateIncomingRamiMessage } from "../../service/validate-message.js";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata.js";
+import { validateIncomingRosmMessage } from "../../service/validate-message.js";
+import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata-rosm.js";
+import { copyAndUndefine, undefine } from "../message-util.js";
 
 describe("validate incoming rami message", () => {
     test("validateIncomingRamiMessage - invalid scheduledMessage", () => {
-        const invalidMessage = _.set(
-            _.cloneDeep(validRamiScheduledMessage),
-            ["payload", "messageId"],
-            undefined
-        );
-        _.set(
-            invalidMessage,
-            ["payload", "scheduledMessage", "onGroundRecipient", "deliveryPoints"],
-            undefined
-        );
+        const invalidMessage = copyAndUndefine(validRamiScheduledMessage, "payload", "messageId");
+        undefine(invalidMessage, "payload", "scheduledMessage", "onGroundRecipient", "deliveryPoints");
 
-        const result = validateIncomingRamiMessage(invalidMessage);
+        const result = validateIncomingRosmMessage(invalidMessage);
         expect(result.valid).toBe(false);
         if (!result.valid) {
             expect(result.errors).toMatch(/payload must have required property 'messageId'/);
@@ -25,18 +18,14 @@ describe("validate incoming rami message", () => {
         }
     });
     test("validateIncomingRamiMessage - invalid monitoredJourneyScheduledMessage", () => {
-        const invalidMessage = _.set(
-            _.cloneDeep(validRamiMonitoredJourneyScheduledMessage),
-            ["payload", "messageId"],
-            undefined
-        );
-        _.set(invalidMessage, ["payload", "messageVersion"], undefined);
+        const invalidMessage = copyAndUndefine(validRamiMonitoredJourneyScheduledMessage, "payload", "messageId");
+        undefine(invalidMessage, "payload", "messageVersion");
         _.set(invalidMessage, ["payload", "monitoredJourneyScheduledMessage", "deliveryPoints", 0], {
             id: 0,
             nameLong: "abc"
         });
 
-        const result = validateIncomingRamiMessage(invalidMessage);
+        const result = validateIncomingRosmMessage(invalidMessage);
         expect(result.valid).toBe(false);
         if (!result.valid) {
             expect(result.errors).toMatch(/payload must have required property 'messageId'/);
@@ -48,13 +37,13 @@ describe("validate incoming rami message", () => {
     });
 
     test("validateIncomingRamiMessage - valid scheduledMessage", () => {
-        const result = validateIncomingRamiMessage(validRamiScheduledMessage);
+        const result = validateIncomingRosmMessage(validRamiScheduledMessage);
         expect(result.valid).toBe(true);
         if (result.valid) expect(result.value).toEqual(validRamiScheduledMessage);
     });
 
     test("validateIncomingRamiMessage - valid monitoredJourneyScheduledMessage", () => {
-        const result = validateIncomingRamiMessage(validRamiMonitoredJourneyScheduledMessage);
+        const result = validateIncomingRosmMessage(validRamiMonitoredJourneyScheduledMessage);
         expect(result.valid).toBe(true);
         if (result.valid) expect(result.value).toEqual(validRamiMonitoredJourneyScheduledMessage);
     });

@@ -1,7 +1,7 @@
 /* eslint-disable @rushstack/no-new-null */
 import { MYSQL_DATETIME_FORMAT, dateToUTCString } from "@digitraffic/common/dist/utils/date-utils";
 import type { Connection } from "mysql2/promise.js";
-import type { DtRamiMessage } from "../model/dt-rami-message.js";
+import type { DtRosmMessage } from "../model/dt-rami-message.js";
 import { mapDaysToBits } from "../util/weekdays.js";
 import { inDatabase, inTransaction } from "../util/database.js";
 
@@ -300,7 +300,7 @@ export async function findMessagesUpdatedAfter(
     return rows as DbRamiMessage[];
 }
 
-export async function insertMessage(message: DtRamiMessage): Promise<void> {
+export async function insertMessage(message: DtRosmMessage): Promise<void> {
     return inTransaction(async (conn: Connection): Promise<void> => {
         await conn.query(INSERT_RAMI_MESSAGE, createDtRamiMessageInsertValues(message));
         await conn.query(INSERT_RAMI_MESSAGE_STATIONS, createDtRamiMessageStationInsertValues(message));
@@ -315,7 +315,7 @@ export async function setMessageDeleted(messageId: string): Promise<void> {
     });
 }
 
-function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown {
+function createDtRamiMessageInsertValues(message: DtRosmMessage): unknown {
     return {
         id: message.id,
         version: message.version,
@@ -329,13 +329,13 @@ function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown {
     };
 }
 
-function createDtRamiMessageStationInsertValues(message: DtRamiMessage): (string | number)[][][] | null {
+function createDtRamiMessageStationInsertValues(message: DtRosmMessage): (string | number)[][][] | null {
     return message.stations
         ? [message.stations.map((station) => [message.id, message.version, station])]
         : null;
 }
 
-function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown {
+function createDtRamiMessageVideoInsertValues(message: DtRosmMessage): unknown {
     return {
         id: message.id,
         version: message.version,
@@ -355,7 +355,7 @@ function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown {
     };
 }
 
-function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown {
+function createDtRamiMessageAudioInsertValues(message: DtRosmMessage): unknown {
     return {
         id: message.id,
         version: message.version,
