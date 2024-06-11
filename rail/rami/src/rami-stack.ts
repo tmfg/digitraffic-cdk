@@ -11,7 +11,6 @@ import { IntegrationApi } from "./integration-api.js";
 export interface RamiConfiguration extends StackConfiguration {
     readonly dlqBucketName: string;
     readonly dlqNotificationDuration?: Duration;
-    readonly enablePublicApi: boolean;
 }
 export class RamiStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
@@ -21,13 +20,12 @@ export class RamiStack extends DigitrafficStack {
         const smSqs = this.createSmSqs(this, dlq);
 
         new IntegrationApi(this, rosmSqs, smSqs, dlq);
-        
+
         InternalLambdas.create(this, rosmSqs, dlq, configuration.dlqBucketName);
-        if (configuration.enablePublicApi === true) {
-            const publicApi = new PublicApi(this);
-            if (!this.secret) throw new Error("secret not found");
-            Canaries.create(this, dlq, publicApi, this.secret);
-        }
+
+        const publicApi = new PublicApi(this);
+        if (!this.secret) throw new Error("secret not found");
+        Canaries.create(this, dlq, publicApi, this.secret);
     }
 
     createRosmSqs(stack: DigitrafficStack, dlq: Queue): DigitrafficSqsQueue {
