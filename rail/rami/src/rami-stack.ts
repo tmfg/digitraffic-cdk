@@ -24,13 +24,12 @@ export class RamiStack extends DigitrafficStack {
         const smSqs = this.createSmSqs(this, dlq);
 
         new IntegrationApi(this, rosmSqs, smSqs, dlq);
-        
+
         InternalLambdas.create(this, rosmSqs, dlq, configuration.dlqBucketName);
-        if (configuration.enablePublicApi === true) {
-            const publicApi = new PublicApi(this);
-            if (!this.secret) throw new Error("secret not found");
-            Canaries.create(this, dlq, publicApi, this.secret);
-        }
+
+        const publicApi = new PublicApi(this);
+        if (!this.secret) throw new Error("secret not found");
+        Canaries.create(this, dlq, publicApi, this.secret);
     }
   }
 
