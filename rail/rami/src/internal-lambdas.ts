@@ -27,7 +27,7 @@ function createProcessRosmQueueLambda(stack: DigitrafficStack, queue: Queue, dlq
     const lambdaEnv = {
         ...(stack.configuration.secretId && { SECRET_ID: stack.configuration.secretId }),
         DB_APPLICATION: "avoindata",
-        DLQ_URL: dlq.queueUrl
+        [RamiEnvKeys.DLQ_URL]: dlq.queueUrl
     };
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-rosm-queue", lambdaEnv, {
         memorySize: 256,

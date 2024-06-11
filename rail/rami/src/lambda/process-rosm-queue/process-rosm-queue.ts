@@ -6,8 +6,9 @@ import { parseRosmMessage, processRosmMessage } from "../../service/process-mess
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { sendToSqs } from "../../util/sqs.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { RamiEnvKeys } from "../../keys.js";
 
-const DLQ_URL = getEnvVariable("DLQ_URL");
+const DLQ_URL = getEnvVariable(RamiEnvKeys.DLQ_URL);
 
 export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return (event: SQSEvent) => {
@@ -26,6 +27,7 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                     } catch (error) {
                         logException(logger, error);
                         // send original message to dlq on error
+                        
                         await sendToSqs(
                             DLQ_URL,
                             2,
