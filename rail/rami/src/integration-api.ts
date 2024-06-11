@@ -11,6 +11,7 @@ import { Duration } from "aws-cdk-lib";
 import { EndpointType, Model, type Resource } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
+import { RamiEnvKeys } from "./keys.js";
 
 export class IntegrationApi {
   readonly integrationApi: DigitrafficRestApi;
@@ -51,7 +52,10 @@ export class IntegrationApi {
             handler: "upload-rosm-message.handler",
             runtime: Runtime.NODEJS_20_X,
             reservedConcurrentExecutions: 20,
-            environment: { ROSM_SQS_URL: sqs.queueUrl, DLQ_URL: dlq.queueUrl }
+            environment: { 
+                [RamiEnvKeys.ROSM_SQS_URL]: sqs.queueUrl, 
+                [RamiEnvKeys.DLQ_URL]: dlq.queueUrl 
+            }
         });
 
         sqs.grantSendMessages(uploadLambda);
@@ -86,7 +90,10 @@ export class IntegrationApi {
             handler: "upload-sm-message.handler",
             runtime: Runtime.NODEJS_20_X,
             reservedConcurrentExecutions: 20,
-            environment: { SM_SQS_URL: sqs.queueUrl, DLQ_URL: dlq.queueUrl }
+            environment: { 
+                [RamiEnvKeys.SM_SQS_URL]: sqs.queueUrl, 
+                [RamiEnvKeys.DLQ_URL]: dlq.queueUrl 
+            }
         });
 
         sqs.grantSendMessages(uploadLambda);

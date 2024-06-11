@@ -7,10 +7,11 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
     if (messageBody) {
         const validationResult = validateIncomingRosmMessage(messageBody);
         if (validationResult.valid) {
+            // should this be debug?
             logger.info({
                 method: "UploadRamiMessage.handler",
                 message: "Received valid RAMI message",
-                customValidRamiMessage: JSON.stringify(messageBody)
+                customValidRosmMessage: JSON.stringify(messageBody)
             });
 
             await sendRosmMessage(validationResult);
@@ -20,7 +21,7 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
             logger.warn({
                 method: "UploadRamiMessage.handler",
                 message: "Received invalid RAMI message",
-                customInvalidRamiMessage: JSON.stringify(messageBody),
+                customInvalidRosmMessage: JSON.stringify(messageBody),
                 customValidationErrors: validationResult.errors
             });
             // send invalid message and error report to dlq
