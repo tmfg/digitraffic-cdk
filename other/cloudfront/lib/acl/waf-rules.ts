@@ -49,4 +49,30 @@ export class WafRules {
             perIpAndQueryWithoutHeader
         );
     }
+
+    static per5minWithSelectedCommon(
+        awsCommonRules: "all" | AWSManagedWafRule[],
+        perIpWithHeader: number,
+        perIpWithoutHeader: number,
+        perIpAndQueryWithHeader?: number,
+        perIpAndQueryWithoutHeader?: number
+    ): WafRules {
+        if (
+            perIpWithHeader < 100 ||
+            perIpWithoutHeader < 100 ||
+            (perIpAndQueryWithHeader ?? 100) < 100 ||
+            (perIpAndQueryWithoutHeader ?? 100) < 100
+        ) {
+            throw new Error("Minimum limit is 100");
+        }
+
+        return new WafRules(
+            awsCommonRules,
+            true,
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader
+        );
+    }
 }
