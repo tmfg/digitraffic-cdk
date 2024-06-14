@@ -25,7 +25,7 @@
     "@aws-sdk/client-sts": "~3.533.0",
     "@aws-sdk/types": "~3.533.0",
     "@digitraffic/common": "2024.3.14-1",
-    "@smithy/node-http-handler": "~2.5.0",
+    "@smithy/node-http-handler": "~3.0.1",
     "@smithy/protocol-http": "~3.3.0",
     "@smithy/signature-v4": "~2.2.0",
     "aws-cdk-lib": "~2.135.0",
