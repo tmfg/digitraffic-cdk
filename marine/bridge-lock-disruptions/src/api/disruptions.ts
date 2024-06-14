@@ -1,18 +1,34 @@
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import axios, { type AxiosResponse } from "axios";
+import ky from "ky";
 import type { Feature, Geometry } from "geojson";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export async function getDisruptions(endpointUrl: string): Promise<DisruptionFeature[]> {
-    const resp = await getDisruptionsFromServer(endpointUrl);
-    if (resp.status !== 200) {
+    const start = Date.now();
+
+    const response = await ky.get(endpointUrl, {
+        headers: {
+            Accept: MediaType.APPLICATION_JSON
+        }
+    });
+
+    if (response.status !== 200) {
         logger.error({
             method: "DisruptionsApi.getDisruptions",
-            message: `Fetching disruptions failed code: ${resp.status} details: ${resp.statusText}`
+            message: `Fetching disruptions failed code: ${response.status} details: ${response.statusText}`
         });
         throw new Error("Fetching disruptions failed");
     }
-    return resp.data.features;
+
+    const data = await response.json<ApiFeatures>();
+
+    logger.info({
+        method: `DisruptionsApi.getDisruptionsFromServer`,
+        message: `count=${data.features.length}`,
+        tookMs: Date.now() - start
+    });
+
+    return data.features;
 }
 
 interface ApiFeatures {
@@ -30,23 +46,4 @@ export interface DisruptionProperties {
     DescriptionSv?: string;
     DescriptionEn?: string;
     geometry: Geometry;
-}
-
-export function getDisruptionsFromServer(url: string): Promise<AxiosResponse<ApiFeatures>> {
-    const start = Date.now();
-    return axios
-        .get<ApiFeatures>(url, {
-            headers: {
-                Accept: MediaType.APPLICATION_JSON
-            }
-        })
-        .then((a) => {
-            logger.info({
-                method: `DisruptionsApi.getDisruptionsFromServer`,
-                message: `count=${a.data.features.length}`,
-                tookMs: Date.now() - start
-            });
-
-            return a;
-        });
 }

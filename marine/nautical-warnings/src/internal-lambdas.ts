@@ -17,5 +17,7 @@ export class InternalLambdas {
 }
 
 function createUpdateNauticalWarningsLambda(stack: DigitrafficStack): MonitoredFunction {
-    return MonitoredDBFunction.create(stack, "update-nautical-warnings");
+    return MonitoredDBFunction.create(stack, "update-nautical-warnings", stack.createLambdaEnvironment(), {
+        memorySize: 192,
+    });
 }

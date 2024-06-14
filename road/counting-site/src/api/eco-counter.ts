@@ -1,10 +1,10 @@
-import axios from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import type { ApiCounter } from "../model/counter.js";
 import type { ApiData } from "../model/data.js";
 import type { ApiChannel, ApiSite } from "../model/site.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import ky from "ky";
 
 export const URL_ALL_SITES = "/api/1.0/site";
 export const URL_SITE_DATA = "/api/1.0/data/site";
@@ -28,7 +28,7 @@ export class EcoCounterApi {
         });
 
         try {
-            const resp = await axios.get<T>(serverUrl, {
+            const resp = await ky.get(serverUrl, {
                 headers: {
                     accept: MediaType.APPLICATION_JSON,
                     Authorization: this.token
@@ -43,7 +43,7 @@ export class EcoCounterApi {
 
                 return Promise.reject();
             }
-            return resp.data;
+            return await resp.json<T>();
         } catch (error) {
             logException(logger, error);
 

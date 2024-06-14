@@ -1,4 +1,4 @@
-import axios from "axios";
+import ky, { HTTPError } from "ky";
 
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
@@ -55,17 +55,18 @@ export class AreaLightsApi {
     updateLightsForArea(request: AreaLightsBrightenRequest): Promise<AreaLightsBrightenResponse> {
         const start = Date.now();
 
-        const requestPromise = axios.post<AreaLightsBrightenResponse>(this.url, request, {
+        const requestPromise = ky.post(this.url, {
+            body: JSON.stringify(request),
             headers: { "x-api-key": this.apiKey },
-            validateStatus: (status) => status === 200
+//            validateStatus: (status) => status === 200
         });
 
         return requestPromise
             .then((response) => {
-                return response.data;
+                return response.json<AreaLightsBrightenResponse>();
             })
             .catch((error) => {
-                if (axios.isAxiosError(error)) {
+                if(error instanceof HTTPError) {
                     if (error.response) {
                         logger.error({
                             method: "AreaLightsApi.updateLightsForArea",

@@ -1,14 +1,10 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import axios from "axios";
-import axiosRetry from "axios-retry";
+import ky from "ky";
 import type { FeatureCollection } from "geojson";
 
 const LAYER_ACTIVE = "merivaroitus_julkaistu_dt" as const;
 const LAYER_ARCHIVED = "merivaroitus_arkistoitu_dt" as const;
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay });
 
 export class NauticalWarningsApi {
     private readonly baseUrl: string;
@@ -30,7 +26,7 @@ export class NauticalWarningsApi {
         const url = `${this.baseUrl}?crs=EPSG:4326&layer=${layer}`;
 
         try {
-            const resp = await axios.get<FeatureCollection>(url);
+            const resp = await ky.get(url);
 
             if (resp.status !== 200) {
                 logger.error({
@@ -40,7 +36,7 @@ export class NauticalWarningsApi {
 
                 return Promise.reject(resp);
             }
-            return Promise.resolve(resp.data);
+            return Promise.resolve(resp.json<FeatureCollection>());
         } catch (error) {
             logException(logger, error as Error);
 

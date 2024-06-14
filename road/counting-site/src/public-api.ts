@@ -225,7 +225,9 @@ export class PublicApi {
     }
 
     createValuesEndpoint(stack: DigitrafficStack): void {
-        const lambda = MonitoredDBFunction.create(stack, "get-values");
+        const lambda = MonitoredDBFunction.create(stack, "get-values", stack.createLambdaEnvironment(), {
+            memorySize: 192
+        });
 
         const integration = new DigitrafficIntegration(lambda, MediaType.APPLICATION_JSON)
             .addQueryParameter("counter_id", "domain_name", "year", "month")

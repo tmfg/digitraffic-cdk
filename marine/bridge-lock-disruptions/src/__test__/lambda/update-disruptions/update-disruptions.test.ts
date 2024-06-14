@@ -8,8 +8,9 @@ const DisruptionsDb = await import("../../../db/disruptions.js");
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 const { ProxyHolder } = await import("@digitraffic/common/dist/aws/runtime/secrets/proxy-holder");
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
 import { jest } from "@jest/globals";
-import axios, { type AxiosRequestConfig } from "axios";
+import ky from "ky";
 
 const SERVER_PORT = 8089;
 
@@ -24,14 +25,7 @@ describe(
 
         test("Update", async () => {
             const features = disruptionFeatures();
-            jest.spyOn(axios, "get").mockImplementation(
-                (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                    return Promise.resolve({
-                        status: 200,
-                        data: features
-                    });
-                }
-            );
+            jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify(features)));
 
             await handler();
             const disruptions = await DisruptionsDb.findAll(db);

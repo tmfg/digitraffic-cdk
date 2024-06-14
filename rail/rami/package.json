@@ -35,7 +35,7 @@
     "constructs": "10.3.0",
     "date-fns": "~2.30.0",
     "date-fns-tz": "~2.0.0",
-    "mysql2": "~3.9.7",
+    "mysql2": "~3.9.9",
     "source-map-support": "^0.5.21",
     "spex": "^3.3.0",
     "zod": "3.22.4"

@@ -1,9 +1,6 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
-import { Agent } from "https";
 import util from "util";
 import { parseString } from "xml2js";
-import axiosRetry from "axios-retry";
 import {
     ChangeStreamCommand,
     CloseStreamCommand,
@@ -16,15 +13,7 @@ import {
     RequestStreamCommand,
     LogoutCommand
 } from "./command.js";
-
-axiosRetry(axios, {
-    retryCondition: (error) => {
-        logger.debug(`retry for ${error.code ?? "<undefined>"}`);
-
-        return true;
-    },
-    retryDelay: (retry) => 1000 + retry * 3000
-});
+import { Agent, request, type Dispatcher } from "undici";
 
 const COMPR_LEVEL = "70" as const;
 const DEST_WIDTH = "1280" as const;
@@ -52,45 +41,65 @@ export class Session {
         this.videoUrl = url + VIDEO_URL_PART;
         this.sequenceId = 1;
 
-        this.agent = new Agent({
-            cert: Buffer.from(certificate, "base64").toString(),
-            ca: Buffer.from(ca, "base64").toString()
+        this.agent = new Agent({            
+            connect: {
+                cert: Buffer.from(certificate, "base64").toString(),
+                ca: Buffer.from(ca, "base64").toString()                
+            },            
+            pipelining: 6,
         });
     }
 
-    post<T>(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return axios.post<T>(url, xml, {
-            ...{ headers: {
-                host: "VideoOSLogServer"
-            }},
-            ...{ httpsAgent: this.agent, timeout: AXIOS_TIMEOUT_MILLIS },
-            ...configuration
-        });
+    async post(url: string, xml: string, configuration?: Partial<Dispatcher.RequestOptions>): Promise<Dispatcher.ResponseData> {
+        try {
+            return await request(url, {            
+                method: "POST",
+                throwOnError: false,
+                body: xml,
+                headers: {
+                    host: "VideoOSLogServer",
+                    "accept": "application/json"
+                },                
+                dispatcher: this.agent,
+                bodyTimeout: AXIOS_TIMEOUT_MILLIS,
+                ...configuration
+            });
+        } catch(e) {
+            logger.error({
+                method: "Session.post",
+                error: e
+            });
+
+            throw e;
+        }
     }
 
-    async sendMessage<T>(command: Command<T>, configuration?: AxiosRequestConfig): Promise<T> {
+    async sendMessage<T>(command: Command<T>, configuration?: Partial<Dispatcher.RequestOptions>): Promise<T> {
         const xml = command.createXml(this.sequenceId, this.connectionId);
         this.sequenceId++;
 
-        logger.debug("sending:" + xml);
+//        logger.debug("sending:" + xml);
 
-        const resp = await this.post<string>(this.communicationUrl, xml, configuration);
+        const resp = await this.post(this.communicationUrl, xml, configuration);
 
-        if (resp.status !== 200) {
+//        logger.debug("response " + JSON.stringify(resp));
+
+        if (resp.statusCode !== 200) {
             throw Error("sendMessage failed " + JSON.stringify(resp));
         }
 
-        const response: CommandResponse = (await parse(resp.data)) as CommandResponse;
-        command.checkError(response);
+        // it's actually xml, so we have to take it as text and then parse it
+        const body = await resp.body.text();
 
-        logger.debug("response " + JSON.stringify(response, null, 2));
+        const response = await parse(body) as CommandResponse;
+        command.checkError(response);
 
         return command.getResult(response);
     }
 
     async connect(): Promise<string> {
         // longer timeout for connect
-        this.connectionId = await this.sendMessage(new ConnectCommand(), { timeout: 4000 });
+        this.connectionId = await this.sendMessage(new ConnectCommand(), { bodyTimeout: 4000 });
 
         return this.connectionId;
     }
@@ -101,7 +110,7 @@ export class Session {
             .addInputParameters("Password", password);
 
         // use a bit longer timeout for login
-        return this.sendMessage(command, { timeout: 8000 });
+        return this.sendMessage(command, { bodyTimeout: 8000 });
     }
 
     disconnect(): Promise<void> {
@@ -173,10 +182,10 @@ export class Session {
             message: "posting to " + streamUrl
         });
 
-        const response = await this.post<ArrayBuffer>(streamUrl, "", { responseType: "arraybuffer" });
+        const response = await this.post(streamUrl, "");
 
         // format is uuid(16) timestamp(8) datasize(4) headersize(2) headerExtension(2)...
-        const buffer = Buffer.from(response.data);
+        const buffer = Buffer.from(await response.body.arrayBuffer());
         const dataSize = buffer.readUInt32LE(16 + 8 + 4);
         const headerSize = buffer.readUInt16LE(16 + 8 + 4 + 4);
 

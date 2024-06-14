@@ -1,4 +1,4 @@
-import { Agent } from "undici";
+import { Agent, request } from "undici";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
@@ -17,7 +17,8 @@ export async function postDocument(
 
     // try-catch so axios won't log keys/certs
     try {
-        const resp = await ky.post(url, {
+        const resp = await request(url, {
+            method: "POST",
             body: faultS124,
             dispatcher: new Agent({
                 connect: {
@@ -31,11 +32,10 @@ export async function postDocument(
             }
         });
 
-        if (resp.status !== 200) {
+        if (resp.statusCode !== 200) {
             logger.error({
                 method: "VisApi.postDocument",
-                customStatus: resp.status,
-                customText: resp.statusText
+                customStatus: resp.statusCode,
             });
             return Promise.reject();
         }
