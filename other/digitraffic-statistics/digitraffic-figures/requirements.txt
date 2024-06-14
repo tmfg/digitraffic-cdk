@@ -47,5 +47,5 @@ tzdata==2024.1
 urllib3==2.2.1
 Werkzeug==3.0.3
 WTForms==3.1.2
-zipp==3.19.0
+zipp==3.19.2
 zstandard==0.22.0
