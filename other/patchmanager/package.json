@@ -22,7 +22,7 @@
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.6.8",
+    "@rushstack/eslint-config": "^3.7.0",
     "@rushstack/heft": "^0.66.2",
     "@rushstack/heft-jest-plugin": "^0.11.23",
     "@types/heft-jest": "1.0.6",
