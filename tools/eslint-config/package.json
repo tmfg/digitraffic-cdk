@@ -12,7 +12,7 @@
   "dependencies": {
     "@rushstack/eslint-config": "^3.6.8",
     "@typescript-eslint/eslint-plugin": "~6.18.0",
-    "eslint-plugin-deprecation": "~2.0.0"
+    "eslint-plugin-deprecation": "~3.0.0"
   },
   "devDependencies": {
     "eslint": "~8.57.0",
