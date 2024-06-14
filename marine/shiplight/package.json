@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@digitraffic/common": "2024.5.13-1",
-    "aws-cdk-lib": "~2.142.0",
+    "aws-cdk-lib": "~2.146.0",
     "constructs": "10.3.0",
     "ky": "1.2.4",
     "pg-native": "^3.0.1",
