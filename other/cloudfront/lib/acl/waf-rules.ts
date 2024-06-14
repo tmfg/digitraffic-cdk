@@ -25,12 +25,11 @@ export class WafRules {
         this.perIpAndQueryWithoutHeader = perIpAndQueryWithoutHeader;
     }
 
-    static per5min(
+    private static checkLimits(
         perIpWithHeader: number,
         perIpWithoutHeader: number,
         perIpAndQueryWithHeader?: number,
-        perIpAndQueryWithoutHeader?: number
-    ): WafRules {
+        perIpAndQueryWithoutHeader?: number): void {
         if (
             perIpWithHeader < 100 ||
             perIpWithoutHeader < 100 ||
@@ -39,6 +38,15 @@ export class WafRules {
         ) {
             throw new Error("Minimum limit is 100");
         }
+    }
+
+    static per5min(
+        perIpWithHeader: number,
+        perIpWithoutHeader: number,
+        perIpAndQueryWithHeader?: number,
+        perIpAndQueryWithoutHeader?: number
+    ): WafRules {
+        WafRules.checkLimits(perIpWithHeader, perIpWithoutHeader, perIpAndQueryWithHeader, perIpAndQueryWithoutHeader)
 
         return new WafRules(
             "all",
@@ -57,14 +65,7 @@ export class WafRules {
         perIpAndQueryWithHeader?: number,
         perIpAndQueryWithoutHeader?: number
     ): WafRules {
-        if (
-            perIpWithHeader < 100 ||
-            perIpWithoutHeader < 100 ||
-            (perIpAndQueryWithHeader ?? 100) < 100 ||
-            (perIpAndQueryWithoutHeader ?? 100) < 100
-        ) {
-            throw new Error("Minimum limit is 100");
-        }
+        WafRules.checkLimits(perIpWithHeader, perIpWithoutHeader, perIpAndQueryWithHeader, perIpAndQueryWithoutHeader)
 
         return new WafRules(
             awsCommonRules,
