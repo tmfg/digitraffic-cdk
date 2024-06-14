@@ -41,7 +41,7 @@
     "@types/aws-lambda": "8.10.137",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
-    "@types/node": "20.12.4",
+    "@types/node": "20.14.2",
     "esbuild": "~0.20.2",
     "eslint": "~8.57.0",
     "typescript": "~5.4.4"
