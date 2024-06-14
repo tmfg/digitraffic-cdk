@@ -1,7 +1,7 @@
 import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import { IResolvable, RemovalPolicy, Stack } from "aws-cdk-lib";
-import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder.mjs";
-import { WafRules } from "./waf-rules";
+import { type IResolvable, RemovalPolicy, Stack } from "aws-cdk-lib";
+import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder";
+import { WafRules } from "./waf-rules.js";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
 type ResponseKey = "IP_WITH_HEADER" | "IPQUERY_WITH_HEADER" | "IP_WITHOUT_HEADER" | "IPQUERY_WITHOUT_HEADER";
@@ -75,13 +75,14 @@ function createRuleProperty(
 }
 
 export function createWebAcl(stack: Stack, environment: string, rules: WafRules): CfnWebACL {
-    const aclBuilder = new AclBuilder(stack)
+    const aclBuilder = new AclBuilder(stack);
 
-    aclBuilder.withAWSManagedRules(rules.awsCommonRules)
-      .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
-      .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
-      .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
-      .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader)
+    aclBuilder
+        .withAWSManagedRules(rules.awsCommonRules)
+        .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
+        .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
+        .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
+        .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
 
     const acl = aclBuilder.build();
 

@@ -29,7 +29,8 @@ export class WafRules {
         perIpWithHeader: number,
         perIpWithoutHeader: number,
         perIpAndQueryWithHeader?: number,
-        perIpAndQueryWithoutHeader?: number): void {
+        perIpAndQueryWithoutHeader?: number
+    ): void {
         if (
             perIpWithHeader < 100 ||
             perIpWithoutHeader < 100 ||
@@ -46,7 +47,12 @@ export class WafRules {
         perIpAndQueryWithHeader?: number,
         perIpAndQueryWithoutHeader?: number
     ): WafRules {
-        WafRules.checkLimits(perIpWithHeader, perIpWithoutHeader, perIpAndQueryWithHeader, perIpAndQueryWithoutHeader)
+        WafRules.checkLimits(
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader
+        );
 
         return new WafRules(
             "all",
@@ -65,7 +71,12 @@ export class WafRules {
         perIpAndQueryWithHeader?: number,
         perIpAndQueryWithoutHeader?: number
     ): WafRules {
-        WafRules.checkLimits(perIpWithHeader, perIpWithoutHeader, perIpAndQueryWithHeader, perIpAndQueryWithoutHeader)
+        WafRules.checkLimits(
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader
+        );
 
         return new WafRules(
             awsCommonRules,

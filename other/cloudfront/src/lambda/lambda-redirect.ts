@@ -1,8 +1,8 @@
 const domainName = "EXT_DOMAIN_NAME";
 const hostName = "EXT_HOST_NAME";
 
-const hostHeader = [{ key: 'host', value: hostName}];
-const sslProtocols = ['TLSv1', 'TLSv1.1'];
+const hostHeader = [{ key: "host", value: hostName }];
+const sslProtocols = ["TLSv1", "TLSv1.1"];
 
 const VERSION_REDIRECT = "EXT_VERSION";
 
@@ -27,13 +27,13 @@ exports.handler = function handler(event: any, context: any, callback: any) {
             custom: {
                 domainName: domainName,
                 port: 80,
-                protocol: 'http',
-                path: '',
+                protocol: "http",
+                path: "",
                 sslProtocols: sslProtocols,
                 readTimeout: 5,
                 keepaliveTimeout: 5,
-                customHeaders: {},
-            },
+                customHeaders: {}
+            }
         };
 
         request.headers.host = hostHeader;

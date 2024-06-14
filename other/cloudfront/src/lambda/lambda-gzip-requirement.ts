@@ -1,4 +1,4 @@
-import {addCorsHeaders} from "../lambda-util";
+import { addCorsHeaders } from "../lambda-util";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
@@ -15,13 +15,15 @@ exports.handler = function handler(event: any, context: any, callback: any) {
     if (isOptionsRequest(request)) {
         const response = {
             status: 204,
-            statusDescription: 'No Content',
+            statusDescription: "No Content",
             headers: {
-                'access-control-max-age': [{
-                    key: 'access-control-max-age',
-                    value: '86400',
-                }],
-            },
+                "access-control-max-age": [
+                    {
+                        key: "access-control-max-age",
+                        value: "86400"
+                    }
+                ]
+            }
         };
         addCorsHeaders(response);
         callback(null, response);
@@ -29,7 +31,7 @@ exports.handler = function handler(event: any, context: any, callback: any) {
         const response = {
             status: 406,
             statusDescription: "Not Acceptable",
-            body: "Use of gzip compression is required with Accept-Encoding: gzip header.",
+            body: "Use of gzip compression is required with Accept-Encoding: gzip header."
         };
 
         callback(null, response);
@@ -40,21 +42,25 @@ exports.handler = function handler(event: any, context: any, callback: any) {
 };
 
 function isOptionsRequest(request: any): boolean {
-    return request.method === 'OPTIONS';
+    return request.method === "OPTIONS";
 }
 
 function isGetRequest(request: any): boolean {
-    return request.method === 'GET';
+    return request.method === "GET";
 }
 
 function isAcceptGzipHeaderPresent(request: any): boolean {
     // everything will be lower-case, so no problemos!
     const headers = request.headers;
-    const acceptHeader = headers['accept-encoding'];
+    const acceptHeader = headers["accept-encoding"];
     if (!acceptHeader) {
         return false;
     }
     const acceptHeaderValue = acceptHeader[0];
 
-    return acceptHeaderValue != null && acceptHeaderValue.value != null && acceptHeaderValue.value.indexOf('gzip') > -1;
+    return (
+        acceptHeaderValue != null &&
+        acceptHeaderValue.value != null &&
+        acceptHeaderValue.value.indexOf("gzip") > -1
+    );
 }
