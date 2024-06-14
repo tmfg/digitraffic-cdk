@@ -55,7 +55,7 @@
     "@types/lodash": "4.17.0",
     "@types/node": "20.12.4",
     "esbuild": "~0.20.1",
-    "eslint": "~8.57.0",
+    "eslint": "~9.4.0",
     "lodash": "~4.17.21",
     "parallelshell": "3.0.2",
     "typescript": "~5.4.4"
