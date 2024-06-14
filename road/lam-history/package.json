@@ -42,7 +42,7 @@
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
     "@types/node": "20.12.4",
-    "esbuild": "~0.20.2",
+    "esbuild": "~0.21.5",
     "eslint": "~8.57.0",
     "typescript": "~5.4.4"
   }
