@@ -57,7 +57,7 @@
     "@types/jest": "29.5.12",
     "@types/lodash": "4.17.0",
     "@types/node": "20.12.4",
-    "@types/sinon": "17.0.2",
+    "@types/sinon": "17.0.3",
     "@types/uuid": "9.0.7",
     "@types/ws": "8.5.10",
     "@types/xml2js": "0.4.14",
