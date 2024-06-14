@@ -27,7 +27,7 @@
     "@digitraffic/common": "2024.3.14-1",
     "@smithy/node-http-handler": "~2.5.0",
     "@smithy/protocol-http": "~3.3.0",
-    "@smithy/signature-v4": "~2.2.0",
+    "@smithy/signature-v4": "~3.0.1",
     "aws-cdk-lib": "~2.135.0",
     "constructs": "~10.3.0"
   },
