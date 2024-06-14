@@ -4,203 +4,204 @@ updates:
     directory: "aviation/aviation-data"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "common/autoinstallers/rush-prettier"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "lib/digitraffic-common"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "lib/repo-scripts"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/aton-faults"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/bridge-lock-disruptions"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/gofrep"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/marinecam"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/nautical-warnings"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/portactivity"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/shiplight"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/sse"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "marine/voyage-plan-gateway"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/aws-github-oidc"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/cloudfront"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/cloudwatch-logs-recipient"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/digitraffic-statistics"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/elasticsearch"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/es-key-figures"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/monitoring"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/opensearch-monitors"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/patchmanager"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/status"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "other/swagger-joiner"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "rail/rami"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "rail/rata"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/charging-network"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/counting-site"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/lam-history"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/maintenance-tracking-municipality"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/maintenance-tracking"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/open311"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/street-traffic-message"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "road/variable-signs"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "template/esm"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "tools/eslint-config"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "tools/testing"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "tools/rig"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "npm"
     directory: "tools/toolchain"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "pip"
     directory: "other/digitraffic-statistics/digitraffic-figures"
     schedule:
       interval: "daily"
-    versioning-strategy: increase
+    open-pull-requests-limit: 0
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
