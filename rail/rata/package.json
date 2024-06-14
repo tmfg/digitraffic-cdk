@@ -22,7 +22,7 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.6.8",
-    "@types/aws-lambda": "8.10.137",
+    "@types/aws-lambda": "8.10.138",
     "eslint": "~8.57.0",
     "jest": "^29.7.0",
     "typescript": "~5.4.4"
