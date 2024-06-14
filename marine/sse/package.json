@@ -27,7 +27,7 @@
     "aws-cdk-lib": "~2.142.1",
     "constructs": "10.3.0",
     "pg-native": "^3.0.1",
-    "pg-promise": "^11.5.4"
+    "pg-promise": "^11.8.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
