@@ -44,7 +44,7 @@
     "@rushstack/eslint-config": "^3.6.8",
     "@rushstack/heft": "^0.66.2",
     "@rushstack/heft-jest-plugin": "^0.11.23",
-    "@types/aws-lambda": "8.10.137",
+    "@types/aws-lambda": "8.10.138",
     "@types/geojson": "^7946.0.13",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
