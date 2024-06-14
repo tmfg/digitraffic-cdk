@@ -20,7 +20,7 @@
   "dependencies": {
     "@digitraffic/common": "2024.1.24-3",
     "aws-cdk-lib": "~2.135.0",
-    "aws-sdk": "~2.1593.0",
+    "aws-sdk": "~2.1641.0",
     "axios": "^1.6.5",
     "constructs": "10.3.0",
     "source-map-support": "^0.5.21"
