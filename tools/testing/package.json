@@ -20,7 +20,7 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@rushstack/eslint-config": "^3.6.9",
+    "@rushstack/eslint-config": "^3.7.0",
     "@typescript-eslint/eslint-plugin": "~6.18.1",
     "eslint-plugin-deprecation": "~2.0.0",
     "madge": "6.1.0"
@@ -30,7 +30,7 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "29.7.0",
-    "@rushstack/eslint-config": "^3.6.1",
+    "@rushstack/eslint-config": "^3.7.0",
     "@rushstack/heft": "^0.64.2",
     "@rushstack/heft-jest-plugin": "^0.11.2",
     "@types/heft-jest": "1.0.6",
