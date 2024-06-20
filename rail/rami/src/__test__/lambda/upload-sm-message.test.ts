@@ -3,9 +3,11 @@ import { validSmMessage } from "../testdata-sm.js";
 import { copyAndUndefine } from "../message-util.js";
 
 const sendSmFn = jest.fn();
+const sendDlqFn = jest.fn();
 
 jest.unstable_mockModule("../../service/sqs-service.js", () => ({
-    sendSmMessage: sendSmFn
+    sendSmMessage: sendSmFn,
+    sendDlq: sendDlqFn
 }));
 
 describe(
@@ -17,6 +19,7 @@ describe(
 
             expect(result.status).toEqual(400);
             expect(sendSmFn).toHaveBeenCalledTimes(0);
+            expect(sendDlqFn).toHaveBeenCalledTimes(0);
         });
 
         test("handler - valid message", async () => {
@@ -25,6 +28,7 @@ describe(
 
             expect(result.status).toEqual(200);
             expect(sendSmFn).toHaveBeenCalledTimes(1);
+            expect(sendDlqFn).toHaveBeenCalledTimes(0);
         });
 
         test("handler - invalid message", async () => {
@@ -34,6 +38,7 @@ describe(
             
             expect(result.status).toEqual(200);
             expect(sendSmFn).toHaveBeenCalledTimes(0);
+            expect(sendDlqFn).toHaveBeenCalledTimes(1);
         });
     }
 );
