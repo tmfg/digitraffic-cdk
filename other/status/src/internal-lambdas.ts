@@ -21,6 +21,7 @@ export function create(
     createUpdateStatusesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, configuration);
     createHandleMaintenanceLambda(secret, alarmSnsTopic, warningSnsTopic, stack, configuration);
     createCheckComponentStatesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, configuration);
+    createTestSlackNotifyLambda(secret, alarmSnsTopic, warningSnsTopic, stack, configuration);
 }
 
 function createCommonEnv(props: Props): LambdaEnvironment {
@@ -153,5 +154,42 @@ function createCheckComponentStatesLambda(
 
     Scheduler.everyHour(stack, "CheckComponentStatesRule", lambda);
 
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+}
+
+function createTestSlackNotifyLambda(
+    secret: ISecret,
+    alarmSnsTopic: ITopic,
+    warningSnsTopic: ITopic,
+    stack: Stack,
+    props: Props
+): void {
+    const functionName = "Status-TestSlackNotify" as const;
+
+    const environment = createCommonEnv(props);
+
+    const lambdaConf: FunctionProps = {
+        functionName: functionName,
+        code: new AssetCode("dist/lambda/test-slack-notify"),
+        handler: "lambda-test-slack-notify.handler",
+        runtime: Runtime.NODEJS_20_X,
+        memorySize: 128,
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+        environment,
+        logRetention: RetentionDays.ONE_MONTH,
+        reservedConcurrentExecutions: 1
+    };
+
+    const lambda = new MonitoredFunction(
+        stack,
+        "TestSlackNotify",
+        lambdaConf,
+        alarmSnsTopic,
+        warningSnsTopic,
+        true,
+        TrafficType.OTHER
+    );
+
+    secret.grantRead(lambda);
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }

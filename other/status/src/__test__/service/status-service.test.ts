@@ -121,6 +121,40 @@ describe("StatusServiceTest", () => {
             ]
         ));
 
+    test("getNodePingAndStatuspageComponentStatuses - NodePing check UP and cState DISRUPTED", async () =>
+        testGetNodePingAndStatuspageComponentNotInSyncStatuses(
+            (statuses: string[]) => {
+                expect(statuses.length).toBe(0);
+            },
+            {
+                ...emptyCStateStatus,
+                systems: [{ ...defaultCStateSystem, status: "disrupted" }]
+            },
+            [
+                {
+                    label: defaultApiLabel,
+                    state: 1
+                } as NodePingCheck
+            ]
+        ));
+
+    test("getNodePingAndStatuspageComponentStatuses - NodePing check UP and cState NOTICE", async () =>
+        testGetNodePingAndStatuspageComponentNotInSyncStatuses(
+            (statuses: string[]) => {
+                expect(statuses.length).toBe(0);
+            },
+            {
+                ...emptyCStateStatus,
+                systems: [{ ...defaultCStateSystem, status: "notice" }]
+            },
+            [
+                {
+                    label: defaultApiLabel,
+                    state: 1
+                } as NodePingCheck
+            ]
+        ));
+
     test("getNodePingAndStatuspageComponentStatuses - NodePing check DOWN and cState statuspage check UP", async () =>
         testGetNodePingAndStatuspageComponentNotInSyncStatuses(
             (statuses: string[]) => {

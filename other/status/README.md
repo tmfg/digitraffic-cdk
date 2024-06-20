@@ -2,6 +2,18 @@
 
 Takes a OpenApi descriptions and creates a set of NodePing checks to monitor them.
 
+## Build and install command
+
+    # Buildint
+    rush update
+    rushx test
+    rushx build
+    rushx ci:eslint-report; open report.html
+
+    # Deploy
+    rushx cdk-diff-status-prod
+    rushx cdk-deploy-status-prod
+
 ## Lambdas
 
 ### [lambda-check-component-states.ts](src/lambda/check-component-states/lambda-check-component-states.ts)

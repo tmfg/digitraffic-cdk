@@ -1,7 +1,7 @@
 import type { UpdateStatusSecret } from "../../secret.js";
 import * as StatusService from "../../service/status-service.js";
 import { NodePingApi } from "../../api/nodeping-api.js";
-import { StatusReportApi } from "../../api/statusreport-api.js";
+import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { StatusEnvKeys } from "../../keys.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
@@ -22,14 +22,15 @@ const GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE = getEnvVariable(
 );
 
 let nodePingApi: NodePingApi;
-let statusReportApi: StatusReportApi;
+let slackApi: SlackApi;
 let cStateApi: CStateStatuspageApi;
 /**
  * Checks current status of StatusPage and NodePing and sends report to Slack
  */
 export const handler = async (): Promise<void> => {
     const method = `LambdaCheckComponentStates.handler` as const satisfies LoggerMethodType;
-    init();
+    const secret = await secretHolder.get();
+    init(secret);
 
     const componentStatuses = await StatusService.getNodePingAndStatuspageComponentNotInSyncStatuses(
         nodePingApi,
@@ -41,13 +42,14 @@ export const handler = async (): Promise<void> => {
             method,
             message: `Nodeping and statuspage not in sync. Diff: ${JSON.stringify(componentStatuses)}`
         });
-        await statusReportApi.sendReport(componentStatuses);
+        const statesText = componentStatuses.join("\n");
+        await slackApi.notify(statesText);
     } else {
         logger.info({ method, message: "Nodeping and statuspage in sync" });
     }
 };
 
-function init(): void {
+function init(secret: UpdateStatusSecret): void {
     if (!nodePingApi) {
         nodePingApi = new NodePingApi(secretHolder, DEFAULT_TIMEOUT_MS, CHECK_TIMEOUT, CHECK_INTERVAL);
         cStateApi = new CStateStatuspageApi(
@@ -58,6 +60,7 @@ function init(): void {
             GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE,
             secretHolder
         );
-        statusReportApi = new StatusReportApi(secretHolder);
+
+        slackApi = new SlackApi(secret.reportUrl);
     }
 }
