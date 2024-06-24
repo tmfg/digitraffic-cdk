@@ -165,10 +165,7 @@ function doUploadToS3(
         commandInput.ContentType = contentType;
     }
     const command = new PutObjectCommand(commandInput);
-    logger.info({
-        method: `${SERVICE}.doUploadToS3`,
-        message: `commandInput: ${JSON.stringify(commandInput)}`
-    });
+
     return s3.send(command).catch((error: Error) => {
         logger.error({
             method: `${SERVICE}.doUploadToS3`,

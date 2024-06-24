@@ -47,9 +47,9 @@ export async function getNodePingAndStatuspageComponentNotInSyncStatuses(
                   if (!nodePingCheck) {
                       return null;
                   }
-                  if (nodePingCheck.state === 1 && cStateSystem.status !== "ok") {
+                  if (nodePingCheck.state === 1 && cStateSystem.status === "down") {
                       return `${cStateSystem.name}: NodePing check is UP, cState statuspage component is DOWN`;
-                  } else if (nodePingCheck.state === 0 && cStateSystem.status === "ok") {
+                  } else if (nodePingCheck.state === 0 && cStateSystem.status !== "down") {
                       return `${cStateSystem.name}: NodePing check is DOWN, cState statuspage component is UP`;
                   }
                   return null;

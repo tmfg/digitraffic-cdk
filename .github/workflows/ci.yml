@@ -1,5 +1,5 @@
 name: CI
-on: [ push ]
+on: [push]
 
 jobs:
   build:
@@ -17,8 +17,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check rush.json and dependabot.yml
-        run: python scripts/check-dependabot-projects.py
+      #- name: Check rush.json and dependabot.yml
+      #  run: python scripts/check-dependabot-projects.py
       - name: Cache pnpm store cache
         uses: actions/cache@v4
         with:

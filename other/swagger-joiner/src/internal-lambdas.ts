@@ -45,8 +45,6 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
     statement.addResources("*");
 
     updateDocsLambda.addToRolePolicy(statement);
-
-    createSubscription(updateDocsLambda, functionName, props.logsDestinationArn, stack);
 }
 
 function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: Bucket): void {
@@ -102,8 +100,6 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
     statement.addResources(bucket.bucketArn);
 
     updateSwaggerLambda.addToRolePolicy(statement);
-
-    createSubscription(updateSwaggerLambda, functionName, props.logsDestinationArn, stack);
 
     const ruleName = `${stack.stackName}-UpdateSwaggerRule`;
     const rule = new Rule(stack, ruleName, {

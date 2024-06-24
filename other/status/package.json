@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "~3.543.0",
-    "@digitraffic/common": "2024.3.28-1",
+    "@digitraffic/common": "2024.6.14-2",
     "aws-cdk-lib": "~2.135.0",
     "axios": "~1.6.8",
     "constructs": "~10.3.0",
@@ -35,8 +35,8 @@
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
+    "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "~29.7.0",
     "@rushstack/eslint-config": "~3.6.8",
     "@rushstack/heft": "~0.66.2",
