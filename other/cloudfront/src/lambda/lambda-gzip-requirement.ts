@@ -1,4 +1,4 @@
-import { addCorsHeaders } from "../lambda-util";
+import { addCorsHeaders } from "../lambda-util.js";
 
 const VERSION_HEADERS = "EXT_VERSION";
 

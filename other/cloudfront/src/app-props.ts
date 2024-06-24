@@ -1,6 +1,6 @@
 import { CloudFrontAllowedMethods, OriginProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
-import { WafRules } from "./acl/waf-rules";
-import { FunctionType, LambdaType } from "./lambda/lambda-creator";
+import type { WafRules } from "./acl/waf-rules.js";
+import { FunctionType, LambdaType } from "./lambda/lambda-creator.js";
 
 export class CFBehavior {
     readonly path: string;

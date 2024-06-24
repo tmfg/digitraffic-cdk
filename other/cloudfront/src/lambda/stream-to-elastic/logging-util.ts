@@ -22,12 +22,12 @@ export const CLOUDFRONT_STREAMING_LOG_FIELDS = [
     "cs-headers"
 ];
 
-export function findHeaderValue(headerName: string, allHeaders: string): string | null {
+export function findHeaderValue(headerName: string, allHeaders: string | undefined): string | null {
     if (allHeaders) {
         for (const value of allHeaders.split("%0A")) {
             const values = value.split(":");
 
-            if (values[0].toUpperCase() === headerName.toUpperCase()) {
+            if (values && values[0] && values[0].toUpperCase() === headerName.toUpperCase() && values[1]) {
                 return unescape(values[1]);
             }
         }

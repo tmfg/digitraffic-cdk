@@ -1,13 +1,14 @@
 import { CfnRealtimeLogConfig } from "aws-cdk-lib/aws-cloudfront";
-import { Duration, Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
 import { Code, Runtime, StartingPosition, Tracing, Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Stream } from "aws-cdk-lib/aws-kinesis";
 import { KinesisEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
-import { CLOUDFRONT_STREAMING_LOG_FIELDS } from "./lambda/stream-to-elastic/logging-util";
-import { ElasticProps } from "./app-props";
+import { CLOUDFRONT_STREAMING_LOG_FIELDS } from "./lambda/stream-to-elastic/logging-util.js";
+import type { ElasticProps } from "./app-props.js";
 
 export interface StreamingConfig {
     kinesis: Stream;

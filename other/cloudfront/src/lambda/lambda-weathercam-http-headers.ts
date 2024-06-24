@@ -1,4 +1,4 @@
-import { addWeathercamImageLastModifiedHeaderFromXAmzMeta } from "../lambda-util";
+import { addWeathercamImageLastModifiedHeaderFromXAmzMeta } from "../lambda-util.js";
 
 const VERSION_HEADERS = "EXT_VERSION";
 

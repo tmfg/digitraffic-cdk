@@ -1,7 +1,7 @@
-import { Duration, Stack } from "aws-cdk-lib";
+import { Duration, type Stack } from "aws-cdk-lib";
 import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
 import type { Role } from "aws-cdk-lib/aws-iam";
-import { Function as AWSFunction, InlineCode, Runtime, Version } from "aws-cdk-lib/aws-lambda";
+import { Function as AWSFunction, InlineCode, Runtime, type Version } from "aws-cdk-lib/aws-lambda";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import fs from "node:fs";
 

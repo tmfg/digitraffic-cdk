@@ -1,4 +1,4 @@
-import { AWSManagedWafRule } from "@digitraffic/common/dist/aws/infra/acl-builder.mjs";
+import type { AWSManagedWafRule } from "@digitraffic/common/dist/aws/infra/acl-builder";
 
 export class WafRules {
     readonly awsCommonRules: "all" | AWSManagedWafRule[];
