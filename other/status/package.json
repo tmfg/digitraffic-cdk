@@ -22,16 +22,16 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "~3.543.0",
+    "@aws-sdk/client-secrets-manager": "~3.600.0",
     "@digitraffic/common": "2024.6.14-2",
-    "aws-cdk-lib": "~2.135.0",
+    "aws-cdk-lib": "~2.147.0",
     "axios": "~1.6.8",
     "constructs": "~10.3.0",
     "date-fns": "~2.30.0",
     "ky": "~1.2.3",
     "lodash": "~4.17.21",
-    "mqtt": "~5.5.0",
-    "ws": "~8.16.0"
+    "mqtt": "~5.7.2",
+    "ws": "~8.17.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
