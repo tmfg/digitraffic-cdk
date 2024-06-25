@@ -1,10 +1,10 @@
 import { validateIncomingSmMessage } from "../../service/validate-message.js";
 import { validMessage2, validMessageUnknownTrackAndDelay } from "../testdata-sm.js";
-import { copyAndUndefine } from "../message-util.js";
+import { cloneAndUndefine } from "../message-util.js";
 
 describe("validate incoming sm message", () => {
     test("validateIncomingSmMessage - missing payload", () => {
-        const invalidMessage = copyAndUndefine(validMessageUnknownTrackAndDelay, "payload");
+        const invalidMessage = cloneAndUndefine(validMessageUnknownTrackAndDelay, "payload");
 
         const result = validateIncomingSmMessage(invalidMessage);
         expect(result.valid).toBe(false);
@@ -14,7 +14,7 @@ describe("validate incoming sm message", () => {
     });
 
     test("validateIncomingSmMessage - missing monitoredStopVisits", () => {
-        const invalidMessage = copyAndUndefine(validMessageUnknownTrackAndDelay, "stopMonitoringMsg", "payload", "monitoredStopVisits");
+        const invalidMessage = cloneAndUndefine(validMessageUnknownTrackAndDelay, "stopMonitoringMsg", "payload", "monitoredStopVisits");
 
         const result = validateIncomingSmMessage(invalidMessage);
         expect(result.valid).toBe(false);

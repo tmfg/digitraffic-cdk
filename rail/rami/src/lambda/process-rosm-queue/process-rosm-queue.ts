@@ -10,9 +10,9 @@ import { RamiEnvKeys } from "../../keys.js";
 
 const DLQ_URL = getEnvVariable(RamiEnvKeys.DLQ_URL);
 
-export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
-    return (event: SQSEvent) => {
-        return Promise.allSettled(
+export function handlerFn(): (event: SQSEvent) => Promise<void> {
+    return async (event: SQSEvent) => {
+        await Promise.allSettled(
             event.Records.map(async (r) => {
                 const start = Date.now();
                 const recordBody = r.body;
