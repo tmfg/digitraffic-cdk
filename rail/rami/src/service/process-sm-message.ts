@@ -1,35 +1,45 @@
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { DtSmMessage } from "../model/dt-rami-message.js";
-import { ramiSmMessageSchema } from "../model/zod-schema/sm-message.js";
+import type { DtSmMessage, StMonitoringData } from "../model/dt-rami-message.js";
+import { monitoredCall, ramiSmMessageSchema } from "../model/zod-schema/sm-message.js";
 import type { z } from "zod";
 
 export function parseSmMessage(message: unknown): DtSmMessage | undefined {
     try {
         const parsedMessage = ramiSmMessageSchema.parse(message);
 
-        return ramiMessageToDtSmMessage(parsedMessage);
+        return ramiMessageToDtSmMessages(parsedMessage);
     } catch (e) {
         logException(logger, e);
     }
     return undefined;
 }
 
-function ramiMessageToDtSmMessage(message: z.infer<typeof ramiSmMessageSchema>): DtSmMessage {
+function ramiMessageToDtSmMessages(message: z.infer<typeof ramiSmMessageSchema>): DtSmMessage {
+    const data: StMonitoringData[] = [];
     const mcj = message.payload.monitoredStopVisits[0].monitoredVehicleJourney;
     const monitoredCall = mcj.monitoredCall;
-
-    const hasDeparture = !!monitoredCall.departureStopAssignment;
     const { trainNumber, departureDate } = parseTrain(mcj.vehicleJourneyName);
 
+    data.push(parseMonitoredCall(monitoredCall));
+
+    mcj.onwardCalls.forEach(oc => {
+        data.push(parseMonitoredCall(oc));
+    });  
+
+    return { trainNumber, departureDate, data };
+}
+
+function parseMonitoredCall(mc: z.infer<typeof monitoredCall>): StMonitoringData {
+    const hasDeparture = Object.keys(mc.departureStopAssignment).length > 0;
+
     return {
-        trainNumber, departureDate,
-        stationShortCode: monitoredCall.stopPointRef,
-        arrivalTimeUnknown: !monitoredCall.expectedArrivalTime,
-        arrivalQuayUnknown: !monitoredCall.arrivalStopAssignment.expectedQuayName,
-        departureTimeUnknown: hasDeparture && !monitoredCall.expectedDepartureTime,
-        departureQuayUnknown: hasDeparture && !monitoredCall.departureStopAssignment.expectedQuayName,
-    }
+        stationShortCode: mc.stopPointRef,
+        arrivalTimeUnknown: !mc.expectedArrivalTime,
+        arrivalQuayUnknown: !mc.arrivalStopAssignment.expectedQuayName,
+        departureTimeUnknown: hasDeparture && !mc.expectedDepartureTime,
+        departureQuayUnknown: hasDeparture && !mc.departureStopAssignment.expectedQuayName,
+    };
 }
 
 /**
