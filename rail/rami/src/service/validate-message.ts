@@ -36,25 +36,22 @@ export interface Valid<T> {
 export type ValidationResult<T> = Valid<T> | Invalid;
 
 export function validateIncomingRosmMessage(message: unknown): ValidationResult<ValidatedRamiMessage> {
-    const ajv = new Ajv({ allErrors: true });
-    addFormats(ajv);
-    // allow custom field "example" used in the schema
-    ajv.addKeyword("example");
-    // allow custom format "HH:MM" used in the schema
-    ajv.addFormat("HH:MM", /^\d{2}:\d{2}$/);
-    return ajv.validate(ramiRosmMessageJsonSchema, message)
-        ? { valid: true, value: message as ValidatedRamiMessage }
-        : { valid: false, errors: ajv.errorsText() };
+    return validateWithSchema(ramiRosmMessageJsonSchema, message);
 }
 
 export function validateIncomingSmMessage(message: unknown): ValidationResult<ValidatedRamiMessage> {
+    return validateWithSchema(ramiSmMessageJsonSchema, message);
+}
+
+function validateWithSchema(schema: unknown, message: unknown): ValidationResult<ValidatedRamiMessage> {
     const ajv = new Ajv({ allErrors: true });
     addFormats(ajv);
     // allow custom field "example" used in the schema
     ajv.addKeyword("example");
     // allow custom format "HH:MM" used in the schema
     ajv.addFormat("HH:MM", /^\d{2}:\d{2}$/);
-    return ajv.validate(ramiSmMessageJsonSchema, message)
+    return ajv.validate(schema, message)
         ? { valid: true, value: message as ValidatedRamiMessage }
         : { valid: false, errors: ajv.errorsText() };
+
 }

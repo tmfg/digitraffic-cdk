@@ -2,18 +2,15 @@ export const ramiSmMessageJsonSchema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "StopMonitoring Kafka topic - description",
     "description": "No description provided",
+    "type": "object",
     "properties": {
-      "schemaVersion": {
-        "type": "string",
-        "description": "The version of this schema that will be used to validate JSON data"
-      },
       "stopMonitoringMsg": {
         "$ref": "#/definitions/StopMonitoringMsg",
         "description": "Object to deserialize from Kafka"
       }
     },
     "required": [
-      "schemaVersion"
+      "payload"
     ],
     "definitions": {
       "KafkaMessageHeaders": {

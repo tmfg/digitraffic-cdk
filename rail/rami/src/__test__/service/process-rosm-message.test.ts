@@ -1,9 +1,9 @@
 import _ from "lodash";
 import { RosmMessageOperations } from "../../model/rosm-message.js";
 import { getActiveMessages } from "../../service/get-message.js";
-import { parseRosmMessage, processRosmMessage } from "../../service/process-message.js";
+import { parseRosmMessage, processRosmMessage } from "../../service/process-rosm-message.js";
 import { dbTestBase } from "../db-testutil.js";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata-rosm.js";
+import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";
 import { createMonitoredJourneyScheduledMessage, createScheduledMessage } from "../testdata-util.js";
 
 describe("parse rosm message", () => {
@@ -13,8 +13,8 @@ describe("parse rosm message", () => {
     });
 
     test("parseMessage - valid scheduledMessage is correctly parsed", () => {
-        const processedMessage = parseRosmMessage(validRamiScheduledMessage);
-        expect(processedMessage?.id).toEqual(validRamiScheduledMessage.payload.messageId);
+        const processedMessage = parseRosmMessage(validRamiMonitoredJourneyScheduledMessage);
+        expect(processedMessage?.id).toEqual(validRamiMonitoredJourneyScheduledMessage.payload.messageId);
     });
 
     test("parseMessage - invalid message is correctly parsed", () => {

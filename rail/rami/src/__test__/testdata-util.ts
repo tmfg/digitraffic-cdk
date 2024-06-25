@@ -1,7 +1,9 @@
 import { addHours } from "date-fns";
 import type { DtRosmMessage } from "../model/dt-rami-message.js";
 import type { RosmMessageOperation } from "../model/rosm-message.js";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata-rosm.js";
+import { validRamiMonitoredJourneyScheduledMessage } from "./testdata-rosm.js";
+import { validMessageUnknownTrackAndDelay } from "./testdata-sm.js";
+import _ from "lodash";
 
 export function createDtRosmMessage(properties: {
     created?: Date;
@@ -84,18 +86,29 @@ export function createScheduledMessage(properties: {
     station?: string;
     messageId?: string;
 }): unknown {
-  return {
-    ...validRamiScheduledMessage,
-    payload: {
-      ...validRamiScheduledMessage.payload,
-      operation: properties.operation ??
-        validRamiScheduledMessage.payload.operation,
-      startValidity: properties.start
-        ? properties.start.toISOString()
-        : new Date().toISOString(),
-      endValidity: properties.end
-        ? properties.end.toISOString()
-        : addHours(new Date(), 1).toISOString(),
-    },
-  };
+    return {
+        ...validRamiMonitoredJourneyScheduledMessage,
+        payload: {
+            ...validRamiMonitoredJourneyScheduledMessage.payload,
+            operation: properties.operation ?? validRamiMonitoredJourneyScheduledMessage.payload.operation,
+            startValidity: properties.start ? properties.start.toISOString() : new Date().toISOString(),
+            endValidity: properties.end ? properties.end.toISOString() : addHours(new Date(), 1).toISOString()
+        }
+    };
+}
+
+export function createSmMessage(properties: {
+    arrivalTime?: string,
+    arrivalQuay?: string,
+    departureTime?: string,
+    departureQuay?: string
+}): unknown {
+    const message = _.clone(validMessageUnknownTrackAndDelay);
+
+    const m1 = _.set(message, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "expectedArrivalTime"], properties.arrivalTime);
+    const m2 = _.set(m1, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "expectedDepartureTime"], properties.departureTime);
+    const m3 = _.set(m2, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "arrivalStopAssignment", "expectedQuayName"], properties.arrivalQuay);
+    const m4 = _.set(m3, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "departureStopAssignment", "expectedQuayName"], properties.departureQuay);
+
+    return m4;
 }
