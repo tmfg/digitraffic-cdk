@@ -16,14 +16,18 @@ export interface DtRosmMessage {
     readonly audio?: DtAudioContent;
 }
 
-export interface DtSmMessage {
-    readonly trainNumber: number
-    readonly departureDate: string // YYYYMMDD
+export interface StMonitoringData {
     readonly stationShortCode: string
     readonly arrivalTimeUnknown: boolean
     readonly arrivalQuayUnknown: boolean
     readonly departureTimeUnknown: boolean
     readonly departureQuayUnknown: boolean
+}
+export interface DtSmMessage {
+    readonly trainNumber: number
+    readonly departureDate: string // YYYYMMDD
+
+    readonly data: StMonitoringData[]
 }
 
 export interface DtVideoContent {

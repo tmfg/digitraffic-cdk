@@ -1,25 +1,23 @@
 import type { DtSmMessage } from "../../model/dt-rami-message.js";
 import { parseSmMessage } from "../../service/process-sm-message.js";
+import { validMessage2 } from "../testdata-sm.js";
 import { createSmMessage } from "../testdata-util.js";
 
 describe("parse sm message", () => {
-    function expectMessage(processedMessage: DtSmMessage | undefined, at: boolean, aq:boolean, dt: boolean, dq: boolean): void {
+    function expectMessage(processedMessage: DtSmMessage | undefined, index: number, at: boolean, aq:boolean, dt: boolean, dq: boolean,
+        trainNumber: number = 8122, departureDate: string = "20240619"
+    ): void {
         expect(processedMessage).toBeDefined();
 
-        expect(processedMessage?.trainNumber).toEqual(8122);
-        expect(processedMessage?.departureDate).toEqual("20240619");
+        expect(processedMessage?.trainNumber).toEqual(trainNumber);
+        expect(processedMessage?.departureDate).toEqual(departureDate);
 
-        if(at) expect(processedMessage?.arrivalTimeUnknown).toBeTruthy();
-        else expect(processedMessage?.arrivalTimeUnknown).toBeFalsy();
+        const data = processedMessage?.data[index];
 
-        if(aq) expect(processedMessage?.arrivalQuayUnknown).toBeTruthy();
-        else expect(processedMessage?.arrivalQuayUnknown).toBeFalsy();
-
-        if(dt) expect(processedMessage?.departureTimeUnknown).toBeTruthy();
-        else expect(processedMessage?.departureTimeUnknown).toBeFalsy();
-
-        if(dq) expect(processedMessage?.departureQuayUnknown).toBeTruthy();
-        else expect(processedMessage?.departureQuayUnknown).toBeFalsy();
+        expect(data?.arrivalTimeUnknown).toEqual(at);
+        expect(data?.arrivalQuayUnknown).toEqual(aq);
+        expect(data?.departureTimeUnknown).toEqual(dt);
+        expect(data?.departureQuayUnknown).toEqual(dq);
     }
 
     test("parseMessage - invalid scheduledMessage", () => {
@@ -32,7 +30,8 @@ describe("parse sm message", () => {
     test("parseMessage - valid scheduledMessage all unknown", () => {
         const processedMessage = parseSmMessage(createSmMessage({}));
 
-        expectMessage(processedMessage, true, true, true, true);
+        expectMessage(processedMessage, 0, true, true, true, true);
+        expectMessage(processedMessage, 1, true, false, false, false);
     });
 
     test("parseMessage - valid scheduledMessage arrival time known", () => {
@@ -40,7 +39,7 @@ describe("parse sm message", () => {
             arrivalTime: "2024-06-19T12:03:00"
         }));
 
-        expectMessage(processedMessage, false, true, true, true);
+        expectMessage(processedMessage, 0, false, true, true, true);
     });
 
     test("parseMessage - valid scheduledMessage arrival quay known", () => {
@@ -48,7 +47,7 @@ describe("parse sm message", () => {
             arrivalQuay: "B1",
         }));
 
-        expectMessage(processedMessage, true, false, true, true);
+        expectMessage(processedMessage, 0, true, false, true, true);
     });
 
 
@@ -57,7 +56,7 @@ describe("parse sm message", () => {
             departureTime: "2024-06-19T12:03:00"
         }));
 
-        expectMessage(processedMessage, true, true, false, true);
+        expectMessage(processedMessage, 0, true, true, false, true);
     });
 
     test("parseMessage - valid scheduledMessage departure quay known", () => {
@@ -65,7 +64,14 @@ describe("parse sm message", () => {
             departureQuay: "B2"
         }));
 
-        expectMessage(processedMessage, true, true, true, false);
+        expectMessage(processedMessage, 0, true, true, true, false);
+    });
+
+    test("parseMessage - valid scheduledMessage with onwardCalls", () => {
+        const processedMessage = parseSmMessage(validMessage2);
+
+        expectMessage(processedMessage, 0, false, false, false, false, 762, "20240319");
+        expectMessage(processedMessage, 1, true, false, true, false, 762, "20240319");
     });
 
 });

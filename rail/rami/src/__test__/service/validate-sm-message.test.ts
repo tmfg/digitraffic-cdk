@@ -1,5 +1,5 @@
 import { validateIncomingSmMessage } from "../../service/validate-message.js";
-import { validMessageUnknownTrackAndDelay } from "../testdata-sm.js";
+import { validMessage2, validMessageUnknownTrackAndDelay } from "../testdata-sm.js";
 import { copyAndUndefine } from "../message-util.js";
 
 describe("validate incoming sm message", () => {
@@ -32,5 +32,16 @@ describe("validate incoming sm message", () => {
 
         expect(result.valid).toBe(true);
         if (result.valid) expect(result.value).toEqual(validMessageUnknownTrackAndDelay);
-    });    
+    });
+
+    test("validateIncomingSmMessage - valid message with onwardCalls", () => {
+        const result = validateIncomingSmMessage(validMessage2);
+
+        if(!result.valid) {
+            console.info(result.errors);
+        }
+
+        expect(result.valid).toBe(true);
+        if (result.valid) expect(result.value).toEqual(validMessage2);
+    });
 });
