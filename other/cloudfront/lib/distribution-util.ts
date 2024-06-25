@@ -80,12 +80,14 @@ function addRealtimeLogging(
     createDistributionProps: CreateDistributionProps
 ): void {
     const {
-        originConfigs: { length },
+        originConfigs,
         realtimeLogConfigArn,
         distributionProps,
         bucketLogging
     } = createDistributionProps;
     const distributionCf = distribution.node.defaultChild as CfnResource;
+
+    const length = originConfigs.flatMap(o => o.behaviors).length;
 
     for (let i = 1; i < length; i++) {
         distributionCf.addPropertyOverride(
