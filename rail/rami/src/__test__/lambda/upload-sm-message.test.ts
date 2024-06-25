@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { validSmMessage } from "../testdata-sm.js";
+import { validMessageUnknownTrackAndDelay } from "../testdata-sm.js";
 import { copyAndUndefine } from "../message-util.js";
 
 const sendSmFn = jest.fn();
@@ -24,7 +24,7 @@ describe(
 
         test("handler - valid message", async () => {
             const handler = await import("../../lambda/upload-sm-message/upload-sm-message.js");
-            const result = await handler.handler(validSmMessage);
+            const result = await handler.handler(validMessageUnknownTrackAndDelay);
 
             expect(result.status).toEqual(200);
             expect(sendSmFn).toHaveBeenCalledTimes(1);
@@ -32,7 +32,7 @@ describe(
         });
 
         test("handler - invalid message", async () => {
-            const invalidMessage = copyAndUndefine(validSmMessage, "schemaVersion");
+            const invalidMessage = copyAndUndefine(validMessageUnknownTrackAndDelay, "payload");
             const handler = await import("../../lambda/upload-sm-message/upload-sm-message.js");
             const result = await handler.handler(invalidMessage);
             

@@ -1,20 +1,20 @@
 import { validateIncomingSmMessage } from "../../service/validate-message.js";
-import { validSmMessage } from "../testdata-sm.js";
+import { validMessageUnknownTrackAndDelay } from "../testdata-sm.js";
 import { copyAndUndefine } from "../message-util.js";
 
 describe("validate incoming sm message", () => {
-    test("validateIncomingSmMessage - missing schemaVersion", () => {
-        const invalidMessage = copyAndUndefine(validSmMessage, "schemaVersion");
+    test("validateIncomingSmMessage - missing payload", () => {
+        const invalidMessage = copyAndUndefine(validMessageUnknownTrackAndDelay, "payload");
 
         const result = validateIncomingSmMessage(invalidMessage);
         expect(result.valid).toBe(false);
         if (!result.valid) {
-            expect(result.errors).toMatch(/must have required property 'schemaVersion'/);            
+            expect(result.errors).toMatch(/must have required property 'payload'/);
         }
     });
 
     test("validateIncomingSmMessage - missing monitoredStopVisits", () => {
-        const invalidMessage = copyAndUndefine(validSmMessage, "stopMonitoringMsg", "payload", "monitoredStopVisits");
+        const invalidMessage = copyAndUndefine(validMessageUnknownTrackAndDelay, "stopMonitoringMsg", "payload", "monitoredStopVisits");
 
         const result = validateIncomingSmMessage(invalidMessage);
         expect(result.valid).toBe(false);
@@ -24,13 +24,13 @@ describe("validate incoming sm message", () => {
     });
 
     test("validateIncomingSmMessage - valid scheduledMessage", () => {
-        const result = validateIncomingSmMessage(validSmMessage);
+        const result = validateIncomingSmMessage(validMessageUnknownTrackAndDelay);
 
         if(!result.valid) {
             console.info(result.errors);
         }
 
         expect(result.valid).toBe(true);
-        if (result.valid) expect(result.value).toEqual(validSmMessage);
+        if (result.valid) expect(result.value).toEqual(validMessageUnknownTrackAndDelay);
     });    
 });

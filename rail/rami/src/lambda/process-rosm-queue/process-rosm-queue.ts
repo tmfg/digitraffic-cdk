@@ -2,7 +2,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
-import { parseRosmMessage, processRosmMessage } from "../../service/process-message.js";
+import { parseRosmMessage, processRosmMessage } from "../../service/process-rosm-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { sendToSqs } from "../../util/sqs.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";

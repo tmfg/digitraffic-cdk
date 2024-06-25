@@ -1,12 +1,20 @@
 import _ from "lodash";
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata-rosm.js";
+import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";
 import { copyAndUndefine, undefine } from "../message-util.js";
 
 describe("validate incoming rami message", () => {
     test("validateIncomingRamiMessage - invalid scheduledMessage", () => {
-        const invalidMessage = copyAndUndefine(validRamiScheduledMessage, "payload", "messageId");
-        undefine(invalidMessage, "payload", "scheduledMessage", "onGroundRecipient", "deliveryPoints");
+        const invalidMessage = _.set(
+            _.cloneDeep(validRamiMonitoredJourneyScheduledMessage),
+            ["payload", "messageId"],
+            undefined
+        );
+        _.set(
+            invalidMessage,
+            ["payload", "scheduledMessage", "onGroundRecipient", "deliveryPoints"],
+            undefined
+        );
 
         const result = validateIncomingRosmMessage(invalidMessage);
         expect(result.valid).toBe(false);
@@ -37,9 +45,9 @@ describe("validate incoming rami message", () => {
     });
 
     test("validateIncomingRamiMessage - valid scheduledMessage", () => {
-        const result = validateIncomingRosmMessage(validRamiScheduledMessage);
+        const result = validateIncomingRosmMessage(validRamiMonitoredJourneyScheduledMessage);
         expect(result.valid).toBe(true);
-        if (result.valid) expect(result.value).toEqual(validRamiScheduledMessage);
+        if (result.valid) expect(result.value).toEqual(validRamiMonitoredJourneyScheduledMessage);
     });
 
     test("validateIncomingRamiMessage - valid monitoredJourneyScheduledMessage", () => {
