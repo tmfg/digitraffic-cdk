@@ -7,17 +7,23 @@ describe("parse sm message", () => {
     function expectMessage(processedMessage: DtSmMessage | undefined, index: number, at: boolean, aq:boolean, dt: boolean, dq: boolean,
         trainNumber: number = 8122, departureDate: string = "20240619"
     ): void {
-        expect(processedMessage).toBeDefined();
+        if(!processedMessage) {
+            throw new Error("no message!");
+        }
 
-        expect(processedMessage?.trainNumber).toEqual(trainNumber);
-        expect(processedMessage?.departureDate).toEqual(departureDate);
+        expect(processedMessage.trainNumber).toEqual(trainNumber);
+        expect(processedMessage.departureDate).toEqual(departureDate);
 
-        const data = processedMessage?.data[index];
+        const data = processedMessage.data[index];
 
-        expect(data?.arrivalTimeUnknown).toEqual(at);
-        expect(data?.arrivalQuayUnknown).toEqual(aq);
-        expect(data?.departureTimeUnknown).toEqual(dt);
-        expect(data?.departureQuayUnknown).toEqual(dq);
+        if(!data) {
+            throw new Error("No data at index " + index);
+        }
+
+        expect(data.arrivalTimeUnknown).toEqual(at);
+        expect(data.arrivalQuayUnknown).toEqual(aq);
+        expect(data.departureTimeUnknown).toEqual(dt);
+        expect(data.departureQuayUnknown).toEqual(dq);
     }
 
     test("parseMessage - invalid scheduledMessage", () => {

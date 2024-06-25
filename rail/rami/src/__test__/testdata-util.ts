@@ -101,12 +101,11 @@ export function createSmMessage(properties: {
     departureTime?: string,
     departureQuay?: string
 }): unknown {
-    const message = _.clone(validMessageUnknownTrackAndDelay);
-
-    const m1 = _.set(message, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "expectedArrivalTime"], properties.arrivalTime);
-    const m2 = _.set(m1, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "expectedDepartureTime"], properties.departureTime);
-    const m3 = _.set(m2, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "arrivalStopAssignment", "expectedQuayName"], properties.arrivalQuay);
-    const m4 = _.set(m3, ["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "departureStopAssignment", "expectedQuayName"], properties.departureQuay);
-
-    return m4;
+    return _.chain(validMessageUnknownTrackAndDelay)
+            .clone()
+            .set(["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "expectedArrivalTime"], properties.arrivalTime)
+            .set(["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "expectedDepartureTime"], properties.departureTime)
+            .set(["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "arrivalStopAssignment", "expectedQuayName"], properties.arrivalQuay)
+            .set(["payload", "monitoredStopVisits", 0, "monitoredVehicleJourney", "monitoredCall", "departureStopAssignment", "expectedQuayName"], properties.departureQuay)
+            .value();
 }

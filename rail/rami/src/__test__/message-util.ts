@@ -1,6 +1,9 @@
 import _ from "lodash";
 
-export function copyAndUndefine(message: object, ...path: string[]): object {
+/**
+ * Returns new copy of given object, with given path undefined
+ */
+export function cloneAndUndefine(message: object, ...path: string[]): object {
     return _.set(
         _.cloneDeep(message),
         path,
@@ -8,11 +11,13 @@ export function copyAndUndefine(message: object, ...path: string[]): object {
     );
 }
 
-export function undefine(message: object, ...path: string[]): object {
-    return _.set(
+/**
+ * Undefines a given path from the given object
+ */
+export function undefine(message: object, ...path: string[]): void {
+    _.set(
         message,
         path,
         undefined
     );
-
 }

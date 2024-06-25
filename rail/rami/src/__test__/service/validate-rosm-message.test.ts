@@ -1,20 +1,12 @@
 import _ from "lodash";
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";
 import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";
-import { copyAndUndefine, undefine } from "../message-util.js";
+import { cloneAndUndefine, undefine } from "../message-util.js";
 
-describe("validate incoming rami message", () => {
+describe("validate incoming rosm message", () => {
     test("validateIncomingRamiMessage - invalid scheduledMessage", () => {
-        const invalidMessage = _.set(
-            _.cloneDeep(validRamiMonitoredJourneyScheduledMessage),
-            ["payload", "messageId"],
-            undefined
-        );
-        _.set(
-            invalidMessage,
-            ["payload", "scheduledMessage", "onGroundRecipient", "deliveryPoints"],
-            undefined
-        );
+        const invalidMessage = cloneAndUndefine(validRamiMonitoredJourneyScheduledMessage, "payload", "messageId");
+        undefine(invalidMessage, "payload", "scheduledMessage", "onGroundRecipient", "deliveryPoints");
 
         const result = validateIncomingRosmMessage(invalidMessage);
         expect(result.valid).toBe(false);
@@ -26,7 +18,7 @@ describe("validate incoming rami message", () => {
         }
     });
     test("validateIncomingRamiMessage - invalid monitoredJourneyScheduledMessage", () => {
-        const invalidMessage = copyAndUndefine(validRamiMonitoredJourneyScheduledMessage, "payload", "messageId");
+        const invalidMessage = cloneAndUndefine(validRamiMonitoredJourneyScheduledMessage, "payload", "messageId");
         undefine(invalidMessage, "payload", "messageVersion");
         _.set(invalidMessage, ["payload", "monitoredJourneyScheduledMessage", "deliveryPoints", 0], {
             id: 0,

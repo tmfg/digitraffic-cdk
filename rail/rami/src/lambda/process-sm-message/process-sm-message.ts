@@ -4,9 +4,9 @@ import type { Handler, SQSEvent } from "aws-lambda";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { parseSmMessage } from "../../service/process-sm-message.js";
 
-export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
-    return (event: SQSEvent) => {
-        return Promise.allSettled(
+export function handlerFn(): (event: SQSEvent) => Promise<void> {
+    return async (event: SQSEvent) => {
+        await Promise.allSettled(
             event.Records.map(async (r) => {
                 const start = Date.now();
                 const recordBody = r.body;
