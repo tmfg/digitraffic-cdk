@@ -55,10 +55,9 @@ export function insertMaintenanceTrackingObservationData(
         return t.batch(
             observations.map((observation) =>
                 db
-                    .oneOrNone<DbNumberId | undefined>(
-                        UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
-                        observation
-                    )
+                    .oneOrNone<
+                        DbNumberId | undefined
+                    >(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
                     .then((result) => (result === null ? undefined : result))
             )
         );

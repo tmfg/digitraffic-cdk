@@ -8,35 +8,27 @@ import { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-st
 import * as Sqs from "./sqs";
 
 export class MaintenanceTrackingStack extends DigitrafficStack {
-    constructor(
-        scope: Construct,
-        id: string,
-        stackConfiguration: MaintenanceTrackingStackConfiguration
-    ) {
+    constructor(scope: Construct, id: string, stackConfiguration: MaintenanceTrackingStackConfiguration) {
         super(scope, id, stackConfiguration);
 
         const queueAndDLQ = Sqs.createQueue(this);
         // Create bucket with internal id DLQBucket, that is not going to AWS and must be unique
         const dlqBucket = new Bucket(this, "DLQBucket", {
             bucketName: stackConfiguration.sqsDlqBucketName,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
         // Create bucket for SQS-messages and delete old messages from bucket after 30 day
-        const sqsExtendedMessageBucket = new Bucket(
-            this,
-            "SqsExtendedMessageBucket",
-            {
-                blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-                bucketName: stackConfiguration.sqsMessageBucketName,
-                lifecycleRules: [
-                    {
-                        enabled: true,
-                        expiration: Duration.days(31),
-                    },
-                ],
-            }
-        );
+        const sqsExtendedMessageBucket = new Bucket(this, "SqsExtendedMessageBucket", {
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            bucketName: stackConfiguration.sqsMessageBucketName,
+            lifecycleRules: [
+                {
+                    enabled: true,
+                    expiration: Duration.days(31)
+                }
+            ]
+        });
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
         // InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);

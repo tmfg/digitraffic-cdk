@@ -17,9 +17,8 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const QUEUE = "MaintenanceTrackingQueue";
 process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = "sqs-bucket-name";
-process.env[
-    MaintenanceTrackingEnvKeys.SQS_QUEUE_URL
-] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
+process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] =
+    `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 process.env.AWS_REGION = "aws-region";
 process.env.SECRET_ID = "";
 

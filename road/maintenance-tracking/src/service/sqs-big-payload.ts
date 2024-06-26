@@ -105,9 +105,8 @@ export async function handleMessage(
 
     try {
         const start = Date.now();
-        const insertCount: number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(
-            observationDatas
-        );
+        const insertCount: number =
+            await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
         const end = Date.now();
         logger.info({
             method: "SqsBigPayload.handleMessage",
