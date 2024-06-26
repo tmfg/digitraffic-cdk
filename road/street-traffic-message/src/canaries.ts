@@ -10,10 +10,7 @@ export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
         if (stack.configuration.stackFeatures?.enableCanaries) {
             const urlRole = new DigitrafficCanaryRole(stack, "stm-url");
-            const dbRole = new DigitrafficCanaryRole(
-                stack,
-                "stm-db"
-            ).withDatabaseAccess();
+            const dbRole = new DigitrafficCanaryRole(stack, "stm-db").withDatabaseAccess();
 
             DatabaseCanary.createV2(stack, dbRole, "stm");
 
@@ -22,8 +19,8 @@ export class Canaries {
                 schedule: Schedule.rate(Duration.minutes(30)),
                 alarm: {
                     alarmName: "STM-PublicAPI-Alarm",
-                    topicArn: stack.configuration.alarmTopicArn,
-                },
+                    topicArn: stack.configuration.alarmTopicArn
+                }
             });
         }
     }

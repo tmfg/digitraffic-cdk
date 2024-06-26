@@ -1,7 +1,4 @@
-import {
-    DTDatabase,
-    DTTransaction,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import { PreparedStatement } from "pg-promise";
 import { ApiPermit, DbPermit } from "../model/permit";
 import { FeatureCollection, Geometry as GeoJSONGeometry, Point } from "geojson";
@@ -47,33 +44,30 @@ const SQL_SET_PERMIT_REMOVED = `UPDATE permit SET removed=true WHERE source_id=$
 
 const PS_INSERT_PERMIT_OR_UPDATE_GEOMETRY = new PreparedStatement({
     name: "insert-permit-or-update-geometry",
-    text: SQL_INSERT_PERMIT_OR_UPDATE_GEOMETRY,
+    text: SQL_INSERT_PERMIT_OR_UPDATE_GEOMETRY
 });
 
 const PS_FIND_ALL_GEOJSON = new PreparedStatement({
     name: "find-all-permits-geojson",
-    text: SQL_FIND_ALL_PERMITS_GEOJSON,
+    text: SQL_FIND_ALL_PERMITS_GEOJSON
 });
 
 const PS_FIND_ALL = new PreparedStatement({
     name: "find-all-permits",
-    text: SQL_FIND_ALL_PERMITS,
+    text: SQL_FIND_ALL_PERMITS
 });
 
 const PS_FIND_ALL_SOURCE_IDS = new PreparedStatement({
     name: "find-all-permit-source-ids",
-    text: SQL_FIND_ALL_PERMIT_SOURCE_IDS,
+    text: SQL_FIND_ALL_PERMIT_SOURCE_IDS
 });
 
 const PS_SET_PERMIT_REMOVED = new PreparedStatement({
     name: "set-permit-removed",
-    text: SQL_SET_PERMIT_REMOVED,
+    text: SQL_SET_PERMIT_REMOVED
 });
 
-export function insertPermits(
-    db: DTTransaction,
-    permits: ApiPermit[]
-): Promise<null[]> {
+export function insertPermits(db: DTTransaction, permits: ApiPermit[]): Promise<null[]> {
     return Promise.all(
         permits.map((permit) =>
             db.none(PS_INSERT_PERMIT_OR_UPDATE_GEOMETRY, [
@@ -83,26 +77,17 @@ export function insertPermits(
                 permit.permitSubject,
                 permit.effectiveFrom,
                 permit.effectiveTo,
-                permit.gmlGeometryXmlString,
+                permit.gmlGeometryXmlString
             ])
         )
     );
 }
 
-export function setRemovedPermits(
-    db: DTTransaction,
-    permitIdList: string[]
-): Promise<null[]> {
-    return Promise.all(
-        permitIdList.map((permitId) =>
-            db.none(PS_SET_PERMIT_REMOVED, [permitId])
-        )
-    );
+export function setRemovedPermits(db: DTTransaction, permitIdList: string[]): Promise<null[]> {
+    return Promise.all(permitIdList.map((permitId) => db.none(PS_SET_PERMIT_REMOVED, [permitId])));
 }
 
-export function getActivePermitsGeojson(
-    db: DTDatabase
-): Promise<FeatureCollection> {
+export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollection> {
     return db.one(PS_FIND_ALL_GEOJSON).then((result) => result.collection);
 }
 
@@ -121,20 +106,16 @@ export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
                     geometry: Geometry.parse(
                         Buffer.from(result.geometry, "hex")
                     ).toGeoJSON() as GeoJSONGeometry,
-                    centroid: Geometry.parse(
-                        Buffer.from(result.centroid, "hex")
-                    ).toGeoJSON() as Point,
+                    centroid: Geometry.parse(Buffer.from(result.centroid, "hex")).toGeoJSON() as Point,
                     effectiveFrom: result.effective_from,
                     effectiveTo: result.effective_to,
                     created: result.created,
-                    modified: result.modified,
-                } as DbPermit)
+                    modified: result.modified
+                }) as DbPermit
         )
     );
 }
 
-export function getAllPermitIds(
-    db: DTDatabase
-): Promise<Record<string, string>[]> {
+export function getAllPermitIds(db: DTDatabase): Promise<Record<string, string>[]> {
     return db.manyOrNone(PS_FIND_ALL_SOURCE_IDS);
 }

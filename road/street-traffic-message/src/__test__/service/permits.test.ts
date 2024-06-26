@@ -1,15 +1,7 @@
 import * as sinon from "sinon";
 import { PermitsApi } from "../../lib/api/permits";
-import {
-    findPermitsInD2Light,
-    findPermitsInGeojson,
-    getPermitsFromSource,
-} from "../../lib/service/permits";
-import {
-    dbTestBase,
-    insertPermit,
-    insertPermitOrUpdateGeometry,
-} from "../db-testutil";
+import { findPermitsInD2Light, findPermitsInGeojson, getPermitsFromSource } from "../../lib/service/permits";
+import { dbTestBase, insertPermit, insertPermitOrUpdateGeometry } from "../db-testutil";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 const TEST_XML_PERMITS =
@@ -18,9 +10,7 @@ const TEST_XML_PERMITS =
 describe(
     "permits service tests",
     dbTestBase((db: DTDatabase) => {
-        sinon
-            .stub(PermitsApi.prototype, "getPermitsXml")
-            .returns(Promise.resolve(TEST_XML_PERMITS));
+        sinon.stub(PermitsApi.prototype, "getPermitsXml").returns(Promise.resolve(TEST_XML_PERMITS));
 
         test("getPermits filters permits with no effectiveFrom date", async () => {
             const parsedPermits = await getPermitsFromSource("123", "123");
@@ -52,7 +42,7 @@ describe(
                 effectiveFrom: new Date(Date.now()),
                 effectiveTo: new Date(Date.now()),
                 gmlGeometryXmlString:
-                    '<gml:Point srsName="http://www.opengis.net/gml/srs/epsg.xml#3880"> <gml:pos>26483500.000 6761970.000</gml:pos> </gml:Point>',
+                    '<gml:Point srsName="http://www.opengis.net/gml/srs/epsg.xml#3880"> <gml:pos>26483500.000 6761970.000</gml:pos> </gml:Point>'
             };
             await insertPermitOrUpdateGeometry(db, apiPermit);
 
@@ -63,17 +53,13 @@ describe(
             const permits = await findPermitsInGeojson();
 
             expect(permits.features).toHaveLength(2);
-            expect(permits.features[0].geometry.type).not.toEqual(
-                "GeometryCollection"
-            );
+            expect(permits.features[0].geometry.type).not.toEqual("GeometryCollection");
         });
 
         test("findPermitsInD2Light - empty", async () => {
             const permits = await findPermitsInD2Light();
 
-            expect(
-                permits.situationPublicationLight.situationRecord
-            ).toHaveLength(0);
+            expect(permits.situationPublicationLight.situationRecord).toHaveLength(0);
         });
 
         test("findPermitsInD2Light - two permits", async () => {
@@ -84,9 +70,7 @@ describe(
 
             console.info("permits " + JSON.stringify(permits, null, 2));
 
-            expect(
-                permits.situationPublicationLight.situationRecord
-            ).toHaveLength(2);
+            expect(permits.situationPublicationLight.situationRecord).toHaveLength(2);
         });
     })
 );

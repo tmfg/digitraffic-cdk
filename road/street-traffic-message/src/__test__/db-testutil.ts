@@ -3,13 +3,7 @@ import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ApiPermit } from "../lib/model/permit";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "road",
-        "road",
-        "localhost:54322/road"
-    );
+    return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");
 }
 
 function truncate(db: DTDatabase): Promise<void> {
@@ -29,10 +23,7 @@ export function insertPermit(db: DTDatabase, id: number, subject: string) {
     });
 }
 
-export function insertPermitOrUpdateGeometry(
-    db: DTDatabase,
-    permit: ApiPermit
-) {
+export function insertPermitOrUpdateGeometry(db: DTDatabase, permit: ApiPermit) {
     return db.tx(async (t) => {
         await t.none(
             `INSERT INTO permit
@@ -50,7 +41,7 @@ export function insertPermitOrUpdateGeometry(
                 permit.permitSubject,
                 permit.effectiveFrom,
                 permit.effectiveTo,
-                permit.gmlGeometryXmlString,
+                permit.gmlGeometryXmlString
             ]
         );
     });

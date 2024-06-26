@@ -1,7 +1,7 @@
 import {
     ContentChecker,
     ContentTypeChecker,
-    UrlChecker,
+    UrlChecker
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
@@ -39,10 +39,7 @@ export const handler = async () => {
         PERMITS_D2LIGHT_URL,
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
         ContentChecker.checkJson((json: D2LightMessage) => {
-            Asserter.assertLengthGreaterThan(
-                json.situationPublicationLight.situationRecord,
-                0
-            );
+            Asserter.assertLengthGreaterThan(json.situationPublicationLight.situationRecord, 0);
         })
     );
 

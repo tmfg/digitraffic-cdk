@@ -1,4 +1,4 @@
-import axios, {AxiosError} from 'axios';
+import axios, { AxiosError } from "axios";
 
 export class PermitsApi {
     readonly apiUrl: string;
@@ -22,17 +22,15 @@ export class PermitsApi {
             const resp = await axios.get(`${this.apiUrl}${this.path}?authKey=${this.authKey}`, {
                 timeout: 10000,
                 headers: {
-                    'Accept': 'application/xml',
+                    Accept: "application/xml"
                 },
-                validateStatus: ((status: number) => {
-                    return status === 200
-                })
+                validateStatus: (status: number) => {
+                    return status === 200;
+                }
             });
 
             return resp.data;
-        }
-
-        catch (error: unknown) {
+        } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError;
                 console.error(`method=getPermitsXml ${this.genericError} with status ${axiosError.code}`);
@@ -42,10 +40,8 @@ export class PermitsApi {
                 throw Error(`${this.genericError} with: ${error.message}`);
             }
             throw error;
-        }
-
-        finally {
-            console.info("method=getPermitsXml tookMs=%d", (Date.now() - start));
+        } finally {
+            console.info("method=getPermitsXml tookMs=%d", Date.now() - start);
         }
     }
 }

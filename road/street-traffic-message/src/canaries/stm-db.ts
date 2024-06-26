@@ -4,10 +4,7 @@ import { DataType } from "@digitraffic/common/dist/database/last-updated";
 export const handler = (): Promise<string> => {
     const checker = DatabaseCountChecker.createForProxy();
 
-    checker.expectOneOrMore(
-        "permit table not empty",
-        "SELECT COUNT(*) FROM permit"
-    );
+    checker.expectOneOrMore("permit table not empty", "SELECT COUNT(*) FROM permit");
 
     checker.expectOneOrMore(
         "permit data updated in last 2 hours",
