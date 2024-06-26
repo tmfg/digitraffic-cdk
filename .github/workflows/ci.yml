@@ -1,5 +1,5 @@
 name: CI
-on: [ push ]
+on: [push]
 
 jobs:
   build:
@@ -28,6 +28,8 @@ jobs:
 
       # - name: Verify Change Logs
       #   run: node common/scripts/install-run-rush.js change --verify
+      - name: Rush purge
+        run: node common/scripts/install-run-rush.js purge
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
       - name: Rush rebuild
