@@ -87,9 +87,10 @@ then
 
   if [[ "${OPERATION}" == "diff" ]]
   then
+      CDK_OUT=/tmp/cdk-out-${STACK}
       # npx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
       # Use script too capture command output and save it to file
-      script /tmp/cdk_out.txt npx --yes cdk@latest  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+      script ${CDK_OUT}.txt npx --yes cdk@latest  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
 
       read -p "Do you wanna see formatted diff in browser? " -n 1 -r
       echo    # move to a new line
@@ -97,11 +98,11 @@ then
       then
         SKIP_LINES_PATTERN="pnpm\|dlx-\|Downloading"
         # first egrep takes lines without green, gsed removes ansi colour codes and last grep removes unwanted lines
-        egrep -v '\x1b\[32m' /tmp/cdk_out.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > /tmp/cdk_old.txt
+        egrep -v '\x1b\[32m' ${CDK_OUT}.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > ${CDK_OUT}-old.txt
         # first egrep takes lines without red, gsed removes ansi colour codes and last grep removes unwanted lines
-        egrep -v '\x1b\[31m' /tmp/cdk_out.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > /tmp/cdk_new.txt
+        egrep -v '\x1b\[31m' ${CDK_OUT}.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > ${CDK_OUT}-new.txt
         # Make a diff with full context and convert it to html
-        diff -u -U 1000000 /tmp/cdk_old.txt /tmp/cdk_new.txt | npx --yes diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
+        diff -u -U 1000000 ${CDK_OUT}-old.txt ${CDK_OUT}-new.txt | npx --yes diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
       fi
     else
         npx --yes cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
