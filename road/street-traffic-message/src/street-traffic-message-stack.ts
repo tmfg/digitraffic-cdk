@@ -1,8 +1,8 @@
-import { Construct } from "constructs";
-import { InternalLambdas } from "./internal-lambdas";
-import { Canaries } from "./canaries";
-import { PublicApi } from "./public-api";
-import { DigitrafficStack, StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { Construct } from "constructs";
+import { InternalLambdas } from "./internal-lambdas.js";
+import { Canaries } from "./canaries.js";
+import { PublicApi } from "./public-api.js";
+import { DigitrafficStack, type StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class StreetTrafficMessageStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {

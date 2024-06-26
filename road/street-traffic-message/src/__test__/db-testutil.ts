@@ -1,6 +1,6 @@
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { ApiPermit } from "../lib/model/permit";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { ApiPermit } from "../model/permit.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");

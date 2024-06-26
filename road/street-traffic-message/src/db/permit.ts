@@ -1,7 +1,7 @@
-import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import { PreparedStatement } from "pg-promise";
-import { ApiPermit, DbPermit } from "../model/permit";
-import { FeatureCollection, Geometry as GeoJSONGeometry, Point } from "geojson";
+import type { ApiPermit, DbPermit } from "../model/permit.js";
+import type { FeatureCollection, Geometry as GeoJSONGeometry, Point, Feature } from "geojson";
 import { Geometry } from "wkx";
 
 // multiple geometries related to a single permit are contained inside otherwise duplicated fields in Lahti source data
@@ -13,6 +13,10 @@ const SQL_INSERT_PERMIT_OR_UPDATE_GEOMETRY = `INSERT INTO permit
     DO UPDATE 
     SET geometry=ST_ForceCollection(ST_Collect(ARRAY(SELECT (ST_Dump(geometry)).geom FROM permit WHERE source_id=$1 AND source=$2) 
      || ST_Transform(ST_GeomFromGML($7), 4326)))`;
+
+interface PermitsGeoJSON {
+    collection: FeatureCollection;
+}
 
 const SQL_FIND_ALL_PERMITS_GEOJSON = `select json_build_object(
         'type', 'FeatureCollection', 
@@ -35,8 +39,19 @@ const SQL_FIND_ALL_PERMITS_GEOJSON = `select json_build_object(
         ) as collection
      from permit where removed=false`;
 
-const SQL_FIND_ALL_PERMITS = `select id, version, permit_type, permit_subject, geometry, effective_from, effective_to, created, modified, ST_CENTROID(geometry) centroid
-     from permit`;
+const SQL_FIND_ALL_PERMITS = `select id, 
+    version, 
+    permit_type, 
+    permit_subject, 
+    geometry, 
+    effective_from, 
+    effective_to, 
+    created, 
+    modified,
+    source,
+    source_id,
+    ST_CENTROID(geometry) centroid
+from permit`;
 
 const SQL_FIND_ALL_PERMIT_SOURCE_IDS = "SELECT source_id FROM permit";
 
@@ -51,6 +66,21 @@ const PS_FIND_ALL_GEOJSON = new PreparedStatement({
     name: "find-all-permits-geojson",
     text: SQL_FIND_ALL_PERMITS_GEOJSON
 });
+
+type FindAllPermits = {
+    id: number;
+    version: number;
+    permit_type: string;
+    permit_subject: string;
+    geometry: string;
+    effective_from: Date;
+    effective_to: Date;
+    created: Date;
+    modified: Date;
+    source: string;
+    source_id: string;
+    centroid: string;
+}[];
 
 const PS_FIND_ALL = new PreparedStatement({
     name: "find-all-permits",
@@ -88,21 +118,20 @@ export function setRemovedPermits(db: DTTransaction, permitIdList: string[]): Pr
 }
 
 export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollection> {
-    return db.one(PS_FIND_ALL_GEOJSON).then((result) => result.collection);
+    return db.one(PS_FIND_ALL_GEOJSON).then((result: PermitsGeoJSON) => result.collection);
 }
 
 export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
-    return db.manyOrNone(PS_FIND_ALL).then((results) =>
+    return db.manyOrNone(PS_FIND_ALL).then((results: FindAllPermits) =>
         results.map(
             (result) =>
                 ({
                     id: result.id,
-                    sourceId: result.sourceId,
+                    sourceId: result.source_id,
                     source: result.source,
                     version: result.version,
                     permitSubject: result.permit_subject,
                     permitType: result.permit_type,
-                    subject: result.subject,
                     geometry: Geometry.parse(
                         Buffer.from(result.geometry, "hex")
                     ).toGeoJSON() as GeoJSONGeometry,

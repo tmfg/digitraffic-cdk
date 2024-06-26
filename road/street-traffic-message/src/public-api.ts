@@ -1,13 +1,13 @@
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { Model, type Resource } from "aws-cdk-lib/aws-apigateway";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { defaultIntegration, methodResponse } from "@digitraffic/common/dist/aws/infra/api/responses";
+import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { featureSchema, geojsonSchema, getModelReference } from "@digitraffic/common/dist/utils/api-model";
-import { permitProperties } from "./model/permit";
+import { permitProperties } from "./model/permit.js";
 import { DigitrafficIntegrationResponse } from "@digitraffic/common/dist/aws/runtime/digitraffic-integration-response";
 
 const STREET_TRAFFIC_MESSAGE_TAGS = ["Street Traffic Message(Beta)"];

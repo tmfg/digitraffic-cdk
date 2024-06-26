@@ -1,24 +1,27 @@
 import {
-    DTDatabase,
-    DTTransaction,
+    type DTDatabase,
+    type DTTransaction,
     inDatabase,
     inDatabaseReadonly,
     inTransaction
 } from "@digitraffic/common/dist/database/database";
-import * as permitsService from "./permits";
-import * as permitDb from "../db/permit";
+import * as permitsService from "./permits.js";
+import * as permitDb from "../db/permit.js";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { DataType } from "@digitraffic/common/dist/database/last-updated";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export async function updatePermits(authKey: string, url: string) {
     const permitsInApi = await permitsService.getPermitsFromSource(authKey, url);
     const permitIdsInDb = await getAllPermitIdsFromDb();
 
-    const dbIdList = permitIdsInDb.map((row) => row.source_id);
+    // eslint-disable-next-line dot-notation
+    const dbIdList = permitIdsInDb.map((row) => row["source_id"]);
     const newPermits = permitsInApi.filter((permit) => !dbIdList.includes(permit.sourceId));
 
     const apiIdList = permitsInApi.map((permit) => permit.sourceId);
-    const removedPermits = dbIdList.filter((id) => !apiIdList.includes(id));
+    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+    const removedPermits = dbIdList.filter((id) => !apiIdList.includes(id as string));
 
     const updatedTimestamp = new Date();
 
@@ -34,7 +37,7 @@ export async function updatePermits(authKey: string, url: string) {
     if (removedPermits.length > 0) {
         await inTransaction((db: DTTransaction) => {
             return Promise.all([
-                permitDb.setRemovedPermits(db, removedPermits),
+                permitDb.setRemovedPermits(db, removedPermits as string[]),
                 LastUpdatedDb.updateLastUpdated(db, DataType.PERMIT_DATA, updatedTimestamp)
             ]);
         });
@@ -44,11 +47,10 @@ export async function updatePermits(authKey: string, url: string) {
         LastUpdatedDb.updateLastUpdated(db, DataType.PERMIT_DATA_CHECK, updatedTimestamp)
     );
 
-    console.info(
-        "method=UpdateService.updatePermits count=%d insertCount=%d",
-        permitsInApi.length,
-        newPermits.length
-    );
+    logger.info({
+        method: "update.updatePermits",
+        message: `count=${permitsInApi.length} insertCount=${newPermits.length}`
+    });
 }
 
 function getAllPermitIdsFromDb(): Promise<Record<string, string>[]> {

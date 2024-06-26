@@ -5,20 +5,20 @@ import {
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { FeatureCollection } from "geojson";
+import type { FeatureCollection } from "geojson";
 
 const BASE_URL = "/prod/api/street-traffic-message/beta/";
 
 const PERMITS_GEOJSON_URL = BASE_URL + "messages";
 const PERMITS_D2LIGHT_URL = BASE_URL + "messages.d2light";
 
-type D2LightMessage = {
+interface D2LightMessage {
     situationPublicationLight: {
         situationRecord: {
             id: number;
         }[];
     };
-};
+}
 
 export const handler = async () => {
     const checker = await UrlChecker.createV2();

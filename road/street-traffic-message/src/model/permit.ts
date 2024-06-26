@@ -1,7 +1,7 @@
-import { JsonSchema, JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
-import { Geometry, Point } from "geojson";
+import { type JsonSchema, JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
+import type { Geometry, Point } from "geojson";
 
-export type ApiPermit = {
+export interface ApiPermit {
     readonly sourceId: string;
     readonly source: string;
     readonly permitSubject: string;
@@ -9,7 +9,7 @@ export type ApiPermit = {
     readonly gmlGeometryXmlString: string;
     readonly effectiveFrom: Date;
     readonly effectiveTo?: Date;
-};
+}
 
 export enum PermitType {
     CONSTRUCTION_WORKS = "constructionWorks",
@@ -23,8 +23,8 @@ export enum PermitDetailedType {
     OTHER = "other"
 }
 
-export type DbPermit = {
-    readonly id: string;
+export interface DbPermit {
+    readonly id: number;
     readonly sourceId: string;
     readonly source: string;
     readonly permitType: string;
@@ -36,7 +36,7 @@ export type DbPermit = {
     readonly created: Date;
     readonly modified: Date;
     readonly version: number;
-};
+}
 
 export const permitProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,

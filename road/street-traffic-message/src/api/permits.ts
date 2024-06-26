@@ -1,4 +1,5 @@
-import axios, { AxiosError } from "axios";
+import axios, { type AxiosError } from "axios";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class PermitsApi {
     readonly apiUrl: string;
@@ -29,11 +30,14 @@ export class PermitsApi {
                 }
             });
 
-            return resp.data;
+            return resp.data as string;
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError;
-                console.error(`method=getPermitsXml ${this.genericError} with status ${axiosError.code}`);
+                logger.error({
+                    method: "permits.getPermitsXml",
+                    message: `${this.genericError} with status ${axiosError.code}`
+                });
                 throw Error(`${this.genericError} with: ${axiosError.message}`);
             }
             if (error instanceof Error) {
@@ -41,7 +45,10 @@ export class PermitsApi {
             }
             throw error;
         } finally {
-            console.info("method=getPermitsXml tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "permits.getPermitsXml",
+                tookMs: Date.now() - start
+            });
         }
     }
 }

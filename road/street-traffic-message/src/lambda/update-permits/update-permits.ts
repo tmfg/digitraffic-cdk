@@ -1,9 +1,11 @@
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import * as UpdateService from "../../service/update";
-import { PermitsSecret } from "../../model/permits-secret";
+import * as UpdateService from "../../service/update.js";
+import type { PermitsSecret } from "../../model/permits-secret.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-const PERMIT_DOMAIN = process.env.PERMIT_DOMAIN as string;
+// eslint-disable-next-line dot-notation
+const PERMIT_DOMAIN = process.env["PERMIT_DOMAIN"];
 const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<PermitsSecret>("ep." + PERMIT_DOMAIN);
 
@@ -17,10 +19,10 @@ export const handler = async () => {
             await UpdateService.updatePermits(secret.authKey, secret.url);
         })
         .finally(() => {
-            console.info(
-                "method=StreetTrafficMessage.updatePermits.%s tookMs=%d",
-                PERMIT_DOMAIN,
-                Date.now() - start
-            );
+            logger.info({
+                method: "update-permits.handler",
+                message: `permit domain: ${PERMIT_DOMAIN}`,
+                tookMs: Date.now() - start
+            });
         });
 };

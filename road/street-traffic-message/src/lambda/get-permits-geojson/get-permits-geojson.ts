@@ -1,6 +1,7 @@
-import * as PermitsService from "../../service/permits";
+import * as PermitsService from "../../service/permits.js";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const holder = ProxyHolder.create();
 
@@ -14,11 +15,17 @@ export const handler = async () => {
             return LambdaResponse.okJson(result);
         })
         .catch((error) => {
-            console.error("method=StreetTrafficMessage.GetPermitsGeoJson error " + error);
+            logger.error({
+                method: "get-permits-geojson.handler",
+                error: error
+            });
 
             return LambdaResponse.internalError();
         })
         .finally(() => {
-            console.info("method=StreetTrafficMessage.GetPermitsGeoJson tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "get-permits-geojson.handler",
+                tookMs: Date.now() - start
+            });
         });
 };

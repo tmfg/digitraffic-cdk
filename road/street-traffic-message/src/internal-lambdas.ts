@@ -1,8 +1,8 @@
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import {
     MonitoredDBFunction,
-    MonitoredFunction
+    type MonitoredFunction
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 
 export class InternalLambdas {
@@ -17,7 +17,8 @@ export class InternalLambdas {
         permitDomain: string
     ): MonitoredFunction {
         const lambdaEnvironment = stack.createLambdaEnvironment();
-        lambdaEnvironment.PERMIT_DOMAIN = permitDomain;
+        // eslint-disable-next-line dot-notation
+        lambdaEnvironment["PERMIT_DOMAIN"] = permitDomain;
 
         return MonitoredDBFunction.create(stack, "update-permits", lambdaEnvironment, {
             memorySize: 256,

@@ -1,12 +1,13 @@
-import { PermitsApi } from "../api/permits";
-import { ApiPermit, DbPermit, PermitDetailedType, PermitType } from "../model/permit";
-import { PermitElement, PermitResponse } from "../model/permit-xml";
+import { PermitsApi } from "../api/permits.js";
+import { type ApiPermit, type DbPermit, PermitDetailedType, PermitType } from "../model/permit.js";
+import type { PermitElement, PermitResponse } from "../model/permit-xml.js";
 import { parse } from "date-fns";
 import * as xml2js from "xml2js";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
-import * as PermitsDAO from "../db/permit";
-import { FeatureCollection, Geometry, GeometryCollection, Point } from "geojson";
+import * as PermitsDAO from "../db/permit.js";
+import type { FeatureCollection, Geometry, GeometryCollection, Point } from "geojson";
 import { createGmlLineString, positionToList } from "@digitraffic/common/dist/utils/geometry";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
@@ -102,12 +103,14 @@ function createSituationRecords(permits: DbPermit[]) {
 }
 
 function createLocation(permit: DbPermit) {
-    if (permit.geometry.type != "GeometryCollection") {
+    if (permit.geometry.type !== "GeometryCollection") {
         throw new Error("GeometryCollection expected, got " + permit.geometry.type);
     }
 
     if (permit.geometry.geometries.length === 1) {
-        return convertGeometry(permit.geometry.geometries[0], permit.centroid);
+        // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+        const geometry = permit.geometry.geometries[0] as Geometry;
+        return convertGeometry(geometry, permit.centroid);
     }
 
     return convertGeometry(permit.geometry, permit.centroid);
@@ -159,15 +162,18 @@ function createGmlPolygon(geometry: Geometry) {
 
 function isValidPermit(permitElement: PermitElement): boolean {
     return (
+        // eslint-disable-next-line eqeqeq
         permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null &&
         ALLOWED_PERMIT_PROCESSING_STAGES.includes(permitElement["GIS:YlAlLuvat"]["GIS:Kasittelyvaihe"]) &&
+        // eslint-disable-next-line eqeqeq
         mapLupatyyppi(permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi_koodi"]) != null
     );
 }
 
 function convertPermit(permitElement: PermitElement): ApiPermit {
     const permitObject = permitElement["GIS:YlAlLuvat"];
-    const permitType = mapLupatyyppi(permitObject["GIS:Lupatyyppi_koodi"]);
+    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+    const permitType = mapLupatyyppi(permitObject["GIS:Lupatyyppi_koodi"]) as PermitType;
     const permitSubject = convertSubject(
         permitType,
         permitObject["GIS:LuvanTarkoitus"],
@@ -186,6 +192,7 @@ function convertPermit(permitElement: PermitElement): ApiPermit {
             new Date()
         ),
         effectiveTo:
+            // eslint-disable-next-line eqeqeq
             permitObject["GIS:VoimassaolonPaattymispaiva"] != null
                 ? parse(
                       `${permitObject["GIS:VoimassaolonPaattymispaiva"]} ${permitObject["GIS:VoimassaolonPaattymissaika"]}`,
@@ -207,15 +214,19 @@ function convertSubject(permitType: PermitType, tarkoitus: string, nimi: string)
 function mapLupatyyppi(lupatyyppiKoodi: string) {
     const mappedType = PERMIT_TYPE_MAP[lupatyyppiKoodi];
 
-    if (lupatyyppiKoodi != "0" && mappedType == null) {
-        console.info("method=PermitsService unmapped lupatyyppi " + lupatyyppiKoodi);
+    // eslint-disable-next-line eqeqeq
+    if (lupatyyppiKoodi !== "0" && mappedType == null) {
+        logger.info({
+            method: "permits.mapLupatyyppi",
+            message: `unmapped lupatyyppi ${lupatyyppiKoodi}`
+        });
     }
 
     return mappedType;
 }
 
 function xmlToJs(xml: string): Promise<PermitResponse> {
-    return xml2js.parseStringPromise(xml, { explicitArray: false });
+    return xml2js.parseStringPromise(xml, { explicitArray: false }) as Promise<PermitResponse>;
 }
 
 function jsToXml(obj: Record<string, unknown>): string {

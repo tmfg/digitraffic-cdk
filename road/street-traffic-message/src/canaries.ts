@@ -1,5 +1,5 @@
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
 import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
 import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
