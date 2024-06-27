@@ -1,10 +1,10 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { APIGatewayEvent } from "aws-lambda/trigger/api-gateway-proxy";
-import { SqsProducer } from "sns-sqs-big-payload";
-import { MaintenanceTrackingEnvKeys } from "../../keys";
-import { TyokoneenseurannanKirjaus } from "../../model/models";
-import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
-import * as SqsBigPayload from "../../service/sqs-big-payload";
+import type { APIGatewayEvent } from "aws-lambda";
+import type { SqsProducer } from "sns-sqs-big-payload";
+import { MaintenanceTrackingEnvKeys } from "../../keys.js";
+import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
+import * as MaintenanceTrackingService from "../../service/maintenance-tracking.js";
+import * as SqsBigPayload from "../../service/sqs-big-payload.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const sqsBucketName = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME);
@@ -19,11 +19,14 @@ export const handler: (apiGWRequest: APIGatewayEvent) => Promise<ResponseValue> 
 export function handlerFn(sqsProducer: SqsProducer): (request: APIGatewayEvent) => Promise<ResponseValue> {
     return async (apiGWRequest: APIGatewayEvent): Promise<ResponseValue> => {
         const start = Date.now();
+
+        const body = apiGWRequest.body;
+
         logger.info({
             method: "MaintenanceTracking.updateQueue",
             message: `bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl} and region: ${region} apiGWRequest type: ${typeof apiGWRequest}`
         });
-        if (!apiGWRequest.body) {
+        if (!body) {
             logger.info({
                 method: "MaintenanceTracking.updateQueue",
                 message: `empty message body`
@@ -32,14 +35,13 @@ export function handlerFn(sqsProducer: SqsProducer): (request: APIGatewayEvent) 
         }
 
         try {
-            const messageSizeBytes = Buffer.byteLength(apiGWRequest.body);
-            const messageDeduplicationId = MaintenanceTrackingService.createMaintenanceTrackingMessageHash(
-                apiGWRequest.body
-            );
+            const messageSizeBytes = Buffer.byteLength(body);
+            const messageDeduplicationId =
+                MaintenanceTrackingService.createMaintenanceTrackingMessageHash(body);
 
             // logger.debug(`method=updateMaintenanceTrackingRequest messageDeduplicationId: ${messageDeduplicationId} sizeBytes=${messageSizeBytes}`);
             // Will send message's body to S3 if it's larger than max SQS message size
-            const json = JSON.parse(apiGWRequest.body) as TyokoneenseurannanKirjaus;
+            const json = JSON.parse(body) as TyokoneenseurannanKirjaus;
             await sqsProducer.sendJSON(json);
             logger.info({
                 method: "MaintenanceTracking.updateQueue",

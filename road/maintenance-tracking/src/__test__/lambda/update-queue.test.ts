@@ -1,16 +1,17 @@
-import { MaintenanceTrackingEnvKeys } from "../../lib/keys";
+import { MaintenanceTrackingEnvKeys } from "../../keys.js";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import * as sinon from "sinon";
+import type { SqsProducer } from "sns-sqs-big-payload";
+import * as LambdaUpdateQueue from "../../lambda/update-queue/update-queue.js";
+import * as SqsBigPayload from "../../service/sqs-big-payload.js";
+import { getRandompId, getTrackingJsonWith3Observations } from "../testdata.js";
+import type { APIGatewayEvent } from "aws-lambda";
+
 process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = "sqs-bucket-name";
 process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = "https://aws-queue-123";
-process.env.AWS_REGION = "aws-region";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { APIGatewayEvent } from "aws-lambda/trigger/api-gateway-proxy";
-import * as sinon from "sinon";
-import { SqsProducer } from "sns-sqs-big-payload";
-import * as LambdaUpdateQueue from "../../lib/lambda/update-queue/update-queue";
-import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
-import { getRandompId, getTrackingJsonWith3Observations } from "../testdata";
-
-const testEvent = require("../test-apigw-event") as APIGatewayEvent;
+// eslint-disable-next-line dot-notation
+process.env["AWS_REGION"] = "aws-region";
+const testEvent = (await import("../test-apigw-event.json")) as unknown as APIGatewayEvent;
 
 function createSqsProducerForTest(): SqsProducer {
     return SqsBigPayload.createSqsProducer(

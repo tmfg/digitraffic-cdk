@@ -1,12 +1,12 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { SQS } from "aws-sdk";
+import type { SQS } from "aws-sdk";
 import { parseISO } from "date-fns";
 import _ from "lodash";
 import { SqsConsumer, SqsProducer } from "sns-sqs-big-payload";
-import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao";
-import { MaintenanceTrackingEnvKeys } from "../keys";
-import { Havainto, TyokoneenseurannanKirjaus } from "../model/models";
-import * as MaintenanceTrackingService from "./maintenance-tracking";
+import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao.js";
+import { MaintenanceTrackingEnvKeys } from "../keys.js";
+import type { Havainto, TyokoneenseurannanKirjaus } from "../model/models.js";
+import * as MaintenanceTrackingService from "./maintenance-tracking.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let sqsConsumerInstance: SqsConsumer | undefined;

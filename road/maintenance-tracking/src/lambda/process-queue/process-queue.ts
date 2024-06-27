@@ -2,9 +2,9 @@ import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-hold
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
-import { SQSEvent, SQSRecord } from "aws-lambda";
-import { MaintenanceTrackingEnvKeys } from "../../keys";
-import { getSqsConsumerInstance } from "../../service/sqs-big-payload";
+import type { SQSEvent, SQSRecord } from "aws-lambda";
+import { MaintenanceTrackingEnvKeys } from "../../keys.js";
+import { getSqsConsumerInstance } from "../../service/sqs-big-payload.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let rdsHolder: RdsHolder | undefined;

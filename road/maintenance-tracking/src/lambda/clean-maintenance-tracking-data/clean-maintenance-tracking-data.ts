@@ -1,5 +1,5 @@
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { cleanMaintenanceTrackingData } from "../../service/maintenance-tracking";
+import { cleanMaintenanceTrackingData } from "../../service/maintenance-tracking.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const proxyHolder = ProxyHolder.create();

@@ -1,12 +1,12 @@
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
 import * as sinon from "sinon";
-import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
-import { Havainto, TyokoneenseurannanKirjaus } from "../lib/model/models";
-import { convertToDbObservationData } from "../lib/service/maintenance-tracking";
+import type { DbObservationData } from "../dao/maintenance-tracking-dao.js";
+import type { Havainto, TyokoneenseurannanKirjaus } from "../model/models.js";
+import { convertToDbObservationData } from "../service/maintenance-tracking.js";
 import { parseISO } from "date-fns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

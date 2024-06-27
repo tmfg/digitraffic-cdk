@@ -1,26 +1,28 @@
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { SQSRecord } from "aws-lambda";
+import type { SQSRecord } from "aws-lambda";
 import { parseISO } from "date-fns";
 import * as sinon from "sinon";
-import { SqsConsumer } from "sns-sqs-big-payload";
-import { MaintenanceTrackingEnvKeys } from "../../lib/keys";
-import * as LambdaProcessQueue from "../../lib/lambda/process-queue/process-queue";
-import { getSqsConsumerInstance } from "../../lib/service/sqs-big-payload";
-import { dbTestBase, findAllObservations, mockSecrets } from "../db-testutil";
+import type { SqsConsumer } from "sns-sqs-big-payload";
+import { MaintenanceTrackingEnvKeys } from "../../keys.js";
+import * as LambdaProcessQueue from "../../lambda/process-queue/process-queue.js";
+import { getSqsConsumerInstance } from "../../service/sqs-big-payload.js";
+import { dbTestBase, findAllObservations, mockSecrets } from "../db-testutil.js";
 import {
     getRandompId,
     getTrackingJsonWith3Observations,
     getTrackingJsonWith3ObservationsAndMissingSendingSystem
-} from "../testdata";
+} from "../testdata.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const QUEUE = "MaintenanceTrackingQueue";
 process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = "sqs-bucket-name";
 process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] =
     `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
-process.env.AWS_REGION = "aws-region";
-process.env.SECRET_ID = "";
+// eslint-disable-next-line dot-notation
+process.env["AWS_REGION"] = "aws-region";
+// eslint-disable-next-line dot-notation
+process.env["SECRET_ID"] = "";
 
 describe(
     "process-queue",
@@ -38,10 +40,14 @@ describe(
                 messageId: "aaaa",
                 Body: "test"
             });
-            expect(clone.messageId).toEqual("aaaa");
-            expect(clone.MessageId).toEqual("aaaa");
-            expect(clone.body).toEqual("test");
-            expect(clone.Body).toEqual("test");
+            // eslint-disable-next-line dot-notation
+            expect(clone["messageId"]).toEqual("aaaa");
+            // eslint-disable-next-line dot-notation
+            expect(clone["MessageId"]).toEqual("aaaa");
+            // eslint-disable-next-line dot-notation
+            expect(clone["body"]).toEqual("test");
+            // eslint-disable-next-line dot-notation
+            expect(clone["Body"]).toEqual("test");
         });
 
         test("no records", async () => {

@@ -1,6 +1,6 @@
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { PreparedStatement } from "pg-promise";
-import { DbNumberId } from "../model/db-data";
+import type { DbNumberId } from "../model/db-data.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum Status {

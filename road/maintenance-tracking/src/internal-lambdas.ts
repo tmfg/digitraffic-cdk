@@ -3,16 +3,16 @@ import {
     MonitoredDBFunction,
     MonitoredFunction
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { Bucket } from "aws-cdk-lib/aws-s3";
-import { Queue } from "aws-cdk-lib/aws-sqs";
-import { Construct } from "constructs";
-import { MaintenanceTrackingEnvKeys } from "./keys";
-import { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration";
-import { QueueAndDLQ } from "./sqs";
+import type { Bucket } from "aws-cdk-lib/aws-s3";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Construct } from "constructs";
+import { MaintenanceTrackingEnvKeys } from "./keys.js";
+import type { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
+import type { QueueAndDLQ } from "./sqs.js";
 
 export function createCleanMaintenanceTrackingDataLambda(stack: DigitrafficStack): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();

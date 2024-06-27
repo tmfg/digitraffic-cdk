@@ -1,15 +1,15 @@
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { addDefaultValidator, addServiceModel } from "@digitraffic/common/dist/utils/api-model";
-import { Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
 import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { Queue } from "aws-cdk-lib/aws-sqs";
-import { Construct } from "constructs";
-import { MaintenanceTrackingEnvKeys } from "./keys";
-import { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Construct } from "constructs";
+import { MaintenanceTrackingEnvKeys } from "./keys.js";
+import type { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
 
 import {
     createSchemaGeometriaSijainti,
@@ -20,7 +20,7 @@ import {
     Organisaatio,
     Tunniste,
     Viivageometriasijainti
-} from "./model/maintenance-tracking-schema";
+} from "./model/maintenance-tracking-schema.js";
 import apigateway = require("aws-cdk-lib/aws-apigateway");
 
 export function createIntegrationApiAndHandlerLambda(
@@ -51,11 +51,8 @@ export function createIntegrationApiAndHandlerLambda(
 function addServiceModelToIntegrationApi(integrationApi: RestApi): void {
     const tunnisteModel = addServiceModel("Tunniste", integrationApi, Tunniste);
     const organisaatioModel = addServiceModel("Organisaatio", integrationApi, Organisaatio);
-    const otsikkoModel = addServiceModel(
-        "Otsikko",
-        integrationApi,
-        createSchemaOtsikko(organisaatioModel.modelReference, tunnisteModel.modelReference)
-    );
+    const s = createSchemaOtsikko(organisaatioModel.modelReference, tunnisteModel.modelReference);
+    const otsikkoModel = addServiceModel("Otsikko", integrationApi, s);
     const koordinaattisijaintiModel = addServiceModel(
         "Koordinaattisijainti",
         integrationApi,

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
-import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
-import { TyokoneenseurannanKirjaus } from "../lib/model/models";
+import type { DbObservationData } from "../dao/maintenance-tracking-dao.js";
+import type { TyokoneenseurannanKirjaus } from "../model/models.js";
 
 const REGEXP_ID = new RegExp("ID_PLACEHOLDER", "g");
 const REGEXP_TK = new RegExp("TK_PLACEHOLDER", "g");

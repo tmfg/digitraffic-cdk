@@ -1,7 +1,7 @@
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import * as MaintenanceTrackingDb from "../../lib/dao/maintenance-tracking-dao";
-import * as DbTestutil from "../db-testutil";
-import * as TestData from "../testdata";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import * as MaintenanceTrackingDb from "../../dao/maintenance-tracking-dao.js";
+import * as DbTestutil from "../db-testutil.js";
+import * as TestData from "../testdata.js";
 
 describe(
     "db-maintenance-tracking-dao",
@@ -60,12 +60,12 @@ describe(
         test("remove json from DbObservationData", () => {
             const json = '{ "a" : "b" }';
             const data: MaintenanceTrackingDb.DbObservationData[] = createDbObservationData();
-            expect(data[0].json).toEqual(json);
-            expect(data[1].json).toEqual(json);
+            expect(data[0]!.json).toEqual(json);
+            expect(data[1]!.json).toEqual(json);
             const clones = MaintenanceTrackingDb.cloneObservationsWithoutJson(data);
             const removed = "{...REMOVED...}";
-            expect(clones[0].json).toEqual(removed);
-            expect(clones[1].json).toEqual(removed);
+            expect(clones[0]!.json).toEqual(removed);
+            expect(clones[1]!.json).toEqual(removed);
         });
     })
 );

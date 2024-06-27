@@ -1,4 +1,4 @@
-import { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export interface MaintenanceTrackingStackConfiguration extends StackConfiguration {
     readonly sqsDlqBucketName: string;
