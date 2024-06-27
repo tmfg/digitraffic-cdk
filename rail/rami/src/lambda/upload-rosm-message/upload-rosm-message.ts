@@ -14,8 +14,8 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         const body = JSON.stringify(messageBody);
 
         logger.info({
-            method: "UploadRamiMessage.handler",
-            message: "Received valid RAMI message",
+            method: "UploadRosmMessage.handler",
+            message: "Received valid ROSM message",
             customSizeBytes: body.length
         });
 
@@ -24,8 +24,8 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         await sendRosmMessage(validationResult);
     } else {
         logger.error({
-            method: "UploadRamiMessage.handler",
-            message: "Received invalid RAMI message",
+            method: "UploadRosmMessage.handler",
+            message: "Received invalid ROSM message",
             customInvalidRosmMessage: JSON.stringify(messageBody),
             customValidationErrors: validationResult.errors
         });

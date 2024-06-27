@@ -14,8 +14,8 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         const body = JSON.stringify(messageBody);
 
         logger.info({
-            method: "UploadSMMessage.handler",
-            message: "Received valid RAMI message",
+            method: "UploadSmMessage.handler",
+            message: "Received valid SM message",
             customSizeBytes: body.length
         });
 
@@ -24,8 +24,8 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         await sendSmMessage(validationResult);
     } else {
         logger.error({
-            method: "UploadSMMessage.handler",
-            message: "Received invalid message",
+            method: "UploadSmMessage.handler",
+            message: "Received invalid SM message",
             customInvalidSmMessage: JSON.stringify(messageBody),
             customValidationErrors: validationResult.errors
         });

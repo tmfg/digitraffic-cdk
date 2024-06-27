@@ -4,6 +4,17 @@ import type { DtSmMessage, StMonitoringData } from "../model/dt-rami-message.js"
 import { monitoredCall, ramiSmMessageSchema } from "../model/zod-schema/sm-message.js";
 import type { z } from "zod";
 
+export async function processSmMessage(message: DtSmMessage): Promise<void> {
+    logger.info({
+        method: "ProcessSmMessageService.processSmMessage",
+        message: `Message for train ${message.trainNumber} ${message.departureDate}`
+    });
+
+
+    return await Promise.resolve();
+    // save to db
+}
+
 export function parseSmMessage(message: unknown): DtSmMessage | undefined {
     try {
         const parsedMessage = ramiSmMessageSchema.parse(message);

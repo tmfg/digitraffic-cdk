@@ -2,7 +2,8 @@ import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { parseSmMessage } from "../../service/process-sm-message.js";
+import { parseSmMessage, processSmMessage } from "../../service/process-sm-message.js";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export function handlerFn(): (event: SQSEvent) => Promise<void> {
     return async (event: SQSEvent) => {
@@ -13,18 +14,28 @@ export function handlerFn(): (event: SQSEvent) => Promise<void> {
 
                 try {
                     const parsedSmMessage = parseSmMessage(JSON.parse(recordBody));
-                    logger.debug({
-                        method: "RAMI-ProcessSmQueue.handler",
-                        customParsedRamiMessage: JSON.stringify(parsedSmMessage)
-                    });
-    
 
-                    // TODO parse message
-                    // process
-                    // error handling, DLQ
+                    if(parsedSmMessage) {
+                        logger.debug({
+                            method: "RAMI-ProcessSmQueue.handler",
+                            customParsedRamiMessage: JSON.stringify(parsedSmMessage)
+                        });
 
-                    // do nothing for now
+                        await processSmMessage(parsedSmMessage);
+                    } else {
+                        logger.debug(recordBody);
+
+                        logger.error({
+                            method: "RAMI-ProcessSmQueue.handler",
+                            message: "Could not parse Sm message"
+                        });
+
+                        // DLQ??
+                    }    
+
                     return await Promise.resolve();
+                } catch (error) {
+                    logException(logger, error);                
                 } finally {
                     logger.info({
                         method: "RAMI-ProcessSmQueue.handler",
