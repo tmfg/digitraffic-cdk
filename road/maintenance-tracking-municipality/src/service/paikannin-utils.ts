@@ -2,16 +2,20 @@ import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { distanceBetweenPositionsInM } from "@digitraffic/common/dist/utils/geometry";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
-import { Position } from "geojson";
-import * as Constants from "../constants";
+import { type Position } from "geojson";
+import * as Constants from "../constants.js";
 import {
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbMaintenanceTracking,
-    DbWorkMachine
-} from "../model/db-data";
-import { ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice } from "../model/paikannin-api-data";
-import * as Utils from "./utils";
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbMaintenanceTracking,
+    type DbWorkMachine
+} from "../model/db-data.js";
+import {
+    type ApiWorkevent,
+    type ApiWorkeventDevice,
+    type ApiWorkeventIoDevice
+} from "../model/paikannin-api-data.js";
+import * as Utils from "./utils.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 /**
@@ -91,9 +95,11 @@ function toEventGroups(
         return toEventGroups(sourceEvents, filterBeforeOrEquaTime, targetGroups);
     } else if (targetGroups.length > 0) {
         // Take prev event from groups and compare it to next
-        const prevGroup: ApiWorkevent[] = targetGroups[targetGroups.length - 1];
-        const prevEvent: ApiWorkevent = prevGroup[prevGroup.length - 1];
-
+        const prevGroup: ApiWorkevent[] | undefined = targetGroups[targetGroups.length - 1];
+        const prevEvent: ApiWorkevent | undefined = prevGroup ? prevGroup[prevGroup.length - 1] : undefined;
+        if (!prevEvent || !prevGroup) {
+            throw new Error(`No previous event in previous target group ${JSON.stringify(targetGroups)}`);
+        }
         const prevTime = prevEvent.timestamp;
         const nextTime = nextEvent.timestamp;
 
@@ -361,9 +367,13 @@ export function createLineStringFromEvents(
     const lineStringCoordinates: Position[] = events.reduce((coordinates: Position[], nextEvent) => {
         const nextCoordinate: Position = [nextEvent.lon, nextEvent.lat, nextEvent.altitude];
         if (coordinates.length > 0) {
-            const previousCoordinate: Position = coordinates[coordinates.length - 1];
+            const previousCoordinate: Position | undefined = coordinates[coordinates.length - 1];
             // Linestring points must differ from previous values
-            if (previousCoordinate[0] !== nextCoordinate[0] || previousCoordinate[1] !== nextCoordinate[1]) {
+            if (
+                !previousCoordinate ||
+                previousCoordinate[0] !== nextCoordinate[0] ||
+                previousCoordinate[1] !== nextCoordinate[1]
+            ) {
                 coordinates.push(nextCoordinate);
             }
         } else {
@@ -373,7 +383,11 @@ export function createLineStringFromEvents(
     }, []);
 
     if (lineStringCoordinates.length === 1) {
-        return new GeoJsonPoint(lineStringCoordinates[0]);
+        const point = lineStringCoordinates[0];
+        if (!point) {
+            throw new Error("lineStringCoordinates[0] was undefined");
+        }
+        return new GeoJsonPoint(point);
     } else if (lineStringCoordinates.length > 1) {
         return new GeoJsonLineString(lineStringCoordinates);
     }
@@ -386,6 +400,9 @@ export function createDbMaintenanceTracking(
     events: ApiWorkevent[],
     taskMappings: DbDomainTaskMapping[]
 ): DbMaintenanceTracking | undefined {
+    if (events.length <= 0 || !events[0]) {
+        return undefined;
+    }
     const tasks: string[] = getTasksForOperations(events[0].ioChannels, taskMappings);
     if (tasks.length === 0) {
         return undefined;
@@ -393,7 +410,7 @@ export function createDbMaintenanceTracking(
 
     const firstEvent = events[0];
     // lastPoint
-    const lastEvent = events[events.length - 1];
+    const lastEvent = events[events.length - 1] ?? firstEvent;
     const lastPoint = new GeoJsonPoint([lastEvent.lon, lastEvent.lat, lastEvent.altitude]);
     const geometry: GeoJsonLineString | GeoJsonPoint | undefined = createLineStringFromEvents(events);
     if (!geometry) {

@@ -1,7 +1,7 @@
 import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { MaintenanceTrackingMunicipalityEnvKeys } from "./keys";
+import { MaintenanceTrackingMunicipalityEnvKeys } from "./keys.js";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 
 export class InternalLambdasCdk {

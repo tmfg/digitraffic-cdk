@@ -2,8 +2,8 @@ import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/d
 import { parseISO } from "date-fns";
 import * as MaintenanceTrackingDB from "../dao/maintenance-tracking-dao.js";
 import { type DbObservationData, Status } from "../dao/maintenance-tracking-dao.js";
-import type { DbNumberId } from "../model/db-data.js";
-import type { Havainto } from "../model/models.js";
+import { type DbNumberId } from "../model/db-data.js";
+import { type Havainto } from "../model/models.js";
 import crypto from "crypto";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

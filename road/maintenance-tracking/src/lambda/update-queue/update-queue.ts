@@ -1,12 +1,11 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import type { APIGatewayEvent } from "aws-lambda";
-import type { SqsProducer } from "sns-sqs-big-payload";
+import { type APIGatewayEvent } from "aws-lambda";
+import { type SqsProducer } from "sns-sqs-big-payload";
 import { MaintenanceTrackingEnvKeys } from "../../keys.js";
-import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
+import { type TyokoneenseurannanKirjaus } from "../../model/models.js";
 import * as MaintenanceTrackingService from "../../service/maintenance-tracking.js";
 import * as SqsBigPayload from "../../service/sqs-big-payload.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-
 const sqsBucketName = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME);
 const sqsQueueUrl = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL);
 const region = getEnvVariable("AWS_REGION");

@@ -1,19 +1,23 @@
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
-import { LineString, Point } from "geojson";
-import { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import { type LineString, type Point } from "geojson";
+import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 import add from "date-fns/add";
 import sub from "date-fns/sub";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
     AUTORI_MAX_MINUTES_TO_HISTORY,
     AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S
-} from "../../lib/constants";
-import { ApiContractData, ApiRouteData } from "../../lib/model/autori-api-data";
-import { DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine } from "../../lib/model/db-data";
-import { UNKNOWN_TASK_NAME } from "../../lib/model/tracking-save-result";
-import * as AutoriUtils from "../../lib/service/autori-utils";
-import * as utils from "../../lib/service/utils";
-import * as AutoriTestutils from "../autori-testutil";
+} from "../../constants.js";
+import { type ApiContractData, type ApiRouteData } from "../../model/autori-api-data.js";
+import {
+    type DbDomainTaskMapping,
+    type DbMaintenanceTracking,
+    type DbWorkMachine
+} from "../../model/db-data.js";
+import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
+import * as AutoriUtils from "../../service/autori-utils.js";
+import * as utils from "../../service/utils.js";
+import * as AutoriTestutils from "../autori-testutil.js";
 
 import {
     AUTORI_OPERATION_BRUSHING,
@@ -28,7 +32,7 @@ import {
     POINT_550M_FROM_START,
     POINT_START,
     VEHICLE_TYPE
-} from "../testconstants";
+} from "../testconstants.js";
 import {
     createDbDomainContract,
     createFeature,
@@ -37,7 +41,7 @@ import {
     createLineStringGeometry,
     createTaskMapping,
     createZigZagCoordinates
-} from "../testutil";
+} from "../testutil.js";
 
 describe("autori-utils-service-test", () => {
     test("isExtendingPreviousTracking", () => {
@@ -54,10 +58,14 @@ describe("autori-utils-service-test", () => {
 
         const fixedRoute = AutoriUtils.fixApiRouteDatas([route]);
         expect(fixedRoute.length).toEqual(2);
-        expect(fixedRoute[0].geography?.features.length).toEqual(1);
-        expect(fixedRoute[1].geography?.features.length).toEqual(1);
-        expect((fixedRoute[0].geography?.features[0].geometry as LineString).coordinates.length).toEqual(10);
-        expect((fixedRoute[1].geography?.features[0].geometry as LineString).coordinates.length).toEqual(15);
+        expect(fixedRoute[0]?.geography?.features.length).toEqual(1);
+        expect(fixedRoute[1]?.geography?.features.length).toEqual(1);
+        expect((fixedRoute[0]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(
+            10
+        );
+        expect((fixedRoute[1]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(
+            15
+        );
     });
 
     test("fixApiRouteData single", () => {
@@ -69,9 +77,11 @@ describe("autori-utils-service-test", () => {
 
         const fixedRoute = AutoriUtils.fixApiRouteDatas([route]);
         expect(fixedRoute.length).toEqual(1);
-        expect(fixedRoute[0].geography?.features.length).toEqual(1);
+        expect(fixedRoute[0]?.geography?.features.length).toEqual(1);
 
-        expect((fixedRoute[0].geography?.features[0].geometry as LineString).coordinates.length).toEqual(10);
+        expect((fixedRoute[0]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(
+            10
+        );
     });
 
     test("fixApiRouteData empty", () => {
@@ -85,7 +95,7 @@ describe("autori-utils-service-test", () => {
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
         expect(groups.length).toEqual(1);
-        expect((groups[0].geometry as LineString).coordinates.length).toEqual(20);
+        expect((groups[0]?.geometry as LineString).coordinates.length).toEqual(20);
     });
 
     test("groupEventsToIndividualGeometries split when big jump", () => {
@@ -95,8 +105,8 @@ describe("autori-utils-service-test", () => {
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
         expect(groups.length).toEqual(2);
-        expect((groups[0].geometry as LineString).coordinates.length).toEqual(10);
-        expect((groups[1].geometry as LineString).coordinates.length).toEqual(8);
+        expect((groups[0]?.geometry as LineString).coordinates.length).toEqual(10);
+        expect((groups[1]?.geometry as LineString).coordinates.length).toEqual(8);
     });
 
     test("groupEventsToIndividualGeometries split to point", () => {
@@ -106,9 +116,9 @@ describe("autori-utils-service-test", () => {
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
         expect(groups.length).toEqual(2);
-        expect((groups[0].geometry as Point).coordinates.length).toEqual(3); // Just point [x,y,z]
-        expect(groups[0].geometry.type).toEqual("Point"); // Just point [x,y]
-        expect((groups[1].geometry as LineString).coordinates.length).toEqual(17);
+        expect((groups[0]?.geometry as Point).coordinates.length).toEqual(3); // Just point [x,y,z]
+        expect(groups[0]?.geometry.type).toEqual("Point"); // Just point [x,y]
+        expect((groups[1]?.geometry as LineString).coordinates.length).toEqual(17);
     });
 
     test("isOverTimeLimit", () => {
@@ -185,8 +195,8 @@ describe("autori-utils-service-test", () => {
         ];
         const contracts = AutoriUtils.createDbDomainContracts(apiContracts, DOMAIN_1);
         expect(contracts).toHaveLength(2);
-        expect(contracts.find((c) => c.name === CONTRACT_1)?.contract).toEqual(apiContracts[0].id);
-        expect(contracts.find((c) => c.name === CONTRACT_2)?.contract).toEqual(apiContracts[1].id);
+        expect(contracts.find((c) => c.name === CONTRACT_1)?.contract).toEqual(apiContracts[0]?.id);
+        expect(contracts.find((c) => c.name === CONTRACT_2)?.contract).toEqual(apiContracts[1]?.id);
     });
 
     test("createDbWorkMachine", () => {
@@ -217,6 +227,7 @@ describe("autori-utils-service-test", () => {
         ); // same as geometries count
 
         const ls = tracking?.geometry as GeoJsonLineString;
+        // @ts-ignore
         expect(ls.coordinates[0][1]).toEqual(geometry.coordinates[0][1]);
         console.info(`Found ${JSON.stringify(ls)}`);
         expect(tracking?.start_time).toEqual(AutoriTestutils.createTrackingStartTimeFromUpdatedTime(now));
@@ -251,7 +262,7 @@ describe("autori-utils-service-test", () => {
             expect(mapping.ignore).toEqual(true);
             expect(mapping.domain).toEqual(DOMAIN_1);
             expect(mapping.name).toEqual(UNKNOWN_TASK_NAME);
-            expect(mapping.original_id).toEqual(operations[index].id);
+            expect(mapping.original_id).toEqual(operations[index]?.id);
         });
     });
 });

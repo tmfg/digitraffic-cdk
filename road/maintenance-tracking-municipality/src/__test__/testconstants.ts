@@ -1,4 +1,4 @@
-import { ApiWorkeventIoDevice } from "../lib/model/paikannin-api-data";
+import { type ApiWorkeventIoDevice } from "../model/paikannin-api-data.js";
 
 export const X_MIN = 19.0;
 export const X_MAX = 32.0;

@@ -1,10 +1,10 @@
-import axios, { AxiosError } from "axios";
+import axios, { type AxiosError } from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { ApiContractData, ApiOperationData, ApiRouteData } from "../model/autori-api-data";
-import { DbDomainContract } from "../model/db-data";
-import { MaintenanceTrackingAutoriSecret } from "../model/maintenance-tracking-municipality-secret";
+import { type ApiContractData, type ApiOperationData, type ApiRouteData } from "../model/autori-api-data.js";
+import { type DbDomainContract } from "../model/db-data.js";
+import { type MaintenanceTrackingAutoriSecret } from "../model/maintenance-tracking-municipality-secret.js";
 import { URLSearchParams } from "url";
-import logger from "../service/maintenance-logger";
+import logger from "../service/maintenance-logger.js";
 
 export const PATH_SUFFIX_CONTRACTS = "contracts";
 export const PATH_SUFFIX_ROUTE = "route";

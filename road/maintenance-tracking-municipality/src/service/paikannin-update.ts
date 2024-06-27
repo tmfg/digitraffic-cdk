@@ -1,26 +1,26 @@
-import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import * as Geometry from "@digitraffic/common/dist/utils/geometry";
-import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
+import { type GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
-import { Position } from "geojson";
+import { type Position } from "geojson";
 import sub from "date-fns/sub";
-import { PaikanninApi } from "../api/paikannin";
-import { PAIKANNIN_MAX_MINUTES_TO_HISTORY, PAIKANNIN_MIN_MINUTES_FROM_PRESENT } from "../constants";
-import * as DataDb from "../dao/data";
+import { type PaikanninApi } from "../api/paikannin.js";
+import { PAIKANNIN_MAX_MINUTES_TO_HISTORY, PAIKANNIN_MIN_MINUTES_FROM_PRESENT } from "../constants.js";
+import * as DataDb from "../dao/data.js";
 import {
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbLatestTracking,
-    DbMaintenanceTracking,
-    DbTextId,
-    DbWorkMachine
-} from "../model/db-data";
-import { ApiDevice, ApiWorkevent, ApiWorkeventDevice } from "../model/paikannin-api-data";
-import { TrackingSaveResult, UNKNOWN_TASK_NAME } from "../model/tracking-save-result";
-import * as CommonUpdateService from "./common-update";
-import * as PaikanninUtils from "./paikannin-utils";
-import * as Utils from "./utils";
-import logger from "./maintenance-logger";
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbLatestTracking,
+    type DbMaintenanceTracking,
+    type DbTextId,
+    type DbWorkMachine
+} from "../model/db-data.js";
+import { type ApiDevice, type ApiWorkevent, type ApiWorkeventDevice } from "../model/paikannin-api-data.js";
+import { TrackingSaveResult, UNKNOWN_TASK_NAME } from "../model/tracking-save-result.js";
+import * as CommonUpdateService from "./common-update.js";
+import * as PaikanninUtils from "./paikannin-utils.js";
+import * as Utils from "./utils.js";
+import logger from "./maintenance-logger.js";
 
 export class PaikanninUpdate {
     readonly api: PaikanninApi;
@@ -226,6 +226,7 @@ export class PaikanninUpdate {
 
         // mark last tracking as not finished as next fetch of the api data can continue it
         if (maintenanceTrackings.length > 0) {
+            // @ts-ignore
             maintenanceTrackings[maintenanceTrackings.length - 1].finished = false;
         }
 
@@ -254,13 +255,16 @@ export class PaikanninUpdate {
         latest: DbLatestTracking | undefined
     ): Promise<TrackingSaveResult> {
         const timerStart = Date.now();
-        const machineId = maintenanceTrackings[0].work_machine_id;
+        const nextTracking = maintenanceTrackings[0];
+        if (!nextTracking) {
+            return Promise.resolve(TrackingSaveResult.createSaved(0, 0));
+        }
+        const machineId = nextTracking.work_machine_id;
         return db
             .tx(async (tx) => {
                 // If first new tracking is extending latest tracking in db -> update latest in db also with
                 // new end point and time
                 if (latest && !latest.finished && maintenanceTrackings.length > 0) {
-                    const nextTracking: DbMaintenanceTracking = maintenanceTrackings[0];
                     const previousEndPosition = (JSON.parse(latest.last_point) as GeoJsonPoint).coordinates;
                     const nextStartPosition: Position = Utils.getTrackingStartPoint(nextTracking);
                     if (

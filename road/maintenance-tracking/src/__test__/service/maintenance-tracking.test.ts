@@ -1,5 +1,5 @@
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
+import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import { type TyokoneenseurannanKirjaus } from "../../model/models.js";
 import {
     cleanMaintenanceTrackingData,
     createMaintenanceTrackingMessageHash,
@@ -17,6 +17,7 @@ import {
 } from "../db-testutil.js";
 import { assertObservationData, getTrackingJsonWith3Observations } from "../testdata.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { expect } from "@jest/globals";
 
 describe(
     "maintenance-tracking",
@@ -87,7 +88,7 @@ describe(
                 getTrackingJsonWith3Observations("1", "1")
             ) as TyokoneenseurannanKirjaus;
             expect(tracking.havainnot.length).toBe(3);
-            const observation = tracking.havainnot[0]!.havainto;
+            const observation = tracking.havainnot[0]?.havainto;
             const h1 = createMaintenanceTrackingMessageHash(JSON.stringify(observation));
             const h2 = createMaintenanceTrackingMessageHash(JSON.stringify(observation));
             // Assert has is same for same json with different viestitunniste
@@ -99,8 +100,8 @@ describe(
                 getTrackingJsonWith3Observations("1", "1")
             ) as TyokoneenseurannanKirjaus;
             expect(tracking.havainnot.length).toBe(3);
-            const observation1 = tracking.havainnot[0]!.havainto;
-            const observation2 = tracking.havainnot[1]!.havainto;
+            const observation1 = tracking.havainnot[0]?.havainto;
+            const observation2 = tracking.havainnot[1]?.havainto;
             const h1 = createMaintenanceTrackingMessageHash(JSON.stringify(observation1));
             const h2 = createMaintenanceTrackingMessageHash(JSON.stringify(observation2));
             // Assert has is same for same json with different viestitunniste

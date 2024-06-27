@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import { Position } from "geojson";
-import { DbMaintenanceTracking } from "../model/db-data";
+import { type Position } from "geojson";
+import { type DbMaintenanceTracking } from "../model/db-data.js";
 import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 /**
@@ -49,12 +49,23 @@ export function getTrackingStartPoint(tracking: DbMaintenanceTracking): Position
     if (tracking.geometry instanceof GeoJsonPoint) {
         return tracking.geometry.coordinates;
     }
-    return tracking.geometry.coordinates[0];
+    if (tracking.geometry.coordinates[0]) {
+        return tracking.geometry.coordinates[0];
+    }
+    throw new Error(
+        `method=getTrackingStartPoint ${tracking.id} tracking.geometry.coordinates[0] was missing`
+    );
 }
 
 export function getTrackingEndPoint(tracking: DbMaintenanceTracking): Position {
     if (tracking.geometry instanceof GeoJsonPoint) {
         return tracking.geometry.coordinates;
     }
-    return tracking.geometry.coordinates[tracking.geometry.coordinates.length - 1];
+    const end = tracking.geometry.coordinates[tracking.geometry.coordinates.length - 1];
+    if (end) {
+        return end;
+    }
+    throw new Error(
+        `method=getTrackingEndPoint for ${tracking.id} failed: end position was undefined ${JSON.stringify(tracking.geometry.coordinates)}`
+    );
 }

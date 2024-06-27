@@ -1,5 +1,5 @@
 import { logger as dtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { DtLogger, LoggableType } from "@digitraffic/common/dist/aws/runtime/dt-logger";
+import { DtLogger, type LoggableType } from "@digitraffic/common/dist/aws/runtime/dt-logger";
 
 export interface MaintenanceLoggableType extends LoggableType {
     customSizeBytes?: number;
@@ -9,15 +9,15 @@ export interface MaintenanceLoggableType extends LoggableType {
 }
 
 export class DtLoggeri extends DtLogger {
-    info(message: MaintenanceLoggableType): void {
+    override info(message: MaintenanceLoggableType): void {
         dtLogger.info(message);
     }
 
-    warn(message: MaintenanceLoggableType): void {
+    override warn(message: MaintenanceLoggableType): void {
         dtLogger.warn(message);
     }
 
-    error(message: MaintenanceLoggableType): void {
+    override error(message: MaintenanceLoggableType): void {
         dtLogger.error(message);
     }
 }

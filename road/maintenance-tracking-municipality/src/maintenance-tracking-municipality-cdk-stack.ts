@@ -1,7 +1,7 @@
-import { Construct } from "constructs";
-import { InternalLambdasCdk } from "./internal-lambdas.cdk";
-import { DigitrafficStack, StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { Canaries } from "./canaries";
+import { type Construct } from "constructs";
+import { InternalLambdasCdk } from "./internal-lambdas.cdk.js";
+import { DigitrafficStack, type StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Canaries } from "./canaries.js";
 
 export class MaintenanceTrackingMunicipalityCdkStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {

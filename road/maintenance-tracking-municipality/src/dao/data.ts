@@ -1,21 +1,21 @@
-import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase, type DTTransaction } from "@digitraffic/common/dist/database/database";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
-import { Position } from "geojson";
-import { PreparedStatement } from "pg-promise";
-import { COORDINATE_PRECISION } from "../constants";
+import { type Position } from "geojson";
+import { default as pgPromise } from "pg-promise";
+import { COORDINATE_PRECISION } from "../constants.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 import {
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbLatestTracking,
-    DbMaintenanceTracking,
-    DbNumberId,
-    DbTextId,
-    DbWorkMachine
-} from "../model/db-data";
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbLatestTracking,
+    type DbMaintenanceTracking,
+    type DbNumberId,
+    type DbTextId,
+    type DbWorkMachine
+} from "../model/db-data.js";
 
-const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN = new PreparedStatement({
+const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN = new pgPromise.PreparedStatement({
     name: "PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN",
     text: `INSERT INTO maintenance_tracking_domain(name, source)
            VALUES ($1, $2)
@@ -37,7 +37,7 @@ export async function upsertDomain(db: DTDatabase, domain: string, source?: stri
     }
 }
 
-const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT = new PreparedStatement({
+const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT = new pgPromise.PreparedStatement({
     name: "UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT",
     text: `INSERT INTO maintenance_tracking_domain_contract(domain, contract, name, start_date, end_date, data_last_updated)
            VALUES ($1, $2, $3, $4, $5, $6)
@@ -89,7 +89,7 @@ export function upsertContracts(
     }
 }
 
-const PS_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED = new PreparedStatement({
+const PS_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED = new pgPromise.PreparedStatement({
     name: "UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED",
     text: `UPDATE maintenance_tracking_domain_contract
            UPDATE SET data_last_updated = $3
@@ -120,7 +120,7 @@ export async function updateContractLastUpdated(
     }
 }
 
-const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING = new PreparedStatement({
+const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING = new pgPromise.PreparedStatement({
     name: "UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING",
     text: `INSERT INTO maintenance_tracking_domain_task_mapping (name, original_id, domain, ignore, info)
            VALUES ($1, $2, $3, $4, 'TODO: Auto generated')
@@ -148,7 +148,7 @@ export function upsertTaskMappings(
     });
 }
 
-const PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED = new PreparedStatement({
+const PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED = new pgPromise.PreparedStatement({
     name: "PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED",
     // line_string => takes either previous value and append to it or if previous value is null, then take the last_point and append to it
     text: `
@@ -201,7 +201,7 @@ export async function appendMaintenanceTrackingEndPointAndMarkFinished(
     ]);
 }
 
-const PS_MARK_MAINTENANCE_TRACKING_FINISHED = new PreparedStatement({
+const PS_MARK_MAINTENANCE_TRACKING_FINISHED = new pgPromise.PreparedStatement({
     name: "PS_MARK_MAINTENANCE_TRACKING_FINISHED",
     text: `UPDATE maintenance_tracking 
            SET finished = true
@@ -215,7 +215,7 @@ export async function markMaintenanceTrackingFinished(
     await db.none(PS_MARK_MAINTENANCE_TRACKING_FINISHED, [id]);
 }
 
-const PS_INSERT_MAINTENANCE_TRACKING = new PreparedStatement({
+const PS_INSERT_MAINTENANCE_TRACKING = new pgPromise.PreparedStatement({
     name: "PS_INSERT_MAINTENANCE_TRACKING",
     text: `
 WITH geometry AS (
@@ -261,7 +261,7 @@ RETURNING ID`
     //            finished = $9`
 });
 
-const PS_INSERT_MAINTENANCE_TRACKING_TASK = new PreparedStatement({
+const PS_INSERT_MAINTENANCE_TRACKING_TASK = new pgPromise.PreparedStatement({
     name: "PS_INSERT_MAINTENANCE_TRACKING_TASK",
     text: `INSERT INTO maintenance_tracking_task(maintenance_tracking_id, task)
            VALUES ($1, $2)`
@@ -317,7 +317,7 @@ export async function insertMaintenanceTracking(
     return tx.batch(tracking.tasks.map(insertHarjaTask)).then(() => mtId);
 }
 
-const PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE = new PreparedStatement({
+const PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE = new pgPromise.PreparedStatement({
     name: "PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE",
     text: `INSERT INTO maintenance_tracking_work_machine(id, harja_id, harja_urakka_id, type)
            VALUES (NEXTVAL('seq_maintenance_tracking_work_machine'), $1, $2, $3)
@@ -334,9 +334,10 @@ export function upsertWorkMachine(db: DTTransaction, data: DbWorkMachine): Promi
     ]);
 }
 
-const PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKING = new PreparedStatement({
-    name: "PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_MACHINE_WITHOUT_NEXT",
-    text: `
+const PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKING =
+    new pgPromise.PreparedStatement({
+        name: "PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_MACHINE_WITHOUT_NEXT",
+        text: `
     select t.id
          , ST_AsGeoJSON(t.last_point) as last_point
          , t.end_time
@@ -356,7 +357,7 @@ const PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKIN
     group by t.id, t.end_time
     order by t.end_time desc
     limit 1`
-});
+    });
 
 export function findLatestNotFinishedTrackingForWorkMachine(
     db: DTDatabase,
@@ -371,7 +372,7 @@ export function findLatestNotFinishedTrackingForWorkMachine(
         .then((result) => (result === null ? undefined : result));
 }
 
-const PS_GET_CONTRACTS_WITH_SOURCE = new PreparedStatement({
+const PS_GET_CONTRACTS_WITH_SOURCE = new pgPromise.PreparedStatement({
     name: "PS_GET_MAINTENANCE_T_MUNICIPALITY_DOMAIN_CONTRACTS_WITH_SOURCE",
     text: `
     SELECT c.domain,
@@ -399,7 +400,7 @@ export function getContractWithSource(
         .then((result) => (result === null ? undefined : result));
 }
 
-const PS_GET_TASK_MAPPINGS = new PreparedStatement({
+const PS_GET_TASK_MAPPINGS = new pgPromise.PreparedStatement({
     name: "PS_GET_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPINGS",
     text: `SELECT c.name,
                   c.original_id,

@@ -1,21 +1,24 @@
-import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
-import { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
-import { Position } from "geojson";
+import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import { type Position } from "geojson";
 import add from "date-fns/add";
 import sub from "date-fns/sub";
-import * as sinon from "sinon";
-import { AutoriApi } from "../../lib/api/autori";
-import { AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M, AUTORI_MAX_MINUTES_TO_HISTORY } from "../../lib/constants";
-import * as DataDb from "../../lib/dao/data";
-import { ApiContractData, ApiOperationData, ApiRouteData } from "../../lib/model/autori-api-data";
-import { DbDomainContract, DbDomainTaskMapping } from "../../lib/model/db-data";
-import { UNKNOWN_TASK_NAME } from "../../lib/model/tracking-save-result";
-import { AutoriUpdate } from "../../lib/service/autori-update";
-import * as AutoriUtils from "../../lib/service/autori-utils";
-import * as AutoriTestutils from "../autori-testutil";
+import { AutoriApi } from "../../api/autori.js";
+import { AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M, AUTORI_MAX_MINUTES_TO_HISTORY } from "../../constants.js";
+import * as DataDb from "../../dao/data.js";
+import {
+    type ApiContractData,
+    type ApiOperationData,
+    type ApiRouteData
+} from "../../model/autori-api-data.js";
+import { type DbDomainContract, type DbDomainTaskMapping } from "../../model/db-data.js";
+import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
+import { AutoriUpdate } from "../../service/autori-update.js";
+import * as AutoriUtils from "../../service/autori-utils.js";
+import * as AutoriTestutils from "../autori-testutil.js";
 import {
     dbTestBase,
     findAllDomaindContracts,
@@ -24,7 +27,7 @@ import {
     insertDomaindContract,
     insertDomaindTaskMapping,
     truncate
-} from "../db-testutil";
+} from "../db-testutil.js";
 import {
     AUTORI_OPERATION_BRUSHING,
     AUTORI_OPERATION_PAVING,
@@ -35,9 +38,10 @@ import {
     HARJA_SALTING,
     POINT_START,
     SOURCE_1
-} from "../testconstants";
-import { createLineString, createLineStringGeometries, createZigZagCoordinates } from "../testutil";
+} from "../testconstants.js";
+import { createLineString, createLineStringGeometries, createZigZagCoordinates } from "../testutil.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { jest } from "@jest/globals";
 
 const autoriUpdateService = createAutoriUpdateService();
 
@@ -48,8 +52,11 @@ function createAutoriUpdateService(): AutoriUpdate {
 describe(
     "autori-update-service-test",
     dbTestBase((db: DTDatabase) => {
+        beforeEach(async () => {
+            await truncate(db);
+        });
+
         afterEach(async () => {
-            sinon.restore();
             await truncate(db);
         });
 
@@ -141,8 +148,8 @@ describe(
             });
 
             expect(taskMappings1.length).toEqual(2);
-            expect(taskMappings1[0].name).toEqual(UNKNOWN_TASK_NAME);
-            expect(taskMappings1[1].name).toEqual(UNKNOWN_TASK_NAME);
+            expect(taskMappings1[0]!.name).toEqual(UNKNOWN_TASK_NAME);
+            expect(taskMappings1[1]!.name).toEqual(UNKNOWN_TASK_NAME);
             expect(taskMappings1.find((t) => t.original_id === AUTORI_OPERATION_BRUSHING)?.domain).toEqual(
                 DOMAIN_1
             );
@@ -165,10 +172,10 @@ describe(
             });
 
             expect(taskMappings1.length).toEqual(1);
-            expect(taskMappings1[0].name).toEqual(HARJA_SALTING);
-            expect(taskMappings1[0].ignore).toEqual(false);
-            expect(taskMappings1[0].domain).toEqual(DOMAIN_1);
-            expect(taskMappings1[0].original_id).toEqual(AUTORI_OPERATION_BRUSHING);
+            expect(taskMappings1[0]!.name).toEqual(HARJA_SALTING);
+            expect(taskMappings1[0]!.ignore).toEqual(false);
+            expect(taskMappings1[0]!.domain).toEqual(DOMAIN_1);
+            expect(taskMappings1[0]!.original_id).toEqual(AUTORI_OPERATION_BRUSHING);
         });
 
         test("updateContracts", async () => {
@@ -182,7 +189,7 @@ describe(
             await insertDomain(db, DOMAIN_1, SOURCE_1);
 
             // Insert one exiting contract with endin date today
-            const contract1 = contracts[0];
+            const contract1 = contracts[0]!;
             await insertDomaindContract(
                 db,
                 DOMAIN_1,
@@ -204,14 +211,15 @@ describe(
             });
 
             expect(contractsWithSouce.length).toEqual(1);
-            expect(contractsWithSouce[0].contract).toEqual(contract1.id);
-            expect(contractsWithSouce[0].domain).toEqual(DOMAIN_1);
-            expect(contractsWithSouce[0].name).toEqual(contract1Name);
-            expect(contractsWithSouce[0].source).toEqual(SOURCE_1);
-            expect(contractsWithSouce[0].end_date).toEqual(contract1NewEndDate);
+            const contract = contractsWithSouce[0]!;
+            expect(contract.contract).toEqual(contract1.id);
+            expect(contract.domain).toEqual(DOMAIN_1);
+            expect(contract.name).toEqual(contract1Name);
+            expect(contract.source).toEqual(SOURCE_1);
+            expect(contract.end_date).toEqual(contract1NewEndDate);
 
             const all = await findAllDomaindContracts(db, DOMAIN_1);
-            const dbContract2 = all.find((c) => c.contract === contracts[1].id);
+            const dbContract2 = all.find((c) => c.contract === contracts[1]!.id);
             expect(dbContract2?.name).toEqual(contract2Name);
             expect(dbContract2?.source).toBeNull();
         });
@@ -330,13 +338,14 @@ describe(
             const trackings = await findAllTrackings(db, DOMAIN_1);
 
             expect(trackings.length).toEqual(1);
+            const tracking0 = trackings[0]!;
             // As source linestring is two equal point's -> it's invalid and it should not be saved
-            expect(trackings[0].geometry).toBeTruthy();
-            expect(trackings[0].geometry).toEqual(trackings[0].last_point);
+            expect(tracking0.geometry).toBeTruthy();
+            expect(tracking0.geometry).toEqual(tracking0.last_point);
 
-            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[0], POINT_START[0], 0.000001);
-            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[1], POINT_START[1], 0.000001);
-            expect(trackings[0].last_point.coordinates[2]).toEqual(0);
+            Asserter.assertToBeCloseTo(tracking0.last_point.coordinates[0]!, POINT_START[0]!, 0.000001);
+            Asserter.assertToBeCloseTo(tracking0.last_point.coordinates[1]!, POINT_START[1]!, 0.000001);
+            expect(tracking0.last_point.coordinates[2]).toEqual(0);
         });
 
         test("updateTrackings and set previous reference", async () => {
@@ -392,27 +401,26 @@ describe(
 
             expect(trackings.length).toEqual(3);
             // TODO Warning:(295, 33) Error: expect(received).toEqual(expected) // deep equality Expected: null Received: 264
-            expect(trackings[0].id).toBe(trackings[1].previous_tracking_id);
-            expect(trackings[1].id).toBe(trackings[2].previous_tracking_id);
-            expect(trackings[0].geometry.coordinates.length).toEqual(10);
-            expect(trackings[1].geometry.coordinates.length).toEqual(5);
-            expect(trackings[2].geometry.coordinates.length).toEqual(17);
-            expect(trackings[2].geometry.coordinates.length).toEqual(17);
+            expect(trackings[0]!.id).toBe(trackings[1]!.previous_tracking_id);
+            expect(trackings[1]!.id).toBe(trackings[2]!.previous_tracking_id);
+            expect(trackings[0]!.geometry.coordinates.length).toEqual(10);
+            expect(trackings[1]!.geometry.coordinates.length).toEqual(5);
+            expect(trackings[2]!.geometry.coordinates.length).toEqual(17);
+            expect(trackings[2]!.geometry.coordinates.length).toEqual(17);
         });
 
         function mockGetOperationsApiResponse(response: ApiOperationData[]): void {
-            sinon.stub(AutoriApi.prototype, "getOperations").returns(Promise.resolve(response));
+            jest.spyOn(AutoriApi.prototype, "getOperations").mockReturnValueOnce(Promise.resolve(response));
         }
 
         function mockGetContractsApiResponse(response: ApiContractData[]): void {
-            sinon.stub(AutoriApi.prototype, "getContracts").returns(Promise.resolve(response));
+            jest.spyOn(AutoriApi.prototype, "getContracts").mockReturnValueOnce(Promise.resolve(response));
         }
 
         function mockGetWorkEventsApiResponse(response: ApiRouteData[]): void {
-            sinon
-                .stub(AutoriApi.prototype, "getNextRouteDataForContract")
-                .withArgs(sinon.match.any, sinon.match.any, sinon.match.any)
-                .returns(Promise.resolve(response));
+            jest.spyOn(AutoriApi.prototype, "getNextRouteDataForContract").mockReturnValueOnce(
+                Promise.resolve(response)
+            );
         }
     })
 );

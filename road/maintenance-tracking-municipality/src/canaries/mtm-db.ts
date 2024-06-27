@@ -1,7 +1,7 @@
 import { DatabaseCountChecker } from "@digitraffic/common/dist/aws/infra/canaries/database-checker";
 import { DataType } from "@digitraffic/common/dist/database/last-updated";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { MaintenanceTrackingMunicipalityEnvKeys } from "../keys";
+import { MaintenanceTrackingMunicipalityEnvKeys } from "../keys.js";
 
 const domainName = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME);
 

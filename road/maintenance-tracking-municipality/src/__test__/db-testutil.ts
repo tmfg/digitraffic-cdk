@@ -1,6 +1,6 @@
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { DbDomain, DbDomainContract, DbMaintenanceTracking } from "../lib/model/db-data";
+import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import { type DbDomain, type DbDomainContract, type DbMaintenanceTracking } from "../model/db-data.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");

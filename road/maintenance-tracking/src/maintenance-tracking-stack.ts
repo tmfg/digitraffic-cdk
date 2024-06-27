@@ -1,10 +1,10 @@
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Duration } from "aws-cdk-lib";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
-import type { Construct } from "constructs";
+import { type Construct } from "constructs";
 import * as IntegrationApi from "./integration-api.js";
 import * as InternalLambdas from "./internal-lambdas.js";
-import type { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
+import { type MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
 import * as Sqs from "./sqs.js";
 
 export class MaintenanceTrackingStack extends DigitrafficStack {

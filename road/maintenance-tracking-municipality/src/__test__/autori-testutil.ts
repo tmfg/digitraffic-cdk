@@ -1,14 +1,14 @@
 import { randomString } from "@digitraffic/common/dist/test/testutils";
-import { Feature, Geometry } from "geojson";
+import { type Feature, type Geometry } from "geojson";
 import add from "date-fns/add";
 import sub from "date-fns/sub";
-import { ApiContractData, ApiOperationData, ApiRouteData } from "../lib/model/autori-api-data";
+import { type ApiContractData, type ApiOperationData, type ApiRouteData } from "../model/autori-api-data.js";
 import {
     AUTORI_OPERATION_BRUSHING,
     AUTORI_OPERATION_PAVING,
     AUTORI_OPERATION_SALTING,
     VEHICLE_TYPE
-} from "./testconstants";
+} from "./testconstants.js";
 
 /**
  *
@@ -50,7 +50,7 @@ export function createApiRoutedataFeatures(geometries: Geometry[]): Feature[] {
     return Array.from({ length: geometries.length }, (_, i) => {
         return {
             type: "Feature",
-            geometry: geometries[i],
+            geometry: geometries[i]!,
             properties: {
                 streetAddress: "Patukatu 1-10, Oulu",
                 featureType: "StreetAddress"

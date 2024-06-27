@@ -2,10 +2,11 @@ import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-hold
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
-import type { SQSEvent, SQSRecord } from "aws-lambda";
+import { type SQSEvent, type SQSRecord } from "aws-lambda";
 import { MaintenanceTrackingEnvKeys } from "../../keys.js";
 import { getSqsConsumerInstance } from "../../service/sqs-big-payload.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { type Handler } from "aws-lambda";
 
 let rdsHolder: RdsHolder | undefined;
 
@@ -20,7 +21,7 @@ function getRdsHolder(): RdsHolder {
     return rdsHolder;
 }
 
-export const handler = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());
+export const handler: Handler<SQSEvent> = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());
 
 export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return (event: SQSEvent): Promise<PromiseSettledResult<void>[]> => {

@@ -1,26 +1,26 @@
-import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
-import { Position } from "geojson";
-import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
+import { type Position } from "geojson";
+import { type GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import add from "date-fns/add";
-import { AutoriApi } from "../api/autori";
-import * as DataDb from "../dao/data";
-import { ApiContractData, ApiOperationData, ApiRouteData } from "../model/autori-api-data";
+import { type AutoriApi } from "../api/autori.js";
+import * as DataDb from "../dao/data.js";
+import { type ApiContractData, type ApiOperationData, type ApiRouteData } from "../model/autori-api-data.js";
 import {
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbLatestTracking,
-    DbMaintenanceTracking,
-    DbNumberId,
-    DbTextId,
-    DbWorkMachine
-} from "../model/db-data";
-import { TrackingSaveResult } from "../model/tracking-save-result";
-import * as AutoriUtils from "./autori-utils";
-import * as CommonUpdateService from "./common-update";
-import * as Utils from "./utils";
-import logger from "./maintenance-logger";
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbLatestTracking,
+    type DbMaintenanceTracking,
+    type DbNumberId,
+    type DbTextId,
+    type DbWorkMachine
+} from "../model/db-data.js";
+import { TrackingSaveResult } from "../model/tracking-save-result.js";
+import * as AutoriUtils from "./autori-utils.js";
+import * as CommonUpdateService from "./common-update.js";
+import * as Utils from "./utils.js";
+import logger from "./maintenance-logger.js";
 
 const service = "AutoriUpdate";
 export class AutoriUpdate {

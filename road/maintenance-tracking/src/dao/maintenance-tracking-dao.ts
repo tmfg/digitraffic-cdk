@@ -1,6 +1,6 @@
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { PreparedStatement } from "pg-promise";
-import type { DbNumberId } from "../model/db-data.js";
+import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import { default as pgPromise } from "pg-promise";
+import { type DbNumberId } from "../model/db-data.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum Status {
@@ -64,7 +64,7 @@ export function insertMaintenanceTrackingObservationData(
     });
 }
 
-const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS = new PreparedStatement({
+const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS = new pgPromise.PreparedStatement({
     name: "PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS",
     text: `
         UPDATE maintenance_tracking
@@ -73,7 +73,7 @@ const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS = new PreparedS
 `
 });
 
-const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new PreparedStatement({
+const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new pgPromise.PreparedStatement({
     name: "PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS",
     text: `
         DELETE
@@ -87,28 +87,27 @@ const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new PreparedStatement({
 `
 });
 
-export function cleanMaintenanceTrackingData(db: DTDatabase, hoursToKeep: number): Promise<void> {
-    return db.tx((t) => {
+export async function cleanMaintenanceTrackingData(db: DTDatabase, hoursToKeep: number): Promise<void> {
+    await db.tx(async (t) => {
         const cleanUpQuery = t.none(PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS, [
             hoursToKeep
         ]);
         const deleteQuery = t.none(PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS, [hoursToKeep]);
         // These should and must be run in given order https://github.com/vitaly-t/pg-promise/issues/307
-        return t
-            .batch([cleanUpQuery, deleteQuery])
-            .then(() => Promise.resolve())
-            .catch((error: Error) => {
-                logger.error({
-                    method: "MaintenanceTrackingDao.cleanMaintenanceTrackingData",
-                    message: "cleanup failed",
-                    error
-                });
-                throw error;
+        try {
+            await t.batch([cleanUpQuery, deleteQuery]);
+        } catch (error) {
+            logger.error({
+                method: "MaintenanceTrackingDao.cleanMaintenanceTrackingData",
+                message: "cleanup failed",
+                error
             });
+            throw error;
+        }
     });
 }
 
-const PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS = new PreparedStatement({
+const PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS = new pgPromise.PreparedStatement({
     name: "PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS",
     text: `
         select round(EXTRACT(EPOCH FROM (now() - min(end_time)))/60/60) AS hours

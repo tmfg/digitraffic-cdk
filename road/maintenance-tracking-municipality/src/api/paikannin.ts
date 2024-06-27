@@ -1,8 +1,8 @@
-import axios, { AxiosError } from "axios";
+import axios, { type AxiosError } from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { parseISO } from "date-fns";
-import { ApiDevice, ApiWorkeventDevice } from "../model/paikannin-api-data";
-import logger from "../service/maintenance-logger";
+import { type ApiDevice, type ApiWorkeventDevice } from "../model/paikannin-api-data.js";
+import logger from "../service/maintenance-logger.js";
 
 const URL_DEVICES = "/public/api/devices/all";
 const URL_WORKEVENTS = "/public/api/devices/workevents/alldevices";

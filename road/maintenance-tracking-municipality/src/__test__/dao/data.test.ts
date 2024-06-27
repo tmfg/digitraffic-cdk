@@ -5,13 +5,13 @@ import {
     insertDbDomaindContract,
     insertDomain,
     truncate
-} from "../db-testutil";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+} from "../db-testutil.js";
+import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import add from "date-fns/add";
-import * as DataDb from "../../lib/dao/data";
-import { DbMaintenanceTracking, DbNumberId, DbWorkMachine } from "../../lib/model/db-data";
-import * as TestUtils from "../testutil";
-import { Point } from "geojson";
+import * as DataDb from "../../dao/data.js";
+import { type DbMaintenanceTracking, type DbNumberId, type DbWorkMachine } from "../../model/db-data.js";
+import * as TestUtils from "../testutil.js";
+import { type Point } from "geojson";
 import {
     CONTRACT_ID,
     DOMAIN_1,
@@ -20,8 +20,8 @@ import {
     POINT_START,
     SOURCE_1,
     VEHICLE_TYPE
-} from "../testconstants";
-import * as AutoriUtils from "../../lib/service/autori-utils";
+} from "../testconstants.js";
+import * as AutoriUtils from "../../service/autori-utils.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let WORKMACHINE_ID: DbNumberId;
@@ -181,8 +181,8 @@ describe(
             );
             const finishedId = await db.tx(async (tx) => {
                 const ids = await DataDb.upsertMaintenanceTrackings(tx, [tracking1, tracking2]);
-                await DataDb.markMaintenanceTrackingFinished(tx, ids[0].id);
-                return ids[0].id;
+                await DataDb.markMaintenanceTrackingFinished(tx, ids[0]!.id);
+                return ids[0]!.id;
             });
 
             const trackings = await findAllTrackings(db, CONTRACT.domain);

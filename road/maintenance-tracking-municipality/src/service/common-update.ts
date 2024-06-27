@@ -1,7 +1,7 @@
-import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
-import * as DbData from "../dao/data";
-import { TrackingSaveResult } from "../model/tracking-save-result";
+import * as DbData from "../dao/data.js";
+import { TrackingSaveResult } from "../model/tracking-save-result.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export function sumResultsFromPromises(

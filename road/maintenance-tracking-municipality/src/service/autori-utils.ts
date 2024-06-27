@@ -1,7 +1,7 @@
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as GeometryUtils from "@digitraffic/common/dist/utils/geometry";
-import { Feature, Geometry, LineString, Position } from "geojson";
+import { type Feature, type Geometry, type LineString, type Position } from "geojson";
 import sub from "date-fns/sub";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
@@ -9,18 +9,17 @@ import {
     AUTORI_MAX_MINUTES_TO_HISTORY,
     AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH,
     AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S
-} from "../constants";
-import { ApiContractData, ApiOperationData, ApiRouteData } from "../model/autori-api-data";
+} from "../constants.js";
+import { type ApiContractData, type ApiOperationData, type ApiRouteData } from "../model/autori-api-data.js";
 import {
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbMaintenanceTracking,
-    DbWorkMachine
-} from "../model/db-data";
-import { UNKNOWN_TASK_NAME } from "../model/tracking-save-result";
-import * as Utils from "./utils";
-import { createHarjaId } from "./utils";
-import logger from "./maintenance-logger";
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbMaintenanceTracking,
+    type DbWorkMachine
+} from "../model/db-data.js";
+import { UNKNOWN_TASK_NAME } from "../model/tracking-save-result.js";
+import { createHarjaId, calculateSpeedInKmH } from "./utils.js";
+import logger from "./maintenance-logger.js";
 
 /**
  * This fixes:
@@ -105,7 +104,9 @@ export function groupFeaturesToIndividualGeometries(feature: Feature): Feature[]
 
         const newFeatures = positionGroups.map((positions) => {
             const g: Geometry =
-                positions.length === 1 ? new GeoJsonPoint(positions[0]) : new GeoJsonLineString(positions);
+                positions.length === 1 && positions[0]
+                    ? new GeoJsonPoint(positions[0])
+                    : new GeoJsonLineString(positions);
             return {
                 type: "Feature",
                 geometry: g
@@ -148,11 +149,17 @@ function toPositionGroups(sourceGeometry: Position[], targetGeometries: Position
 
     if (targetGeometries.length > 0) {
         // Take prev Position from groups and compare it to next
-        const prevLineString: Position[] = targetGeometries[targetGeometries.length - 1];
-        const prevPosition: Position = prevLineString[prevLineString.length - 1];
+        const prevLineString: Position[] | undefined = targetGeometries[targetGeometries.length - 1];
+        const prevPosition: Position | undefined = prevLineString
+            ? prevLineString[prevLineString.length - 1]
+            : undefined;
 
-        // Throw position to trash if it same as previous
-        if (GeometryUtils.areDistinctPositions(prevPosition, nextPosition)) {
+        if (!prevLineString || !prevPosition) {
+            // This should never happen as prevPosition, but just in case.
+            // Not extending previous tracking -> create new linestring/point
+            targetGeometries.push([nextPosition]);
+            // Throw position to trash if it same as previous
+        } else if (GeometryUtils.areDistinctPositions(prevPosition, nextPosition)) {
             if (isExtendingPreviousTracking(prevPosition, nextPosition)) {
                 prevLineString.push(nextPosition);
             } else {
@@ -202,7 +209,7 @@ export function isExtendingPreviousTracking(
     }
     const distInM = GeometryUtils.distanceBetweenPositionsInM(previousPosition, nextPosition);
     const diffInS = previousTime && nextTime ? CommonDateUtils.countDiffInSeconds(previousTime, nextTime) : 0;
-    const speedInKmH = previousTime && nextTime ? Utils.calculateSpeedInKmH(distInM, diffInS) : 0;
+    const speedInKmH = previousTime && nextTime ? calculateSpeedInKmH(distInM, diffInS) : 0;
     if (distInM > AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M) {
         return false;
     } else if (isFinite(speedInKmH) && diffInS > 0 && speedInKmH > AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH) {
@@ -357,13 +364,23 @@ export function createDbMaintenanceTracking(
     const f = routeData.geography.features[0];
     let lastPoint: GeoJsonPoint;
     let geometry: GeoJsonPoint | GeoJsonLineString;
-
-    if (f.geometry.type === "Point") {
+    if (!f) {
+        throw new Error(
+            `Undefined feature routeData.geography.features[0] geometry for ${JSON.stringify(routeData?.geography)}`
+        );
+    } else if (f.geometry.type === "Point") {
         lastPoint = new GeoJsonPoint(f.geometry.coordinates);
         geometry = lastPoint;
     } else if (f.geometry.type === "LineString") {
-        lastPoint = new GeoJsonPoint(f.geometry.coordinates[f.geometry.coordinates.length - 1]);
-        geometry = new GeoJsonLineString(f.geometry.coordinates);
+        const lastPos: Position | undefined = f.geometry.coordinates[f.geometry.coordinates.length - 1];
+        if (lastPos) {
+            lastPoint = new GeoJsonPoint(lastPos);
+            geometry = new GeoJsonLineString(f.geometry.coordinates);
+        } else {
+            throw new Error(
+                `Invalid LineString for maintenance tracking ${f.geometry.type} ${JSON.stringify(f.geometry.coordinates)}`
+            );
+        }
     } else {
         throw new Error(`Unsupported geometry type for maintenance tracking ${f.geometry.type}`);
     }

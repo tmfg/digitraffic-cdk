@@ -1,15 +1,15 @@
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { addDefaultValidator, addServiceModel } from "@digitraffic/common/dist/utils/api-model";
-import type { Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { type Resource, type RestApi } from "aws-cdk-lib/aws-apigateway";
 import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import type { Queue } from "aws-cdk-lib/aws-sqs";
-import type { Construct } from "constructs";
+import { type Queue } from "aws-cdk-lib/aws-sqs";
+import { type Construct } from "constructs";
 import { MaintenanceTrackingEnvKeys } from "./keys.js";
-import type { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
+import { type MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
 
 import {
     createSchemaGeometriaSijainti,
@@ -37,7 +37,7 @@ export function createIntegrationApiAndHandlerLambda(
 
     addServiceModelToIntegrationApi(integrationApi);
 
-    const apiResource = createUpdateMaintenanceTrackingApiGatewayResource(stack, integrationApi);
+    const apiResource = createUpdateMaintenanceTrackingApiGatewayResource(integrationApi);
     createUpdateRequestHandlerLambda(
         apiResource,
         queue,
@@ -81,10 +81,7 @@ function addServiceModelToIntegrationApi(integrationApi: RestApi): void {
     );
 }
 
-function createUpdateMaintenanceTrackingApiGatewayResource(
-    stack: Construct,
-    integrationApi: RestApi
-): Resource {
+function createUpdateMaintenanceTrackingApiGatewayResource(integrationApi: RestApi): Resource {
     const apiResource = integrationApi.root
         .addResource("maintenance-tracking")
         .addResource("v1")

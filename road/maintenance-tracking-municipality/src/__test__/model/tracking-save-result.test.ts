@@ -1,4 +1,4 @@
-import { TrackingSaveResult } from "../../lib/model/tracking-save-result";
+import { TrackingSaveResult } from "../../model/tracking-save-result.js";
 
 describe("tracking-save-result-model-test", () => {
     test("createSaved", () => {

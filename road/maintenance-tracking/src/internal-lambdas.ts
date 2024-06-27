@@ -3,16 +3,16 @@ import {
     MonitoredDBFunction,
     MonitoredFunction
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import type { Bucket } from "aws-cdk-lib/aws-s3";
-import type { Queue } from "aws-cdk-lib/aws-sqs";
-import type { Construct } from "constructs";
+import { type Bucket } from "aws-cdk-lib/aws-s3";
+import { type Queue } from "aws-cdk-lib/aws-sqs";
+import { type Construct } from "constructs";
 import { MaintenanceTrackingEnvKeys } from "./keys.js";
-import type { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
-import type { QueueAndDLQ } from "./sqs.js";
+import { type MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
+import { type QueueAndDLQ } from "./sqs.js";
 
 export function createCleanMaintenanceTrackingDataLambda(stack: DigitrafficStack): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
@@ -34,19 +34,12 @@ export function createProcessQueueAndDlqLambda(
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
 ): void {
-    createProcessQueueLambda(
-        queueAndDLQ.queue,
-        dlqBucket.urlForObject(),
-        sqsExtendedMessageBucketArn,
-        stackConfiguration,
-        stack
-    );
+    createProcessQueueLambda(queueAndDLQ.queue, sqsExtendedMessageBucketArn, stackConfiguration, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stackConfiguration, stack);
 }
 
 function createProcessQueueLambda(
     queue: Queue,
-    dlqBucketUrl: string,
     sqsExtendedMessageBucketArn: string,
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack

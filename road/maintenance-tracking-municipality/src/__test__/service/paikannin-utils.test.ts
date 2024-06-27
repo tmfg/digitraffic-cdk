@@ -1,17 +1,21 @@
 import { getRandomInteger, randomString } from "@digitraffic/common/dist/test/testutils";
 import add from "date-fns/add";
 import sub from "date-fns/sub";
-import { PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S } from "../../lib/constants";
-import { DbWorkMachine } from "../../lib/model/db-data";
-import { ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice } from "../../lib/model/paikannin-api-data";
+import { PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S } from "../../constants.js";
+import { type DbWorkMachine } from "../../model/db-data.js";
+import {
+    type ApiWorkevent,
+    type ApiWorkeventDevice,
+    type ApiWorkeventIoDevice
+} from "../../model/paikannin-api-data.js";
 import {
     createDbWorkMachine,
     filterEventsWithoutTasks,
     getTasksForOperations,
     groupEventsToIndividualTrackings,
     isOverTimeLimit
-} from "../../lib/service/paikannin-utils";
-import * as Utils from "../../lib/service/utils";
+} from "../../service/paikannin-utils.js";
+import * as Utils from "../../service/utils.js";
 import {
     DOMAIN_1,
     HARJA_BRUSHING,
@@ -24,8 +28,12 @@ import {
     POINT_550M_FROM_START,
     POINT_750M_FROM_START,
     POINT_START
-} from "../testconstants";
-import { createApiRouteDataForEveryMinute, createLineStringGeometry, createTaskMapping } from "../testutil";
+} from "../testconstants.js";
+import {
+    createApiRouteDataForEveryMinute,
+    createLineStringGeometry,
+    createTaskMapping
+} from "../testutil.js";
 
 describe("paikannin-utils-service-test", () => {
     test("groupEventsToIndividualTrackings - events in chronological order", () => {
@@ -57,11 +65,11 @@ describe("paikannin-utils-service-test", () => {
         const groups = groupEventsToIndividualTrackings(events, subtractSecond(past));
 
         expect(groups).toHaveLength(1);
-        expect(groups[0][0].timestamp).toEqual(past);
-        expect(groups[0][1].timestamp).toEqual(now);
+        expect(groups[0]![0]!.timestamp).toEqual(past);
+        expect(groups[0]![1]!.timestamp).toEqual(now);
         // original is not touched
-        expect(events[0].timestamp).toEqual(now);
-        expect(events[1].timestamp).toEqual(past);
+        expect(events[0]!.timestamp).toEqual(now);
+        expect(events[1]!.timestamp).toEqual(past);
     });
 
     test("groupEventsToIndividualTrackings - task changes", () => {
@@ -90,14 +98,17 @@ describe("paikannin-utils-service-test", () => {
 
         expect(groups).toHaveLength(3);
         expect(groups[0]).toHaveLength(3); // end is added and is same as next group start
-        expect(groups[0][2].timestamp).toEqual(groups[1][0].timestamp); // end is added and is same as next group start
+        expect(groups[0]![2]!.timestamp).toEqual(groups[1]![0]!.timestamp); // end is added and is same as next group start
         expect(groups[0]).toHaveLength(3); // end is added and is same as next group start
-        expect(groups[1][2].timestamp).toEqual(groups[2][0].timestamp); // end is added and is same as next group start
+        expect(groups[1]![2]!.timestamp).toEqual(groups[2]![0]!.timestamp); // end is added and is same as next group start
         expect(groups[2]).toHaveLength(2);
 
-        assertContainsEvents(groups[0], [PAIKANNIN_OPERATION_BRUSHING.name]);
-        assertContainsEvents(groups[1], [PAIKANNIN_OPERATION_BRUSHING.name, PAIKANNIN_OPERATION_PAVING.name]);
-        assertContainsEvents(groups[2], [PAIKANNIN_OPERATION_PAVING.name]);
+        assertContainsEvents(groups[0]!, [PAIKANNIN_OPERATION_BRUSHING.name]);
+        assertContainsEvents(groups[1]!, [
+            PAIKANNIN_OPERATION_BRUSHING.name,
+            PAIKANNIN_OPERATION_PAVING.name
+        ]);
+        assertContainsEvents(groups[2]!, [PAIKANNIN_OPERATION_PAVING.name]);
     });
 
     test("groupEventsToIndividualTrackings - events inside 5 minute time limit", () => {
@@ -296,26 +307,26 @@ describe("paikannin-utils-service-test", () => {
         expect(resultDevices.length).toEqual(2);
 
         // deviceWithIgnoredTasks has reduced workEvents as events without valid tasks has been filtered out
-        const resultDeviceWithFilteredEvents = resultDevices[0];
+        const resultDeviceWithFilteredEvents = resultDevices[0]!;
         expect(resultDeviceWithFilteredEvents.deviceId).toEqual(deviceWithIgnoredTasks.deviceId);
         expect(resultDeviceWithFilteredEvents.deviceName).toEqual(deviceWithIgnoredTasks.deviceName);
         expect(resultDeviceWithFilteredEvents.workEvents.length).toEqual(
             deviceWithIgnoredTasks.workEvents.length / 2
         );
         resultDeviceWithFilteredEvents.workEvents.forEach((we) =>
-            expect(we.ioChannels[0].name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name)
+            expect(we.ioChannels[0]!.name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name)
         );
 
         // deviceWithAcceptedTasks has all events untouched
-        const resultDeviceWithAcceptedTasks = resultDevices[1];
+        const resultDeviceWithAcceptedTasks = resultDevices[1]!;
         expect(resultDeviceWithAcceptedTasks.deviceId).toEqual(deviceWithAcceptedTasks.deviceId);
         expect(resultDeviceWithAcceptedTasks.deviceName).toEqual(deviceWithAcceptedTasks.deviceName);
         expect(resultDeviceWithAcceptedTasks.workEvents.length).toEqual(
             deviceWithAcceptedTasks.workEvents.length
         );
         resultDeviceWithAcceptedTasks.workEvents.forEach((we) => {
-            expect(we.ioChannels[0].name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name);
-            expect(we.ioChannels[1].name).toEqual(PAIKANNIN_OPERATION_SALTING.name);
+            expect(we.ioChannels[0]!.name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name);
+            expect(we.ioChannels[1]!.name).toEqual(PAIKANNIN_OPERATION_SALTING.name);
         });
     });
 
@@ -372,8 +383,8 @@ function createWorkEventWithLocation(workEvents: string[], time: Date, xy: numbe
         altitude: 10,
         heading: 10,
         ioChannels: createWorkEventDevices(workEvents),
-        lat: xy[1],
-        lon: xy[0],
+        lat: xy[1]!,
+        lon: xy[0]!,
         speed: 100,
         timestamp: time
     };

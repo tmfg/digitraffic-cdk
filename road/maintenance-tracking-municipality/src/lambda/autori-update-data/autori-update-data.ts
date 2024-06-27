@@ -1,13 +1,14 @@
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { AutoriApi } from "../../api/autori";
-import { MaintenanceTrackingMunicipalityEnvKeys } from "../../keys";
-import { MaintenanceTrackingAutoriSecret } from "../../model/maintenance-tracking-municipality-secret";
-import { TrackingSaveResult } from "../../model/tracking-save-result";
-import { AutoriUpdate } from "../../service/autori-update";
-import * as CommonUpdate from "../../service/common-update";
-import logger from "../../service/maintenance-logger";
+import { AutoriApi } from "../../api/autori.js";
+import { MaintenanceTrackingMunicipalityEnvKeys } from "../../keys.js";
+import { type MaintenanceTrackingAutoriSecret } from "../../model/maintenance-tracking-municipality-secret.js";
+import { type TrackingSaveResult } from "../../model/tracking-save-result.js";
+import { AutoriUpdate } from "../../service/autori-update.js";
+import * as CommonUpdate from "../../service/common-update.js";
+import logger from "../../service/maintenance-logger.js";
+import { type Handler } from "aws-lambda";
 
 const domainName = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME);
 const domainPrefix = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX);
@@ -16,7 +17,7 @@ const proxyHolder: ProxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<MaintenanceTrackingAutoriSecret>(domainPrefix);
 let autoriUpdateServiceHolder: AutoriUpdate | undefined;
 
-export const handler = (): Promise<TrackingSaveResult> => {
+export const handler: Handler = (): Promise<TrackingSaveResult> => {
     const start = Date.now();
     const method = "MaintenanceTrackingMunicipality.updateTrackingsForDomain";
     const wasWarm = !!autoriUpdateServiceHolder;

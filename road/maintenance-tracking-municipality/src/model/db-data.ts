@@ -1,5 +1,4 @@
-// eslint-disable camelcase
-import { GeoJsonPoint, GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import { type GeoJsonPoint, type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 
 export interface DbWorkMachine {
     readonly harjaId: bigint;

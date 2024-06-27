@@ -1,11 +1,11 @@
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { setEnv } from "../test-env.js";
+import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import type { SQSRecord } from "aws-lambda";
+import { type SQSRecord } from "aws-lambda";
 import { parseISO } from "date-fns";
-import * as sinon from "sinon";
-import type { SqsConsumer } from "sns-sqs-big-payload";
+import { type SqsConsumer } from "sns-sqs-big-payload";
 import { MaintenanceTrackingEnvKeys } from "../../keys.js";
-import * as LambdaProcessQueue from "../../lambda/process-queue/process-queue.js";
+import { jest } from "@jest/globals";
 import { getSqsConsumerInstance } from "../../service/sqs-big-payload.js";
 import { dbTestBase, findAllObservations, mockSecrets } from "../db-testutil.js";
 import {
@@ -15,49 +15,49 @@ import {
 } from "../testdata.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
+setEnv();
+
 const QUEUE = "MaintenanceTrackingQueue";
-process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = "sqs-bucket-name";
-process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] =
-    `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
-// eslint-disable-next-line dot-notation
-process.env["AWS_REGION"] = "aws-region";
-// eslint-disable-next-line dot-notation
-process.env["SECRET_ID"] = "";
+
+const { cloneRecordWithCamelAndPascal, handlerFn } = await import(
+    "../../lambda/process-queue/process-queue.js"
+);
 
 describe(
     "process-queue",
     dbTestBase((db: DTDatabase) => {
-        const sandbox = sinon.createSandbox();
-
         beforeEach(() => {
             getSqsConsumerInstance(true); // create new consumer for each test
-            sinon.restore();
             mockSecrets({});
         });
 
+        afterEach(() => {
+            jest.clearAllMocks();
+        });
+
         test("clone record", () => {
-            const clone = LambdaProcessQueue.cloneRecordWithCamelAndPascal({
+            const clone = cloneRecordWithCamelAndPascal({
                 messageId: "aaaa",
                 Body: "test"
             });
-            // eslint-disable-next-line dot-notation
+            // eslint-disable-next-line
             expect(clone["messageId"]).toEqual("aaaa");
-            // eslint-disable-next-line dot-notation
+            // eslint-disable-next-line
             expect(clone["MessageId"]).toEqual("aaaa");
-            // eslint-disable-next-line dot-notation
+            // eslint-disable-next-line
             expect(clone["body"]).toEqual("test");
-            // eslint-disable-next-line dot-notation
+            // eslint-disable-next-line
             expect(clone["Body"]).toEqual("test");
         });
 
         test("no records", async () => {
             const sqsConsumer: SqsConsumer = getSqsConsumerInstance();
-            const transformLambdaRecordsStub = sandbox
-                .stub(sqsConsumer, "processMessage")
-                .returns(Promise.resolve());
+            const transformLambdaRecordsStub = jest
+                .spyOn(sqsConsumer, "processMessage")
+                .mockReturnValue(Promise.resolve());
 
-            await expect(LambdaProcessQueue.handlerFn()({ Records: [] })).resolves.toMatchObject([]);
-            expect(transformLambdaRecordsStub.calledWith({})).toBe(false);
+            await expect(handlerFn()({ Records: [] })).resolves.toMatchObject([]);
+            expect(transformLambdaRecordsStub).not.toHaveBeenCalledWith({});
         });
 
         test("single valid record", async () => {
@@ -65,7 +65,7 @@ describe(
             const record: SQSRecord = createRecord(json);
 
             await expect(
-                LambdaProcessQueue.handlerFn()({
+                handlerFn()({
                     Records: [record]
                 })
             ).resolves.toMatchObject([{ status: "fulfilled", value: undefined }]);
@@ -91,7 +91,7 @@ describe(
             const record2: SQSRecord = createRecord(json2);
 
             await expect(
-                LambdaProcessQueue.handlerFn()({
+                handlerFn()({
                     Records: [record1, record2]
                 })
             ).resolves.toMatchObject([
@@ -115,7 +115,7 @@ describe(
             const record: SQSRecord = createRecord(json);
 
             await expect(
-                LambdaProcessQueue.handlerFn()({
+                handlerFn()({
                     Records: [record]
                 })
             ).resolves.toMatchObject([{ status: "fulfilled", value: undefined }]);
@@ -134,7 +134,7 @@ describe(
             const validRecord: SQSRecord = createRecord(validJson);
 
             await expect(
-                LambdaProcessQueue.handlerFn()({
+                handlerFn()({
                     Records: [invalidRecord, validRecord]
                 })
             ).resolves.toMatchObject([
@@ -160,7 +160,7 @@ describe(
             );
             const record: SQSRecord = createRecord(invalidJson);
 
-            await LambdaProcessQueue.handlerFn()({
+            await handlerFn()({
                 Records: [record]
             });
 

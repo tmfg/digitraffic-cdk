@@ -1,20 +1,26 @@
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { fail } from "assert";
-import { Position } from "geojson";
-import { getRandompId } from "maintenance-tracking/test/testdata";
+import { type Position } from "geojson";
 import sub from "date-fns/sub";
-import * as sinon from "sinon";
-import { PaikanninApi } from "../../lib/api/paikannin";
-import { PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M } from "../../lib/constants";
-import * as DataDb from "../../lib/dao/data";
-import { DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking } from "../../lib/model/db-data";
-import { ApiDevice, ApiIoChannel, ApiWorkeventDevice } from "../../lib/model/paikannin-api-data";
-import { UNKNOWN_TASK_NAME } from "../../lib/model/tracking-save-result";
-import { PaikanninUpdate } from "../../lib/service/paikannin-update";
-import { getTrackingEndPoint, getTrackingStartPoint } from "../../lib/service/utils";
+import { PaikanninApi } from "../../api/paikannin.js";
+import { PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M } from "../../constants.js";
+import * as DataDb from "../../dao/data.js";
+import {
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbMaintenanceTracking
+} from "../../model/db-data.js";
+import {
+    type ApiDevice,
+    type ApiIoChannel,
+    type ApiWorkeventDevice
+} from "../../model/paikannin-api-data.js";
+import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
+import { PaikanninUpdate } from "../../service/paikannin-update.js";
+import { getTrackingEndPoint, getTrackingStartPoint } from "../../service/utils.js";
 import {
     dbTestBase,
     findAllTrackings,
@@ -23,7 +29,7 @@ import {
     insertDomain,
     insertDomaindTaskMapping,
     truncate
-} from "../db-testutil";
+} from "../db-testutil.js";
 import {
     DOMAIN_1,
     HARJA_BRUSHING,
@@ -32,14 +38,16 @@ import {
     PAIKANNIN_OPERATION_PAVING,
     PAIKANNIN_OPERATION_SALTING,
     POINT_START
-} from "../testconstants";
+} from "../testconstants.js";
 import {
     createApiRouteDataForEveryMinute,
     createDbDomainContract,
     createLineString,
     createLineStringGeometry,
-    createZigZagCoordinates
-} from "../testutil";
+    createZigZagCoordinates,
+    getRandompId
+} from "../testutil.js";
+import { jest } from "@jest/globals";
 
 const paikanninUpdateService = createPaikanninUpdateService();
 
@@ -51,7 +59,10 @@ describe(
     "paikannin-update-service-test",
     dbTestBase((db: DTDatabase) => {
         beforeEach(async () => {
-            sinon.restore();
+            await truncate(db);
+        });
+
+        afterEach(async () => {
             await truncate(db);
         });
 
@@ -135,18 +146,19 @@ describe(
 
             mockGetWorkEventsApiResponse([route2d]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-            sinon.restore();
+            jest.clearAllMocks(); // ??
+
             mockGetWorkEventsApiResponse([route1d]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
             const trackings = await findAllTrackings(db, DOMAIN_1);
 
             expect(trackings.length).toEqual(2);
-            expect(trackings[0].end_time).toEqual(past10);
-            expect(trackings[1].end_time).toEqual(past0);
+            expect(trackings[0]?.end_time).toEqual(past10);
+            expect(trackings[1]?.end_time).toEqual(past0);
 
-            expect(trackings[0].geometry.coordinates.length).toEqual(10);
-            expect(trackings[1].geometry.coordinates.length).toEqual(9);
+            expect(trackings[0]?.geometry.coordinates.length).toEqual(10);
+            expect(trackings[1]?.geometry.coordinates.length).toEqual(9);
 
             const checked = await LastUpdatedDb.getLastUpdatedWithSubtype(
                 db,
@@ -197,12 +209,12 @@ describe(
 
             expect(trackings.length).toEqual(1);
             // As source linestring is two equal point's -> it's invalid and it should be saved as point
-            expect(trackings[0].geometry).toBeTruthy();
-            expect(trackings[0].geometry).toEqual(trackings[0].last_point);
+            expect(trackings[0]?.geometry).toBeTruthy();
+            expect(trackings[0]?.geometry).toEqual(trackings[0]?.last_point);
 
-            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[0], POINT_START[0], 0.000001);
-            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[1], POINT_START[1], 0.000001);
-            expect(trackings[0].last_point.coordinates[2]).toEqual(0);
+            Asserter.assertToBeCloseTo(trackings[0]?.last_point.coordinates[0]!, POINT_START[0]!, 0.000001);
+            Asserter.assertToBeCloseTo(trackings[0]?.last_point.coordinates[1]!, POINT_START[1]!, 0.000001);
+            expect(trackings[0]?.last_point.coordinates[2]).toEqual(0);
         });
 
         test("updateTrackings and split on big distance between points", async () => {
@@ -230,16 +242,16 @@ describe(
 
             mockGetWorkEventsApiResponse([route]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-            sinon.restore();
+            jest.restoreAllMocks();
 
             const trackings = await findAllTrackings(db, DOMAIN_1);
 
             expect(trackings.length).toEqual(2);
-            expect(trackings[0].end_time).toEqual(sub(end, { minutes: 10 }));
-            expect(trackings[1].end_time).toEqual(end);
+            expect(trackings[0]?.end_time).toEqual(sub(end, { minutes: 10 }));
+            expect(trackings[1]?.end_time).toEqual(end);
 
-            expect(trackings[0].geometry.coordinates.length).toEqual(10);
-            expect(trackings[1].geometry.coordinates.length).toEqual(10);
+            expect(trackings[0]?.geometry.coordinates.length).toEqual(10);
+            expect(trackings[1]?.geometry.coordinates.length).toEqual(10);
         });
 
         test("updateTrackings and continue previous", async () => {
@@ -277,7 +289,7 @@ describe(
 
             mockGetWorkEventsApiResponse([route1]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-            sinon.restore();
+            jest.restoreAllMocks();
             mockGetWorkEventsApiResponse([route2]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
@@ -285,14 +297,14 @@ describe(
 
             expect(trackings.length).toEqual(2);
             // First tracking's end is extended to next tracking start
-            expect(trackings[0].end_time).toEqual(trackings[1].start_time);
-            expect(trackings[1].end_time).toEqual(end2);
+            expect(trackings[0]?.end_time).toEqual(trackings[1]?.start_time);
+            expect(trackings[1]?.end_time).toEqual(end2);
 
-            expect(trackings[0].id).toEqual(trackings[1].previous_tracking_id);
+            expect(trackings[0]?.id).toEqual(trackings[1]?.previous_tracking_id);
 
-            const prevEnd: Position = trackings[0].last_point.coordinates;
-            const prevLineStringEnd: Position = getTrackingEndPoint(trackings[0]);
-            const nextStart: Position = getTrackingStartPoint(trackings[1]);
+            const prevEnd: Position = trackings[0]!.last_point.coordinates;
+            const prevLineStringEnd: Position = getTrackingEndPoint(trackings[0]!);
+            const nextStart: Position = getTrackingStartPoint(trackings[1]!);
 
             // Check marked end poind is same as next start as it's extending previous one
             expect(prevEnd[0]).toEqual(nextStart[0]);
@@ -305,14 +317,13 @@ describe(
         });
 
         function mockGetDevicesApiResponse(response: ApiDevice[]): void {
-            sinon.stub(PaikanninApi.prototype, "getDevices").returns(Promise.resolve(response));
+            jest.spyOn(PaikanninApi.prototype, "getDevices").mockReturnValueOnce(Promise.resolve(response));
         }
 
         function mockGetWorkEventsApiResponse(response: ApiWorkeventDevice[]): void {
-            sinon
-                .stub(PaikanninApi.prototype, "getWorkEvents")
-                .withArgs(sinon.match.any, sinon.match.any)
-                .returns(Promise.resolve(response));
+            jest.spyOn(PaikanninApi.prototype, "getWorkEvents").mockReturnValueOnce(
+                Promise.resolve(response)
+            );
         }
 
         function createDevice(ioChannels: ApiIoChannel[]): ApiDevice {

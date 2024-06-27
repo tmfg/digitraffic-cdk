@@ -1,9 +1,9 @@
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
-import { Position } from "geojson";
-import { DbMaintenanceTracking } from "../../lib/model/db-data";
-import * as Utils from "../../lib/service/utils";
-import { createGeoJSONPoint, createLineStringGeometry } from "../testutil";
+import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import { type Position } from "geojson";
+import { type DbMaintenanceTracking } from "../../model/db-data.js";
+import * as Utils from "../../service/utils.js";
+import { createGeoJSONPoint, createLineStringGeometry } from "../testutil.js";
 
 const END_POINT: Position = [27.688935, 62.892983];
 
@@ -29,10 +29,8 @@ describe("UtilsTests", () => {
     });
 
     test("countEstimatedSizeOfMessage null and undefined", () => {
-        /* eslint-disable */
         expect(Utils.countEstimatedSizeOfMessage(null!)).toEqual(0);
         expect(Utils.countEstimatedSizeOfMessage(undefined!)).toEqual(0);
-        /* eslint-enable */
     });
 
     test("calculateSpeedInKmH", () => {
@@ -42,8 +40,8 @@ describe("UtilsTests", () => {
     test("getTrackingStartPoint with line string", () => {
         const mt = createDbMaintenanceTracking(true);
         const start = Utils.getTrackingStartPoint(mt);
-        expect(start[0]).toEqual((mt.geometry as GeoJsonLineString).coordinates[0][0]);
-        expect(start[1]).toEqual((mt.geometry as GeoJsonLineString).coordinates[0][1]);
+        expect(start[0]).toEqual((mt.geometry as GeoJsonLineString).coordinates[0]![0]!);
+        expect(start[1]).toEqual((mt.geometry as GeoJsonLineString).coordinates[0]![1]!);
     });
 
     test("getTrackingStartPoint without line string", () => {

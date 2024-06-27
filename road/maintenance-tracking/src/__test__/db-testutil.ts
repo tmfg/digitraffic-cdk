@@ -1,14 +1,14 @@
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
-import * as sinon from "sinon";
-import type { DbObservationData } from "../dao/maintenance-tracking-dao.js";
-import type { Havainto, TyokoneenseurannanKirjaus } from "../model/models.js";
+import { type DbObservationData } from "../dao/maintenance-tracking-dao.js";
+import { type Havainto, type TyokoneenseurannanKirjaus } from "../model/models.js";
 import { convertToDbObservationData } from "../service/maintenance-tracking.js";
 import { parseISO } from "date-fns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { jest } from "@jest/globals";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");
@@ -192,6 +192,6 @@ export function findAllTrackingIds(db: DTDatabase): Promise<number[]> {
 }
 
 export function mockSecrets<T>(secret: T): void {
-    sinon.stub(RdsHolder.prototype, "setCredentials").resolves();
-    sinon.stub(SecretHolder.prototype, "get").resolves(secret);
+    jest.spyOn(RdsHolder.prototype, "setCredentials").mockReturnValue(Promise.resolve());
+    jest.spyOn(SecretHolder.prototype, "get").mockReturnValue(Promise.resolve(secret));
 }

@@ -1,11 +1,23 @@
-import { getRandomInteger, getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
-import { Feature, Geometry, LineString, Point, Position } from "geojson";
-import { cloneDeep } from "lodash";
+import {
+    getRandomInteger,
+    getRandomNumber,
+    getRandomIntegerAsString
+} from "@digitraffic/common/dist/test/testutils";
+import { type GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
+import { type Feature, type Geometry, type LineString, type Point, type Position } from "geojson";
+import _ from "lodash";
 import add from "date-fns/add";
 import sub from "date-fns/sub";
-import { DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking } from "../lib/model/db-data";
-import { ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice } from "../lib/model/paikannin-api-data";
+import {
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbMaintenanceTracking
+} from "../model/db-data.js";
+import {
+    type ApiWorkevent,
+    type ApiWorkeventDevice,
+    type ApiWorkeventIoDevice
+} from "../model/paikannin-api-data.js";
 import {
     PAIKANNIN_OPERATION_BRUSHING,
     PAIKANNIN_OPERATION_PAVING,
@@ -14,7 +26,7 @@ import {
     X_MIN,
     Y_MAX,
     Y_MIN
-} from "./testconstants";
+} from "./testconstants.js";
 
 export function createDbDomainContract(
     contract: string,
@@ -90,9 +102,10 @@ export function createZigZagCoordinates(
     const yAddition = KM_IN_Y * distInXyKm;
     const x = getRandomNumber(X_MIN, X_MAX);
     const y = getRandomNumber(Y_MIN, Y_MAX);
+    // @ts-ignore
     return Array.from({ length: coordinateCount }).map((i, index) => {
         const even: boolean = index % 2 === 0;
-        // Make linestring to go zigzag, so it wont be simplified
+        // Make linestring to go zigzag, so it won't be simplified
         const nextX = x + index * xAddition;
         const nextY = y + (even ? 0 : yAddition);
         return [nextX, nextY, 0.5];
@@ -160,13 +173,13 @@ export function createApiRouteDataForEveryMinute(
         return {
             deviceId: deviceId,
             heading: 0,
-            lon: position[0],
-            lat: position[1],
+            lon: position[0]!,
+            lat: position[1]!,
             speed: 10,
-            altitude: position[2],
+            altitude: position[2]!,
             deviceName: deviceId.toString(),
             timest: eventTime.toISOString(),
-            ioChannels: cloneDeep(operations),
+            ioChannels: _.cloneDeep(operations),
             timestamp: eventTime
         };
     });
@@ -176,4 +189,8 @@ export function createApiRouteDataForEveryMinute(
         deviceName: deviceId.toString(),
         workEvents: events
     };
+}
+
+export function getRandompId(): string {
+    return getRandomIntegerAsString(100000, 100000000000);
 }
