@@ -27,5 +27,27 @@ describe("StopMonitoringDao", dbTestBase(() => {
 
             await expectStopMonitoringRows(1);
         });      
+
+        test("insertOrUpdate - two", async () => {
+            await expectStopMonitoringRows(0);
+
+            await inTransaction(async conn => {
+                await insertOrUpdate(conn, [{
+                    trainNumber: 10,
+                    trainDepartureDate: "2024-10-10",
+                    attapId: 1234,
+                    uq: false,
+                    ut: false
+                }, {
+                    trainNumber: 20,
+                    trainDepartureDate: "2024-10-10",
+                    attapId: 1234,
+                    uq: false,
+                    ut: false
+                }]);
+            });
+
+            await expectStopMonitoringRows(2);
+        });      
     })
 );

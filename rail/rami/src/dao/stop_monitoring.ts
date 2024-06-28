@@ -8,7 +8,7 @@ ON DUPLICATE KEY UPDATE
     unknown_time = :ut`;
 
     // TODO: create table
-`create table stop_monitoring (
+/*create table stop_monitoring (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     train_number INT UNSIGNED NOT NULL,
     train_departure_date DATE NOT NULL,
@@ -16,7 +16,7 @@ ON DUPLICATE KEY UPDATE
 	modified_db DATETIME ON UPDATE CURRENT_TIMESTAMP,
 	unknown_quay BOOLEAN NOT NULL, 
 	unknown_time BOOLEAN NOT NULL
-);`
+);*/
 
 export interface UpsertValues {
     readonly trainNumber: number
@@ -27,5 +27,5 @@ export interface UpsertValues {
 }
 
 export async function insertOrUpdate(conn: Connection, values: UpsertValues[]): Promise<void> {
-    values.forEach(async v => await conn.query(UPSERT, v));
+    await Promise.allSettled(values.map(async v => await conn.query(UPSERT, v)));
 }
