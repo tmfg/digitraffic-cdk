@@ -38,6 +38,51 @@
       "summary": "Used by the Github Actions to create eslint report.",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
+    },
+    {
+      "name": "common-subtree",
+      "commandKind": "global",
+      "summary": "Pull common subtree changes from some branch",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "bash common/scripts/git-subtree-helper.sh"
+    }
+  ],
+  "parameters": [
+    {
+      "parameterKind": "choice",
+      "longName": "--cmd",
+      "shortName": "-c",
+      "description": "which command to do",
+      "required": true,
+      "associatedCommands": ["common-subtree"],
+      "alternatives": [
+        {
+          "name":  "pull",
+          "description": "pull changes to common subtree"
+        },
+        {
+          "name":  "push",
+          "description": "push changes to common subtree"
+        },
+        {
+          "name":  "diff",
+          "description": "diff against some branch in common"
+        },
+        {
+          "name":  "subtree-add",
+          "description": "Add common as subtree"
+        }
+      ]
+    },
+    {
+      "parameterKind": "string",
+      "longName": "--refspec",
+      "shortName": "-r",
+      "description": "git refspec for what to pull, such as master or name of a tag",
+      "argumentName": "BRANCH_OR_TAG",
+      "required": true,
+      "associatedCommands": ["common-subtree"]
     }
   ]
+
 }
