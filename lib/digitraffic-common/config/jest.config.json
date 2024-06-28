@@ -1,0 +1,33 @@
+{
+  "extends": "@rushstack/heft-jest-plugin/includes/jest-shared.config.json",
+  "roots": ["<rootDir>/dist/"],
+  "testMatch": ["<rootDir>/dist/__test__/**/*.test.m[j]s"],
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "dist/**/*.mjs",
+    "!dist/**/*.d.mts",
+    "!dist/**/*.test.mjs",
+    "!dist/**/__test__/**",
+    "!dist/**/__tests__/**",
+    "!dist/**/__fixtures__/**",
+    "!dist/**/__mocks__/**"
+  ],
+  "reporters": [
+    "default",
+    "jest-junit"
+  ],
+  "coveragePathIgnorePatterns": ["/node_modules/"],
+  "coverageThreshold": {
+    "global": {
+      "branches": 50,
+      "functions": 50,
+      "lines": 50,
+      "statements": 50
+    }
+  },
+  "moduleNameMapper": {
+    "^axios$": "<rootDir>/node_modules/axios/dist/esm/axios.js"
+  },
+  "extensionsToTreatAsEsm": [".mts"],
+  "moduleFileExtensions": ["js", "mts", "mjs"]
+}
