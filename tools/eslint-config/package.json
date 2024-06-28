@@ -1,6 +1,6 @@
 {
   "name": "@digitraffic/eslint-config",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "",
   "keywords": [],
   "main": "index.js",
@@ -13,7 +13,7 @@
     "@rushstack/eslint-config": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "eslint": "^8.57.0",
-    "eslint-plugin-deprecation": "^2.0.0",
+    "eslint-plugin-deprecation": "^3.0.0",
     "typescript": "^5.4.4"
   }
 }
