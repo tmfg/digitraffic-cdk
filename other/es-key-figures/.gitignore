@@ -7,10 +7,9 @@
 !package.json
 !tscconfig.json
 
-!config/
-!config/*.json
-
-!src/
-!src/**/
-!src/**/*.ts
-src/bin/*.ts
+!/config/
+!/config/*.json
+!/src/
+!/src/**/
+!/src/**/*.ts
+/src/bin

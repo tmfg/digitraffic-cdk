@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
-import { fetchDataFromEs } from "./es-query";
-import { esQueries } from "../es_queries";
+import { fetchDataFromEs } from "./es-query.js";
+import { esQueries } from "../es_queries.js";
 import axios, { AxiosError } from "axios";
 import mysql from "mysql";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";

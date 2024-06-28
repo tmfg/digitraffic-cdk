@@ -2,6 +2,7 @@
   "name": "es-key-figures",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "build": "heft build --clean && npm run postbuild",
@@ -14,6 +15,7 @@
     "test": "heft test --clean"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
     "@digitraffic/common": "2024.6.26-2",
     "aws-cdk-lib": "~2.147.1",
     "aws-lambda": "^1.0.7",
@@ -44,8 +46,6 @@
     "node-mocks-http": "~1.15.0",
     "parallelshell": "3.0.2",
     "sinon": "18.0.0",
-    "ts-jest": "^29.1.5",
-    "ts-node": "^10.9.2",
     "typescript": "~5.5.2"
   },
   "externals": [

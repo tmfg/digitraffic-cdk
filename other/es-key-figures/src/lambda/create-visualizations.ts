@@ -3,6 +3,9 @@ import util from "node:util";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { S3Client } from "@aws-sdk/client-s3";
+
+const s3 = new S3Client();
 interface KeyFigure {
     filter: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -415,12 +418,13 @@ export async function handler(): Promise<boolean> {
     logger.info({ message: filters.toString(), method: "create-visualizations.handler" });
 
     const bucketName = "eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw";
-    await uploadToS3(bucketName, await createIndex(), `index.html`, undefined, "text/html");
+    await uploadToS3(s3, bucketName, await createIndex(), `index.html`, undefined, "text/html");
 
     for (const row of filters) {
         const filter = row.filter;
         logger.info({ message: `Processing: ${filter}`, method: "create-visualizations.handler" });
         await uploadToS3(
+            s3,
             bucketName,
             await createDetailPage(filter),
             `${base64encodeFilter(filter)}.html`,

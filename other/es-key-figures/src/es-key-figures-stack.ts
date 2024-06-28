@@ -1,5 +1,5 @@
-import { App, Duration, Stack, StackProps } from "aws-cdk-lib";
-import { DatabaseClusterEngine, ServerlessCluster, ServerlessClusterProps } from "aws-cdk-lib/aws-rds";
+import { App, Duration, Stack, type StackProps } from "aws-cdk-lib";
+import { DatabaseClusterEngine, ServerlessCluster, type ServerlessClusterProps } from "aws-cdk-lib/aws-rds";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { AnyPrincipal, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
