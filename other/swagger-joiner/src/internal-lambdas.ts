@@ -1,6 +1,5 @@
 import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
 import { Duration } from "aws-cdk-lib";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { type Props } from "./app-props.js";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";

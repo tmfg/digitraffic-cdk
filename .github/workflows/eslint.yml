@@ -34,14 +34,8 @@ jobs:
           path: |
             common/temp/build-cache
 
-      - name: Rush subrepos
-        run: node common/scripts/install-run-rush.js repo:init
-
       - name: Rush install
         run: node common/scripts/install-run-rush.js install
-
-      - name: Rush build
-        run: node common/scripts/install-run-rush.js build
 
       - name: Create eslint reports
         run: node common/scripts/install-run-rush.js ci:eslint-report

@@ -33,18 +33,6 @@
       "shellCommand": "node common/scripts/check-dependencies.mjs"
     },
     {
-      "name": "repo:init",
-      "commandKind": "global",
-      "summary": "Used to initialize the repository",
-      "shellCommand": "node common/scripts/git-submodule-extra.mjs init"
-    },
-    {
-      "name": "repo:deinit",
-      "commandKind": "global",
-      "summary": "Used to deinitialize the repository",
-      "shellCommand": "git submodule deinit --all && rm .gitmodules"
-    },
-    {
       "name": "ci:eslint-report",
       "commandKind": "bulk",
       "summary": "Used by the Github Actions to create eslint report.",
