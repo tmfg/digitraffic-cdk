@@ -15,6 +15,7 @@ export enum DatabaseEnvironmentKeys {
 
 async function truncate(db: Connection): Promise<void> {
     await db.execute("DELETE FROM rami_message");
+    await db.execute("DELETE FROM stop_monitoring");
 }
 
 export function dbTestBase(fn: JestEmptyFunction): JestEmptyFunction {

@@ -8,6 +8,8 @@ const stopAssignment = z.object({
 export const monitoredCall = z.object({
     arrivalStopAssignment: stopAssignment,
     departureStopAssignment: stopAssignment,
+    aimedArrivalTime: z.string().describe("datetime, in UTC ISO8601, expected arrival time").optional(),
+    aimedDepartureTime: z.string().describe("datetime, in UTC ISO8601, expected arrival time").optional(),
     expectedArrivalTime: z.string().describe("datetime, in UTC ISO8601, expected arrival time").optional(),
     expectedDepartureTime: z.string().describe("datetime, in UTC ISO8601, expected arrival time").optional(),
     stopPointRef: z.string().describe("station")
