@@ -7,28 +7,23 @@ const accounts: Account[] = [
     {
         accountNumber,
         app,
-        env,
-    },
+        env
+    }
 ];
 process.env.TOPIC_ARN = "somearn";
 process.env.KNOWN_ACCOUNTS = JSON.stringify(accounts);
-process.env.ES_ENDPOINT =
-    "some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com";
+process.env.ES_ENDPOINT = "some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com";
 
 import { CloudWatchLogsDecodedData, CloudWatchLogsLogEvent } from "aws-lambda";
 import {
     buildSource,
     isLambdaLifecycleEvent,
-    transform,
+    transform
 } from "../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es";
-import {
-    getAppFromSenderAccount,
-    getEnvFromSenderAccount,
-} from "../../../lib/lambda/kinesis-to-es/accounts";
+import { getAppFromSenderAccount, getEnvFromSenderAccount } from "../../../lib/lambda/kinesis-to-es/accounts";
 import { Account } from "../../../lib/app-props";
 
-const TEST_LOGLINE =
-    "2021-10-08T05:41:10.271Z\tec182986-d87f-5ce8-8ad8-705f04503e55\tINFO\tlogline";
+const TEST_LOGLINE = "2021-10-08T05:41:10.271Z\tec182986-d87f-5ce8-8ad8-705f04503e55\tINFO\tlogline";
 
 describe("kinesis-to-es", () => {
     test("isLambdaLifecycleEvent true", () => {
@@ -43,30 +38,22 @@ describe("kinesis-to-es", () => {
 
     test("getAppFromSenderAccount true", () => {
         const account: Account = { accountNumber: accountNumber, env, app };
-        expect(getAppFromSenderAccount(account.accountNumber, [account])).toBe(
-            account.app
-        );
+        expect(getAppFromSenderAccount(account.accountNumber, [account])).toBe(account.app);
     });
 
     test("getAppFromSenderAccount error", () => {
         const account: Account = { accountNumber: accountNumber, env, app };
-        expect(() =>
-            getAppFromSenderAccount("4567890123", [account])
-        ).toThrow();
+        expect(() => getAppFromSenderAccount("4567890123", [account])).toThrow();
     });
 
     test("getEnvFromSenderAccount true", () => {
         const account: Account = { accountNumber: accountNumber, env, app };
-        expect(getEnvFromSenderAccount(accountNumber, [account])).toBe(
-            account.env
-        );
+        expect(getEnvFromSenderAccount(accountNumber, [account])).toBe(account.env);
     });
 
     test("getEnvFromSenderAccount error", () => {
         const account: Account = { accountNumber: accountNumber, env, app };
-        expect(() =>
-            getEnvFromSenderAccount("4567890123", [account])
-        ).toThrow();
+        expect(() => getEnvFromSenderAccount("4567890123", [account])).toThrow();
     });
 
     test("buildSource", () => {
@@ -79,7 +66,7 @@ describe("kinesis-to-es", () => {
         const logEvent: CloudWatchLogsLogEvent = {
             id: "some-id",
             timestamp: 0,
-            message: "message",
+            message: "message"
         };
         const data: CloudWatchLogsDecodedData = {
             owner: account.accountNumber,
@@ -87,7 +74,7 @@ describe("kinesis-to-es", () => {
             logStream: "",
             subscriptionFilters: [],
             messageType: "",
-            logEvents: [logEvent],
+            logEvents: [logEvent]
         };
 
         const transformed = transform(data, new Statistics());

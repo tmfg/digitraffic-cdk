@@ -1,10 +1,5 @@
 import "source-map-support/register";
-import {
-    Context,
-    KinesisStreamRecord,
-    CloudWatchLogsDecodedData,
-    KinesisStreamHandler,
-} from "aws-lambda";
+import { Context, KinesisStreamRecord, CloudWatchLogsDecodedData, KinesisStreamHandler } from "aws-lambda";
 
 import * as AWSx from "aws-sdk";
 import {
@@ -15,7 +10,7 @@ import {
     isControlMessage,
     ItemStatus,
     parseESReturnValue,
-    parseNumber,
+    parseNumber
 } from "./util";
 import { getAppFromSenderAccount, getEnvFromSenderAccount } from "./accounts";
 import { notifyFailedItems } from "./notify";
@@ -33,9 +28,7 @@ const knownAccounts: Account[] = JSON.parse(
 const creds = new AWS.EnvironmentCredentials("AWS");
 
 const endpoint = process.env.ES_ENDPOINT as unknown as string;
-const endpointParts = endpoint.match(
-    /^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.com$/
-) as string[];
+const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.com$/) as string[];
 const esEndpoint = new AWS.Endpoint(endpoint);
 const region = endpointParts[2];
 
@@ -72,19 +65,14 @@ export const handler: KinesisStreamHandler = (event, context): void => {
     }
 };
 
-function handleRecord(
-    record: KinesisStreamRecord,
-    statistics: Statistics
-): string {
+function handleRecord(record: KinesisStreamRecord, statistics: Statistics): string {
     const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
     const uncompressed = zlib.gunzipSync(zippedInput).toString("utf8");
 
     // parse the input from JSON
-    const awslogsData = JSON.parse(
-        uncompressed
-    ) as unknown as CloudWatchLogsDecodedData;
+    const awslogsData = JSON.parse(uncompressed) as unknown as CloudWatchLogsDecodedData;
 
     // skip control messages
     if (isControlMessage(awslogsData)) {
@@ -95,47 +83,30 @@ function handleRecord(
     return transform(awslogsData, statistics);
 }
 
-function postToElastic(
-    context: Context,
-    retryOnFailure: boolean,
-    elasticsearchBulkData: string
-) {
+function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchBulkData: string) {
     // post documents to the Amazon Elasticsearch Service
-    post(
-        elasticsearchBulkData,
-        (
-            error: any,
-            success: any,
-            statusCode: number,
-            failedItems: ItemStatus[]
-        ) => {
-            if (error) {
-                console.log("Error: " + JSON.stringify(error, null, 2));
+    post(elasticsearchBulkData, (error: any, success: any, statusCode: number, failedItems: ItemStatus[]) => {
+        if (error) {
+            console.log("Error: " + JSON.stringify(error, null, 2));
 
-                if (failedItems && failedItems.length > 0) {
-                    notifyFailedItems(failedItems);
+            if (failedItems && failedItems.length > 0) {
+                notifyFailedItems(failedItems);
 
-                    // try repost only once
-                    if (retryOnFailure) {
-                        const failedIds = getFailedIds(failedItems);
+                // try repost only once
+                if (retryOnFailure) {
+                    const failedIds = getFailedIds(failedItems);
 
-                        console.log(
-                            "reposting, failed ids " + failedIds.toString()
-                        );
+                    console.log("reposting, failed ids " + failedIds.toString());
 
-                        // some items failed, try to repost
-                        const filteredBulkData = filterIds(
-                            elasticsearchBulkData,
-                            failedIds
-                        );
-                        postToElastic(context, false, filteredBulkData);
-                    }
-                } else {
-                    context.fail(JSON.stringify(error));
+                    // some items failed, try to repost
+                    const filteredBulkData = filterIds(elasticsearchBulkData, failedIds);
+                    postToElastic(context, false, filteredBulkData);
                 }
+            } else {
+                context.fail(JSON.stringify(error));
             }
         }
-    );
+    });
 }
 
 export function post(body: string, callback: any) {
@@ -199,18 +170,11 @@ export function transform(
             .filter((e) => !isLambdaLifecycleEvent(e.message))
             .filter((e) => !isDebugLine(e.message))
             .map((logEvent) => {
-                const messageParts = logEvent.message.split(
-                    SEPARATOR_LAMBDA_LOGS
-                ); // timestamp, id, level, message
+                const messageParts = logEvent.message.split(SEPARATOR_LAMBDA_LOGS); // timestamp, id, level, message
 
-                const source = buildSource(
-                    logEvent.message,
-                    logEvent.extractedFields
-                );
+                const source = buildSource(logEvent.message, logEvent.extractedFields);
                 source["@id"] = logEvent.id;
-                source["@timestamp"] = new Date(
-                    logEvent.timestamp
-                ).toISOString();
+                source["@timestamp"] = new Date(logEvent.timestamp).toISOString();
                 source.level = messageParts[2];
                 source.message = messageParts[3];
                 source["@log_group"] = payload.logGroup;
@@ -222,15 +186,13 @@ export function transform(
                     index: {
                         _id: logEvent.id,
                         _index: getIndexName(appName, logEvent.timestamp),
-                        _type: "doc",
-                    },
+                        _type: "doc"
+                    }
                 };
 
                 statistics.addStatistics(payload.logGroup);
 
-                return [JSON.stringify(action), JSON.stringify(source)].join(
-                    "\n"
-                );
+                return [JSON.stringify(action), JSON.stringify(source)].join("\n");
             })
             .join("\n") + "\n"
     ); // must end with new-line
@@ -244,10 +206,7 @@ export function isLambdaLifecycleEvent(message: string) {
     );
 }
 
-export function buildSource(
-    message: string,
-    extractedFields?: CloudWatchLogsLogEventExtractedFields
-): any {
+export function buildSource(message: string, extractedFields?: CloudWatchLogsLogEventExtractedFields): any {
     message = message.replace("[, ]", "[0.0,0.0]");
 
     if (extractedFields) {
@@ -266,7 +225,7 @@ function buildFromMessage(message: string) {
 
     return {
         // eslint-disable-next-line camelcase
-        log_line: logLine,
+        log_line: logLine
     };
 }
 

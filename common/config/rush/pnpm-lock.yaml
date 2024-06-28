@@ -1337,48 +1337,54 @@ importers:
         specifier: ^0.5.21
         version: 0.5.21
     devDependencies:
+      '@digitraffic-cdk/digitraffic-cdk-rig':
+        specifier: workspace:*
+        version: link:../../tools/rig
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
       '@digitraffic/eslint-config':
         specifier: workspace:*
         version: link:../../tools/eslint-config
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
       '@rushstack/eslint-config':
         specifier: ^3.7.0
         version: 3.7.0(eslint@8.57.0)(typescript@5.5.2)
+      '@rushstack/heft':
+        specifier: ^0.66.18
+        version: 0.66.18(@types/node@20.14.9)
+      '@rushstack/heft-jest-plugin':
+        specifier: ^0.12.0
+        version: 0.12.0(@rushstack/heft@0.66.18(@types/node@20.14.9))(@types/node@20.14.9)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.2))
       '@types/aws-lambda':
         specifier: 8.10.140
         version: 8.10.140
+      '@types/heft-jest':
+        specifier: ^1.0.6
+        version: 1.0.6
       '@types/jest':
-        specifier: 29.5.12
+        specifier: ^29.5.12
         version: 29.5.12
       '@types/node':
-        specifier: 20.14.8
-        version: 20.14.8
+        specifier: ^20.14.8
+        version: 20.14.9
       '@types/sinon':
         specifier: 17.0.3
         version: 17.0.3
       esbuild:
-        specifier: 0.21.5
+        specifier: ^0.21.5
         version: 0.21.5
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
-      jest:
-        specifier: ^29.7.0
-        version: 29.7.0(@types/node@20.14.8)(ts-node@10.9.2(@types/node@20.14.8)(typescript@5.5.2))
-      jest-junit:
-        specifier: ^16.0.0
-        version: 16.0.0
       parallelshell:
         specifier: 3.0.2
         version: 3.0.2
       sinon:
         specifier: 18.0.0
         version: 18.0.0
-      ts-jest:
-        specifier: ^29.1.5
-        version: 29.1.5(@babel/core@7.24.7)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.24.7))(esbuild@0.21.5)(jest@29.7.0(@types/node@20.14.8)(ts-node@10.9.2(@types/node@20.14.8)(typescript@5.5.2)))(typescript@5.5.2)
       typescript:
         specifier: ~5.5.2
         version: 5.5.2

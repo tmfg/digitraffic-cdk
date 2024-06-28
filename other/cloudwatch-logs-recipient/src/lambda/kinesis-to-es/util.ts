@@ -3,25 +3,19 @@ import { CloudWatchLogsDecodedData } from "aws-lambda";
 
 const nanValue = -1;
 
-export function getIndexName(
-    appName: string,
-    timestampFromEvent: number
-): string {
+export function getIndexName(appName: string, timestampFromEvent: number): string {
     const timestamp = new Date(timestampFromEvent);
 
     // index name format: app-YYYY.MM
     const timePart = [
         timestamp.getUTCFullYear(), // year
-        ("0" + (timestamp.getUTCMonth() + 1)).slice(-2), // month
+        ("0" + (timestamp.getUTCMonth() + 1)).slice(-2) // month
     ].join(".");
 
     return `${appName}-${timePart}`;
 }
 
-export function buildFromMessage(
-    message: string,
-    enableJsonParse: boolean
-): unknown {
+export function buildFromMessage(message: string, enableJsonParse: boolean): unknown {
     if (skipElasticLogging(message)) {
         return {};
     }
@@ -43,7 +37,7 @@ export function buildFromMessage(
 
         return {
             // eslint-disable-next-line camelcase
-            log_line: logLine,
+            log_line: logLine
         };
     } catch (e) {
         console.info("error " + e);
@@ -59,13 +53,9 @@ function parseJson<T>(message: string): T | null {
         const parsedJson = JSON.parse(jsonSubString);
 
         // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
-        if (
-            "@fields" in parsedJson &&
-            "upstream_response_time" in parsedJson["@fields"]
-        ) {
+        if ("@fields" in parsedJson && "upstream_response_time" in parsedJson["@fields"]) {
             // eslint-disable-next-line camelcase
-            parsedJson["@fields"].upstream_response_time =
-                parseUpstreamResponseTime(parsedJson);
+            parsedJson["@fields"].upstream_response_time = parseUpstreamResponseTime(parsedJson);
         }
 
         return parsedJson;
@@ -192,10 +182,7 @@ interface ESResponse {
     errors: boolean;
 }
 
-export function parseESReturnValue(
-    response: IncomingMessage,
-    responseBody: string
-): ESReturnValue {
+export function parseESReturnValue(response: IncomingMessage, responseBody: string): ESReturnValue {
     try {
         const info = JSON.parse(responseBody) as unknown as ESResponse;
 
@@ -213,21 +200,21 @@ export function parseESReturnValue(
             success = {
                 attemptedItems: info.items.length,
                 successfulItems: info.items.length - failedItems.length,
-                failedItems: failedItems.length,
+                failedItems: failedItems.length
             };
         }
 
         if (statusCode !== 200 || info.errors) {
             error = {
                 statusCode: statusCode,
-                responseBody: responseBody,
+                responseBody: responseBody
             };
         }
 
         return {
             success: success,
             error: error,
-            failedItems: failedItems,
+            failedItems: failedItems
         };
     } catch (error) {
         console.log("Could not parse " + responseBody);
