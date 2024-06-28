@@ -6,7 +6,7 @@
 !/.gitattributes
 !/.node-version
 !/.prettierignore
-!/.prettierrc.js
+!/.prettierrc.cjs
 !/*.md
 !/*.sh
 !/*.py
