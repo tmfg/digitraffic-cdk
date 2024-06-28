@@ -34,9 +34,6 @@ jobs:
           path: |
             common/temp/build-cache
 
-      - name: Rush subrepos
-        run: node common/scripts/install-run-rush.js repo:init
-
       - name: Rush install
         run: node common/scripts/install-run-rush.js install
 
