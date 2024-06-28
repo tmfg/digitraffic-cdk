@@ -4,6 +4,10 @@ on: [push]
 
 env:
   CI_DIR: "common/scripts/ci"
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   generate-reports:
@@ -54,47 +58,32 @@ jobs:
   publish:
     needs: generate-reports
     runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Download reports
         uses: actions/download-artifact@v4
         with:
           name: reports
-          path: ${{ github.ref_name }}/
+          path: reports/${{ github.ref_name }}/
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: reports/
+
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       - name: Create summary
         shell: sh
+        env:
+          GITHUB_PAGES: ${{ steps.deployment.outputs.page_url }}
         run: python ${{ env.CI_DIR }}/create-summary.py
-
-      - name: Publish report
-        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
-        with:
-          GH_PAGES_BRANCH: gh-pages
-          FILE_PATH: ${{ github.ref_name }}/
-          COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
-          NO_SUMMARY: true
-        continue-on-error: true
-
-      # gh-pages-publish changes to gh-pages branch, which doesn't have ci scripts.
-      - name: Fail on ESLint errors
-        shell: python
-        run: |
-          import os
-          import sys
-          import os.path
-          import json
-
-          reports_file = os.path.join(os.environ["GITHUB_REF_NAME"], "reports.json")
-          reports_created = json.loads(open(reports_file).read())
-          count_errors = 0
-
-          for report_path, _, status_line in reports_created:
-              if "0 problems" in status_line or "0 errors" in status_line:
-                  print(f"No error in {report_path}. Continue")
-                  continue
-
-              print(f"Found error in {report_path}.")
-              count_errors = count_errors + 1
-
-          sys.exit(count_errors)
