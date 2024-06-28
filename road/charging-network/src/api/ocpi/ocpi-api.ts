@@ -1,8 +1,8 @@
-import { LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { type LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { VersionsResponse } from "./ocpi-api-responses";
+import axios, { type AxiosError, type AxiosResponse } from "axios";
+import type { VersionsResponse } from "./ocpi-api-responses.js";
 
 const SERVICE = "OcpiApi";
 

@@ -3,9 +3,9 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { ChargingNetworkKeys } from "../../keys";
-import { parseAuthEvent } from "../../service/lambda-authorizer-service";
-import * as OcpiEmspApiService from "../../service/ocpi-emsp-api-service";
+import { ChargingNetworkKeys } from "../../keys.js";
+import { parseAuthEvent } from "../../service/lambda-authorizer-service.js";
+import * as OcpiEmspApiService from "../../service/ocpi-emsp-api-service.js";
 
 const domain = getEnvVariable(ChargingNetworkKeys.OCPI_DOMAIN_URL);
 

@@ -5,17 +5,19 @@ import {
     insertOcpiCpo,
     prettyJson,
     setTestEnv
-} from "../../db-testutil";
-setTestEnv();
+} from "../../db-testutil.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { OcpiErrorResponse, StatusCode } from "../../../lib/api/ocpi/ocpi-api-responses";
-import { ChargingNetworkKeys } from "../../../lib/keys";
-import { handler } from "../../../lib/lambda/get-ocpi-emsp-2_1_1-credentials/get-ocpi-emsp-2_1_1-credentials";
-import { CPO_NAME, CPO_TOKEN_A, CPO_VERSIONS_ENPOINT, DT_CPO_ID } from "../../test-constants";
+import { type OcpiErrorResponse, StatusCode } from "../../../api/ocpi/ocpi-api-responses.js";
+import { ChargingNetworkKeys } from "../../../keys.js";
+import { handler } from "../../../lambda/get-ocpi-emsp-2_1_1-credentials/get-ocpi-emsp-2_1_1-credentials.js";
+import { CPO_NAME, CPO_TOKEN_A, CPO_VERSIONS_ENPOINT, DT_CPO_ID } from "../../test-constants.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+
+setTestEnv();
 
 describe(
     "lambda-get-ocpi-emsp-2_1_1_credentials-test",
-    dbTestBase((db) => {
+    dbTestBase((db: DTDatabase) => {
         test("get-ocpi-emsp-2_1_1_credentials", async () => {
             await insertOcpiCpo(
                 db,

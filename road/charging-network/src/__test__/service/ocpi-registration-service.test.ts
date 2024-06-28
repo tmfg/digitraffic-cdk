@@ -1,8 +1,9 @@
-import { dbTestBase, setTestEnv } from "../db-testutil";
+import { dbTestBase, setTestEnv } from "../db-testutil.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { Version, VersionString } from "../../api/ocpi/ocpi-api-responses.js";
+import * as OcpiRegistrationService from "../../service/ocpi-registration-service.js";
+
 setTestEnv();
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { Version, VersionString } from "../../lib/api/ocpi/ocpi-api-responses";
-import * as OcpiRegistrationService from "../../lib/service/ocpi-registration-service";
 
 describe(
     "ocpi-registration-service test",

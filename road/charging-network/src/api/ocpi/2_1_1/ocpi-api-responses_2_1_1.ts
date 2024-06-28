@@ -1,4 +1,4 @@
-import { URL, OcpiSuccessResponse } from "../ocpi-api-responses";
+import type { URL, OcpiSuccessResponse } from "../ocpi-api-responses.js";
 
 export type ImageCategory = "CHARGER" | "ENTRANCE" | "LOCATION" | "NETWORK" | "OPERATOR" | "OTHER" | "OWNER";
 

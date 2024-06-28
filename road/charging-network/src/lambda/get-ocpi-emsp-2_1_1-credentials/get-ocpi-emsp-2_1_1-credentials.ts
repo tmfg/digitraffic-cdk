@@ -1,12 +1,12 @@
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { StatusCode } from "../../api/ocpi/ocpi-api-responses";
+import { StatusCode } from "../../api/ocpi/ocpi-api-responses.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { ChargingNetworkKeys } from "../../keys";
-import * as ocpiApiServiceV2_1_1 from "../../service/ocpi-emsp-api-service_2_1_1";
-import { parseAuthEvent as parseAuthContextDtCpoId } from "../../service/lambda-authorizer-service";
-import { getErrorResponse } from "../../service/ocpi-emsp-api-service";
+import { ChargingNetworkKeys } from "../../keys.js";
+import * as ocpiApiServiceV2_1_1 from "../../service/ocpi-emsp-api-service_2_1_1.js";
+import { parseAuthEvent as parseAuthContextDtCpoId } from "../../service/lambda-authorizer-service.js";
+import { getErrorResponse } from "../../service/ocpi-emsp-api-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -23,7 +23,8 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
         event
     });
 
-    const postRequest = event.httpMethod === "POST";
+    // eslint-disable-next-line dot-notation
+    const postRequest = event["httpMethod"] === "POST";
 
     let dtCpoId: string | undefined = undefined;
     try {

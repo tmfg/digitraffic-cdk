@@ -1,10 +1,10 @@
 import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { ChargingNetworkProps } from "./app-props";
-import { ChargingNetworkKeys } from "./keys";
+import type { ChargingNetworkProps } from "./app-props.js";
+import { ChargingNetworkKeys } from "./keys.js";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 //import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
-import { DBLambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import type { DBLambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
 export class InternalLambdas {
     constructor(stack: DigitrafficStack) {

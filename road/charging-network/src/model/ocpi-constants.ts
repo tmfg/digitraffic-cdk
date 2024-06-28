@@ -1,4 +1,4 @@
-import { VersionString } from "../api/ocpi/ocpi-api-responses";
+import type { VersionString } from "../api/ocpi/ocpi-api-responses.js";
 
 // export enum OcpiModule {
 //     CREDENTIALS = "credentials",

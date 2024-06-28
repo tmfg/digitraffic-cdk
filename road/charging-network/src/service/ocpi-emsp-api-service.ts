@@ -1,12 +1,12 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import {
-    OcpiErrorResponse,
+    type OcpiErrorResponse,
     StatusCode,
-    StatusCodeValue,
-    VersionString,
-    VersionsResponse
-} from "../api/ocpi/ocpi-api-responses";
-import { OcpiModule, VERSION_2_1_1 } from "../model/ocpi-constants";
+    type StatusCodeValue,
+    type VersionString,
+    type VersionsResponse
+} from "../api/ocpi/ocpi-api-responses.js";
+import { type OcpiModule, VERSION_2_1_1 } from "../model/ocpi-constants.js";
 
 const SERVICE = "OcpiEmspApiService";
 

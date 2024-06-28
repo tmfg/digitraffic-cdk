@@ -58,6 +58,7 @@
     "@types/uuid": "10.0.0",
     "lodash": "^4.17.21",
     "parallelshell": "3.0.2",
-    "sinon": "18.0.0"
+    "sinon": "18.0.0",
+    "nock": "^13.5.4"
   }
 }

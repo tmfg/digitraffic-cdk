@@ -1,7 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import * as OcpiApiService from "../../../service/ocpi-emsp-api-service";
-import * as OcpiApi from "../ocpi-api";
-import { Credentials, CredentialsObject, LocationResponse } from "./ocpi-api-responses_2_1_1";
+import * as OcpiApiService from "../../../service/ocpi-emsp-api-service.js";
+import * as OcpiApi from "../ocpi-api.js";
+import type { Credentials, CredentialsObject, LocationResponse } from "./ocpi-api-responses_2_1_1.js";
 
 const SERVICE = "OcpiV2_1_1Api";
 

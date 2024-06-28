@@ -1,22 +1,22 @@
-import { logger, LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { type DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { compareVersions } from "compare-versions";
 import { v4 as uuidv4 } from "uuid";
-import { BusinessDetails, CredentialsObject } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1";
-import * as OcpiApi_2_1_1 from "../api/ocpi/2_1_1/ocpi-api_2_1_1";
-import * as OcpiApi from "../api/ocpi/ocpi-api";
-import {
+import type { BusinessDetails, CredentialsObject } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
+import * as OcpiApi_2_1_1 from "../api/ocpi/2_1_1/ocpi-api_2_1_1.js";
+import * as OcpiApi from "../api/ocpi/ocpi-api.js";
+import type {
     Endpoint,
     Version,
     VersionDetailsResponse,
     VersionsResponse,
     VersionString
-} from "../api/ocpi/ocpi-api-responses";
-import * as OcpiDao from "../dao/ocpi-dao";
-import { ChargingNetworkKeys } from "../keys";
-import { DbOcpiCpo, DbOcpiCpoBusinessDetailsUpdate } from "../model/dao-models";
-import { OCPI_MODULE_CREDENTIALS, SUPPORTED_VERSIONS, VERSION_2_1_1 } from "../model/ocpi-constants";
+} from "../api/ocpi/ocpi-api-responses.js";
+import * as OcpiDao from "../dao/ocpi-dao.js";
+import { ChargingNetworkKeys } from "../keys.js";
+import type { DbOcpiCpo, DbOcpiCpoBusinessDetailsUpdate } from "../model/dao-models.js";
+import { OCPI_MODULE_CREDENTIALS, SUPPORTED_VERSIONS, VERSION_2_1_1 } from "../model/ocpi-constants.js";
 
 const SERVICE = "OcpiRegistrationService";
 

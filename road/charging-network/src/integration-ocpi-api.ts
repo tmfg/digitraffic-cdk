@@ -1,20 +1,20 @@
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import { DBLambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import type { DBLambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { IdentitySource, RequestAuthorizer, Resource } from "aws-cdk-lib/aws-apigateway";
-import { ChargingNetworkProps } from "./app-props";
-import { ChargingNetworkKeys } from "./keys";
-import { OCPI_MODULE_CREDENTIALS, VERSION_2_1_1 } from "./model/ocpi-constants";
+import { IdentitySource, RequestAuthorizer, type Resource } from "aws-cdk-lib/aws-apigateway";
+import type { ChargingNetworkProps } from "./app-props.js";
+import { ChargingNetworkKeys } from "./keys.js";
+import { OCPI_MODULE_CREDENTIALS, VERSION_2_1_1 } from "./model/ocpi-constants.js";
 import {
     OcpiV2_1_1CredentialsSchema,
     OcpiV2_1_1VersionEndpointsSchema
-} from "./model/ocpi/2_1_1/ocpi-2_1_1-schema";
-import { OcpiVersionsSchema } from "./model/ocpi/ocpi-versions-schema";
-import { ModelWithReference } from "@digitraffic/common/dist/aws/types/model-with-reference";
+} from "./model/ocpi/2_1_1/ocpi-2_1_1-schema.js";
+import { OcpiVersionsSchema } from "./model/ocpi/ocpi-versions-schema.js";
+import type { ModelWithReference } from "@digitraffic/common/dist/aws/types/model-with-reference";
 
 export class IntegrationOcpiApi {
     publicApi: DigitrafficRestApi;

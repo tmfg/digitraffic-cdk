@@ -1,10 +1,10 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { DbOcpiCpo } from "../../model/dao-models";
+import type { DbOcpiCpo } from "../../model/dao-models.js";
 import {
     findUnregisteredCpos as OcpiRegistrationService_findUnregisteredCpos,
     handleCpoRegistration as OcpiRegistrationService_handleCpoRegistration
-} from "../../service/ocpi-registration-service";
+} from "../../service/ocpi-registration-service.js";
 
 const proxyHolder = ProxyHolder.create();
 const method = `OcpiRegistration.handler` as const;

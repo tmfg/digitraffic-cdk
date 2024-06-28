@@ -1,12 +1,12 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { BusinessDetails, CredentialsObject } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1";
-import { StatusCode, VersionDetailsResponse } from "../api/ocpi/ocpi-api-responses";
-import * as OcpiDao from "../dao/ocpi-dao";
-import { ChargingNetworkKeys } from "../keys";
-import { OCPI_MODULE_CREDENTIALS, VERSION_2_1_1 } from "../model/ocpi-constants";
-import { getModuleUrl, getVersionsUrl } from "./ocpi-emsp-api-service";
+import type { BusinessDetails, CredentialsObject } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
+import { StatusCode, type VersionDetailsResponse } from "../api/ocpi/ocpi-api-responses.js";
+import * as OcpiDao from "../dao/ocpi-dao.js";
+import { ChargingNetworkKeys } from "../keys.js";
+import { OCPI_MODULE_CREDENTIALS, VERSION_2_1_1 } from "../model/ocpi-constants.js";
+import { getModuleUrl, getVersionsUrl } from "./ocpi-emsp-api-service.js";
 
 const PARTY_ID = getEnvVariable(ChargingNetworkKeys.OCPI_PARTY_ID);
 const BUSINESS_DETAILS_NAME = getEnvVariable(ChargingNetworkKeys.OCPI_BUSINESS_DETAILS_NAME);

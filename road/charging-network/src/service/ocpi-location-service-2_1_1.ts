@@ -1,17 +1,17 @@
-import { LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
+import { type LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
-import { Location } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1";
-import * as OcpiApi_2_1_1 from "../api/ocpi/2_1_1/ocpi-api_2_1_1";
-import * as OcpiDao from "../dao/ocpi-dao";
-import {
+import type { Location } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
+import * as OcpiApi_2_1_1 from "../api/ocpi/2_1_1/ocpi-api_2_1_1.js";
+import * as OcpiDao from "../dao/ocpi-dao.js";
+import type {
     DbInsertedUpdated,
     DbOcpiCpo,
     DbOcpiCpoModuleEndpoint,
     DbOcpiLocationInsert
-} from "../model/dao-models";
-import { OCPI_MODULE_LOCATIONS, VERSION_2_1_1 } from "../model/ocpi-constants";
-import * as OcpiModuleService from "./ocpi-module-service";
+} from "../model/dao-models.js";
+import { OCPI_MODULE_LOCATIONS, VERSION_2_1_1 } from "../model/ocpi-constants.js";
+import * as OcpiModuleService from "./ocpi-module-service.js";
 
 const SERVICE = "OcpiLocationService2_1_1";
 const OCPI_MODULE = OCPI_MODULE_LOCATIONS;

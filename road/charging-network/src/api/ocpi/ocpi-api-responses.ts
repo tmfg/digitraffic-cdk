@@ -1,4 +1,4 @@
-import { ValueOf } from "@digitraffic/common/dist/types/util-types";
+import type { ValueOf } from "@digitraffic/common/dist/types/util-types";
 
 export type VersionString = `${number}.${number}.${number}` | `${number}.${number}`;
 

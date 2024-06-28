@@ -1,9 +1,9 @@
-import { LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { type LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
-import { VersionString } from "../api/ocpi/ocpi-api-responses";
-import * as OcpiDao from "../dao/ocpi-dao";
-import { DbOcpiCpoModuleEndpoint } from "../model/dao-models";
-import { OcpiModule } from "../model/ocpi-constants";
+import type { VersionString } from "../api/ocpi/ocpi-api-responses.js";
+import * as OcpiDao from "../dao/ocpi-dao.js";
+import type { DbOcpiCpoModuleEndpoint } from "../model/dao-models.js";
+import type { OcpiModule } from "../model/ocpi-constants.js";
 
 const SERVICE = "OcpiModuleService";
 

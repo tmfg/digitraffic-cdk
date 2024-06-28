@@ -4,13 +4,14 @@ import {
     getLambdaInputAuthorizerEvent,
     prettyJson,
     setTestEnv
-} from "../../db-testutil";
-setTestEnv();
+} from "../../db-testutil.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { VersionDetailsResponse } from "../../../lib/api/ocpi/ocpi-api-responses";
-import { ChargingNetworkKeys } from "../../../lib/keys";
-import { handler } from "../../../lib/lambda/get-ocpi-emsp-2_1_1/get-ocpi-emsp-2_1_1";
-import { DT_CPO_ID } from "../../test-constants";
+import type { VersionDetailsResponse } from "../../../api/ocpi/ocpi-api-responses.js";
+import { ChargingNetworkKeys } from "../../../keys.js";
+import { handler } from "../../../lambda/get-ocpi-emsp-2_1_1/get-ocpi-emsp-2_1_1.js";
+import { DT_CPO_ID } from "../../test-constants.js";
+
+setTestEnv();
 
 const TEST_VERSIONS = `{
     "type": "Success",

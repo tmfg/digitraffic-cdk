@@ -1,7 +1,7 @@
-import { logger, LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import { PreparedStatement } from "pg-promise";
-import {
+import type {
     DbInsertedUpdated,
     DbOcpiCpo,
     DbOcpiCpoBusinessDetails,
@@ -11,11 +11,11 @@ import {
     DbOcpiCpoVersionUpdate,
     DbOcpiLocation,
     DbOcpiLocationInsert
-} from "../model/dao-models";
-import { OcpiModule } from "../model/ocpi-constants";
+} from "../model/dao-models.js";
+import type { OcpiModule } from "../model/ocpi-constants.js";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
-import { VersionString } from "../api/ocpi/ocpi-api-responses";
-import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
+import type { VersionString } from "../api/ocpi/ocpi-api-responses.js";
+import type { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 
 const COORDINATE_PRECISION = 0.000001 as const; // What is the precision of saved coordinates
 const SERVICE = "OcpiDao" as const;

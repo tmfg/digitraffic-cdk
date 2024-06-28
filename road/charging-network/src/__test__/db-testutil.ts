@@ -1,14 +1,14 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { ListenProperties, TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
+import * as nock from "nock";
 import { hasOwnPropertySafe } from "@digitraffic/common/dist/utils/utils";
 import * as sinon from "sinon";
-import { VersionString } from "../lib/api/ocpi/ocpi-api-responses";
-import { ChargingNetworkKeys } from "../lib/keys";
-import { VERSION_2_1_1 } from "../lib/model/ocpi-constants";
+import type { VersionString } from "../api/ocpi/ocpi-api-responses.js";
+import { ChargingNetworkKeys } from "../keys.js";
+import { VERSION_2_1_1 } from "../model/ocpi-constants.js";
 
 export const PORT = 8091 as const;
 const service = "DbTestutil.ts";
@@ -58,51 +58,6 @@ export async function insertOcpiVersion(db: DTDatabase, version: VersionString):
 
 export type UrlResponsePair = [url: string, response: object];
 
-/* TODO: use SuperTest? https://github.com/ladjs/supertest */
-export async function withServer(
-    urlResponsePairs: UrlResponsePair[],
-    fn: (server: TestHttpServer) => Promise<void>
-): Promise<void> {
-    const server = new TestHttpServer();
-
-    let httpPort = 80;
-    const props: ListenProperties = {};
-    urlResponsePairs.forEach(([url, response]) => {
-        const parsedURL = new URL(url);
-        if (parsedURL.port) {
-            // If port is defined use it
-            // Remove leading colon from the port number
-            httpPort = parseInt(parsedURL.port, 10);
-        }
-        const path = parsedURL.pathname;
-        const responseStr = JSON.stringify(response);
-        props[path] = (url?, data?) => {
-            logger.info({
-                method: `TestHttpServer.request`,
-                customUrl: url,
-                customData: JSON.stringify(data),
-                customResponse: responseStr
-            });
-            return responseStr;
-        };
-        logger.info({
-            message: "Register test server to listen",
-            method: `${service}.withServer`,
-            customHttpPort: httpPort,
-            customPath: path,
-            customResponse: responseStr
-        });
-    });
-
-    server.listen(httpPort, props, false);
-
-    try {
-        await fn(server);
-    } finally {
-        server.close();
-    }
-}
-
 export function decodeBody(response: LambdaResponse): string {
     return Buffer.from(response.body, "base64").toString();
 }
@@ -126,8 +81,10 @@ export function prettyJson(object: object | string, nullifyFields?: [string]): s
 }
 
 export function setTestEnv(): void {
-    process.env.SECRET_ID = "TEST_SECRET";
-    process.env.AWS_REGION = "aws-region";
+    // eslint-disable-next-line dot-notation
+    process.env["SECRET_ID"] = "TEST_SECRET";
+    // eslint-disable-next-line dot-notation
+    process.env["AWS_REGION"] = "aws-region";
     process.env[ChargingNetworkKeys.OCPI_DOMAIN_URL] = `http://localhost:${PORT}`;
     process.env[ChargingNetworkKeys.OCPI_PARTY_ID] = "DTT";
     process.env[ChargingNetworkKeys.OCPI_BUSINESS_DETAILS_NAME] = `Digitraffic test`;

@@ -1,6 +1,6 @@
-import { ImageCategory } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1";
-import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
-import { VersionString } from "../api/ocpi/ocpi-api-responses";
+import type { ImageCategory } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
+import type { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
+import type { VersionString } from "../api/ocpi/ocpi-api-responses.js";
 
 export interface DbTextId {
     readonly id: string;

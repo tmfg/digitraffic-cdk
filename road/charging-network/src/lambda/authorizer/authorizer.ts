@@ -1,4 +1,4 @@
-import {
+import type {
     APIGatewayAuthorizerResult,
     AuthResponse,
     Callback,
@@ -6,15 +6,12 @@ import {
     PolicyDocument,
     Statement
 } from "aws-lambda";
-import {
-    APIGatewayRequestAuthorizerEvent,
-    APIGatewayRequestAuthorizerEventHeaders
-} from "aws-lambda/trigger/api-gateway-authorizer";
+import type { APIGatewayRequestAuthorizerEvent, APIGatewayRequestAuthorizerEventHeaders } from "aws-lambda";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
-import * as OcpiDao from "../../dao/ocpi-dao";
-import { DbOcpiCpo } from "../../model/dao-models";
+import * as OcpiDao from "../../dao/ocpi-dao.js";
+import type { DbOcpiCpo } from "../../model/dao-models.js";
 
 const EFFECT_ALLOW = "Allow" as const;
 const EFFECT_DENY = "Deny" as const;
@@ -53,7 +50,9 @@ export const handler: (
 
 // eslint-disable-next-line @rushstack/no-new-null
 function parseAuthentication(headers: APIGatewayRequestAuthorizerEventHeaders | null): string | undefined {
-    const authHeaderValue = headers?.authorization ? headers?.authorization : headers?.Authorization;
+    const header = headers ?? {};
+    // eslint-disable-next-line dot-notation
+    const authHeaderValue = header["authorization"] ? header["authorization"] : header["Authorization"];
     if (!authHeaderValue) {
         return undefined;
     }
