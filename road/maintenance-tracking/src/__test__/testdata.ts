@@ -1,8 +1,10 @@
 import _ from "lodash";
 import { getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { type DbObservationData } from "../dao/maintenance-tracking-dao.js";
 import { type TyokoneenseurannanKirjaus } from "../model/models.js";
-
+import { MaintenanceTrackingEnvKeys } from "../keys.js";
+import { type SQSEvent, type SQSRecord } from "aws-lambda";
 const REGEXP_ID = new RegExp("ID_PLACEHOLDER", "g");
 const REGEXP_TK = new RegExp("TK_PLACEHOLDER", "g");
 
@@ -130,4 +132,32 @@ export function assertObservationData(
 
 export function getRandompId(): string {
     return getRandomIntegerAsString(100000, 100000000000);
+}
+
+export function createSQSEventWithBodies(bodies: string[] = []): SQSEvent {
+
+    const records = bodies.map((body) => {
+        return {
+            body,
+            messageId: "",
+            receiptHandle: `s3://${getEnvVariable(
+                MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
+            )}/${getEnvVariable(
+                MaintenanceTrackingEnvKeys.SQS_QUEUE_URL
+            )}/${getRandompId()}`,
+            messageAttributes: {},
+            md5OfBody: "",
+            attributes: {
+                ApproximateReceiveCount: "",
+                SentTimestamp: "",
+                SenderId: "",
+                ApproximateFirstReceiveTimestamp: ""
+            },
+            eventSource: "",
+            eventSourceARN: "",
+            awsRegion: ""
+        } satisfies SQSRecord;
+    });
+
+    return { Records: records } satisfies SQSEvent
 }

@@ -1,81 +1,105 @@
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import middy from "@middy/core";
-import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
-import { type SQSEvent, type SQSRecord } from "aws-lambda";
+import { type SQSEvent } from "aws-lambda";
+import { type ReceiveMessageCommandOutput } from "@aws-sdk/client-sqs";
 import { MaintenanceTrackingEnvKeys } from "../../keys.js";
-import { getSqsConsumerInstance } from "../../service/sqs-big-payload.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { type Handler } from 'aws-lambda';
+import { type ExtendedSqsClient } from "sqs-extended-client";
+import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
+import {
+    createExtendedSqsClient,
+    createSqsReceiveMessageCommandOutput
+} from "../../service/sqs-big-payload.js";
+import { handleMessage } from "../../service/maintenance-tracking.js";
+import { getErrorMessage } from "../../util/util.js";
+
+const sqsExtendedClient = createExtendedSqsClient();
+const method = "MaintenanceTracking.processQueue" as const;
 
 let rdsHolder: RdsHolder | undefined;
 
 function getRdsHolder(): RdsHolder {
     if (!rdsHolder) {
         logger.info({
-            method: "MaintenanceTracking.processQueue",
-            message: `lambda was cold`
+            method,
+            message: `Lambda was cold`
         });
         rdsHolder = RdsHolder.create();
     }
     return rdsHolder;
 }
 
-export const handler: Handler<SQSEvent> = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());
+export const handler: (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> = handlerFn(sqsExtendedClient);
 
-export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
-    return (event: SQSEvent): Promise<PromiseSettledResult<void>[]> => {
-        return getRdsHolder()
-            .setCredentials()
-            .then(async () => {
-                const sqsBucketName = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME);
-                const sqsQueueUrl = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL);
-                const region = getEnvVariable("AWS_REGION");
+export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
+    return async (event: SQSEvent): Promise<PromiseSettledResult<void>[]> => {
+        const start = Date.now();
+        await getRdsHolder().setCredentials();
+        const sqsBucketName = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME);
+        const sqsQueueUrl = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL);
+        const region = getEnvVariable("AWS_REGION");
+        logger.info({
+            method,
+            message: `Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`
+        });
 
-                logger.info({
-                    method: "MaintenanceTracking.processQueue",
-                    message: `Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`
-                });
+        logger.debug("LENGHT: " + event.Records.length);
+        if (!event.Records.length) {
+            return Promise.reject("SQSEvent records was empty.");
+        }
 
-                const sqsConsumer = getSqsConsumerInstance();
+        // sqs-extended-client library needs ReceiveMessageCommandOutput to process and fetch the big message
+        // from S3, but AWS Lambda SQS eventsource only delivers SQSEvent. Here we re-create dummy
+        // ReceiveMessageCommandOutput with needed fields for sqs-extended-client
+        const receiveCommandOutputForSqsExtClient: ReceiveMessageCommandOutput = createSqsReceiveMessageCommandOutput(event);
 
-                return Promise.allSettled(
-                    event.Records.map(async (record: SQSRecord) => {
-                        try {
-                            // clone event as library uses PascalCase properties -> include properties in camelCase and PascalCase
-                            const clone = cloneRecordWithCamelAndPascal(record);
-                            await sqsConsumer.processMessage(clone, {
-                                deleteAfterProcessing: false
-                            }); // Delete is done by S3 lifecycle
-                            return Promise.resolve();
-                        } catch (e) {
-                            logger.error({
-                                method: "MaintenanceTracking.processQueue",
-                                message: "Error while handling tracking from SQS",
-                                error: e
-                            });
-                            return Promise.reject(e);
-                        }
-                    })
-                );
+        // logger.debug({ method, message: "output.Messages", value: receiveCommandOutputForSqsExtClient });
+
+        const extendedSqsMessage: ReceiveMessageCommandOutput = await sqsExtendedClient._processReceive(receiveCommandOutputForSqsExtClient);
+
+        if (!extendedSqsMessage.Messages) {
+            logger.error({
+                method,
+                message: `ReceiveMessageCommandOutput.Messages was undefined`
             });
+            return Promise.resolve([]);
+        }
+
+        // logger.debug({ method, message: "extendedSqsMessage.Messages", value: extendedSqsMessage });
+
+        return Promise.allSettled(
+            extendedSqsMessage.Messages.map(async (m) => {
+
+                try {
+                    if (m.Body) {
+                        const tyokoneenKirjaus = JSON.parse(m.Body) as TyokoneenseurannanKirjaus;
+                        await handleMessage(tyokoneenKirjaus);
+                        return Promise.resolve();
+                    } else {
+                        logger.error({
+                            method,
+                            message: `Message handling failed: Message body was empty.`,
+                            customMessageContent: JSON.stringify(m)
+                        });
+                    }
+                    return Promise.reject();
+                } catch (e) {
+                    logger.error({
+                        method,
+                        message: `Message handling failed: Invalid JSON.`,
+                        customMessageContent: JSON.stringify({ ...m, Body: "{...REMOVED...}" }),
+                        error: getErrorMessage(e)
+                    });
+                    return Promise.reject();
+                } finally {
+                    logger.info({
+                        method,
+                        message: `Message handled`,
+                        tookMs: Date.now() - start
+                    });
+                }
+            })
+        );
     };
 }
 
-export function cloneRecordWithCamelAndPascal(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    record: Record<string, any>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Record<string, any> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const clone: Record<string, any> = {};
-    for (const key in record) {
-        if (key in record) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            clone[key.charAt(0).toUpperCase() + key.substring(1)] = record[key];
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            clone[key.charAt(0).toLowerCase() + key.substring(1)] = record[key];
-        }
-    }
-    return clone;
-}

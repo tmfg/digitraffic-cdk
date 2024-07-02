@@ -1,35 +1,35 @@
-import { setEnv } from "../test-env.js";
+import { setTestEnv } from "../test-env.js";
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { type SQSRecord } from "aws-lambda";
-import { parseISO } from "date-fns";
-import { type SqsConsumer } from "sns-sqs-big-payload";
-import { MaintenanceTrackingEnvKeys } from "../../keys.js";
-import { jest } from "@jest/globals";
-import { getSqsConsumerInstance } from "../../service/sqs-big-payload.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { type ExtendedSqsClient } from "sqs-extended-client";
 import { dbTestBase, findAllObservations, mockSecrets } from "../db-testutil.js";
+import { parseISO } from "date-fns";
+import { type ReceiveMessageCommandOutput } from "@aws-sdk/client-sqs";
 import {
+    createExtendedSqsClient,
+    createSqsReceiveMessageCommandOutput
+} from "../../service/sqs-big-payload.js";
+import { jest } from "@jest/globals";
+import type { SQSEvent } from "aws-lambda";
+import {
+    createSQSEventWithBodies,
     getRandompId,
     getTrackingJsonWith3Observations,
     getTrackingJsonWith3ObservationsAndMissingSendingSystem
 } from "../testdata.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import _ from "lodash";
 
-setEnv();
+setTestEnv();
+const { handlerFn } = await import("../../lambda/process-queue/process-queue.js");
 
-const QUEUE = "MaintenanceTrackingQueue";
-
-const {
-    cloneRecordWithCamelAndPascal,
-    handlerFn
-} = await import("../../lambda/process-queue/process-queue.js");
+let extendedSqsClient: ExtendedSqsClient;
 
 describe(
     "process-queue",
     dbTestBase((db: DTDatabase) => {
 
         beforeEach(() => {
-            getSqsConsumerInstance(true); // create new consumer for each test
+            extendedSqsClient = createExtendedSqsClient();
             mockSecrets({});
         });
 
@@ -37,39 +37,34 @@ describe(
             jest.clearAllMocks();
         });
 
-        test("clone record", () => {
-            const clone = cloneRecordWithCamelAndPascal({
-                messageId: "aaaa",
-                Body: "test"
-            });
-            // eslint-disable-next-line
-            expect(clone["messageId"]).toEqual("aaaa");
-            // eslint-disable-next-line
-            expect(clone["MessageId"]).toEqual("aaaa");
-            // eslint-disable-next-line
-            expect(clone["body"]).toEqual("test");
-            // eslint-disable-next-line
-            expect(clone["Body"]).toEqual("test");
-        });
-
         test("no records", async () => {
-            const sqsConsumer: SqsConsumer = getSqsConsumerInstance();
-            const transformLambdaRecordsStub =
-                jest.spyOn(sqsConsumer, "processMessage").mockReturnValue(Promise.resolve());
+            const output: ReceiveMessageCommandOutput = {
+                Messages: [],
+                $metadata: {}
+            };
+            const extendedSqsClientStub =
+                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(output));
+            const event = { Records: [] } satisfies SQSEvent;
 
-            await expect(handlerFn()({ Records: [] })).resolves.toMatchObject([]);
-            expect(transformLambdaRecordsStub).not.toHaveBeenCalledWith({});
+            await expect(handlerFn(extendedSqsClient)(event)).rejects.toMatch("SQSEvent records was empty.");
+
+            expect(extendedSqsClientStub).not.toHaveBeenCalled();
         });
 
         test("single valid record", async () => {
             const json = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-            const record: SQSRecord = createRecord(json);
+            const event = createSQSEventWithBodies(["bigMessageInS3"]);
 
-            await expect(
-                handlerFn()({
-                    Records: [record]
-                })
-            ).resolves.toMatchObject([{ status: "fulfilled", value: undefined }]);
+            // Output without big message json as it's in S3
+            const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [json]);
+            const extendedSqsClientStub =
+                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
+
+            await expect(handlerFn(extendedSqsClient)(event))
+                .resolves.toMatchObject([{ status: "fulfilled" }]);
+
+            expect(extendedSqsClientStub).toHaveBeenCalledWith(outputWithRefToS3);
 
             const allObservations = await findAllObservations(db);
             expect(allObservations.length).toBe(3);
@@ -85,20 +80,24 @@ describe(
         });
 
         test("two valid records", async () => {
-            // Create two records
+            // Create event with two records
+            const event = createSQSEventWithBodies(["json1-in-S3", "json2-in-S3"]);
             const json1 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-            const record1: SQSRecord = createRecord(json1);
             const json2 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-            const record2: SQSRecord = createRecord(json2);
+
+            const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [json1, json2]);
+            const extendedSqsClientStub =
+                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
 
             await expect(
-                handlerFn()({
-                    Records: [record1, record2]
-                })
+                handlerFn(extendedSqsClient)(event)
             ).resolves.toMatchObject([
                 { status: "fulfilled", value: undefined },
                 { status: "fulfilled", value: undefined }
             ]);
+
+            expect(extendedSqsClientStub).toHaveBeenCalledWith(outputWithRefToS3);
 
             const allObservations = await findAllObservations(db);
             expect(allObservations.length).toBe(6);
@@ -113,13 +112,18 @@ describe(
 
         test("invalid record", async () => {
             const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-            const record: SQSRecord = createRecord(json);
+            const event = createSQSEventWithBodies(["bigMessageInS3"]);
 
-            await expect(
-                handlerFn()({
-                    Records: [record]
-                })
-            ).resolves.toMatchObject([{ status: "fulfilled", value: undefined }]);
+            // Output without big message json as it's in S3
+            const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [json]);
+            const extendedSqsClientStub =
+                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
+
+            await expect(handlerFn(extendedSqsClient)(event))
+                .resolves.toMatchObject([{ status: "rejected" }]);
+
+            expect(extendedSqsClientStub).toHaveBeenCalledWith(outputWithRefToS3);
 
             const allObservations = await findAllObservations(db);
             expect(allObservations.length).toBe(0);
@@ -129,20 +133,21 @@ describe(
             // Create two records
             const invalidJson =
                 `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-            const invalidRecord: SQSRecord = createRecord(invalidJson);
-
             const validJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-            const validRecord: SQSRecord = createRecord(validJson);
+            const event = createSQSEventWithBodies(["invalidJsonS2Ref", "validJsonS3Ref"]);
+            // Output without big message json as it's in S3
+            const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [invalidJson, validJson]);
 
-            await expect(
-                handlerFn()({
-                    Records: [invalidRecord, validRecord]
-                })
-            ).resolves.toMatchObject([
-                { status: "fulfilled", value: undefined },
-                { status: "fulfilled", value: undefined }
+            const extendedSqsClientStub =
+                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
+
+            await expect(handlerFn(extendedSqsClient)(event)).resolves.toMatchObject([
+                { status: "rejected" },
+                { status: "fulfilled" }
             ]);
 
+            expect(extendedSqsClientStub).toHaveBeenCalledWith(outputWithRefToS3);
             const allObservations = await findAllObservations(db);
             expect(allObservations.length).toBe(3);
 
@@ -159,11 +164,9 @@ describe(
                 getRandompId(),
                 getRandompId()
             );
-            const record: SQSRecord = createRecord(invalidJson);
+            const event = createSQSEventWithBodies([invalidJson]);
 
-            await handlerFn()({
-                Records: [record]
-            });
+            await handlerFn(extendedSqsClient)(event);
 
             const allObservations = await findAllObservations(db);
             expect(allObservations.length).toBe(3);
@@ -175,23 +178,15 @@ describe(
     })
 );
 
-function createRecord(trackingJson: string = ""): SQSRecord {
-    return {
-        body: trackingJson,
-        messageId: "",
-        receiptHandle: `s3://${getEnvVariable(
-            MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
-        )}/${QUEUE}/${getRandompId()}`,
-        messageAttributes: {},
-        md5OfBody: "",
-        attributes: {
-            ApproximateReceiveCount: "",
-            SentTimestamp: "",
-            SenderId: "",
-            ApproximateFirstReceiveTimestamp: ""
-        },
-        eventSource: "",
-        eventSourceARN: "",
-        awsRegion: ""
-    };
+function createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3: ReceiveMessageCommandOutput, jsons: string[]): ReceiveMessageCommandOutput {
+    const outputValueWithBigJsonFromS3 = _.cloneDeep(outputWithRefToS3);
+    jsons.forEach((json, index) => {
+        if (outputValueWithBigJsonFromS3.Messages && outputValueWithBigJsonFromS3.Messages[index]) {
+            _.set(outputValueWithBigJsonFromS3.Messages[index]!, "Body", json); //  Set payload from S3
+        } else {
+            throw new Error(`outputValueWithBigJsonFromS3.Messages[${index}] was missing`);
+        }
+    });
+    return outputValueWithBigJsonFromS3;
 }
+

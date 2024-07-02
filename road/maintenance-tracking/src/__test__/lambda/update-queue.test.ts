@@ -1,28 +1,17 @@
-import { setEnv } from "../test-env.js";
+import { setTestEnv } from "../test-env.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { APIGatewayEvent } from "aws-lambda";
-import { type SqsProducer } from "sns-sqs-big-payload";
-import * as SqsBigPayload from "../../service/sqs-big-payload.js";
 import { getRandompId, getTrackingJsonWith3Observations } from "../testdata.js";
 import { jest } from "@jest/globals";
 import { MaintenanceTrackingEnvKeys } from "../../keys.js";
+import type { SendMessageCommandInput } from "@aws-sdk/client-sqs";
+import { createExtendedSqsClient } from "../../service/sqs-big-payload.js";
 
-setEnv();
-// process.env["SQS_BUCKET_NAME"] = "sqs-bucket-name";
-// process.env.SQS_QUEUE_URL. = "https://aws-queue-123";
-// process.env.AWS_REGION = "aws-region";
+setTestEnv();
 
 const { handlerFn, invalidRequest, ok } = await import("../../lambda/update-queue/update-queue.js");
 const testEvent = await import("../test-apigw-event.json") as unknown as APIGatewayEvent;
 
-function createSqsProducerForTest(): SqsProducer {
-
-    return SqsBigPayload.createSqsProducer(
-        getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL),
-        getEnvVariable("AWS_REGION"),
-        getEnvVariable(MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME)
-    );
-}
 
 describe("update-queue", () => {
     afterEach(() => {
@@ -30,11 +19,10 @@ describe("update-queue", () => {
     });
 
     test("no records - should reject", async () => {
-        const sqsClient: SqsProducer = createSqsProducerForTest();
+        const sqsClient = createExtendedSqsClient();
         const sendMessageStub = jest
-            .spyOn(sqsClient, "sendJSON")
-            .mockReturnValue(Promise.resolve());
-        //const sendMessageStub = sandbox.stub(sqsClient, "sendJSON").returns(Promise.resolve());
+            .spyOn(sqsClient, "sendMessage")
+            .mockReturnValue(await Promise.resolve());
 
         await expect(() =>
             handlerFn(sqsClient)({ ...testEvent, body: null })
@@ -45,10 +33,10 @@ describe("update-queue", () => {
 
     test("single valid record", async () => {
         const jsonString = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-        const sqsClient: SqsProducer = createSqsProducerForTest();
+        const sqsClient = createExtendedSqsClient();
         const sendMessageStub = jest
-            .spyOn(sqsClient, "sendJSON")
-            .mockReturnValue(Promise.resolve());
+            .spyOn(sqsClient, "sendMessage")
+            .mockReturnValue(await Promise.resolve());
 
         await expect(
             handlerFn(sqsClient)({
@@ -57,16 +45,22 @@ describe("update-queue", () => {
             })
         ).resolves.toMatchObject(ok());
 
-        expect(sendMessageStub).toHaveBeenCalledWith(JSON.parse(jsonString));
+
+        const sendCommand: SendMessageCommandInput = {
+            QueueUrl: getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL),
+            MessageBody: jsonString
+        };
+
+        expect(sendMessageStub).toHaveBeenCalledWith(sendCommand);
         expect(sendMessageStub).toHaveBeenCalledTimes(1);
     });
 
     test("invalid record", async () => {
         const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-        const sqsClient: SqsProducer = createSqsProducerForTest();
+        const sqsClient = createExtendedSqsClient();
         const sendMessageStub = jest
-            .spyOn(sqsClient, "sendJSON")
-            .mockReturnValue(Promise.resolve());
+            .spyOn(sqsClient, "sendMessage")
+            .mockReturnValue(await Promise.resolve());
 
         await expect(() =>
             handlerFn(sqsClient)({ ...testEvent, body: json })
