@@ -278,7 +278,7 @@ importers:
         version: 3.583.0
       '@digitraffic/common':
         specifier: 2024.5.13-1
-        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
+        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
       '@middy/core':
         specifier: ^5.3.0
         version: 5.3.5
@@ -399,7 +399,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.5.13-1
-        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
+        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
       aws-cdk-lib:
         specifier: ~2.142.1
         version: 2.142.1(constructs@10.3.0)
@@ -681,7 +681,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.5.13-1
-        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
+        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
       aws-cdk-lib:
         specifier: ~2.142.1
         version: 2.142.1(constructs@10.3.0)
@@ -914,7 +914,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.5.13-1
-        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
+        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
       aws-cdk-lib:
         specifier: ~2.142.0
         version: 2.142.1(constructs@10.3.0)
@@ -1011,7 +1011,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.5.13-1
-        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
+        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
       aws-cdk-lib:
         specifier: ~2.142.1
         version: 2.142.1(constructs@10.3.0)
@@ -1620,7 +1620,7 @@ importers:
         version: 3.533.0
       '@digitraffic/common':
         specifier: 2024.3.14-1
-        version: 2024.3.14-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.135.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
+        version: 2024.3.14-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.135.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
       '@smithy/node-http-handler':
         specifier: ~2.5.0
         version: 2.5.0
@@ -1718,7 +1718,7 @@ importers:
         version: 3.600.0
       '@digitraffic/common':
         specifier: 2024.6.14-2
-        version: 2024.6.14-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
+        version: 2024.6.14-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
       aws-cdk-lib:
         specifier: ~2.147.0
         version: 2.147.1(constructs@10.3.0)
@@ -2110,7 +2110,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.3.22-2
-        version: 2024.3.22-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.7.8)
+        version: 2024.3.22-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.7.8)
       aws-cdk-lib:
         specifier: ~2.143.1
         version: 2.143.1(constructs@10.3.0)
@@ -2276,17 +2276,17 @@ importers:
   ../../road/maintenance-tracking:
     dependencies:
       '@aws-sdk/client-s3':
-        specifier: ^3.600.0
-        version: 3.600.0
+        specifier: ^3.608.0
+        version: 3.608.0
       '@aws-sdk/client-sqs':
-        specifier: ^3.600.0
-        version: 3.600.0
+        specifier: ^3.606.0
+        version: 3.606.0
       '@digitraffic/common':
-        specifier: 2024.6.26-1
-        version: 2024.6.26-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
+        specifier: 2024.7.2-1
+        version: 2024.7.2-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(aws-cdk-lib@2.147.3)(aws-sdk@2.1648.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.4.0)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
       aws-cdk-lib:
-        specifier: ^2.147.1
-        version: 2.147.1(constructs@10.3.0)
+        specifier: ^2.147.3
+        version: 2.147.3(constructs@10.3.0)
       constructs:
         specifier: ^10.3.0
         version: 10.3.0
@@ -2310,7 +2310,7 @@ importers:
         version: 3.3.0
       sqs-extended-client:
         specifier: ^1.0.0
-        version: 1.0.0(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-sqs@3.600.0)
+        version: 1.0.0(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-sqs@3.606.0)
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -2331,11 +2331,11 @@ importers:
         specifier: ^3.7.0
         version: 3.7.0(eslint@8.57.0)(typescript@5.4.5)
       '@rushstack/heft':
-        specifier: ^0.66.18
-        version: 0.66.18(@types/node@20.14.9)
+        specifier: ^0.66.19
+        version: 0.66.19(@types/node@20.14.9)
       '@rushstack/heft-jest-plugin':
         specifier: ^0.12.1
-        version: 0.12.1(@rushstack/heft@0.66.18)(@types/node@20.14.9)
+        version: 0.12.1(@rushstack/heft@0.66.19)(@types/node@20.14.9)
       '@types/aws-lambda':
         specifier: 8.10.140
         version: 8.10.140
@@ -2346,14 +2346,14 @@ importers:
         specifier: 29.5.12
         version: 29.5.12
       '@types/lodash':
-        specifier: 4.17.5
-        version: 4.17.5
+        specifier: 4.17.6
+        version: 4.17.6
       '@types/node':
         specifier: 20.14.9
         version: 20.14.9
       esbuild:
-        specifier: ^0.21.5
-        version: 0.21.5
+        specifier: ^0.23.0
+        version: 0.23.0
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -2365,7 +2365,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.6.26-1
-        version: 2024.6.26-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
+        version: 2024.6.26-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0)
       aws-cdk-lib:
         specifier: ^2.147.1
         version: 2.147.1(constructs@10.3.0)
@@ -2620,7 +2620,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.5.13-1
-        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.574.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.141.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
+        version: 2024.5.13-1(@aws-sdk/client-api-gateway@3.574.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.141.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0)
       '@rgrove/parse-xml':
         specifier: 4.1.0
         version: 4.1.0
@@ -3489,6 +3489,73 @@ packages:
       tslib: 2.6.3
     transitivePeerDependencies:
       - aws-crt
+    dev: true
+
+  /@aws-sdk/client-s3@3.608.0:
+    resolution: {integrity: sha512-la2R6QfUOmE4JMubxLD3OdnPTduAs5YekIvx68I5CbLudb5pbxkHDqnrWDhgK1lX4Cu19pXjgQXmS8oZMJPeLQ==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@aws-crypto/sha1-browser': 5.2.0
+      '@aws-crypto/sha256-browser': 5.2.0
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/client-sso-oidc': 3.606.0(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/client-sts': 3.606.0
+      '@aws-sdk/core': 3.598.0
+      '@aws-sdk/credential-provider-node': 3.600.0(@aws-sdk/client-sso-oidc@3.606.0)(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/middleware-bucket-endpoint': 3.598.0
+      '@aws-sdk/middleware-expect-continue': 3.598.0
+      '@aws-sdk/middleware-flexible-checksums': 3.598.0
+      '@aws-sdk/middleware-host-header': 3.598.0
+      '@aws-sdk/middleware-location-constraint': 3.598.0
+      '@aws-sdk/middleware-logger': 3.598.0
+      '@aws-sdk/middleware-recursion-detection': 3.598.0
+      '@aws-sdk/middleware-sdk-s3': 3.598.0
+      '@aws-sdk/middleware-signing': 3.598.0
+      '@aws-sdk/middleware-ssec': 3.598.0
+      '@aws-sdk/middleware-user-agent': 3.598.0
+      '@aws-sdk/region-config-resolver': 3.598.0
+      '@aws-sdk/signature-v4-multi-region': 3.598.0
+      '@aws-sdk/types': 3.598.0
+      '@aws-sdk/util-endpoints': 3.598.0
+      '@aws-sdk/util-user-agent-browser': 3.598.0
+      '@aws-sdk/util-user-agent-node': 3.598.0
+      '@aws-sdk/xml-builder': 3.598.0
+      '@smithy/config-resolver': 3.0.3
+      '@smithy/core': 2.2.3
+      '@smithy/eventstream-serde-browser': 3.0.3
+      '@smithy/eventstream-serde-config-resolver': 3.0.2
+      '@smithy/eventstream-serde-node': 3.0.3
+      '@smithy/fetch-http-handler': 3.1.0
+      '@smithy/hash-blob-browser': 3.1.1
+      '@smithy/hash-node': 3.0.2
+      '@smithy/hash-stream-node': 3.1.1
+      '@smithy/invalid-dependency': 3.0.2
+      '@smithy/md5-js': 3.0.2
+      '@smithy/middleware-content-length': 3.0.2
+      '@smithy/middleware-endpoint': 3.0.3
+      '@smithy/middleware-retry': 3.0.6
+      '@smithy/middleware-serde': 3.0.2
+      '@smithy/middleware-stack': 3.0.2
+      '@smithy/node-config-provider': 3.1.2
+      '@smithy/node-http-handler': 3.1.0
+      '@smithy/protocol-http': 4.0.2
+      '@smithy/smithy-client': 3.1.4
+      '@smithy/types': 3.2.0
+      '@smithy/url-parser': 3.0.2
+      '@smithy/util-base64': 3.0.0
+      '@smithy/util-body-length-browser': 3.0.0
+      '@smithy/util-body-length-node': 3.0.0
+      '@smithy/util-defaults-mode-browser': 3.0.6
+      '@smithy/util-defaults-mode-node': 3.0.6
+      '@smithy/util-endpoints': 2.0.3
+      '@smithy/util-retry': 3.0.2
+      '@smithy/util-stream': 3.0.4
+      '@smithy/util-utf8': 3.0.0
+      '@smithy/util-waiter': 3.1.1
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - aws-crt
+    dev: false
 
   /@aws-sdk/client-secrets-manager@3.533.0:
     resolution: {integrity: sha512-xwkVgN2getN7Hcd/ZVt2WusRuJwdMzg1H9TSEmBAjVxyr+o9E8vtNqLKn64cZ5tmxljkB0jaMH8vfnEWydxJTg==}
@@ -3983,16 +4050,16 @@ packages:
       - aws-crt
     dev: false
 
-  /@aws-sdk/client-sqs@3.600.0:
-    resolution: {integrity: sha512-GgjEiWbGbiHGU3yZcCr1hXfaq/B/3ncYclqLEbbxrWkQOdri3qfl278h+Qn0/DQ8On0kj1UUxld87TVIkYfG8w==}
+  /@aws-sdk/client-sqs@3.606.0:
+    resolution: {integrity: sha512-Wp5aAKUgiaZXS9v/1Ie8vk9VuDXn153HKYFDZzFzSLN2T+PSxKURcdFxThFL63E+57YxwUhdSq/DLaTGvTRhtg==}
     engines: {node: '>=16.0.0'}
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/client-sso-oidc': 3.600.0(@aws-sdk/client-sts@3.600.0)
-      '@aws-sdk/client-sts': 3.600.0
+      '@aws-sdk/client-sso-oidc': 3.606.0(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/client-sts': 3.606.0
       '@aws-sdk/core': 3.598.0
-      '@aws-sdk/credential-provider-node': 3.600.0(@aws-sdk/client-sso-oidc@3.600.0)(@aws-sdk/client-sts@3.600.0)
+      '@aws-sdk/credential-provider-node': 3.600.0(@aws-sdk/client-sso-oidc@3.606.0)(@aws-sdk/client-sts@3.606.0)
       '@aws-sdk/middleware-host-header': 3.598.0
       '@aws-sdk/middleware-logger': 3.598.0
       '@aws-sdk/middleware-recursion-detection': 3.598.0
@@ -4478,6 +4545,56 @@ packages:
     transitivePeerDependencies:
       - '@aws-sdk/client-sts'
       - aws-crt
+
+  /@aws-sdk/client-sso-oidc@3.606.0(@aws-sdk/client-sts@3.606.0):
+    resolution: {integrity: sha512-gL1FHPS6hwgMNS/A+Qh5bUyHOeRVOqdb7c6+i+9gR3wtGvt2lvoSm8w5DhS08Xiiacz2AqYRDEapp0xuyCrbBQ==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sts': ^3.606.0
+    dependencies:
+      '@aws-crypto/sha256-browser': 5.2.0
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/client-sts': 3.606.0
+      '@aws-sdk/core': 3.598.0
+      '@aws-sdk/credential-provider-node': 3.600.0(@aws-sdk/client-sso-oidc@3.606.0)(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/middleware-host-header': 3.598.0
+      '@aws-sdk/middleware-logger': 3.598.0
+      '@aws-sdk/middleware-recursion-detection': 3.598.0
+      '@aws-sdk/middleware-user-agent': 3.598.0
+      '@aws-sdk/region-config-resolver': 3.598.0
+      '@aws-sdk/types': 3.598.0
+      '@aws-sdk/util-endpoints': 3.598.0
+      '@aws-sdk/util-user-agent-browser': 3.598.0
+      '@aws-sdk/util-user-agent-node': 3.598.0
+      '@smithy/config-resolver': 3.0.3
+      '@smithy/core': 2.2.3
+      '@smithy/fetch-http-handler': 3.1.0
+      '@smithy/hash-node': 3.0.2
+      '@smithy/invalid-dependency': 3.0.2
+      '@smithy/middleware-content-length': 3.0.2
+      '@smithy/middleware-endpoint': 3.0.3
+      '@smithy/middleware-retry': 3.0.6
+      '@smithy/middleware-serde': 3.0.2
+      '@smithy/middleware-stack': 3.0.2
+      '@smithy/node-config-provider': 3.1.2
+      '@smithy/node-http-handler': 3.1.0
+      '@smithy/protocol-http': 4.0.2
+      '@smithy/smithy-client': 3.1.4
+      '@smithy/types': 3.2.0
+      '@smithy/url-parser': 3.0.2
+      '@smithy/util-base64': 3.0.0
+      '@smithy/util-body-length-browser': 3.0.0
+      '@smithy/util-body-length-node': 3.0.0
+      '@smithy/util-defaults-mode-browser': 3.0.6
+      '@smithy/util-defaults-mode-node': 3.0.6
+      '@smithy/util-endpoints': 2.0.3
+      '@smithy/util-middleware': 3.0.2
+      '@smithy/util-retry': 3.0.2
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - aws-crt
+    dev: false
 
   /@aws-sdk/client-sso@3.470.0:
     resolution: {integrity: sha512-iMXqdXuypE3OK0rggbvSz7vBGlLDG418dNidHhdaeLluMTG/GfHbh1fLOlavhYxRwrsPrtYvFiVkxXFGzXva4w==}
@@ -5373,6 +5490,54 @@ packages:
     transitivePeerDependencies:
       - aws-crt
 
+  /@aws-sdk/client-sts@3.606.0:
+    resolution: {integrity: sha512-b11mAhjrkm3MMiAPoMGcmd6vsaz2120lg8rHG/NZCo9vB1K6Kc7WP+a1Q05TRMseer2egTtpWJfn44aVO97VqA==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@aws-crypto/sha256-browser': 5.2.0
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/client-sso-oidc': 3.606.0(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/core': 3.598.0
+      '@aws-sdk/credential-provider-node': 3.600.0(@aws-sdk/client-sso-oidc@3.606.0)(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/middleware-host-header': 3.598.0
+      '@aws-sdk/middleware-logger': 3.598.0
+      '@aws-sdk/middleware-recursion-detection': 3.598.0
+      '@aws-sdk/middleware-user-agent': 3.598.0
+      '@aws-sdk/region-config-resolver': 3.598.0
+      '@aws-sdk/types': 3.598.0
+      '@aws-sdk/util-endpoints': 3.598.0
+      '@aws-sdk/util-user-agent-browser': 3.598.0
+      '@aws-sdk/util-user-agent-node': 3.598.0
+      '@smithy/config-resolver': 3.0.3
+      '@smithy/core': 2.2.3
+      '@smithy/fetch-http-handler': 3.1.0
+      '@smithy/hash-node': 3.0.2
+      '@smithy/invalid-dependency': 3.0.2
+      '@smithy/middleware-content-length': 3.0.2
+      '@smithy/middleware-endpoint': 3.0.3
+      '@smithy/middleware-retry': 3.0.6
+      '@smithy/middleware-serde': 3.0.2
+      '@smithy/middleware-stack': 3.0.2
+      '@smithy/node-config-provider': 3.1.2
+      '@smithy/node-http-handler': 3.1.0
+      '@smithy/protocol-http': 4.0.2
+      '@smithy/smithy-client': 3.1.4
+      '@smithy/types': 3.2.0
+      '@smithy/url-parser': 3.0.2
+      '@smithy/util-base64': 3.0.0
+      '@smithy/util-body-length-browser': 3.0.0
+      '@smithy/util-body-length-node': 3.0.0
+      '@smithy/util-defaults-mode-browser': 3.0.6
+      '@smithy/util-defaults-mode-node': 3.0.6
+      '@smithy/util-endpoints': 2.0.3
+      '@smithy/util-middleware': 3.0.2
+      '@smithy/util-retry': 3.0.2
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - aws-crt
+    dev: false
+
   /@aws-sdk/core@3.468.0:
     resolution: {integrity: sha512-ezUJR9VvknKoXzNZ4wvzGi1jdkmm+/1dUYQ9Sw4r8bzlJDTsUnWbyvaDlBQh81RuhLtVkaUfTnQKoec0cwlZKQ==}
     engines: {node: '>=14.0.0'}
@@ -5846,6 +6011,29 @@ packages:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
+  /@aws-sdk/credential-provider-ini@3.598.0(@aws-sdk/client-sso-oidc@3.606.0)(@aws-sdk/client-sts@3.606.0):
+    resolution: {integrity: sha512-/ppcIVUbRwDIwJDoYfp90X3+AuJo2mvE52Y1t2VSrvUovYn6N4v95/vXj6LS8CNDhz2jvEJYmu+0cTMHdhI6eA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sts': ^3.598.0
+    dependencies:
+      '@aws-sdk/client-sts': 3.606.0
+      '@aws-sdk/credential-provider-env': 3.598.0
+      '@aws-sdk/credential-provider-http': 3.598.0
+      '@aws-sdk/credential-provider-process': 3.598.0
+      '@aws-sdk/credential-provider-sso': 3.598.0(@aws-sdk/client-sso-oidc@3.606.0)
+      '@aws-sdk/credential-provider-web-identity': 3.598.0(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/types': 3.598.0
+      '@smithy/credential-provider-imds': 3.1.2
+      '@smithy/property-provider': 3.1.2
+      '@smithy/shared-ini-file-loader': 3.1.2
+      '@smithy/types': 3.2.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
+    dev: false
+
   /@aws-sdk/credential-provider-ini@3.598.0(@aws-sdk/client-sts@3.533.0):
     resolution: {integrity: sha512-/ppcIVUbRwDIwJDoYfp90X3+AuJo2mvE52Y1t2VSrvUovYn6N4v95/vXj6LS8CNDhz2jvEJYmu+0cTMHdhI6eA==}
     engines: {node: '>=16.0.0'}
@@ -5856,7 +6044,7 @@ packages:
       '@aws-sdk/credential-provider-env': 3.598.0
       '@aws-sdk/credential-provider-http': 3.598.0
       '@aws-sdk/credential-provider-process': 3.598.0
-      '@aws-sdk/credential-provider-sso': 3.598.0(@aws-sdk/client-sso-oidc@3.600.0)
+      '@aws-sdk/credential-provider-sso': 3.598.0(@aws-sdk/client-sso-oidc@3.606.0)
       '@aws-sdk/credential-provider-web-identity': 3.598.0(@aws-sdk/client-sts@3.533.0)
       '@aws-sdk/types': 3.598.0
       '@smithy/credential-provider-imds': 3.1.2
@@ -6052,6 +6240,28 @@ packages:
       - '@aws-sdk/client-sts'
       - aws-crt
 
+  /@aws-sdk/credential-provider-node@3.600.0(@aws-sdk/client-sso-oidc@3.606.0)(@aws-sdk/client-sts@3.606.0):
+    resolution: {integrity: sha512-1pC7MPMYD45J7yFjA90SxpR0yaSvy+yZiq23aXhAPZLYgJBAxHLu0s0mDCk/piWGPh8+UGur5K0bVdx4B1D5hw==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@aws-sdk/credential-provider-env': 3.598.0
+      '@aws-sdk/credential-provider-http': 3.598.0
+      '@aws-sdk/credential-provider-ini': 3.598.0(@aws-sdk/client-sso-oidc@3.606.0)(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/credential-provider-process': 3.598.0
+      '@aws-sdk/credential-provider-sso': 3.598.0(@aws-sdk/client-sso-oidc@3.606.0)
+      '@aws-sdk/credential-provider-web-identity': 3.598.0(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/types': 3.598.0
+      '@smithy/credential-provider-imds': 3.1.2
+      '@smithy/property-provider': 3.1.2
+      '@smithy/shared-ini-file-loader': 3.1.2
+      '@smithy/types': 3.2.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - '@aws-sdk/client-sts'
+      - aws-crt
+    dev: false
+
   /@aws-sdk/credential-provider-node@3.600.0(@aws-sdk/client-sts@3.533.0):
     resolution: {integrity: sha512-1pC7MPMYD45J7yFjA90SxpR0yaSvy+yZiq23aXhAPZLYgJBAxHLu0s0mDCk/piWGPh8+UGur5K0bVdx4B1D5hw==}
     engines: {node: '>=16.0.0'}
@@ -6060,7 +6270,7 @@ packages:
       '@aws-sdk/credential-provider-http': 3.598.0
       '@aws-sdk/credential-provider-ini': 3.598.0(@aws-sdk/client-sts@3.533.0)
       '@aws-sdk/credential-provider-process': 3.598.0
-      '@aws-sdk/credential-provider-sso': 3.598.0(@aws-sdk/client-sso-oidc@3.600.0)
+      '@aws-sdk/credential-provider-sso': 3.598.0(@aws-sdk/client-sso-oidc@3.606.0)
       '@aws-sdk/credential-provider-web-identity': 3.598.0(@aws-sdk/client-sts@3.533.0)
       '@aws-sdk/types': 3.598.0
       '@smithy/credential-provider-imds': 3.1.2
@@ -6301,6 +6511,22 @@ packages:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
+  /@aws-sdk/credential-provider-sso@3.598.0(@aws-sdk/client-sso-oidc@3.606.0):
+    resolution: {integrity: sha512-5InwUmrAuqQdOOgxTccRayMMkSmekdLk6s+az9tmikq0QFAHUCtofI+/fllMXSR9iL6JbGYi1940+EUmS4pHJA==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@aws-sdk/client-sso': 3.598.0
+      '@aws-sdk/token-providers': 3.598.0(@aws-sdk/client-sso-oidc@3.606.0)
+      '@aws-sdk/types': 3.598.0
+      '@smithy/property-provider': 3.1.2
+      '@smithy/shared-ini-file-loader': 3.1.2
+      '@smithy/types': 3.2.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
+    dev: false
+
   /@aws-sdk/credential-provider-web-identity@3.468.0:
     resolution: {integrity: sha512-rexymPmXjtkwCPfhnUq3EjO1rSkf39R4Jz9CqiM7OsqK2qlT5Y/V3gnMKn0ZMXsYaQOMfM3cT5xly5R+OKDHlw==}
     engines: {node: '>=14.0.0'}
@@ -6431,6 +6657,19 @@ packages:
       '@smithy/types': 3.2.0
       tslib: 2.6.3
 
+  /@aws-sdk/credential-provider-web-identity@3.598.0(@aws-sdk/client-sts@3.606.0):
+    resolution: {integrity: sha512-GV5GdiMbz5Tz9JO4NJtRoFXjW0GPEujA0j+5J/B723rTN+REHthJu48HdBKouHGhdzkDWkkh1bu52V02Wprw8w==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sts': ^3.598.0
+    dependencies:
+      '@aws-sdk/client-sts': 3.606.0
+      '@aws-sdk/types': 3.598.0
+      '@smithy/property-provider': 3.1.2
+      '@smithy/types': 3.2.0
+      tslib: 2.6.3
+    dev: false
+
   /@aws-sdk/lib-storage@3.472.0(@aws-sdk/client-s3@3.472.0):
     resolution: {integrity: sha512-5P57iNMYhdz9u6jt7gDZJyJtwvNSDxVg1TDbMvXsb1MHgokTdDhj+VOBYvxKyHRCNB6y1gIYfsAwBikm5kMBPA==}
     engines: {node: '>=14.0.0'}
@@ -6509,6 +6748,23 @@ packages:
       events: 3.3.0
       stream-browserify: 3.0.0
       tslib: 2.6.3
+    dev: true
+
+  /@aws-sdk/lib-storage@3.600.0(@aws-sdk/client-s3@3.608.0):
+    resolution: {integrity: sha512-jjgGMmFykXBAs8YO3ghgnVSjM/uf99jvVQqKJfDjwXUCLPrsZqk14v2WcDCWAXzeAroDvIOVQO1V/RR8fK18Pw==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-s3': ^3.600.0
+    dependencies:
+      '@aws-sdk/client-s3': 3.608.0
+      '@smithy/abort-controller': 3.1.0
+      '@smithy/middleware-endpoint': 3.0.3
+      '@smithy/smithy-client': 3.1.4
+      buffer: 5.6.0
+      events: 3.3.0
+      stream-browserify: 3.0.0
+      tslib: 2.6.3
+    dev: false
 
   /@aws-sdk/middleware-bucket-endpoint@3.470.0:
     resolution: {integrity: sha512-vLXXNWtsRmEIwzJ9HUQfIuTNAsEzvCv0Icsnkvt2BiBZXnmHdp2vIC3e3+kfy1D7dVQloXqMmnfcLu/BUMu2Jw==}
@@ -7556,6 +7812,20 @@ packages:
       '@smithy/shared-ini-file-loader': 3.1.2
       '@smithy/types': 3.2.0
       tslib: 2.6.3
+
+  /@aws-sdk/token-providers@3.598.0(@aws-sdk/client-sso-oidc@3.606.0):
+    resolution: {integrity: sha512-TKY1EVdHVBnZqpyxyTHdpZpa1tUpb6nxVeRNn1zWG8QB5MvH4ALLd/jR+gtmWDNQbIG4cVuBOZFVL8hIYicKTA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sso-oidc': ^3.598.0
+    dependencies:
+      '@aws-sdk/client-sso-oidc': 3.606.0(@aws-sdk/client-sts@3.606.0)
+      '@aws-sdk/types': 3.598.0
+      '@smithy/property-provider': 3.1.2
+      '@smithy/shared-ini-file-loader': 3.1.2
+      '@smithy/types': 3.2.0
+      tslib: 2.6.3
+    dev: false
 
   /@aws-sdk/types@3.468.0:
     resolution: {integrity: sha512-rx/9uHI4inRbp2tw3Y4Ih4PNZkVj32h7WneSg3MVgVjAoVD5Zti9KhS5hkvsBxfgmQmg0AQbE+b1sy5WGAgntA==}
@@ -9692,7 +9962,7 @@ packages:
       pg-promise: 11.8.0(pg-native@3.1.0)
     dev: false
 
-  /@digitraffic/common@2024.3.14-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.135.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0):
+  /@digitraffic/common@2024.3.14-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.135.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0):
     resolution: {integrity: sha512-7oVYTeEmeVYNHYXhsGCJsFuBCih2xsV7DizriMHJ73HO0xdqTIwSHKJs8g/xVhgbQ+YE8KNjhHqaGQUG6EhZVQ==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -9716,10 +9986,10 @@ packages:
       pg-promise: ^11.5.4
     dependencies:
       '@aws-sdk/client-api-gateway': 3.600.0
-      '@aws-sdk/client-s3': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
       '@aws-sdk/client-secrets-manager': 3.600.0
       '@aws-sdk/client-sns': 3.600.0
-      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.600.0)
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
       '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.135.0(constructs@10.3.0)
       change-case: 5.0.0
@@ -9735,7 +10005,7 @@ packages:
       pg-promise: 11.8.0(pg-native@3.1.0)
     dev: false
 
-  /@digitraffic/common@2024.3.22-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.7.8):
+  /@digitraffic/common@2024.3.22-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.7.8):
     resolution: {integrity: sha512-Zpw0V/nBHNdw5oJYObFqyr0Ng70oNPVp4DzvRjEO7QtbBougv/ccGtLeJkrVz/RqYOG4few30iRRhy9vPYEVyA==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -9759,10 +10029,10 @@ packages:
       pg-promise: ^11.5.4
     dependencies:
       '@aws-sdk/client-api-gateway': 3.600.0
-      '@aws-sdk/client-s3': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
       '@aws-sdk/client-secrets-manager': 3.600.0
       '@aws-sdk/client-sns': 3.600.0
-      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.600.0)
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
       '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.143.1(constructs@10.3.0)
       change-case: 5.0.0
@@ -9864,7 +10134,7 @@ packages:
       pg-promise: 11.6.0(pg-native@3.0.1)
     dev: false
 
-  /@digitraffic/common@2024.5.13-1(@aws-sdk/client-api-gateway@3.574.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.141.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0):
+  /@digitraffic/common@2024.5.13-1(@aws-sdk/client-api-gateway@3.574.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.141.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0):
     resolution: {integrity: sha512-DkhRo5FO9MVZpMul4Iiu6pWOkYobkRjRdFmP2o9D2SwznzaPETcLETrEeu4dpgj/qGqO56NTyePKRvJxwGHJzA==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -9888,10 +10158,10 @@ packages:
       pg-promise: ^11.5.4
     dependencies:
       '@aws-sdk/client-api-gateway': 3.574.0
-      '@aws-sdk/client-s3': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
       '@aws-sdk/client-secrets-manager': 3.600.0
       '@aws-sdk/client-sns': 3.600.0
-      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.600.0)
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
       '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.141.0(constructs@10.3.0)
       change-case: 5.0.0
@@ -9950,7 +10220,7 @@ packages:
       pg-promise: 11.6.0(pg-native@3.0.1)
     dev: false
 
-  /@digitraffic/common@2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0):
+  /@digitraffic/common@2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.142.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0):
     resolution: {integrity: sha512-DkhRo5FO9MVZpMul4Iiu6pWOkYobkRjRdFmP2o9D2SwznzaPETcLETrEeu4dpgj/qGqO56NTyePKRvJxwGHJzA==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -9974,10 +10244,10 @@ packages:
       pg-promise: ^11.5.4
     dependencies:
       '@aws-sdk/client-api-gateway': 3.600.0
-      '@aws-sdk/client-s3': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
       '@aws-sdk/client-secrets-manager': 3.600.0
       '@aws-sdk/client-sns': 3.600.0
-      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.600.0)
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
       '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.142.1(constructs@10.3.0)
       change-case: 5.0.0
@@ -9993,7 +10263,7 @@ packages:
       pg-promise: 11.6.0(pg-native@3.0.1)
     dev: false
 
-  /@digitraffic/common@2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0):
+  /@digitraffic/common@2024.5.13-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.143.0)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.6.0):
     resolution: {integrity: sha512-DkhRo5FO9MVZpMul4Iiu6pWOkYobkRjRdFmP2o9D2SwznzaPETcLETrEeu4dpgj/qGqO56NTyePKRvJxwGHJzA==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -10017,10 +10287,10 @@ packages:
       pg-promise: ^11.5.4
     dependencies:
       '@aws-sdk/client-api-gateway': 3.600.0
-      '@aws-sdk/client-s3': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
       '@aws-sdk/client-secrets-manager': 3.600.0
       '@aws-sdk/client-sns': 3.600.0
-      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.600.0)
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
       '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.143.0(constructs@10.3.0)
       change-case: 5.0.0
@@ -10036,7 +10306,7 @@ packages:
       pg-promise: 11.6.0(pg-native@3.0.1)
     dev: false
 
-  /@digitraffic/common@2024.6.14-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0):
+  /@digitraffic/common@2024.6.14-2(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0):
     resolution: {integrity: sha512-i6/c4UTX97hhw3WhwKB5YW1BkmxK4gGeeVnBNVESlIQ0XMUnbVdzeYlGZGI4Tq8HVC0YgUI1RePvFqHb4olf2A==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -10060,10 +10330,10 @@ packages:
       pg-promise: ^11.5.4
     dependencies:
       '@aws-sdk/client-api-gateway': 3.600.0
-      '@aws-sdk/client-s3': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
       '@aws-sdk/client-secrets-manager': 3.600.0
       '@aws-sdk/client-sns': 3.600.0
-      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.600.0)
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
       '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.147.1(constructs@10.3.0)
       change-case: 5.0.0
@@ -10079,7 +10349,7 @@ packages:
       pg-promise: 11.8.0(pg-native@3.1.0)
     dev: false
 
-  /@digitraffic/common@2024.6.26-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0):
+  /@digitraffic/common@2024.6.26-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(@types/geojson@7946.0.14)(aws-cdk-lib@2.147.1)(change-case@5.0.0)(constructs@10.3.0)(date-fns-tz@2.0.1)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.2.4)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0):
     resolution: {integrity: sha512-l8sjxx7Fxs81bH5zcxDvh4ll4K4DipQNFB9tuDfxtjfIaw6Bw4A4CEBKPpnBc8PNrr4Gc88KpV5huJClYb81sw==}
     engines: {node: '>=20 <21'}
     peerDependencies:
@@ -10103,10 +10373,10 @@ packages:
       pg-promise: ^11.5.4
     dependencies:
       '@aws-sdk/client-api-gateway': 3.600.0
-      '@aws-sdk/client-s3': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
       '@aws-sdk/client-secrets-manager': 3.600.0
       '@aws-sdk/client-sns': 3.600.0
-      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.600.0)
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
       '@types/geojson': 7946.0.14
       aws-cdk-lib: 2.147.1(constructs@10.3.0)
       change-case: 5.0.0
@@ -10116,6 +10386,49 @@ packages:
       etag: 1.8.1
       geojson-validation: 1.0.2
       ky: 1.2.4
+      lodash: 4.17.21
+      node-ttl: 0.2.0
+      pg-native: 3.1.0
+      pg-promise: 11.8.0(pg-native@3.1.0)
+    dev: false
+
+  /@digitraffic/common@2024.7.2-1(@aws-sdk/client-api-gateway@3.600.0)(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-secrets-manager@3.600.0)(@aws-sdk/client-sns@3.600.0)(@aws-sdk/lib-storage@3.600.0)(aws-cdk-lib@2.147.3)(aws-sdk@2.1648.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.4.0)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.8.0):
+    resolution: {integrity: sha512-I6FP5pTO7IaYD2SEq++eehbyV1Oka3LC6nI7n63a7vW2pFCOrsqTbGWfu5DTJe56LFvqbgWOgdxQYCVn5+WP0Q==}
+    engines: {node: '>=20 <21'}
+    peerDependencies:
+      '@aws-sdk/client-api-gateway': ^3.600.0
+      '@aws-sdk/client-s3': ^3.600.0
+      '@aws-sdk/client-secrets-manager': ^3.600.0
+      '@aws-sdk/client-sns': ^3.600.0
+      '@aws-sdk/lib-storage': ^3.600.0
+      aws-cdk-lib: ^2.147.1
+      aws-sdk: ^2.1648.0
+      change-case: ^5.4.4
+      constructs: ^10.3.0
+      date-fns: ^3.6.0
+      date-fns-tz: ^3.1.3
+      etag: ^1.8.1
+      geojson-validation: ^1.0.2
+      ky: ^1.3.0
+      lodash: ^4.17.21
+      node-ttl: ^0.2.0
+      pg-native: ^3.1.0
+      pg-promise: ^11.8.0
+    dependencies:
+      '@aws-sdk/client-api-gateway': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
+      '@aws-sdk/client-secrets-manager': 3.600.0
+      '@aws-sdk/client-sns': 3.600.0
+      '@aws-sdk/lib-storage': 3.600.0(@aws-sdk/client-s3@3.608.0)
+      aws-cdk-lib: 2.147.3(constructs@10.3.0)
+      aws-sdk: 2.1648.0
+      change-case: 5.4.4
+      constructs: 10.3.0
+      date-fns: 2.30.0
+      date-fns-tz: 3.1.3(date-fns@2.30.0)
+      etag: 1.8.1
+      geojson-validation: 1.0.2
+      ky: 1.4.0
       lodash: 4.17.21
       node-ttl: 0.2.0
       pg-native: 3.1.0
@@ -10167,6 +10480,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/aix-ppc64@0.23.0:
+    resolution: {integrity: sha512-3sG8Zwa5fMcA9bgqB8AfWPQ+HFke6uD3h1s3RIwUNK8EG7a4buxvuFTs3j1IMs2NXAk9F30C/FF4vxRgQCcmoQ==}
+    engines: {node: '>=18'}
+    cpu: [ppc64]
+    os: [aix]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/android-arm64@0.19.11:
     resolution: {integrity: sha512-aiu7K/5JnLj//KOnOfEZ0D90obUkRzDMyqd/wNAUQ34m4YUPVhRZpnqKV9uqDGxT7cToSDnIHsGooyIczu9T+Q==}
     engines: {node: '>=12'}
@@ -10206,6 +10528,15 @@ packages:
   /@esbuild/android-arm64@0.21.5:
     resolution: {integrity: sha512-c0uX9VAUBQ7dTDCjq+wdyGLowMdtR/GoC2U5IYk/7D1H1JYC0qseD7+11iMP2mRLN9RcCMRcjC4YMclCzGwS/A==}
     engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [android]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/android-arm64@0.23.0:
+    resolution: {integrity: sha512-EuHFUYkAVfU4qBdyivULuu03FhJO4IJN9PGuABGrFy4vUuzk91P2d+npxHcFdpUnfYKy0PuV+n6bKIpHOB3prQ==}
+    engines: {node: '>=18'}
     cpu: [arm64]
     os: [android]
     requiresBuild: true
@@ -10257,6 +10588,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/android-arm@0.23.0:
+    resolution: {integrity: sha512-+KuOHTKKyIKgEEqKbGTK8W7mPp+hKinbMBeEnNzjJGyFcWsfrXjSTNluJHCY1RqhxFurdD8uNXQDei7qDlR6+g==}
+    engines: {node: '>=18'}
+    cpu: [arm]
+    os: [android]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/android-x64@0.19.11:
     resolution: {integrity: sha512-eccxjlfGw43WYoY9QgB82SgGgDbibcqyDTlk3l3C0jOVHKxrjdc9CTwDUQd0vkvYg5um0OH+GpxYvp39r+IPOg==}
     engines: {node: '>=12'}
@@ -10296,6 +10636,15 @@ packages:
   /@esbuild/android-x64@0.21.5:
     resolution: {integrity: sha512-D7aPRUUNHRBwHxzxRvp856rjUHRFW1SdQATKXH2hqA0kAZb1hKmi02OpYRacl0TxIGz/ZmXWlbZgjwWYaCakTA==}
     engines: {node: '>=12'}
+    cpu: [x64]
+    os: [android]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/android-x64@0.23.0:
+    resolution: {integrity: sha512-WRrmKidLoKDl56LsbBMhzTTBxrsVwTKdNbKDalbEZr0tcsBgCLbEtoNthOW6PX942YiYq8HzEnb4yWQMLQuipQ==}
+    engines: {node: '>=18'}
     cpu: [x64]
     os: [android]
     requiresBuild: true
@@ -10347,6 +10696,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/darwin-arm64@0.23.0:
+    resolution: {integrity: sha512-YLntie/IdS31H54Ogdn+v50NuoWF5BDkEUFpiOChVa9UnKpftgwzZRrI4J132ETIi+D8n6xh9IviFV3eXdxfow==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/darwin-x64@0.19.11:
     resolution: {integrity: sha512-fkFUiS6IUK9WYUO/+22omwetaSNl5/A8giXvQlcinLIjVkxwTLSktbF5f/kJMftM2MJp9+fXqZ5ezS7+SALp4g==}
     engines: {node: '>=12'}
@@ -10386,6 +10744,15 @@ packages:
   /@esbuild/darwin-x64@0.21.5:
     resolution: {integrity: sha512-se/JjF8NlmKVG4kNIuyWMV/22ZaerB+qaSi5MdrXtd6R08kvs2qCN4C09miupktDitvh8jRFflwGFBQcxZRjbw==}
     engines: {node: '>=12'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/darwin-x64@0.23.0:
+    resolution: {integrity: sha512-IMQ6eme4AfznElesHUPDZ+teuGwoRmVuuixu7sv92ZkdQcPbsNHzutd+rAfaBKo8YK3IrBEi9SLLKWJdEvJniQ==}
+    engines: {node: '>=18'}
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
@@ -10437,6 +10804,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/freebsd-arm64@0.23.0:
+    resolution: {integrity: sha512-0muYWCng5vqaxobq6LB3YNtevDFSAZGlgtLoAc81PjUfiFz36n4KMpwhtAd4he8ToSI3TGyuhyx5xmiWNYZFyw==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [freebsd]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/freebsd-x64@0.19.11:
     resolution: {integrity: sha512-JkUqn44AffGXitVI6/AbQdoYAq0TEullFdqcMY/PCUZ36xJ9ZJRtQabzMA+Vi7r78+25ZIBosLTOKnUXBSi1Kw==}
     engines: {node: '>=12'}
@@ -10476,6 +10852,15 @@ packages:
   /@esbuild/freebsd-x64@0.21.5:
     resolution: {integrity: sha512-J95kNBj1zkbMXtHVH29bBriQygMXqoVQOQYA+ISs0/2l3T9/kj42ow2mpqerRBxDJnmkUDCaQT/dfNXWX/ZZCQ==}
     engines: {node: '>=12'}
+    cpu: [x64]
+    os: [freebsd]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/freebsd-x64@0.23.0:
+    resolution: {integrity: sha512-XKDVu8IsD0/q3foBzsXGt/KjD/yTKBCIwOHE1XwiXmrRwrX6Hbnd5Eqn/WvDekddK21tfszBSrE/WMaZh+1buQ==}
+    engines: {node: '>=18'}
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
@@ -10527,6 +10912,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/linux-arm64@0.23.0:
+    resolution: {integrity: sha512-j1t5iG8jE7BhonbsEg5d9qOYcVZv/Rv6tghaXM/Ug9xahM0nX/H2gfu6X6z11QRTMT6+aywOMA8TDkhPo8aCGw==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/linux-arm@0.19.11:
     resolution: {integrity: sha512-3CRkr9+vCV2XJbjwgzjPtO8T0SZUmRZla+UL1jw+XqHZPkPgZiyWvbDvl9rqAN8Zl7qJF0O/9ycMtjU67HN9/Q==}
     engines: {node: '>=12'}
@@ -10566,6 +10960,15 @@ packages:
   /@esbuild/linux-arm@0.21.5:
     resolution: {integrity: sha512-bPb5AHZtbeNGjCKVZ9UGqGwo8EUu4cLq68E95A53KlxAPRmUyYv2D6F0uUI65XisGOL1hBP5mTronbgo+0bFcA==}
     engines: {node: '>=12'}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/linux-arm@0.23.0:
+    resolution: {integrity: sha512-SEELSTEtOFu5LPykzA395Mc+54RMg1EUgXP+iw2SJ72+ooMwVsgfuwXo5Fn0wXNgWZsTVHwY2cg4Vi/bOD88qw==}
+    engines: {node: '>=18'}
     cpu: [arm]
     os: [linux]
     requiresBuild: true
@@ -10617,6 +11020,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/linux-ia32@0.23.0:
+    resolution: {integrity: sha512-P7O5Tkh2NbgIm2R6x1zGJJsnacDzTFcRWZyTTMgFdVit6E98LTxO+v8LCCLWRvPrjdzXHx9FEOA8oAZPyApWUA==}
+    engines: {node: '>=18'}
+    cpu: [ia32]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/linux-loong64@0.19.11:
     resolution: {integrity: sha512-ppZSSLVpPrwHccvC6nQVZaSHlFsvCQyjnvirnVjbKSHuE5N24Yl8F3UwYUUR1UEPaFObGD2tSvVKbvR+uT1Nrg==}
     engines: {node: '>=12'}
@@ -10656,6 +11068,15 @@ packages:
   /@esbuild/linux-loong64@0.21.5:
     resolution: {integrity: sha512-uHf1BmMG8qEvzdrzAqg2SIG/02+4/DHB6a9Kbya0XDvwDEKCoC8ZRWI5JJvNdUjtciBGFQ5PuBlpEOXQj+JQSg==}
     engines: {node: '>=12'}
+    cpu: [loong64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/linux-loong64@0.23.0:
+    resolution: {integrity: sha512-InQwepswq6urikQiIC/kkx412fqUZudBO4SYKu0N+tGhXRWUqAx+Q+341tFV6QdBifpjYgUndV1hhMq3WeJi7A==}
+    engines: {node: '>=18'}
     cpu: [loong64]
     os: [linux]
     requiresBuild: true
@@ -10707,6 +11128,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/linux-mips64el@0.23.0:
+    resolution: {integrity: sha512-J9rflLtqdYrxHv2FqXE2i1ELgNjT+JFURt/uDMoPQLcjWQA5wDKgQA4t/dTqGa88ZVECKaD0TctwsUfHbVoi4w==}
+    engines: {node: '>=18'}
+    cpu: [mips64el]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/linux-ppc64@0.19.11:
     resolution: {integrity: sha512-MHrZYLeCG8vXblMetWyttkdVRjQlQUb/oMgBNurVEnhj4YWOr4G5lmBfZjHYQHHN0g6yDmCAQRR8MUHldvvRDA==}
     engines: {node: '>=12'}
@@ -10746,6 +11176,15 @@ packages:
   /@esbuild/linux-ppc64@0.21.5:
     resolution: {integrity: sha512-1hHV/Z4OEfMwpLO8rp7CvlhBDnjsC3CttJXIhBi+5Aj5r+MBvy4egg7wCbe//hSsT+RvDAG7s81tAvpL2XAE4w==}
     engines: {node: '>=12'}
+    cpu: [ppc64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/linux-ppc64@0.23.0:
+    resolution: {integrity: sha512-cShCXtEOVc5GxU0fM+dsFD10qZ5UpcQ8AM22bYj0u/yaAykWnqXJDpd77ublcX6vdDsWLuweeuSNZk4yUxZwtw==}
+    engines: {node: '>=18'}
     cpu: [ppc64]
     os: [linux]
     requiresBuild: true
@@ -10797,6 +11236,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/linux-riscv64@0.23.0:
+    resolution: {integrity: sha512-HEtaN7Y5UB4tZPeQmgz/UhzoEyYftbMXrBCUjINGjh3uil+rB/QzzpMshz3cNUxqXN7Vr93zzVtpIDL99t9aRw==}
+    engines: {node: '>=18'}
+    cpu: [riscv64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/linux-s390x@0.19.11:
     resolution: {integrity: sha512-A5xdUoyWJHMMlcSMcPGVLzYzpcY8QP1RtYzX5/bS4dvjBGVxdhuiYyFwp7z74ocV7WDc0n1harxmpq2ePOjI0Q==}
     engines: {node: '>=12'}
@@ -10836,6 +11284,15 @@ packages:
   /@esbuild/linux-s390x@0.21.5:
     resolution: {integrity: sha512-zus5sxzqBJD3eXxwvjN1yQkRepANgxE9lgOW2qLnmr8ikMTphkjgXu1HR01K4FJg8h1kEEDAqDcZQtbrRnB41A==}
     engines: {node: '>=12'}
+    cpu: [s390x]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/linux-s390x@0.23.0:
+    resolution: {integrity: sha512-WDi3+NVAuyjg/Wxi+o5KPqRbZY0QhI9TjrEEm+8dmpY9Xir8+HE/HNx2JoLckhKbFopW0RdO2D72w8trZOV+Wg==}
+    engines: {node: '>=18'}
     cpu: [s390x]
     os: [linux]
     requiresBuild: true
@@ -10887,6 +11344,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/linux-x64@0.23.0:
+    resolution: {integrity: sha512-a3pMQhUEJkITgAw6e0bWA+F+vFtCciMjW/LPtoj99MhVt+Mfb6bbL9hu2wmTZgNd994qTAEw+U/r6k3qHWWaOQ==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/netbsd-x64@0.19.11:
     resolution: {integrity: sha512-13jvrQZJc3P230OhU8xgwUnDeuC/9egsjTkXN49b3GcS5BKvJqZn86aGM8W9pd14Kd+u7HuFBMVtrNGhh6fHEQ==}
     engines: {node: '>=12'}
@@ -10932,6 +11398,24 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/netbsd-x64@0.23.0:
+    resolution: {integrity: sha512-cRK+YDem7lFTs2Q5nEv/HHc4LnrfBCbH5+JHu6wm2eP+d8OZNoSMYgPZJq78vqQ9g+9+nMuIsAO7skzphRXHyw==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [netbsd]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/openbsd-arm64@0.23.0:
+    resolution: {integrity: sha512-suXjq53gERueVWu0OKxzWqk7NxiUWSUlrxoZK7usiF50C6ipColGR5qie2496iKGYNLhDZkPxBI3erbnYkU0rQ==}
+    engines: {node: '>=18'}
+    cpu: [arm64]
+    os: [openbsd]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/openbsd-x64@0.19.11:
     resolution: {integrity: sha512-ysyOGZuTp6SNKPE11INDUeFVVQFrhcNDVUgSQVDzqsqX38DjhPEPATpid04LCoUr2WXhQTEZ8ct/EgJCUDpyNw==}
     engines: {node: '>=12'}
@@ -10971,6 +11455,15 @@ packages:
   /@esbuild/openbsd-x64@0.21.5:
     resolution: {integrity: sha512-HLNNw99xsvx12lFBUwoT8EVCsSvRNDVxNpjZ7bPn947b8gJPzeHWyNVhFsaerc0n3TsbOINvRP2byTZ5LKezow==}
     engines: {node: '>=12'}
+    cpu: [x64]
+    os: [openbsd]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/openbsd-x64@0.23.0:
+    resolution: {integrity: sha512-6p3nHpby0DM/v15IFKMjAaayFhqnXV52aEmv1whZHX56pdkK+MEaLoQWj+H42ssFarP1PcomVhbsR4pkz09qBg==}
+    engines: {node: '>=18'}
     cpu: [x64]
     os: [openbsd]
     requiresBuild: true
@@ -11022,6 +11515,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/sunos-x64@0.23.0:
+    resolution: {integrity: sha512-BFelBGfrBwk6LVrmFzCq1u1dZbG4zy/Kp93w2+y83Q5UGYF1d8sCzeLI9NXjKyujjBBniQa8R8PzLFAUrSM9OA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [sunos]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/win32-arm64@0.19.11:
     resolution: {integrity: sha512-0P58Sbi0LctOMOQbpEOvOL44Ne0sqbS0XWHMvvrg6NE5jQ1xguCSSw9jQeUk2lfrXYsKDdOe6K+oZiwKPilYPQ==}
     engines: {node: '>=12'}
@@ -11061,6 +11563,15 @@ packages:
   /@esbuild/win32-arm64@0.21.5:
     resolution: {integrity: sha512-Z0gOTd75VvXqyq7nsl93zwahcTROgqvuAcYDUr+vOv8uHhNSKROyU961kgtCD1e95IqPKSQKH7tBTslnS3tA8A==}
     engines: {node: '>=12'}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/win32-arm64@0.23.0:
+    resolution: {integrity: sha512-lY6AC8p4Cnb7xYHuIxQ6iYPe6MfO2CC43XXKo9nBXDb35krYt7KGhQnOkRGar5psxYkircpCqfbNDB4uJbS2jQ==}
+    engines: {node: '>=18'}
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
@@ -11112,6 +11623,15 @@ packages:
     dev: true
     optional: true
 
+  /@esbuild/win32-ia32@0.23.0:
+    resolution: {integrity: sha512-7L1bHlOTcO4ByvI7OXVI5pNN6HSu6pUQq9yodga8izeuB1KcT2UkHaH6118QJwopExPn0rMHIseCTx1CRo/uNA==}
+    engines: {node: '>=18'}
+    cpu: [ia32]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /@esbuild/win32-x64@0.19.11:
     resolution: {integrity: sha512-vfkhltrjCAb603XaFhqhAF4LGDi2M4OrCRrFusyQ+iTLQ/o60QQXxc9cZC/FFpihBI9N1Grn6SMKVJ4KP7Fuiw==}
     engines: {node: '>=12'}
@@ -11151,6 +11671,15 @@ packages:
   /@esbuild/win32-x64@0.21.5:
     resolution: {integrity: sha512-tQd/1efJuzPC6rCFwEvLtci/xNFcTZknmXs98FYDfGE4wP9ClFV98nyKrzJKVPMhdDnjzLhdUyMX4PsQAPjwIw==}
     engines: {node: '>=12'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@esbuild/win32-x64@0.23.0:
+    resolution: {integrity: sha512-Arm+WgUFLUATuoxCJcahGuk6Yj9Pzxd6l11Zb/2aAuv5kWWvvfhLFo2fni4uSK5vzlUdCGZ/BdV5tH8klj8p8g==}
+    engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
     requiresBuild: true
@@ -12335,7 +12864,7 @@ packages:
       - ts-node
     dev: true
 
-  /@rushstack/heft-jest-plugin@0.12.1(@rushstack/heft@0.66.18)(@types/node@20.14.9):
+  /@rushstack/heft-jest-plugin@0.12.1(@rushstack/heft@0.66.19)(@types/node@20.14.9):
     resolution: {integrity: sha512-fkaQqmtHOsAlNWMFf+/sWjIbN6hOElmpAx2BSTQNA+gz32z6RtkdVdJbZoE9xYnfLUuPqSEJ7DijVkOBSL1raw==}
     peerDependencies:
       '@rushstack/heft': ^0.66.19
@@ -12350,7 +12879,7 @@ packages:
       '@jest/core': 29.5.0(ts-node@10.9.2)
       '@jest/reporters': 29.5.0
       '@jest/transform': 29.5.0
-      '@rushstack/heft': 0.66.18(@types/node@20.14.9)
+      '@rushstack/heft': 0.66.19(@types/node@20.14.9)
       '@rushstack/heft-config-file': 0.15.0(@types/node@20.14.9)
       '@rushstack/node-core-library': 5.4.1(@types/node@20.14.9)
       '@rushstack/terminal': 0.13.0(@types/node@20.14.9)
@@ -12559,6 +13088,28 @@ packages:
     hasBin: true
     dependencies:
       '@rushstack/heft-config-file': 0.14.25(@types/node@20.14.9)
+      '@rushstack/node-core-library': 5.4.1(@types/node@20.14.9)
+      '@rushstack/operation-graph': 0.2.25(@types/node@20.14.9)
+      '@rushstack/rig-package': 0.5.2
+      '@rushstack/terminal': 0.13.0(@types/node@20.14.9)
+      '@rushstack/ts-command-line': 4.22.0(@types/node@20.14.9)
+      '@types/tapable': 1.0.6
+      fast-glob: 3.3.2
+      git-repo-info: 2.1.1
+      ignore: 5.1.9
+      tapable: 1.1.3
+      true-case-path: 2.2.1
+      watchpack: 2.4.0
+    transitivePeerDependencies:
+      - '@types/node'
+    dev: true
+
+  /@rushstack/heft@0.66.19(@types/node@20.14.9):
+    resolution: {integrity: sha512-7BxYULezPaEWTdA2eVNTZjNWJcwfyr/apBGH7osC51Y94BagKXOkqGQQOiUEbOikC/zF6eYOHmzU00EDJ6+uDA==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    dependencies:
+      '@rushstack/heft-config-file': 0.15.0(@types/node@20.14.9)
       '@rushstack/node-core-library': 5.4.1(@types/node@20.14.9)
       '@rushstack/operation-graph': 0.2.25(@types/node@20.14.9)
       '@rushstack/rig-package': 0.5.2
@@ -15698,6 +16249,10 @@ packages:
     resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
     dev: true
 
+  /@types/lodash@4.17.6:
+    resolution: {integrity: sha512-OpXEVoCKSS3lQqjx9GGGOapBeuW5eUboYHRlHP9urXPX25IKZ6AnP5ZRxtVf63iieUbsHxLn8NQ5Nlftc6yzAA==}
+    dev: true
+
   /@types/madge@5.0.3:
     resolution: {integrity: sha512-NlQJd0qRAoyu+pawTDhLxkW940QT2dqASfwd2g/xEZu2F4Xjwa7TVRSPdbmZwUF1ygvAh0/nepeN7JjwEuOXCA==}
     dependencies:
@@ -16040,7 +16595,7 @@ packages:
       '@typescript-eslint/types': 6.19.1
       '@typescript-eslint/typescript-estree': 6.19.1(typescript@5.3.3)
       '@typescript-eslint/visitor-keys': 6.19.1
-      debug: 4.3.5
+      debug: 4.3.4
       eslint: 8.56.0
       typescript: 5.3.3
     transitivePeerDependencies:
@@ -16081,7 +16636,7 @@ packages:
       '@typescript-eslint/types': 6.19.1
       '@typescript-eslint/typescript-estree': 6.19.1(typescript@5.5.2)
       '@typescript-eslint/visitor-keys': 6.19.1
-      debug: 4.3.5
+      debug: 4.3.4
       eslint: 8.57.0
       typescript: 5.5.2
     transitivePeerDependencies:
@@ -17135,6 +17690,30 @@ packages:
       - yaml
       - mime-types
 
+  /aws-cdk-lib@2.147.3(constructs@10.3.0):
+    resolution: {integrity: sha512-GX07otmLydgR3CX51OaDtDr/MXRbsl9HZ2txVQpEV3pkF0UpJVc7XLShYuHmVv0uyStnAQfEN6W89cXMK64Nlg==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      constructs: ^10.0.0
+    dependencies:
+      '@aws-cdk/asset-awscli-v1': 2.2.202
+      '@aws-cdk/asset-kubectl-v20': 2.1.2
+      '@aws-cdk/asset-node-proxy-agent-v6': 2.0.3
+      constructs: 10.3.0
+    dev: false
+    bundledDependencies:
+      - '@balena/dockerignore'
+      - case
+      - fs-extra
+      - ignore
+      - jsonschema
+      - minimatch
+      - punycode
+      - semver
+      - table
+      - yaml
+      - mime-types
+
   /aws-lambda@1.0.7:
     resolution: {integrity: sha512-9GNFMRrEMG5y3Jvv+V4azWvc+qNWdWLTjDdhf/zgMlz8haaaLWv0xeAIWxz9PuWUBawsVxy0zZotjCdR3Xq+2w==}
     hasBin: true
@@ -17514,7 +18093,6 @@ packages:
 
   /change-case@5.4.4:
     resolution: {integrity: sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==}
-    dev: true
 
   /char-regex@1.0.2:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
@@ -17868,6 +18446,14 @@ packages:
       date-fns: 2.x
     dependencies:
       date-fns: 2.30.0
+
+  /date-fns-tz@3.1.3(date-fns@2.30.0):
+    resolution: {integrity: sha512-ZfbMu+nbzW0mEzC8VZrLiSWvUIaI3aRHeq33mTe7Y38UctKukgqPR4nTDwcwS4d64Gf8GghnVsroBuMY3eiTeA==}
+    peerDependencies:
+      date-fns: ^3.0.0
+    dependencies:
+      date-fns: 2.30.0
+    dev: false
 
   /date-fns-tz@3.1.3(date-fns@3.6.0):
     resolution: {integrity: sha512-ZfbMu+nbzW0mEzC8VZrLiSWvUIaI3aRHeq33mTe7Y38UctKukgqPR4nTDwcwS4d64Gf8GghnVsroBuMY3eiTeA==}
@@ -18639,6 +19225,38 @@ packages:
       '@esbuild/win32-arm64': 0.21.5
       '@esbuild/win32-ia32': 0.21.5
       '@esbuild/win32-x64': 0.21.5
+    dev: true
+
+  /esbuild@0.23.0:
+    resolution: {integrity: sha512-1lvV17H2bMYda/WaFb2jLPeHU3zml2k4/yagNMG8Q/YtfMjCwEUZa2eXXMgZTVSL5q1n4H7sQ0X6CdJDqqeCFA==}
+    engines: {node: '>=18'}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@esbuild/aix-ppc64': 0.23.0
+      '@esbuild/android-arm': 0.23.0
+      '@esbuild/android-arm64': 0.23.0
+      '@esbuild/android-x64': 0.23.0
+      '@esbuild/darwin-arm64': 0.23.0
+      '@esbuild/darwin-x64': 0.23.0
+      '@esbuild/freebsd-arm64': 0.23.0
+      '@esbuild/freebsd-x64': 0.23.0
+      '@esbuild/linux-arm': 0.23.0
+      '@esbuild/linux-arm64': 0.23.0
+      '@esbuild/linux-ia32': 0.23.0
+      '@esbuild/linux-loong64': 0.23.0
+      '@esbuild/linux-mips64el': 0.23.0
+      '@esbuild/linux-ppc64': 0.23.0
+      '@esbuild/linux-riscv64': 0.23.0
+      '@esbuild/linux-s390x': 0.23.0
+      '@esbuild/linux-x64': 0.23.0
+      '@esbuild/netbsd-x64': 0.23.0
+      '@esbuild/openbsd-arm64': 0.23.0
+      '@esbuild/openbsd-x64': 0.23.0
+      '@esbuild/sunos-x64': 0.23.0
+      '@esbuild/win32-arm64': 0.23.0
+      '@esbuild/win32-ia32': 0.23.0
+      '@esbuild/win32-x64': 0.23.0
     dev: true
 
   /escalade@3.1.2:
@@ -21119,7 +21737,6 @@ packages:
   /ky@1.4.0:
     resolution: {integrity: sha512-tPhhoGUiEiU/WXR4rt8klIoLdnTtyu+9jVKHd/wauEjYud32jyn63mzKWQweaQrHWxBQtYoVtdcEnYX1LosnFQ==}
     engines: {node: '>=18'}
-    dev: true
 
   /leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
@@ -22857,14 +23474,14 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /sqs-extended-client@1.0.0(@aws-sdk/client-s3@3.600.0)(@aws-sdk/client-sqs@3.600.0):
+  /sqs-extended-client@1.0.0(@aws-sdk/client-s3@3.608.0)(@aws-sdk/client-sqs@3.606.0):
     resolution: {integrity: sha512-WOenc72R9fsC2oAGwGMpfkPvPqDl1JcLCDiTaCZTSO8kKPkPn4f9n4CjFkVr4W2hWOT5WJLRfNbFvRZjMniVng==}
     peerDependencies:
       '@aws-sdk/client-s3': ^3.428.0
       '@aws-sdk/client-sqs': ^3.428.0
     dependencies:
-      '@aws-sdk/client-s3': 3.600.0
-      '@aws-sdk/client-sqs': 3.600.0
+      '@aws-sdk/client-s3': 3.608.0
+      '@aws-sdk/client-sqs': 3.606.0
       uuid: 9.0.1
     dev: false
 
