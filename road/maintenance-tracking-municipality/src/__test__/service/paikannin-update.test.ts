@@ -4,12 +4,20 @@ import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { fail } from "assert";
 import { type Position } from "geojson";
-import sub from "date-fns/sub";
+import { sub } from "date-fns/sub";
 import { PaikanninApi } from "../../api/paikannin.js";
 import { PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M } from "../../constants.js";
 import * as DataDb from "../../dao/data.js";
-import { type DbDomainContract, type DbDomainTaskMapping, type DbMaintenanceTracking } from "../../model/db-data.js";
-import { type ApiDevice, type ApiIoChannel, type ApiWorkeventDevice } from "../../model/paikannin-api-data.js";
+import {
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbMaintenanceTracking
+} from "../../model/db-data.js";
+import {
+    type ApiDevice,
+    type ApiIoChannel,
+    type ApiWorkeventDevice
+} from "../../model/paikannin-api-data.js";
 import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
 import { PaikanninUpdate } from "../../service/paikannin-update.js";
 import { getTrackingEndPoint, getTrackingStartPoint } from "../../service/utils.js";
@@ -36,7 +44,8 @@ import {
     createDbDomainContract,
     createLineString,
     createLineStringGeometry,
-    createZigZagCoordinates, getRandompId
+    createZigZagCoordinates,
+    getRandompId
 } from "../testutil.js";
 import { jest } from "@jest/globals";
 
@@ -56,7 +65,6 @@ describe(
         afterEach(async () => {
             await truncate(db);
         });
-
 
         test("upsertContractForDomain", async () => {
             await insertDomain(db, DOMAIN_1);
@@ -281,7 +289,7 @@ describe(
 
             mockGetWorkEventsApiResponse([route1]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-            jest.restoreAllMocks()
+            jest.restoreAllMocks();
             mockGetWorkEventsApiResponse([route2]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
@@ -313,7 +321,9 @@ describe(
         }
 
         function mockGetWorkEventsApiResponse(response: ApiWorkeventDevice[]): void {
-            jest.spyOn(PaikanninApi.prototype, "getWorkEvents").mockReturnValueOnce(Promise.resolve(response));
+            jest.spyOn(PaikanninApi.prototype, "getWorkEvents").mockReturnValueOnce(
+                Promise.resolve(response)
+            );
         }
 
         function createDevice(ioChannels: ApiIoChannel[]): ApiDevice {

@@ -1,9 +1,13 @@
 import { getRandomInteger, randomString } from "@digitraffic/common/dist/test/testutils";
-import add from "date-fns/add";
-import sub from "date-fns/sub";
+import { add } from "date-fns/add";
+import { sub } from "date-fns/sub";
 import { PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S } from "../../constants.js";
 import { type DbWorkMachine } from "../../model/db-data.js";
-import { type ApiWorkevent, type ApiWorkeventDevice, type ApiWorkeventIoDevice } from "../../model/paikannin-api-data.js";
+import {
+    type ApiWorkevent,
+    type ApiWorkeventDevice,
+    type ApiWorkeventIoDevice
+} from "../../model/paikannin-api-data.js";
 import {
     createDbWorkMachine,
     filterEventsWithoutTasks,
@@ -25,7 +29,11 @@ import {
     POINT_750M_FROM_START,
     POINT_START
 } from "../testconstants.js";
-import { createApiRouteDataForEveryMinute, createLineStringGeometry, createTaskMapping } from "../testutil.js";
+import {
+    createApiRouteDataForEveryMinute,
+    createLineStringGeometry,
+    createTaskMapping
+} from "../testutil.js";
 
 describe("paikannin-utils-service-test", () => {
     test("groupEventsToIndividualTrackings - events in chronological order", () => {
@@ -96,7 +104,10 @@ describe("paikannin-utils-service-test", () => {
         expect(groups[2]).toHaveLength(2);
 
         assertContainsEvents(groups[0]!, [PAIKANNIN_OPERATION_BRUSHING.name]);
-        assertContainsEvents(groups[1]!, [PAIKANNIN_OPERATION_BRUSHING.name, PAIKANNIN_OPERATION_PAVING.name]);
+        assertContainsEvents(groups[1]!, [
+            PAIKANNIN_OPERATION_BRUSHING.name,
+            PAIKANNIN_OPERATION_PAVING.name
+        ]);
         assertContainsEvents(groups[2]!, [PAIKANNIN_OPERATION_PAVING.name]);
     });
 

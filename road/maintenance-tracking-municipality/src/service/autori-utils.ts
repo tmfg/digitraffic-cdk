@@ -2,7 +2,7 @@ import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as GeometryUtils from "@digitraffic/common/dist/utils/geometry";
 import { type Feature, type Geometry, type LineString, type Position } from "geojson";
-import sub from "date-fns/sub";
+import { sub } from "date-fns/sub";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
     AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M,
@@ -103,7 +103,10 @@ export function groupFeaturesToIndividualGeometries(feature: Feature): Feature[]
         const positionGroups: Position[][] = toPositionGroups(geom.coordinates.slice());
 
         const newFeatures = positionGroups.map((positions) => {
-            const g: Geometry = positions.length === 1 && positions[0] ? new GeoJsonPoint(positions[0]) : new GeoJsonLineString(positions);
+            const g: Geometry =
+                positions.length === 1 && positions[0]
+                    ? new GeoJsonPoint(positions[0])
+                    : new GeoJsonLineString(positions);
             return {
                 type: "Feature",
                 geometry: g
@@ -147,13 +150,15 @@ function toPositionGroups(sourceGeometry: Position[], targetGeometries: Position
     if (targetGeometries.length > 0) {
         // Take prev Position from groups and compare it to next
         const prevLineString: Position[] | undefined = targetGeometries[targetGeometries.length - 1];
-        const prevPosition: Position | undefined = prevLineString ? prevLineString[prevLineString.length - 1] : undefined;
+        const prevPosition: Position | undefined = prevLineString
+            ? prevLineString[prevLineString.length - 1]
+            : undefined;
 
         if (!prevLineString || !prevPosition) {
             // This should never happen as prevPosition, but just in case.
             // Not extending previous tracking -> create new linestring/point
             targetGeometries.push([nextPosition]);
-        // Throw position to trash if it same as previous
+            // Throw position to trash if it same as previous
         } else if (GeometryUtils.areDistinctPositions(prevPosition, nextPosition)) {
             if (isExtendingPreviousTracking(prevPosition, nextPosition)) {
                 prevLineString.push(nextPosition);
@@ -360,17 +365,21 @@ export function createDbMaintenanceTracking(
     let lastPoint: GeoJsonPoint;
     let geometry: GeoJsonPoint | GeoJsonLineString;
     if (!f) {
-        throw new Error(`Undefined feature routeData.geography.features[0] geometry for ${JSON.stringify(routeData?.geography)}`);
+        throw new Error(
+            `Undefined feature routeData.geography.features[0] geometry for ${JSON.stringify(routeData?.geography)}`
+        );
     } else if (f.geometry.type === "Point") {
         lastPoint = new GeoJsonPoint(f.geometry.coordinates);
         geometry = lastPoint;
     } else if (f.geometry.type === "LineString") {
-        const lastPos : Position | undefined = f.geometry.coordinates[f.geometry.coordinates.length - 1];
+        const lastPos: Position | undefined = f.geometry.coordinates[f.geometry.coordinates.length - 1];
         if (lastPos) {
             lastPoint = new GeoJsonPoint(lastPos);
             geometry = new GeoJsonLineString(f.geometry.coordinates);
         } else {
-            throw new Error(`Invalid LineString for maintenance tracking ${f.geometry.type} ${JSON.stringify(f.geometry.coordinates)}`);
+            throw new Error(
+                `Invalid LineString for maintenance tracking ${f.geometry.type} ${JSON.stringify(f.geometry.coordinates)}`
+            );
         }
     } else {
         throw new Error(`Unsupported geometry type for maintenance tracking ${f.geometry.type}`);

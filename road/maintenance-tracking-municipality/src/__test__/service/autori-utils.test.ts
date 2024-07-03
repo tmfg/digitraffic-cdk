@@ -1,8 +1,8 @@
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { type LineString, type Point } from "geojson";
 import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
-import add from "date-fns/add";
-import sub from "date-fns/sub";
+import { add } from "date-fns/add";
+import { sub } from "date-fns/sub";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
     AUTORI_MAX_MINUTES_TO_HISTORY,
@@ -60,8 +60,12 @@ describe("autori-utils-service-test", () => {
         expect(fixedRoute.length).toEqual(2);
         expect(fixedRoute[0]?.geography?.features.length).toEqual(1);
         expect(fixedRoute[1]?.geography?.features.length).toEqual(1);
-        expect((fixedRoute[0]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(10);
-        expect((fixedRoute[1]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(15);
+        expect((fixedRoute[0]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(
+            10
+        );
+        expect((fixedRoute[1]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(
+            15
+        );
     });
 
     test("fixApiRouteData single", () => {
@@ -75,7 +79,9 @@ describe("autori-utils-service-test", () => {
         expect(fixedRoute.length).toEqual(1);
         expect(fixedRoute[0]?.geography?.features.length).toEqual(1);
 
-        expect((fixedRoute[0]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(10);
+        expect((fixedRoute[0]?.geography?.features[0]?.geometry as LineString).coordinates.length).toEqual(
+            10
+        );
     });
 
     test("fixApiRouteData empty", () => {

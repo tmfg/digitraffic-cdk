@@ -3,7 +3,7 @@ import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import { type Position } from "geojson";
 import { type GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
-import add from "date-fns/add";
+import { add } from "date-fns/add";
 import { type AutoriApi } from "../api/autori.js";
 import * as DataDb from "../dao/data.js";
 import { type ApiContractData, type ApiOperationData, type ApiRouteData } from "../model/autori-api-data.js";

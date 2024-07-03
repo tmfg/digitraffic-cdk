@@ -7,7 +7,7 @@ import {
     truncate
 } from "../db-testutil.js";
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import add from "date-fns/add";
+import { add } from "date-fns/add";
 import * as DataDb from "../../dao/data.js";
 import { type DbMaintenanceTracking, type DbNumberId, type DbWorkMachine } from "../../model/db-data.js";
 import * as TestUtils from "../testutil.js";

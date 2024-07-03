@@ -1,11 +1,23 @@
-import { getRandomInteger, getRandomNumber, getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
+import {
+    getRandomInteger,
+    getRandomNumber,
+    getRandomIntegerAsString
+} from "@digitraffic/common/dist/test/testutils";
 import { type GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { type Feature, type Geometry, type LineString, type Point, type Position } from "geojson";
 import _ from "lodash";
-import add from "date-fns/add";
-import sub from "date-fns/sub";
-import { type DbDomainContract, type DbDomainTaskMapping, type DbMaintenanceTracking } from "../model/db-data.js";
-import { type ApiWorkevent, type ApiWorkeventDevice, type ApiWorkeventIoDevice } from "../model/paikannin-api-data.js";
+import { add } from "date-fns/add";
+import { sub } from "date-fns/sub";
+import {
+    type DbDomainContract,
+    type DbDomainTaskMapping,
+    type DbMaintenanceTracking
+} from "../model/db-data.js";
+import {
+    type ApiWorkevent,
+    type ApiWorkeventDevice,
+    type ApiWorkeventIoDevice
+} from "../model/paikannin-api-data.js";
 import {
     PAIKANNIN_OPERATION_BRUSHING,
     PAIKANNIN_OPERATION_PAVING,
@@ -182,4 +194,3 @@ export function createApiRouteDataForEveryMinute(
 export function getRandompId(): string {
     return getRandomIntegerAsString(100000, 100000000000);
 }
-
