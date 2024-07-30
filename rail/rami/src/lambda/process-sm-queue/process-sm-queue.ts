@@ -16,9 +16,11 @@ export function handlerFn(): (event: SQSEvent) => Promise<void> {
                     const parsedSmMessage = parseSmMessage(JSON.parse(recordBody));
 
                     if(parsedSmMessage) {
-                        logger.debug({
+                        logger.debug(parsedSmMessage);
+
+                        logger.info({
                             method: "RAMI-ProcessSmQueue.handler",
-                            customParsedRamiMessage: JSON.stringify(parsedSmMessage)
+                            customDataCount: parsedSmMessage.data.length
                         });
 
                         await processSmMessage(parsedSmMessage);
@@ -39,8 +41,7 @@ export function handlerFn(): (event: SQSEvent) => Promise<void> {
                 } finally {
                     logger.info({
                         method: "RAMI-ProcessSmQueue.handler",
-                        tookMs: Date.now() - start,
-                        customValidSmMessage: JSON.stringify(recordBody)
+                        tookMs: Date.now() - start
                     });
                 }
             })

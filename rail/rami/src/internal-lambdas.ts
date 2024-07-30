@@ -10,9 +10,10 @@ import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { RamiEnvKeys } from "./keys.js";
 
-export function create(stack: DigitrafficStack, sqs: Queue, dlq: Queue, dlqBucketName: string): void {
+export function create(stack: DigitrafficStack, rosmSqs: Queue, smSqs: Queue, dlq: Queue, dlqBucketName: string): void {
     const dlqBucket = createDLQBucket(stack, dlqBucketName);
-    createProcessRosmQueueLambda(stack, sqs, dlq);
+    createProcessRosmQueueLambda(stack, rosmSqs, dlq);
+    createProcessSmQueueLambda(stack, smSqs, dlq);
     createProcessDLQLambda(stack, dlq, dlqBucket);
 }
 
@@ -30,6 +31,22 @@ function createProcessRosmQueueLambda(stack: DigitrafficStack, queue: Queue, dlq
         [RamiEnvKeys.DLQ_URL]: dlq.queueUrl
     };
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-rosm-queue", lambdaEnv, {
+        memorySize: 256,
+        reservedConcurrentExecutions: 10,
+        timeout: 10
+    });
+    processQueueLambda.addEventSource(new SqsEventSource(queue));
+    dlq.grantSendMessages(processQueueLambda);
+    return processQueueLambda;
+}
+
+function createProcessSmQueueLambda(stack: DigitrafficStack, queue: Queue, dlq: Queue): MonitoredFunction {
+    const lambdaEnv = {
+        ...(stack.configuration.secretId && { SECRET_ID: stack.configuration.secretId }),
+        DB_APPLICATION: "avoindata",
+        [RamiEnvKeys.DLQ_URL]: dlq.queueUrl
+    };
+    const processQueueLambda = MonitoredDBFunction.create(stack, "process-sm-queue", lambdaEnv, {
         memorySize: 256,
         reservedConcurrentExecutions: 10,
         timeout: 10

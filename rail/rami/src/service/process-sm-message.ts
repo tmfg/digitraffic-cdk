@@ -18,6 +18,8 @@ export async function processSmMessage(message: DtSmMessage): Promise<void> {
     const rows = await findTimeTableRows(message.trainNumber, message.departureDate);
     const upsertValues: UpsertValues[] = [];
 
+    logger.debug(`rows for ${message.trainNumber} ${message.departureDate} : ${JSON.stringify(rows)}`);
+
     message.data.forEach(datarow => {
         // find attap_id for each line
         const attapId = findAttapId(rows, datarow);
@@ -31,17 +33,20 @@ export async function processSmMessage(message: DtSmMessage): Promise<void> {
                 ut: datarow.timeUnknown
             });
         } else {
-            logger.error({
+            logger.info({
                 method: "ProcessSmMessageService.processSmMessage",
                 message: "Could not find attapId for " + JSON.stringify(datarow)
             });
         }
     });
 
+    logger.debug(upsertValues);
+
+    /*
     return inTransaction(async (conn: Connection): Promise<void> => {
         // run all updates to db
         await insertOrUpdate(conn, upsertValues);
-    });    
+    });*/    
 }
 
 function findAttapId(rows: TimeTableRow[], datarow: StMonitoringData): number | undefined {

@@ -21,7 +21,7 @@ export class RamiStack extends DigitrafficStack {
 
         new IntegrationApi(this, rosmSqs, smSqs, dlq);
 
-        InternalLambdas.create(this, rosmSqs, dlq, configuration.dlqBucketName);
+        InternalLambdas.create(this, rosmSqs, smSqs, dlq, configuration.dlqBucketName);
 
         const publicApi = new PublicApi(this);
         if (!this.secret) throw new Error("secret not found");
