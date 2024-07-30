@@ -5,7 +5,7 @@ const FIND_ROWS = `
 select attap_id, station_short_code, scheduled_time, type
 from time_table_row ttr
 where departure_date = :departureDate and train_number = :trainNumber
-order by scheduled_time, type;`;
+order by scheduled_time, type`;
 
 export interface TimeTableRow {
     readonly attap_id: number
