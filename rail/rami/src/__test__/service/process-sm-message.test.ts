@@ -1,6 +1,6 @@
 import type { DtSmMessage } from "../../model/dt-rosm-message.js";
 import { parseSmMessage } from "../../service/process-sm-message.js";
-import { validMessage2 } from "../testdata-sm.js";
+import { realMessage, validMessage2 } from "../testdata-sm.js";
 import { createSmMessage } from "../testdata-util.js";
 
 describe("parse sm messages", () => {
@@ -86,4 +86,9 @@ describe("parse sm messages", () => {
         expectMessage(processedMessage, 3, true, false, 1, 762, "20240319");
     });
 
+    test("parseSmMessage - real message", () => {
+        const processedMessage = parseSmMessage(realMessage);
+
+        expectMessage(processedMessage, 0, false, false, 0, 8844, "20240726");
+    });
 });
