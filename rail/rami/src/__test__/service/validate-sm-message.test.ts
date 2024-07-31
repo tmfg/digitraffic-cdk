@@ -1,8 +1,19 @@
 import { validateIncomingSmMessage } from "../../service/validate-message.js";
-import { validMessage2, validMessageUnknownTrackAndDelay } from "../testdata-sm.js";
+import { realMessage, validMessage2, validMessageUnknownTrackAndDelay } from "../testdata-sm.js";
 import { cloneAndUndefine } from "../message-util.js";
 
 describe("validate incoming sm message", () => {
+    function expectValid(message: unknown): void {
+        const result = validateIncomingSmMessage(message);
+
+        if(!result.valid) {
+            console.info(result.errors);
+        }
+
+        expect(result.valid).toBe(true);
+        if (result.valid) expect(result.value).toEqual(message);
+    }
+
     test("validateIncomingSmMessage - missing payload", () => {
         const invalidMessage = cloneAndUndefine(validMessageUnknownTrackAndDelay, "payload");
 
@@ -24,24 +35,14 @@ describe("validate incoming sm message", () => {
     });
 
     test("validateIncomingSmMessage - valid scheduledMessage", () => {
-        const result = validateIncomingSmMessage(validMessageUnknownTrackAndDelay);
-
-        if(!result.valid) {
-            console.info(result.errors);
-        }
-
-        expect(result.valid).toBe(true);
-        if (result.valid) expect(result.value).toEqual(validMessageUnknownTrackAndDelay);
+        expectValid(validMessageUnknownTrackAndDelay);
     });
 
     test("validateIncomingSmMessage - valid message with onwardCalls", () => {
-        const result = validateIncomingSmMessage(validMessage2);
+        expectValid(validMessage2);
+    });
 
-        if(!result.valid) {
-            console.info(result.errors);
-        }
-
-        expect(result.valid).toBe(true);
-        if (result.valid) expect(result.value).toEqual(validMessage2);
+    test("validateIncomingSmMessage - real message", () => {
+        expectValid(realMessage);
     });
 });
