@@ -6,6 +6,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 const SQL_ALL_COUNTERS = `select id, site_id, domain_name, site_domain, name, ST_Y(location::geometry) as lat, ST_Y(location::geometry) as lon, user_type_id, interval, direction, created, modified, last_data_timestamp, removed_timestamp
     from counting_site_counter
     where domain_name = $1
+    and removed_timestamp is null
     order by id`;
 
 const SQL_ALL_COUNTERS_FEATURE_COLLECTION = `select json_build_object(

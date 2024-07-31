@@ -19,7 +19,8 @@ export const handler = (): Promise<string> => {
     checker.expectOneOrMore(
         "data has values in last 48 hours",
         `with data as (
-                select counter_id, sum(count) from counting_site_data csd  where data_timestamp > now() - interval '48 hours'
+                select counter_id, sum(count) from counting_site_data csd
+                where data_timestamp > now() - interval '48 hours'
                 group by counter_id
             ) 
             select count(*) from data
