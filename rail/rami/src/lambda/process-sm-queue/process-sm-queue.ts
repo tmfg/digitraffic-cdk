@@ -2,28 +2,36 @@ import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { parseSmMessage, processSmMessage } from "../../service/process-sm-message.js";
+import { parseUDOTMessage, saveSMMessage } from "../../service/process-sm-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { sendDlq, sendUdotMessage } from "../../service/sqs-service.js";
 
-export function handlerFn(): (event: SQSEvent) => Promise<void> {
+export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return async (event: SQSEvent) => {
-        await Promise.allSettled(
+        return await Promise.allSettled(
             event.Records.map(async (r) => {
                 const start = Date.now();
                 const recordBody = r.body;
 
                 try {
-                    const parsedSmMessage = parseSmMessage(JSON.parse(recordBody));
+                    // parse udot message (unknown track/delay)
+                    const udotMessage = parseUDOTMessage(JSON.parse(recordBody));
+                    // TODO: parse sectoring
+                    // TODO: parse bus replacement
 
-                    if(parsedSmMessage) {
-                        logger.debug(parsedSmMessage);
+                    if(udotMessage) {
+                        logger.debug(udotMessage);
 
                         logger.info({
                             method: "RAMI-ProcessSmQueue.handler",
-                            customDataCount: parsedSmMessage.data.length
+                            customDataCount: udotMessage.data.length
                         });
 
-                        await processSmMessage(parsedSmMessage);
+                        await saveSMMessage(udotMessage.messageId, udotMessage.trainNumber, udotMessage.departureDate, recordBody);
+
+                        if(udotMessage.data.length > 0) {
+                            await sendUdotMessage(udotMessage);
+                        }
                     } else {
                         logger.debug(recordBody);
 
@@ -32,7 +40,8 @@ export function handlerFn(): (event: SQSEvent) => Promise<void> {
                             message: "Could not parse Sm message"
                         });
 
-                        // DLQ??
+                        // send invalid message and error report to dlq
+                        await sendDlq("could not parse UDOT", recordBody);
                     }    
 
                     return await Promise.resolve();

@@ -31,7 +31,7 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         });
         
         // send invalid message and error report to dlq
-        await sendDlq(validationResult, messageBody);     
+        await sendDlq(validationResult.errors, messageBody);     
     }
 
     return LambdaResponse.ok("OK");
