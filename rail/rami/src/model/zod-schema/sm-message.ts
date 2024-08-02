@@ -12,6 +12,7 @@ export const monitoredCall = z.object({
     aimedDepartureTime: z.string().describe("datetime, in UTC ISO8601, expected arrival time").optional(),
     expectedArrivalTime: z.string().describe("datetime, in UTC ISO8601, expected arrival time").optional(),
     expectedDepartureTime: z.string().describe("datetime, in UTC ISO8601, expected arrival time").optional(),
+    departureBoardingActivity: z.string(),
     stopPointRef: z.string().describe("station")
 });
 

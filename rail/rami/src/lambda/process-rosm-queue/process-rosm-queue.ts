@@ -10,9 +10,9 @@ import { RamiEnvKeys } from "../../keys.js";
 
 const DLQ_URL = getEnvVariable(RamiEnvKeys.DLQ_URL);
 
-export function handlerFn(): (event: SQSEvent) => Promise<void> {
+export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return async (event: SQSEvent) => {
-        await Promise.allSettled(
+        return await Promise.allSettled(
             event.Records.map(async (r) => {
                 const start = Date.now();
                 const recordBody = r.body;
@@ -30,9 +30,7 @@ export function handlerFn(): (event: SQSEvent) => Promise<void> {
                         
                         await sendToSqs(
                             DLQ_URL,
-                            2,
-                            `[{"errors":"${JSON.stringify(error)}"}, ${recordBody}}]`,
-                            parsedRamiMessage.id
+                            `[{"errors":"${JSON.stringify(error)}"}, ${recordBody}}]`
                         );
                         return Promise.reject(error);
                     }

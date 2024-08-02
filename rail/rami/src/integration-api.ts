@@ -77,7 +77,7 @@ export class IntegrationApi {
     createUploadSmMessageResource(
         stack: DigitrafficStack,
         resource: Resource,
-        sqs: Queue,
+        smSqs: Queue,
         dlq: Queue
     ): MonitoredDBFunction {
         const activeResource = resource.addResource("sm");
@@ -85,18 +85,18 @@ export class IntegrationApi {
         const uploadLambda = MonitoredFunction.create(stack, functionName, {
             functionName,
             timeout: Duration.seconds(15),
-            memorySize: 256,
+            memorySize: 128,
             code: new AssetCode("dist/lambda/upload-sm-message"),
             handler: "upload-sm-message.handler",
             runtime: Runtime.NODEJS_20_X,
-            reservedConcurrentExecutions: 20,
+            reservedConcurrentExecutions: 4,
             environment: { 
-                [RamiEnvKeys.SM_SQS_URL]: sqs.queueUrl, 
+                [RamiEnvKeys.SM_SQS_URL]: smSqs.queueUrl, 
                 [RamiEnvKeys.DLQ_URL]: dlq.queueUrl 
             }
         });
 
-        sqs.grantSendMessages(uploadLambda);
+        smSqs.grantSendMessages(uploadLambda);
         dlq.grantSendMessages(uploadLambda);
 
         const uploadRamiMessageIntegration = new DigitrafficIntegration(uploadLambda).build();

@@ -1,79 +1,37 @@
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { UnknownDelayOrTrack, UnknownDelayOrTrackMessage } from "../model/dt-rosm-message.js";
 import { monitoredCall, ramiSmMessageSchema } from "../model/zod-schema/sm-message.js";
 import type { z } from "zod";
-import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
-import { insertOrUpdate, type UpsertValues } from "../dao/stop_monitoring.js";
+import _ from "lodash";
+import { insertMessage } from "../dao/stop_monitoring.js";
 import type { Connection } from "mysql2/promise";
 import { inTransaction } from "../util/database.js";
-import type { DtSmMessage, StMonitoringData } from "../model/dt-rosm-message.js";
-import _ from "lodash";
 
-export async function processSmMessage(message: DtSmMessage): Promise<void> {
-    logger.info({
-        method: "ProcessSmMessageService.processSmMessage",
-        message: `Message for train ${message.trainNumber} ${message.departureDate}`
-    });
-
-    const rows = await findTimeTableRows(message.trainNumber, message.departureDate);
-    const upsertValues: UpsertValues[] = [];
-
-    logger.debug(`rows for ${message.trainNumber} ${message.departureDate} : ${JSON.stringify(rows)}`);
-
-    message.data.forEach(datarow => {
-        // find attap_id for each line
-        const attapId = findAttapId(rows, datarow);
-
-        if(attapId) {
-            upsertValues.push({
-                trainNumber: message.trainNumber,
-                trainDepartureDate: message.departureDate,
-                attapId, 
-                uq: datarow.quayUnknown,
-                ut: datarow.timeUnknown
-            });
-        } else {
-            logger.info({
-                method: "ProcessSmMessageService.processSmMessage",
-                message: "Could not find attapId for " + JSON.stringify(datarow)
-            });
-        }
-    });
-
-    logger.debug(upsertValues);
-
-    /*
-    return inTransaction(async (conn: Connection): Promise<void> => {
-        // run all updates to db
-        await insertOrUpdate(conn, upsertValues);
-    });*/    
-}
-
-function findAttapId(rows: TimeTableRow[], datarow: StMonitoringData): number | undefined {
-    const row = rows.find(r => {
-        console.info(`Comparing ${JSON.stringify(r)} and ${JSON.stringify(datarow)} with type ${datarow.type}`);
-
-        return r.station_short_code === datarow.stationShortCode && r.type === datarow.type && r.scheduled_time === datarow.scheduledTime
-    });
-
-    return row?.attap_id;
-}
-
-export function parseSmMessage(message: unknown): DtSmMessage | undefined {
+export function parseUDOTMessage(message: unknown): UnknownDelayOrTrackMessage | undefined {
     try {
         const parsedMessage = ramiSmMessageSchema.parse(message);
 
-        return ramiMessageToDtSmMessages(parsedMessage);
+        return ramiSmMessageToUDOTMessage(parsedMessage);
     } catch (e) {
         logException(logger, e);
     }
+    
     return undefined;
 }
 
-function ramiMessageToDtSmMessages(message: z.infer<typeof ramiSmMessageSchema>): DtSmMessage {
-    const data: StMonitoringData[] = [];
+export async function saveSMMessage(id: string, trainNumber: number, trainDepartureDate: string, message: string): Promise<void> {
+    await inTransaction(async (conn: Connection): Promise<void> => {
+        // run all updates to db
+        await insertMessage(conn, id, trainNumber, trainDepartureDate, message);
+    });
+}
+
+function ramiSmMessageToUDOTMessage(message: z.infer<typeof ramiSmMessageSchema>): UnknownDelayOrTrackMessage {
+    const data: UnknownDelayOrTrack[] = [];
     const mcj = message.payload.monitoredStopVisits[0].monitoredVehicleJourney;
     const monitoredCall = mcj.monitoredCall;
+    const messageId = message.headers.e2eId;
     const { trainNumber, departureDate } = parseTrain(mcj.vehicleJourneyName);
 
     data.push(...parseMonitoredCall(monitoredCall));
@@ -82,27 +40,31 @@ function ramiMessageToDtSmMessages(message: z.infer<typeof ramiSmMessageSchema>)
         data.push(...parseMonitoredCall(oc));
     });  
 
-    return { trainNumber, departureDate, data };
+    return { messageId, trainNumber, departureDate, data };
 }
 
-function parseMonitoredCall(mc: z.infer<typeof monitoredCall>): StMonitoringData[] {
-    const arrival: StMonitoringData | undefined = !mc.aimedArrivalTime ? undefined :{
+function parseMonitoredCall(mc: z.infer<typeof monitoredCall>): UnknownDelayOrTrack[] {
+    const arrival: UnknownDelayOrTrack | undefined = !!mc.aimedArrivalTime && includeCall(mc) ? {
         stationShortCode: mc.stopPointRef,
         scheduledTime: new Date(mc.aimedArrivalTime),
         type: 0,
-        timeUnknown: !mc.expectedArrivalTime,
-        quayUnknown: !mc.arrivalStopAssignment.expectedQuayName
-    }
+        delayUnknown: !mc.expectedArrivalTime,
+        trackUnknown: !mc.arrivalStopAssignment.expectedQuayName
+    } : undefined;
 
-    const departure: StMonitoringData | undefined = !mc.aimedDepartureTime ? undefined : {
+    const departure: UnknownDelayOrTrack | undefined = !!mc.aimedDepartureTime && includeCall(mc) ? {
         stationShortCode: mc.stopPointRef,
         scheduledTime: new Date(mc.aimedDepartureTime),
         type: 1,
-        timeUnknown: !mc.expectedDepartureTime,
-        quayUnknown: !mc.departureStopAssignment.expectedQuayName
-    };
+        delayUnknown: !mc.expectedDepartureTime,
+        trackUnknown: !mc.departureStopAssignment.expectedQuayName
+    } : undefined;
 
     return _.compact([arrival, departure]);
+}
+
+function includeCall(mc: z.infer<typeof monitoredCall>): boolean {
+    return mc.departureBoardingActivity === "boarding";
 }
 
 /**
@@ -123,7 +85,7 @@ function parseTrain(vehicleJourney: string): {
     const trainNumber = vehicleJourney.substring(9);
 
     return {
-        departureDate,
+        departureDate: `${departureDate.substring(0, 4)}-${departureDate.substring(4, 6)}-${departureDate.substring(6, 8)}`,
         trainNumber: Number.parseInt(trainNumber),
     }
 }

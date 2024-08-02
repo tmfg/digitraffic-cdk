@@ -10,18 +10,18 @@ order by scheduled_time, type`;
 export interface TimeTableRow {
     readonly attap_id: number
     readonly station_short_code: string
-    readonly scheduled_time: Date
+    readonly scheduled_time: string
     readonly type: number;
 }
 
 /**
  * Find all time table rows for given train
  */
-export async function findTimeTableRows(trainNumber: number, trainDepartureDate: string): Promise<TimeTableRow[]> {
+export async function findTimeTableRows(trainNumber: number, departureDate: string): Promise<TimeTableRow[]> {
     const [rows] = await inDatabase(async (conn: Connection) => {
-        return conn.query(FIND_ROWS, {
+        return await conn.query(FIND_ROWS, {
             trainNumber,
-            trainDepartureDate
+            departureDate
         });
     });
     return rows as TimeTableRow[];

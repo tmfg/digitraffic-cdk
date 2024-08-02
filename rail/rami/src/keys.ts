@@ -3,5 +3,6 @@ export const RamiEnvKeys = {
     SQS_DLQ_BUCKET_NAME: "SQS_DLQ_BUCKET_NAME",
     ROSM_SQS_URL: "ROSM_SQS_URL",
     SM_SQS_URL: "SM_SQS_URL",
+    UDOT_SQS_URL: "UDOT_SQS_URL",
     DLQ_URL: "DLQ_URL"
 } as const;

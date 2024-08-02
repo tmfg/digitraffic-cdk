@@ -18,13 +18,6 @@ type addFormats = (ajv: typeof Ajv) => void;
 
 const addFormats: addFormats = addFormatsOrig.default as unknown as addFormats;
 
-// we can assume id exists if message passes validation
-export interface ValidatedRamiMessage {
-    payload: {
-        messageId: string;
-    };
-}
-
 export interface Invalid {
     valid: false;
     errors: string;
@@ -35,15 +28,15 @@ export interface Valid<T> {
 }
 export type ValidationResult<T> = Valid<T> | Invalid;
 
-export function validateIncomingRosmMessage(message: unknown): ValidationResult<ValidatedRamiMessage> {
+export function validateIncomingRosmMessage<T>(message: unknown): ValidationResult<T> {
     return validateWithSchema(ramiRosmMessageJsonSchema, message);
 }
 
-export function validateIncomingSmMessage(message: unknown): ValidationResult<ValidatedRamiMessage> {
+export function validateIncomingSmMessage<T>(message: unknown): ValidationResult<T> {
     return validateWithSchema(ramiSmMessageJsonSchema, message);
 }
 
-function validateWithSchema(schema: unknown, message: unknown): ValidationResult<ValidatedRamiMessage> {
+function validateWithSchema<T>(schema: unknown, message: unknown): ValidationResult<T> {
     const ajv = new Ajv({ allErrors: true });
     addFormats(ajv);
     // allow custom field "example" used in the schema
@@ -51,7 +44,7 @@ function validateWithSchema(schema: unknown, message: unknown): ValidationResult
     // allow custom format "HH:MM" used in the schema
     ajv.addFormat("HH:MM", /^\d{2}:\d{2}$/);
     return ajv.validate(schema, message)
-        ? { valid: true, value: message as ValidatedRamiMessage }
+        ? { valid: true, value: message as T }
         : { valid: false, errors: ajv.errorsText() };
 
 }
