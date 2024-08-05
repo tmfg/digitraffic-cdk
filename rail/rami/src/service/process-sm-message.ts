@@ -4,7 +4,7 @@ import type { UnknownDelayOrTrack, UnknownDelayOrTrackMessage } from "../model/d
 import { monitoredCall, ramiSmMessageSchema } from "../model/zod-schema/sm-message.js";
 import type { z } from "zod";
 import _ from "lodash";
-import { insertMessage } from "../dao/stop_monitoring.js";
+import { insertMessage } from "../dao/stop_monitoring_message.js";
 import type { Connection } from "mysql2/promise";
 import { inTransaction } from "../util/database.js";
 

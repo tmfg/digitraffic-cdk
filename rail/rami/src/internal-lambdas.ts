@@ -10,6 +10,7 @@ import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { RamiEnvKeys } from "./keys.js";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import { Duration } from "aws-cdk-lib";
 
 export function create(stack: DigitrafficStack, rosmSqs: Queue, smSqs: Queue, udotSqs: Queue, dlq: Queue, dlqBucketName: string): void {
     const dlqBucket = createDLQBucket(stack, dlqBucketName);
@@ -72,11 +73,15 @@ function createProcessUdotQueueLambda(stack: DigitrafficStack, queue: Queue, dlq
         [RamiEnvKeys.DLQ_URL]: dlq.queueUrl
     };
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-udot-queue", lambdaEnv, {
-        memorySize: 128,
+        memorySize: 256,
         reservedConcurrentExecutions: 1,
         timeout: 10
     });
-    processQueueLambda.addEventSource(new SqsEventSource(queue, {reportBatchItemFailures: true}));
+    processQueueLambda.addEventSource(new SqsEventSource(queue, {
+        reportBatchItemFailures: true,
+        batchSize: 20,
+        maxBatchingWindow: Duration.seconds(5)
+    }));
     dlq.grantSendMessages(processQueueLambda);
     return processQueueLambda;
 }
