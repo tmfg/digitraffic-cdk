@@ -1,5 +1,5 @@
 import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
-import type { Invalid, Valid } from "./validate-message.js";
+import type { Valid } from "./validate-message.js";
 import { sendToSqs } from "../util/sqs.js";
 import { RamiEnvKeys } from "../keys.js";
 import type { UnknownDelayOrTrackMessage } from "../model/dt-rosm-message.js";
