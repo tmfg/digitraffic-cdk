@@ -1,5 +1,5 @@
-import { IncomingMessage } from "http";
-import { CloudWatchLogsDecodedData } from "aws-lambda";
+import type { IncomingMessage } from "http";
+import type { CloudWatchLogsDecodedData } from "aws-lambda";
 
 const nanValue = -1;
 
@@ -15,7 +15,7 @@ export function getIndexName(appName: string, timestampFromEvent: number): strin
     return `${appName}-${timePart}`;
 }
 
-export function buildFromMessage(message: string, enableJsonParse: boolean): unknown {
+export function buildFromMessage(message: string, enableJsonParse: boolean): object {
     if (skipElasticLogging(message)) {
         return {};
     }
@@ -28,7 +28,7 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): unk
 
     try {
         if (enableJsonParse) {
-            const parsedJson = parseJson(message);
+            const parsedJson = parseJson<object>(message);
 
             if (parsedJson) {
                 return parsedJson;
@@ -40,22 +40,28 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): unk
             log_line: logLine
         };
     } catch (e) {
-        console.info("error " + e);
+        // eslint-disable-next-line no-console
+        console.info("error " + (e as Error).toString());
+        // eslint-disable-next-line no-console
         console.error("Error converting to json:" + message);
     }
 
     return {};
 }
 
-function parseJson<T>(message: string): T | null {
+function parseJson<T extends object>(message: string): T | null {
     const jsonSubString = extractJson(message);
     if (jsonSubString !== null) {
-        const parsedJson = JSON.parse(jsonSubString);
+        const parsedJson = JSON.parse(jsonSubString) as T;
 
         // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
-        if ("@fields" in parsedJson && "upstream_response_time" in parsedJson["@fields"]) {
-            // eslint-disable-next-line camelcase
-            parsedJson["@fields"].upstream_response_time = parseUpstreamResponseTime(parsedJson);
+        if (
+            "@fields" in parsedJson &&
+            "upstream_response_time" in (parsedJson["@fields"] as { [key: string]: unknown })
+        ) {
+            // eslint-disable-next-line camelcase, dot-notation
+            (parsedJson["@fields"] as { [key: string]: unknown })["upstream_response_time"] =
+                parseUpstreamResponseTime(parsedJson as { "@fields": { upstream_response_time: string } });
         }
 
         return parsedJson;
@@ -64,11 +70,11 @@ function parseJson<T>(message: string): T | null {
     return null;
 }
 
-function parseUpstreamResponseTime(parsedJson: any) {
+function parseUpstreamResponseTime(parsedJson: { "@fields": { upstream_response_time: string } }) {
     if (parsedJson["@fields"].upstream_response_time) {
         const sum = parsedJson["@fields"].upstream_response_time
             .split(":")
-            .reduce((prev: any, next: any) => prev + +next, 0)
+            .reduce((prev, next) => prev + +next, 0)
             .toFixed(3);
         if (sum && !isNaN(+sum)) {
             return parseFloat(sum);
@@ -138,7 +144,8 @@ export function filterIds(body: string, ids: string[]): string {
         const logLine = lines[i + 1];
 
         // ends with newline, so one empty line in the end
-        if (indexLine.length > 0 && !containsIds(logLine, ids)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        if (indexLine!.length > 0 && !containsIds(logLine!, ids)) {
             newBody += indexLine + "\n";
             newBody += logLine + "\n";
         }
@@ -217,7 +224,9 @@ export function parseESReturnValue(response: IncomingMessage, responseBody: stri
             failedItems: failedItems
         };
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.log("Could not parse " + responseBody);
+        // eslint-disable-next-line no-console
         console.log("Error: " + JSON.stringify(error, null, 2));
         return {};
     }

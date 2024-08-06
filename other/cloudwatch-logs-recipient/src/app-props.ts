@@ -1,4 +1,4 @@
-import { FunctionProps } from "aws-cdk-lib/aws-lambda";
+import type { FunctionProps } from "aws-cdk-lib/aws-lambda";
 
 export interface Props {
     readonly accounts: Account[];

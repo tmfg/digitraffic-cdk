@@ -1,36 +1,43 @@
 import "source-map-support/register";
-import { Context, KinesisStreamRecord, CloudWatchLogsDecodedData, KinesisStreamHandler } from "aws-lambda";
+import type {
+    Context,
+    KinesisStreamRecord,
+    CloudWatchLogsDecodedData,
+    KinesisStreamHandler
+} from "aws-lambda";
 
-import * as AWSx from "aws-sdk";
+import AWS, { type EnvironmentCredentials, type HttpRequest } from "aws-sdk";
 import {
+    type ESReturnValue,
     extractJson,
     filterIds,
     getFailedIds,
     getIndexName,
     isControlMessage,
-    ItemStatus,
+    type ItemStatus,
     parseESReturnValue,
     parseNumber
-} from "./util";
-import { getAppFromSenderAccount, getEnvFromSenderAccount } from "./accounts";
-import { notifyFailedItems } from "./notify";
-import { CloudWatchLogsLogEventExtractedFields } from "aws-lambda/trigger/cloudwatch-logs";
-import { IncomingMessage } from "http";
-import { Statistics } from "./statistics";
-import { Account } from "../../app-props";
+} from "./util.js";
+import { getAppFromSenderAccount, getEnvFromSenderAccount } from "./accounts.js";
+import { notifyFailedItems } from "./notify.js";
+import type { CloudWatchLogsLogEventExtractedFields } from "aws-lambda";
+import type { IncomingMessage } from "http";
+import { Statistics } from "./statistics.js";
+import type { Account } from "../../app-props.js";
 import zlib from "zlib";
 
-const AWS = AWSx as any;
-
 const knownAccounts: Account[] = JSON.parse(
-    process.env.KNOWN_ACCOUNTS as unknown as string
+    // eslint-disable-next-line dot-notation
+    process.env["KNOWN_ACCOUNTS"] as unknown as string
 ) as unknown as Account[];
 const creds = new AWS.EnvironmentCredentials("AWS");
 
-const endpoint = process.env.ES_ENDPOINT as unknown as string;
+// eslint-disable-next-line dot-notation
+const endpoint = process.env["ES_ENDPOINT"] as unknown as string;
 const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.com$/) as string[];
 const esEndpoint = new AWS.Endpoint(endpoint);
-const region = endpointParts[2];
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const region: string = endpointParts[2]!;
 
 const MAX_BODY_SIZE = 3 * 1000 * 1000;
 const SEPARATOR_LAMBDA_LOGS = "\t";
@@ -59,8 +66,10 @@ export const handler: KinesisStreamHandler = (event, context): void => {
             postToElastic(context, true, batchBody);
         }
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.log("ERROR ", e);
     } finally {
+        // eslint-disable-next-line no-console
         console.log("statistics " + JSON.stringify(statistics));
     }
 };
@@ -76,6 +85,7 @@ function handleRecord(record: KinesisStreamRecord, statistics: Statistics): stri
 
     // skip control messages
     if (isControlMessage(awslogsData)) {
+        // eslint-disable-next-line no-console
         console.log("Received a control message");
         return "";
     }
@@ -85,8 +95,9 @@ function handleRecord(record: KinesisStreamRecord, statistics: Statistics): stri
 
 function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchBulkData: string) {
     // post documents to the Amazon Elasticsearch Service
-    post(elasticsearchBulkData, (error: any, success: any, statusCode: number, failedItems: ItemStatus[]) => {
+    post(elasticsearchBulkData, (error, success, statusCode, failedItems) => {
         if (error) {
+            // eslint-disable-next-line no-console
             console.log("Error: " + JSON.stringify(error, null, 2));
 
             if (failedItems && failedItems.length > 0) {
@@ -96,6 +107,7 @@ function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchB
                 if (retryOnFailure) {
                     const failedIds = getFailedIds(failedItems);
 
+                    // eslint-disable-next-line no-console
                     console.log("reposting, failed ids " + failedIds.toString());
 
                     // some items failed, try to repost
@@ -109,9 +121,40 @@ function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchB
     });
 }
 
-export function post(body: string, callback: any) {
+type PostCallback = (
+    error: ESReturnValue["error"] | Error,
+    success?: ESReturnValue["success"],
+    statusCode?: IncomingMessage["statusCode"],
+    failedItems?: ESReturnValue["failedItems"]
+) => void;
+// Signers API as well as NodeHttpClient are part of private API in AWS SDK v2.
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace AWS {
+        // eslint-disable-next-line @typescript-eslint/no-namespace
+        namespace Signers {
+            class V4 {
+                constructor(request: AWS.HttpRequest, serviceName: string, options?: object);
+                addAuthorization(creds: EnvironmentCredentials, date: Date): void;
+            }
+        }
+        class NodeHttpClient {
+            // eslint-disable-next-line @typescript-eslint/ban-types,@rushstack/no-new-null
+            handleRequest(
+                req: HttpRequest,
+                options: object | null,
+                callback: Function,
+                errCallback: Function
+            ): void;
+        }
+    }
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function post(body: string, callback: PostCallback) {
     const req = new AWS.HttpRequest(esEndpoint, region);
 
+    // eslint-disable-next-line no-console
     console.log("sending POST to es unCompressedSize=%d", body.length);
 
     if (body.length === 0) {
@@ -121,7 +164,7 @@ export function post(body: string, callback: any) {
     req.method = "POST";
     req.path = "/_bulk?pipeline=keyval";
     req.headers["presigned-expires"] = "false";
-    req.headers.Host = esEndpoint.host;
+    req.headers["Host"] = esEndpoint.host;
     req.body = body;
     req.headers["Content-Type"] = "application/json";
 
@@ -134,10 +177,10 @@ export function post(body: string, callback: any) {
         null,
         (response: IncomingMessage) => {
             let respBody = "";
-            response.on("data", function (chunk: any) {
+            response.on("data", function (chunk: string) {
                 respBody += chunk;
             });
-            response.on("end", function (chunk: any) {
+            response.on("end", function (chunk: string) {
                 const parsedValues = parseESReturnValue(response, respBody);
 
                 callback(
@@ -149,6 +192,7 @@ export function post(body: string, callback: any) {
             });
         },
         function (err: Error) {
+            // eslint-disable-next-line
             console.log("Error: " + err);
             callback(err);
         }
@@ -175,11 +219,14 @@ export function transform(
                 const source = buildSource(logEvent.message, logEvent.extractedFields);
                 source["@id"] = logEvent.id;
                 source["@timestamp"] = new Date(logEvent.timestamp).toISOString();
-                source.level = messageParts[2];
-                source.message = messageParts[3];
+                // eslint-disable-next-line dot-notation
+                source["level"] = messageParts[2];
+                // eslint-disable-next-line dot-notation
+                source["message"] = messageParts[3];
                 source["@log_group"] = payload.logGroup;
                 source["@app"] = appName;
-                source.fields = { app: appName };
+                // eslint-disable-next-line dot-notation
+                source["fields"] = { app: appName };
                 source["@transport_type"] = app;
 
                 const action = {
@@ -206,7 +253,10 @@ export function isLambdaLifecycleEvent(message: string) {
     );
 }
 
-export function buildSource(message: string, extractedFields?: CloudWatchLogsLogEventExtractedFields): any {
+export function buildSource(
+    message: string,
+    extractedFields?: CloudWatchLogsLogEventExtractedFields
+): object {
     message = message.replace("[, ]", "[0.0,0.0]");
 
     if (extractedFields) {
@@ -238,18 +288,15 @@ function isDebugLine(logline: string): boolean {
     // split[2] LOG level
     // split[3] log line
 
-    return split.length > 3 && split[3].startsWith("DEBUG");
+    return !!(split.length > 3 && split[3]?.startsWith("DEBUG"));
 }
 
-function buildFromExtractedFields(
-    message: string,
-    extractedFields: CloudWatchLogsLogEventExtractedFields
-): unknown {
-    const source = {} as any;
+function buildFromExtractedFields(message: string, extractedFields: CloudWatchLogsLogEventExtractedFields) {
+    const source: object = {};
 
     for (const key in extractedFields) {
         if (extractedFields[key]) {
-            const value = extractedFields[key] as string;
+            const value = extractedFields[key];
 
             const numValue = parseNumber(value);
 
@@ -258,13 +305,14 @@ function buildFromExtractedFields(
             } else {
                 const jsonSubString = extractJson(value);
                 if (jsonSubString !== null) {
-                    source["$" + key] = JSON.parse(jsonSubString);
+                    source["$" + key] = JSON.parse(jsonSubString) as unknown;
                 }
 
                 source[key] = value;
             }
         }
     }
-    source.message = message;
+    // eslint-disable-next-line dot-notation
+    source["message"] = message;
     return source;
 }

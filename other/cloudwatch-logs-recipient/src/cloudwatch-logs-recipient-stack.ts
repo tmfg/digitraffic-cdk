@@ -1,21 +1,21 @@
-import { Stack, StackProps, Duration } from "aws-cdk-lib";
+import { Stack, type StackProps, Duration } from "aws-cdk-lib";
 import { Role, ServicePrincipal, PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { CrossAccountDestination, CfnDestination, RetentionDays } from "aws-cdk-lib/aws-logs";
+import { CrossAccountDestination, type CfnDestination, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Stream } from "aws-cdk-lib/aws-kinesis";
 import {
-    Function,
-    FunctionProps,
+    type Function,
+    type FunctionProps,
     AssetCode,
     Runtime,
     StartingPosition,
     Architecture
 } from "aws-cdk-lib/aws-lambda";
 import { KinesisEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { ITopic, Topic } from "aws-cdk-lib/aws-sns";
+import { type ITopic, Topic } from "aws-cdk-lib/aws-sns";
 import { EmailSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { Props } from "./app-props";
+import type { Props } from "./app-props.js";
 
 export class CloudWatchLogsRecipientStack extends Stack {
     constructor(scope: Construct, id: string, cwlrProps: Props, props?: StackProps) {
@@ -164,7 +164,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
         warningTopic: ITopic,
         alarmTopic: ITopic,
         props: Props
-    ): Function {
+    ): MonitoredFunction {
         const kinesisToESId = "KinesisToES";
         const lambdaConf = {
             role: lambdaRole,
@@ -200,7 +200,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
         warningTopic: ITopic,
         alarmTopic: ITopic,
         props: Props
-    ): Function {
+    ): MonitoredFunction {
         const kinesisToESId = "AppLogs-KinesisToES";
         const lambdaConf = {
             role: lambdaRole,

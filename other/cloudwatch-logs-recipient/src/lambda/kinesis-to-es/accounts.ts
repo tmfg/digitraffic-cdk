@@ -1,4 +1,4 @@
-import { Account } from "../../app-props";
+import type { Account } from "../../app-props.js";
 
 export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]): string {
     const app = knownAccounts.find((value) => {

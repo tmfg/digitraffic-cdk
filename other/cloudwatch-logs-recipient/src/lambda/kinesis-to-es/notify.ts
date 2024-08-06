@@ -1,5 +1,5 @@
 import { SNS } from "aws-sdk";
-import { ItemStatus } from "./util";
+import type { ItemStatus } from "./util.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 const topicArn = getEnvVariable("TOPIC_ARN");
@@ -7,6 +7,7 @@ const topicArn = getEnvVariable("TOPIC_ARN");
 const sns = new SNS();
 
 export function notifyFailedItems(failedItems: ItemStatus[]) {
+    // eslint-disable-next-line no-console
     console.log(`failed items ${JSON.stringify(failedItems)}`);
 
     sns.publish(
@@ -16,6 +17,7 @@ export function notifyFailedItems(failedItems: ItemStatus[]) {
         },
         (err?: Error) => {
             if (err) {
+                // eslint-disable-next-line no-console
                 console.info("publish failed", err.message);
             }
         }

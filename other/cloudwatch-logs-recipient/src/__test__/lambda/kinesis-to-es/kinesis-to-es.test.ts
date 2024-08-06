@@ -1,4 +1,12 @@
-import { Statistics } from "../../../lib/lambda/kinesis-to-es/statistics";
+import { Statistics } from "../../../lambda/kinesis-to-es/statistics.js";
+import type { CloudWatchLogsDecodedData, CloudWatchLogsLogEvent } from "aws-lambda";
+import {
+    buildSource,
+    isLambdaLifecycleEvent,
+    transform
+} from "../../../lambda/kinesis-to-es/lambda-kinesis-to-es.js";
+import { getAppFromSenderAccount, getEnvFromSenderAccount } from "../../../lambda/kinesis-to-es/accounts.js";
+import type { Account } from "../../../app-props.js";
 
 const accountNumber = "123456789012";
 const app = "someapp";
@@ -10,18 +18,12 @@ const accounts: Account[] = [
         env
     }
 ];
-process.env.TOPIC_ARN = "somearn";
-process.env.KNOWN_ACCOUNTS = JSON.stringify(accounts);
-process.env.ES_ENDPOINT = "some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com";
-
-import { CloudWatchLogsDecodedData, CloudWatchLogsLogEvent } from "aws-lambda";
-import {
-    buildSource,
-    isLambdaLifecycleEvent,
-    transform
-} from "../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es";
-import { getAppFromSenderAccount, getEnvFromSenderAccount } from "../../../lib/lambda/kinesis-to-es/accounts";
-import { Account } from "../../../lib/app-props";
+// eslint-disable-next-line dot-notation
+process.env["TOPIC_ARN"] = "somearn";
+// eslint-disable-next-line dot-notation
+process.env["KNOWN_ACCOUNTS"] = JSON.stringify(accounts);
+// eslint-disable-next-line dot-notation
+process.env["ES_ENDPOINT"] = "some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com";
 
 const TEST_LOGLINE = "2021-10-08T05:41:10.271Z\tec182986-d87f-5ce8-8ad8-705f04503e55\tINFO\tlogline";
 
@@ -58,7 +60,8 @@ describe("kinesis-to-es", () => {
 
     test("buildSource", () => {
         const source = buildSource(TEST_LOGLINE, undefined);
-        expect(source.log_line).toBe(TEST_LOGLINE);
+        // eslint-disable-next-line dot-notation
+        expect(source["log_line"]).toBe(TEST_LOGLINE);
     });
 
     test("transform", () => {

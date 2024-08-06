@@ -1,4 +1,5 @@
-import { Account } from "../../../lib/app-props";
+import type { Account } from "../../../app-props.js";
+import { buildSource } from "../../../lambda/kinesis-to-es/app-kinesis-to-es.js";
 
 const accountNumber = "123456789012";
 const app = "someapp";
@@ -10,11 +11,12 @@ const accounts: Account[] = [
         env
     }
 ];
-process.env.TOPIC_ARN = "somearn";
-process.env.KNOWN_ACCOUNTS = JSON.stringify(accounts);
-process.env.ES_ENDPOINT = "some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com";
-
-import { buildSource } from "../../../lib/lambda/kinesis-to-es/app-kinesis-to-es";
+// eslint-disable-next-line dot-notation
+process.env["TOPIC_ARN"] = "somearn";
+// eslint-disable-next-line dot-notation
+process.env["KNOWN_ACCOUNTS"] = JSON.stringify(accounts);
+// eslint-disable-next-line dot-notation
+process.env["ES_ENDPOINT"] = "some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com";
 
 describe("app-kinesis-to-es", () => {
     test("buildSource one upstream_response_time", () => {
