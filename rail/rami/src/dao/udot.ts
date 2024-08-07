@@ -2,16 +2,16 @@ import type { Connection } from "mysql2/promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const SQL_DELETE_OLD_VALUES = `
-DELETE FROM stop_monitoring
-WHERE train_departure_date < current_date - INTERVAL 2 DAY`;
+DELETE FROM rami_udot
+WHERE created_db < current_date - INTERVAL 2 DAY`;
 
 const SQL_UPDATE_FALSE_VALUES = `
 UPDATE rami_udot
 SET unknown_delay = false, unknown_track = false
-WHERE train_number = :trainNumber AND departure_date = :trainDepartureDate AND attap_id = :attapId`;
+WHERE train_number = :trainNumber AND train_departure_date = :trainDepartureDate AND attap_id = :attapId`;
 
 const SQL_UPSERT_VALUES = `
-INSERT INTO rami_udot(message_id, train_number, train_departure_date, attap_id, unknown_delay, unknown_track)
+INSERT INTO rami_udot(rami_message_id, train_number, train_departure_date, attap_id, unknown_delay, unknown_track)
 VALUES (:messageId, :trainNumber, :trainDepartureDate, :attapId, :ud, :ut)
 ON DUPLICATE KEY UPDATE
     unknown_delay = :ud,
@@ -19,18 +19,25 @@ ON DUPLICATE KEY UPDATE
 /*
 
 create table rami_udot (
-    message_id VARCHAR(36) NOT NULL PRIMARY KEY,
+    rami_message_id VARCHAR(36) NOT NULL PRIMARY KEY,
     train_number INT UNSIGNED NOT NULL,
     train_departure_date DATE NOT NULL,
 	attap_id BIGINT UNSIGNED NOT NULL, 
     created_db DATETIME DEFAULT CURRENT_TIMESTAMP,
-	modified_db DATETIME ON UPDATE CURRENT_TIMESTAMP,
+	modified_db DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   	model_updated_time DATETIME,
 	unknown_track BOOLEAN NOT NULL, 
 	unknown_delay BOOLEAN NOT NULL
 );
 
 create unique index rami_udot_at_u on rami_udot(train_departure_date, train_number, attap_id);
 create index rami_udot_created_i on rami_udot(created_db);
+
+create trigger rami_udot_before_update BEFORE UPDATE on rami_udot for each row BEGIN 
+	IF (OLD.model_updated_time = NEW.model_updated_time) THEN
+	   set new.model_updated_time = null;	
+    END IF;
+END
 
 */
 
@@ -48,9 +55,9 @@ export async function insertOrUpdate(conn: Connection, values: UdotUpsertValues[
     await Promise.allSettled(values.map(async v => {
         try {
             if(v.ud === false && v.ut === false) {
-                return conn.query(SQL_UPDATE_FALSE_VALUES, v);
+                return await conn.query(SQL_UPDATE_FALSE_VALUES, v);
             } else {
-                return conn.query(SQL_UPSERT_VALUES, v) 
+                return await conn.query(SQL_UPSERT_VALUES, v) 
             };
         } catch(error) {
             logger.error({

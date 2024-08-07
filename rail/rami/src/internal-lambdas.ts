@@ -55,8 +55,8 @@ function createProcessSmQueueLambda(stack: DigitrafficStack, smQueue: Queue, udo
     };
 
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-sm-queue", lambdaEnv, {
-        memorySize: 128,
-        reservedConcurrentExecutions: 1,
+        memorySize: 256,
+        reservedConcurrentExecutions: 6,
         timeout: 10
     });
     processQueueLambda.addEventSource(new SqsEventSource(smQueue, {reportBatchItemFailures: true}));
@@ -74,13 +74,14 @@ function createProcessUdotQueueLambda(stack: DigitrafficStack, queue: Queue, dlq
     };
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-udot-queue", lambdaEnv, {
         memorySize: 256,
-        reservedConcurrentExecutions: 1,
+        reservedConcurrentExecutions: 2,
         timeout: 10
     });
     processQueueLambda.addEventSource(new SqsEventSource(queue, {
         reportBatchItemFailures: true,
-        batchSize: 20,
-        maxBatchingWindow: Duration.seconds(5)
+        batchSize: 30,
+        maxBatchingWindow: Duration.seconds(5),
+        maxConcurrency: 2
     }));
     dlq.grantSendMessages(processQueueLambda);
     return processQueueLambda;

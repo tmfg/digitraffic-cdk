@@ -32,8 +32,8 @@ export class RamiStack extends DigitrafficStack {
 
     createSqs(stack: DigitrafficStack, name: string, dlq: Queue): DigitrafficSqsQueue {
         return DigitrafficSqsQueue.create(stack, name, {
-            receiveMessageWaitTime: Duration.seconds(5),
-            visibilityTimeout: Duration.seconds(60),
+            receiveMessageWaitTime: Duration.seconds(2),
+            visibilityTimeout: Duration.seconds(10),
             deadLetterQueue: { queue: dlq, maxReceiveCount: 2 }
         });
     }
