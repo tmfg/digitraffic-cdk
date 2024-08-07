@@ -1,9 +1,9 @@
 import { CfnOutput, Stack } from "aws-cdk-lib";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import * as ecr from "aws-cdk-lib/aws-ecr";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as rds from "aws-cdk-lib/aws-rds";
-import { RataProps } from "./rata-props";
+import type { RataProps } from "./rata-props.js";
 
 export class TrainHistoryStack extends Stack {
     constructor(scope: Construct, id: string, props: RataProps) {
@@ -20,7 +20,7 @@ export class TrainHistoryStack extends Stack {
             props.trainHistory.web.ecrRepo
         );
         new CfnOutput(this, "trainHistoryWebRepoArnOutput", {
-            value: trainHistoryWebRepo.repositoryArn,
+            value: trainHistoryWebRepo.repositoryArn
         });
 
         const trainHistoryBackendRepo = ecr.Repository.fromRepositoryName(
@@ -29,7 +29,7 @@ export class TrainHistoryStack extends Stack {
             props.trainHistory.backend.ecrRepo
         );
         new CfnOutput(this, "trainHistoryBackendRepoArnOutput", {
-            value: trainHistoryBackendRepo.repositoryArn,
+            value: trainHistoryBackendRepo.repositoryArn
         });
 
         const trainHistoryUpdaterRepo = ecr.Repository.fromRepositoryName(
@@ -38,7 +38,7 @@ export class TrainHistoryStack extends Stack {
             props.trainHistory.updater.ecrRepo
         );
         new CfnOutput(this, "trainHistoryUpdaterRepoArnOutput", {
-            value: trainHistoryUpdaterRepo.repositoryArn,
+            value: trainHistoryUpdaterRepo.repositoryArn
         });
     }
 
@@ -49,19 +49,18 @@ export class TrainHistoryStack extends Stack {
             props.trainHistory.database.securityGroupId
         );
         new CfnOutput(this, "trainHistoryDbSecurityGroupIdOutput", {
-            value: securityGroup.securityGroupId,
+            value: securityGroup.securityGroupId
         });
 
-        const databaseCluster: rds.IDatabaseCluster =
-            rds.DatabaseCluster.fromDatabaseClusterAttributes(
-                this,
-                "trainHistoryDatabaseCluster",
-                {
-                    clusterIdentifier: props.trainHistory.database.clusterId,
-                }
-            );
+        const databaseCluster: rds.IDatabaseCluster = rds.DatabaseCluster.fromDatabaseClusterAttributes(
+            this,
+            "trainHistoryDatabaseCluster",
+            {
+                clusterIdentifier: props.trainHistory.database.clusterId
+            }
+        );
         new CfnOutput(this, "trainHistoryDatabaseClusterArnOutput", {
-            value: databaseCluster.clusterIdentifier,
+            value: databaseCluster.clusterIdentifier
         });
     }
 }

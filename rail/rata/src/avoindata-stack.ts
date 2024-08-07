@@ -4,8 +4,8 @@ import * as ecr from "aws-cdk-lib/aws-ecr";
 import * as ecs from "aws-cdk-lib/aws-ecs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as rds from "aws-cdk-lib/aws-rds";
-import { Construct } from "constructs";
-import { RataProps } from "./rata-props";
+import type { Construct } from "constructs";
+import type { RataProps } from "./rata-props.js";
 
 export class AvoinDataStack extends Stack {
     constructor(scope: Construct, id: string, props: RataProps) {
