@@ -85,11 +85,11 @@ export class IntegrationApi {
         const uploadLambda = MonitoredFunction.create(stack, functionName, {
             functionName,
             timeout: Duration.seconds(15),
-            memorySize: 128,
+            memorySize: 256,
             code: new AssetCode("dist/lambda/upload-sm-message"),
             handler: "upload-sm-message.handler",
             runtime: Runtime.NODEJS_20_X,
-            reservedConcurrentExecutions: 4,
+            reservedConcurrentExecutions: 10,
             environment: { 
                 [RamiEnvKeys.SM_SQS_URL]: smSqs.queueUrl, 
                 [RamiEnvKeys.DLQ_URL]: dlq.queueUrl 
