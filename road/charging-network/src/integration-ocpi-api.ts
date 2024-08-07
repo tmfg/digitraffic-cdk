@@ -46,7 +46,7 @@ export class IntegrationOcpiApi {
             stack.configuration as ChargingNetworkProps
         ).ocpiBusinessDetailsWebsite;
 
-        this.createLambdaAuthorizer(stack, environment);
+        this.lambdaAuthorizer = this.createLambdaAuthorizer(stack, environment);
         this.createOcpiResources(this.publicApi);
         this.createOcpiResourcesV2_1_1(this.publicApi);
 
@@ -152,12 +152,15 @@ export class IntegrationOcpiApi {
         });
     }
 
-    createLambdaAuthorizer(stack: DigitrafficStack, lambdaEnvironment: DBLambdaEnvironment): void {
+    createLambdaAuthorizer(
+        stack: DigitrafficStack,
+        lambdaEnvironment: DBLambdaEnvironment
+    ): RequestAuthorizer {
         const authFunction = MonitoredDBFunction.create(stack, "authorizer", lambdaEnvironment, {
             timeout: 10
         });
 
-        this.lambdaAuthorizer = new RequestAuthorizer(stack, "request-authorizer", {
+        return new RequestAuthorizer(stack, "request-authorizer", {
             handler: authFunction,
             identitySources: [IdentitySource.header("Authorization")]
         });

@@ -1,17 +1,12 @@
-import { dbTestBase, insertOcpiCpo, setTestEnv } from "../../db-testutil.js";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import nock from "nock";
-import * as sinon from "sinon";
-import type { CredentialsObject } from "../../../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
+import { dbTestBase, insertOcpiCpo } from "../../db-test-util.js";
+import { type CredentialsObject } from "../../../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
 import {
     StatusCode,
     type VersionDetailsResponse,
-    type VersionString,
-    type VersionsResponse
+    type VersionsResponse,
+    type VersionString
 } from "../../../api/ocpi/ocpi-api-responses.js";
 import * as OcpiDao from "../../../dao/ocpi-dao.js";
-import { handler } from "../../../lambda/ocpi-registration/ocpi-registration.js";
-import type { ChargingNetworkSecret } from "../../../model/charging-network-secret.js";
 import type { DbOcpiCpo, DbOcpiCpoBusinessDetails } from "../../../model/dao-models.js";
 import {
     OCPI_MODULE_CREDENTIALS,
@@ -21,30 +16,36 @@ import {
 } from "../../../model/ocpi-constants.js";
 import {
     CPO_2_1_1_CREDENTIALS_ENPOINT,
-    CPO_2_1_1_CREDENTIALS_PATH,
     CPO_2_1_1_ENPOINT,
     CPO_2_1_1_LOCATIONS_ENPOINT,
-    CPO_2_1_1_PATH,
     CPO_COUNTRY_CODE,
     CPO_NAME,
     CPO_PARTY_ID,
     CPO_TOKEN_A,
     CPO_TOKEN_C,
     CPO_VERSIONS_ENPOINT,
-    CPO_VERSIONS_PATH,
     CPO_WEBSITE,
-    DT_CPO_ID
-} from "../../test-constants.js";
-import { ChargingNetworkKeys } from "../../../keys.js";
+    DT_CPO_ID,
+    mockProxyAndSecretHolder,
+    setTestEnv,
+    withServer,
+    withServerPost
+} from "../../test-util.js";
+import { afterEach, expect, jest } from "@jest/globals";
 
 setTestEnv();
-
-const SECRET_VALUE = {} as ChargingNetworkSecret;
+const { handler } = await import("../../../lambda/ocpi-registration/ocpi-registration.js");
 
 describe(
     "lambda-ocpi-registration-test",
     dbTestBase((db) => {
-        sinon.stub(SecretHolder.prototype, "get").returns(Promise.resolve(SECRET_VALUE));
+        beforeEach(() => {
+            mockProxyAndSecretHolder();
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
 
         test("one cpo", async () => {
             await insertOcpiCpo(
@@ -67,7 +68,6 @@ describe(
                 CPO_2_1_1_LOCATIONS_ENPOINT
             );
             const cpoCredentialsResponse: CredentialsObject = createCredentials(
-                VERSION_2_1_1,
                 CPO_TOKEN_C,
                 CPO_COUNTRY_CODE,
                 CPO_PARTY_ID,
@@ -75,19 +75,19 @@ describe(
                 CPO_NAME,
                 CPO_WEBSITE
             );
-            try {
-                const scope = nock(ChargingNetworkKeys.OCPI_DOMAIN_URL)
-                    .get(CPO_VERSIONS_PATH)
-                    .reply(200, cpoVersionsResponse)
-                    .get(CPO_2_1_1_PATH)
-                    .reply(200, cpoVersion_2_1_1_Response)
-                    .post(CPO_2_1_1_CREDENTIALS_PATH)
-                    .reply(200, cpoCredentialsResponse);
-                await handler();
-                expect(scope.isDone()).toBeTruthy();
-            } catch (e) {
-                fail("More than one request was made");
-            }
+
+            const spyGet = withServer([
+                { url: CPO_VERSIONS_ENPOINT, response: { data: cpoVersionsResponse } },
+                { url: CPO_2_1_1_ENPOINT, response: { data: cpoVersion_2_1_1_Response } }
+            ]);
+            const spyPost = withServerPost([
+                { url: CPO_2_1_1_CREDENTIALS_ENPOINT, response: { data: cpoCredentialsResponse } }
+            ]);
+
+            await handler();
+
+            expect(spyGet).toHaveBeenCalledTimes(2);
+            expect(spyPost).toHaveBeenCalledTimes(1);
 
             const cpo: DbOcpiCpo | undefined = await OcpiDao.findCpo(db, DT_CPO_ID);
             expect(cpo).toBeDefined();
@@ -183,7 +183,6 @@ describe(
                 CPO_2_1_1_LOCATIONS_ENPOINT
             );
             const cpoCredentialsResponse: CredentialsObject = createCredentials(
-                VERSION_2_1_1,
                 CPO_TOKEN_C,
                 CPO_COUNTRY_CODE,
                 CPO_PARTY_ID,
@@ -192,22 +191,19 @@ describe(
                 CPO_WEBSITE
             );
 
-            try {
-                const scope = nock(ChargingNetworkKeys.OCPI_DOMAIN_URL)
-                    .get(CPO_VERSIONS_PATH)
-                    .times(2)
-                    .reply(200, cpoVersionsResponse)
-                    .get(CPO_2_1_1_PATH)
-                    .times(2)
-                    .reply(200, cpoVersion_2_1_1_Response)
-                    .post(CPO_2_1_1_CREDENTIALS_PATH)
-                    .times(2)
-                    .reply(200, cpoCredentialsResponse);
-                await handler();
-                expect(scope.isDone()).toBeTruthy();
-            } catch (e) {
-                fail("More than one request was made");
-            }
+            const spyGet = withServer([
+                { url: CPO_VERSIONS_ENPOINT, response: { data: cpoVersionsResponse } },
+                { url: CPO_2_1_1_ENPOINT, response: { data: cpoVersion_2_1_1_Response } }
+            ]);
+            const spyPost = withServerPost([
+                { url: CPO_2_1_1_CREDENTIALS_ENPOINT, response: { data: cpoCredentialsResponse } }
+            ]);
+
+            await handler();
+
+            expect(spyGet).toHaveBeenCalledTimes(4);
+            expect(spyPost).toHaveBeenCalledTimes(2);
+
             const cpo1: DbOcpiCpo | undefined = await OcpiDao.findCpo(db, DT_CPO_ID);
             const cpo2: DbOcpiCpo | undefined = await OcpiDao.findCpo(db, DT_CPO_ID_2);
             expect(cpo1).toBeDefined();
@@ -238,7 +234,6 @@ describe(
                 CPO_2_1_1_LOCATIONS_ENPOINT
             );
             const cpoCredentialsResponse: CredentialsObject = createCredentials(
-                VERSION_2_1_1,
                 CPO_TOKEN_C,
                 CPO_COUNTRY_CODE,
                 CPO_PARTY_ID,
@@ -247,15 +242,18 @@ describe(
                 CPO_WEBSITE
             );
 
-            try {
-                const scope = nock(ChargingNetworkKeys.OCPI_DOMAIN_URL)
-                    .get(CPO_VERSIONS_PATH)
-                    .reply(200, cpoVersionsResponse);
-                await handler();
-                expect(scope.isDone()).toBeTruthy();
-            } catch (e) {
-                fail("More than one request was made");
-            }
+            const spyGet = withServer([
+                { url: CPO_VERSIONS_ENPOINT, response: { data: cpoVersionsResponse } },
+                { url: CPO_2_1_1_ENPOINT, response: { data: cpoVersion_2_1_1_Response } }
+            ]);
+            const spyPost = withServerPost([
+                { url: CPO_2_1_1_CREDENTIALS_ENPOINT, response: { data: cpoCredentialsResponse } }
+            ]);
+
+            await handler();
+
+            expect(spyGet).toHaveBeenCalledTimes(1);
+            expect(spyPost).toHaveBeenCalledTimes(0);
 
             const cpo1: DbOcpiCpo | undefined = await OcpiDao.findCpo(db, DT_CPO_ID);
 
@@ -269,7 +267,6 @@ describe(
 );
 
 function createCredentials(
-    version: VersionString,
     token: string,
     countryCode: "FI",
     partyId: string,

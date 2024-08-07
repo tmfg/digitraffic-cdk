@@ -4,16 +4,12 @@ import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 import { type Position } from "geojson";
-import add from "date-fns/add";
-import sub from "date-fns/sub";
+import { add } from "date-fns/add";
+import { sub } from "date-fns/sub";
 import { AutoriApi } from "../../api/autori.js";
 import { AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M, AUTORI_MAX_MINUTES_TO_HISTORY } from "../../constants.js";
 import * as DataDb from "../../dao/data.js";
-import {
-    type ApiContractData,
-    type ApiOperationData,
-    type ApiRouteData
-} from "../../model/autori-api-data.js";
+import type { ApiContractData, ApiOperationData, ApiRouteData } from "../../model/autori-api-data.js";
 import { type DbDomainContract, type DbDomainTaskMapping } from "../../model/db-data.js";
 import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
 import { AutoriUpdate } from "../../service/autori-update.js";

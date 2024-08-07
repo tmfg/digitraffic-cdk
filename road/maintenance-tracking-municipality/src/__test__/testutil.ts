@@ -6,8 +6,8 @@ import {
 import { type GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { type Feature, type Geometry, type LineString, type Point, type Position } from "geojson";
 import _ from "lodash";
-import add from "date-fns/add";
-import sub from "date-fns/sub";
+import { add } from "date-fns/add";
+import { sub } from "date-fns/sub";
 import {
     type DbDomainContract,
     type DbDomainTaskMapping,

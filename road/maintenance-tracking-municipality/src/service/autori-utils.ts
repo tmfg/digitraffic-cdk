@@ -2,7 +2,7 @@ import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as GeometryUtils from "@digitraffic/common/dist/utils/geometry";
 import { type Feature, type Geometry, type LineString, type Position } from "geojson";
-import sub from "date-fns/sub";
+import { sub } from "date-fns/sub";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
     AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M,

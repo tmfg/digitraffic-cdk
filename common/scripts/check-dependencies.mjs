@@ -329,9 +329,9 @@ var require_glob_parent = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/utils.js
+// ../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/utils.js
 var require_utils = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/utils.js"(exports) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/utils.js"(exports) {
     "use strict";
     exports.isInteger = (num) => {
       if (typeof num === "number") {
@@ -351,7 +351,7 @@ var require_utils = __commonJS({
       return (Number(max) - Number(min)) / Number(step) >= limit;
     };
     exports.escapeNode = (block, n = 0, type) => {
-      let node = block.nodes[n];
+      const node = block.nodes[n];
       if (!node)
         return;
       if (type && node.type === type || node.type === "open" || node.type === "close") {
@@ -402,8 +402,14 @@ var require_utils = __commonJS({
       const result = [];
       const flat = (arr) => {
         for (let i = 0; i < arr.length; i++) {
-          let ele = arr[i];
-          Array.isArray(ele) ? flat(ele, result) : ele !== void 0 && result.push(ele);
+          const ele = arr[i];
+          if (Array.isArray(ele)) {
+            flat(ele);
+            continue;
+          }
+          if (ele !== void 0) {
+            result.push(ele);
+          }
         }
         return result;
       };
@@ -413,15 +419,15 @@ var require_utils = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/stringify.js
+// ../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/stringify.js
 var require_stringify = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/stringify.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/stringify.js"(exports, module) {
     "use strict";
     var utils = require_utils();
     module.exports = (ast, options = {}) => {
-      let stringify = (node, parent = {}) => {
-        let invalidBlock = options.escapeInvalid && utils.isInvalidBrace(parent);
-        let invalidNode = node.invalid === true && options.escapeInvalid === true;
+      const stringify = (node, parent = {}) => {
+        const invalidBlock = options.escapeInvalid && utils.isInvalidBrace(parent);
+        const invalidNode = node.invalid === true && options.escapeInvalid === true;
         let output = "";
         if (node.value) {
           if ((invalidBlock || invalidNode) && utils.isOpenOrClose(node)) {
@@ -433,7 +439,7 @@ var require_stringify = __commonJS({
           return node.value;
         }
         if (node.nodes) {
-          for (let child of node.nodes) {
+          for (const child of node.nodes) {
             output += stringify(child);
           }
         }
@@ -672,9 +678,9 @@ var require_to_regex_range = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/fill-range@7.0.1/node_modules/fill-range/index.js
+// ../../common/temp/node_modules/.pnpm/fill-range@7.1.1/node_modules/fill-range/index.js
 var require_fill_range = __commonJS({
-  "../../common/temp/node_modules/.pnpm/fill-range@7.0.1/node_modules/fill-range/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/fill-range@7.1.1/node_modules/fill-range/index.js"(exports, module) {
     "use strict";
     var util = __require("util");
     var toRegexRange = require_to_regex_range();
@@ -725,7 +731,7 @@ var require_fill_range = __commonJS({
         input = "0" + input;
       return negative ? "-" + input : input;
     };
-    var toSequence = (parts, options) => {
+    var toSequence = (parts, options, maxLen) => {
       parts.negatives.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
       parts.positives.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
       let prefix = options.capture ? "" : "?:";
@@ -733,10 +739,10 @@ var require_fill_range = __commonJS({
       let negatives = "";
       let result;
       if (parts.positives.length) {
-        positives = parts.positives.join("|");
+        positives = parts.positives.map((v) => toMaxLen(String(v), maxLen)).join("|");
       }
       if (parts.negatives.length) {
-        negatives = `-(${prefix}${parts.negatives.join("|")})`;
+        negatives = `-(${prefix}${parts.negatives.map((v) => toMaxLen(String(v), maxLen)).join("|")})`;
       }
       if (positives && negatives) {
         result = `${positives}|${negatives}`;
@@ -818,7 +824,7 @@ var require_fill_range = __commonJS({
         index++;
       }
       if (options.toRegex === true) {
-        return step > 1 ? toSequence(parts, options) : toRegex(range, null, { wrap: false, ...options });
+        return step > 1 ? toSequence(parts, options, maxLen) : toRegex(range, null, { wrap: false, ...options });
       }
       return range;
     };
@@ -878,23 +884,24 @@ var require_fill_range = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/compile.js
+// ../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/compile.js
 var require_compile = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/compile.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/compile.js"(exports, module) {
     "use strict";
     var fill = require_fill_range();
     var utils = require_utils();
     var compile = (ast, options = {}) => {
-      let walk = (node, parent = {}) => {
-        let invalidBlock = utils.isInvalidBrace(parent);
-        let invalidNode = node.invalid === true && options.escapeInvalid === true;
-        let invalid = invalidBlock === true || invalidNode === true;
-        let prefix = options.escapeInvalid === true ? "\\" : "";
+      const walk = (node, parent = {}) => {
+        const invalidBlock = utils.isInvalidBrace(parent);
+        const invalidNode = node.invalid === true && options.escapeInvalid === true;
+        const invalid = invalidBlock === true || invalidNode === true;
+        const prefix = options.escapeInvalid === true ? "\\" : "";
         let output = "";
         if (node.isOpen === true) {
           return prefix + node.value;
         }
         if (node.isClose === true) {
+          console.log("node.isClose", prefix, node.value);
           return prefix + node.value;
         }
         if (node.type === "open") {
@@ -910,14 +917,14 @@ var require_compile = __commonJS({
           return node.value;
         }
         if (node.nodes && node.ranges > 0) {
-          let args = utils.reduce(node.nodes);
-          let range = fill(...args, { ...options, wrap: false, toRegex: true });
+          const args = utils.reduce(node.nodes);
+          const range = fill(...args, { ...options, wrap: false, toRegex: true, strictZeros: true });
           if (range.length !== 0) {
             return args.length > 1 && range.length > 1 ? `(${range})` : range;
           }
         }
         if (node.nodes) {
-          for (let child of node.nodes) {
+          for (const child of node.nodes) {
             output += walk(child, node);
           }
         }
@@ -929,15 +936,15 @@ var require_compile = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/expand.js
+// ../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/expand.js
 var require_expand = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/expand.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/expand.js"(exports, module) {
     "use strict";
     var fill = require_fill_range();
     var stringify = require_stringify();
     var utils = require_utils();
     var append = (queue = "", stash = "", enclose = false) => {
-      let result = [];
+      const result = [];
       queue = [].concat(queue);
       stash = [].concat(stash);
       if (!stash.length)
@@ -945,9 +952,9 @@ var require_expand = __commonJS({
       if (!queue.length) {
         return enclose ? utils.flatten(stash).map((ele) => `{${ele}}`) : stash;
       }
-      for (let item of queue) {
+      for (const item of queue) {
         if (Array.isArray(item)) {
-          for (let value of item) {
+          for (const value of item) {
             result.push(append(value, stash, enclose));
           }
         } else {
@@ -961,8 +968,8 @@ var require_expand = __commonJS({
       return utils.flatten(result);
     };
     var expand = (ast, options = {}) => {
-      let rangeLimit = options.rangeLimit === void 0 ? 1e3 : options.rangeLimit;
-      let walk = (node, parent = {}) => {
+      const rangeLimit = options.rangeLimit === void 0 ? 1e3 : options.rangeLimit;
+      const walk = (node, parent = {}) => {
         node.queue = [];
         let p = parent;
         let q = parent.queue;
@@ -979,7 +986,7 @@ var require_expand = __commonJS({
           return;
         }
         if (node.nodes && node.ranges > 0) {
-          let args = utils.reduce(node.nodes);
+          const args = utils.reduce(node.nodes);
           if (utils.exceedsLimit(...args, options.step, rangeLimit)) {
             throw new RangeError("expanded array length exceeds range limit. Use options.rangeLimit to increase or disable the limit.");
           }
@@ -991,7 +998,7 @@ var require_expand = __commonJS({
           node.nodes = [];
           return;
         }
-        let enclose = utils.encloseBrace(node);
+        const enclose = utils.encloseBrace(node);
         let queue = node.queue;
         let block = node;
         while (block.type !== "brace" && block.type !== "root" && block.parent) {
@@ -999,7 +1006,7 @@ var require_expand = __commonJS({
           queue = block.queue;
         }
         for (let i = 0; i < node.nodes.length; i++) {
-          let child = node.nodes[i];
+          const child = node.nodes[i];
           if (child.type === "comma" && node.type === "brace") {
             if (i === 1)
               queue.push("");
@@ -1026,12 +1033,12 @@ var require_expand = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/constants.js
+// ../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/constants.js
 var require_constants = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/constants.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/constants.js"(exports, module) {
     "use strict";
     module.exports = {
-      MAX_LENGTH: 1024 * 64,
+      MAX_LENGTH: 1e4,
       // Digits
       CHAR_0: "0",
       /* 0 */
@@ -1127,9 +1134,9 @@ var require_constants = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/parse.js
+// ../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/parse.js
 var require_parse = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/lib/parse.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/lib/parse.js"(exports, module) {
     "use strict";
     var stringify = require_stringify();
     var {
@@ -1165,21 +1172,20 @@ var require_parse = __commonJS({
       if (typeof input !== "string") {
         throw new TypeError("Expected a string");
       }
-      let opts = options || {};
-      let max = typeof opts.maxLength === "number" ? Math.min(MAX_LENGTH, opts.maxLength) : MAX_LENGTH;
+      const opts = options || {};
+      const max = typeof opts.maxLength === "number" ? Math.min(MAX_LENGTH, opts.maxLength) : MAX_LENGTH;
       if (input.length > max) {
         throw new SyntaxError(`Input length (${input.length}), exceeds max characters (${max})`);
       }
-      let ast = { type: "root", input, nodes: [] };
-      let stack = [ast];
+      const ast = { type: "root", input, nodes: [] };
+      const stack = [ast];
       let block = ast;
       let prev = ast;
       let brackets = 0;
-      let length = input.length;
+      const length = input.length;
       let index = 0;
       let depth = 0;
       let value;
-      let memo = {};
       const advance = () => input[index++];
       const push = (node) => {
         if (node.type === "text" && prev.type === "dot") {
@@ -1212,7 +1218,6 @@ var require_parse = __commonJS({
         }
         if (value === CHAR_LEFT_SQUARE_BRACKET) {
           brackets++;
-          let closed = true;
           let next;
           while (index < length && (next = advance())) {
             value += next;
@@ -1251,7 +1256,7 @@ var require_parse = __commonJS({
           continue;
         }
         if (value === CHAR_DOUBLE_QUOTE || value === CHAR_SINGLE_QUOTE || value === CHAR_BACKTICK) {
-          let open = value;
+          const open = value;
           let next;
           if (options.keepQuotes !== true) {
             value = "";
@@ -1273,8 +1278,8 @@ var require_parse = __commonJS({
         }
         if (value === CHAR_LEFT_CURLY_BRACE) {
           depth++;
-          let dollar = prev.value && prev.value.slice(-1) === "$" || block.dollar === true;
-          let brace = {
+          const dollar = prev.value && prev.value.slice(-1) === "$" || block.dollar === true;
+          const brace = {
             type: "brace",
             open: true,
             close: false,
@@ -1294,7 +1299,7 @@ var require_parse = __commonJS({
             push({ type: "text", value });
             continue;
           }
-          let type = "close";
+          const type = "close";
           block = stack.pop();
           block.close = true;
           push({ type, value });
@@ -1305,7 +1310,7 @@ var require_parse = __commonJS({
         if (value === CHAR_COMMA && depth > 0) {
           if (block.ranges > 0) {
             block.ranges = 0;
-            let open = block.nodes.shift();
+            const open = block.nodes.shift();
             block.nodes = [open, { type: "text", value: stringify(block) }];
           }
           push({ type: "comma", value });
@@ -1313,7 +1318,7 @@ var require_parse = __commonJS({
           continue;
         }
         if (value === CHAR_DOT && depth > 0 && block.commas === 0) {
-          let siblings = block.nodes;
+          const siblings = block.nodes;
           if (depth === 0 || siblings.length === 0) {
             push({ type: "text", value });
             continue;
@@ -1334,7 +1339,7 @@ var require_parse = __commonJS({
           }
           if (prev.type === "range") {
             siblings.pop();
-            let before = siblings[siblings.length - 1];
+            const before = siblings[siblings.length - 1];
             before.value += prev.value + value;
             prev = before;
             block.ranges--;
@@ -1359,8 +1364,8 @@ var require_parse = __commonJS({
               node.invalid = true;
             }
           });
-          let parent = stack[stack.length - 1];
-          let index2 = parent.nodes.indexOf(block);
+          const parent = stack[stack.length - 1];
+          const index2 = parent.nodes.indexOf(block);
           parent.nodes.splice(index2, 1, ...block.nodes);
         }
       } while (stack.length > 0);
@@ -1371,9 +1376,9 @@ var require_parse = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/index.js
+// ../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/index.js
 var require_braces = __commonJS({
-  "../../common/temp/node_modules/.pnpm/braces@3.0.2/node_modules/braces/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/braces@3.0.3/node_modules/braces/index.js"(exports, module) {
     "use strict";
     var stringify = require_stringify();
     var compile = require_compile();
@@ -1382,8 +1387,8 @@ var require_braces = __commonJS({
     var braces = (input, options = {}) => {
       let output = [];
       if (Array.isArray(input)) {
-        for (let pattern of input) {
-          let result = braces.create(pattern, options);
+        for (const pattern of input) {
+          const result = braces.create(pattern, options);
           if (Array.isArray(result)) {
             output.push(...result);
           } else {
@@ -2960,9 +2965,9 @@ var require_picomatch2 = __commonJS({
   }
 });
 
-// ../../common/temp/node_modules/.pnpm/micromatch@4.0.5/node_modules/micromatch/index.js
+// ../../common/temp/node_modules/.pnpm/micromatch@4.0.7/node_modules/micromatch/index.js
 var require_micromatch = __commonJS({
-  "../../common/temp/node_modules/.pnpm/micromatch@4.0.5/node_modules/micromatch/index.js"(exports, module) {
+  "../../common/temp/node_modules/.pnpm/micromatch@4.0.7/node_modules/micromatch/index.js"(exports, module) {
     "use strict";
     var util = __require("util");
     var braces = require_braces();

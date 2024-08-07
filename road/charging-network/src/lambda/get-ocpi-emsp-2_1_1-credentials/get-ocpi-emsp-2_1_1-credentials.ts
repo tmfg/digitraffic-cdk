@@ -7,7 +7,7 @@ import { ChargingNetworkKeys } from "../../keys.js";
 import * as ocpiApiServiceV2_1_1 from "../../service/ocpi-emsp-api-service_2_1_1.js";
 import { parseAuthEvent as parseAuthContextDtCpoId } from "../../service/lambda-authorizer-service.js";
 import { getErrorResponse } from "../../service/ocpi-emsp-api-service.js";
-
+import _ from "lodash";
 const proxyHolder = ProxyHolder.create();
 
 const domain = getEnvVariable(ChargingNetworkKeys.OCPI_DOMAIN_URL);
@@ -23,8 +23,7 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
         event
     });
 
-    // eslint-disable-next-line dot-notation
-    const postRequest = event["httpMethod"] === "POST";
+    const isPostRequest = _.get(event, "httpMethod") === "POST";
 
     let dtCpoId: string | undefined = undefined;
     try {
@@ -50,7 +49,7 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
             message: `getCredentialsResponse: ${JSON.stringify(credentials)}`
         });
         /* Just for testing to register with self */
-        if (postRequest) {
+        if (isPostRequest) {
             return LambdaResponse.internalError();
             /*
             const tokenC = generateToken();

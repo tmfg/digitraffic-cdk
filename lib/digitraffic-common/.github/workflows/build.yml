@@ -1,0 +1,71 @@
+name: Build
+on: [push]
+jobs:
+  build:
+    if: github.repository != 'tmfg/digitraffic-common'
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Compile
+        run: |
+          pnpm install
+          pnpm build
+
+      - name: Run tests
+        run: |
+          pnpm test >> $GITHUB_STEP_SUMMARY
+
+      - name: Install madge
+        run: npm -g install madge
+
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+
+      - name: Run madge
+        id: run-madge
+        continue-on-error: true
+        run: |
+          # create image
+          madge --image dependencies.svg dist
+          # run for output
+          madge --circular dist
+
+      - name: Publish madge image
+        id: publish-reports
+        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
+        with:
+          GH_PAGES_BRANCH: gh-pages
+          FILE_PATH: dependencies.svg
+          COMMIT_MESSAGE: Madge dependency graph in branch $CURRENT_BRANCH
+          LINK_TEXT: Dependency graph
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Jest test report
+          reporter: jest-junit
+          path: junit.xml
+
+      - name: Notify Slack
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: FAILED digitraffic-common build
+          fields: repo, job, took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

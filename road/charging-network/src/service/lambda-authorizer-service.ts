@@ -10,15 +10,13 @@ export function parseAuthEvent(event: Record<string, string>): string {
     });
 
     const payload = event[KEY]; // "[<dtCpoId>]"
-    if (payload) {
-        const dtCpoId = payload.substring(1, payload.length - 1).trim();
-        logger.debug({
-            method,
-            dtCpoId
-        });
-        if (dtCpoId.length) {
-            return dtCpoId;
-        }
+    const dtCpoId = payload?.substring(1, payload.length - 1).trim();
+    logger.debug({
+        method,
+        dtCpoId
+    });
+    if (dtCpoId?.length) {
+        return dtCpoId;
     }
     logger.error({
         method,

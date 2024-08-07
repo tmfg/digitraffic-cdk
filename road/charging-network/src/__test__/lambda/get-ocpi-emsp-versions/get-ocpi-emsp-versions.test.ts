@@ -1,17 +1,16 @@
+import { dbTestBase } from "../../db-test-util.js";
 import {
-    dbTestBase,
     decodeBodyToObject,
+    DT_CPO_ID,
     getLambdaInputAuthorizerEvent,
     prettyJson,
     setTestEnv
-} from "../../db-testutil.js";
+} from "../../test-util.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { ChargingNetworkKeys } from "../../../keys.js";
-import { handler } from "../../../lambda/get-ocpi-emsp-versions/get-ocpi-emsp-versions.js";
-import { DT_CPO_ID } from "../../test-constants.js";
 
 setTestEnv();
-
+const { handler } = await import("../../../lambda/get-ocpi-emsp-versions/get-ocpi-emsp-versions.js");
 const TEST_VERSIONS = `{
     "type": "Success",
     "status_code": 1000, 
@@ -27,7 +26,7 @@ const TEST_VERSIONS = `{
 
 describe(
     "lambda-get-ocpi-emsp-versions",
-    dbTestBase((db) => {
+    dbTestBase((_db) => {
         test("get-ocpi-emsp-versions", () => {
             const response = handler(getLambdaInputAuthorizerEvent(DT_CPO_ID));
             const body = decodeBodyToObject(response);

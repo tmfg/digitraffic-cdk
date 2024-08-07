@@ -1,24 +1,33 @@
-import { dbTestBase, insertOcpiCpo, setTestEnv } from "../../db-testutil.js";
+import {
+    CPO_NAME as DT_CPO_NAME,
+    CPO_TOKEN_A,
+    CPO_VERSIONS_ENPOINT,
+    DT_CPO_ID,
+    mockProxyAndSecretHolder,
+    setTestEnv
+} from "../../test-util.js";
+
+import { dbTestBase, insertOcpiCpo } from "../../db-test-util.js";
 import type {
     APIGatewayAuthorizerResult,
     APIGatewayEventRequestContextWithAuthorizer,
     Context
 } from "aws-lambda";
-import type { APIGatewayRequestAuthorizerEvent, APIGatewayRequestAuthorizerEventHeaders } from "aws-lambda";
-import * as sinon from "sinon";
-import { handler } from "../../../lambda/authorizer/authorizer.js";
-import * as OcpiRegistrationService from "../../../service/ocpi-registration-service.js";
-import {
-    CPO_TOKEN_A,
-    CPO_VERSIONS_ENPOINT,
-    DT_CPO_ID,
-    CPO_NAME as DT_CPO_NAME
-} from "../../test-constants.js";
+import type {
+    APIGatewayRequestAuthorizerEvent,
+    APIGatewayRequestAuthorizerEventHeaders,
+    AuthResponse
+} from "aws-lambda";
 import _ from "lodash";
 
-setTestEnv();
+import { afterEach, jest, test } from "@jest/globals";
 
-const sandbox = sinon.createSandbox();
+setTestEnv();
+const { handler } = await import("../../../lambda/authorizer/authorizer.js");
+
+const OcpiRegistrationService = await import("../../../service/ocpi-registration-service.js");
+
+//const sandbox = sinon.createSandbox();
 const CPO_TOKEN_B = OcpiRegistrationService.generateToken();
 
 interface Params {
@@ -33,6 +42,7 @@ describe(
     "lambda-authorizer-test",
     dbTestBase((db) => {
         beforeEach(async () => {
+            mockProxyAndSecretHolder();
             await insertOcpiCpo(
                 db,
                 DT_CPO_ID,
@@ -44,7 +54,9 @@ describe(
             );
         });
 
-        afterEach(() => sandbox.restore());
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
 
         test.each([
             [
@@ -77,45 +89,39 @@ describe(
         ])("Test lambda authorizer: $name", async (testParams: Params) => {
             const authorizerEvent = createAPIGatewayRequestAuthorizerEvent(testParams.cpoToken);
 
-            const callback = sinon.spy();
+            const callback = jest.fn(
+                (error?: Error | string | null, result?: APIGatewayAuthorizerResult): void => {
+                    console.log(
+                        `callback called with (error: ${error?.toString()}, result: ${JSON.stringify(result)})`
+                    );
+                }
+            );
+
             // Call authorizer lambda with apigw event that contains cpo token_b
             await handler(authorizerEvent, {} as Context, callback);
 
-            expect(callback.callCount).toBe(testParams.handlerCallbackCount);
-            const [error, authorizerResult] = callback.getCall(0).args as [
-                Error | string | null,
-                APIGatewayAuthorizerResult
-            ];
-
-            console.log(authorizerResult);
-
-            expect(error).toBe(null);
-            const expectedAuthorizerResultCpoIdValue = testParams.authorizerResultCpoId
-                ? `[\"${testParams.authorizerResultCpoId}\"]`
-                : `[]`;
-            // eslint-disable-next-line dot-notation
-            expect(authorizerResult.context!["dtCpoId"]).toBe(expectedAuthorizerResultCpoIdValue);
-
-            expect(authorizerResult.policyDocument.Statement[0]!.Effect).toBe(testParams.effect);
-            expect(_.get(authorizerResult, "policyDocument.Statement[0].Resource")).toBe(
-                authorizerEvent.methodArn
+            expect(callback).toHaveBeenCalledTimes(testParams.handlerCallbackCount);
+            expect(callback).toHaveBeenCalledWith(
+                null,
+                createAPIGatewayAuthorizerResponse(testParams.authorizerResultCpoId, testParams.effect)
             );
         });
     })
 );
 
+const METHOD_ARN = "arn:aws:execute-api:resource" as const;
 function createAPIGatewayRequestAuthorizerEvent(
     cpoTokenB: string | undefined
 ): APIGatewayRequestAuthorizerEvent {
     const headers = cpoTokenB
         ? ({
-              authorization: `Token ${cpoTokenB}`
+              Authorization: `Token ${cpoTokenB}`
           } as APIGatewayRequestAuthorizerEventHeaders)
         : null;
 
     return {
         type: "REQUEST",
-        methodArn: "arn:aws:execute-api:resource",
+        methodArn: METHOD_ARN,
         resource: "string",
         path: "string",
         httpMethod: "string",
@@ -126,5 +132,27 @@ function createAPIGatewayRequestAuthorizerEvent(
         multiValueQueryStringParameters: null,
         stageVariables: null,
         requestContext: {} as APIGatewayEventRequestContextWithAuthorizer<undefined>
+    };
+}
+
+function createAPIGatewayAuthorizerResponse(
+    cpoId: string | undefined,
+    effect: "Allow" | "Deny"
+): AuthResponse {
+    return {
+        principalId: "cpo",
+        policyDocument: {
+            Version: "2012-10-17",
+            Statement: [
+                {
+                    Action: "execute-api:Invoke",
+                    Effect: effect,
+                    Resource: METHOD_ARN
+                }
+            ]
+        },
+        context: {
+            dtCpoId: `[${cpoId ? '"' + cpoId + '"' : ""}]`
+        }
     };
 }

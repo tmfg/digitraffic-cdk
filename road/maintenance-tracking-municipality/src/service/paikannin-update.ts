@@ -3,7 +3,7 @@ import * as Geometry from "@digitraffic/common/dist/utils/geometry";
 import { type GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import { type Position } from "geojson";
-import sub from "date-fns/sub";
+import { sub } from "date-fns/sub";
 import { type PaikanninApi } from "../api/paikannin.js";
 import { PAIKANNIN_MAX_MINUTES_TO_HISTORY, PAIKANNIN_MIN_MINUTES_FROM_PRESENT } from "../constants.js";
 import * as DataDb from "../dao/data.js";

@@ -1,5 +1,3 @@
-// import * as FaultsService from "../../service/faults";
-
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";

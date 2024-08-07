@@ -1,11 +1,19 @@
+import { afterEach, jest } from "@jest/globals";
+import { dbTestBase, insertOcpiCpo, insertOcpiVersion } from "../../db-test-util.js";
 import {
-    dbTestBase,
-    insertOcpiCpo,
-    insertOcpiVersion,
+    CPO_2_1_1_ENPOINT,
+    CPO_2_1_1_LOCATIONS_ENPOINT,
+    CPO_NAME,
+    CPO_PARTY_ID,
+    CPO_TOKEN_A,
+    CPO_VERSIONS_ENPOINT,
+    DT_CPO_ID,
+    mockProxyAndSecretHolder,
     roundToNearestSecond,
-    setTestEnv
-} from "../../db-testutil.js";
-import nock from "nock";
+    setTestEnv,
+    type UrlResponsePairResponse,
+    withServer
+} from "../../test-util.js";
 import {
     Capability,
     ConnectorFormat,
@@ -20,23 +28,12 @@ import {
 } from "../../../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
 import { StatusCode } from "../../../api/ocpi/ocpi-api-responses.js";
 import * as OcpiDao from "../../../dao/ocpi-dao.js";
-import { handler } from "../../../lambda/ocpi-locations-update/ocpi-locations-update.js";
 import { OCPI_MODULE_LOCATIONS, VERSION_2_1_1, VERSION_2_2 } from "../../../model/ocpi-constants.js";
-import {
-    CPO_2_1_1_ENPOINT,
-    CPO_2_1_1_LOCATIONS_ENPOINT,
-    CPO_2_1_1_LOCATIONS_PATH,
-    CPO_NAME,
-    CPO_PARTY_ID,
-    CPO_TOKEN_A,
-    CPO_VERSIONS_ENPOINT,
-    DT_CPO_ID
-} from "../../test-constants.js";
 import _ from "lodash";
-import { expect } from "@jest/globals";
-import { ChargingNetworkKeys } from "../../../keys.js";
+import { LIMIT_HEADER, TOTAL_COUNT_HEADER } from "../../../api/ocpi/2_1_1/ocpi-api_2_1_1.js";
 
 setTestEnv();
+const { handler } = await import("../../../lambda/ocpi-locations-update/ocpi-locations-update.js");
 
 const GEO_LOCATIONS: GeoLocation[] = [
     { latitude: 61.1811616, longitude: 23.8851502 },
@@ -48,6 +45,7 @@ describe(
     "lambda-ocpi-locations-update-test",
     dbTestBase((db) => {
         beforeEach(async () => {
+            mockProxyAndSecretHolder();
             await insertOcpiCpo(
                 db,
                 DT_CPO_ID,
@@ -57,6 +55,10 @@ describe(
                 "TOKEN_C",
                 CPO_VERSIONS_ENPOINT
             );
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
         });
 
         test("two-locations", async () => {
@@ -75,22 +77,27 @@ describe(
             const lastUpdated = roundToNearestSecond(new Date());
 
             const cpoLocationsResponse: LocationResponse = createLocationResponse(2, lastUpdated);
+            const response: UrlResponsePairResponse<LocationResponse> = {
+                data: cpoLocationsResponse,
+                headers: {
+                    [TOTAL_COUNT_HEADER]: "2",
+                    [LIMIT_HEADER]: "100"
+                }
+            };
 
-            try {
-                const scope = nock(ChargingNetworkKeys.OCPI_DOMAIN_URL)
-                    .get(CPO_2_1_1_LOCATIONS_PATH)
-                    .reply(200, cpoLocationsResponse);
-                await handler();
-                expect(scope.isDone()).toBeTruthy();
-            } catch (e) {
-                fail("More than one request was made");
-            }
+            const spy = withServer([{ url: CPO_2_1_1_LOCATIONS_ENPOINT, response }]);
+
+            await handler(); // do locations update
+            expect(spy).toHaveBeenCalledTimes(1); // Expect calls to: versions + version + credentials
 
             const locations = await OcpiDao.findLocations(db, DT_CPO_ID);
             expect(locations.length).toBe(2);
 
             for (let i = 0; i < 2; i++) {
-                const location = locations[i]!;
+                const location = locations[i];
+                if (!location) {
+                    throw new Error("Error: location was not defined!");
+                }
                 expect(location.modified_cpo).toEqual(lastUpdated);
                 expect(location.dt_cpo_id).toEqual(DT_CPO_ID);
                 expect(location.id).toEqual(getLocationId(i));
@@ -100,8 +107,10 @@ describe(
                 const locationObject = location.location_object as Location;
                 expect(locationObject.name).toEqual(CHARGER_NAMES[i]);
                 expect(locationObject.coordinates).toEqual(GEO_LOCATIONS[i]);
-                expect(location.geometry.coordinates[0]!).toBeCloseTo(GEO_LOCATIONS[i]!.longitude, 5);
-                expect(location.geometry.coordinates[1]!).toBeCloseTo(GEO_LOCATIONS[i]!.latitude, 5);
+                // @ts-ignore
+                expect(location.geometry.coordinates[0]).toBeCloseTo(GEO_LOCATIONS[i].longitude, 5);
+                // @ts-ignore
+                expect(location.geometry.coordinates[1]).toBeCloseTo(GEO_LOCATIONS[i].latitude, 5);
             }
         });
 
@@ -120,17 +129,17 @@ describe(
             });
             const lastUpdated = roundToNearestSecond(new Date());
             const cpoLocationsResponse: LocationResponse = createLocationResponse(2, lastUpdated);
+            const response: UrlResponsePairResponse<LocationResponse> = {
+                data: cpoLocationsResponse,
+                headers: {
+                    [TOTAL_COUNT_HEADER]: "2",
+                    [LIMIT_HEADER]: "100"
+                }
+            };
 
-            try {
-                const scope = nock(ChargingNetworkKeys.OCPI_DOMAIN_URL)
-                    .get(CPO_2_1_1_LOCATIONS_PATH)
-                    .reply(200, cpoLocationsResponse);
-                await handler();
-                expect(scope.isDone()).toBeFalsy(); // Expect no calls as no common version
-            } catch (e) {
-                fail("more than one call was made");
-            }
-
+            const spy = withServer([{ url: CPO_2_1_1_LOCATIONS_ENPOINT, response }]);
+            await handler(); // do locations update
+            expect(spy).toHaveBeenCalledTimes(0); // Expect no calls as no common version
             const locations = await OcpiDao.findLocations(db, DT_CPO_ID);
             expect(locations.length).toBe(0);
         });
@@ -166,7 +175,9 @@ function createLocation(locationIndex: number, evseCount: number, lastUpdated: D
     const evses: EVSE[] = _.range(evseCount).map((evseIndex: number) =>
         createEvses(locationIndex, evseIndex, lastUpdated)
     );
-
+    if (locationIndex > GEO_LOCATIONS.length - 1) {
+        throw new Error(`locationIndex max value is ${GEO_LOCATIONS.length - 1}`);
+    }
     return {
         /** (39) Uniquely identifies the location within the CPOs platform (and suboperator platforms). This field can never be changed, modified or renamed. */
         id: getLocationId(locationIndex),
@@ -183,7 +194,8 @@ function createLocation(locationIndex: number, evseCount: number, lastUpdated: D
         /** (3) ISO 3166-1 alpha-3 code for the country of this location. */
         country: "FIN",
         /**  */
-        coordinates: GEO_LOCATIONS[locationIndex]!,
+        // @ts-ignore
+        coordinates: GEO_LOCATIONS[locationIndex],
         related_locations: undefined, // AdditionalGeoLocation[];
         evses, // EVSE[];
         directions: undefined, // DisplayText[];

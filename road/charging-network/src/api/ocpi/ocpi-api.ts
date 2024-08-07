@@ -1,7 +1,8 @@
 import { type LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
+import type { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
 import type { VersionsResponse } from "./ocpi-api-responses.js";
 
 const SERVICE = "OcpiApi";
@@ -42,7 +43,7 @@ export async function getFromServer<T>(
                 return status === 200 || status === 201; // Resolve only if the status code is 200 or 201
             }
         })
-        .then((response) => {
+        .then((response: AxiosResponse<T>) => {
             // Replaces all iso-date-time strings with Date-objects as axios can't do it
             replaceIsoDateStringsWithDateObject<T>(response.data);
 
@@ -142,7 +143,7 @@ export async function postToServer<ResponseData, PostData>(
 
 export async function getVersions(versionsEndpoint: string, token: string): Promise<VersionsResponse> {
     const start = Date.now();
-    const method = `${SERVICE}.getFromServer` satisfies LoggerMethodType;
+    const method = `${SERVICE}.getVersions` satisfies LoggerMethodType;
     return getFromServer<VersionsResponse>(versionsEndpoint, token)
         .then((response) => {
             logger.debug({

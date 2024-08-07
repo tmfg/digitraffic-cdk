@@ -15,6 +15,12 @@ export interface LocationsUpdatedResult extends DbInsertedUpdated {
 export function updateLocationsForCpos(cpos: DbOcpiCpo[]): Promise<void> {
     const method = `${SERVICE}.updateLocationsForCpos` satisfies LoggerMethodType;
     const start = Date.now();
+
+    logger.info({
+        method,
+        message: `update locations for cpo's: ${cpos.map((c) => c.dt_cpo_id).toString()}`
+    });
+
     return Promise.allSettled(cpos.map((cpo) => updateLocationsForCpo(cpo)))
         .then((result: PromiseSettledResult<LocationsUpdatedResult>[]) => {
             result.map((r) => {
@@ -25,7 +31,7 @@ export function updateLocationsForCpos(cpos: DbOcpiCpo[]): Promise<void> {
                         customOcpiVersion: r.value.version,
                         customUpdatedCount: r.value.updated,
                         customInsertedCount: r.value.inserted,
-                        message: `Summary for updating cpo locations`
+                        message: `Summary for updating single cpo locations`
                     });
                 } else if (r.status === "rejected") {
                     logger.error({
@@ -38,6 +44,7 @@ export function updateLocationsForCpos(cpos: DbOcpiCpo[]): Promise<void> {
         .finally(() => {
             logger.info({
                 method,
+                message: `Summary for updating all cpo's locations`,
                 customCpoCount: cpos.length,
                 tookMs: Date.now() - start
             });
@@ -50,6 +57,11 @@ async function updateLocationsForCpo(cpo: DbOcpiCpo): Promise<LocationsUpdatedRe
     if (cpo.token_c === undefined || cpo.token_c === null) {
         throw new Error(`${method} cpo ${cpo.dt_cpo_id} token_c was empty`);
     }
+
+    logger.info({
+        method,
+        customDtCpoId: cpo.dt_cpo_id
+    });
 
     return OcpiModuleService.getCpoLatestVersion(cpo.dt_cpo_id).then((version: VersionString) => {
         if (VERSION_2_1_1 === version) {

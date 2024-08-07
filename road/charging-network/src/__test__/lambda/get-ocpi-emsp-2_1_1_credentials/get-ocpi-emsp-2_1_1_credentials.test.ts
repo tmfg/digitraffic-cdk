@@ -1,23 +1,37 @@
+import { dbTestBase, insertOcpiCpo } from "../../db-test-util.js";
 import {
-    dbTestBase,
+    CPO_NAME,
+    CPO_TOKEN_A,
+    CPO_VERSIONS_ENPOINT,
     decodeBodyToObject,
+    DT_CPO_ID,
     getLambdaInputAuthorizerEvent,
-    insertOcpiCpo,
+    mockProxyAndSecretHolder,
     prettyJson,
     setTestEnv
-} from "../../db-testutil.js";
+} from "../../test-util.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { type OcpiErrorResponse, StatusCode } from "../../../api/ocpi/ocpi-api-responses.js";
 import { ChargingNetworkKeys } from "../../../keys.js";
-import { handler } from "../../../lambda/get-ocpi-emsp-2_1_1-credentials/get-ocpi-emsp-2_1_1-credentials.js";
-import { CPO_NAME, CPO_TOKEN_A, CPO_VERSIONS_ENPOINT, DT_CPO_ID } from "../../test-constants.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { afterEach, jest } from "@jest/globals";
 
 setTestEnv();
+const { handler } = await import(
+    "../../../lambda/get-ocpi-emsp-2_1_1-credentials/get-ocpi-emsp-2_1_1-credentials.js"
+);
 
 describe(
     "lambda-get-ocpi-emsp-2_1_1_credentials-test",
-    dbTestBase((db: DTDatabase) => {
+
+    dbTestBase((db) => {
+        beforeEach(() => {
+            mockProxyAndSecretHolder();
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
         test("get-ocpi-emsp-2_1_1_credentials", async () => {
             await insertOcpiCpo(
                 db,

@@ -5,8 +5,8 @@ import type { Credentials, CredentialsObject, LocationResponse } from "./ocpi-ap
 
 const SERVICE = "OcpiV2_1_1Api";
 
-const TOTAL_COUNT_HEADER = "x-total-count" as const;
-const LIMIT_HEADER = "x-limit" as const;
+export const TOTAL_COUNT_HEADER = "x-total-count" as const;
+export const LIMIT_HEADER = "x-limit" as const;
 
 export async function postCredentials(
     credentialsEndpoint: string,
@@ -57,7 +57,12 @@ export async function getLocations(
     offset: number,
     limit: number
 ): Promise<GetLocationsResponse> {
+    const method = `${SERVICE}.getLocations`;
     const url = `${locationsEndpoint}?offset=${offset}&limit=${limit}`;
+    logger.info({
+        method,
+        customUrl: url
+    });
 
     return OcpiApi.getFromServer<LocationResponse>(url, tokenC, [LIMIT_HEADER, TOTAL_COUNT_HEADER]).then(
         (response: OcpiApi.ResponseWithHeader<LocationResponse>) => {

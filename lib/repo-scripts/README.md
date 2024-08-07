@@ -8,6 +8,7 @@ Project workflow:
 2. Run `rushx bundle`, which will build and bundle the cli tools into a single
    script file under `dist/cli`
 3. Copy the cli tool from `dist/cli` to appropriate place.
+   - You can use the `publish:cdk` script from package.json for it
 
 ## Running cli tools
 
@@ -22,7 +23,3 @@ permission, then it can be called directly `./tool.js`.
 ### check-dependencies
 
 Checks package.json dependencies. Run during git commit hook.
-
-### git-init-submodule
-
-Used to initialize digitraffic-common repository as a submodule in the cdk repo.

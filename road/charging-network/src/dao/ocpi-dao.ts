@@ -1,6 +1,6 @@
 import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
-import { PreparedStatement } from "pg-promise";
+import { default as pgPromise } from "pg-promise";
 import type {
     DbInsertedUpdated,
     DbOcpiCpo,
@@ -20,7 +20,7 @@ import type { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types"
 const COORDINATE_PRECISION = 0.000001 as const; // What is the precision of saved coordinates
 const SERVICE = "OcpiDao" as const;
 
-const PS_SELECT_UNREGISTERED_CPOS = new PreparedStatement({
+const PS_SELECT_UNREGISTERED_CPOS = new pgPromise.PreparedStatement({
     name: "PS_SELECT_UNREGISTERED_CPOS",
     text: `select dt_cpo_id, dt_cpo_name, token_a, token_b, token_c, versions_endpoint, created, modified
            from ocpi_cpo
@@ -39,7 +39,7 @@ export function findUnregisteredCpos(db: DTDatabase): Promise<DbOcpiCpo[]> {
     });
 }
 
-const PS_SELECT_REGISTERED_CPOS = new PreparedStatement({
+const PS_SELECT_REGISTERED_CPOS = new pgPromise.PreparedStatement({
     name: "PS_SELECT_REGISTERED_CPOS",
     text: `select dt_cpo_id, dt_cpo_name, token_a, token_b, token_c, versions_endpoint, created, modified
            from ocpi_cpo
@@ -58,7 +58,7 @@ export function findRegisteredCpos(db: DTDatabase): Promise<DbOcpiCpo[]> {
     });
 }
 
-const PS_UPSERT_OCPI_TOKEN_B = new PreparedStatement({
+const PS_UPSERT_OCPI_TOKEN_B = new pgPromise.PreparedStatement({
     name: "PS_UPSERT_OCPI_TOKEN_B",
     text: `UPDATE ocpi_cpo
            SET token_b = $2
@@ -80,7 +80,7 @@ export async function upsertTokenB(db: DTDatabase, dtCpoId: string, tokenB: stri
         });
 }
 
-const PS_UPDATE_OCPI_CPO_CREDENTIALS = new PreparedStatement({
+const PS_UPDATE_OCPI_CPO_CREDENTIALS = new pgPromise.PreparedStatement({
     name: "PS_UPDATE_OCPI_CPO_CREDENTIALS",
     text: `UPDATE ocpi_cpo
            SET token_c = $2,
@@ -112,7 +112,7 @@ export async function updateCpoCredentials(
         });
 }
 
-const PS_UPSERT_OCPI_CPO_BUSINESS_DETAILS = new PreparedStatement({
+const PS_UPSERT_OCPI_CPO_BUSINESS_DETAILS = new pgPromise.PreparedStatement({
     name: "PS_UPSERT_OCPI_CPO_BUSINESS_DETAILS",
     text: `INSERT INTO ocpi_cpo_business_details (dt_cpo_id, name, logo_url, logo_thumbnail, logo_category, logo_type, logo_width, logo_height, website)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -155,7 +155,7 @@ export async function upsertCpoBusinessDetails(
         });
 }
 
-const PS_UPSERT_OCPI_CPO_VERSION = new PreparedStatement({
+const PS_UPSERT_OCPI_CPO_VERSION = new pgPromise.PreparedStatement({
     name: "PS_UPSERT_OCPI_CPO_VERSION",
     text: `INSERT INTO ocpi_cpo_version (dt_cpo_id, ocpi_version, endpoints_endpoint)
            VALUES ($1, $2, $3)
@@ -178,7 +178,7 @@ export async function upsertCpoVersion(db: DTDatabase, cpo: DbOcpiCpoVersionUpda
         });
 }
 
-const PS_SELECT_OCPI_CPO = new PreparedStatement({
+const PS_SELECT_OCPI_CPO = new pgPromise.PreparedStatement({
     name: "PS_SELECT_OCPI_CPO",
     text: `select dt_cpo_id, dt_cpo_name, token_a, token_b, token_c, versions_endpoint, party_id, country_code, created, modified
            from ocpi_cpo
@@ -199,7 +199,7 @@ export function findCpo(db: DTDatabase, dtCpoId: string): Promise<DbOcpiCpo | un
         });
 }
 
-const PS_SELECT_OCPI_CPO_BUSINESS_DETAILS = new PreparedStatement({
+const PS_SELECT_OCPI_CPO_BUSINESS_DETAILS = new pgPromise.PreparedStatement({
     name: "PS_SELECT_OCPI_CPO_BUSINESS_DETAILS",
     text: `select dt_cpo_id, name, logo_url, logo_thumbnail, logo_category, logo_type, logo_width, logo_height, website, created, modified
            from ocpi_cpo_business_details
@@ -223,7 +223,7 @@ export function findCpoBusinessDetails(
         });
 }
 
-const PS_SELECT_OCPI_CPO_TOKEN_B_EXISTS = new PreparedStatement({
+const PS_SELECT_OCPI_CPO_TOKEN_B_EXISTS = new pgPromise.PreparedStatement({
     name: "PS_SELECT_OCPI_CPO_TOKEN_B_EXISTS",
     text: `SELECT EXISTS (SELECT cpo FROM ocpi_cpo WHERE token_b = $1)::bool as found`
 });
@@ -242,7 +242,7 @@ export function isValidCpoToken(db: DTDatabase, tokenB: string): Promise<boolean
         });
 }
 
-const PS_SELECT_OCPI_CPO_WITH_TOKEN_B = new PreparedStatement({
+const PS_SELECT_OCPI_CPO_WITH_TOKEN_B = new pgPromise.PreparedStatement({
     name: "PS_SELECT_OCPI_CPO_WITH_TOKEN_B",
     text: `select dt_cpo_id, dt_cpo_name, token_a, token_b, token_c, versions_endpoint, party_id, country_code, created, modified
            from ocpi_cpo
@@ -263,7 +263,7 @@ export function findCpoByTokenB(db: DTDatabase, tokenB: string): Promise<DbOcpiC
         });
 }
 
-const PS_UPSERT_OCPI_LOCATION = new PreparedStatement({
+const PS_UPSERT_OCPI_LOCATION = new pgPromise.PreparedStatement({
     name: "PS_UPSERT_OCPI_LOCATION",
     text: `INSERT INTO ocpi_location (id, dt_cpo_id, ocpi_version, location_object, geometry, modified_cpo)
            VALUES ($1, $2, $3, $4, ST_Snaptogrid(ST_SetSRID(ST_GeomFromGeoJSON($5), ${SRID_WGS84}), ${COORDINATE_PRECISION}), $6)
@@ -335,7 +335,7 @@ export async function upsertOcpiLocations(
         });
 }
 
-const PS_UPSERT_OCPI_CPO_MODULE_ENDPOINT = new PreparedStatement({
+const PS_UPSERT_OCPI_CPO_MODULE_ENDPOINT = new pgPromise.PreparedStatement({
     name: "PS_UPSERT_OCPI_CPO_MODULE_ENDPOINT",
     text: `INSERT INTO ocpi_cpo_module_endpoint (dt_cpo_id, ocpi_version, module, endpoint)
            VALUES ($1, $2, $3, $4)
@@ -374,7 +374,7 @@ export async function upsertCpoModuleEndpoint(
         );
 }
 
-const PS_SELECT_OCPI_CPO_MODULE_ENDPOINT = new PreparedStatement({
+const PS_SELECT_OCPI_CPO_MODULE_ENDPOINT = new pgPromise.PreparedStatement({
     name: "select-counters",
     text: `select module, dt_cpo_id, ocpi_version, endpoint, created, modified
            from ocpi_cpo_module_endpoint
@@ -407,7 +407,7 @@ export function findCpoModuleEndpoint(
         });
 }
 
-const PS_FIND_CPO_LATEST_VERSION = new PreparedStatement({
+const PS_FIND_CPO_LATEST_VERSION = new pgPromise.PreparedStatement({
     name: "PS_FIND_REGISTERED_CPOS_LATEST_ENDPOINT_VERSIONS",
     text: `SELECT ver.ocpi_version
            FROM ocpi_cpo cpo
@@ -435,7 +435,7 @@ export function findCpoLatestVersion(db: DTDatabase, dtCpoId: string): Promise<V
         });
 }
 
-const PS_FIND_CPO_LOCATIONS = new PreparedStatement({
+const PS_FIND_CPO_LOCATIONS = new pgPromise.PreparedStatement({
     name: "PS_FIND_CPO_LOCATIONS",
     text: `SELECT id, dt_cpo_id, ocpi_version, location_object, ST_AsGeoJSON(geometry) as geometry, modified_cpo, modified, created
            FROM ocpi_location 
@@ -465,7 +465,7 @@ export function findLocations(db: DTDatabase, dtCpoId: string): Promise<DbOcpiLo
         });
 }
 
-// const PS_FIND_REGISTERED_CPOS_LATEST_ENDPOINT_VERSIONS = new PreparedStatement({
+// const PS_FIND_REGISTERED_CPOS_LATEST_ENDPOINT_VERSIONS = new pgPromise.PreparedStatement({
 //     name: "PS_FIND_REGISTERED_CPOS_LATEST_ENDPOINT_VERSIONS",
 //     text: `SELECT DISTINCT ON (module_ep.dt_cpo_id) module_ep.dt_cpo_id
 //                 , module_ep.module

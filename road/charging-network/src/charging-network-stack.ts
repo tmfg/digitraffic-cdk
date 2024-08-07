@@ -8,8 +8,8 @@ export class ChargingNetworkStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: ChargingNetworkProps) {
         super(scope, id, configuration);
 
-        /*const publicApi = */ new IntegrationOcpiApi(this);
-        /*const internalLambdas = */ new InternalLambdas(this);
+        new IntegrationOcpiApi(this);
+        new InternalLambdas(this);
         // new Canaries(this, publicApi);
     }
 }

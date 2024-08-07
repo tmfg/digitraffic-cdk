@@ -1,6 +1,6 @@
 import { getRandomInteger, randomString } from "@digitraffic/common/dist/test/testutils";
-import add from "date-fns/add";
-import sub from "date-fns/sub";
+import { add } from "date-fns/add";
+import { sub } from "date-fns/sub";
 import { PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S } from "../../constants.js";
 import { type DbWorkMachine } from "../../model/db-data.js";
 import {

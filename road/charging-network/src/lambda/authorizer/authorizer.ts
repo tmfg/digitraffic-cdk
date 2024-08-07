@@ -12,6 +12,7 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as OcpiDao from "../../dao/ocpi-dao.js";
 import type { DbOcpiCpo } from "../../model/dao-models.js";
+import _ from "lodash";
 
 const EFFECT_ALLOW = "Allow" as const;
 const EFFECT_DENY = "Deny" as const;
@@ -35,24 +36,23 @@ export const handler: (
         eventHeaders: event.headers
     });
     const tokenB = parseAuthentication(event.headers);
-    logger.debug({ method, tokenB });
+
+    logger.debug({ method, message: `got tokenB: ${tokenB !== undefined}` });
 
     const cpo = tokenB ? await proxyHolder.setCredentials().then(() => getCpoByTokenB(tokenB)) : undefined;
 
-    logger.debug({ method, cpo });
+    logger.debug({ method, message: `cpo: ${JSON.stringify(cpo)}` });
 
     const policy = generatePolicy(event.methodArn, cpo);
 
-    logger.debug({ method, policy });
+    logger.debug({ method, message: `policy: ${JSON.stringify(policy)}` });
 
     callback(null, policy);
 };
 
 // eslint-disable-next-line @rushstack/no-new-null
 function parseAuthentication(headers: APIGatewayRequestAuthorizerEventHeaders | null): string | undefined {
-    const header = headers ?? {};
-    // eslint-disable-next-line dot-notation
-    const authHeaderValue = header["authorization"] ? header["authorization"] : header["Authorization"];
+    const authHeaderValue = _.get(headers, "authorization", _.get(headers, "Authorization"));
     if (!authHeaderValue) {
         return undefined;
     }

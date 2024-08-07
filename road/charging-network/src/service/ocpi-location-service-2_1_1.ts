@@ -2,6 +2,7 @@ import { type LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runt
 import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import type { Location } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
+import { type Location } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
 import * as OcpiApi_2_1_1 from "../api/ocpi/2_1_1/ocpi-api_2_1_1.js";
 import * as OcpiDao from "../dao/ocpi-dao.js";
 import type {
@@ -60,6 +61,12 @@ async function getAndUpdateLocationsForCpo(
     let offset = 0;
     let totalCount = limit;
 
+    logger.info({
+        method,
+        customDtCpoId: dtCpoId,
+        customOcpiVersion: OCPI_VERSION
+    });
+
     while (offset < totalCount) {
         const response = await OcpiApi_2_1_1.getLocations(endpoint.endpoint, tokenC, offset, limit);
 
@@ -116,7 +123,7 @@ function updateLocationsToDb(
 
     return inDatabase(async (db: DTDatabase) => {
         if (locations) {
-            const inserts: DbOcpiLocationInsert[] = locations.map((location: Location, index: number) => {
+            const inserts: DbOcpiLocationInsert[] = locations.map((location: Location) => {
                 return {
                     id: location.id,
                     dt_cpo_id: dtCpoId,

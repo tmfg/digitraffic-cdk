@@ -1,13 +1,16 @@
-import { dbTestBase, setTestEnv } from "../db-testutil.js";
+import { dbTestBase } from "../db-test-util.js";
+
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Version, VersionString } from "../../api/ocpi/ocpi-api-responses.js";
-import * as OcpiRegistrationService from "../../service/ocpi-registration-service.js";
+
+import { setTestEnv } from "../test-util.js";
 
 setTestEnv();
+const OcpiRegistrationService = await import("../../service/ocpi-registration-service.js");
 
 describe(
     "ocpi-registration-service test",
-    dbTestBase((db: DTDatabase) => {
+    dbTestBase((_db: DTDatabase) => {
         const VERSION_2_0: VersionString = "2.0" as const;
         const VERSION_2_1_1: VersionString = "2.1.1" as const;
         const VERSION_2_2_1: VersionString = "2.2.1" as const;

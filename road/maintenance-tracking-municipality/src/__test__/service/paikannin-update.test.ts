@@ -4,7 +4,7 @@ import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { fail } from "assert";
 import { type Position } from "geojson";
-import sub from "date-fns/sub";
+import { sub } from "date-fns/sub";
 import { PaikanninApi } from "../../api/paikannin.js";
 import { PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M } from "../../constants.js";
 import * as DataDb from "../../dao/data.js";

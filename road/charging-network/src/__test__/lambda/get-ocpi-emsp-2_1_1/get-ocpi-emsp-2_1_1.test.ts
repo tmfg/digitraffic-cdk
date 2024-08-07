@@ -1,17 +1,17 @@
 import {
-    dbTestBase,
     decodeBodyToObject,
+    DT_CPO_ID,
     getLambdaInputAuthorizerEvent,
     prettyJson,
     setTestEnv
-} from "../../db-testutil.js";
+} from "../../test-util.js";
+
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import type { VersionDetailsResponse } from "../../../api/ocpi/ocpi-api-responses.js";
+import { type VersionDetailsResponse } from "../../../api/ocpi/ocpi-api-responses.js";
 import { ChargingNetworkKeys } from "../../../keys.js";
-import { handler } from "../../../lambda/get-ocpi-emsp-2_1_1/get-ocpi-emsp-2_1_1.js";
-import { DT_CPO_ID } from "../../test-constants.js";
 
 setTestEnv();
+const { handler } = await import("../../../lambda/get-ocpi-emsp-2_1_1/get-ocpi-emsp-2_1_1.js");
 
 const TEST_VERSIONS = `{
     "type": "Success",
@@ -27,15 +27,12 @@ const TEST_VERSIONS = `{
     }
 }`;
 
-describe(
-    "lambda-get-ocpi-emsp-2_1_1",
-    dbTestBase((db) => {
-        test("get-ocpi-emsp-2_1_1", () => {
-            // console.log(JSON.stringify(process.env));
-            const response = handler(getLambdaInputAuthorizerEvent(DT_CPO_ID));
-            const body = decodeBodyToObject(response) as VersionDetailsResponse;
-            console.log(prettyJson(body));
-            expect(prettyJson(body, ["timestamp"])).toEqual(prettyJson(TEST_VERSIONS, ["timestamp"]));
-        });
-    })
-);
+describe("lambda-get-ocpi-emsp-2_1_1", () => {
+    test("get-ocpi-emsp-2_1_1", () => {
+        // console.log(JSON.stringify(process.env));
+        const response = handler(getLambdaInputAuthorizerEvent(DT_CPO_ID));
+        const body = decodeBodyToObject(response) as VersionDetailsResponse;
+        console.log(prettyJson(body));
+        expect(prettyJson(body, ["timestamp"])).toEqual(prettyJson(TEST_VERSIONS, ["timestamp"]));
+    });
+});

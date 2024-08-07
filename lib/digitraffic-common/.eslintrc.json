@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": false,
+    "commonjs": false,
+    "es2022": true
+  },
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.eslint.json"]
+  },
+  "plugins": ["@typescript-eslint", "deprecation"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/strict",
+    "prettier"
+  ],
+  "rules": {
+    "deprecation/deprecation": "warn",
+    "@typescript-eslint/no-extraneous-class": "off",
+    "@typescript-eslint/no-throw-literal": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/non-nullable-type-assertion-style": "error",
+    "@typescript-eslint/no-dynamic-delete": "off"
+  }
+}

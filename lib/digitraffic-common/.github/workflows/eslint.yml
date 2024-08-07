@@ -1,0 +1,45 @@
+name: ESLint
+
+on: [push]
+
+jobs:
+  lint:
+    if: github.repository != 'tmfg/digitraffic-common'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install packages
+        run: pnpm install
+
+      - name: Create ESLint reports for affected projects
+        id: report
+        run: pnpm eslint-report -o ${{ github.ref_name }}/report.html
+        continue-on-error: true
+
+      - name: Publish report
+        id: publish-reports
+        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
+        with:
+          GH_PAGES_BRANCH: gh-pages
+          FILE_PATH: ${{ github.ref_name }}/report.html
+          COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
+          LINK_TEXT: ESLint report
+
+      - name: Fail on ESLint errors
+        run: |
+          if [[ "${{ steps.report.outcome }}" == "failure" || "${{ steps.report-affected.outcome }}" == "failure" ]]; then exit 1; else exit 0; fi
