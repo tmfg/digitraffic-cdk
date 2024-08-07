@@ -1,5 +1,7 @@
+import type { AWSManagedWafRule } from "@digitraffic/common/dist/aws/infra/acl-builder";
+
 export class WafRules {
-    readonly awsCommonRules: boolean;
+    readonly awsCommonRules: "all" | AWSManagedWafRule[];
     readonly digitrafficHeaderRules: boolean;
 
     readonly perIpWithHeader: number;
@@ -8,7 +10,7 @@ export class WafRules {
     readonly perIpAndQueryWithoutHeader?: number;
 
     constructor(
-        awsCommonRules: boolean,
+        awsCommonRules: "all" | AWSManagedWafRule[],
         digitrafficHeaderRules: boolean,
         perIpWithHeader: number,
         perIpWithoutHeader: number,
@@ -23,12 +25,12 @@ export class WafRules {
         this.perIpAndQueryWithoutHeader = perIpAndQueryWithoutHeader;
     }
 
-    static per5min(
+    private static checkLimits(
         perIpWithHeader: number,
         perIpWithoutHeader: number,
         perIpAndQueryWithHeader?: number,
         perIpAndQueryWithoutHeader?: number
-    ): WafRules {
+    ): void {
         if (
             perIpWithHeader < 100 ||
             perIpWithoutHeader < 100 ||
@@ -37,9 +39,47 @@ export class WafRules {
         ) {
             throw new Error("Minimum limit is 100");
         }
+    }
+
+    static per5min(
+        perIpWithHeader: number,
+        perIpWithoutHeader: number,
+        perIpAndQueryWithHeader?: number,
+        perIpAndQueryWithoutHeader?: number
+    ): WafRules {
+        WafRules.checkLimits(
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader
+        );
 
         return new WafRules(
+            "all",
             true,
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader
+        );
+    }
+
+    static per5minWithSelectedCommon(
+        awsCommonRules: "all" | AWSManagedWafRule[],
+        perIpWithHeader: number,
+        perIpWithoutHeader: number,
+        perIpAndQueryWithHeader?: number,
+        perIpAndQueryWithoutHeader?: number
+    ): WafRules {
+        WafRules.checkLimits(
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader
+        );
+
+        return new WafRules(
+            awsCommonRules,
             true,
             perIpWithHeader,
             perIpWithoutHeader,

@@ -1,9 +1,9 @@
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
-import { Annotations, Aspects, Stack, StackProps } from "aws-cdk-lib";
+import type { StackProps } from "aws-cdk-lib";
+import { Annotations, Aspects, Stack } from "aws-cdk-lib";
+import type { CfnDistribution, CloudFrontWebDistribution } from "aws-cdk-lib/aws-cloudfront";
 import {
     CachePolicy,
-    CfnDistribution,
-    CloudFrontWebDistribution,
     OriginAccessIdentity,
     OriginRequestPolicy,
     ResponseHeadersPolicy
@@ -15,10 +15,10 @@ import {
     Role,
     ServicePrincipal
 } from "aws-cdk-lib/aws-iam";
-import { Construct } from "constructs";
-import { CFLambdaParameters, CFOrigin, CFProps, DistributionProps, ElasticProps } from "./app-props";
-import { createDistribution } from "./distribution-util";
-import { LambdaHolder } from "./lambda-holder";
+import type { Construct } from "constructs";
+import type { CFLambdaParameters, CFOrigin, CFProps, DistributionProps, ElasticProps } from "./app-props.js";
+import { createDistribution } from "./distribution-util.js";
+import { LambdaHolder } from "./lambda-holder.js";
 import {
     createGzipRequirement,
     createHistoryPath,
@@ -31,9 +31,9 @@ import {
     createWeathercamRedirect,
     FunctionType,
     LambdaType
-} from "./lambda/lambda-creator";
-import { createOriginConfig } from "./origin-configs";
-import { createRealtimeLogging } from "./streaming-util";
+} from "./lambda/lambda-creator.js";
+import { createOriginConfig } from "./origin-configs.js";
+import { createRealtimeLogging } from "./streaming-util.js";
 
 type ViewerPolicyMap = Record<string, string>;
 

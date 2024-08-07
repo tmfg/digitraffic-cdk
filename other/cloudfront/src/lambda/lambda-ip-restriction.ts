@@ -1,4 +1,4 @@
-const ALLOWED_IPS = "EXT_IP".split(',');
+const ALLOWED_IPS = "EXT_IP".split(",");
 
 const VERSION_HEADERS = "EXT_VERSION";
 
@@ -11,7 +11,7 @@ const VERSION_HEADERS = "EXT_VERSION";
 
 const FORBIDDEN = {
     status: 403,
-    statusDescription: 'Forbidden',
+    statusDescription: "Forbidden"
 };
 
 exports.handler = function handler(event: any, context: any, callback: any) {

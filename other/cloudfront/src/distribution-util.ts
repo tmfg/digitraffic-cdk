@@ -1,15 +1,12 @@
-import {
-    CloudFrontWebDistribution,
-    HttpVersion,
-    SecurityPolicyProtocol,
-    SourceConfiguration
-} from "aws-cdk-lib/aws-cloudfront";
-import { CfnResource, Stack, Tags } from "aws-cdk-lib";
-import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
+import type { SourceConfiguration } from "aws-cdk-lib/aws-cloudfront";
+import { CloudFrontWebDistribution, HttpVersion, SecurityPolicyProtocol } from "aws-cdk-lib/aws-cloudfront";
+import type { CfnResource, Stack } from "aws-cdk-lib";
+import { Tags } from "aws-cdk-lib";
+import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import type { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
-import { createWebAcl } from "./acl/acl-creator";
-import { CFProps, DistributionProps } from "./app-props";
+import { createWebAcl } from "./acl/acl-creator.js";
+import type { CFProps, DistributionProps } from "./app-props.js";
 import _ from "lodash";
 
 export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
@@ -79,15 +76,10 @@ function addRealtimeLogging(
     distribution: CloudFrontWebDistribution,
     createDistributionProps: CreateDistributionProps
 ): void {
-    const {
-        originConfigs,
-        realtimeLogConfigArn,
-        distributionProps,
-        bucketLogging
-    } = createDistributionProps;
+    const { originConfigs, realtimeLogConfigArn, distributionProps, bucketLogging } = createDistributionProps;
     const distributionCf = distribution.node.defaultChild as CfnResource;
 
-    const length = originConfigs.flatMap(o => o.behaviors).length;
+    const length = originConfigs.flatMap((o) => o.behaviors).length;
 
     for (let i = 1; i < length; i++) {
         distributionCf.addPropertyOverride(

@@ -1,20 +1,18 @@
-import { KinesisStreamEvent, KinesisStreamRecord } from "aws-lambda";
-import { findHeaderValue } from "./logging-util";
+import type { KinesisStreamEvent, KinesisStreamRecord } from "aws-lambda";
+import { findHeaderValue } from "./logging-util.js";
 
-import * as AWSx from "aws-sdk";
-const AWS = AWSx as any;
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const zlib = require("zlib");
+import AWS from "aws-sdk";
+import * as zlib from "zlib";
 
 // camels
-/* eslint-disable camelcase */
 
-const appDomain = process.env.APP_DOMAIN as string;
+// eslint-disable-next-line dot-notation, @typescript-eslint/non-nullable-type-assertion-style
+const appDomain = process.env["APP_DOMAIN"] as string;
 const application = appDomain.split("-")[0];
 const env = appDomain.split("-")[1];
 
-const elasticDomain = process.env.ELASTIC_DOMAIN as string;
+// eslint-disable-next-line dot-notation, @typescript-eslint/non-nullable-type-assertion-style
+const elasticDomain = process.env["ELASTIC_DOMAIN"] as string;
 const endpoint = new AWS.Endpoint(elasticDomain);
 const creds = new AWS.EnvironmentCredentials("AWS");
 
@@ -25,7 +23,8 @@ const COMPRESS_OPTIONS = {
 };
 
 // fields contains all the selected log fields in the order specified in loggint-utils.ts CLOUDFRONT_STREAMING_LOG_FIELDS
-async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function convertFieldNamesAndFormats(fields: string[]) {
     // field order comes from documentation https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields
     const timestamp = new Date(1000 * Number(fields[0])).toISOString();
     const ip = fields[1];
@@ -59,19 +58,19 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
         "@env": env,
         "@fields": {
             remote_addr: ip,
-            body_bytes_sent: +responseBytes,
+            body_bytes_sent: responseBytes ? +responseBytes : responseBytes,
             http_referrer: referrer,
-            http_user_agent: unescape(userAgent),
+            http_user_agent: userAgent ? unescape(userAgent) : userAgent,
             request_method: requestMethod,
-            request_time: +timeTaken,
+            request_time: timeTaken ? +timeTaken : timeTaken,
             request_uri: requestUri,
             request_host: host,
             scheme: requestProtocol,
             server_protocol: httpVersion,
-            status: +responseStatus,
+            status: responseStatus ? +responseStatus : responseStatus,
             upstream_cache_status: resultType,
             http_x_forwarded_for: forwardedFor,
-            upstream_response_time: +timeToFirstByte,
+            upstream_response_time: timeToFirstByte ? +timeToFirstByte : timeToFirstByte,
             http_digitraffic_user: digitrafficUser,
             accept_encoding: acceptEncoding,
             http_x_forwarded_proto: xForwardedProto
@@ -79,7 +78,8 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
     };
 }
 
-async function transformRecord(record: KinesisStreamRecord): Promise<any> {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function transformRecord(record: KinesisStreamRecord) {
     const buffer = Buffer.from(record.kinesis.data, "base64");
     const cloudfrontRealtimeLogData: string = buffer.toString("utf8");
 
@@ -102,15 +102,12 @@ export const handler = async (event: KinesisStreamEvent) => {
     try {
         const action = {
             index: { _index: createIndexName(), _type: "_doc" }
-        } as any;
+        };
 
         //        console.log('using action ' + JSON.stringify(action));
 
-        const recordTransformPromises = event.Records.map(async (record: KinesisStreamRecord) =>
-            transformRecord(record)
-        );
+        const data = event.Records.map((record: KinesisStreamRecord) => transformRecord(record));
 
-        const data = await Promise.all(recordTransformPromises);
         const returnValue = await sendMessageToEs(createBulkMessage(action, data));
 
         if (returnValue.length < 200) {
@@ -135,14 +132,15 @@ function createBulkMessage(action: any, lines: any[]): string {
     return message;
 }
 
-function sendMessageToEs(message: string): Promise<any> {
-    const request = new AWS.HttpRequest(endpoint);
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+function sendMessageToEs(message: string) {
+    const request = new AWS.HttpRequest(endpoint, "eu-west-1");
 
     request.method = "POST";
     request.path = "/_bulk";
-    request.region = "eu-west-1";
-    request.headers["presigned-expires"] = false;
-    request.headers.Host = endpoint.host;
+    request.headers["presigned-expires"] = "false";
+    // eslint-disable-next-line dot-notation
+    request.headers["Host"] = endpoint.host;
     request.body = zlib.gzipSync(message, COMPRESS_OPTIONS);
     request.headers["Content-Type"] = "application/x-ndjson";
     request.headers["Content-Encoding"] = "gzip";

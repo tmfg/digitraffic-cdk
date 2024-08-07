@@ -1,9 +1,5 @@
 import * as Utils from "@digitraffic/common/dist/utils/utils";
-import {
-    CloudFrontResponseEvent,
-    CloudFrontResponseHandler,
-    CloudFrontResponseResult,
-} from "aws-lambda";
+import { CloudFrontResponseEvent, CloudFrontResponseHandler, CloudFrontResponseResult } from "aws-lambda";
 import { CloudFrontRequest } from "aws-lambda/common/cloudfront";
 import { Callback, Context } from "aws-lambda/handler";
 import queryStringHelper from "querystring";
@@ -34,15 +30,15 @@ export const handler: CloudFrontResponseHandler = (
         headers[headerContentDisp.toLowerCase()] = [
             {
                 key: headerContentDisp,
-                value: 'attachment; filename="' + filename + '"',
-            },
+                value: 'attachment; filename="' + filename + '"'
+            }
         ];
 
         headers[headerContentType.toLowerCase()] = [
             {
                 key: headerContentType,
-                value: "text/csv; charset=utf-8",
-            },
+                value: "text/csv; charset=utf-8"
+            }
         ];
     }
 
@@ -61,10 +57,7 @@ export const handler: CloudFrontResponseHandler = (
 };
 
 function createFilename(
-    request: Omit<
-        CloudFrontRequest,
-        "body" | "headers" | "method" | "origin" | "clientIp"
-    >
+    request: Omit<CloudFrontRequest, "body" | "headers" | "method" | "origin" | "clientIp">
 ): string {
     const type = request.uri.substring(1); // ie. uri=/liikennemaara
     const params = queryStringHelper.parse(request.querystring); // ie. tyyppi=h&pvm=2023-03-01&loppu=&lam_type=option1&piste=1
@@ -73,10 +66,7 @@ function createFilename(
     return `${type}_${subType}_${dateOrWeek}.csv`;
 }
 
-function getDateOrWeek(
-    date: string | string[] | undefined,
-    week: string | string[] | undefined
-): string {
+function getDateOrWeek(date: string | string[] | undefined, week: string | string[] | undefined): string {
     if (typeof date === "string" && date) {
         return date;
     } else if (typeof week === "string" && week) {

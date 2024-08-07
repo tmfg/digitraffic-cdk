@@ -1,4 +1,4 @@
-import {addWeathercamImageLastModifiedHeaderFromXAmzMeta} from "../lambda-util";
+import { addWeathercamImageLastModifiedHeaderFromXAmzMeta } from "../lambda-util.js";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
@@ -13,7 +13,7 @@ exports.handler = (event: any, context: any, callback: any) => {
     const request = event.Records[0].cf.request;
     const response = event.Records[0].cf.response;
 
-    if (request.method === 'GET') {
+    if (request.method === "GET") {
         addWeathercamImageLastModifiedHeaderFromXAmzMeta(response);
     }
 

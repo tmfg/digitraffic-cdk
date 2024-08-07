@@ -1,15 +1,17 @@
-import { Duration, Stack } from "aws-cdk-lib";
-import {
+import type { Stack } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
+import type {
     Behavior,
     LambdaFunctionAssociation,
     OriginAccessIdentity,
     SourceConfiguration
 } from "aws-cdk-lib/aws-cloudfront";
-import { CfnDistribution } from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
-import { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
+import type { CfnDistribution } from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
+import type { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
 import { Bucket } from "aws-cdk-lib/aws-s3";
-import { CFBehavior, CFDomain, CFOrigin, S3Domain } from "./app-props";
-import { LambdaHolder } from "./lambda-holder";
+import type { CFBehavior, CFOrigin } from "./app-props.js";
+import { CFDomain, S3Domain } from "./app-props.js";
+import type { LambdaHolder } from "./lambda-holder.js";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 
 export function createOriginConfig(
