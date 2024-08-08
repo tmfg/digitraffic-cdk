@@ -32,7 +32,8 @@ function ramiSmMessageToUDOTMessage(message: z.infer<typeof ramiSmMessageSchema>
     const mcj = message.payload.monitoredStopVisits[0].monitoredVehicleJourney;
     const monitoredCall = mcj.monitoredCall;
     const messageId = message.headers.e2eId;
-    const { trainNumber, departureDate } = parseTrain(mcj.vehicleJourneyName);
+    const vehicleJourneyName = mcj.vehicleJourneyName;
+    const { trainNumber, departureDate } = parseTrain(vehicleJourneyName);
 
     data.push(...parseMonitoredCall(monitoredCall));
 
@@ -40,7 +41,7 @@ function ramiSmMessageToUDOTMessage(message: z.infer<typeof ramiSmMessageSchema>
         data.push(...parseMonitoredCall(oc));
     });  
 
-    return { messageId, trainNumber, departureDate, data };
+    return { messageId, trainNumber, departureDate, vehicleJourneyName, data };
 }
 
 function parseMonitoredCall(mc: z.infer<typeof monitoredCall>): UnknownDelayOrTrack[] {
@@ -48,16 +49,16 @@ function parseMonitoredCall(mc: z.infer<typeof monitoredCall>): UnknownDelayOrTr
         stationShortCode: mc.stopPointRef,
         scheduledTime: new Date(mc.aimedArrivalTime),
         type: 0,
-        delayUnknown: !mc.expectedArrivalTime,
-        trackUnknown: !mc.arrivalStopAssignment.expectedQuayName
+        unknownDelay: !mc.expectedArrivalTime,
+        unknownTrack: !mc.arrivalStopAssignment.expectedQuayName
     } : undefined;
 
     const departure: UnknownDelayOrTrack | undefined = !!mc.aimedDepartureTime && includeCall(mc) ? {
         stationShortCode: mc.stopPointRef,
         scheduledTime: new Date(mc.aimedDepartureTime),
         type: 1,
-        delayUnknown: !mc.expectedDepartureTime,
-        trackUnknown: !mc.departureStopAssignment.expectedQuayName
+        unknownDelay: !mc.expectedDepartureTime,
+        unknownTrack: !mc.departureStopAssignment.expectedQuayName
     } : undefined;
 
     return _.compact([arrival, departure]);
@@ -71,18 +72,19 @@ function includeCall(mc: z.infer<typeof monitoredCall>): boolean {
  * Parse departure date and train number from VehicleJourneyName
  * 
  * VehicleJourneyName has the following format:
- * YYYYMMDD1nnnnn
+ * YYYYMMDD1nnnnn[BUS]
  * 
- * Meaning the departure date followed by 1 and then the train number with leading zeros
+ * Meaning the departure date followed by 1 and then the train number with leading zeros, and might be followed with BUS
  * 
  * For example "20240619108122"
+ * For example "20240807100761BUS"
  */
 function parseTrain(vehicleJourney: string): {
     departureDate: string,
     trainNumber: number
 } {
     const departureDate = vehicleJourney.substring(0, 8);
-    const trainNumber = vehicleJourney.substring(9);
+    const trainNumber = vehicleJourney.substring(9, 14);
 
     return {
         departureDate: `${departureDate.substring(0, 4)}-${departureDate.substring(4, 6)}-${departureDate.substring(6, 8)}`,

@@ -34,7 +34,7 @@ create unique index rami_udot_at_u on rami_udot(train_departure_date, train_numb
 create index rami_udot_created_i on rami_udot(created_db);
 
 create trigger rami_udot_before_update BEFORE UPDATE on rami_udot for each row BEGIN 
-	IF (OLD.model_updated_time = NEW.model_updated_time) THEN
+	IF (OLD.unknown_track <> NEW.unknown_track OR OLD.unknown_delay <> NEW.unknown_delay) THEN
 	   set new.model_updated_time = null;	
     END IF;
 END
@@ -51,23 +51,20 @@ export interface UdotUpsertValues {
     readonly ud: boolean
 }
 
-export async function insertOrUpdate(conn: Connection, values: UdotUpsertValues[]): Promise<void> {
-    await Promise.allSettled(values.map(async v => {
-        try {
-            if(v.ud === false && v.ut === false) {
-                return await conn.query(SQL_UPDATE_FALSE_VALUES, v);
-            } else {
-                return await conn.query(SQL_UPSERT_VALUES, v) 
-            };
-        } catch(error) {
-            logger.error({
-                method: "UdotDao.insertOrUpdate",
-                error
-            });
-        
-            return Promise.reject(error);
-        }
-    }));
+export async function insertOrUpdate(conn: Connection, value: UdotUpsertValues): Promise<void> {    
+    try {
+        if(value.ud === false && value.ut === false) {                
+            await conn.query(SQL_UPDATE_FALSE_VALUES, value);
+        } else {
+            await conn.query(SQL_UPSERT_VALUES, value) 
+        };
+    } catch(error) {
+        logger.error({
+            method: "UdotDao.insertOrUpdate",
+            error
+        });        
+    }
+
 }
 
 export async function deleteOldValues(conn: Connection): Promise<void> {

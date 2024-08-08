@@ -20,8 +20,8 @@ describe("parse sm messages", () => {
             throw new Error("No data at index " + index);
         }
 
-        expect(data.delayUnknown).toEqual(delayUnknown);
-        expect(data.trackUnknown).toEqual(trackUnknown);
+        expect(data.unknownDelay).toEqual(delayUnknown);
+        expect(data.unknownTrack).toEqual(trackUnknown);
         expect(data.type).toEqual(type);
     }
 

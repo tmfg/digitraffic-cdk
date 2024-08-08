@@ -24,35 +24,31 @@ export async function processUDOTMessage(message: UnknownDelayOrTrackMessage): P
 
         logger.debug(`rows for ${message.trainNumber} ${message.departureDate} : ${JSON.stringify(rows)}`);
 
-        const upsertValues: UdotUpsertValues[] = [];
-
-        message.data.forEach(datarow => {
+        for(const datarow of message.data) {
             // find attap_id for each line
             const attapId = findAttapId(rows, datarow);
 
             if(attapId) {
                 foundCount++;
-                upsertValues.push({
-                    trainNumber: message.trainNumber,
-                    trainDepartureDate: message.departureDate,
-                    attapId, 
-                    ut: datarow.trackUnknown,
-                    ud: datarow.delayUnknown,
-                    messageId: message.messageId
+
+                // each update in own transaction, to prevent locking!
+                await inTransaction(async (conn: Connection): Promise<void> => {
+                    return await insertOrUpdate(conn, {
+                        trainNumber: message.trainNumber,
+                        trainDepartureDate: message.departureDate,
+                        attapId, 
+                        ut: datarow.unknownTrack,
+                        ud: datarow.unknownDelay,
+                        messageId: message.messageId
+                    });
                 });
+        
             } else {
                 notFoundCount++;
 
                 logRowNotFound(message, datarow, rows);
             }
-        });
-
-        logger.debug(upsertValues);
-        
-        return await inTransaction(async (conn: Connection): Promise<void> => {
-            // run all updates to db
-            return await insertOrUpdate(conn, upsertValues);
-        });
+        };
     } finally {
         logger.info({
             method: "ProcessSmMessageService.processSmMessage",
@@ -85,11 +81,16 @@ function findAttapId(rows: TimeTableRow[], datarow: UnknownDelayOrTrack): number
  //       if(r.station_short_code === datarow.stationShortCode) {
 //            console.info(`Comparing ${JSON.stringify(r)} and ${JSON.stringify(datarow)} ${r.station_short_code === datarow.stationShortCode && r.type === datarow.type && JSON.stringify(r.scheduled_time) === JSON.stringify(datarow.scheduledTime)}`);
 
-            return JSON.stringify(r.scheduled_time) === JSON.stringify(datarow.scheduledTime) && r.station_short_code === datarow.stationShortCode && r.type === datarow.type
+            return timesMatch(JSON.stringify(r.scheduled_time), JSON.stringify(datarow.scheduledTime)) && r.station_short_code === datarow.stationShortCode && r.type === datarow.type
  //       }
 
  //       return false;
     });
 
     return row?.attap_id;
+}
+
+// match at the minute level
+function timesMatch(jsonTime1: string, jsonTime2: string): boolean {
+    return jsonTime1.substring(0, 17) === jsonTime2.substring(0, 17);
 }

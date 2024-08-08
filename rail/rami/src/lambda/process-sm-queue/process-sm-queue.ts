@@ -8,9 +8,10 @@ import { sendDlq, sendUdotMessage } from "../../service/sqs-service.js";
 
 export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return async (event: SQSEvent) => {
-        return await Promise.allSettled(
-            event.Records.map(async (r) => {
-                const start = Date.now();
+        const start = Date.now();
+
+        try {
+            return await Promise.allSettled(event.Records.map(async (r) => {
                 const recordBody = r.body;
 
                 try {
@@ -20,8 +21,6 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                     // TODO: parse bus replacement
 
                     if(udotMessage) {
-                        logger.debug(udotMessage);
-
                         logger.info({
                             method: "RAMI-ProcessSmQueue.handler",
                             customDataCount: udotMessage.data.length
@@ -29,8 +28,16 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
 
                         await saveSMMessage(udotMessage.messageId, udotMessage.trainNumber, udotMessage.departureDate, recordBody);
 
-                        if(udotMessage.data.length > 0) {
-                            await sendUdotMessage(udotMessage);
+                        if(udotMessage.vehicleJourneyName.includes("BUS")) {
+                            logger.info({
+                                method: "RAMI-ProcessSmQueue.handler",                                
+                                message: `Skipping message ${udotMessage.messageId} with vehicleJourneyName ${udotMessage.vehicleJourneyName}`,
+                                customSkippedCount: 1
+                            });
+                        } else {
+                            if(udotMessage.data.length > 0) {
+                                await sendUdotMessage(udotMessage);
+                            }
                         }
                     } else {
                         logger.debug(recordBody);
@@ -44,17 +51,18 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                         await sendDlq("could not parse UDOT", recordBody);
                     }    
 
-                    return await Promise.resolve();
+                    return Promise.resolve();
                 } catch (error) {
                     logException(logger, error);                
-                } finally {
-                    logger.info({
-                        method: "RAMI-ProcessSmQueue.handler",
-                        tookMs: Date.now() - start
-                    });
                 }
-            })
-        );
+            }));
+        } finally {
+            logger.info({
+                method: "RAMI-ProcessSmQueue.handler",
+                tookMs: Date.now() - start,
+                customRecordCount: event.Records.length
+            });
+        }
     };
 }
 
