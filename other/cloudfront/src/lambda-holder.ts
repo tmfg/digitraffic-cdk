@@ -1,9 +1,8 @@
 import type { IVersion } from "aws-cdk-lib/aws-lambda";
 import type * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
-import type { LambdaFunctionAssociation } from "aws-cdk-lib/aws-cloudfront";
+import type { LambdaFunctionAssociation, FunctionAssociation } from "aws-cdk-lib/aws-cloudfront";
 import { FunctionEventType, LambdaEdgeEventType } from "aws-cdk-lib/aws-cloudfront";
 import { FunctionType, LambdaType } from "./lambda/lambda-creator.js";
-import type { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
 
 export class LambdaHolder {
     readonly lambdas: Record<number, IVersion> = {};
@@ -25,21 +24,24 @@ export class LambdaHolder {
     getFunctionAssociation(functionType: FunctionType): FunctionAssociation {
         return {
             eventType: LambdaHolder.getFunctionEventType(functionType),
-            function: this.functions[functionType]
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            function: this.functions[functionType]!
         };
     }
 
     getLambdaAssociation(lambdaType: LambdaType): LambdaFunctionAssociation {
         return {
             eventType: LambdaHolder.getLambdaEventType(lambdaType),
-            lambdaFunction: this.lambdas[lambdaType]
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            lambdaFunction: this.lambdas[lambdaType]!
         };
     }
 
     getRestriction(name: string): LambdaFunctionAssociation {
         return {
             eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
-            lambdaFunction: this.restrictions[name]
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            lambdaFunction: this.restrictions[name]!
         };
     }
 

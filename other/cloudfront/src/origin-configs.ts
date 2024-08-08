@@ -4,10 +4,10 @@ import type {
     Behavior,
     LambdaFunctionAssociation,
     OriginAccessIdentity,
-    SourceConfiguration
+    SourceConfiguration,
+    CfnDistribution,
+    FunctionAssociation
 } from "aws-cdk-lib/aws-cloudfront";
-import type { CfnDistribution } from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
-import type { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import type { CFBehavior, CFOrigin } from "./app-props.js";
 import { CFDomain, S3Domain } from "./app-props.js";

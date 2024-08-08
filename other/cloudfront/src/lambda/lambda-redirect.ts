@@ -1,3 +1,6 @@
+import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
+import { createAndLogError } from "../lambda-util.js";
+
 const domainName = "EXT_DOMAIN_NAME";
 const hostName = "EXT_HOST_NAME";
 
@@ -18,27 +21,44 @@ const VERSION_REDIRECT = "EXT_VERSION";
     https://origin-address/C123.jpg -> no changes, send request to that origin
     https://origin-address/C123.jpg?versionId=123 -> send request to new origin http://DOMAIN_NAME/C123.jpg?versionId=123
  */
-exports.handler = function handler(event: any, context: any, callback: any) {
-    const { request } = event.Records[0].cf;
-    const { querystring } = request;
+export const handler: CloudFrontRequestHandler = (event, context, callback) => {
+    const records = event.Records;
 
-    if (querystring.length > 0) {
-        request.origin = {
-            custom: {
-                domainName: domainName,
-                port: 80,
-                protocol: "http",
-                path: "",
-                sslProtocols: sslProtocols,
-                readTimeout: 5,
-                keepaliveTimeout: 5,
-                customHeaders: {}
-            }
-        };
+    if (records) {
+        const record = records[0];
+        if (!record) {
+            const err = createAndLogError("lambda-redirect.handler", "Records did not have a record");
+            callback(err);
+            throw err;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        const request: CloudFrontRequest = record.cf.request;
 
-        request.headers.host = hostHeader;
+        const { querystring } = request;
+
+        if (querystring.length > 0) {
+            request.origin = {
+                custom: {
+                    domainName: domainName,
+                    port: 80,
+                    protocol: "http",
+                    path: "",
+                    sslProtocols: sslProtocols,
+                    readTimeout: 5,
+                    keepaliveTimeout: 5,
+                    customHeaders: {}
+                }
+            };
+
+            // eslint-disable-next-line dot-notation
+            request.headers["host"] = hostHeader;
+        }
+
+        // If nothing matches, return request unchanged
+        callback(null, request);
+    } else {
+        const err = createAndLogError("lambda-redirect.handler", "Event did not have records");
+        callback(err);
+        throw err;
     }
-
-    // If nothing matches, return request unchanged
-    callback(null, request);
 };

@@ -1,7 +1,9 @@
 import type { KinesisStreamEvent, KinesisStreamRecord } from "aws-lambda";
 import { findHeaderValue } from "./logging-util.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-import AWS from "aws-sdk";
+import AWS, { type EnvironmentCredentials, type HttpRequest } from "aws-sdk";
+import type { IncomingMessage } from "http";
 import * as zlib from "zlib";
 
 // camels
@@ -111,15 +113,23 @@ export const handler = async (event: KinesisStreamEvent) => {
         const returnValue = await sendMessageToEs(createBulkMessage(action, data));
 
         if (returnValue.length < 200) {
-            console.log("return value " + returnValue);
+            logger.info({
+                method: "lambda-stream-to-elastic.handler",
+                message: "return value " + returnValue
+            });
         }
-    } catch (e) {
-        console.log("exception: " + e);
+    } catch (e_) {
+        const e = e_ as Error;
+        logger.error({
+            message: "exception: " + e.message,
+            method: "lambda-stream-to-elastic.handler",
+            error: e
+        });
         throw e;
     }
 };
 
-function createBulkMessage(action: any, lines: any[]): string {
+function createBulkMessage(action: unknown, lines: unknown[]): string {
     let message = "";
 
     lines.forEach((line) => {
@@ -132,8 +142,33 @@ function createBulkMessage(action: any, lines: any[]): string {
     return message;
 }
 
+// Signers API as well as NodeHttpClient are part of private API in AWS SDK v2.
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace AWS {
+        // eslint-disable-next-line @typescript-eslint/no-namespace
+        namespace Signers {
+            class V4 {
+                constructor(request: AWS.HttpRequest, serviceName: string, options?: object);
+                addAuthorization(creds: EnvironmentCredentials, date: Date): void;
+            }
+        }
+        class NodeHttpClient {
+            // eslint-disable-next-line @typescript-eslint/ban-types,@rushstack/no-new-null
+            handleRequest(
+                req: HttpRequest,
+                options: object | null,
+                // eslint-disable-next-line @typescript-eslint/ban-types
+                callback: Function,
+                // eslint-disable-next-line @typescript-eslint/ban-types
+                errCallback: Function
+            ): void;
+        }
+    }
+}
+
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function sendMessageToEs(message: string) {
+function sendMessageToEs(message: string): Promise<string> {
     const request = new AWS.HttpRequest(endpoint, "eu-west-1");
 
     request.method = "POST";
@@ -148,27 +183,36 @@ function sendMessageToEs(message: string) {
     const signer = new AWS.Signers.V4(request, "es");
     signer.addAuthorization(creds, new Date());
 
-    console.log("sending POST to es unCompressedSize=%d requestSize=%d", message.length, request.body.length);
+    logger.info({
+        message: `sending POST to es unCompressedSize=${message.length} requestSize=${request.body.length}`,
+        method: "lambda-stream-to-elastic.sendMessageToEs"
+    });
 
     const client = new AWS.NodeHttpClient();
     return new Promise((resolve, reject) => {
         client.handleRequest(
             request,
             null,
-            function (httpResp: any) {
+            function (httpResp: IncomingMessage) {
                 let respBody = "";
 
-                console.log("statuscode %d", httpResp.statusCode);
+                logger.info({
+                    message: `statuscode ${httpResp.statusCode}`,
+                    method: "lambda-stream-to-elastic.sendMessageToEs"
+                });
 
-                httpResp.on("data", function (chunk: any) {
+                httpResp.on("data", function (chunk: string) {
                     respBody += chunk;
                 });
-                httpResp.on("end", function (chunk: any) {
+                httpResp.on("end", function (chunk: string) {
                     resolve(respBody);
                 });
             },
-            function (err: any) {
-                console.log("Error: " + err);
+            function (err: string) {
+                logger.error({
+                    message: "Error: " + err,
+                    method: "lambda-stream-to-elastic.sendMessageToEs"
+                });
                 reject(new Error(err));
             }
         );

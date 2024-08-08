@@ -1,17 +1,21 @@
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { setEnvVariable, setSecretOverideAwsRegionEnv } from "@digitraffic/common/dist/utils/utils";
-import {
+import type {
     CloudFrontRequestEvent,
     CloudFrontRequestResult,
     CloudFrontResultResponse,
     Context,
     CloudFrontRequestHandler,
-    CloudFrontRequestCallback
+    CloudFrontRequestCallback,
+    CloudFrontRequestEventRecord,
+    CloudFrontRequest
 } from "aws-lambda";
 
-import queryStringHelper, { ParsedUrlQuery, ParsedUrlQueryInput } from "querystring";
+import queryStringHelper, { type ParsedUrlQuery, type ParsedUrlQueryInput } from "querystring";
 import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
+import { createAndLogError } from "../lambda-util.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 setEnvVariable(EnvKeys.SECRET_ID, "road");
 // Set region for secret reading manually to eu-west-1 as edge lambda is in us-west-1 or "random" region at runtime
@@ -23,147 +27,186 @@ export const handler: CloudFrontRequestHandler = async (
     _: Context,
     callback: CloudFrontRequestCallback
 ): Promise<CloudFrontRequestResult> => {
-    const { request } = event.Records[0].cf;
+    const records = event.Records;
+    if (records) {
+        const record = records[0];
+        if (!record) {
+            const err = createAndLogError("lambda-lam-redirect.handler", "Records did not have a record");
+            callback(err);
+            throw err;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        const request: CloudFrontRequest = record.cf.request;
 
-    console.log(
-        "method=tmsHistoryHandler uri=%s, request=%o, region=%s",
-        request.uri,
-        request,
-        process.env.AWS_REGION
-    );
+        logger.info({
+            method: "lambda-lam-redirect.handler",
+            customUri: request.uri,
+            customRequest: JSON.stringify(request),
+            // eslint-disable-next-line dot-notation
+            customRegion: process.env["AWS_REGION"],
+            message: "Redirect called"
+        });
 
-    // This is for raw-data from ongoing or history S3 bucket. History-bucket has data until end of 2021
-    // and ongoing-bucket has data from start of the 2022.
-    if (request.uri.includes("/api/tms/v1/history/raw/")) {
-        // Adjust uri i.e. /api/tms/v1/history/raw/lamraw_[lam_id]_[yearshort]_[day_number].csv -> /lamraw_[lam_id]_[yearshort]_[day_number].csv
-        request.uri = request.uri.substring(request.uri.lastIndexOf("/"));
+        // This is for raw-data from ongoing or history S3 bucket. History-bucket has data until end of 2021
+        // and ongoing-bucket has data from start of the 2022.
+        if (request.uri.includes("/api/tms/v1/history/raw/")) {
+            // Adjust uri i.e. /api/tms/v1/history/raw/lamraw_[lam_id]_[yearshort]_[day_number].csv -> /lamraw_[lam_id]_[yearshort]_[day_number].csv
+            request.uri = request.uri.substring(request.uri.lastIndexOf("/"));
 
-        const parts = request.uri.split("_");
+            const parts = request.uri.split("_");
 
-        if (Array.isArray(parts) && parts.length > 2) {
-            const year = parseInt(parts[2], 10);
+            if (Array.isArray(parts) && parts.length > 2) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-non-null-assertion
+                const year = parseInt(parts[2]!, 10);
 
-            if (!isNaN(year) && year > 21) {
-                // Change origin
-                const secret = await secretHolder.get();
-                if (request.origin?.s3) {
-                    request.origin.s3.domainName = secret.s3DomainTmsRawOngoing;
-                } else {
-                    throw new Error("method=tmsHistoryHandler type=raw Empty request.origin.s3!");
-                }
-                request.headers.host = [
-                    {
-                        key: "host",
-                        value: secret.s3DomainTmsRawOngoing
+                if (!isNaN(year) && year > 21) {
+                    // Change origin
+                    const secret = await secretHolder.get();
+                    if (request.origin?.s3) {
+                        request.origin.s3.domainName = secret.s3DomainTmsRawOngoing;
+                    } else {
+                        throw new Error("method=tmsHistoryHandler type=raw Empty request.origin.s3!");
                     }
-                ];
-            }
-        }
-
-        console.log(
-            "method=tmsHistoryHandler type=raw fix request uri=%s, host=%o",
-            request.uri,
-            request.headers.host
-        );
-        // This is for the SnowLake request and GET works with webpage address (/ui/tms/history) and with api-url.
-        // Index.html has been set to do GET to /api/tms/v1/history. Without it, it will default to do get to webpage address.
-    } else if (
-        (request.uri.includes("/ui/tms/history") || request.uri.includes("/api/tms/v1/history")) &&
-        request.querystring.length
-    ) {
-        const newQuery = parseQuery(request.querystring);
-        if (!newQuery.length) {
-            throw new Error(
-                "method=tmsHistoryHandler Empty query string! querystring: " + request.querystring
-            );
-        }
-
-        const secret: LamSecrets = await secretHolder.get();
-
-        request.origin = {
-            custom: {
-                domainName: secret.snowflakeDomain,
-                port: 443,
-                protocol: "https",
-                path: "/prod",
-                sslProtocols: ["TLSv1", "TLSv1.1"],
-                readTimeout: 20,
-                keepaliveTimeout: 5,
-                customHeaders: {
-                    "x-api-key": [
+                    // eslint-disable-next-line dot-notation
+                    request.headers["host"] = [
                         {
-                            key: "x-api-key",
-                            value: secret.snowflakeApikey
+                            key: "host",
+                            value: secret.s3DomainTmsRawOngoing
+                        }
+                    ];
+                }
+            }
+
+            logger.info({
+                method: "lambda-lam-redirect.handler",
+                type: "raw fix",
+                customRequestUri: request.uri,
+                // eslint-disable-next-line dot-notation
+                customHost: JSON.stringify(request.headers["host"])
+            });
+            // This is for the SnowLake request and GET works with webpage address (/ui/tms/history) and with api-url.
+            // Index.html has been set to do GET to /api/tms/v1/history. Without it, it will default to do get to webpage address.
+        } else if (
+            (request.uri.includes("/ui/tms/history") || request.uri.includes("/api/tms/v1/history")) &&
+            request.querystring.length
+        ) {
+            const newQuery = parseQuery(request.querystring);
+            if (!newQuery.length) {
+                throw new Error(
+                    "method=tmsHistoryHandler Empty query string! querystring: " + request.querystring
+                );
+            }
+
+            const secret: LamSecrets = await secretHolder.get();
+
+            request.origin = {
+                custom: {
+                    domainName: secret.snowflakeDomain,
+                    port: 443,
+                    protocol: "https",
+                    path: "/prod",
+                    sslProtocols: ["TLSv1", "TLSv1.1"],
+                    readTimeout: 20,
+                    keepaliveTimeout: 5,
+                    customHeaders: {
+                        "x-api-key": [
+                            {
+                                key: "x-api-key",
+                                value: secret.snowflakeApikey
+                            }
+                        ]
+                    }
+                }
+            };
+
+            // host is not allowed in CF custom headers
+            // eslint-disable-next-line dot-notation
+            request.headers["host"] = [{ key: "host", value: secret.snowflakeDomain }];
+
+            request.uri = getApiPath(request.querystring);
+            request.querystring = newQuery;
+            logger.info({
+                method: "lambda-lam-redirect.handler",
+                message: "",
+                type: "snowflake",
+                customRequestUri: request.uri,
+                // eslint-disable-next-line dot-notation
+                customHost: JSON.stringify(request.headers["host"]),
+                customQueryString: request.querystring
+            });
+
+            // Redirect /ui/tms/history and /ui/tms/history/index.html requests to root /ui/tms/history/.
+            // Then other resources from the webpage are also found under the root.
+        } else if (
+            request.uri.endsWith("/ui/tms/history") ||
+            request.uri.includes("/ui/tms/history/index.")
+        ) {
+            //Generate HTTP redirect response to a different landing page that is root.
+            const redirectResponse: CloudFrontResultResponse = {
+                status: "301",
+                statusDescription: "Moved Permanently",
+                headers: {
+                    location: [
+                        {
+                            key: "Location",
+                            value: "/ui/tms/history/"
+                        }
+                    ],
+                    "cache-control": [
+                        {
+                            key: "Cache-Control",
+                            value: "max-age=300"
                         }
                     ]
                 }
+            };
+
+            logger.info({
+                method: "lambda-lam-redirect.handler",
+                message: "",
+                type: "redirectToWebpage",
+                customRequestUri: request.uri,
+                // eslint-disable-next-line dot-notation
+                customHost: JSON.stringify(request.headers["host"]),
+                customQueryString: request.querystring,
+                customResponseStatus: redirectResponse.status,
+                // @ts-ignore
+                customLocation: JSON.stringify(redirectResponse?.headers?.location)
+            });
+            callback(null, redirectResponse);
+            return redirectResponse;
+            // This is for the webpage and it's resources
+        } else if (request.uri.includes("/ui/tms/history/")) {
+            // Adjust uri path to match root of bucket
+            if (request.uri.endsWith("/ui/tms/history/")) {
+                request.uri = "/index.html";
+            } else {
+                // Adjust uri i.e. /ui/tms-history/index.html -> /index. or /ui/tms-history/ -> /
+                request.uri = request.uri.substring(request.uri.lastIndexOf("/"));
             }
-        };
 
-        // host is not allowed in CF custom headers
-        request.headers.host = [{ key: "host", value: secret.snowflakeDomain }];
-
-        request.uri = getApiPath(request.querystring);
-        request.querystring = newQuery;
-        console.log(
-            "method=tmsHistoryHandler type=snowflake request uri=%s, queryString=%s host=%o",
-            request.uri,
-            request.querystring,
-            request.headers.host
-        );
-
-        // Redirect /ui/tms/history and /ui/tms/history/index.html requests to root /ui/tms/history/.
-        // Then other resources from the webpage are also found under the root.
-    } else if (request.uri.endsWith("/ui/tms/history") || request.uri.includes("/ui/tms/history/index.")) {
-        //Generate HTTP redirect response to a different landing page that is root.
-        const redirectResponse: CloudFrontResultResponse = {
-            status: "301",
-            statusDescription: "Moved Permanently",
-            headers: {
-                location: [
-                    {
-                        key: "Location",
-                        value: "/ui/tms/history/"
-                    }
-                ],
-                "cache-control": [
-                    {
-                        key: "Cache-Control",
-                        value: "max-age=300"
-                    }
-                ]
-            }
-        };
-
-        console.log(
-            "method=tmsHistoryHandler type=redirectToWebpage request uri=%s, host=%o response status: %s location: %s",
-            request.uri,
-            request.headers.host,
-            redirectResponse.status,
-            JSON.stringify(redirectResponse.headers?.location)
-        );
-        callback(null, redirectResponse);
-        return redirectResponse;
-        // This is for the webpage and it's resources
-    } else if (request.uri.includes("/ui/tms/history/")) {
-        // Adjust uri path to match root of bucket
-        if (request.uri.endsWith("/ui/tms/history/")) {
-            request.uri = "/index.html";
-        } else {
-            // Adjust uri i.e. /ui/tms-history/index.html -> /index. or /ui/tms-history/ -> /
-            request.uri = request.uri.substring(request.uri.lastIndexOf("/"));
+            logger.info({
+                method: "lambda-lam-redirect.handler",
+                message: "",
+                type: "webpage",
+                customRequestUri: request.uri,
+                // eslint-disable-next-line dot-notation
+                customHost: JSON.stringify(request.headers["host"])
+            });
         }
 
-        console.log(
-            "method=tmsHistoryHandler type=webpage request uri=%s, host=%o",
-            request.uri,
-            request.headers.host
-        );
-    }
+        logger.info({
+            method: "lambda-lam-redirect.handler",
+            message: `Return request ${JSON.stringify(request)}`
+        });
 
-    console.log("method=tmsHistoryHandler return request %o", request);
-    callback(null, request);
-    return request;
+        callback(null, request);
+        return request;
+    } else {
+        const err = createAndLogError("lambda-lam-redirect.handler", "Event did not have records");
+        callback(err);
+        throw err;
+    }
 };
 
 interface LamSecrets extends GenericSecret {
@@ -200,7 +243,8 @@ interface ResponseParams extends ParsedUrlQueryInput {
 }
 
 function getApiPath(query: string): string {
-    const api = queryStringHelper.parse(query).api;
+    // eslint-disable-next-line dot-notation
+    const api = queryStringHelper.parse(query)["api"];
     if (typeof api === "string") {
         return `/${api}`;
     }
@@ -217,11 +261,10 @@ function parseQuery(query: string): string {
     const q = queryStringHelper.parse(query) as QueryParams;
 
     if (!q.api || !q.tyyppi || (!q.piste && !q.pistejoukko) || (!q.pvm && !q.viikko)) {
-        console.log(
-            `method=tmsHistoryHandler.parseQuery invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${JSON.stringify(
-                q
-            )}`
-        );
+        logger.warn({
+            method: "lambda-lam-redirect.parseQuery",
+            message: `invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${JSON.stringify(q)}`
+        });
         return "";
     }
 
@@ -232,7 +275,10 @@ function parseQuery(query: string): string {
     } else if (q.viikko) {
         resp.viikko = q.viikko;
     } else {
-        console.log("method=tmsHistoryHandler.parseQuery invalid input: no date");
+        logger.warn({
+            method: "lambda-lam-redirect.parseQuery",
+            message: "Invalid input: no date"
+        });
         return "";
     }
 
@@ -249,7 +295,10 @@ function parseQuery(query: string): string {
     } else if (q.pistejoukko) {
         resp.pistejoukko = q.pistejoukko;
     } else {
-        console.log("method=tmsHistoryHandler.parseQuery invalid input: no piste/pistejoukko");
+        logger.warn({
+            method: "lambda-lam-redirect.parseQuery",
+            message: "Invalid input: no piste/pistejoukko"
+        });
         return "";
     }
 
@@ -265,9 +314,10 @@ function parseQuery(query: string): string {
         resp.ryhma = getValue(q.ryhma);
     } else if (q.luokka) {
         if (q.tyyppi !== "h") {
-            console.log(
-                "method=tmsHistoryHandler.parseQuery invalid input: luokka is valid only with h-tyyppi"
-            );
+            logger.warn({
+                method: "lambda-lam-redirect.parseQuery",
+                message: "Invalid input: luokka is valid only with h-tyyppi"
+            });
             return "";
         }
 

@@ -1,7 +1,7 @@
-import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import { type IResolvable, RemovalPolicy, Stack } from "aws-cdk-lib";
+import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { RemovalPolicy, type Stack } from "aws-cdk-lib";
 import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder";
-import { WafRules } from "./waf-rules.js";
+import type { WafRules } from "./waf-rules.js";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
 type ResponseKey = "IP_WITH_HEADER" | "IPQUERY_WITH_HEADER" | "IP_WITHOUT_HEADER" | "IPQUERY_WITHOUT_HEADER";

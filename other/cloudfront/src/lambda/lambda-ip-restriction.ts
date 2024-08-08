@@ -1,3 +1,7 @@
+import type { CloudFrontRequest, CloudFrontRequestEventRecord, CloudFrontRequestHandler } from "aws-lambda";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { createAndLogError } from "../lambda-util.js";
+
 const ALLOWED_IPS = "EXT_IP".split(",");
 
 const VERSION_HEADERS = "EXT_VERSION";
@@ -14,12 +18,26 @@ const FORBIDDEN = {
     statusDescription: "Forbidden"
 };
 
-exports.handler = function handler(event: any, context: any, callback: any) {
-    const request = event.Records[0].cf.request;
+export const handler: CloudFrontRequestHandler = (event, context, callback) => {
+    const records = event.Records;
+    if (records) {
+        const record = records[0];
+        if (!record) {
+            const err = createAndLogError("lambda-ip-restriction.handler", "Records did not have a record");
+            callback(err);
+            throw err;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        const request: CloudFrontRequest = record.cf.request;
 
-    if (ALLOWED_IPS.indexOf(request.clientIp) === -1) {
-        callback(null, FORBIDDEN);
+        if (ALLOWED_IPS.indexOf(request.clientIp) === -1) {
+            callback(null, FORBIDDEN);
+        }
+
+        callback(null, request);
+    } else {
+        const err = createAndLogError("lambda-ip-restriction.handler", "Event did not have records");
+        callback(err);
+        throw err;
     }
-
-    callback(null, request);
 };

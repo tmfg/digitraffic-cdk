@@ -1,8 +1,10 @@
+import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+
 interface Response {
     headers: Record<
         string,
         | {
-              key: string;
+              key?: string | undefined;
               value: string;
           }[]
         | undefined
@@ -43,14 +45,17 @@ const lastModifiedHeader = "last-modified";
 
 export function addWeathercamImageLastModifiedHeaderFromXAmzMeta(response: Response): void {
     const responseHeaders = response.headers;
-    if (responseHeaders[xAmzLastModifiedHeader]) {
+    if (responseHeaders[xAmzLastModifiedHeader] && responseHeaders[xAmzLastModifiedHeader][0]) {
         responseHeaders[lastModifiedHeader] = [
             {
                 key: lastModifiedHeader,
                 value: responseHeaders[xAmzLastModifiedHeader][0].value
             }
         ];
-    } else if (responseHeaders[xAmzLastModifiedHeaderUpper]) {
+    } else if (
+        responseHeaders[xAmzLastModifiedHeaderUpper] &&
+        responseHeaders[xAmzLastModifiedHeaderUpper][0]
+    ) {
         responseHeaders[lastModifiedHeader] = [
             {
                 key: lastModifiedHeader,
@@ -58,4 +63,12 @@ export function addWeathercamImageLastModifiedHeaderFromXAmzMeta(response: Respo
             }
         ];
     }
+}
+
+export function createAndLogError(method: LoggerMethodType, message: string): Error {
+    logger.error({
+        method,
+        message
+    });
+    return Error(message);
 }

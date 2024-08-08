@@ -1,8 +1,13 @@
 import * as Utils from "@digitraffic/common/dist/utils/utils";
-import { CloudFrontResponseEvent, CloudFrontResponseHandler, CloudFrontResponseResult } from "aws-lambda";
-import { CloudFrontRequest } from "aws-lambda/common/cloudfront";
-import { Callback, Context } from "aws-lambda/handler";
+import type {
+    CloudFrontResponseEvent,
+    CloudFrontResponseHandler,
+    CloudFrontResponseResult
+} from "aws-lambda";
+import type { CloudFrontRequest, Callback, Context } from "aws-lambda";
 import queryStringHelper from "querystring";
+import { createAndLogError } from "../lambda-util.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 /*
     This is an edge lambda that should be run at cloudfront at viewer response event.
@@ -16,53 +21,69 @@ export const handler: CloudFrontResponseHandler = (
     _: Context,
     callback: Callback<CloudFrontResponseResult>
 ): void => {
-    const { request } = event.Records[0].cf;
-    const { response } = event.Records[0].cf;
-    const { headers } = response;
+    const records = event.Records;
+    if (records) {
+        const record = records[0];
 
-    const headerContentDisp = "Content-Disposition";
-    const headerContentType = "Content-Type";
+        if (!record) {
+            const err = createAndLogError("lambda-lam-headers.handler", "Records did not have a record");
+            callback(err);
+            throw err;
+        }
+        const request = record.cf.request;
+        const response = record.cf.response;
 
-    if (Utils.hasOwnPropertySafe(headers, "x-amzn-remapped-host")) {
-        // Create filename
-        const filename = createFilename(request);
+        const { headers } = response;
 
-        headers[headerContentDisp.toLowerCase()] = [
-            {
-                key: headerContentDisp,
-                value: 'attachment; filename="' + filename + '"'
-            }
-        ];
+        const headerContentDisp = "Content-Disposition";
+        const headerContentType = "Content-Type";
 
-        headers[headerContentType.toLowerCase()] = [
-            {
-                key: headerContentType,
-                value: "text/csv; charset=utf-8"
-            }
-        ];
+        if (Utils.hasOwnPropertySafe(headers, "x-amzn-remapped-host")) {
+            // Create filename
+            const filename = createFilename(request);
+
+            headers[headerContentDisp.toLowerCase()] = [
+                {
+                    key: headerContentDisp,
+                    value: 'attachment; filename="' + filename + '"'
+                }
+            ];
+
+            headers[headerContentType.toLowerCase()] = [
+                {
+                    key: headerContentType,
+                    value: "text/csv; charset=utf-8"
+                }
+            ];
+        }
+
+        // Delete apikey that SnowFlake is returning for some reason
+        delete headers["x-api-key"];
+        delete headers["x-amzn-remapped-x-forwarded-for"];
+        delete headers["x-amzn-remapped-host"];
+
+        logger.info({
+            method: "lambda-lam-headers.handler",
+            message: "Lam headers called",
+            customOutgoingUri: request.uri,
+            customHeaders: JSON.stringify(headers),
+            customResponseHeaders: JSON.stringify(response.headers)
+        });
+        callback(null, response);
+    } else {
+        const err = createAndLogError("lambda-lam-headers.handler", "Event did not have records");
+        callback(err);
+        throw err;
     }
-
-    // Delete apikey that SnowFlake is returning for some reason
-    delete headers["x-api-key"];
-    delete headers["x-amzn-remapped-x-forwarded-for"];
-    delete headers["x-amzn-remapped-host"];
-
-    console.log(
-        "method=tmsHistoryHeaders Outgoing uri: %s, headers: %o, response.headers: %o",
-        request.uri,
-        headers,
-        response.headers
-    );
-    callback(null, response);
 };
 
 function createFilename(
     request: Omit<CloudFrontRequest, "body" | "headers" | "method" | "origin" | "clientIp">
 ): string {
-    const type = request.uri.substring(1); // ie. uri=/liikennemaara
-    const params = queryStringHelper.parse(request.querystring); // ie. tyyppi=h&pvm=2023-03-01&loppu=&lam_type=option1&piste=1
-    const subType = typeof params.tyyppi === "string" ? params.tyyppi : ""; // ie. v (vuosi), h (tunti), vrk (vuorokausi), ...
-    const dateOrWeek = getDateOrWeek(params.pvm, params.viikko); // One of these should always exist
+    const type = request["uri"].substring(1); // ie. uri=/liikennemaara
+    const params = queryStringHelper.parse(request["querystring"]); // ie. tyyppi=h&pvm=2023-03-01&loppu=&lam_type=option1&piste=1
+    const subType = typeof params["tyyppi"] === "string" ? params["tyyppi"] : ""; // ie. v (vuosi), h (tunti), vrk (vuorokausi), ...
+    const dateOrWeek = getDateOrWeek(params["pvm"], params["viikko"]); // One of these should always exist
     return `${type}_${subType}_${dateOrWeek}.csv`;
 }
 

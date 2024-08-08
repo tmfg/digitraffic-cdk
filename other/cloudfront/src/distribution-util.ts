@@ -3,7 +3,7 @@ import { CloudFrontWebDistribution, HttpVersion, SecurityPolicyProtocol } from "
 import type { CfnResource, Stack } from "aws-cdk-lib";
 import { Tags } from "aws-cdk-lib";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import type { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
+import type { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront";
 
 import { createWebAcl } from "./acl/acl-creator.js";
 import type { CFProps, DistributionProps } from "./app-props.js";

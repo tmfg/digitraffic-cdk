@@ -34,6 +34,7 @@ import {
 } from "./lambda/lambda-creator.js";
 import { createOriginConfig } from "./origin-configs.js";
 import { createRealtimeLogging } from "./streaming-util.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 type ViewerPolicyMap = Record<string, string>;
 
@@ -105,7 +106,10 @@ export class CloudfrontCdkStack extends Stack {
                 Annotations.of(this).addError("no defaults for " + distribution.distributionName);
             } else if (defaults.length > 1) {
                 Annotations.of(this).addError("multiple defaults for " + distribution.distributionName);
-                console.error("defaults:%s", defaults);
+                logger.error({
+                    method: "CloudfrontCdkStack.validateDefaultBehaviors",
+                    message: `defaults: ${defaults.join()}`
+                });
             }
         });
     }

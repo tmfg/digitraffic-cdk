@@ -1,4 +1,10 @@
-import { addCorsHeaders, addWeathercamImageLastModifiedHeaderFromXAmzMeta } from "../lambda-util.js";
+import {
+    addCorsHeaders,
+    addWeathercamImageLastModifiedHeaderFromXAmzMeta,
+    createAndLogError
+} from "../lambda-util.js";
+import type { CloudFrontResponseHandler } from "aws-lambda";
+import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
@@ -9,13 +15,26 @@ const VERSION_HEADERS = "EXT_VERSION";
     You must replace EXT_VERSION with timestamp to change code when deploying.  You can't deploy a new lambda version
     if the code does not change.
  */
-exports.handler = (event: any, context: any, callback: any) => {
-    const request = event.Records[0].cf.request;
-    const response = event.Records[0].cf.response;
+export const handler: CloudFrontResponseHandler = (event, context, callback) => {
+    const records = event.Records;
+    if (records) {
+        const record = records[0];
+        if (!record) {
+            const err = createAndLogError("lambda-http-headers.handler", "Records did not have a record");
+            callback(err);
+            throw err;
+        }
+        const request = record.cf.request;
+        const response = record.cf.response;
 
-    if (request.method === "GET") {
-        addCorsHeaders(response);
+        if (request.method === "GET") {
+            addCorsHeaders(response);
+        }
+
+        callback(null, response);
+    } else {
+        const err = createAndLogError("lambda-http-headers.handler", "Event did not have records");
+        callback(err);
+        throw err;
     }
-
-    callback(null, response);
 };
