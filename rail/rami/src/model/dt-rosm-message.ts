@@ -5,14 +5,15 @@ export interface UnknownDelayOrTrack {
     readonly stationShortCode: string
     readonly scheduledTime: Date
     readonly type: TimeTableRowType;    
-    readonly delayUnknown: boolean
-    readonly trackUnknown: boolean
+    readonly unknownDelay: boolean
+    readonly unknownTrack: boolean
 }
 
 export interface UnknownDelayOrTrackMessage {
     readonly messageId: string
     readonly trainNumber: number
     readonly departureDate: string // YYYYMMDD
+    readonly vehicleJourneyName: string
 
     readonly data: UnknownDelayOrTrack[]
 }

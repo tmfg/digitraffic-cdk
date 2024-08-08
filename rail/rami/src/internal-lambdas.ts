@@ -59,7 +59,12 @@ function createProcessSmQueueLambda(stack: DigitrafficStack, smQueue: Queue, udo
         reservedConcurrentExecutions: 6,
         timeout: 10
     });
-    processQueueLambda.addEventSource(new SqsEventSource(smQueue, {reportBatchItemFailures: true}));
+    processQueueLambda.addEventSource(new SqsEventSource(smQueue, {
+        reportBatchItemFailures: true,
+        batchSize: 30,
+        maxBatchingWindow: Duration.seconds(5),
+        maxConcurrency: 6
+    }));
     dlq.grantSendMessages(processQueueLambda);
     udotQueue.grantSendMessages(processQueueLambda);
 

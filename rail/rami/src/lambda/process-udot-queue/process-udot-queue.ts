@@ -11,24 +11,22 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
         const start = Date.now();
 
         try {
-            return await Promise.allSettled(
-                event.Records.map(async (r) => {
-                    const recordBody = r.body;
+            return await Promise.allSettled(event.Records.map(async (r) => {
+                const recordBody = r.body;
 
-                    try {
-                        const udotMessage = JSON.parse(recordBody) as UnknownDelayOrTrackMessage;
+                try {
+                    const udotMessage = JSON.parse(recordBody) as UnknownDelayOrTrackMessage;
 
-                        logger.info({
-                            method: "RAMI-ProcessUDOTQueue.handler",
-                            customCount: udotMessage.data.length
-                        })
+                    logger.info({
+                        method: "RAMI-ProcessUDOTQueue.handler",
+                        customCount: udotMessage.data.length
+                    })
 
-                        return processUDOTMessage(udotMessage);                    
-                    } catch (error) {
-                        logException(logger, error);                
-                    }
-                })
-            );
+                    return processUDOTMessage(udotMessage);                    
+                } catch (error) {
+                    logException(logger, error);                
+                }
+            }));        
         } finally {
             logger.info({
                 method: "RAMI-ProcessUDOTQueue.handler",

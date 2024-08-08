@@ -57,6 +57,8 @@ describe("UdotDaoTests", dbTestBase(() => {
 
         test("update removes modified", async () => {
             await insertStopMonitoring(true, false);
+            await expectModelUpdatedCount(0);
+
             await modelUpdated();
             await expectModelUpdatedCount(1);
 
@@ -67,6 +69,8 @@ describe("UdotDaoTests", dbTestBase(() => {
 
         test("update without changes does not remove modified", async () => {
             await insertStopMonitoring(true, false);
+            await expectModelUpdatedCount(0);
+            
             await modelUpdated();
             await expectModelUpdatedCount(1);
 

@@ -23,7 +23,7 @@ export const payload = z
                 monitoredVehicleJourney: z.object({
                     monitoredCall: monitoredCall,
                     onwardCalls: z.array(monitoredCall),
-                    vehicleJourneyName: z.string().length(14)
+                    vehicleJourneyName: z.string().length(14).or(z.string().length(17))
                 }),
             })
         ).nonempty().length(1),
