@@ -2,7 +2,7 @@ import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure"
 import type { Handler, SQSEvent } from "aws-lambda";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { processUDOTMessage } from "../../service/process-udot-message.js";
+import { processUdotMessage } from "../../service/process-udot-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { UnknownDelayOrTrackMessage } from "../../model/dt-rosm-message.js";
 
@@ -22,7 +22,7 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                         customCount: udotMessage.data.length
                     })
 
-                    return processUDOTMessage(udotMessage);                    
+                    return processUdotMessage(udotMessage);                    
                 } catch (error) {
                     logException(logger, error);                
                 }

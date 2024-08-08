@@ -10,13 +10,13 @@ describe("UdotDaoTests", dbTestBase(() => {
 
     async function insertStopMonitoring(ud: boolean, ut: boolean, trainNumber: number = 10): Promise<void> {
         await inTransaction(async conn => {
-            await insertOrUpdate(conn, [{
+            await insertOrUpdate(conn, {
                 trainNumber,
                 trainDepartureDate: "2024-10-10",
                 attapId: 1234,
                 ud, ut,
                 messageId: "id_" + randomString()
-            }]);
+            });
         });
     }
 

@@ -3,9 +3,9 @@ import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
 import type { Connection } from "mysql2/promise";
 import { inTransaction } from "../util/database.js";
 import type { UnknownDelayOrTrackMessage, UnknownDelayOrTrack } from "../model/dt-rosm-message.js";
-import { insertOrUpdate, type UdotUpsertValues } from "../dao/udot.js";
+import { insertOrUpdate } from "../dao/udot.js";
 
-export async function processUDOTMessage(message: UnknownDelayOrTrackMessage): Promise<void> {
+export async function processUdotMessage(message: UnknownDelayOrTrackMessage): Promise<void> {
     const start = Date.now();
     let foundCount = 0;
     let notFoundCount = 0;
@@ -15,7 +15,7 @@ export async function processUDOTMessage(message: UnknownDelayOrTrackMessage): P
 
         if(rows.length === 0) {
             logger.info({
-                method: "ProcessSmMessageService.processUDOTMessage",
+                method: "ProcessSmMessageService.processUdotMessage",
                 message: `Could not find rows for ${message.trainNumber} ${message.departureDate}`
             });
 
@@ -51,7 +51,7 @@ export async function processUDOTMessage(message: UnknownDelayOrTrackMessage): P
         };
     } finally {
         logger.info({
-            method: "ProcessSmMessageService.processSmMessage",
+            method: "ProcessUdotMessageService.processUdotMessage",
             message: `udot for ${message.trainNumber} ${message.departureDate} processed`,
             tookMs: Date.now() - start,
             customFoundCount: foundCount,
@@ -62,7 +62,7 @@ export async function processUDOTMessage(message: UnknownDelayOrTrackMessage): P
 
 function logRowNotFound(message: UnknownDelayOrTrackMessage, datarow: UnknownDelayOrTrack, rows: TimeTableRow[]): void {
     logger.info({
-        method: "ProcessSmMessageService.processSmMessage",
+        method: "ProcessUdotMessageService.processUdotMessage",
         message: `Could not find attapId for ${message.trainNumber} row ${JSON.stringify(datarow)}`
     });
 
@@ -70,7 +70,7 @@ function logRowNotFound(message: UnknownDelayOrTrackMessage, datarow: UnknownDel
 
     if(row) {
         logger.info({
-            method: "ProcessSmMessageService.processSmMessage",
+            method: "ProcessUdotMessageService.processUdotMessage",
             message: `Candidate ${JSON.stringify(row)}`
         });
         }
