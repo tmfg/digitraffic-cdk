@@ -31,7 +31,11 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         });
         
         // send invalid message and error report to dlq
-        await sendDlq(validationResult.errors, messageBody);     
+        await sendDlq({
+            messageType: "ROSM",
+            errors: validationResult.errors,
+            message: messageBody
+        });     
     }
 
     return LambdaResponse.ok("OK");
