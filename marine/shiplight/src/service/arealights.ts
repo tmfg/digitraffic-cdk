@@ -26,18 +26,26 @@ export class AreaLightsService {
 
         await retry(
             async () => {
-                const response = await this.api.updateLightsForArea({
-                    routeId: areaId,
-                    visibility: areaTraffic.visibilityInMeters ?? null,
-                    time: areaTraffic.durationInMinutes,
-                    MMSI: areaTraffic.ship.mmsi.toString(),
-                    shipName: areaTraffic.ship.name
-                });
-                if (response.LightsSetSentFailed.length) {
-                    logger.warn({
-                        method: "ArealightsService.updateLightsForArea",
-                        message: `LightsSetSentFailed : ${response.LightsSetSentFailed.join(", ")}`
+                try {
+                    const response = await this.api.updateLightsForArea({
+                        routeId: areaId,
+                        visibility: areaTraffic.visibilityInMeters ?? null,
+                        time: areaTraffic.durationInMinutes,
+                        MMSI: areaTraffic.ship.mmsi.toString(),
+                        shipName: areaTraffic.ship.name
                     });
+                    if (response.LightsSetSentFailed.length) {
+                        logger.warn({
+                            method: "ArealightsService.updateLightsForArea",
+                            message: `LightsSetSentFailed : ${response.LightsSetSentFailed.join(", ")}`
+                        });
+                    }
+                } catch (error) {
+                    logger.debug({
+                        method: "ArealightsService.updateLightsForArea",
+                        message: `DEBUG_ERROR ${JSON.stringify(error)}`
+                    });
+                    throw error;
                 }
             },
             2,
