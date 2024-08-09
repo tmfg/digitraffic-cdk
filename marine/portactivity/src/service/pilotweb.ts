@@ -120,7 +120,7 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
                 return undefined;
             })
         )
-    ).filter((x) => !!x) as ApiTimestamp[];
+    ).filter((x) => !!x);
 }
 
 function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | undefined> {
