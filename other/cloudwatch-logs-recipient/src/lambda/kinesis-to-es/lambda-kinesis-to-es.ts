@@ -143,7 +143,9 @@ declare global {
             handleRequest(
                 req: HttpRequest,
                 options: object | null,
+                // eslint-disable-next-line @typescript-eslint/ban-types
                 callback: Function,
+                // eslint-disable-next-line @typescript-eslint/ban-types
                 errCallback: Function
             ): void;
         }
