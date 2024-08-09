@@ -41,7 +41,7 @@ export function createOriginConfig(
                 originAccessIdentity: oai
                 //                originPath: origin.originPath,
             },
-            behaviors: createBehaviors(origin.behaviors, lambdaMap, true)
+            behaviors: createBehaviors(origin.behaviors, lambdaMap, true),
         };
     } else if (origin instanceof CFDomain) {
         return {
@@ -51,9 +51,10 @@ export function createOriginConfig(
                 httpsPort: origin.httpsPort ?? 443,
                 originProtocolPolicy: origin.originProtocolPolicy,
                 originPath: origin.originPath,
-                originHeaders: createOriginHeaders(origin, secretsArn, stack)
+                originHeaders: createOriginHeaders(origin, secretsArn, stack),
+                originReadTimeout: origin.responseTimeout
             },
-            behaviors: createBehaviors(origin.behaviors, lambdaMap, false)
+            behaviors: createBehaviors(origin.behaviors, lambdaMap, false),
         };
     }
 
