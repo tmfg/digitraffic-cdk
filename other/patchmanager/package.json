@@ -15,16 +15,16 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "aws-cdk-lib": "~2.147.1",
+    "aws-cdk-lib": "~2.151.0",
     "constructs": "10.3.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.7.0",
-    "@rushstack/heft": "^0.66.18",
-    "@rushstack/heft-jest-plugin": "^0.12.0",
+    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/heft": "^0.66.25",
+    "@rushstack/heft-jest-plugin": "^0.12.7",
     "@types/heft-jest": "1.0.6",
     "@types/node": "20.14.8",
     "eslint": "^8.57.0",

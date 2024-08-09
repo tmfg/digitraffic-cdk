@@ -195,6 +195,7 @@
     {
       "packageName": "rail-rata-cdk",
       "projectFolder": "rail/rata",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "rail"]
     },
     {

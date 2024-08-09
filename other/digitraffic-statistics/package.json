@@ -12,15 +12,15 @@
     "test": "echo 'No tests implemented'"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.6.26-2",
-    "aws-cdk-lib": "~2.147.1",
+    "@digitraffic/common": "2024.7.8-1",
+    "aws-cdk-lib": "~2.151.0",
     "constructs": "10.3.0"
   },
   "devDependencies": {
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.7.0",
-    "@types/aws-lambda": "8.10.140",
+    "@rushstack/eslint-config": "^3.7.1",
+    "@types/aws-lambda": "8.10.143",
     "@types/node": "20.14.8",
     "eslint": "^8.57.0",
     "typescript": "~5.5.2"
