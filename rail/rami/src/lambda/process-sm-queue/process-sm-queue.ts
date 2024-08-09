@@ -48,7 +48,11 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                         });
 
                         // send invalid message and error report to dlq
-                        await sendDlq("could not parse UDOT", recordBody);
+                        await sendDlq({
+                            messageType: "SM",
+                            errors: "could not parse UDOT", 
+                            message: recordBody
+                        });
                     }    
 
                     return Promise.resolve();

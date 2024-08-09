@@ -22,7 +22,7 @@ export async function processUdotMessage(message: UnknownDelayOrTrackMessage): P
             return Promise.resolve();
         }
 
-        logger.debug(`rows for ${message.trainNumber} ${message.departureDate} : ${JSON.stringify(rows)}`);
+//        logger.debug(`rows for ${message.trainNumber} ${message.departureDate} : ${JSON.stringify(rows)}`);
 
         for(const datarow of message.data) {
             // find attap_id for each line
@@ -77,15 +77,11 @@ function logRowNotFound(message: UnknownDelayOrTrackMessage, datarow: UnknownDel
 }
 
 function findAttapId(rows: TimeTableRow[], datarow: UnknownDelayOrTrack): number | undefined {
-    const row = rows.find(r => {
- //       if(r.station_short_code === datarow.stationShortCode) {
-//            console.info(`Comparing ${JSON.stringify(r)} and ${JSON.stringify(datarow)} ${r.station_short_code === datarow.stationShortCode && r.type === datarow.type && JSON.stringify(r.scheduled_time) === JSON.stringify(datarow.scheduledTime)}`);
-
-            return timesMatch(JSON.stringify(r.scheduled_time), JSON.stringify(datarow.scheduledTime)) && r.station_short_code === datarow.stationShortCode && r.type === datarow.type
- //       }
-
- //       return false;
-    });
+    const row = rows.find(
+        r => r.station_short_code === datarow.stationShortCode 
+        && timesMatch(JSON.stringify(r.scheduled_time), JSON.stringify(datarow.scheduledTime)) 
+        && r.type === datarow.type
+    );
 
     return row?.attap_id;
 }

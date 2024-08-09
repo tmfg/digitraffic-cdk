@@ -3,6 +3,7 @@ import type { Valid } from "./validate-message.js";
 import { sendToSqs } from "../util/sqs.js";
 import { RamiEnvKeys } from "../keys.js";
 import type { UnknownDelayOrTrackMessage } from "../model/dt-rosm-message.js";
+import type { DlqMessage } from "../model/dlq-message.js";
 
 const ROSM_SQS_URL = getEnvVariableSafe(RamiEnvKeys.ROSM_SQS_URL);
 const SM_SQS_URL = getEnvVariableSafe(RamiEnvKeys.SM_SQS_URL);
@@ -33,9 +34,10 @@ export async function sendUdotMessage(message: UnknownDelayOrTrackMessage): Prom
     }
 }
 
-export async function sendDlq(errors: string, messageBody: unknown): Promise<void> {
+export async function sendDlq(dqlMessage: DlqMessage): Promise<void> {
     if(DLQ_URL.result === "ok") {
-        await sendToSqs(DLQ_URL.value, `[{"errors":"${errors}"}, ${JSON.stringify(messageBody)}]`);
+        await sendToSqs(DLQ_URL.value, JSON.stringify(dqlMessage));
+        //await sendToSqs(DLQ_URL.value, `[{"errors":"${errors}"}, ${JSON.stringify(messageBody)}]`);
     } else {
         throw new Error(`${RamiEnvKeys.DLQ_URL} env variable not defined!`);
     }    
