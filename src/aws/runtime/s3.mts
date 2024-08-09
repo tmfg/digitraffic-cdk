@@ -9,7 +9,7 @@ export async function uploadToS3(
     body: NodeJsRuntimeStreamingBlobPayloadInputTypes,
     objectName: string,
     cannedAcl?: ObjectCannedACL,
-    contentType?: string,
+    contentType?: string
 ) {
     const command = new PutObjectCommand({
         Bucket: bucketName,

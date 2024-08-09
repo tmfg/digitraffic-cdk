@@ -4,15 +4,15 @@
 import { APIGateway } from "aws-sdk";
 import type { ApiKey } from "aws-sdk/clients/apigateway.js";
 
-export async function getApiKeyFromAPIGateway(
-    keyId: string
-): Promise<ApiKey> {
+export async function getApiKeyFromAPIGateway(keyId: string): Promise<ApiKey> {
     const ag = new APIGateway();
 
-    return ag.getApiKey({
-        apiKey: keyId,
-        includeValue: true
-    }).promise();
+    return ag
+        .getApiKey({
+            apiKey: keyId,
+            includeValue: true,
+        })
+        .promise();
     /*
     const client = new APIGatewayClient();
     const command = new GetApiKeyCommand({

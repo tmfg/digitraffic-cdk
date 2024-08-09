@@ -1,4 +1,8 @@
-import { SecretsManager, type GetSecretValueCommandInput, type GetSecretValueCommandOutput } from "@aws-sdk/client-secrets-manager";
+import {
+    SecretsManager,
+    type GetSecretValueCommandInput,
+    type GetSecretValueCommandOutput,
+} from "@aws-sdk/client-secrets-manager";
 import { jest } from "@jest/globals";
 
 const SECRET_ID = "test_secret";
@@ -10,17 +14,19 @@ const SECRET_WITH_PREFIX = {
 
 const emptySecret: GetSecretValueCommandOutput = { $metadata: {} };
 
-const getSecretValueMock = jest.fn<(arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>>();
+const getSecretValueMock =
+    jest.fn<(arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>>();
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(getSecretValueMock);
 
 function mockSecret<T>(secret: null | T) {
-    if(!secret) {
+    if (!secret) {
         getSecretValueMock.mockImplementation(() => Promise.resolve(emptySecret));
     } else {
-        getSecretValueMock.mockImplementation(() => Promise.resolve({...emptySecret, ...{SecretString: JSON.stringify(secret)}}));
-
+        getSecretValueMock.mockImplementation(() =>
+            Promise.resolve({ ...emptySecret, ...{ SecretString: JSON.stringify(secret) } })
+        );
     }
 }
 

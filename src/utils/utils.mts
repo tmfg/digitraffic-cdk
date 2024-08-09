@@ -25,7 +25,7 @@ import { EnvKeys } from "../aws/runtime/environment.mjs";
  */
 export function bothArraysHasSameValues(
     a: null | undefined | unknown[],
-    b: null | undefined | unknown[],
+    b: null | undefined | unknown[]
 ): boolean {
     if ((a && !b) || (!a && b)) {
         return false;
@@ -54,15 +54,9 @@ export function getFirst<T>(array: T[], sortFunction?: (a: T) => number): T {
     return getFirstOrLast(true, array, sortFunction);
 }
 
-function getFirstOrLast<T>(
-    getFirst: boolean,
-    array: T[],
-    sortFunction?: (a: T) => number,
-): T {
+function getFirstOrLast<T>(getFirst: boolean, array: T[], sortFunction?: (a: T) => number): T {
     if (array.length == 0) {
-        throw new Error(
-            `can't get ${getFirst ? "first" : "last"} from empty array!`,
-        );
+        throw new Error(`can't get ${getFirst ? "first" : "last"} from empty array!`);
     }
 
     const index = getFirst ? 0 : array.length - 1;
@@ -165,10 +159,7 @@ export function setSecretOverideAwsRegionEnv(region: string) {
  * @param propertyName property name to check
  * @see https://eslint.org/docs/latest/rules/no-prototype-builtins
  */
-export function hasOwnPropertySafe(
-    object: object,
-    propertyName: string,
-): boolean {
+export function hasOwnPropertySafe(object: object, propertyName: string): boolean {
     return Object.prototype.hasOwnProperty.call(object, propertyName);
 }
 
@@ -181,4 +172,12 @@ export function getErrorMessage(maybeError: unknown) {
         return maybeError.name + ": " + maybeError.message;
     }
     return String(maybeError);
+}
+
+/**
+ *
+ * @param value
+ */
+export function isDefined<T>(value: T | undefined | null): value is T {
+    return value !== undefined && value !== null;
 }

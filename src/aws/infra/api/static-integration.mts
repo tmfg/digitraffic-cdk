@@ -25,12 +25,11 @@ export class DigitrafficStaticIntegration extends MockIntegration {
             headers = { ...headers, "Access-Control-Allow-Origin": "*" };
         }
 
-        const integrationResponse =
-            DigitrafficStaticIntegration.createIntegrationResponse(
-                response,
-                mediaType,
-                headers
-            );
+        const integrationResponse = DigitrafficStaticIntegration.createIntegrationResponse(
+            response,
+            mediaType,
+            headers
+        );
 
         super({
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
@@ -43,9 +42,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         ["GET", "HEAD"].forEach((httpMethod) => {
             resource.addMethod(httpMethod, this, {
                 apiKeyRequired,
-                methodResponses: [
-                    DigitrafficStaticIntegration.createMethodResponse(headers),
-                ],
+                methodResponses: [DigitrafficStaticIntegration.createMethodResponse(headers)],
             });
         });
     }
@@ -79,7 +76,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
             responseTemplates: {
                 [mediaType]: response,
             },
-            responseParameters: params
+            responseParameters: params,
         };
     }
 
@@ -89,8 +86,8 @@ export class DigitrafficStaticIntegration extends MockIntegration {
 
         return {
             statusCode: "200",
-            responseParameters: prefixKeys("method.response.header.", entries)
-        }
+            responseParameters: prefixKeys("method.response.header.", entries),
+        };
     }
 }
 

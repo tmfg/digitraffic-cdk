@@ -12,7 +12,7 @@ export class DigitrafficCanary extends Canary {
         canaryName: string,
         role: Role,
         params: CanaryParameters,
-        environmentVariables: LambdaEnvironment,
+        environmentVariables: LambdaEnvironment
     ) {
         super(scope, canaryName, {
             runtime: params.runtime ?? Runtime.SYNTHETICS_NODEJS_PUPPETEER_6_2,

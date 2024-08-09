@@ -1,4 +1,8 @@
-import { SecretsManager, type GetSecretValueCommandOutput, type GetSecretValueCommandInput } from "@aws-sdk/client-secrets-manager";
+import {
+    SecretsManager,
+    type GetSecretValueCommandOutput,
+    type GetSecretValueCommandInput,
+} from "@aws-sdk/client-secrets-manager";
 import { jest } from "@jest/globals";
 
 const SECRET_WITH_PREFIX = {
@@ -10,7 +14,8 @@ const SECRET_WITH_PREFIX = {
 
 const emptySecret: GetSecretValueCommandOutput = { $metadata: {} };
 
-const getSecretValueMock = jest.fn<(arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>>();
+const getSecretValueMock =
+    jest.fn<(arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>>();
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(getSecretValueMock);
@@ -19,11 +24,12 @@ const { SecretHolder } = await import("../../aws/runtime/secrets/secret-holder.m
 const { DatabaseEnvironmentKeys } = await import("../../database/database.mjs");
 
 function mockSecret<T>(secret: null | T) {
-    if(!secret) {
+    if (!secret) {
         getSecretValueMock.mockImplementation(() => Promise.resolve(emptySecret));
     } else {
-        getSecretValueMock.mockImplementation(() => Promise.resolve({...emptySecret, ...{SecretString: JSON.stringify(secret)}}));
-
+        getSecretValueMock.mockImplementation(() =>
+            Promise.resolve({ ...emptySecret, ...{ SecretString: JSON.stringify(secret) } })
+        );
     }
 }
 

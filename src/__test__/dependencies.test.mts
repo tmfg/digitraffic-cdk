@@ -2,7 +2,7 @@ const madge = await import("madge");
 
 const WHITELISTED_DEPENDENCIES = [
     // aspect is using DigitrafficStack with instanceof, can't remove
-    `["aws/infra/stack/stack.mjs","aws/infra/stack/stack-checking-aspect.mjs"]`
+    `["aws/infra/stack/stack.mjs","aws/infra/stack/stack-checking-aspect.mjs"]`,
 ] as string[];
 
 function whitelist(circular: string[]): boolean {
@@ -15,7 +15,7 @@ function assertNoErrors(errors: string[][]): void {
 
 test("circular dependencies", async () => {
     const instance = await madge.default("dist", {
-        fileExtensions: ["mts", "mjs"]
+        fileExtensions: ["mts", "mjs"],
     });
 
     const circulars = instance.circular();

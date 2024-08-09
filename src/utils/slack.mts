@@ -17,7 +17,7 @@ export class SlackApi {
             });
 
             await ky.post(this.url, {
-                json: { "text": text }
+                json: { text: text },
             });
         } catch (error) {
             logException(logger, error);

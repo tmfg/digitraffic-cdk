@@ -1,11 +1,21 @@
-import {ApplicationLogLevel, Function, type FunctionProps, LoggingFormat, SystemLogLevel} from "aws-cdk-lib/aws-lambda";
-import {Stack} from "aws-cdk-lib";
-import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
-import {ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
-import {DigitrafficStack} from "./stack.mjs";
-import type {ITopic} from "aws-cdk-lib/aws-sns";
-import {databaseFunctionProps, type LambdaEnvironment, type MonitoredFunctionParameters,} from "./lambda-configs.mjs";
-import {TrafficType} from "../../../types/traffictype.mjs";
+import {
+    ApplicationLogLevel,
+    Function,
+    type FunctionProps,
+    LoggingFormat,
+    SystemLogLevel,
+} from "aws-cdk-lib/aws-lambda";
+import { Stack } from "aws-cdk-lib";
+import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
+import { ComparisonOperator, Metric } from "aws-cdk-lib/aws-cloudwatch";
+import { DigitrafficStack } from "./stack.mjs";
+import type { ITopic } from "aws-cdk-lib/aws-sns";
+import {
+    databaseFunctionProps,
+    type LambdaEnvironment,
+    type MonitoredFunctionParameters,
+} from "./lambda-configs.mjs";
+import { TrafficType } from "../../../types/traffictype.mjs";
 import _ from "lodash";
 
 /**
@@ -72,10 +82,7 @@ export class MonitoredFunction extends Function {
         functionProps: FunctionProps,
         props?: Partial<MonitoredFunctionProps>
     ): MonitoredFunction {
-        if (
-            props === MonitoredFunction.DISABLE_ALARMS &&
-            stack.configuration.production
-        ) {
+        if (props === MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
             throw new Error(
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 `Function ${functionProps.functionName!} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`
@@ -125,12 +132,7 @@ export class MonitoredFunction extends Function {
             functionParameters
         );
 
-        return MonitoredFunction.create(
-            stack,
-            functionName,
-            functionProps,
-            functionParameters
-        );
+        return MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
     }
 
     /**
@@ -157,9 +159,10 @@ export class MonitoredFunction extends Function {
         super(scope, id, {
             ...{
                 loggingFormat: LoggingFormat.JSON,
-                applicationLogLevel: ApplicationLogLevel.DEBUG,
-                systemLogLevel: SystemLogLevel.INFO
-            }, ...functionProps
+                applicationLogLevelV2: ApplicationLogLevel.DEBUG,
+                systemLogLevelV2: SystemLogLevel.INFO,
+            },
+            ...functionProps,
         });
 
         if (functionProps.functionName === undefined) {
@@ -177,16 +180,12 @@ export class MonitoredFunction extends Function {
 
             this.createAlarm(
                 scope,
-                this.metricDuration().with({statistic: "max"}),
+                this.metricDuration().with({ statistic: "max" }),
                 "Duration",
                 "Duration alarm",
                 `Duration has exceeded ${functionProps.timeout.toSeconds()} seconds`,
                 trafficType,
-                this.getAlarmActionForEnv(
-                    alarmSnsAction,
-                    warningSnsAction,
-                    production
-                ),
+                this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
                 functionProps.timeout.toMilliseconds(),
                 1,
                 1,
@@ -201,7 +200,7 @@ export class MonitoredFunction extends Function {
 
             this.createAlarm(
                 scope,
-                this.metricDuration().with({statistic: "max"}),
+                this.metricDuration().with({ statistic: "max" }),
                 "Duration-Warning",
                 "Duration warning",
                 `Duration is 85 % of max ${functionProps.timeout.toSeconds()} seconds`,
@@ -223,11 +222,7 @@ export class MonitoredFunction extends Function {
                 "Errors alarm",
                 "Invocations did not succeed",
                 trafficType,
-                this.getAlarmActionForEnv(
-                    alarmSnsAction,
-                    warningSnsAction,
-                    production
-                ),
+                this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
                 1,
                 1,
                 1,
@@ -244,11 +239,7 @@ export class MonitoredFunction extends Function {
                 "Throttles alarm",
                 "Has throttled",
                 trafficType,
-                this.getAlarmActionForEnv(
-                    alarmSnsAction,
-                    warningSnsAction,
-                    production
-                ),
+                this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
                 0,
                 1,
                 1,
@@ -274,17 +265,12 @@ export class MonitoredFunction extends Function {
     ) {
         metric
             .createAlarm(stack, `${this.node.id}-${alarmId}`, {
-                alarmName: `${trafficType ?? ""} ${stack.stackName} ${
-                    this.functionName
-                } ${alarmName}`.trim(),
+                alarmName: `${trafficType ?? ""} ${stack.stackName} ${this.functionName} ${alarmName}`.trim(),
                 alarmDescription,
                 threshold: alarmProps?.threshold ?? threshold,
-                evaluationPeriods:
-                    alarmProps?.evaluationPeriods ?? evaluationPeriods,
-                datapointsToAlarm:
-                    alarmProps?.datapointsToAlarm ?? datapointsToAlarm,
-                comparisonOperator:
-                    alarmProps?.comparisonOperator ?? comparisonOperator,
+                evaluationPeriods: alarmProps?.evaluationPeriods ?? evaluationPeriods,
+                datapointsToAlarm: alarmProps?.datapointsToAlarm ?? datapointsToAlarm,
+                comparisonOperator: alarmProps?.comparisonOperator ?? comparisonOperator,
             })
             .addAlarmAction(alarmSnsAction);
     }
@@ -327,20 +313,9 @@ export class MonitoredDBFunction {
                 .replace(/\s/g, "")
                 .value()}`;
         const env = environment ? environment : stack.createLambdaEnvironment();
-        const functionProps = databaseFunctionProps(
-            stack,
-            env,
-            functionName,
-            name,
-            functionParameters
-        );
+        const functionProps = databaseFunctionProps(stack, env, functionName, name, functionParameters);
 
-        const mf = MonitoredFunction.create(
-            stack,
-            functionName,
-            functionProps,
-            functionParameters
-        );
+        const mf = MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
 
         stack.grantSecret(mf);
 

@@ -193,7 +193,7 @@ export class StackCheckingAspect implements IAspect {
                     const name = split[3];
 
                     if (name === undefined) {
-                        throw Error('Name should not be undefined');
+                        throw Error("Name should not be undefined");
                     }
 
                     if (type === "querystring" && !StackCheckingAspect.isValidQueryString(name)) {
@@ -215,7 +215,7 @@ export class StackCheckingAspect implements IAspect {
     private checkLogGroupRetention(node: IConstruct) {
         if (node instanceof LogRetention) {
             const child = node.node.defaultChild as unknown as Record<string, Record<string, string>>;
-            const retention = child?.['_cfnProperties']?.['RetentionInDays'];
+            const retention = child?.["_cfnProperties"]?.["RetentionInDays"];
 
             if (!retention) {
                 this.addAnnotation(

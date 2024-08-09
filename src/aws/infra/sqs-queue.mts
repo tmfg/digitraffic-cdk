@@ -108,7 +108,7 @@ async function uploadToS3(
     body: NodeJsRuntimeStreamingBlobPayloadInputTypes,
     objectName: string,
     cannedAcl?: ObjectCannedACL,
-    contentType?: string,
+    contentType?: string
 ) {
     const command = new PutObjectCommand({
         Bucket: bucketName,
@@ -137,7 +137,7 @@ function createHandler(): SQSHandler {
         await Promise.all(
             event.Records.map((e: SQSRecord, idx: number) => {
                 uploadToS3(s3, bucketName, e.body, `dlq-${millis}-${idx}.json`);
-            }),
+            })
         );
     };
 }

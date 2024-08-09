@@ -19,10 +19,7 @@ function getSmClient(): SecretsManager {
 
 export type GenericSecret = Record<string, string>;
 
-export async function getSecret<Secret>(
-    secretId: string,
-    prefix = ""
-): Promise<Secret> {
+export async function getSecret<Secret>(secretId: string, prefix = ""): Promise<Secret> {
     const secretObj = await getSmClient().getSecretValue({
         SecretId: secretId,
     });
@@ -31,9 +28,9 @@ export async function getSecret<Secret>(
         throw new Error("No secret found!");
     }
 
-    const secret: GenericSecret | Secret = JSON.parse(
-        secretObj.SecretString
-    ) as unknown as GenericSecret | Secret;
+    const secret: GenericSecret | Secret = JSON.parse(secretObj.SecretString) as unknown as
+        | GenericSecret
+        | Secret;
 
     if (!prefix) {
         return secret as Secret;
@@ -62,10 +59,7 @@ function parseSecret<Secret>(secret: GenericSecret, prefix: string): Secret {
  * @param Secret id in Secrets Manager
  */
 
-export async function getFromEnvOrSecret(
-    key: string,
-    secretId: string,
-): Promise<string> {
+export async function getFromEnvOrSecret(key: string, secretId: string): Promise<string> {
     const envValue = getEnvVariableSafe(key);
     if (envValue.result === "ok") {
         return envValue.value;

@@ -1,22 +1,19 @@
 import {
-    CfnDocumentationPart, Cors,
+    CfnDocumentationPart,
+    Cors,
     EndpointType,
     GatewayResponse,
     type IResource,
     type JsonSchema,
     MethodLoggingLevel,
     Model,
-    Resource, type ResourceOptions,
+    Resource,
+    type ResourceOptions,
     ResponseType,
     RestApi,
     type RestApiProps,
 } from "aws-cdk-lib/aws-apigateway";
-import {
-    AnyPrincipal,
-    Effect,
-    PolicyDocument,
-    PolicyStatement,
-} from "aws-cdk-lib/aws-iam";
+import { AnyPrincipal, Effect, PolicyDocument, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { getModelReference } from "../../../utils/api-model.mjs";
 import { MediaType } from "../../types/mediatypes.mjs";
@@ -59,16 +56,13 @@ export class DigitrafficRestApi extends RestApi {
         super(stack, apiId, apiConfig);
 
         this.apiKeyIds = [];
-        this.enableDocumentation =
-            stack.configuration.stackFeatures?.enableDocumentation ?? true;
+        this.enableDocumentation = stack.configuration.stackFeatures?.enableDocumentation ?? true;
 
         add404Support(this, stack);
     }
 
     hostname(): string {
-        return `${this.restApiId}.execute-api.${
-            (this.stack as DigitrafficStack).region
-        }.amazonaws.com`;
+        return `${this.restApiId}.execute-api.${(this.stack as DigitrafficStack).region}.amazonaws.com`;
     }
 
     createUsagePlan(apiKeyId: string, apiKeyName: string): string {
@@ -135,10 +129,7 @@ export class DigitrafficRestApi extends RestApi {
         });
     }
 
-    documentResource(
-        resource: Resource,
-        ...documentationPart: DocumentationPart[]
-    ) {
+    documentResource(resource: Resource, ...documentationPart: DocumentationPart[]) {
         if (this.enableDocumentation) {
             documentationPart.forEach((dp) =>
                 this.addDocumentationPart(
@@ -154,12 +145,10 @@ export class DigitrafficRestApi extends RestApi {
         }
     }
 
-    addResourceWithCorsOptionsSubTree(resource: Resource,
-                                      pathPart: string,
-                                      config?: ResourceOptions) {
+    addResourceWithCorsOptionsSubTree(resource: Resource, pathPart: string, config?: ResourceOptions) {
         const mergedConfig: ResourceOptions = {
             ...PUBLIC_REST_API_CORS_CONFIG,
-            ...config
+            ...config,
         };
         return resource.addResource(pathPart, mergedConfig);
     }
@@ -170,7 +159,7 @@ export class DigitrafficRestApi extends RestApi {
      * @param apiResource
      */
     addCorsOptions(apiResource: IResource): void {
-        apiResource.addCorsPreflight(PUBLIC_REST_API_CORS_CONFIG.defaultCorsPreflightOptions!)
+        apiResource.addCorsPreflight(PUBLIC_REST_API_CORS_CONFIG.defaultCorsPreflightOptions!);
     }
 }
 
@@ -182,33 +171,25 @@ export class DigitrafficRestApi extends RestApi {
  * @param stack Construct
  */
 export function add404Support(restApi: RestApi, stack: Construct) {
-    new GatewayResponse(
-        stack,
-        `MissingAuthenticationTokenResponse-${restApi.restApiName}`,
-        {
-            restApi,
-            type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
-            statusCode: "404",
-            templates: {
-                [MediaType.APPLICATION_JSON]: '{"message": "Not found"}',
-            },
-        }
-    );
+    new GatewayResponse(stack, `MissingAuthenticationTokenResponse-${restApi.restApiName}`, {
+        restApi,
+        type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
+        statusCode: "404",
+        templates: {
+            [MediaType.APPLICATION_JSON]: '{"message": "Not found"}',
+        },
+    });
 }
 
 export function add401Support(restApi: RestApi, stack: Construct) {
-    new GatewayResponse(
-        stack,
-        `AuthenticationFailedResponse-${restApi.restApiName}`,
-        {
-            restApi,
-            type: ResponseType.UNAUTHORIZED,
-            statusCode: "401",
-            responseHeaders: {
-                "WWW-Authenticate": "'Basic'",
-            },
-        }
-    );
+    new GatewayResponse(stack, `AuthenticationFailedResponse-${restApi.restApiName}`, {
+        restApi,
+        type: ResponseType.UNAUTHORIZED,
+        statusCode: "401",
+        responseHeaders: {
+            "WWW-Authenticate": "'Basic'",
+        },
+    });
 }
 
 /**
@@ -226,18 +207,14 @@ export function setReturnCodeForMissingAuthenticationToken(
     restApi: RestApi,
     stack: Construct
 ) {
-    new GatewayResponse(
-        stack,
-        `MissingAuthenticationTokenResponse-${restApi.restApiName}`,
-        {
-            restApi,
-            type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
-            statusCode: `${returnCode}`,
-            templates: {
-                [MediaType.APPLICATION_JSON]: `{"message": ${message}}`,
-            },
-        }
-    );
+    new GatewayResponse(stack, `MissingAuthenticationTokenResponse-${restApi.restApiName}`, {
+        restApi,
+        type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
+        statusCode: `${returnCode}`,
+        templates: {
+            [MediaType.APPLICATION_JSON]: `{"message": ${message}}`,
+        },
+    });
 }
 
 export function createRestApi(
@@ -275,9 +252,7 @@ export function createDefaultPolicyDocument() {
     });
 }
 
-export function createIpRestrictionPolicyDocument(
-    allowFromIpAddresses: string[]
-): PolicyDocument {
+export function createIpRestrictionPolicyDocument(allowFromIpAddresses: string[]): PolicyDocument {
     return new PolicyDocument({
         statements: [
             new PolicyStatement({
@@ -298,7 +273,14 @@ export function createIpRestrictionPolicyDocument(
 export const PUBLIC_REST_API_CORS_CONFIG: Partial<ResourceOptions> = {
     defaultCorsPreflightOptions: {
         allowOrigins: Cors.ALL_ORIGINS,
-        allowHeaders: ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key", "X-Amz-Security-Token", "Digitraffic-User"],
-        allowMethods: ["OPTIONS", "GET", "HEAD"]
-    }
-}
+        allowHeaders: [
+            "Content-Type",
+            "X-Amz-Date",
+            "Authorization",
+            "X-Api-Key",
+            "X-Amz-Security-Token",
+            "Digitraffic-User",
+        ],
+        allowMethods: ["OPTIONS", "GET", "HEAD"],
+    },
+};

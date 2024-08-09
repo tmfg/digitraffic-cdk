@@ -15,10 +15,7 @@ type UpdatedTimestamp = {
     updated: Date;
 } | null;
 
-export function getLastUpdated(
-    db: DTDatabase,
-    datatype: DataType
-): Promise<Date | null> {
+export function getLastUpdated(db: DTDatabase, datatype: DataType): Promise<Date | null> {
     return db.oneOrNone(
         "select updated from data_updated where data_type=$(datatype) and subtype=$(subtype)",
         {
@@ -73,10 +70,7 @@ export function updateLastUpdatedWithSubtype(
     );
 }
 
-export function getUpdatedTimestamp(
-    db: DTDatabase,
-    datatype: string
-): Promise<Date | null> {
+export function getUpdatedTimestamp(db: DTDatabase, datatype: string): Promise<Date | null> {
     return db.oneOrNone(
         "select updated_time as updated from updated_timestamp where updated_name=$(datatype)",
         {
