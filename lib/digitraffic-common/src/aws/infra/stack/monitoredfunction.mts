@@ -159,8 +159,8 @@ export class MonitoredFunction extends Function {
         super(scope, id, {
             ...{
                 loggingFormat: LoggingFormat.JSON,
-                applicationLogLevel: ApplicationLogLevel.DEBUG,
-                systemLogLevel: SystemLogLevel.INFO,
+                applicationLogLevelV2: ApplicationLogLevel.DEBUG,
+                systemLogLevelV2: SystemLogLevel.INFO,
             },
             ...functionProps,
         });

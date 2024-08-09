@@ -47,4 +47,8 @@ describe("ArrayUtils", () => {
     test("getLast - two objects", () => {
         expect(ArrayUtils.getLast([1, 2])).toEqual(2);
     });
+
+    test("isDefined", () => {
+        expect([1, 2, undefined, null, 3].filter(ArrayUtils.isDefined)).toEqual([1, 2, 3]);
+    });
 });
