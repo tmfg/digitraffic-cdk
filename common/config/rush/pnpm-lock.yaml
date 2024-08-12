@@ -385,9 +385,6 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
-      '@types/xsd-schema-validator':
-        specifier: 0.5.7
-        version: 0.5.7
       esbuild:
         specifier: 0.23.0
         version: 0.23.0
@@ -5127,9 +5124,6 @@ packages:
 
   '@types/xml2js@0.4.14':
     resolution: {integrity: sha512-4YnrRemBShWRO2QjvUin8ESA41rH+9nQGLUGZV/1IDhi3SL9OhdpNC/MrulTWuptXKwhx/aDxE7toV0f/ypIXQ==}
-
-  '@types/xsd-schema-validator@0.5.7':
-    resolution: {integrity: sha512-LPw/gw75L7WIGuVyvauFN1njw/V8EBRWHo5CnlB/DDSYu495djeVi+WbnJ8VVrRFCfUU51uXf1Qtm6DSWNew+A==}
 
   '@types/yargs-parser@21.0.3':
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
@@ -12532,10 +12526,6 @@ snapshots:
       '@types/node': 20.14.14
 
   '@types/xml2js@0.4.14':
-    dependencies:
-      '@types/node': 20.14.14
-
-  '@types/xsd-schema-validator@0.5.7':
     dependencies:
       '@types/node': 20.14.14
 

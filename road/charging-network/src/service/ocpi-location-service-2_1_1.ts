@@ -2,7 +2,6 @@ import { type LoggerMethodType, logger } from "@digitraffic/common/dist/aws/runt
 import { type DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import type { Location } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
-import { type Location } from "../api/ocpi/2_1_1/ocpi-api-responses_2_1_1.js";
 import * as OcpiApi_2_1_1 from "../api/ocpi/2_1_1/ocpi-api_2_1_1.js";
 import * as OcpiDao from "../dao/ocpi-dao.js";
 import type {

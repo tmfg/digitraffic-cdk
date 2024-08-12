@@ -266,11 +266,9 @@ export const TEST_ATON_SECRET: AtonSecret = {
     serviceRegistryUrl: ""
 };
 
-export function validateS124(faultS124: string): void {
-    xsdValidator.validateXML(faultS124, "src/__test__/service/S124.xsd", (err, result) => {
-        expect(err).toBeFalsy();
-        expect(result.valid).toBe(true);
-    });
+export async function validateS124(faultS124: string): Promise<void> {
+    const result = await xsdValidator.validateXML(faultS124, "src/__test__/service/S124.xsd");
+    expect(result.valid).toBe(true);
 }
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
