@@ -1,3 +1,4 @@
+import { Duration } from "aws-cdk-lib";
 import { CloudFrontAllowedMethods, OriginProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
 import type { WafRules } from "./acl/waf-rules.js";
 import { FunctionType, LambdaType } from "./lambda/lambda-creator.js";
@@ -20,7 +21,6 @@ export class CFBehavior {
         this.path = path;
         this.cacheTtl = 60;
         this.allowedMethods = CloudFrontAllowedMethods.GET_HEAD;
-
         this.cacheHeaders = [];
 
         this.lambdaTypes = new Set();
@@ -141,10 +141,13 @@ export class CFDomain extends CFOrigin {
     apiKey?: string;
     cfName?: string;
     headers: Record<string, string> = {};
+    // appears as "response timeout" in the console and as "read timeout" in cdk interfaces 
+    responseTimeout: Duration
 
     constructor(domainName: string, ...behaviors: CFBehavior[]) {
         super(behaviors);
         this.domainName = domainName;
+        this.responseTimeout = Duration.seconds(30);
     }
 
     static passAllDomain(domainName: string, path: string = "*"): CFDomain {
@@ -207,6 +210,15 @@ export class CFDomain extends CFOrigin {
 
     public httpOnly(): this {
         this.originProtocolPolicy = OriginProtocolPolicy.HTTP_ONLY;
+
+        return this;
+    }
+
+    public withResponseTimeout(seconds: number): this {
+        if (seconds > 60 || seconds < 1) {
+            throw new Error(`Invalid response timeout value (range is 1-60 seconds)`)
+        }
+        this.responseTimeout = Duration.seconds(seconds);
 
         return this;
     }
