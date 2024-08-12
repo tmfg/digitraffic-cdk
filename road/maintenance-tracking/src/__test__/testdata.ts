@@ -135,16 +135,13 @@ export function getRandompId(): string {
 }
 
 export function createSQSEventWithBodies(bodies: string[] = []): SQSEvent {
-
     const records = bodies.map((body) => {
         return {
             body,
             messageId: "",
             receiptHandle: `s3://${getEnvVariable(
                 MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
-            )}/${getEnvVariable(
-                MaintenanceTrackingEnvKeys.SQS_QUEUE_URL
-            )}/${getRandompId()}`,
+            )}/${getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL)}/${getRandompId()}`,
             messageAttributes: {},
             md5OfBody: "",
             attributes: {
@@ -159,5 +156,5 @@ export function createSQSEventWithBodies(bodies: string[] = []): SQSEvent {
         } satisfies SQSRecord;
     });
 
-    return { Records: records } satisfies SQSEvent
+    return { Records: records } satisfies SQSEvent;
 }

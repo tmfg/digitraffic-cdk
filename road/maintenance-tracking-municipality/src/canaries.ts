@@ -6,10 +6,7 @@ import { MaintenanceTrackingMunicipalityEnvKeys } from "./keys.js";
 export class Canaries {
     constructor(stack: DigitrafficStack) {
         if (stack.configuration.stackFeatures?.enableCanaries) {
-            const dbRole = new DigitrafficCanaryRole(
-                stack,
-                "mtm-db"
-            ).withDatabaseAccess();
+            const dbRole = new DigitrafficCanaryRole(stack, "mtm-db").withDatabaseAccess();
 
             DatabaseCanary.createV2(
                 stack,
@@ -17,9 +14,8 @@ export class Canaries {
                 "mtm",
                 {
                     canaryEnv: {
-                        [MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME]:
-                            "autori-oulu",
-                    },
+                        [MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME]: "autori-oulu"
+                    }
                 },
                 "mtm-autori-oulu"
             );
@@ -29,9 +25,8 @@ export class Canaries {
                 "mtm",
                 {
                     canaryEnv: {
-                        [MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME]:
-                            "autori-kuopio",
-                    },
+                        [MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME]: "autori-kuopio"
+                    }
                 },
                 "mtm-autori-kuopio"
             );

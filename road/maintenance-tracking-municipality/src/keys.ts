@@ -5,5 +5,5 @@
 export enum MaintenanceTrackingMunicipalityEnvKeys {
     DOMAIN_NAME = "DOMAIN_NAME",
     DOMAIN_PREFIX = "DOMAIN_PREFIX",
-    SECRET_ID = "SECRET_ID",
+    SECRET_ID = "SECRET_ID"
 }

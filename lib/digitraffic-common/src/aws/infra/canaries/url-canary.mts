@@ -15,12 +15,7 @@ export interface UrlCanaryParameters extends CanaryParameters {
 }
 
 export class UrlCanary extends DigitrafficCanary {
-    constructor(
-        stack: DigitrafficStack,
-        role: Role,
-        params: UrlCanaryParameters,
-        secret?: ISecret
-    ) {
+    constructor(stack: DigitrafficStack, role: Role, params: UrlCanaryParameters, secret?: ISecret) {
         const canaryName = `${params.name}-url`;
         const environmentVariables: LambdaEnvironment = {};
         environmentVariables[ENV_HOSTNAME] = params.hostname;
@@ -42,14 +37,9 @@ export class UrlCanary extends DigitrafficCanary {
 
         if (params.inVpc && this.node.defaultChild instanceof CfnCanary) {
             const subnetIds =
-                stack.vpc === undefined
-                    ? []
-                    : stack.vpc.privateSubnets.map((subnet) => subnet.subnetId);
+                stack.vpc === undefined ? [] : stack.vpc.privateSubnets.map((subnet) => subnet.subnetId);
 
-            const securityGroupIds =
-                stack.lambdaDbSg === undefined
-                    ? []
-                    : [stack.lambdaDbSg.securityGroupId];
+            const securityGroupIds = stack.lambdaDbSg === undefined ? [] : [stack.lambdaDbSg.securityGroupId];
 
             this.node.defaultChild.vpcConfig = {
                 vpcId: stack.vpc?.vpcId,
@@ -64,7 +54,7 @@ export class UrlCanary extends DigitrafficCanary {
         role: Role,
         publicApi: DigitrafficRestApi,
         params: Partial<UrlCanaryParameters>,
-        secret?: ISecret
+        secret?: ISecret,
     ): UrlCanary {
         return new UrlCanary(
             stack,
@@ -76,7 +66,7 @@ export class UrlCanary extends DigitrafficCanary {
                 apiKeyId: this.getApiKey(publicApi),
                 ...params,
             } as UrlCanaryParameters,
-            secret
+            secret,
         );
     }
 

@@ -34,7 +34,7 @@ export class SecretHolder<Secret extends GenericSecret> {
         secretId: string,
         prefix = "",
         expectedKeys: string[] = [],
-        configuration = DEFAULT_CONFIGURATION
+        configuration = DEFAULT_CONFIGURATION,
     ) {
         this.secretId = secretId;
         this.prefix = prefix;
@@ -56,23 +56,14 @@ export class SecretHolder<Secret extends GenericSecret> {
         this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
     }
 
-    public static create<S extends GenericSecret>(
-        prefix = DEFAULT_PREFIX,
-        expectedKeys: string[] = []
-    ) {
-        return new SecretHolder<S>(
-            getEnvVariable("SECRET_ID"),
-            prefix,
-            expectedKeys
-        );
+    public static create<S extends GenericSecret>(prefix = DEFAULT_PREFIX, expectedKeys: string[] = []) {
+        return new SecretHolder<S>(getEnvVariable("SECRET_ID"), prefix, expectedKeys);
     }
 
     public async get(): Promise<Secret> {
         const secret = await this.getSecret<Secret>();
         const parsedSecret =
-            this.prefix === DEFAULT_PREFIX
-                ? secret
-                : this.parseSecret(secret, `${this.prefix}.`);
+            this.prefix === DEFAULT_PREFIX ? secret : this.parseSecret(secret, `${this.prefix}.`);
 
         if (this.expectedKeys.length > 0) {
             checkExpectedSecretKeys(this.expectedKeys, parsedSecret);
@@ -87,7 +78,7 @@ export class SecretHolder<Secret extends GenericSecret> {
 
         for (const key in secret) {
             if (key.startsWith(prefix)) {
-                const withoutPrefix:string = key.substring(skip);
+                const withoutPrefix: string = key.substring(skip);
                 parsed[withoutPrefix] = secret[key]!;
             }
         }
@@ -102,6 +93,6 @@ export class SecretHolder<Secret extends GenericSecret> {
             await this.initSecret();
         }
 
-        return secret ?? (this.secretCache.get(DEFAULT_SECRET_KEY));
+        return secret ?? this.secretCache.get(DEFAULT_SECRET_KEY);
     }
 }

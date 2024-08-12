@@ -25,18 +25,10 @@ class CountDatabaseCheck extends DatabaseCheck<Countable> {
     readonly minCount: number | null;
     readonly maxCount: number | null;
 
-    constructor(
-        name: string,
-        sql: string,
-        minCount: number | null,
-        maxCount: number | null
-    ) {
+    constructor(name: string, sql: string, minCount: number | null, maxCount: number | null) {
         super(name, sql);
 
-        if (
-            !sql.toLowerCase().includes("select") ||
-            !sql.toLowerCase().includes("count")
-        ) {
+        if (!sql.toLowerCase().includes("select") || !sql.toLowerCase().includes("count")) {
             throw new Error("sql must contain select count(*)");
         }
 
@@ -52,15 +44,11 @@ class CountDatabaseCheck extends DatabaseCheck<Countable> {
         if ("count" in value) {
             if (this.minCount && value.count < this.minCount) {
                 this.failed = true;
-                throw new Error(
-                    `count was ${value.count}, minimum is ${this.minCount}`
-                );
+                throw new Error(`count was ${value.count}, minimum is ${this.minCount}`);
             }
             if (this.maxCount && value.count > this.maxCount) {
                 this.failed = true;
-                throw new Error(
-                    `count was ${value.count}, max is ${this.maxCount}`
-                );
+                throw new Error(`count was ${value.count}, max is ${this.maxCount}`);
             }
         } else {
             this.failed = true;
@@ -94,15 +82,11 @@ export class DatabaseCountChecker {
     }
 
     static createForProxy() {
-        return new DatabaseCountChecker(() =>
-            new ProxyHolder(getEnvVariable("SECRET_ID")).setCredentials()
-        );
+        return new DatabaseCountChecker(() => new ProxyHolder(getEnvVariable("SECRET_ID")).setCredentials());
     }
 
     static createForRds() {
-        return new DatabaseCountChecker(() =>
-            new RdsHolder(getEnvVariable("SECRET_ID")).setCredentials()
-        );
+        return new DatabaseCountChecker(() => new RdsHolder(getEnvVariable("SECRET_ID")).setCredentials());
     }
 
     /**

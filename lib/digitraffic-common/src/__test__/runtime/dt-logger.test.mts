@@ -8,38 +8,30 @@ const LOG_LINE: LoggableType = {
 };
 
 describe("dt-logger", () => {
-    function assertLog<T>(
-        config: LoggerConfiguration,
-        message: LoggableType,
-        expected: NonNullable<T>
-    ) {
+    function assertLog<T>(config: LoggerConfiguration, message: LoggableType, expected: NonNullable<T>) {
         assertWrite(
             config,
             (logger: DtLogger) => {
                 logger.info(message);
             },
-            expected
+            expected,
         );
     }
 
-    function assertDebug<T>(
-        config: LoggerConfiguration,
-        message: unknown,
-        expected: NonNullable<T>
-    ) {
+    function assertDebug<T>(config: LoggerConfiguration, message: unknown, expected: NonNullable<T>) {
         assertWrite(
             config,
             (logger: DtLogger) => {
                 logger.debug(message);
             },
-            expected
+            expected,
         );
     }
 
     function assertWrite<T>(
         config: LoggerConfiguration,
         writeFunction: (logger: DtLogger) => void,
-        expected: NonNullable<T>
+        expected: NonNullable<T>,
     ) {
         const logged: string[] = [];
         const writeStream = new Writable({
@@ -57,19 +49,12 @@ describe("dt-logger", () => {
 
         expect(logged.length).toBe(1);
 
-        const loggedLine = JSON.parse(logged[0]!) as Record<
-            string,
-            unknown
-        >;
+        const loggedLine = JSON.parse(logged[0]!) as Record<string, unknown>;
         console.info(loggedLine);
 
-        if (
-            typeof expected === "object" &&
-            "stack" in expected &&
-            expected.stack
-        ) {
-            const stack = loggedLine['stack'];
-            delete loggedLine['stack'];
+        if (typeof expected === "object" && "stack" in expected && expected.stack) {
+            const stack = loggedLine["stack"];
+            delete loggedLine["stack"];
             delete expected.stack;
 
             expect(stack).toBeDefined();
@@ -89,7 +74,7 @@ describe("dt-logger", () => {
             {
                 ...LOG_LINE,
                 date: date.toISOString(),
-            }
+            },
         );
     });
 
@@ -103,7 +88,7 @@ describe("dt-logger", () => {
             {
                 ...LOG_LINE,
                 fooCount: 123,
-            }
+            },
         );
     });
 

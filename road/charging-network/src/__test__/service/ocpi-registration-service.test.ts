@@ -1,6 +1,6 @@
 import { dbTestBase } from "../db-test-util.js";
 
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Version, VersionString } from "../../api/ocpi/ocpi-api-responses.js";
 
 import { setTestEnv } from "../test-util.js";

@@ -9,16 +9,9 @@ import { DigitrafficCanary } from "./canary.mjs";
 import { DigitrafficStack } from "../stack/stack.mjs";
 
 export class DatabaseCanary extends DigitrafficCanary {
-    constructor(
-        stack: DigitrafficStack,
-        role: Role,
-        secret: ISecret,
-        params: CanaryParameters
-    ) {
+    constructor(stack: DigitrafficStack, role: Role, secret: ISecret, params: CanaryParameters) {
         const canaryName = `${params.name}-db`;
-        const environmentVariables = stack.createDefaultLambdaEnvironment(
-            `Synthetics-${canaryName}`
-        );
+        const environmentVariables = stack.createDefaultLambdaEnvironment(`Synthetics-${canaryName}`);
 
         // the handler code is defined at the actual project using this
         super(stack, canaryName, role, params, environmentVariables);
@@ -29,14 +22,9 @@ export class DatabaseCanary extends DigitrafficCanary {
         // need to override vpc and security group, can't do this with cdk
         if (this.node.defaultChild instanceof CfnCanary) {
             const subnetIds =
-                stack.vpc === undefined
-                    ? []
-                    : stack.vpc.privateSubnets.map((subnet) => subnet.subnetId);
+                stack.vpc === undefined ? [] : stack.vpc.privateSubnets.map((subnet) => subnet.subnetId);
 
-            const securityGroupIds =
-                stack.lambdaDbSg === undefined
-                    ? []
-                    : [stack.lambdaDbSg.securityGroupId];
+            const securityGroupIds = stack.lambdaDbSg === undefined ? [] : [stack.lambdaDbSg.securityGroupId];
 
             this.node.defaultChild.vpcConfig = {
                 vpcId: stack.vpc?.vpcId,
@@ -46,11 +34,7 @@ export class DatabaseCanary extends DigitrafficCanary {
         }
     }
 
-    static create(
-        stack: DigitrafficStack,
-        role: Role,
-        params: CanaryParameters
-    ): DatabaseCanary {
+    static create(stack: DigitrafficStack, role: Role, params: CanaryParameters): DatabaseCanary {
         const secret = stack.getSecret();
         return new DatabaseCanary(stack, role, secret, {
             ...{
@@ -75,7 +59,7 @@ export class DatabaseCanary extends DigitrafficCanary {
         role: Role,
         name: string,
         params: Partial<CanaryParameters> = {},
-        canaryName = name
+        canaryName = name,
     ): DatabaseCanary {
         const secret = stack.getSecret();
         return new DatabaseCanary(stack, role, secret, {

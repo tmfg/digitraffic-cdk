@@ -4,7 +4,7 @@ import {
     PassthroughBehavior,
     RequestValidator,
     Resource,
-  type IModel
+    type IModel,
 } from "aws-cdk-lib/aws-apigateway";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
@@ -17,7 +17,7 @@ export function attachQueueToApiGatewayResource(
     requestValidator: RequestValidator,
     resourceName: string,
     apiKeyRequired: boolean,
-    requestModels?: Record<string, IModel>
+    requestModels?: Record<string, IModel>,
 ) {
     // role for API Gateway
     const apiGwRole = new Role(stack, `${resourceName}APIGatewayToSQSRole`, {
@@ -28,7 +28,7 @@ export function attachQueueToApiGatewayResource(
         new PolicyStatement({
             resources: [queue.queueArn],
             actions: ["sqs:SendMessage"],
-        })
+        }),
     );
     // grants API Gateway the right write CloudWatch Logs
     apiGwRole.addToPolicy(
@@ -43,12 +43,10 @@ export function attachQueueToApiGatewayResource(
                 "logs:GetLogEvents",
                 "logs:FilterLogEvents",
             ],
-        })
+        }),
     );
     // create an integration between API Gateway and an SQS queue
-    const fifoMessageGroupId = queue.fifo
-        ? "&MessageGroupId=AlwaysSameFifoGroup"
-        : "";
+    const fifoMessageGroupId = queue.fifo ? "&MessageGroupId=AlwaysSameFifoGroup" : "";
     const sqsIntegration = new AwsIntegration({
         service: "sqs",
         integrationHttpMethod: "POST",
@@ -57,8 +55,7 @@ export function attachQueueToApiGatewayResource(
             credentialsRole: apiGwRole,
             requestParameters: {
                 // SQS requires the Content-Type of the HTTP request to be application/x-www-form-urlencoded
-                "integration.request.header.Content-Type":
-                    "'application/x-www-form-urlencoded'",
+                "integration.request.header.Content-Type": "'application/x-www-form-urlencoded'",
             },
             requestTemplates: {
                 // map the JSON request to a form parameter, FIFO needs also MessageGroupId

@@ -1,4 +1,4 @@
-import apigateway = require("aws-cdk-lib/aws-apigateway");
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
 
 export const OcpiV2_1_1EndpointSchema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,

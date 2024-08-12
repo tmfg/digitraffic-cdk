@@ -20,26 +20,26 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@rushstack/eslint-config": "^3.6.9",
-    "@typescript-eslint/eslint-plugin": "~6.18.1",
-    "eslint-plugin-deprecation": "~2.0.0",
-    "madge": "6.1.0"
+    "@rushstack/eslint-config": "^3.7.1",
+    "@typescript-eslint/eslint-plugin": "~7.14.1",
+    "eslint-plugin-deprecation": "~3.0.0",
+    "madge": "8.0.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "29.7.0",
-    "@rushstack/eslint-config": "^3.6.1",
-    "@rushstack/heft": "^0.64.2",
-    "@rushstack/heft-jest-plugin": "^0.11.2",
+    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/heft": "^0.66.25",
+    "@rushstack/heft-jest-plugin": "^0.12.7",
     "@types/heft-jest": "1.0.6",
-    "@types/jest": "29.5.11",
+    "@types/jest": "29.5.12",
     "@types/madge": "5.0.3",
-    "@types/node": "20.10.7",
-    "esbuild": "0.19.11",
-    "eslint": "~8.56.0",
-    "rollup": "^4.14.3",
-    "typescript": "~5.3.3"
+    "@types/node": "20.14.8",
+    "esbuild": "0.23.0",
+    "eslint": "^8.57.0",
+    "rollup": "^4.20.0",
+    "typescript": "~5.5.2"
   }
 }

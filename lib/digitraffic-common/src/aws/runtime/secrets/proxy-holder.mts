@@ -12,11 +12,7 @@ export class ProxyHolder {
     private readonly secretHolder;
 
     constructor(secretId: string) {
-        this.secretHolder = new SecretHolder<RdsProxySecret>(
-            secretId,
-            "",
-            RDS_PROXY_SECRET_KEYS
-        );
+        this.secretHolder = new SecretHolder<RdsProxySecret>(secretId, "", RDS_PROXY_SECRET_KEYS);
     }
 
     static create() {

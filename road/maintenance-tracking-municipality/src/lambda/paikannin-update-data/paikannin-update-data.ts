@@ -3,9 +3,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { PaikanninApi } from "../../api/paikannin.js";
 import { MaintenanceTrackingMunicipalityEnvKeys } from "../../keys.js";
-import {
-    type MaintenanceTrackingPaikanninSecret
-} from "../../model/maintenance-tracking-municipality-secret.js";
+import { type MaintenanceTrackingPaikanninSecret } from "../../model/maintenance-tracking-municipality-secret.js";
 import { type TrackingSaveResult } from "../../model/tracking-save-result.js";
 import * as CommonUpdate from "../../service/common-update.js";
 import { PaikanninUpdate } from "../../service/paikannin-update.js";

@@ -61,10 +61,7 @@ function coordinatePair(coordinate: Position): string {
  * @param features List of Features
  * @param lastUpdated Last updated date
  */
-export function createFeatureCollection(
-    features: Feature[],
-    lastUpdated: Date | null
-): FeatureCollection {
+export function createFeatureCollection(features: Feature[], lastUpdated: Date | null): FeatureCollection {
     return {
         type: "FeatureCollection",
         lastUpdated: lastUpdated,
@@ -99,7 +96,7 @@ function distanceBetweenWGS84PointsInKm(
     fromXLon: number,
     fromYLat: number,
     toXLon: number,
-    toYLat: number
+    toYLat: number,
 ): number {
     const diffLat = toRadians(toYLat - fromYLat);
     const diffLon = toRadians(toXLon - fromXLon);
@@ -124,7 +121,9 @@ function distanceBetweenWGS84PointsInKm(
  */
 export function distanceBetweenPositionsInKm(pos1: Position, pos2: Position) {
     if (pos1.length < 2 || pos1.length > 3 || pos2.length < 2 || pos2.length > 3) {
-        throw Error(`Illegal Positions ${pos1.toString()} and ${pos2.toString()}. Both must have length between 2 or 3.`)
+        throw Error(
+            `Illegal Positions ${pos1.toString()} and ${pos2.toString()}. Both must have length between 2 or 3.`,
+        );
     }
     return distanceBetweenWGS84PointsInKm(pos1[0]!, pos1[1]!, pos2[0]!, pos2[1]!);
 }

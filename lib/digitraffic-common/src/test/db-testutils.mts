@@ -1,8 +1,4 @@
-import {
-    DatabaseEnvironmentKeys,
-    type DTDatabase,
-    initDbConnection,
-} from "../database/database.mjs";
+import { DatabaseEnvironmentKeys, type DTDatabase, initDbConnection } from "../database/database.mjs";
 import type { Countable } from "../database/models.mjs";
 
 export async function assertCount(db: DTDatabase, sql: string, count: number) {
@@ -14,21 +10,15 @@ export function dbTestBase(
     truncateFn: (db: DTDatabase) => Promise<void>,
     dbUser: string,
     dbPass: string,
-    dbUri: string
+    dbUri: string,
 ): () => void {
-    const theDbUri = process.env['DB_URI'] ?? dbUri;
+    const theDbUri = process.env["DB_URI"] ?? dbUri;
     console.log(`Test database URI: ${theDbUri}`);
 
     return () => {
-        const db: DTDatabase = initDbConnection(
-            dbUser,
-            dbPass,
-            "test",
-            theDbUri,
-            {
-                noWarnings: true, // ignore duplicate connection warning for tests
-            }
-        );
+        const db: DTDatabase = initDbConnection(dbUser, dbPass, "test", theDbUri, {
+            noWarnings: true, // ignore duplicate connection warning for tests
+        });
 
         beforeAll(async () => {
             process.env[DatabaseEnvironmentKeys.DB_USER] = dbUser;
@@ -39,7 +29,7 @@ export function dbTestBase(
             // if there's no connection to the database, it will be caught here
             try {
                 await truncateFn(db);
-            } catch(e) {
+            } catch (e) {
                 console.info("cought in commonDbTest:" + JSON.stringify(e));
                 throw e;
             }

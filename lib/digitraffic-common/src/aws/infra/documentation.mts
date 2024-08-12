@@ -17,7 +17,7 @@ export function addQueryParameterDescription(
     name: string,
     description: string,
     resource: Resource,
-    stack: Construct
+    stack: Construct,
 ) {
     new CfnDocumentationPart(stack, `${name}Documentation`, {
         restApiId: resource.api.restApiId,
@@ -41,7 +41,7 @@ export function addDocumentation(
     methodDescription: string,
     documentationProperties: object,
     resource: Resource,
-    stack: Construct
+    stack: Construct,
 ) {
     new CfnDocumentationPart(stack, `${methodDescription}Documentation`, {
         restApiId: resource.api.restApiId,
@@ -60,12 +60,7 @@ export function addDocumentation(
  * @param resource REST API resource
  * @param stack CloudFormation stack
  */
-export function addTags(
-    methodDescription: string,
-    tags: string[],
-    resource: Resource,
-    stack: Construct
-) {
+export function addTags(methodDescription: string, tags: string[], resource: Resource, stack: Construct) {
     addDocumentation(methodDescription, { tags }, resource, stack);
 }
 
@@ -85,7 +80,7 @@ export function addTagsAndSummary(
     tags: string[],
     summary: string,
     resource: Resource,
-    stack: Construct
+    stack: Construct,
 ) {
     addDocumentation(methodDescription, { tags, summary }, resource, stack);
 }
@@ -105,7 +100,7 @@ export class DocumentationPart {
     private constructor(
         parameterName: string,
         documentationProperties: DocumentationProperties,
-        type: string
+        type: string,
     ) {
         this.parameterName = parameterName;
         this.documentationProperties = documentationProperties;
@@ -121,19 +116,11 @@ export class DocumentationPart {
     }
 
     static queryParameter(parameterName: string, description: string) {
-        return new DocumentationPart(
-            parameterName,
-            { description },
-            "QUERY_PARAMETER"
-        );
+        return new DocumentationPart(parameterName, { description }, "QUERY_PARAMETER");
     }
 
     static pathParameter(parameterName: string, description: string) {
-        return new DocumentationPart(
-            parameterName,
-            { description },
-            "PATH_PARAMETER"
-        );
+        return new DocumentationPart(parameterName, { description }, "PATH_PARAMETER");
     }
 
     static method(tags: string[], name: string, summary: string) {

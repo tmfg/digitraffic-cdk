@@ -10,7 +10,11 @@ import {
     type DbMaintenanceTracking,
     type DbWorkMachine
 } from "../model/db-data.js";
-import { type ApiWorkevent, type ApiWorkeventDevice, type ApiWorkeventIoDevice } from "../model/paikannin-api-data.js";
+import {
+    type ApiWorkevent,
+    type ApiWorkeventDevice,
+    type ApiWorkeventIoDevice
+} from "../model/paikannin-api-data.js";
 import * as Utils from "./utils.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -365,7 +369,11 @@ export function createLineStringFromEvents(
         if (coordinates.length > 0) {
             const previousCoordinate: Position | undefined = coordinates[coordinates.length - 1];
             // Linestring points must differ from previous values
-            if (!previousCoordinate || previousCoordinate[0] !== nextCoordinate[0] || previousCoordinate[1] !== nextCoordinate[1]) {
+            if (
+                !previousCoordinate ||
+                previousCoordinate[0] !== nextCoordinate[0] ||
+                previousCoordinate[1] !== nextCoordinate[1]
+            ) {
                 coordinates.push(nextCoordinate);
             }
         } else {

@@ -15,9 +15,10 @@ import type {
 } from "aws-lambda";
 import type {
     APIGatewayRequestAuthorizerEvent,
-    APIGatewayRequestAuthorizerEventHeaders
-} from "aws-lambda/trigger/api-gateway-authorizer.js";
-import type { AuthResponse } from "aws-lambda";
+    APIGatewayRequestAuthorizerEventHeaders,
+    AuthResponse
+} from "aws-lambda";
+import _ from "lodash";
 
 import { afterEach, jest, test } from "@jest/globals";
 
@@ -32,6 +33,7 @@ const CPO_TOKEN_B = OcpiRegistrationService.generateToken();
 interface Params {
     name: string;
     cpoToken: string | undefined;
+    handlerCallbackCount: number;
     authorizerResultCpoId: string | undefined;
     effect: "Allow" | "Deny";
 }
@@ -57,24 +59,33 @@ describe(
         });
 
         test.each([
-            {
-                name: "authorize-success-valid-token",
-                cpoToken: CPO_TOKEN_B,
-                authorizerResultCpoId: DT_CPO_ID,
-                effect: "Allow"
-            } satisfies Params,
-            {
-                name: "authorize-fails-invalid-token",
-                cpoToken: OcpiRegistrationService.generateToken(), // This token in request is not found from db
-                authorizerResultCpoId: undefined,
-                effect: "Deny"
-            } satisfies Params,
-            {
-                name: "authorize-fails-missing-token",
-                cpoToken: undefined, // Token in request is missing
-                authorizerResultCpoId: undefined,
-                effect: "Deny"
-            } satisfies Params
+            [
+                {
+                    name: "authorize-success-valid-token",
+                    cpoToken: CPO_TOKEN_B,
+                    handlerCallbackCount: 1,
+                    authorizerResultCpoId: DT_CPO_ID,
+                    effect: "Allow"
+                } satisfies Params
+            ],
+            [
+                {
+                    name: "authorize-fails-invalid-token",
+                    cpoToken: OcpiRegistrationService.generateToken(), // This token in request is not found from db
+                    handlerCallbackCount: 1,
+                    authorizerResultCpoId: undefined,
+                    effect: "Deny"
+                } satisfies Params
+            ],
+            [
+                {
+                    name: "authorize-fails-missing-token",
+                    cpoToken: undefined, // Token in request is missing
+                    handlerCallbackCount: 1,
+                    authorizerResultCpoId: undefined,
+                    effect: "Deny"
+                } satisfies Params
+            ]
         ])("Test lambda authorizer: $name", async (testParams: Params) => {
             const authorizerEvent = createAPIGatewayRequestAuthorizerEvent(testParams.cpoToken);
 
@@ -89,7 +100,7 @@ describe(
             // Call authorizer lambda with apigw event that contains cpo token_b
             await handler(authorizerEvent, {} as Context, callback);
 
-            expect(callback).toHaveBeenCalledTimes(1);
+            expect(callback).toHaveBeenCalledTimes(testParams.handlerCallbackCount);
             expect(callback).toHaveBeenCalledWith(
                 null,
                 createAPIGatewayAuthorizerResponse(testParams.authorizerResultCpoId, testParams.effect)

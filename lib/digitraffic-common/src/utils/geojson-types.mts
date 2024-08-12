@@ -1,7 +1,7 @@
 /**
  * GeoJSON types
  */
-import type {LineString, Point, Position} from "geojson";
+import type { LineString, Point, Position } from "geojson";
 
 export class GeoJsonPoint implements Point {
     readonly type = "Point";

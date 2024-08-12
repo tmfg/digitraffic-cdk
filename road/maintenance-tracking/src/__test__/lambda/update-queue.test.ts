@@ -10,8 +10,7 @@ import { createExtendedSqsClient } from "../../service/sqs-big-payload.js";
 setTestEnv();
 
 const { handlerFn, invalidRequest, ok } = await import("../../lambda/update-queue/update-queue.js");
-const testEvent = await import("../test-apigw-event.json") as unknown as APIGatewayEvent;
-
+const testEvent = (await import("../test-apigw-event.json")) as unknown as APIGatewayEvent;
 
 describe("update-queue", () => {
     afterEach(() => {
@@ -20,13 +19,11 @@ describe("update-queue", () => {
 
     test("no records - should reject", async () => {
         const sqsClient = createExtendedSqsClient();
-        const sendMessageStub = jest
-            .spyOn(sqsClient, "sendMessage")
-            .mockReturnValue(await Promise.resolve());
+        const sendMessageStub = jest.spyOn(sqsClient, "sendMessage").mockReturnValue(await Promise.resolve());
 
-        await expect(() =>
-            handlerFn(sqsClient)({ ...testEvent, body: null })
-        ).rejects.toMatchObject(invalidRequest("Empty message"));
+        await expect(() => handlerFn(sqsClient)({ ...testEvent, body: null })).rejects.toMatchObject(
+            invalidRequest("Empty message")
+        );
 
         expect(sendMessageStub).toHaveBeenCalledTimes(0);
     });
@@ -34,9 +31,7 @@ describe("update-queue", () => {
     test("single valid record", async () => {
         const jsonString = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const sqsClient = createExtendedSqsClient();
-        const sendMessageStub = jest
-            .spyOn(sqsClient, "sendMessage")
-            .mockReturnValue(await Promise.resolve());
+        const sendMessageStub = jest.spyOn(sqsClient, "sendMessage").mockReturnValue(await Promise.resolve());
 
         await expect(
             handlerFn(sqsClient)({
@@ -44,7 +39,6 @@ describe("update-queue", () => {
                 body: jsonString
             })
         ).resolves.toMatchObject(ok());
-
 
         const sendCommand: SendMessageCommandInput = {
             QueueUrl: getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL),
@@ -58,13 +52,9 @@ describe("update-queue", () => {
     test("invalid record", async () => {
         const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const sqsClient = createExtendedSqsClient();
-        const sendMessageStub = jest
-            .spyOn(sqsClient, "sendMessage")
-            .mockReturnValue(await Promise.resolve());
+        const sendMessageStub = jest.spyOn(sqsClient, "sendMessage").mockReturnValue(await Promise.resolve());
 
-        await expect(() =>
-            handlerFn(sqsClient)({ ...testEvent, body: json })
-        ).rejects.toMatchObject(
+        await expect(() => handlerFn(sqsClient)({ ...testEvent, body: json })).rejects.toMatchObject(
             invalidRequest(
                 `Error while sending message to SQS: SyntaxError: Unexpected token 'i', "invalid js"... is not valid JSON`
             )

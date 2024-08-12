@@ -21,8 +21,8 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.7.2-1",
-    "aws-cdk-lib": "^2.147.3",
+    "@digitraffic/common": "2024.7.8-1",
+    "aws-cdk-lib": "~2.151.0",
     "axios": "^1.7.2",
     "constructs": "^10.3.0",
     "date-fns": "^3.6.0",
@@ -37,18 +37,18 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "^29.7.0",
-    "@rushstack/eslint-config": "^3.7.0",
-    "@rushstack/heft": "^0.66.19",
-    "@rushstack/heft-jest-plugin": "^0.12.1",
-    "@types/aws-lambda": "8.10.140",
-    "@types/geojson": "7946.0.14",
-    "@types/heft-jest": "1.0.6",
-    "@types/jest": "29.5.12",
-    "@types/lodash": "4.17.6",
-    "@types/node": "20.14.9",
-    "esbuild": "^0.23.0",
+    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/heft": "^0.66.25",
+    "@rushstack/heft-jest-plugin": "^0.12.7",
+    "@types/aws-lambda": "8.10.143",
+    "@types/geojson": "^7946.0.14",
+    "@types/heft-jest": "^1.0.6",
+    "@types/jest": "^29.5.12",
+    "@types/lodash": "4.17.7",
+    "@types/node": "^20.14.9",
+    "esbuild": "0.23.0",
     "eslint": "^8.57.0",
     "lodash": "^4.17.21",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   }
 }

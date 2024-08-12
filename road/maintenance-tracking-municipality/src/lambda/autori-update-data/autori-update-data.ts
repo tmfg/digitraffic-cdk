@@ -3,9 +3,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { AutoriApi } from "../../api/autori.js";
 import { MaintenanceTrackingMunicipalityEnvKeys } from "../../keys.js";
-import {
-    type MaintenanceTrackingAutoriSecret
-} from "../../model/maintenance-tracking-municipality-secret.js";
+import { type MaintenanceTrackingAutoriSecret } from "../../model/maintenance-tracking-municipality-secret.js";
 import { type TrackingSaveResult } from "../../model/tracking-save-result.js";
 import { AutoriUpdate } from "../../service/autori-update.js";
 import * as CommonUpdate from "../../service/common-update.js";

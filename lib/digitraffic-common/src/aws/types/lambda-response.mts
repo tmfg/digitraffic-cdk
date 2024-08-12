@@ -7,12 +7,7 @@ export class LambdaResponse {
     readonly timestamp?: string;
     readonly etag: string;
 
-    constructor(
-        status: number,
-        body: string,
-        fileName?: string,
-        timestamp?: Date
-    ) {
+    constructor(status: number, body: string, fileName?: string, timestamp?: Date) {
         this.status = status;
         this.body = body;
         this.fileName = fileName;
@@ -21,12 +16,7 @@ export class LambdaResponse {
     }
 
     withTimestamp(timestamp: Date) {
-        return new LambdaResponse(
-            this.status,
-            this.body,
-            this.fileName,
-            timestamp
-        );
+        return new LambdaResponse(this.status, this.body, this.fileName, timestamp);
     }
 
     /**
@@ -78,19 +68,11 @@ export class LambdaResponse {
         return this.createForString(501, "Not implemented");
     }
 
-    private static createForString(
-        status: number,
-        body: string,
-        fileName?: string
-    ): LambdaResponse {
+    private static createForString(status: number, body: string, fileName?: string): LambdaResponse {
         return this.createForBase64(status, toBase64(body), fileName);
     }
 
-    private static createForBase64(
-        status: number,
-        base64Body: string,
-        fileName?: string
-    ): LambdaResponse {
+    private static createForBase64(status: number, base64Body: string, fileName?: string): LambdaResponse {
         return new LambdaResponse(status, base64Body, fileName);
     }
 }

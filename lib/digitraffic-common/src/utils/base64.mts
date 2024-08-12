@@ -3,7 +3,7 @@
  * @param str string
  */
 export function decodeBase64ToAscii(str: string) {
-    return decodeBase64(str, 'ascii');
+    return decodeBase64(str, "ascii");
 }
 
 /**
@@ -12,5 +12,5 @@ export function decodeBase64ToAscii(str: string) {
  * @param encoding
  */
 export function decodeBase64(str: string, encoding: BufferEncoding) {
-    return Buffer.from(str, 'base64').toString(encoding);
+    return Buffer.from(str, "base64").toString(encoding);
 }

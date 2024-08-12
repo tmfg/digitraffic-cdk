@@ -51,21 +51,13 @@ export class DigitrafficStack extends Stack {
 
     readonly configuration: StackConfiguration;
 
-    constructor(
-        scope: Construct,
-        id: string,
-        configuration: StackConfiguration
-    ) {
+    constructor(scope: Construct, id: string, configuration: StackConfiguration) {
         super(scope, id, configuration.stackProps);
 
         this.configuration = configuration;
 
         if (configuration.secretId) {
-            this.secret = Secret.fromSecretNameV2(
-                this,
-                "Secret",
-                configuration.secretId
-            );
+            this.secret = Secret.fromSecretNameV2(this, "Secret", configuration.secretId);
         }
 
         // VPC reference construction requires vpcId and availability zones
@@ -83,40 +75,33 @@ export class DigitrafficStack extends Stack {
             this.lambdaDbSg = SecurityGroup.fromSecurityGroupId(
                 this,
                 "LambdaDbSG",
-                configuration.lambdaDbSgId
+                configuration.lambdaDbSgId,
             );
         }
 
         this.alarmTopic = Topic.fromTopicArn(
             this,
             "AlarmTopic",
-            StringParameter.fromStringParameterName(
-                this,
-                "AlarmTopicParam",
-                SSM_KEY_ALARM_TOPIC
-            ).stringValue
+            StringParameter.fromStringParameterName(this, "AlarmTopicParam", SSM_KEY_ALARM_TOPIC).stringValue,
         );
         this.warningTopic = Topic.fromTopicArn(
             this,
             "WarningTopic",
-            StringParameter.fromStringParameterName(
-                this,
-                "WarningTopicParam",
-                SSM_KEY_WARNING_TOPIC
-            ).stringValue
+            StringParameter.fromStringParameterName(this, "WarningTopicParam", SSM_KEY_WARNING_TOPIC)
+                .stringValue,
         );
 
         this.addAspects();
     }
 
     addAspects() {
-        Aspects.of(this).add(new StackCheckingAspect(this.configuration.shortName, this.configuration.whitelistedResources));
+        Aspects.of(this).add(
+            new StackCheckingAspect(this.configuration.shortName, this.configuration.whitelistedResources),
+        );
     }
 
     createLambdaEnvironment(): DBLambdaEnvironment {
-        return this.createDefaultLambdaEnvironment(
-            this.configuration.shortName
-        );
+        return this.createDefaultLambdaEnvironment(this.configuration.shortName);
     }
 
     createDefaultLambdaEnvironment(dbApplication: string): DBLambdaEnvironment {

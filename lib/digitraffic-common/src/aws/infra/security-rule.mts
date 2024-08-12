@@ -1,7 +1,7 @@
-import {Construct} from "constructs";
-import {Rule} from "aws-cdk-lib/aws-events";
-import type {ITopic} from "aws-cdk-lib/aws-sns";
-import {SnsTopic} from "aws-cdk-lib/aws-events-targets";
+import { Construct } from "constructs";
+import { Rule } from "aws-cdk-lib/aws-events";
+import type { ITopic } from "aws-cdk-lib/aws-sns";
+import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
 
 /**
  * Automatic rule for Security Hub.  Send notification to given topic if the following conditions apply:
@@ -19,14 +19,14 @@ export class DigitrafficSecurityRule extends Rule {
                 detailType: ["Security Hub Findings - Imported"],
                 detail: {
                     findings: {
-                        "Compliance": {
-                            "Status": ["FAILED"],
+                        Compliance: {
+                            Status: ["FAILED"],
                         },
-                        "Workflow": {
-                            "Status": ["NEW"],
+                        Workflow: {
+                            Status: ["NEW"],
                         },
-                        "Severity": {
-                            "Label": ["HIGH", "CRITICAL"],
+                        Severity: {
+                            Label: ["HIGH", "CRITICAL"],
                         },
                     },
                 },

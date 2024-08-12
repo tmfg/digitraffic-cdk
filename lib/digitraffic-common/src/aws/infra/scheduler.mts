@@ -5,12 +5,7 @@ import { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 
 export class Scheduler extends Rule {
-    constructor(
-        stack: Construct,
-        ruleName: string,
-        schedule: Schedule,
-        lambda?: AWSFunction
-    ) {
+    constructor(stack: Construct, ruleName: string, schedule: Schedule, lambda?: AWSFunction) {
         super(stack, ruleName, { ruleName, schedule });
 
         if (lambda) {
@@ -18,26 +13,12 @@ export class Scheduler extends Rule {
         }
     }
 
-    static everyMinute(
-        stack: Construct,
-        ruleName: string,
-        lambda?: AWSFunction
-    ) {
+    static everyMinute(stack: Construct, ruleName: string, lambda?: AWSFunction) {
         return Scheduler.every(stack, ruleName, Duration.minutes(1), lambda);
     }
 
-    static everyMinutes(
-        stack: Construct,
-        ruleName: string,
-        minutes: number,
-        lambda?: AWSFunction
-    ) {
-        return Scheduler.every(
-            stack,
-            ruleName,
-            Duration.minutes(minutes),
-            lambda
-        );
+    static everyMinutes(stack: Construct, ruleName: string, minutes: number, lambda?: AWSFunction) {
+        return Scheduler.every(stack, ruleName, Duration.minutes(minutes), lambda);
     }
 
     static everyHour(stack: Construct, ruleName: string, lambda?: AWSFunction) {
@@ -48,12 +29,7 @@ export class Scheduler extends Rule {
         return Scheduler.every(stack, ruleName, Duration.days(1), lambda);
     }
 
-    static every(
-        stack: Construct,
-        ruleName: string,
-        duration: Duration,
-        lambda?: AWSFunction
-    ) {
+    static every(stack: Construct, ruleName: string, duration: Duration, lambda?: AWSFunction) {
         return new Scheduler(stack, ruleName, Schedule.rate(duration), lambda);
     }
 }

@@ -25,7 +25,6 @@
     // Enable when migrating to 5.0
     // "verbatimModuleSyntax": true,
     "verbatimModuleSyntax": true
-
   },
   "include": ["src/**/*.mts"],
   "$schema": "https://json.schemastore.org/tsconfig"

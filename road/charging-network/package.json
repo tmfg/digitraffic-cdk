@@ -6,7 +6,6 @@
   "scripts": {
     "build": "heft build --clean && npm run build:bundle",
     "build:bundle": "npm run compile-lambdas",
-    "build:bundle_": "npm run compile-lambdas && npm run compile-canaries",
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node20",
@@ -22,16 +21,17 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.7.2-1",
-    "aws-cdk-lib": "~2.135.0",
-    "axios": "^1.6.5",
-    "compare-versions": "^6.1.0",
+    "@digitraffic/common": "2024.7.8-1",
+    "aws-cdk-lib": "~2.151.0",
+    "axios": "^1.7.2",
+    "compare-versions": "^6.1.1",
     "constructs": "10.3.0",
     "geojson": "^0.5.0",
-    "pg-native": "^3.0.1",
-    "pg-promise": "^11.5.0",
+    "pg-native": "^3.1.0",
+    "pg-promise": "^11.8.0",
     "spex": "^3.3.0",
-    "uuid": "^9.0.0"
+    "uuid": "^10.0.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -39,21 +39,21 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "^29.7.0",
-    "@rushstack/eslint-config": "^3.7.0",
-    "@rushstack/heft": "^0.66.19",
-    "@rushstack/heft-jest-plugin": "^0.12.1",
-    "@types/aws-lambda": "8.10.140",
+    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/heft": "^0.66.25",
+    "@rushstack/heft-jest-plugin": "^0.12.7",
+    "@types/aws-lambda": "8.10.143",
     "@types/geojson": "^7946.0.14",
-    "@types/heft-jest": "1.0.6",
+    "@types/heft-jest": "^1.0.6",
     "@types/jest": "29.5.12",
-    "@types/lodash": "4.17.6",
-    "@types/node": "20.14.9",
+    "@types/lodash": "4.17.7",
+    "@types/node": "^20.14.9",
     "@types/semver": "7.5.8",
-    "@types/sinon": "17.0.2",
-    "@types/uuid": "9.0.7",
-    "esbuild": "^0.23.0",
+    "@types/sinon": "17.0.3",
+    "@types/uuid": "10.0.0",
+    "esbuild": "0.23.0",
     "eslint": "^8.57.0",
-    "lodash": "^4.17.21",
-    "typescript": "~5.4.5"
+    "typescript": "~5.5.4",
+    "nock": "^13.5.4"
   }
 }

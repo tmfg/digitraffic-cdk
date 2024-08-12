@@ -17,7 +17,9 @@ const sqsExtendedClient = createExtendedSqsClient() satisfies ExtendedSqsClient;
 export const handler: (apiGWRequest: APIGatewayEvent) => Promise<ResponseValue> =
     handlerFn(sqsExtendedClient);
 
-export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (request: APIGatewayEvent) => Promise<ResponseValue> {
+export function handlerFn(
+    sqsExtendedClient: ExtendedSqsClient
+): (request: APIGatewayEvent) => Promise<ResponseValue> {
     return async (apiGWRequest: APIGatewayEvent): Promise<ResponseValue> => {
         const method = "MaintenanceTracking.updateQueue" as const;
         const start = Date.now();
@@ -40,7 +42,7 @@ export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (request: APIGa
             // Send command
             const sendCommand: SendMessageCommandInput = {
                 QueueUrl: sqsQueueUrl,
-                MessageBody: apiGWRequest.body,
+                MessageBody: apiGWRequest.body
                 // Only for FIFO
                 //MessageDeduplicationId: MaintenanceTrackingService.createMaintenanceTrackingMessageHash(apiGWRequest.body)
             };
@@ -57,7 +59,7 @@ export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (request: APIGa
             });
             return Promise.resolve(ok());
         } catch (e) {
-            logger.debug("maybeError: " + JSON.stringify(e))
+            logger.debug("maybeError: " + JSON.stringify(e));
             const error = getErrorMessage(e);
             logger.error({
                 method,
@@ -65,9 +67,7 @@ export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (request: APIGa
                 tookMs: Date.now() - start,
                 error: error
             });
-            return Promise.reject(
-                invalidRequest(`Error while sending message to SQS: ${error}`)
-            );
+            return Promise.reject(invalidRequest(`Error while sending message to SQS: ${error}`));
         }
     };
 }

@@ -22,11 +22,7 @@ const baseHeaders = {
 } as Record<string, string>;
 
 type CheckerFunction = (Res: IncomingMessage) => Promise<void>;
-type JsonCheckerFunction<T> = (
-    json: T,
-    body: string,
-    message: IncomingMessage
-) => Promise<void>;
+type JsonCheckerFunction<T> = (json: T, body: string, message: IncomingMessage) => Promise<void>;
 
 export class UrlChecker {
     private readonly requestOptions: RequestOptions;
@@ -63,17 +59,10 @@ export class UrlChecker {
     }
 
     static createV2(): Promise<UrlChecker> {
-        return this.create(
-            getEnvVariable(ENV_HOSTNAME),
-            getEnvVariable(ENV_API_KEY)
-        );
+        return this.create(getEnvVariable(ENV_HOSTNAME), getEnvVariable(ENV_API_KEY));
     }
 
-    expectStatus<T>(
-        statusCode: number,
-        url: string,
-        callback: JsonCheckerFunction<T>
-    ): Promise<void> {
+    expectStatus<T>(statusCode: number, url: string, callback: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {
             ...this.requestOptions,
             ...{
@@ -85,19 +74,12 @@ export class UrlChecker {
         return synthetics.executeHttpStep(
             `Verify ${statusCode} for ${url.replace(/auth=.*/, "")}`,
             requestOptions,
-            callback
+            callback,
         );
     }
 
-    expect200<T>(
-        url: string,
-        ...callbacks: JsonCheckerFunction<T>[]
-    ): Promise<void> {
-        const callback = async (
-            json: T,
-            body: string,
-            res: IncomingMessage
-        ) => {
+    expect200<T>(url: string, ...callbacks: JsonCheckerFunction<T>[]): Promise<void> {
+        const callback = async (json: T, body: string, res: IncomingMessage) => {
             await Promise.allSettled(callbacks.map((c) => c(json, body, res)));
         };
 
@@ -116,7 +98,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep(
             `Verify 404 for ${url}`,
             requestOptions,
-            validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN)
+            validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN),
         );
     }
 
@@ -132,7 +114,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep(
             `Verify 400 for ${url}`,
             requestOptions,
-            validateStatusCodeAndContentType(400, MediaType.TEXT_PLAIN)
+            validateStatusCodeAndContentType(400, MediaType.TEXT_PLAIN),
         );
     }
 
@@ -160,10 +142,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep(
             `Verify 403 for ${url}`,
             requestOptions,
-            validateStatusCodeAndContentType(
-                403,
-                mediaType ?? MediaType.APPLICATION_JSON
-            )
+            validateStatusCodeAndContentType(403, mediaType ?? MediaType.APPLICATION_JSON),
         );
     }
 
@@ -207,7 +186,7 @@ function getBodyFromResponse(response: IncomingMessage): Promise<string> {
  */
 function validateStatusCodeAndContentType(
     statusCode: number,
-    contentType: MediaType
+    contentType: MediaType,
 ): (Res: IncomingMessage) => Promise<void> {
     return (res: IncomingMessage) => {
         return new Promise((resolve) => {
@@ -219,7 +198,7 @@ function validateStatusCodeAndContentType(
             if (res.headers["content-type"] !== contentType) {
                 throw new Error(
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    `Wrong content-type ${res.headers["content-type"]!}`
+                    `Wrong content-type ${res.headers["content-type"]!}`,
                 );
             }
 
@@ -259,17 +238,13 @@ export class ResponseChecker {
         });
     }
 
-    checkJson<T>(
-        fn: (json: T, body: string, res: IncomingMessage) => void
-    ): CheckerFunction {
+    checkJson<T>(fn: (json: T, body: string, res: IncomingMessage) => void): CheckerFunction {
         return this.responseChecker((body: string, res: IncomingMessage) => {
             fn(JSON.parse(body) as unknown as T, body, res);
         });
     }
 
-    responseChecker(
-        fn: (body: string, res: IncomingMessage) => void
-    ): CheckerFunction {
+    responseChecker(fn: (body: string, res: IncomingMessage) => void): CheckerFunction {
         return async (res: IncomingMessage): Promise<void> => {
             if (!res.statusCode) {
                 throw new Error("statusCode missing");
@@ -287,7 +262,7 @@ export class ResponseChecker {
             if (res.headers["content-type"] !== this.contentType) {
                 throw new Error(
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    `Wrong content-type ${res.headers["content-type"]!}`
+                    `Wrong content-type ${res.headers["content-type"]!}`,
                 );
             }
 
@@ -299,9 +274,7 @@ export class ResponseChecker {
 }
 
 export class ContentChecker {
-    static checkJson<T>(
-        fn: (json: T, body: string, res: IncomingMessage) => void
-    ): CheckerFunction {
+    static checkJson<T>(fn: (json: T, body: string, res: IncomingMessage) => void): CheckerFunction {
         return async (res: IncomingMessage): Promise<void> => {
             const body = await getResponseBody(res);
 
@@ -309,9 +282,7 @@ export class ContentChecker {
         };
     }
 
-    static checkResponse(
-        fn: (body: string, res: IncomingMessage) => void
-    ): CheckerFunction {
+    static checkResponse(fn: (body: string, res: IncomingMessage) => void): CheckerFunction {
         return async (res: IncomingMessage): Promise<void> => {
             const body = await getResponseBody(res);
 
@@ -339,7 +310,7 @@ export class ContentTypeChecker {
             if (res.headers["content-type"] !== contentType) {
                 throw new Error(
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    `Wrong content-type ${res.headers["content-type"]!}`
+                    `Wrong content-type ${res.headers["content-type"]!}`,
                 );
             }
 
@@ -349,19 +320,15 @@ export class ContentTypeChecker {
 }
 
 export class GeoJsonChecker {
-    static validFeatureCollection(
-        fn?: (json: FeatureCollection) => void
-    ): CheckerFunction {
-        return ResponseChecker.forGeojson().checkJson(
-            (json: FeatureCollection) => {
-                Asserter.assertEquals(json.type, "FeatureCollection");
-                Asserter.assertTrue(isValidGeoJson(json));
+    static validFeatureCollection(fn?: (json: FeatureCollection) => void): CheckerFunction {
+        return ResponseChecker.forGeojson().checkJson((json: FeatureCollection) => {
+            Asserter.assertEquals(json.type, "FeatureCollection");
+            Asserter.assertTrue(isValidGeoJson(json));
 
-                if (fn) {
-                    fn(json);
-                }
+            if (fn) {
+                fn(json);
             }
-        );
+        });
     }
 }
 

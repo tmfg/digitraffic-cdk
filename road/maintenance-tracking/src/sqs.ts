@@ -44,6 +44,6 @@ export function createQueue(scope: Construct): QueueAndDLQ {
 }
 
 export interface QueueAndDLQ {
-    queue: Queue,
-    dlq: Queue
+    queue: Queue;
+    dlq: Queue;
 }

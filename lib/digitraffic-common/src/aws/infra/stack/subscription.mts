@@ -16,20 +16,16 @@ export function createSubscription(
     lambda: AWSFunction,
     lambdaName: string,
     logDestinationArn: string | undefined,
-    stack: Construct
+    stack: Construct,
 ): CfnSubscriptionFilter | undefined {
     if (logDestinationArn == undefined) {
         return undefined;
     }
-    const filter = new CfnSubscriptionFilter(
-        stack,
-        `${lambdaName}LogsSubscription`,
-        {
-            logGroupName: `/aws/lambda/${lambdaName}`,
-            filterPattern: "",
-            destinationArn: logDestinationArn,
-        }
-    );
+    const filter = new CfnSubscriptionFilter(stack, `${lambdaName}LogsSubscription`, {
+        logGroupName: `/aws/lambda/${lambdaName}`,
+        filterPattern: "",
+        destinationArn: logDestinationArn,
+    });
 
     filter.node.addDependency(lambda);
 
@@ -41,15 +37,11 @@ export class DigitrafficLogSubscriptions {
         const destinationArn = stack.configuration.logsDestinationArn;
         if (destinationArn !== undefined) {
             lambdas.forEach((lambda) => {
-                const filter = new CfnSubscriptionFilter(
-                    stack,
-                    `${lambda.givenName}LogsSubscription`,
-                    {
-                        logGroupName: `/aws/lambda/${lambda.givenName}`,
-                        filterPattern: "",
-                        destinationArn,
-                    }
-                );
+                const filter = new CfnSubscriptionFilter(stack, `${lambda.givenName}LogsSubscription`, {
+                    logGroupName: `/aws/lambda/${lambda.givenName}`,
+                    filterPattern: "",
+                    destinationArn,
+                });
 
                 filter.node.addDependency(lambda);
             });

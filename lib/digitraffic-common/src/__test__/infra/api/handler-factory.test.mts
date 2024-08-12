@@ -1,8 +1,5 @@
 import { HandlerFactory } from "../../../aws/infra/api/handler-factory.mjs";
-import type {
-    ErrorHandler,
-    LoggingHandler,
-} from "../../../aws/infra/api/handler-factory.mjs";
+import type { ErrorHandler, LoggingHandler } from "../../../aws/infra/api/handler-factory.mjs";
 import { DtLogger } from "../../../aws/runtime/dt-logger.mjs";
 import { LambdaResponse } from "../../../aws/types/lambda-response.mjs";
 import { jest } from "@jest/globals";
@@ -23,11 +20,9 @@ describe("handler-factory tests", () => {
     });
 
     test("test logging", async () => {
-        const loggingHandler: LoggingHandler = jest.fn(
-            (method: () => Promise<LambdaResponse>) => {
-                return method();
-            }
-        );
+        const loggingHandler: LoggingHandler = jest.fn((method: () => Promise<LambdaResponse>) => {
+            return method();
+        });
         const factory = new HandlerFactory().withLoggingHandler(loggingHandler);
         const method = jest.fn((method: unknown) => {
             return method as Promise<LambdaResponse>;

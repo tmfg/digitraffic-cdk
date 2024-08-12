@@ -1,0 +1,37 @@
+import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { RemovalPolicy, type Stack } from "aws-cdk-lib";
+import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder";
+import type { WafRules } from "./waf-rules.js";
+import { LogGroup } from "aws-cdk-lib/aws-logs";
+
+export function createWebAcl(stack: Stack, environment: string, rules: WafRules): CfnWebACL {
+    const aclBuilder = new AclBuilder(stack);
+
+    aclBuilder
+        .withAWSManagedRules(rules.awsCommonRules)
+        .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
+        .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
+        .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
+        .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
+
+    const acl = aclBuilder.build();
+
+    const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
+        // group name must begin with aws-waf-logs!!!!
+        logGroupName: `aws-waf-logs-${environment}`,
+        removalPolicy: RemovalPolicy.RETAIN
+    });
+
+    // logGroup.logGroupArn is not in the right format for this, so have to construct the arn manually
+    /*    new CfnLoggingConfiguration(stack, `AclLogConfig-${environment}`, {
+        logDestinationConfigs: [stack.formatArn({
+            arnFormat: ArnFormat.COLON_RESOURCE_NAME,
+            service: "logs",
+            resource: "log-group",
+            resourceName: logGroup.logGroupName
+          })],
+        resourceArn: acl.attrArn,
+    });*/
+
+    return acl;
+}

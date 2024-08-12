@@ -20,13 +20,7 @@ export class CanaryAlarm {
 
         if (params.alarm?.topicArn) {
             alarm.addAlarmAction(
-                new SnsAction(
-                    Topic.fromTopicArn(
-                        stack,
-                        `${alarmName}-action`,
-                        params.alarm.topicArn
-                    )
-                )
+                new SnsAction(Topic.fromTopicArn(stack, `${alarmName}-action`, params.alarm.topicArn)),
             );
         }
     }

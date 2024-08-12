@@ -334,9 +334,10 @@ export function upsertWorkMachine(db: DTTransaction, data: DbWorkMachine): Promi
     ]);
 }
 
-const PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKING = new pgPromise.PreparedStatement({
-    name: "PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_MACHINE_WITHOUT_NEXT",
-    text: `
+const PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKING =
+    new pgPromise.PreparedStatement({
+        name: "PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_MACHINE_WITHOUT_NEXT",
+        text: `
     select t.id
          , ST_AsGeoJSON(t.last_point) as last_point
          , t.end_time
@@ -356,7 +357,7 @@ const PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKIN
     group by t.id, t.end_time
     order by t.end_time desc
     limit 1`
-});
+    });
 
 export function findLatestNotFinishedTrackingForWorkMachine(
     db: DTDatabase,

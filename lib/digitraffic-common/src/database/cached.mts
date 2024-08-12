@@ -38,14 +38,14 @@ export async function updateCachedJson<T>(
     db: DTDatabase | DTTransaction,
     cacheKey: JSON_CACHE_KEY,
     value: T,
-    lastUpdated: Date
+    lastUpdated: Date,
 ): Promise<void> {
     await db.none(PS_UPDATE_CACHE_VALUE, [cacheKey, value, lastUpdated]);
 }
 
 export function getJsonFromCache<T>(
     db: DTDatabase | DTTransaction,
-    cacheKey: JSON_CACHE_KEY
+    cacheKey: JSON_CACHE_KEY,
 ): Promise<T | undefined> {
     return db
         .oneOrNone<CachedValue<T>>(PS_GET_CACHE_VALUE, [cacheKey])
@@ -54,11 +54,9 @@ export function getJsonFromCache<T>(
 
 export async function getFromCache<T>(
     db: DTDatabase | DTTransaction,
-    cacheKey: JSON_CACHE_KEY
+    cacheKey: JSON_CACHE_KEY,
 ): Promise<CachedValue<T> | undefined> {
-    return db
-        .oneOrNone<CachedValue<T>>(PS_GET_CACHE_VALUE, [cacheKey])
-        .then((result) => {
-            return result ?? undefined;
-        });
+    return db.oneOrNone<CachedValue<T>>(PS_GET_CACHE_VALUE, [cacheKey]).then((result) => {
+        return result ?? undefined;
+    });
 }

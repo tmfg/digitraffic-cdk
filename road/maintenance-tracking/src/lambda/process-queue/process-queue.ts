@@ -29,9 +29,12 @@ function getRdsHolder(): RdsHolder {
     return rdsHolder;
 }
 
-export const handler: (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> = handlerFn(sqsExtendedClient);
+export const handler: (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> =
+    handlerFn(sqsExtendedClient);
 
-export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
+export function handlerFn(
+    sqsExtendedClient: ExtendedSqsClient
+): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return async (event: SQSEvent): Promise<PromiseSettledResult<void>[]> => {
         const start = Date.now();
         await getRdsHolder().setCredentials();
@@ -51,11 +54,14 @@ export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (event: SQSEven
         // sqs-extended-client library needs ReceiveMessageCommandOutput to process and fetch the big message
         // from S3, but AWS Lambda SQS eventsource only delivers SQSEvent. Here we re-create dummy
         // ReceiveMessageCommandOutput with needed fields for sqs-extended-client
-        const receiveCommandOutputForSqsExtClient: ReceiveMessageCommandOutput = createSqsReceiveMessageCommandOutput(event);
+        const receiveCommandOutputForSqsExtClient: ReceiveMessageCommandOutput =
+            createSqsReceiveMessageCommandOutput(event);
 
         // logger.debug({ method, message: "output.Messages", value: receiveCommandOutputForSqsExtClient });
 
-        const extendedSqsMessage: ReceiveMessageCommandOutput = await sqsExtendedClient._processReceive(receiveCommandOutputForSqsExtClient);
+        const extendedSqsMessage: ReceiveMessageCommandOutput = await sqsExtendedClient._processReceive(
+            receiveCommandOutputForSqsExtClient
+        );
 
         if (!extendedSqsMessage.Messages) {
             logger.error({
@@ -69,7 +75,6 @@ export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (event: SQSEven
 
         return Promise.allSettled(
             extendedSqsMessage.Messages.map(async (m) => {
-
                 try {
                     if (m.Body) {
                         const tyokoneenKirjaus = JSON.parse(m.Body) as TyokoneenseurannanKirjaus;
@@ -102,4 +107,3 @@ export function handlerFn(sqsExtendedClient: ExtendedSqsClient): (event: SQSEven
         );
     };
 }
-

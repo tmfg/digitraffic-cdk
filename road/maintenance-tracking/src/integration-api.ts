@@ -51,11 +51,8 @@ export function createIntegrationApiAndHandlerLambda(
 function addServiceModelToIntegrationApi(integrationApi: RestApi): void {
     const tunnisteModel = addServiceModel("Tunniste", integrationApi, Tunniste);
     const organisaatioModel = addServiceModel("Organisaatio", integrationApi, Organisaatio);
-    const otsikkoModel = addServiceModel(
-        "Otsikko",
-        integrationApi,
-        createSchemaOtsikko(organisaatioModel.modelReference, tunnisteModel.modelReference)
-    );
+    const s = createSchemaOtsikko(organisaatioModel.modelReference, tunnisteModel.modelReference);
+    const otsikkoModel = addServiceModel("Otsikko", integrationApi, s);
     const koordinaattisijaintiModel = addServiceModel(
         "Koordinaattisijainti",
         integrationApi,
@@ -84,9 +81,7 @@ function addServiceModelToIntegrationApi(integrationApi: RestApi): void {
     );
 }
 
-function createUpdateMaintenanceTrackingApiGatewayResource(
-    integrationApi: RestApi
-): Resource {
+function createUpdateMaintenanceTrackingApiGatewayResource(integrationApi: RestApi): Resource {
     const apiResource = integrationApi.root
         .addResource("maintenance-tracking")
         .addResource("v1")

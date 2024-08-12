@@ -16,10 +16,9 @@ export function createExtendedSqsClient(): ExtendedSqsClient {
 }
 
 export function createSqsReceiveMessageCommandOutput(event: SQSEvent): ReceiveMessageCommandOutput {
-
-    const messages: Message[] = event.Records.map(r => {
+    const messages: Message[] = event.Records.map((r) => {
         const messageAttributes: Record<string, MessageAttributeValue> = {};
-        _.keys(r.messageAttributes).map(key => {
+        _.keys(r.messageAttributes).map((key) => {
             const value: SQSMessageAttribute | undefined = r.messageAttributes[key];
             // We are actually only interested of key: S3MessageBodyKey
             if (value?.stringValue && (value.dataType === "String" || value.dataType === "string")) {

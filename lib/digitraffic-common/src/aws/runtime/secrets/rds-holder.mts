@@ -12,11 +12,7 @@ export class RdsHolder {
     private readonly secretHolder;
 
     constructor(secretId: string) {
-        this.secretHolder = new SecretHolder<RdsSecret>(
-            secretId,
-            "",
-            RDS_SECRET_KEYS
-        );
+        this.secretHolder = new SecretHolder<RdsSecret>(secretId, "", RDS_SECRET_KEYS);
     }
 
     static create() {

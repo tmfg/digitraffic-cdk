@@ -39,9 +39,7 @@ describe("IdUtils tests", () => {
     });
 
     test("isValidIMO - fail with number larger than 9999999", () => {
-        expect(IdUtils.isValidIMO(getRandomNumber(9999999 + 1, 99999999))).toBe(
-            false
-        );
+        expect(IdUtils.isValidIMO(getRandomNumber(9999999 + 1, 99999999))).toBe(false);
     });
 
     test("isValidMMSI - success", () => {
@@ -49,14 +47,10 @@ describe("IdUtils tests", () => {
     });
 
     test("isValidMMSI - fail with number smaller than 100000000", () => {
-        expect(IdUtils.isValidMMSI(getRandomNumber(0, 100000000 - 1))).toBe(
-            false
-        );
+        expect(IdUtils.isValidMMSI(getRandomNumber(0, 100000000 - 1))).toBe(false);
     });
 
     test("isValidMMSI - fail with number larger than 999999999", () => {
-        expect(
-            IdUtils.isValidMMSI(getRandomNumber(999999999 + 1, 9999999999))
-        ).toBe(false);
+        expect(IdUtils.isValidMMSI(getRandomNumber(999999999 + 1, 9999999999))).toBe(false);
     });
 });

@@ -4,4 +4,3 @@ export function getErrorMessage(maybeError: unknown): string {
     }
     return String(maybeError);
 }
-

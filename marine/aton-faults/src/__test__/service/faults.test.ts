@@ -34,7 +34,7 @@ describe(
 
             //console.info(faultS124);
 
-            validateS124(faultS124);
+            await validateS124(faultS124);
         });
 
         test("findAllFaults", async () => {

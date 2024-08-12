@@ -19,18 +19,17 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         response: string,
         enableCors = true,
         apiKeyRequired = true,
-        headers: Record<string, string> = {}
+        headers: Record<string, string> = {},
     ) {
         if (enableCors) {
             headers = { ...headers, "Access-Control-Allow-Origin": "*" };
         }
 
-        const integrationResponse =
-            DigitrafficStaticIntegration.createIntegrationResponse(
-                response,
-                mediaType,
-                headers
-            );
+        const integrationResponse = DigitrafficStaticIntegration.createIntegrationResponse(
+            response,
+            mediaType,
+            headers,
+        );
 
         super({
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
@@ -43,9 +42,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         ["GET", "HEAD"].forEach((httpMethod) => {
             resource.addMethod(httpMethod, this, {
                 apiKeyRequired,
-                methodResponses: [
-                    DigitrafficStaticIntegration.createMethodResponse(headers),
-                ],
+                methodResponses: [DigitrafficStaticIntegration.createMethodResponse(headers)],
             });
         });
     }
@@ -55,7 +52,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         response: K,
         enableCors = true,
         apiKeyRequired = true,
-        headers: Record<string, string> = {}
+        headers: Record<string, string> = {},
     ) {
         return new DigitrafficStaticIntegration(
             resource,
@@ -63,14 +60,14 @@ export class DigitrafficStaticIntegration extends MockIntegration {
             JSON.stringify(response),
             enableCors,
             apiKeyRequired,
-            headers
+            headers,
         );
     }
 
     static createIntegrationResponse(
         response: string,
         mediaType: MediaType,
-        headers: Record<string, string> = {}
+        headers: Record<string, string> = {},
     ) {
         const params = mapRecord(headers, (entry) => ["method.response.header." + entry[0], `'${entry[1]}'`]);
 
@@ -79,7 +76,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
             responseTemplates: {
                 [mediaType]: response,
             },
-            responseParameters: params
+            responseParameters: params,
         };
     }
 
@@ -89,8 +86,8 @@ export class DigitrafficStaticIntegration extends MockIntegration {
 
         return {
             statusCode: "200",
-            responseParameters: prefixKeys("method.response.header.", entries)
-        }
+            responseParameters: prefixKeys("method.response.header.", entries),
+        };
     }
 }
 

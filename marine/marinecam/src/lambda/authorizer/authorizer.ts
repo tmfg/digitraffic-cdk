@@ -7,7 +7,8 @@ import type {
     Callback,
     Context,
     PolicyDocument,
-    Statement
+    Statement,
+    StatementEffect
 } from "aws-lambda";
 import type { CognitoUserSession } from "amazon-cognito-identity-js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -93,7 +94,7 @@ async function generatePolicy(
     } as AuthResponse;
 }
 
-function checkAuthorization(user: CognitoUserSession | undefined, group: string): string {
+function checkAuthorization(user: CognitoUserSession | undefined, group: string): StatementEffect {
     if (user) {
         const userGroups = user.getAccessToken().payload[KEY_COGNITO_GROUPS] as string[] | null;
 

@@ -5,7 +5,7 @@ import {
     JsonSchemaVersion,
     type MethodResponse,
     Model,
-  type IModel
+    type IModel,
 } from "aws-cdk-lib/aws-apigateway";
 import { dateFromIsoString } from "../../../utils/date-utils.mjs";
 
@@ -49,9 +49,7 @@ $util.base64Decode($inputRoot.body)`;
 
 export const getDeprecatedDefaultLambdaResponse = (sunset: string) => {
     const setDeprecationHeaders = `#set ($context.responseOverride.header.Deprecation = 'true')
-#set ($context.responseOverride.header.Sunset = '${dateFromIsoString(
-        sunset
-    ).toUTCString()}')`;
+#set ($context.responseOverride.header.Sunset = '${dateFromIsoString(sunset).toUTCString()}')`;
     return RESPONSE_DEFAULT_LAMBDA.concat(setDeprecationHeaders);
 };
 
@@ -111,7 +109,7 @@ export class DigitrafficMethodResponse {
         model: IModel,
         mediaType: MediaType,
         disableCors = false,
-        deprecation = false
+        deprecation = false,
     ): MethodResponse {
         return {
             statusCode,
@@ -131,35 +129,14 @@ export class DigitrafficMethodResponse {
     }
 
     static response200(model: IModel, mediaType = MediaType.APPLICATION_JSON) {
-        return DigitrafficMethodResponse.response(
-            "200",
-            model,
-            mediaType,
-            false
-        );
+        return DigitrafficMethodResponse.response("200", model, mediaType, false);
     }
 
-    static response500(
-        model = Model.EMPTY_MODEL,
-        mediaType = MediaType.APPLICATION_JSON
-    ) {
-        return DigitrafficMethodResponse.response(
-            "500",
-            model,
-            mediaType,
-            false
-        );
+    static response500(model = Model.EMPTY_MODEL, mediaType = MediaType.APPLICATION_JSON) {
+        return DigitrafficMethodResponse.response("500", model, mediaType, false);
     }
 
-    static response400(
-        model = Model.EMPTY_MODEL,
-        mediaType = MediaType.APPLICATION_JSON
-    ) {
-        return DigitrafficMethodResponse.response(
-            "400",
-            model,
-            mediaType,
-            false
-        );
+    static response400(model = Model.EMPTY_MODEL, mediaType = MediaType.APPLICATION_JSON) {
+        return DigitrafficMethodResponse.response("400", model, mediaType, false);
     }
 }

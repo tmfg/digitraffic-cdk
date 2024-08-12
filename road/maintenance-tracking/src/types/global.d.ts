@@ -3,11 +3,10 @@ declare module "sqs-extended-client" {
 
     export interface ExtendedSqsClientOptions {
         readonly bucketName: string;
-        readonly alwaysUseS3?: boolean,
+        readonly alwaysUseS3?: boolean;
         readonly sqsClientConfig?: {
-            readonly region?: string
-        },
-
+            readonly region?: string;
+        };
     }
 
     export class ExtendedSqsClient extends SQS {

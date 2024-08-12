@@ -55,10 +55,9 @@ export function insertMaintenanceTrackingObservationData(
         return t.batch(
             observations.map((observation) =>
                 db
-                    .oneOrNone<DbNumberId | undefined>(
-                        UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
-                        observation
-                    )
+                    .oneOrNone<
+                        DbNumberId | undefined
+                    >(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
                     .then((result) => (result === null ? undefined : result))
             )
         );
@@ -96,8 +95,7 @@ export async function cleanMaintenanceTrackingData(db: DTDatabase, hoursToKeep: 
         const deleteQuery = t.none(PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS, [hoursToKeep]);
         // These should and must be run in given order https://github.com/vitaly-t/pg-promise/issues/307
         try {
-            await t
-                .batch([cleanUpQuery, deleteQuery]);
+            await t.batch([cleanUpQuery, deleteQuery]);
         } catch (error) {
             logger.error({
                 method: "MaintenanceTrackingDao.cleanMaintenanceTrackingData",

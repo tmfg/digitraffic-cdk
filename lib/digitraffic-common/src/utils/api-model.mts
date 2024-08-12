@@ -5,8 +5,8 @@ import {
     RequestValidator,
     JsonSchemaType,
     JsonSchemaVersion,
-} from 'aws-cdk-lib/aws-apigateway';
-import type {ModelWithReference} from "../aws/types/model-with-reference.mjs";
+} from "aws-cdk-lib/aws-apigateway";
+import type { ModelWithReference } from "../aws/types/model-with-reference.mjs";
 
 /**
  * Get a reference to an OpenAPI model object in a REST API.
@@ -24,7 +24,7 @@ export function getModelReference(modelId: string, restApiId: string) {
  * @param api REST API
  */
 export function addDefaultValidator(api: RestApi): RequestValidator {
-    return api.addRequestValidator('DefaultValidator', {
+    return api.addRequestValidator("DefaultValidator", {
         validateRequestParameters: true,
         validateRequestBody: true,
     });
@@ -40,7 +40,7 @@ export function addDefaultValidator(api: RestApi): RequestValidator {
  */
 export function addServiceModel(modelName: string, api: RestApi, schema: JsonSchema): ModelWithReference {
     const mwr = api.addModel(modelName, {
-        contentType: 'application/json',
+        contentType: "application/json",
         modelName,
         schema,
     }) as ModelWithReference;
@@ -55,7 +55,11 @@ export function addServiceModel(modelName: string, api: RestApi, schema: JsonSch
  * @param api
  * @param contentType
  */
-export function addSimpleServiceModel(modelName: string, api: RestApi, contentType = 'application/xml'): Model {
+export function addSimpleServiceModel(
+    modelName: string,
+    api: RestApi,
+    contentType = "application/xml",
+): Model {
     return api.addModel(modelName, {
         contentType,
         modelName,
@@ -86,20 +90,20 @@ export function featureSchema(modelReference: string) {
     return {
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,
-        description: 'GeoJson Feature',
-        required: ['type', 'properties', 'geometry'],
+        description: "GeoJson Feature",
+        required: ["type", "properties", "geometry"],
         properties: {
             type: {
                 type: JsonSchemaType.STRING,
-                description: 'Feature',
-                enum: ['Feature'],
+                description: "Feature",
+                enum: ["Feature"],
             },
             properties: {
                 ref: modelReference,
             },
             geometry: {
                 type: JsonSchemaType.OBJECT,
-                description: 'GeoJSON geometry',
+                description: "GeoJSON geometry",
             },
         },
     };
@@ -114,13 +118,13 @@ export function geojsonSchema(modelReference: string) {
     return {
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,
-        description: 'GeoJson FeatureCollection',
-        required: ['type', 'features'],
+        description: "GeoJson FeatureCollection",
+        required: ["type", "features"],
         properties: {
             type: {
                 type: JsonSchemaType.STRING,
-                description: 'FeatureCollection',
-                enum: ['FeatureCollection'],
+                description: "FeatureCollection",
+                enum: ["FeatureCollection"],
             },
             features: {
                 type: JsonSchemaType.ARRAY,

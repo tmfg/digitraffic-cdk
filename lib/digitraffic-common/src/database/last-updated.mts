@@ -15,24 +15,21 @@ type UpdatedTimestamp = {
     updated: Date;
 } | null;
 
-export function getLastUpdated(
-    db: DTDatabase,
-    datatype: DataType
-): Promise<Date | null> {
+export function getLastUpdated(db: DTDatabase, datatype: DataType): Promise<Date | null> {
     return db.oneOrNone(
         "select updated from data_updated where data_type=$(datatype) and subtype=$(subtype)",
         {
             datatype: datatype,
             subtype: UNSET_SUBTYPE,
         },
-        (x: UpdatedTimestamp) => x?.updated ?? null
+        (x: UpdatedTimestamp) => x?.updated ?? null,
     );
 }
 
 export function getLastUpdatedWithSubtype(
     db: DTDatabase,
     datatype: DataType,
-    subtype: string
+    subtype: string,
 ): Promise<Date | null> {
     return db.oneOrNone(
         "SELECT updated FROM data_updated WHERE data_type=$(datatype) AND subtype=$(subtype)",
@@ -40,21 +37,21 @@ export function getLastUpdatedWithSubtype(
             datatype: datatype,
             subtype: subtype,
         },
-        (x: UpdatedTimestamp) => x?.updated ?? null
+        (x: UpdatedTimestamp) => x?.updated ?? null,
     );
 }
 
 export function updateLastUpdated(
     db: DTDatabase | DTTransaction,
     datatype: DataType,
-    updated: Date
+    updated: Date,
 ): Promise<null> {
     return db.none(
         `insert into data_updated(id, data_type, updated)
  values(nextval('seq_data_updated'), $(datatype), $(updated))
  on conflict (data_type, subtype)
  do update set updated = $(updated)`,
-        { updated, datatype }
+        { updated, datatype },
     );
 }
 
@@ -62,27 +59,24 @@ export function updateLastUpdatedWithSubtype(
     db: DTDatabase | DTTransaction,
     datatype: DataType,
     subtype: string,
-    updated: Date
+    updated: Date,
 ): Promise<null> {
     return db.none(
         `insert into data_updated(id, data_type, subtype, updated)
  values(nextval('seq_data_updated'), $(datatype), $(subtype), $(updated))
  on conflict (data_type, subtype)
  do update set updated = $(updated)`,
-        { updated, subtype, datatype }
+        { updated, subtype, datatype },
     );
 }
 
-export function getUpdatedTimestamp(
-    db: DTDatabase,
-    datatype: string
-): Promise<Date | null> {
+export function getUpdatedTimestamp(db: DTDatabase, datatype: string): Promise<Date | null> {
     return db.oneOrNone(
         "select updated_time as updated from updated_timestamp where updated_name=$(datatype)",
         {
             datatype: datatype,
         },
-        (x: UpdatedTimestamp) => x?.updated ?? null
+        (x: UpdatedTimestamp) => x?.updated ?? null,
     );
 }
 
@@ -90,13 +84,13 @@ export function updateUpdatedTimestamp(
     db: DTDatabase | DTTransaction,
     datatype: string,
     date: Date,
-    by = ""
+    by = "",
 ): Promise<null> {
     return db.none(
         `insert into updated_timestamp(updated_name, updated_time, updated_by)
 values($(datatype), $(date), $(by))
 on conflict (updated_name)
 do update set updated_time = $(date), updated_by = $(by)`,
-        { date, datatype, by }
+        { date, datatype, by },
     );
 }

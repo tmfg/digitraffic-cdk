@@ -34,12 +34,7 @@ export function createProcessQueueAndDlqLambda(
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
 ): void {
-    createProcessQueueLambda(
-        queueAndDLQ.queue,
-        sqsExtendedMessageBucketArn,
-        stackConfiguration,
-        stack
-    );
+    createProcessQueueLambda(queueAndDLQ.queue, sqsExtendedMessageBucketArn, stackConfiguration, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stackConfiguration, stack);
 }
 

@@ -6,10 +6,7 @@ import type {
     PolicyDocument,
     Statement
 } from "aws-lambda";
-import type {
-    APIGatewayRequestAuthorizerEvent,
-    APIGatewayRequestAuthorizerEventHeaders
-} from "aws-lambda/trigger/api-gateway-authorizer.js";
+import type { APIGatewayRequestAuthorizerEvent, APIGatewayRequestAuthorizerEventHeaders } from "aws-lambda";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";

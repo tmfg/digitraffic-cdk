@@ -32,11 +32,7 @@ export class DigitrafficCanaryRole extends Role {
     constructor(stack: Construct, canaryName: string) {
         super(stack, "canary-role-" + canaryName, {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            managedPolicies: [
-                ManagedPolicy.fromAwsManagedPolicyName(
-                    "CloudWatchSyntheticsFullAccess"
-                ),
-            ],
+            managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName("CloudWatchSyntheticsFullAccess")],
         });
 
         this.addToPolicy(new PolicyStatement(BASE_POLICY_STATEMENT_PROPS));
@@ -51,9 +47,7 @@ export class DigitrafficCanaryRole extends Role {
         // this.addToPolicy(new PolicyStatement(DB_STATEMENT_PROPS));
         // Works
         this.addManagedPolicy(
-            ManagedPolicy.fromAwsManagedPolicyName(
-                "service-role/AWSLambdaVPCAccessExecutionRole"
-            )
+            ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole"),
         );
         return this;
     }
@@ -64,9 +58,7 @@ export class DigitrafficCanaryRole extends Role {
      */
     withVpcAccess(): this {
         this.addManagedPolicy(
-            ManagedPolicy.fromAwsManagedPolicyName(
-                "service-role/AWSLambdaVPCAccessExecutionRole"
-            )
+            ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole"),
         );
         return this;
     }

@@ -77,9 +77,7 @@ export function convertToDbObservationData(
     };
 }
 
-export async function handleMessage(
-    payload: TyokoneenseurannanKirjaus
-): Promise<void> {
+export async function handleMessage(payload: TyokoneenseurannanKirjaus): Promise<void> {
     const method = `${service}.handleMessage` satisfies LoggerMethodType;
     const trackingJson = payload;
     const trackingJsonString = JSON.stringify(payload);
@@ -101,9 +99,7 @@ export async function handleMessage(
 
     try {
         const start = Date.now();
-        const insertCount: number = await saveMaintenanceTrackingObservationData(
-            observationDatas
-        );
+        const insertCount: number = await saveMaintenanceTrackingObservationData(observationDatas);
         const end = Date.now();
         logger.info({
             method,

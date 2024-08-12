@@ -38,12 +38,7 @@ export function importValue(environmentName: string, name: string): string {
 /**
  * Export value as stack output.  Use same naming pattern as importValue.
  */
-export function exportValue(
-    stack: Stack,
-    environmentName: string,
-    name: string,
-    value: string
-) {
+export function exportValue(stack: Stack, environmentName: string, name: string, value: string) {
     const exportName = outputName(environmentName, name);
 
     new CfnOutput(stack, exportName, {

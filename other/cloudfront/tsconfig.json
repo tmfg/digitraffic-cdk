@@ -1,10 +1,6 @@
 {
-  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-cdk-old.json",
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
   "compilerOptions": {
-    "lib": ["es2022"],
-    "target": "es2022",
-    "outDir": "dist/out",
-    "resolveJsonModule": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
@@ -12,8 +8,6 @@
     "inlineSources": false,
     "strictPropertyInitialization": false,
     "preserveSymlinks": true,
-    "exactOptionalPropertyTypes": false,
     "allowJs": true
-  },
-  "include": ["bin/**/*.ts", "lib/**/*.ts"]
+  }
 }

@@ -4,7 +4,7 @@ import { type SQSEvent, type SQSRecord } from "aws-lambda";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { S3Client } from "@aws-sdk/client-s3";
-import { type Handler } from 'aws-lambda';
+import { type Handler } from "aws-lambda";
 const s3 = new S3Client();
 const bucketName = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME);
 

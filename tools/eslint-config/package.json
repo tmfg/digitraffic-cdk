@@ -10,10 +10,10 @@
     "test": ""
   },
   "peerDependencies": {
-    "@rushstack/eslint-config": "^3.0.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@rushstack/eslint-config": "^3.7.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
     "eslint": "^8.57.0",
     "eslint-plugin-deprecation": "^3.0.0",
-    "typescript": "^5.4.4"
+    "typescript": "~5.5.2"
   }
 }

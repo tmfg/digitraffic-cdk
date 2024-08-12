@@ -4,7 +4,7 @@ import { LambdaResponse } from "../../types/lambda-response.mjs";
 
 export type LoggingHandler = (
     method: () => Promise<LambdaResponse>,
-    logger: DtLogger
+    logger: DtLogger,
 ) => Promise<LambdaResponse>;
 
 export type ErrorHandler = (error: unknown, logger: DtLogger) => LambdaResponse;
@@ -31,11 +31,7 @@ export class HandlerFactory {
             try {
                 return await method();
             } finally {
-                console.info(
-                    "method=%s.handler tookMs=%d",
-                    functionName,
-                    Date.now() - start
-                );
+                console.info("method=%s.handler tookMs=%d", functionName, Date.now() - start);
             }
         };
 
@@ -54,10 +50,7 @@ export class HandlerFactory {
         return this;
     }
 
-    createEventHandler(
-        handler: (event: unknown) => Promise<LambdaResponse>,
-        logger: DtLogger
-    ) {
+    createEventHandler(handler: (event: unknown) => Promise<LambdaResponse>, logger: DtLogger) {
         return async (event: unknown) => {
             return await this.loggingHandler(async () => {
                 try {

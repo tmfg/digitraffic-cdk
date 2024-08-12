@@ -17,5 +17,4 @@ type OptionalProperties<Obj> = Pick<Obj, OptionalKeys<Obj>>;
 /**
  * Adds `null` as an accepted type to all optional properties in given type. Required properties remain unchanged.
  */
-export type NullableOptional<Obj> = RequiredProperties<Obj> &
-    Nullable<OptionalProperties<Obj>>;
+export type NullableOptional<Obj> = RequiredProperties<Obj> & Nullable<OptionalProperties<Obj>>;

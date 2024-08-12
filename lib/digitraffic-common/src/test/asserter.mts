@@ -7,9 +7,7 @@ type AssertedValue = string | number;
 export abstract class Asserter {
     static assertEquals(value: AssertedValue, expected: AssertedValue) {
         if (value != expected) {
-            throw new Error(
-                `Given value ${value} was not expected ${expected}`
-            );
+            throw new Error(`Given value ${value} was not expected ${expected}`);
         }
     }
 
@@ -25,9 +23,7 @@ export abstract class Asserter {
         }
 
         if (data.length != expected) {
-            throw new Error(
-                `Given array length ${data.length} was not expected ${expected}`
-            );
+            throw new Error(`Given array length ${data.length} was not expected ${expected}`);
         }
     }
 
@@ -37,17 +33,13 @@ export abstract class Asserter {
         }
 
         if (data.length <= expected) {
-            throw new Error(
-                `Given array length ${data.length} was not greater than ${expected}`
-            );
+            throw new Error(`Given array length ${data.length} was not greater than ${expected}`);
         }
     }
 
     static assertGreaterThan(value: number, expected: number) {
         if (value <= expected) {
-            throw new Error(
-                `Value ${value} was expected to be greater than ${expected}`
-            );
+            throw new Error(`Value ${value} was expected to be greater than ${expected}`);
         }
     }
 

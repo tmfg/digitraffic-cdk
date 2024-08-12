@@ -50,7 +50,7 @@ export function initDbConnection(
     password: string,
     applicationName: string,
     url: string,
-    options?: object
+    options?: object,
 ): DTDatabase {
     const finalUrl = `postgresql://${username}:${password}@${url}?application_name=${applicationName}`;
 
@@ -58,9 +58,7 @@ export function initDbConnection(
     return pgp(finalUrl, options);
 }
 
-export function inTransaction<T>(
-    fn: (db: DTTransaction) => Promise<T>
-): Promise<T> {
+export function inTransaction<T>(fn: (db: DTTransaction) => Promise<T>): Promise<T> {
     return inDatabase((db) => db.tx((t: DTTransaction) => fn(t)));
 }
 
@@ -68,19 +66,14 @@ export function inDatabase<T>(fn: (db: DTDatabase) => Promise<T>): Promise<T> {
     return doInDatabase(false, fn);
 }
 
-export function inDatabaseReadonly<T>(
-    fn: (db: DTDatabase) => Promise<T>
-): Promise<T> {
+export function inDatabaseReadonly<T>(fn: (db: DTDatabase) => Promise<T>): Promise<T> {
     return doInDatabase(true, fn);
 }
 
-async function doInDatabase<T>(
-    readonly: boolean,
-    fn: (db: DTDatabase) => Promise<T>
-): Promise<T> {
+async function doInDatabase<T>(readonly: boolean, fn: (db: DTDatabase) => Promise<T>): Promise<T> {
     const db_application = getEnvVariableOrElse(
         DatabaseEnvironmentKeys.DB_APPLICATION,
-        "unknown-cdk-application"
+        "unknown-cdk-application",
     );
     const db_uri = readonly
         ? getEnvVariable(DatabaseEnvironmentKeys.DB_RO_URI)
@@ -90,7 +83,7 @@ async function doInDatabase<T>(
         getEnvVariable(DatabaseEnvironmentKeys.DB_USER),
         getEnvVariable(DatabaseEnvironmentKeys.DB_PASS),
         db_application,
-        db_uri
+        db_uri,
     );
     try {
         // deallocate all prepared statements to allow for connection pooling

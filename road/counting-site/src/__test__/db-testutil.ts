@@ -1,6 +1,5 @@
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { DataType } from "@digitraffic/common/dist/database/last-updated";
-import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
@@ -71,25 +70,4 @@ export async function insertLastUpdated(db: DTDatabase, id: number, updated: Dat
             [id, DataType.COUNTING_SITES_DATA, updated]
         );
     });
-}
-
-export async function withServer(
-    port: number,
-    url: string,
-    response: string,
-    fn: (server: TestHttpServer) => Promise<void>
-): Promise<void> {
-    const server = new TestHttpServer();
-
-    const props = {
-        [url]: () => response
-    };
-
-    server.listen(port, props, false);
-
-    try {
-        await fn(server);
-    } finally {
-        await server.close();
-    }
 }

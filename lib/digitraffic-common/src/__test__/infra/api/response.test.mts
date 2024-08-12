@@ -3,7 +3,7 @@ import etag from "etag";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
 //const velocity = require("velocityjs");
-import velocity from "velocityjs"
+import velocity from "velocityjs";
 
 const TEST_BODY = "Hello world!";
 
@@ -16,9 +16,7 @@ interface VelocityContext {
 
 describe("response tests", () => {
     function generateEtagValueFromString(body: string) {
-        return generateEtagValueFromBase64String(
-            Buffer.from(body).toString("base64")
-        );
+        return generateEtagValueFromBase64String(Buffer.from(body).toString("base64"));
     }
     function generateEtagValueFromBase64String(bodyBase64: string) {
         return etag(bodyBase64);
@@ -27,12 +25,12 @@ describe("response tests", () => {
     function generateResponse(
         status: number,
         fileName?: string,
-        timestamp?: Date
+        timestamp?: Date,
     ): [string, VelocityContext] {
         // eslint-disable-next-line
         const compile = new velocity.Compile(
             // eslint-disable-next-line
-            velocity.parse(RESPONSE_DEFAULT_LAMBDA)
+            velocity.parse(RESPONSE_DEFAULT_LAMBDA),
         );
         // eslint-disable-next-line
         const output = compile.render({
@@ -46,8 +44,7 @@ describe("response tests", () => {
                 }),
             },
             util: {
-                base64Decode: (data: string) =>
-                    Buffer.from(data, "base64").toString(),
+                base64Decode: (data: string) => Buffer.from(data, "base64").toString(),
             },
             context: {
                 responseOverride: {
@@ -74,7 +71,7 @@ describe("response tests", () => {
         status?: number,
         contentType?: string,
         fileName?: string,
-        timestamp?: Date
+        timestamp?: Date,
     ) {
         expect(output).toEqual(TEST_BODY);
         expect(context).toMatchObject({
@@ -100,13 +97,7 @@ describe("response tests", () => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
         const [output, context] = generateResponse(200, "test.txt");
 
-        assertOutputAndContext(
-            output,
-            context,
-            undefined,
-            undefined,
-            'attachment; filename="test.txt"'
-        );
+        assertOutputAndContext(output, context, undefined, undefined, 'attachment; filename="test.txt"');
     });
 
     test("test 200 - filename and timestamp", () => {
@@ -114,14 +105,7 @@ describe("response tests", () => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
         const [output, context] = generateResponse(200, "test.txt", now);
 
-        assertOutputAndContext(
-            output,
-            context,
-            undefined,
-            undefined,
-            'attachment; filename="test.txt"',
-            now
-        );
+        assertOutputAndContext(output, context, undefined, undefined, 'attachment; filename="test.txt"', now);
     });
 
     test("test 204", () => {

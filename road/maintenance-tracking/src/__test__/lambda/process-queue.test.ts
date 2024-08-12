@@ -27,7 +27,6 @@ let extendedSqsClient: ExtendedSqsClient;
 describe(
     "process-queue",
     dbTestBase((db: DTDatabase) => {
-
         beforeEach(() => {
             extendedSqsClient = createExtendedSqsClient();
             mockSecrets({});
@@ -42,8 +41,9 @@ describe(
                 Messages: [],
                 $metadata: {}
             };
-            const extendedSqsClientStub =
-                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(output));
+            const extendedSqsClientStub = jest
+                .spyOn(extendedSqsClient, "_processReceive")
+                .mockReturnValue(Promise.resolve(output));
             const event = { Records: [] } satisfies SQSEvent;
 
             await expect(handlerFn(extendedSqsClient)(event)).rejects.toMatch("SQSEvent records was empty.");
@@ -57,12 +57,16 @@ describe(
 
             // Output without big message json as it's in S3
             const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
-            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [json]);
-            const extendedSqsClientStub =
-                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [
+                json
+            ]);
+            const extendedSqsClientStub = jest
+                .spyOn(extendedSqsClient, "_processReceive")
+                .mockReturnValue(Promise.resolve(bigOutputFromS3));
 
-            await expect(handlerFn(extendedSqsClient)(event))
-                .resolves.toMatchObject([{ status: "fulfilled" }]);
+            await expect(handlerFn(extendedSqsClient)(event)).resolves.toMatchObject([
+                { status: "fulfilled" }
+            ]);
 
             expect(extendedSqsClientStub).toHaveBeenCalledWith(outputWithRefToS3);
 
@@ -86,13 +90,15 @@ describe(
             const json2 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
 
             const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
-            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [json1, json2]);
-            const extendedSqsClientStub =
-                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [
+                json1,
+                json2
+            ]);
+            const extendedSqsClientStub = jest
+                .spyOn(extendedSqsClient, "_processReceive")
+                .mockReturnValue(Promise.resolve(bigOutputFromS3));
 
-            await expect(
-                handlerFn(extendedSqsClient)(event)
-            ).resolves.toMatchObject([
+            await expect(handlerFn(extendedSqsClient)(event)).resolves.toMatchObject([
                 { status: "fulfilled", value: undefined },
                 { status: "fulfilled", value: undefined }
             ]);
@@ -116,12 +122,16 @@ describe(
 
             // Output without big message json as it's in S3
             const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
-            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [json]);
-            const extendedSqsClientStub =
-                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [
+                json
+            ]);
+            const extendedSqsClientStub = jest
+                .spyOn(extendedSqsClient, "_processReceive")
+                .mockReturnValue(Promise.resolve(bigOutputFromS3));
 
-            await expect(handlerFn(extendedSqsClient)(event))
-                .resolves.toMatchObject([{ status: "rejected" }]);
+            await expect(handlerFn(extendedSqsClient)(event)).resolves.toMatchObject([
+                { status: "rejected" }
+            ]);
 
             expect(extendedSqsClientStub).toHaveBeenCalledWith(outputWithRefToS3);
 
@@ -137,10 +147,14 @@ describe(
             const event = createSQSEventWithBodies(["invalidJsonS2Ref", "validJsonS3Ref"]);
             // Output without big message json as it's in S3
             const outputWithRefToS3 = createSqsReceiveMessageCommandOutput(event);
-            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [invalidJson, validJson]);
+            const bigOutputFromS3 = createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3, [
+                invalidJson,
+                validJson
+            ]);
 
-            const extendedSqsClientStub =
-                jest.spyOn(extendedSqsClient, "_processReceive").mockReturnValue(Promise.resolve(bigOutputFromS3));
+            const extendedSqsClientStub = jest
+                .spyOn(extendedSqsClient, "_processReceive")
+                .mockReturnValue(Promise.resolve(bigOutputFromS3));
 
             await expect(handlerFn(extendedSqsClient)(event)).resolves.toMatchObject([
                 { status: "rejected" },
@@ -178,7 +192,10 @@ describe(
     })
 );
 
-function createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3: ReceiveMessageCommandOutput, jsons: string[]): ReceiveMessageCommandOutput {
+function createCopyOfSqsReceiveMessageCommandOutputAndFillBody(
+    outputWithRefToS3: ReceiveMessageCommandOutput,
+    jsons: string[]
+): ReceiveMessageCommandOutput {
     const outputValueWithBigJsonFromS3 = _.cloneDeep(outputWithRefToS3);
     jsons.forEach((json, index) => {
         if (outputValueWithBigJsonFromS3.Messages && outputValueWithBigJsonFromS3.Messages[index]) {
@@ -189,4 +206,3 @@ function createCopyOfSqsReceiveMessageCommandOutputAndFillBody(outputWithRefToS3
     });
     return outputValueWithBigJsonFromS3;
 }
-

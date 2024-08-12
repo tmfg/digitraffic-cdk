@@ -83,7 +83,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.stackName,
-                    "Production is not set for Production-stack"
+                    "Production is not set for Production-stack",
                 );
             }
         }
@@ -95,13 +95,13 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.reservedConcurrentConcurrency,
-                    "Function must have reservedConcurrentConcurrency"
+                    "Function must have reservedConcurrentConcurrency",
                 );
             } else if (node.reservedConcurrentExecutions > MAX_CONCURRENCY_LIMIT) {
                 this.addAnnotation(
                     node,
                     ResourceType.reservedConcurrentConcurrency,
-                    "Function reservedConcurrentConcurrency too high!"
+                    "Function reservedConcurrentConcurrency too high!",
                 );
             }
 
@@ -117,7 +117,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.functionRuntime,
-                    `Function has wrong runtime ${node.runtime}!`
+                    `Function has wrong runtime ${node.runtime}!`,
                 );
             }
 
@@ -129,7 +129,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.functionName,
-                    `Function name does not begin with ${this.stackShortName}`
+                    `Function name does not begin with ${this.stackShortName}`,
                 );
             }
         }
@@ -193,7 +193,7 @@ export class StackCheckingAspect implements IAspect {
                     const name = split[3];
 
                     if (name === undefined) {
-                        throw Error('Name should not be undefined');
+                        throw Error("Name should not be undefined");
                     }
 
                     if (type === "querystring" && !StackCheckingAspect.isValidQueryString(name)) {
@@ -215,13 +215,13 @@ export class StackCheckingAspect implements IAspect {
     private checkLogGroupRetention(node: IConstruct) {
         if (node instanceof LogRetention) {
             const child = node.node.defaultChild as unknown as Record<string, Record<string, string>>;
-            const retention = child?.['_cfnProperties']?.['RetentionInDays'];
+            const retention = child?.["_cfnProperties"]?.["RetentionInDays"];
 
             if (!retention) {
                 this.addAnnotation(
                     node,
                     ResourceType.logGroupRetention,
-                    "Log group must define log group retention"
+                    "Log group must define log group retention",
                 );
             }
         }
