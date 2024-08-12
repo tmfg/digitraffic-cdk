@@ -19,12 +19,11 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
             callback(err);
             throw err;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const request: CloudFrontRequest = record.cf.request;
 
         if (isOptionsRequest(request)) {
             const response = {
-                status: 204,
+                status: "204",
                 statusDescription: "No Content",
                 headers: {
                     "access-control-max-age": [
@@ -39,7 +38,7 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
             callback(null, response);
         } else if (!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {
             const response = {
-                status: 406,
+                status: "406",
                 statusDescription: "Not Acceptable",
                 body: "Use of gzip compression is required with Accept-Encoding: gzip header."
             };

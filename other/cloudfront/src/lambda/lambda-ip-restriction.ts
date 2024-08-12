@@ -14,7 +14,7 @@ const VERSION_HEADERS = "EXT_VERSION";
  */
 
 const FORBIDDEN = {
-    status: 403,
+    status: "403",
     statusDescription: "Forbidden"
 };
 
@@ -27,7 +27,6 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
             callback(err);
             throw err;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const request: CloudFrontRequest = record.cf.request;
 
         if (ALLOWED_IPS.indexOf(request.clientIp) === -1) {
