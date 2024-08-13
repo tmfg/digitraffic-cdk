@@ -23,13 +23,14 @@ export type AWSManagedWafRule =
 export class AclBuilder {
     readonly _construct: Construct;
     readonly _rules: CfnWebACL.RuleProperty[] = [];
+    readonly _name: string;
 
     _scope: string = "CLOUDFRONT";
-    _name: string = "WebACL";
     _customResponseBodies: Record<string, CfnWebACL.CustomResponseBodyProperty> = {};
 
-    constructor(construct: Construct) {
+    constructor(construct: Construct, name="WebACL") {
         this._construct = construct;
+        this._name = name;
     }
 
     isRuleDefined(rules: AWSManagedWafRule[] | "all", rule: AWSManagedWafRule) {
@@ -116,7 +117,7 @@ export class AclBuilder {
         if (key in this._customResponseBodies) {
             logger.warn({
                 method: "acl-builder.withCustomResponseBody",
-                message: `Overriding custom response body with key ${key}`,
+                message: `Overriding custom response body with key ${key} for distribution ${this._name}`,
             });
         }
         this._customResponseBodies[key] = customResponseBody;
@@ -207,7 +208,7 @@ export class AclBuilder {
     _logMissingLimit(method: string) {
         logger.warn({
             method: `acl-builder.${method}`,
-            message: `'limit' was not defined. Not setting a throttle rule`,
+            message: `'limit' was not defined. Not setting a throttle rule for ${this._name}`,
         });
     }
 

@@ -61,13 +61,13 @@ export function createWeathercamHttpHeaders(stack: Stack, edgeLambdaRole: Role):
 }
 
 export function createIndexHtml(stack: Stack): Cloudfront.Function {
-    const body = readBodyWithVersion("lib/lambda/lambda-index-html.js");
+    const body = readBodyWithVersion("src/lambda/lambda-index-html.js");
 
     return createCloudfrontFunction(stack, "index-html", body);
 }
 
 export function createHistoryPath(stack: Stack): Cloudfront.Function {
-    const body = readBodyWithVersion("lib/lambda/lambda-redirect-history.js");
+    const body = readBodyWithVersion("src/lambda/lambda-redirect-history.js");
 
     return createCloudfrontFunction(stack, "history-redirect", body);
 }
@@ -117,7 +117,7 @@ export function createFunction(
     functionBody: string
 ): AWSFunction {
     return new AWSFunction(stack, functionName, {
-        runtime: Runtime.NODEJS_18_X,
+        runtime: Runtime.NODEJS_20_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
         handler: "index.handler",
