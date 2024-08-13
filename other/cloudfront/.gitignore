@@ -15,5 +15,6 @@
 !/src/
 !/src/**/
 !/src/**/*.ts
+!/src/lambda/*.js
 !/src/__test__/**/*.xsd
 /src/bin
