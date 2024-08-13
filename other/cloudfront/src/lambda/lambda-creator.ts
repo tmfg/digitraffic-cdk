@@ -28,7 +28,7 @@ function readBodyWithVersion(fileName: string): string {
 }
 
 export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role): Version {
-    const body = readBodyWithVersion("lib/lambda/lambda-gzip-requirement.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-gzip-requirement.js");
 
     return createVersionedFunction(stack, edgeLambdaRole, "gzip-requirement", body);
 }
@@ -39,7 +39,7 @@ export function createWeathercamRedirect(
     domainName: string,
     hostName: string
 ): Version {
-    const body = readBodyWithVersion("lib/lambda/lambda-redirect.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-redirect.js");
     const functionBody = body
         .toString()
         .replace(/EXT_HOST_NAME/gi, hostName)
@@ -49,13 +49,13 @@ export function createWeathercamRedirect(
 }
 
 export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
-    const body = readBodyWithVersion("lib/lambda/lambda-http-headers.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-http-headers.js");
 
     return createVersionedFunction(stack, edgeLambdaRole, "http-headers", body);
 }
 
 export function createWeathercamHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
-    const body = readBodyWithVersion("lib/lambda/lambda-weathercam-http-headers.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-weathercam-http-headers.js");
 
     return createVersionedFunction(stack, edgeLambdaRole, "weathercam-http-headers", body);
 }
@@ -78,14 +78,14 @@ export function createIpRestriction(
     path: string,
     ipList: string
 ): Version {
-    const body = readBodyWithVersion("lib/lambda/lambda-ip-restriction.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-ip-restriction.js");
     const functionBody = body.toString().replace(/EXT_IP/gi, ipList);
 
     return createVersionedFunction(stack, edgeLambdaRole, `ip-restriction-${path}`, functionBody);
 }
 
 export function createLamRedirect(stack: Stack, edgeLambdaRole: Role, smRef: string): Version {
-    const body = readBodyWithVersion("lib/lambda/lambda-lam-redirect.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-lam-redirect.js");
     const edgeLambda = createFunction(stack, edgeLambdaRole, "lam-redirect", body);
 
     // Allow read-access to secrets manager
@@ -95,7 +95,7 @@ export function createLamRedirect(stack: Stack, edgeLambdaRole: Role, smRef: str
 }
 
 export function createLamHeaders(stack: Stack, edgeLambdaRole: Role): Version {
-    const body = readBodyWithVersion("lib/lambda/lambda-lam-headers.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-lam-headers.js");
 
     return createVersionedFunction(stack, edgeLambdaRole, "lam-headers", body);
 }
@@ -117,7 +117,7 @@ export function createFunction(
     functionBody: string
 ): AWSFunction {
     return new AWSFunction(stack, functionName, {
-        runtime: Runtime.NODEJS_18_X,
+        runtime: Runtime.NODEJS_20_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
         handler: "index.handler",
