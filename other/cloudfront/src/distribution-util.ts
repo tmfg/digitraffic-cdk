@@ -22,7 +22,7 @@ export function createViewerCertificate(acmCertificateArn: string, aliases: stri
 
 function doCreateWebAcl(stack: Stack, props: DistributionProps): CfnWebACL | undefined {
     if (props.aclRules) {
-        return createWebAcl(stack, props.environmentName, props.aclRules);
+        return createWebAcl(stack, props.environmentName, props.aclRules, props.distributionName);
     }
 
     return undefined;

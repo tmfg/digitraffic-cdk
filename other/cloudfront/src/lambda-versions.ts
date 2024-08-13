@@ -18,7 +18,7 @@ async function* walk(dir: string): AsyncGenerator<string> {
     possible to version lambdas(new version needs changes in source code)
  */
 async function main(): Promise<void> {
-    for await (const file of walk("dist/lambda")) {
+    for await (const file of walk("lib/lambda")) {
         let fileContent = await fs.readFile(file, {
             encoding: "utf-8"
         });
