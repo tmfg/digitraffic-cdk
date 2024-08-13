@@ -16,30 +16,6 @@ VALUES (:messageId, :trainNumber, :trainDepartureDate, :attapId, :ud, :ut)
 ON DUPLICATE KEY UPDATE
     unknown_delay = :ud,
     unknown_track = :ut`;
-/*
-
-create table rami_udot (
-    rami_message_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    train_number INT UNSIGNED NOT NULL,
-    train_departure_date DATE NOT NULL,
-	attap_id BIGINT UNSIGNED NOT NULL, 
-    created_db DATETIME DEFAULT CURRENT_TIMESTAMP,
-	modified_db DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-   	model_updated_time DATETIME,
-	unknown_track BOOLEAN NOT NULL, 
-	unknown_delay BOOLEAN NOT NULL
-);
-
-create unique index rami_udot_at_u on rami_udot(train_departure_date, train_number, attap_id);
-create index rami_udot_created_i on rami_udot(created_db);
-
-create trigger rami_udot_before_update BEFORE UPDATE on rami_udot for each row BEGIN 
-	IF (OLD.unknown_track <> NEW.unknown_track OR OLD.unknown_delay <> NEW.unknown_delay) THEN
-	   set new.model_updated_time = null;	
-    END IF;
-END
-
-*/
 
 export interface UdotUpsertValues {
     readonly trainNumber: number

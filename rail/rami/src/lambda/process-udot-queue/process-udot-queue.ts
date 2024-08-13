@@ -19,6 +19,7 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
 
                     logger.info({
                         method: "RAMI-ProcessUDOTQueue.handler",
+                        message: `processing ${udotMessage.trainNumber} ${udotMessage.departureDate}`,
                         customCount: udotMessage.data.length
                     })
 

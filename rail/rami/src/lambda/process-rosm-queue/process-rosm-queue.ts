@@ -4,11 +4,7 @@ import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
 import { parseRosmMessage, processRosmMessage } from "../../service/process-rosm-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { sendToSqs } from "../../util/sqs.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { RamiEnvKeys } from "../../keys.js";
-
-const DLQ_URL = getEnvVariable(RamiEnvKeys.DLQ_URL);
+import { sendDlq } from "../../service/sqs-service.js";
 
 export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return async (event: SQSEvent) => {
@@ -28,10 +24,12 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                         logException(logger, error);
                         // send original message to dlq on error
                         
-                        await sendToSqs(
-                            DLQ_URL,
-                            `[{"errors":"${JSON.stringify(error)}"}, ${recordBody}}]`
-                        );
+                        await sendDlq({
+                            messageType: "ROSM",
+                            errors: JSON.stringify(error),
+                            message: recordBody
+                        });
+
                         return Promise.reject(error);
                     }
                 }

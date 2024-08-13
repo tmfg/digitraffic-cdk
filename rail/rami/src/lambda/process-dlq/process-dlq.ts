@@ -21,14 +21,23 @@ export const handler = async (event: DlqEvent): Promise<void> => {
     });
 
     const uploads = event.Records.map((e, idx: number) => {
-        const dlqMessage = JSON.parse(e.body) as DlqMessage;
-        const body = `[{"errors":"${dlqMessage.errors}"}, ${JSON.stringify(dlqMessage.message)}]`
-        const fileName = `${dlqMessage.messageType}/message-${millis}-${idx}.json`;
+        logger.debug("event " + JSON.stringify(e));
 
-        return uploadToS3(bucketName, body, fileName)
-    });
+        try {
+            const dlqMessage = JSON.parse(e.body) as DlqMessage;
+            const body = `[{"errors":"${dlqMessage.errors}"}, ${JSON.stringify(dlqMessage.message)}]`
+            const folder = `${dlqMessage.messageType}/${new Date().toISOString().substring(0, 10)}`;
+            const fileName = `${folder}/message-${millis}-${idx}.json`;
 
-    await Promise.allSettled(uploads).catch((error): void => {
-        logException(logger, error);
-    });
+            logger.debug("Uploading to " + fileName);
+
+            return uploadToS3(bucketName, body, fileName)
+        } catch(error) {
+            logException(logger, error);
+
+            return Promise.resolve();
+        }
+     });
+
+    await Promise.allSettled(uploads);
 };
