@@ -23,13 +23,14 @@ export type AWSManagedWafRule =
 export class AclBuilder {
     readonly _construct: Construct;
     readonly _rules: CfnWebACL.RuleProperty[] = [];
+    readonly _name: string;
 
     _scope: string = "CLOUDFRONT";
-    _name: string = "WebACL";
     _customResponseBodies: Record<string, CfnWebACL.CustomResponseBodyProperty> = {};
 
-    constructor(construct: Construct) {
+    constructor(construct: Construct, name="WebACL") {
         this._construct = construct;
+        this._name = name;
     }
 
     isRuleDefined(rules: AWSManagedWafRule[] | "all", rule: AWSManagedWafRule) {
@@ -88,7 +89,7 @@ export class AclBuilder {
         limit: number,
         customResponseBodyKey: string,
         isHeaderRequired: boolean,
-        isBasedOnIpAndUriPath: boolean
+        isBasedOnIpAndUriPath: boolean,
     ): AclBuilder {
         this._rules.push({
             name,
@@ -116,7 +117,7 @@ export class AclBuilder {
         if (key in this._customResponseBodies) {
             logger.warn({
                 method: "acl-builder.withCustomResponseBody",
-                message: `Overriding custom response body with key ${key}`,
+                message: `Overriding custom response body with key ${key} for distribution ${this._name}`,
             });
         }
         this._customResponseBodies[key] = customResponseBody;
@@ -136,7 +137,7 @@ export class AclBuilder {
             limit,
             customResponseBodyKey,
             true,
-            false
+            false,
         );
     }
 
@@ -153,7 +154,7 @@ export class AclBuilder {
             limit,
             customResponseBodyKey,
             true,
-            true
+            true,
         );
     }
 
@@ -170,7 +171,7 @@ export class AclBuilder {
             limit,
             customResponseBodyKey,
             false,
-            false
+            false,
         );
     }
 
@@ -187,7 +188,7 @@ export class AclBuilder {
             limit,
             customResponseBodyKey,
             false,
-            true
+            true,
         );
     }
 
@@ -207,7 +208,7 @@ export class AclBuilder {
     _logMissingLimit(method: string) {
         logger.warn({
             method: `acl-builder.${method}`,
-            message: `'limit' was not defined. Not setting a throttle rule`,
+            message: `'limit' was not defined. Not setting a throttle rule for ${this._name}`,
         });
     }
 
@@ -220,7 +221,7 @@ export class AclBuilder {
 
         if (uniqueRuleNames.size != this._rules.length) {
             throw new Error(
-                "Tried to create an Access Control List with multiple rules having the same name"
+                "Tried to create an Access Control List with multiple rules having the same name",
             );
         }
 
@@ -274,7 +275,7 @@ function notStatement(statement: CfnWebACL.StatementProperty): CfnWebACL.Stateme
 function createThrottleStatement(
     limit: number,
     isHeaderRequired: boolean,
-    isBasedOnIpAndUriPath: boolean
+    isBasedOnIpAndUriPath: boolean,
 ): CfnWebACL.StatementProperty {
     // this statement matches empty digitraffic-user -header
     const matchStatement: CfnWebACL.StatementProperty = {
@@ -366,7 +367,7 @@ function createRuleProperty(
     name: string,
     priority: number,
     rule: RuleProperty,
-    overrideAction: boolean = true
+    overrideAction: boolean = true,
 ): CfnWebACL.RuleProperty {
     return {
         ...{
