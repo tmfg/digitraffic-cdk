@@ -78,13 +78,13 @@ function createProcessUdotQueueLambda(stack: DigitrafficStack, queue: Queue, dlq
         [RamiEnvKeys.DLQ_URL]: dlq.queueUrl
     };
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-udot-queue", lambdaEnv, {
-        memorySize: 256,
+        memorySize: 512,
         reservedConcurrentExecutions: 2,
-        timeout: 10
+        timeout: 15
     });
     processQueueLambda.addEventSource(new SqsEventSource(queue, {
         reportBatchItemFailures: true,
-        batchSize: 30,
+        batchSize: 25,
         maxBatchingWindow: Duration.seconds(5),
         maxConcurrency: 2
     }));
@@ -100,10 +100,11 @@ function createDeleteOldDataLambda(stack: DigitrafficStack): MonitoredFunction {
     const deleteOldDataLambda = MonitoredDBFunction.create(stack, "delete-old-data", lambdaEnv, {
         memorySize: 128,
         reservedConcurrentExecutions: 1,
-        timeout: 10
+        timeout: 30
     });
 
-    Scheduler.everyDay(stack, "schedule-every-day", deleteOldDataLambda);
+    // cleaning every hour, otherwise rami-sm-messages will grow too big and delete will be too slow
+    Scheduler.everyHour(stack, "schedule-every-hour", deleteOldDataLambda);
 
     return deleteOldDataLambda;
 }
