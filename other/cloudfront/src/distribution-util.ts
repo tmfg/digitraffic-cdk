@@ -7,7 +7,7 @@ import type { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront";
 
 import { createWebAcl } from "./acl/acl-creator.js";
 import type { CFProps, DistributionProps } from "./app-props.js";
-import _ from "lodash";
+import { get } from "lodash-es";
 
 export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
     return {
@@ -95,7 +95,8 @@ function addRealtimeLogging(
 
     if (bucketLogging) {
         const { bucket, prefix } = bucketLogging;
-        const alias = _.get(distributionProps, "aliasNames[0]", "default");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
+        const alias = get(distributionProps, "aliasNames[0]", "default");
         distributionCf.addPropertyOverride("DistributionConfig.Logging.Bucket", bucket);
         distributionCf.addPropertyOverride("DistributionConfig.Logging.Prefix", `${prefix}/${alias}`);
     }

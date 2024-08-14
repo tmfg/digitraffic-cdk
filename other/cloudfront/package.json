@@ -21,16 +21,16 @@
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff CloudfrontRoadTest",
     "cdk-diff-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test deploy CloudfrontStatusTest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
-    "compile-lambdas": "esbuild src/lambda/**/*.ts src/lambda/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node20,es2022",
+    "compile-lambdas": "rollup -c",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.8.13-1",
+    "@digitraffic/common": "2024.8.14-1",
     "aws-cdk-lib": "~2.151.0",
     "constructs": "10.3.0",
-    "lodash": "~4.17.21"
+    "lodash-es": "~4.17.21"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -44,7 +44,7 @@
     "@types/aws-lambda": "8.10.143",
     "@types/heft-jest": "^1.0.6",
     "@types/jest": "^29.5.12",
-    "@types/lodash": "4.17.7",
+    "@types/lodash-es": "4.17.7",
     "@types/node": "^20.14.8",
     "aws-sdk": "~2.1670.0",
     "esbuild": "0.23.0",
@@ -55,6 +55,12 @@
     "parallelshell": "3.0.2",
     "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "rollup": "^4.20.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "globby": "^14.0.2"
   }
 }

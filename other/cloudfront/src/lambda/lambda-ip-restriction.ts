@@ -1,5 +1,4 @@
-import type { CloudFrontRequest, CloudFrontRequestEventRecord, CloudFrontRequestHandler } from "aws-lambda";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
 import { createAndLogError } from "../lambda-util.js";
 
 const ALLOWED_IPS = "EXT_IP".split(",");

@@ -6,6 +6,7 @@
 !/.gitignore
 !/cdk.json
 !/jest.config.js
+!/rollup.config.js
 !/*.json
 !/*.md
 !/*.sh
