@@ -16,7 +16,7 @@ import {
     type MonitoredFunctionParameters,
 } from "./lambda-configs.mjs";
 import { TrafficType } from "../../../types/traffictype.mjs";
-import _ from "lodash";
+import { chain } from "lodash-es";
 
 /**
  * Allows customization of CloudWatch Alarm properties
@@ -119,7 +119,7 @@ export class MonitoredFunction extends Function {
     ): MonitoredFunction {
         const functionName =
             functionParameters?.functionName ??
-            `${stack.configuration.shortName}-${_.chain(name)
+            `${stack.configuration.shortName}-${chain(name)
                 .camelCase()
                 .startCase()
                 .replace(/\s/g, "")
@@ -307,7 +307,7 @@ export class MonitoredDBFunction {
     ): MonitoredFunction {
         const functionName =
             functionParameters?.functionName ??
-            `${stack.configuration.shortName}-${_.chain(name)
+            `${stack.configuration.shortName}-${chain(name)
                 .camelCase()
                 .startCase()
                 .replace(/\s/g, "")

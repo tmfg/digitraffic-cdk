@@ -7,7 +7,7 @@ import { CfnMethod, CfnResource } from "aws-cdk-lib/aws-apigateway";
 import { CfnQueue } from "aws-cdk-lib/aws-sqs";
 import { LogRetention } from "aws-cdk-lib/aws-logs";
 import { kebabCase } from "change-case";
-import _ from "lodash";
+import { snakeCase } from "lodash-es";
 
 const MAX_CONCURRENCY_LIMIT = 100;
 const NODE_RUNTIMES = [Runtime.NODEJS_20_X.name, Runtime.NODEJS_18_X.name];
@@ -175,7 +175,7 @@ export class StackCheckingAspect implements IAspect {
     }
 
     private static isValidQueryString(name: string) {
-        return _.snakeCase(name) === name;
+        return snakeCase(name) === name;
     }
 
     private checkResourceCasing(node: IConstruct) {

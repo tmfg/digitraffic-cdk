@@ -1,5 +1,5 @@
-import { Writable } from "stream";
-import _ from "lodash";
+import type { Writable } from "stream";
+import { mapKeys, lowerFirst } from "lodash-es";
 
 /** Logging level */
 export type LOG_LEVEL = "DEBUG" | "INFO" | "WARN" | "ERROR";
@@ -170,7 +170,7 @@ export class DtLogger {
 }
 
 function removePrefix(prefix: string, loggable: LoggableType) {
-    return _.mapKeys(loggable, (_index, key: string) =>
-        key.startsWith(prefix) ? _.lowerFirst(key.replace(prefix, "")) : key,
+    return mapKeys(loggable, (_index, key: string) =>
+        key.startsWith(prefix) ? lowerFirst(key.replace(prefix, "")) : key,
     );
 }

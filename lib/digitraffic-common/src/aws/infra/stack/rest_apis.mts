@@ -22,7 +22,7 @@ import { DocumentationPart, type DocumentationProperties } from "../documentatio
 import { createDefaultUsagePlan, createUsagePlan } from "../usage-plans.mjs";
 import { DigitrafficStack } from "./stack.mjs";
 
-import _ from "lodash";
+import { set } from "lodash-es";
 
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];
@@ -102,7 +102,7 @@ export class DigitrafficRestApi extends RestApi {
     }
 
     private getModelWithReference(model: Model): ModelWithReference {
-        return _.set(
+        return set(
             model,
             "modelReference",
             getModelReference(model.modelId, this.restApiId),
