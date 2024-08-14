@@ -7,7 +7,7 @@ import { CfnMethod, CfnResource } from "aws-cdk-lib/aws-apigateway";
 import { CfnQueue } from "aws-cdk-lib/aws-sqs";
 import { LogRetention } from "aws-cdk-lib/aws-logs";
 import { kebabCase } from "change-case";
-import _ from "lodash";
+import { snakeCase } from "lodash-es";
 
 const MAX_CONCURRENCY_LIMIT = 100;
 const NODE_RUNTIMES = [Runtime.NODEJS_20_X.name, Runtime.NODEJS_18_X.name];
@@ -83,7 +83,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.stackName,
-                    "Production is not set for Production-stack"
+                    "Production is not set for Production-stack",
                 );
             }
         }
@@ -95,13 +95,13 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.reservedConcurrentConcurrency,
-                    "Function must have reservedConcurrentConcurrency"
+                    "Function must have reservedConcurrentConcurrency",
                 );
             } else if (node.reservedConcurrentExecutions > MAX_CONCURRENCY_LIMIT) {
                 this.addAnnotation(
                     node,
                     ResourceType.reservedConcurrentConcurrency,
-                    "Function reservedConcurrentConcurrency too high!"
+                    "Function reservedConcurrentConcurrency too high!",
                 );
             }
 
@@ -117,7 +117,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.functionRuntime,
-                    `Function has wrong runtime ${node.runtime}!`
+                    `Function has wrong runtime ${node.runtime}!`,
                 );
             }
 
@@ -129,7 +129,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.functionName,
-                    `Function name does not begin with ${this.stackShortName}`
+                    `Function name does not begin with ${this.stackShortName}`,
                 );
             }
         }
@@ -175,7 +175,7 @@ export class StackCheckingAspect implements IAspect {
     }
 
     private static isValidQueryString(name: string) {
-        return _.snakeCase(name) === name;
+        return snakeCase(name) === name;
     }
 
     private checkResourceCasing(node: IConstruct) {
@@ -221,7 +221,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(
                     node,
                     ResourceType.logGroupRetention,
-                    "Log group must define log group retention"
+                    "Log group must define log group retention",
                 );
             }
         }

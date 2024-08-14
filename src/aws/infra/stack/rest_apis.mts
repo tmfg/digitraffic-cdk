@@ -22,7 +22,7 @@ import { DocumentationPart, type DocumentationProperties } from "../documentatio
 import { createDefaultUsagePlan, createUsagePlan } from "../usage-plans.mjs";
 import { DigitrafficStack } from "./stack.mjs";
 
-import _ from "lodash";
+import { set } from "lodash-es";
 
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];
@@ -33,7 +33,7 @@ export class DigitrafficRestApi extends RestApi {
         apiId: string,
         apiName: string,
         allowFromIpAddresses?: string[] | undefined,
-        config?: Partial<RestApiProps>
+        config?: Partial<RestApiProps>,
     ) {
         const policyDocument =
             allowFromIpAddresses == null
@@ -87,7 +87,7 @@ export class DigitrafficRestApi extends RestApi {
                 contentType: MediaType.APPLICATION_JSON,
                 modelName,
                 schema,
-            })
+            }),
         );
     }
 
@@ -97,15 +97,15 @@ export class DigitrafficRestApi extends RestApi {
                 contentType: MediaType.TEXT_CSV,
                 modelName,
                 schema: {},
-            })
+            }),
         );
     }
 
     private getModelWithReference(model: Model): ModelWithReference {
-        return _.set(
+        return set(
             model,
             "modelReference",
-            getModelReference(model.modelId, this.restApiId)
+            getModelReference(model.modelId, this.restApiId),
         ) as ModelWithReference;
     }
 
@@ -114,7 +114,7 @@ export class DigitrafficRestApi extends RestApi {
         parameterName: string,
         resourceName: string,
         type: string,
-        properties: DocumentationProperties
+        properties: DocumentationProperties,
     ) {
         const location: CfnDocumentationPart.LocationProperty = {
             type,
@@ -137,8 +137,8 @@ export class DigitrafficRestApi extends RestApi {
                     dp.parameterName,
                     `${resource.path}.${dp.parameterName}.Documentation`,
                     dp.type,
-                    dp.documentationProperties
-                )
+                    dp.documentationProperties,
+                ),
             );
         } else {
             console.info("Skipping documentation for %s", resource.path);
@@ -205,7 +205,7 @@ export function setReturnCodeForMissingAuthenticationToken(
     returnCode: number,
     message: string,
     restApi: RestApi,
-    stack: Construct
+    stack: Construct,
 ) {
     new GatewayResponse(stack, `MissingAuthenticationTokenResponse-${restApi.restApiName}`, {
         restApi,
@@ -221,7 +221,7 @@ export function createRestApi(
     stack: Construct,
     apiId: string,
     apiName: string,
-    allowFromIpAddresses?: string[] | undefined
+    allowFromIpAddresses?: string[] | undefined,
 ): RestApi {
     const policyDocument =
         allowFromIpAddresses == null
