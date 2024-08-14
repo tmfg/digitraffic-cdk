@@ -1,4 +1,6 @@
-export const esQueries = [
+// OpenSearch queries
+// the json keys of queries are intentionally left quoted - easier to copy and paste elsewhere when necessary
+export const osQueries = [
     {
         name: 'Http req',
         query:
@@ -7,7 +9,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -35,7 +37,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:* AND @fields.status:200",
+                                "query": "NOT log_line:* AND accountName:* AND httpStatusCode:200",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -59,12 +61,12 @@ export const esQueries = [
         name: 'Bytes out',
         query:
             {
-                "aggs": {"agg": {"sum": {"field": "@fields.body_bytes_sent"}}},
+                "aggs": {"agg": {"sum": {"field": "bytes"}}},
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -88,12 +90,12 @@ export const esQueries = [
         name: 'Unique IPs',
         query:
             {
-                "aggs": {"agg": {"cardinality": {"field": "@fields.remote_addr.keyword"}}},
+                "aggs": {"agg": {"cardinality": {"field": "clientIp"}}},
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -120,7 +122,7 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_referrer.keyword",
+                            "field": "httpReferrer.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
                             "size": 10
@@ -131,7 +133,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -158,7 +160,7 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_digitraffic_user.keyword",
+                            "field": "httpDigitrafficUser.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
                             "size": 100
@@ -169,7 +171,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -196,18 +198,18 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_digitraffic_user.keyword",
+                            "field": "httpDigitrafficUser.keyword",
                             "order": {"agg": "desc"},
                             "missing": "__missing__",
                             "size": 100
-                        }, "aggs": {"agg": {"sum": {"field": "@fields.body_bytes_sent"}}}
+                        }, "aggs": {"agg": {"sum": {"field": "bytes"}}}
                     }
                 },
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -234,7 +236,7 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_user_agent.keyword",
+                            "field": "agent.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
                             "size": 10
@@ -245,7 +247,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -269,12 +271,12 @@ export const esQueries = [
         name: 'Top 10 IPs',
         query:
             {
-                "aggs": {"agg": {"terms": {"field": "@fields.remote_addr.keyword", "size": 10}}},
+                "aggs": {"agg": {"terms": {"field": "clientIp", "size": 10}}},
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
