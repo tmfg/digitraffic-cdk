@@ -12,7 +12,7 @@ export type AppField = "message" | "loggerType" | "messageType" | "messages" | "
 export type NginxField = "@timestamp";
 
 // prettier-ignore
-export type CloudfrontField = "@timestamp" | "env" | "clientCountryCode" | "edgeDetailedResultType" | "edgeLocation" | "edgeResultType" | "httpMethod" | "httpStatusCode" | "request" | "subdomain" | "timeToFirstByte"
+export type CloudfrontField = "@timestamp" | "env" | "clientCountryCode" | "edgeDetailedResultType" | "edgeLocation" | "edgeResultType" | "httpMethod" | "httpStatusCode" | "request" | "subdomain" | "timeToFirstByte" | "httpHost"
 
 export type HttpUserAgentField = "@fields.http_user_agent";
 
