@@ -12,11 +12,19 @@ import { Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import * as s3 from "aws-cdk-lib/aws-s3";
 
 export interface Props {
-    elasticSearchEndpoint: string;
-    elasticSearchDomainArn: string;
-    slackWebhook: string;
-    mysql: { password: string; database: string; host: string; user: string };
-    allowedIpAddresses: string[];
+    readonly elasticSearchEndpoint: string;
+    readonly elasticSearchDomainArn: string;
+    readonly slackWebhook: string;
+    readonly mysql: {
+        readonly password: string;
+        readonly database: string;
+        readonly host: string;
+        readonly user: string;
+    };
+    readonly allowedIpAddresses: string[];
+    readonly marineAccountName: string;
+    readonly railAccountName: string;
+    readonly roadAccountName: string;
 }
 
 const allowedIps = ["0.0.0.0/0"];
@@ -162,7 +170,10 @@ export class EsKeyFiguresStack extends Stack {
                 MYSQL_USERNAME: esKeyFiguresProps.mysql.user,
                 MYSQL_PASSWORD: esKeyFiguresProps.mysql.password,
                 MYSQL_DATABASE: esKeyFiguresProps.mysql.database,
-                SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook
+                SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook,
+                MARINE_ACCOUNT_NAME: esKeyFiguresProps.marineAccountName,
+                RAIL_ACCOUNT_NAME: esKeyFiguresProps.railAccountName,
+                ROAD_ACCOUNT_NAME: esKeyFiguresProps.roadAccountName
             }
         };
         const collectEsKeyFiguresLambda = new Function(this, functionName, lambdaConf);

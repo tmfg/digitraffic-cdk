@@ -19,6 +19,10 @@ const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 0, 
 const KEY_FIGURES_TABLE_NAME = "key_figures";
 const DUPLICATES_TABLE_NAME = "duplicates";
 
+const MARINE_ACCOUNT_NAME = getEnvVariable("MARINE_ACCOUNT_NAME");
+const RAIL_ACCOUNT_NAME = getEnvVariable("RAIL_ACCOUNT_NAME");
+const ROAD_ACCOUNT_NAME = getEnvVariable("ROAD_ACCOUNT_NAME");
+
 const mysqlOpts = {
     host: getEnvVariable("MYSQL_ENDPOINT"),
     user: getEnvVariable("MYSQL_USERNAME"),
@@ -85,9 +89,9 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
         method: "collect-es-key-figures.handler"
     });
 
-    const keyFigures = getKeyFigures();
+    const keyFigureQueries = getKeyFigureQueries();
 
-    const kibanaResults = await getKibanaResults(keyFigures, apiPaths, event);
+    const kibanaResults = await getKibanaResults(keyFigureQueries, apiPaths, event);
     await persistToDatabase(kibanaResults);
 
     return Promise.resolve(true);
@@ -105,7 +109,7 @@ async function getKibanaResult(
         const query = keyFigure.query
             .replace("START_TIME", start.toISOString())
             .replace("END_TIME", end.toISOString())
-            .replace("@transport_type:*", filter);
+            .replace("accountName:*", filter);
 
         const keyFigureResult: KeyFigureResult = {
             type: keyFigure.type,
@@ -162,7 +166,12 @@ export async function getKibanaResults(
                 method: "collect-es-key-figures.getKibanaResults"
             });
             kibanaResults.push(
-                getKibanaResult(keyFigures, startDate, endDate, `@transport_type:${apiPath.transportType}`)
+                getKibanaResult(
+                    keyFigures,
+                    startDate,
+                    endDate,
+                    `${getAccountNameFilterFromTransportTypeName(apiPath.transportType)}`
+                )
             );
         }
     }
@@ -178,7 +187,9 @@ export async function getKibanaResults(
                     keyFigures,
                     startDate,
                     endDate,
-                    `@transport_type:${apiPath.transportType} AND @fields.request_uri:\\"${path}\\"`
+                    `${getAccountNameFilterFromTransportTypeName(
+                        apiPath.transportType
+                    )} AND @fields.request_uri:\\"${path}\\"`
                 )
             );
         }
@@ -218,8 +229,36 @@ async function insertFigures(kibanaResults: KeyFigureResult[], tableName: string
         // prettier-ignore
         await query(`INSERT INTO \`${tableName}\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
                          VALUES ('${startDate.toISOString().substring(0, 10)}', '${endDate.toISOString().substring(0, 10)}', '${result.query}',
-                                 '${JSON.stringify(result.value)}', '${result.name}', '${result.filter}');`);
+                                 '${JSON.stringify(result.value)}', '${result.name}', '${getTransportTypeFilterFromAccountNameFilter(result.filter)}');`);
     }
+}
+
+function getTransportTypeFilterFromAccountNameFilter(filter: string): string | undefined {
+    if (
+        filter.includes(RAIL_ACCOUNT_NAME) &&
+        filter.includes(ROAD_ACCOUNT_NAME) &&
+        filter.includes(MARINE_ACCOUNT_NAME)
+    ) {
+        return "@transport_type:*";
+    } else if (filter.includes(MARINE_ACCOUNT_NAME)) {
+        return "@transport_type:marine";
+    } else if (filter.includes(RAIL_ACCOUNT_NAME)) {
+        return "@transport_type:rail";
+    } else if (filter.includes(ROAD_ACCOUNT_NAME)) {
+        return "@transport_type:road";
+    } else return undefined;
+}
+
+function getAccountNameFilterFromTransportTypeName(transportTypeName: string): string | undefined {
+    if (transportTypeName.trim() === "*") {
+        return `(accountName:${RAIL_ACCOUNT_NAME} OR accountName:${ROAD_ACCOUNT_NAME} OR accountName:${MARINE_ACCOUNT_NAME})`;
+    } else if (transportTypeName.trim() === "marine") {
+        return `accountName:${MARINE_ACCOUNT_NAME}`;
+    } else if (transportTypeName.trim() === "rail") {
+        return `accountName:${RAIL_ACCOUNT_NAME}`;
+    } else if (transportTypeName.trim() === "road") {
+        return `accountName:${ROAD_ACCOUNT_NAME}`;
+    } else return undefined;
 }
 
 async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
@@ -307,7 +346,7 @@ export async function getApiPaths(): Promise<{ transportType: string; paths: Set
     ];
 }
 
-export function getKeyFigures(): KeyFigure[] {
+export function getKeyFigureQueries(): KeyFigure[] {
     return esQueries.map((entry) => {
         return { ...entry, query: JSON.stringify(entry.query) };
     });
