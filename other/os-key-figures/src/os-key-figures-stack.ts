@@ -12,8 +12,8 @@ import { Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import * as s3 from "aws-cdk-lib/aws-s3";
 
 export interface Props {
-    readonly elasticSearchEndpoint: string;
-    readonly elasticSearchDomainArn: string;
+    readonly openSearchEndpoint: string;
+    readonly openSearchDomainArn: string;
     readonly slackWebhook: string;
     readonly mysql: {
         readonly password: string;
@@ -29,20 +29,20 @@ export interface Props {
 
 const allowedIps = ["0.0.0.0/0"];
 
-export class EsKeyFiguresStack extends Stack {
-    constructor(app: App, id: string, esKeyFiguresProps: Props, props?: StackProps) {
+export class OpenSearchKeyFiguresStack extends Stack {
+    constructor(app: App, id: string, osKeyFiguresProps: Props, props?: StackProps) {
         super(app, id, props);
         const vpc = this.createVpc();
         const sg = this.createSecurityGroup(allowedIps, vpc);
 
-        const serverlessCluster = this.createDatabase(esKeyFiguresProps.mysql.database, id, vpc, sg);
+        const serverlessCluster = this.createDatabase(osKeyFiguresProps.mysql.database, id, vpc, sg);
 
-        this.createCollectEsKeyFiguresLambda(esKeyFiguresProps, vpc, serverlessCluster);
-        this.createVisualizationsLambda(esKeyFiguresProps, vpc, serverlessCluster);
+        this.createCollectEsKeyFiguresLambda(osKeyFiguresProps, vpc, serverlessCluster);
+        this.createVisualizationsLambda(osKeyFiguresProps, vpc, serverlessCluster);
     }
 
     private createVisualizationsLambda(
-        esKeyFiguresProps: Props,
+        osKeyFiguresProps: Props,
         vpc: Vpc,
         serverlessCluster: ServerlessCluster
     ) {
@@ -62,7 +62,7 @@ export class EsKeyFiguresStack extends Stack {
                 resources: [htmlBucket.bucketArn + "/*"],
                 conditions: {
                     IpAddress: {
-                        "aws:SourceIp": esKeyFiguresProps.allowedIpAddresses
+                        "aws:SourceIp": osKeyFiguresProps.allowedIpAddresses
                     }
                 }
             })
@@ -96,10 +96,10 @@ export class EsKeyFiguresStack extends Stack {
             memorySize: 256,
             environment: {
                 MYSQL_ENDPOINT: serverlessCluster.clusterEndpoint.hostname,
-                MYSQL_USERNAME: esKeyFiguresProps.mysql.user,
-                MYSQL_PASSWORD: esKeyFiguresProps.mysql.password,
-                MYSQL_DATABASE: esKeyFiguresProps.mysql.database,
-                SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook
+                MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
+                MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
+                MYSQL_DATABASE: osKeyFiguresProps.mysql.database,
+                SLACK_WEBHOOK: osKeyFiguresProps.slackWebhook
             }
         };
         const lambdaFunction = new Function(this, functionName, lambdaConf);
@@ -132,8 +132,8 @@ export class EsKeyFiguresStack extends Stack {
                     "es:ESHttpPut"
                 ],
                 resources: [
-                    esKeyFiguresProps.elasticSearchDomainArn,
-                    `${esKeyFiguresProps.elasticSearchDomainArn}/*`
+                    esKeyFiguresProps.openSearchDomainArn,
+                    `${esKeyFiguresProps.openSearchDomainArn}/*`
                 ]
             })
         );
@@ -153,19 +153,19 @@ export class EsKeyFiguresStack extends Stack {
             })
         );
 
-        const functionName = "CollectEsKeyFigures";
+        const functionName = "CollectOsKeyFigures";
         const lambdaConf = {
             role: lambdaRole,
             functionName: functionName,
             code: new AssetCode("dist/lambda"),
-            handler: "collect-es-key-figures.handler",
+            handler: "collect-os-key-figures.handler",
             runtime: Runtime.NODEJS_20_X,
             timeout: Duration.minutes(15),
             logRetention: RetentionDays.ONE_YEAR,
             vpc: vpc,
             memorySize: 256,
             environment: {
-                ES_ENDPOINT: esKeyFiguresProps.elasticSearchEndpoint,
+                OS_ENDPOINT: esKeyFiguresProps.openSearchEndpoint,
                 MYSQL_ENDPOINT: serverlessCluster.clusterEndpoint.hostname,
                 MYSQL_USERNAME: esKeyFiguresProps.mysql.user,
                 MYSQL_PASSWORD: esKeyFiguresProps.mysql.password,

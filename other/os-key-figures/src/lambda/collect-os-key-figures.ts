@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
 import { fetchDataFromEs } from "./es-query.js";
-import { esQueries } from "../es_queries.js";
+import { osQueries } from "../os-queries.js";
 import axios, { AxiosError } from "axios";
 import mysql from "mysql";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";
@@ -89,7 +89,7 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
         method: "collect-es-key-figures.handler"
     });
 
-    const keyFigureQueries = getKeyFigureQueries();
+    const keyFigureQueries = getKeyFigureOsQueries();
 
     const kibanaResults = await getKibanaResults(keyFigureQueries, apiPaths, event);
     await persistToDatabase(kibanaResults);
@@ -142,7 +142,7 @@ async function getKibanaResult(
         } else {
             logger.error({
                 message: `Unknown type: ${keyFigure.type}`,
-                method: "collect-es-key-figures.getKibanaResult"
+                method: "collect-os-key-figures.getKibanaResult"
             });
         }
 
@@ -346,8 +346,8 @@ export async function getApiPaths(): Promise<{ transportType: string; paths: Set
     ];
 }
 
-export function getKeyFigureQueries(): KeyFigure[] {
-    return esQueries.map((entry) => {
+export function getKeyFigureOsQueries(): KeyFigure[] {
+    return osQueries.map((entry) => {
         return { ...entry, query: JSON.stringify(entry.query) };
     });
 }
