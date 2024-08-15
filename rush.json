@@ -156,8 +156,8 @@
       "tags": ["cdk", "other"]
     },
     {
-      "packageName": "es-key-figures",
-      "projectFolder": "other/es-key-figures",
+      "packageName": "os-key-figures",
+      "projectFolder": "other/os-key-figures",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "other"]
     },

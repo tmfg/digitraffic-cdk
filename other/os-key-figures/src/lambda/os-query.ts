@@ -9,7 +9,7 @@ const AWS = AWSx as any;
 
 const region = "eu-west-1";
 
-function handleResponseFromEs(
+function handleResponseFromOs(
     successCallback: (result: Record<string, unknown>) => void,
     failedCallback: (code: number, message: string) => void
 ) {
@@ -17,7 +17,7 @@ function handleResponseFromEs(
         const statusCode = httpResp.statusCode;
         logger.info({
             message: `OpenSearch responded with status code ${statusCode}`,
-            method: "es-query.handleResponseFromEs"
+            method: "os-query.handleResponseFromEs"
         });
         if (statusCode < 200 || statusCode >= 300) {
             failedCallback(
@@ -36,20 +36,20 @@ function handleResponseFromEs(
             } catch (e) {
                 logger.info({
                     message: `Failed to parse response body: ${respBody}`,
-                    method: "es-query.handleResponseFromEs"
+                    method: "os-query.handleResponseFromEs"
                 });
             }
         });
     };
 }
 
-function addCredentialsToEsRequest(req: AWSx.HttpRequest) {
+function addCredentialsToOsRequest(req: AWSx.HttpRequest) {
     const creds = new AWS.EnvironmentCredentials("AWS");
     const signer = new AWS.Signers.V4(req, "es");
     signer.addAuthorization(creds, new Date());
 }
 
-function createRequestForEs(endpoint: AWSx.Endpoint, query: string, path: string) {
+function createRequestForOs(endpoint: AWSx.Endpoint, query: string, path: string) {
     const req = new AWS.HttpRequest(endpoint);
     const index = "dt-nginx-*";
 
@@ -67,21 +67,21 @@ function handleRequest(client, req, callback) {
     client.handleRequest(req, null, callback, function (err: Error) {
         logger.error({
             message: "Error: " + err.message,
-            method: "es-query.handleRequest"
+            method: "os-query.handleRequest"
         });
     });
 }
 
-export async function fetchDataFromEs(endpoint: AWSx.Endpoint, query: string, path: string): Promise<any> {
-    const req = createRequestForEs(endpoint, query, path);
+export async function fetchDataFromOs(endpoint: AWSx.Endpoint, query: string, path: string): Promise<any> {
+    const req = createRequestForOs(endpoint, query, path);
 
-    addCredentialsToEsRequest(req);
+    addCredentialsToOsRequest(req);
 
     const client = new AWS.NodeHttpClient();
 
     const makeRequest = async (): Promise<Record<string, unknown>> => {
         return new Promise((resolve, reject) => {
-            const callback = handleResponseFromEs(
+            const callback = handleResponseFromOs(
                 (result) => {
                     resolve(result);
                 },

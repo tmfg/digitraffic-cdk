@@ -1,5 +1,5 @@
 import * as AWS from "aws-sdk";
-import { fetchDataFromEs } from "./es-query.js";
+import { fetchDataFromOs } from "./os-query.js";
 import { osQueries } from "../os-queries.js";
 import axios, { AxiosError } from "axios";
 import mysql from "mysql";
@@ -120,20 +120,20 @@ async function getKibanaResult(
         };
 
         if (keyFigure.type === "count") {
-            const keyFigureResponse = await fetchDataFromEs(endpoint, query, "_count");
+            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_count");
             keyFigureResult.value = keyFigureResponse.count;
         } else if (keyFigure.type === "agg") {
-            const keyFigureResponse = await fetchDataFromEs(endpoint, query, "_search?size=0");
+            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_search?size=0");
             keyFigureResult.value = keyFigureResponse.aggregations.agg.value;
         } else if (keyFigure.type === "field_agg") {
-            const keyFigureResponse = await fetchDataFromEs(endpoint, query, "_search?size=0");
+            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_search?size=0");
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
                 value[removeIllegalChars(bucket.key)] = bucket.doc_count;
             }
             keyFigureResult.value = value;
         } else if (keyFigure.type === "sub_agg") {
-            const keyFigureResponse = await fetchDataFromEs(endpoint, query, "_search?size=0");
+            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_search?size=0");
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
                 value[removeIllegalChars(bucket.key)] = bucket.agg.value;

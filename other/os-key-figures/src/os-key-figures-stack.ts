@@ -29,7 +29,7 @@ export interface Props {
 
 const allowedIps = ["0.0.0.0/0"];
 
-export class OpenSearchKeyFiguresStack extends Stack {
+export class OsKeyFiguresStack extends Stack {
     constructor(app: App, id: string, osKeyFiguresProps: Props, props?: StackProps) {
         super(app, id, props);
         const vpc = this.createVpc();
@@ -37,7 +37,7 @@ export class OpenSearchKeyFiguresStack extends Stack {
 
         const serverlessCluster = this.createDatabase(osKeyFiguresProps.mysql.database, id, vpc, sg);
 
-        this.createCollectEsKeyFiguresLambda(osKeyFiguresProps, vpc, serverlessCluster);
+        this.createCollectOsKeyFiguresLambda(osKeyFiguresProps, vpc, serverlessCluster);
         this.createVisualizationsLambda(osKeyFiguresProps, vpc, serverlessCluster);
     }
 
@@ -51,7 +51,7 @@ export class OpenSearchKeyFiguresStack extends Stack {
             roleName: "CreateVisualizationsRoleRole"
         });
 
-        const htmlBucket = new s3.Bucket(this, "es-key-figure-visualizations", {
+        const htmlBucket = new s3.Bucket(this, "os-key-figure-visualizations", {
             versioned: false
         });
 
@@ -112,14 +112,14 @@ export class OpenSearchKeyFiguresStack extends Stack {
         rule.addTarget(target);
     }
 
-    private createCollectEsKeyFiguresLambda(
-        esKeyFiguresProps: Props,
+    private createCollectOsKeyFiguresLambda(
+        osKeyFiguresProps: Props,
         vpc: Vpc,
         serverlessCluster: ServerlessCluster
     ) {
-        const lambdaRole = new Role(this, "CollectEsKeyFiguresRole", {
+        const lambdaRole = new Role(this, "CollectOsKeyFiguresRole", {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: "CollectEsKeyFiguresRole"
+            roleName: "CollectOsKeyFiguresRole"
         });
 
         lambdaRole.addToPolicy(
@@ -132,8 +132,8 @@ export class OpenSearchKeyFiguresStack extends Stack {
                     "es:ESHttpPut"
                 ],
                 resources: [
-                    esKeyFiguresProps.openSearchDomainArn,
-                    `${esKeyFiguresProps.openSearchDomainArn}/*`
+                    osKeyFiguresProps.openSearchDomainArn,
+                    `${osKeyFiguresProps.openSearchDomainArn}/*`
                 ]
             })
         );
@@ -165,24 +165,24 @@ export class OpenSearchKeyFiguresStack extends Stack {
             vpc: vpc,
             memorySize: 256,
             environment: {
-                OS_ENDPOINT: esKeyFiguresProps.openSearchEndpoint,
+                OS_ENDPOINT: osKeyFiguresProps.openSearchEndpoint,
                 MYSQL_ENDPOINT: serverlessCluster.clusterEndpoint.hostname,
-                MYSQL_USERNAME: esKeyFiguresProps.mysql.user,
-                MYSQL_PASSWORD: esKeyFiguresProps.mysql.password,
-                MYSQL_DATABASE: esKeyFiguresProps.mysql.database,
-                SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook,
-                MARINE_ACCOUNT_NAME: esKeyFiguresProps.marineAccountName,
-                RAIL_ACCOUNT_NAME: esKeyFiguresProps.railAccountName,
-                ROAD_ACCOUNT_NAME: esKeyFiguresProps.roadAccountName
+                MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
+                MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
+                MYSQL_DATABASE: osKeyFiguresProps.mysql.database,
+                SLACK_WEBHOOK: osKeyFiguresProps.slackWebhook,
+                MARINE_ACCOUNT_NAME: osKeyFiguresProps.marineAccountName,
+                RAIL_ACCOUNT_NAME: osKeyFiguresProps.railAccountName,
+                ROAD_ACCOUNT_NAME: osKeyFiguresProps.roadAccountName
             }
         };
-        const collectEsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
+        const collectOsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
 
         const rule = new Rule(this, "collect *", {
             schedule: Schedule.expression("cron(0 3 1 * ? *)")
         });
         rule.addTarget(
-            new LambdaFunction(collectEsKeyFiguresLambda, {
+            new LambdaFunction(collectOsKeyFiguresLambda, {
                 event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: "*" })
             })
         );
@@ -191,7 +191,7 @@ export class OpenSearchKeyFiguresStack extends Stack {
             schedule: Schedule.expression("cron(15 3 1 * ? *)")
         });
         rule2.addTarget(
-            new LambdaFunction(collectEsKeyFiguresLambda, {
+            new LambdaFunction(collectOsKeyFiguresLambda, {
                 event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: "rail" })
             })
         );
@@ -200,7 +200,7 @@ export class OpenSearchKeyFiguresStack extends Stack {
             schedule: Schedule.expression("cron(30 3 1 * ? *)")
         });
         rule3.addTarget(
-            new LambdaFunction(collectEsKeyFiguresLambda, {
+            new LambdaFunction(collectOsKeyFiguresLambda, {
                 event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: "marine" })
             })
         );
@@ -209,7 +209,7 @@ export class OpenSearchKeyFiguresStack extends Stack {
             schedule: Schedule.expression("cron(45 3 1 * ? *)")
         });
         rule1.addTarget(
-            new LambdaFunction(collectEsKeyFiguresLambda, {
+            new LambdaFunction(collectOsKeyFiguresLambda, {
                 event: events.RuleTargetInput.fromObject({
                     TRANSPORT_TYPE: "road",
                     PART: 1
@@ -221,7 +221,7 @@ export class OpenSearchKeyFiguresStack extends Stack {
             schedule: Schedule.expression("cron(1 4 1 * ? *)")
         });
         rule4.addTarget(
-            new LambdaFunction(collectEsKeyFiguresLambda, {
+            new LambdaFunction(collectOsKeyFiguresLambda, {
                 event: events.RuleTargetInput.fromObject({
                     TRANSPORT_TYPE: "road",
                     PART: 2
@@ -231,16 +231,16 @@ export class OpenSearchKeyFiguresStack extends Stack {
     }
 
     private createVpc(): Vpc {
-        return new Vpc(this, "EsKeyFiguresVPC", {
+        return new Vpc(this, "OsKeyFiguresVPC", {
             natGateways: 1,
             maxAzs: 2
         });
     }
 
     private createSecurityGroup(solitaCidrs: string[], vpc: Vpc): SecurityGroup {
-        const jenkinsSg = new SecurityGroup(this, "EsKeyFiguresSG", {
+        const jenkinsSg = new SecurityGroup(this, "OsKeyFiguresSG", {
             vpc,
-            securityGroupName: "EsKeyFiguresSG",
+            securityGroupName: "OsKeyFiguresSG",
             allowAllOutbound: true
         });
         solitaCidrs.forEach((ip) => {
@@ -250,7 +250,7 @@ export class OpenSearchKeyFiguresStack extends Stack {
     }
 
     private createDatabase(name: string, id: string, vpc: Vpc, sg: SecurityGroup): ServerlessCluster {
-        const databaseUsername = "eskeyfiguredb";
+        const databaseUsername = "oskeyfiguredb";
 
         const databaseCredentialsSecret = new Secret(this, "DBCredentialsSecret", {
             secretName: `${id}-credentials`,
