@@ -86,7 +86,7 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
         },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
             .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
             .join(",")}`,
-        method: "collect-es-key-figures.handler"
+        method: "collect-os-key-figures.handler"
     });
 
     const keyFigureQueries = getKeyFigureOsQueries();
@@ -163,7 +163,7 @@ export async function getKibanaResults(
         for (const apiPath of apiPaths) {
             logger.info({
                 message: `Running: ${apiPath.transportType}`,
-                method: "collect-es-key-figures.getKibanaResults"
+                method: "collect-os-key-figures.getKibanaResults"
             });
             kibanaResults.push(
                 getKibanaResult(
@@ -180,7 +180,7 @@ export async function getKibanaResults(
         for (const path of apiPath.paths) {
             logger.info({
                 message: `Running path: ${path}`,
-                method: "collect-es-key-figures.getKibanaResults"
+                method: "collect-os-key-figures.getKibanaResults"
             });
             kibanaResults.push(
                 getKibanaResult(
@@ -218,7 +218,7 @@ async function getRowAmountWithDateNameFilter(
     } catch (error: unknown) {
         logger.error({
             message: "Error querying database: " + (error instanceof Error && error.message),
-            method: "collect-es-key-figures.getRowAmountWithDateNameFilter"
+            method: "collect-os-key-figures.getRowAmountWithDateNameFilter"
         });
         throw error;
     }
@@ -291,7 +291,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
         if (existingRows > 0) {
             logger.info({
                 message: `Found existing result '${kibanaResult.name}' where 'from' is '${startIsoDate}' and filter is '${kibanaResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`,
-                method: "collect-es-key-figures.persistToDatabase"
+                method: "collect-os-key-figures.persistToDatabase"
             });
             await query("DROP TABLE IF EXISTS ??", [DUPLICATES_TABLE_NAME]);
             await query(CREATE_KEY_FIGURES_TABLE, [DUPLICATES_TABLE_NAME]);
@@ -303,7 +303,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
     } catch (error) {
         logger.error({
             message: `Error persisting: ${error instanceof Error && error.message}`,
-            method: "collect-es-key-figures.persistToDatabase"
+            method: "collect-os-key-figures.persistToDatabase"
         });
         throw error;
     }
@@ -360,7 +360,7 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
         if (resp.status !== 200) {
             logger.error({
                 message: "Fetching faults failed: " + resp.statusText,
-                method: "collect-es-key-figures.getPaths"
+                method: "collect-os-key-figures.getPaths"
             });
 
             return new Set<string>();
@@ -380,7 +380,7 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
 
         return output;
     } catch (error) {
-        if (error instanceof AxiosError && error.response.status === 403) {
+        if (error instanceof AxiosError && error.response && error.response.status === 403) {
             throw new HttpError(403, error.message);
         }
         throw error;

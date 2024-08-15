@@ -19,7 +19,7 @@ function handleResponseFromOs(
             message: `OpenSearch responded with status code ${statusCode}`,
             method: "os-query.handleResponseFromEs"
         });
-        if (statusCode < 200 || statusCode >= 300) {
+        if (statusCode && (statusCode < 200 || statusCode >= 300)) {
             failedCallback(
                 statusCode,
                 `OpenSearch responded with status code ${httpResp.statusCode}. The error message was: ${httpResp.statusMessage}`
@@ -63,7 +63,7 @@ function createRequestForOs(endpoint: AWSx.Endpoint, query: string, path: string
     return req;
 }
 
-function handleRequest(client, req, callback) {
+function handleRequest(client: AWS.NodeHttpClient, req, callback) {
     client.handleRequest(req, null, callback, function (err: Error) {
         logger.error({
             message: "Error: " + err.message,
@@ -97,7 +97,7 @@ export async function fetchDataFromOs(endpoint: AWSx.Endpoint, query: string, pa
     } catch (error: unknown) {
         logger.error({
             message: `Request failed: ${error instanceof Error && error.message}`,
-            method: "es-query.fetchDataFromEs"
+            method: "os-query.fetchDataFromOs"
         });
         throw error;
     }
