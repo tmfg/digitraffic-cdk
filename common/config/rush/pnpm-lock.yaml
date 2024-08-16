@@ -89,6 +89,9 @@ importers:
       '@aws-sdk/lib-storage':
         specifier: ^3.626.0
         version: 3.627.0(@aws-sdk/client-s3@3.627.0)
+      '@digitraffic/eslint-config':
+        specifier: ^2.1.0
+        version: 2.1.0(@rushstack/eslint-config@3.7.1(eslint@8.57.0)(typescript@5.5.4))(@typescript-eslint/eslint-plugin@7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4))(eslint-plugin-deprecation@3.0.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
@@ -182,6 +185,9 @@ importers:
       ky:
         specifier: ^1.5.0
         version: 1.5.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -3909,6 +3915,15 @@ packages:
       node-ttl: ^0.2.0
       pg-native: ^3.1.0
       pg-promise: ^11.9.1
+
+  '@digitraffic/eslint-config@2.1.0':
+    resolution: {integrity: sha512-JJALclJMJPIqJI7ZKhCQs2IYLjQ8XINK8/VR5LbbeJJOjrzDp6fTn+Mk97XmVaB09J8LRrUuLggOn8Apd0N5bg==}
+    peerDependencies:
+      '@rushstack/eslint-config': ^3.0.0
+      '@typescript-eslint/eslint-plugin': ^7.0.0
+      eslint: ^8.57.0
+      eslint-plugin-deprecation: ^3.0.0
+      typescript: ^5.4.4
 
   '@esbuild/aix-ppc64@0.23.0':
     resolution: {integrity: sha512-3sG8Zwa5fMcA9bgqB8AfWPQ+HFke6uD3h1s3RIwUNK8EG7a4buxvuFTs3j1IMs2NXAk9F30C/FF4vxRgQCcmoQ==}
@@ -10226,6 +10241,14 @@ snapshots:
       node-ttl: 0.2.0
       pg-native: 3.1.0
       pg-promise: 11.9.1(pg-native@3.1.0)
+
+  '@digitraffic/eslint-config@2.1.0(@rushstack/eslint-config@3.7.1(eslint@8.57.0)(typescript@5.5.4))(@typescript-eslint/eslint-plugin@7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4))(eslint-plugin-deprecation@3.0.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)':
+    dependencies:
+      '@rushstack/eslint-config': 3.7.1(eslint@8.57.0)(typescript@5.5.4)
+      '@typescript-eslint/eslint-plugin': 7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
+      eslint: 8.57.0
+      eslint-plugin-deprecation: 3.0.0(eslint@8.57.0)(typescript@5.5.4)
+      typescript: 5.5.4
 
   '@esbuild/aix-ppc64@0.23.0':
     optional: true
