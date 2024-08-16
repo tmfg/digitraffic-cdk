@@ -13,7 +13,7 @@ export function createWebAcl(
     const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
 
     aclBuilder
-        .withAWSManagedRules(rules.awsCommonRules)
+        .withAWSManagedRules(rules.awsCommonRuleSets, rules.excludedRules)
         .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
         .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
         .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
