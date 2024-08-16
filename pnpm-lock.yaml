@@ -23,6 +23,9 @@ importers:
       '@aws-sdk/lib-storage':
         specifier: ^3.626.0
         version: 3.626.0(@aws-sdk/client-s3@3.626.0)
+      '@digitraffic/eslint-config':
+        specifier: ^2.1.0
+        version: 2.1.0(@rushstack/eslint-config@3.7.1(eslint@8.57.0)(typescript@5.5.4))(@typescript-eslint/eslint-plugin@7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4))(eslint-plugin-deprecation@3.0.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
@@ -116,6 +119,9 @@ importers:
       ky:
         specifier: ^1.5.0
         version: 1.5.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -514,6 +520,15 @@ packages:
   '@dependents/detective-less@5.0.0':
     resolution: {integrity: sha512-D/9dozteKcutI5OdxJd8rU+fL6XgaaRg60sPPJWkT33OCiRfkCu5wO5B/yXTaaL2e6EB0lcCBGe5E0XscZCvvQ==}
     engines: {node: '>=18'}
+
+  '@digitraffic/eslint-config@2.1.0':
+    resolution: {integrity: sha512-JJALclJMJPIqJI7ZKhCQs2IYLjQ8XINK8/VR5LbbeJJOjrzDp6fTn+Mk97XmVaB09J8LRrUuLggOn8Apd0N5bg==}
+    peerDependencies:
+      '@rushstack/eslint-config': ^3.0.0
+      '@typescript-eslint/eslint-plugin': ^7.0.0
+      eslint: ^8.57.0
+      eslint-plugin-deprecation: ^3.0.0
+      typescript: ^5.4.4
 
   '@eslint-community/eslint-utils@4.4.0':
     resolution: {integrity: sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==}
@@ -4319,6 +4334,14 @@ snapshots:
     dependencies:
       gonzales-pe: 4.3.0
       node-source-walk: 7.0.0
+
+  '@digitraffic/eslint-config@2.1.0(@rushstack/eslint-config@3.7.1(eslint@8.57.0)(typescript@5.5.4))(@typescript-eslint/eslint-plugin@7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4))(eslint-plugin-deprecation@3.0.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)':
+    dependencies:
+      '@rushstack/eslint-config': 3.7.1(eslint@8.57.0)(typescript@5.5.4)
+      '@typescript-eslint/eslint-plugin': 7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
+      eslint: 8.57.0
+      eslint-plugin-deprecation: 3.0.0(eslint@8.57.0)(typescript@5.5.4)
+      typescript: 5.5.4
 
   '@eslint-community/eslint-utils@4.4.0(eslint@8.57.0)':
     dependencies:
