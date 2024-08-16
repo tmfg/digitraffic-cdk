@@ -3,11 +3,11 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const SQL_DELETE_OLD_VALUES = `
 DELETE FROM rami_udot
-WHERE created_db < current_date - INTERVAL 2 DAY`;
+WHERE created_db < current_timestamp() - INTERVAL 1 DAY`;
 
 const SQL_UPDATE_FALSE_VALUES = `
 UPDATE rami_udot
-SET unknown_delay = false, unknown_track = false
+SET unknown_delay = false, unknown_track = false, rami_message_id = :messageId
 WHERE train_number = :trainNumber AND train_departure_date = :trainDepartureDate AND attap_id = :attapId`;
 
 const SQL_UPSERT_VALUES = `
@@ -15,7 +15,8 @@ INSERT INTO rami_udot(rami_message_id, train_number, train_departure_date, attap
 VALUES (:messageId, :trainNumber, :trainDepartureDate, :attapId, :ud, :ut)
 ON DUPLICATE KEY UPDATE
     unknown_delay = :ud,
-    unknown_track = :ut`;
+    unknown_track = :ut,
+    rami_message_id = :messageId`;
 
 export interface UdotUpsertValues {
     readonly trainNumber: number
@@ -30,9 +31,9 @@ export interface UdotUpsertValues {
 export async function insertOrUpdate(conn: Connection, value: UdotUpsertValues): Promise<void> {    
     try {
         if(value.ud === false && value.ut === false) {                
-            await conn.query(SQL_UPDATE_FALSE_VALUES, value);
+            await conn.execute(SQL_UPDATE_FALSE_VALUES, value);
         } else {
-            await conn.query(SQL_UPSERT_VALUES, value) 
+            await conn.execute(SQL_UPSERT_VALUES, value) 
         };
     } catch(error) {
         logger.error({

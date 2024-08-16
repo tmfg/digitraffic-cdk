@@ -103,8 +103,8 @@ function createDeleteOldDataLambda(stack: DigitrafficStack): MonitoredFunction {
         timeout: 30
     });
 
-    // cleaning every hour, otherwise rami-sm-messages will grow too big and delete will be too slow
-    Scheduler.everyHour(stack, "schedule-every-hour", deleteOldDataLambda);
+    // cleaning every 15 minutes, otherwise rami-sm-messages will grow too big and delete will be too slow
+    Scheduler.everyMinutes(stack, "schedule-every-hour", 15, deleteOldDataLambda);
 
     return deleteOldDataLambda;
 }
