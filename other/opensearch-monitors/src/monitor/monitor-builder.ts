@@ -6,6 +6,7 @@ import type {
     MatchPhraseQuery,
     Order,
     Query,
+    QueryStringQuery,
     RangeQuery,
     ScriptQuery,
     Sort
@@ -21,6 +22,10 @@ export interface MonitorConfig {
     slackDestinations: string[];
     throttleMinutes: number;
     messageSubject: string;
+}
+
+export function queryString(query: string): QueryStringQuery {
+    return { query_string: { query }};
 }
 
 export function matchPhrase(field: OSLogField, query: string): MatchPhraseQuery {

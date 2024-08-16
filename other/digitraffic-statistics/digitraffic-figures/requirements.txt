@@ -2,7 +2,7 @@ blinker==1.8.2
 boto3==1.34.113
 botocore==1.34.113
 Brotli==1.1.0
-certifi==2024.2.2
+certifi==2024.7.4
 cffi==1.16.0
 charset-normalizer==3.3.2
 click==8.1.7
@@ -47,5 +47,5 @@ tzdata==2024.1
 urllib3==2.2.2
 Werkzeug==3.0.3
 WTForms==3.1.2
-zipp==3.19.0
+zipp==3.19.1
 zstandard==0.22.0
