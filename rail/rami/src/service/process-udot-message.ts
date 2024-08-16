@@ -1,7 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
 import type { Connection } from "mysql2/promise";
-import { inTransaction } from "../util/database.js";
+import { inDatabase, inTransaction } from "../util/database.js";
 import type { UnknownDelayOrTrackMessage, UnknownDelayOrTrack } from "../model/dt-rosm-message.js";
 import { insertOrUpdate } from "../dao/udot.js";
 
@@ -31,8 +31,8 @@ export async function processUdotMessage(message: UnknownDelayOrTrackMessage): P
             if(attapId) {
                 foundCount++;
 
-                // each update in own transaction, to prevent locking!
-                await inTransaction(async (conn: Connection): Promise<void> => {
+                // each update in own connection, to prevent locking!
+                await inDatabase(async (conn: Connection): Promise<void> => {
                     return await insertOrUpdate(conn, {
                         trainNumber: message.trainNumber,
                         trainDepartureDate: message.departureDate,
