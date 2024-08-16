@@ -26,6 +26,6 @@
     // "verbatimModuleSyntax": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["src/**/*.mts"],
+  "include": ["src/**/*.ts"],
   "$schema": "https://json.schemastore.org/tsconfig"
 }
