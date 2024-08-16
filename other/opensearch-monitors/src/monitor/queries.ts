@@ -48,7 +48,13 @@ export interface ScriptQuery {
     };
 }
 
-export type Query = BoolQuery | MatchPhraseQuery | RangeQuery | ExistsQuery | ScriptQuery;
+export interface QueryStringQuery {
+    query_string: {
+        query: string
+    }
+}
+
+export type Query = BoolQuery | MatchPhraseQuery | RangeQuery | ExistsQuery | ScriptQuery | QueryStringQuery;
 
 export type Order = "asc" | "desc";
 
