@@ -51,7 +51,7 @@ function addCredentialsToOsRequest(req: AWSx.HttpRequest) {
 
 function createRequestForOs(endpoint: AWSx.Endpoint, query: string, path: string) {
     const req = new AWS.HttpRequest(endpoint);
-    const index = "dt-nginx-*";
+    const index = "ft-digitraffic-access*";
 
     req.method = "POST";
     req.path = `/${index}/${path}`;

@@ -16,11 +16,11 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.627.0",
-    "@digitraffic/common": "2024.7.8-1",
+    "@digitraffic/common": "workspace:*",
     "aws-cdk-lib": "~2.151.0",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "~2.1670.0",
-    "axios": "^1.7.2",
+    "ky": "1.7.0",
     "constructs": "10.3.0",
     "mysql": "^2.18.1",
     "source-map-support": "^0.5.21"
@@ -46,7 +46,8 @@
     "node-mocks-http": "~1.15.0",
     "parallelshell": "3.0.2",
     "sinon": "18.0.0",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "zod": "3.23.8"
   },
   "externals": [
     "aws-sdk"

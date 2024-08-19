@@ -3,10 +3,15 @@ import { fetchDataFromOs } from "./os-query.js";
 import { osQueries } from "../os-queries.js";
 import axios, { AxiosError } from "axios";
 import mysql from "mysql";
-import { HttpError } from "@digitraffic/common/dist/types/http-error";
+
 import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import {
+    openapiSchema,
+    type OpenApiSchema
+} from "../../../../lib/digitraffic-common/src/types/openapi-schema.mjs";
+import ky, { HTTPError } from "ky";
 
 const ES_ENDPOINT = getEnvVariable("ES_ENDPOINT");
 const endpoint = new AWS.Endpoint(ES_ENDPOINT);
@@ -354,19 +359,17 @@ export function getKeyFigureOsQueries(): KeyFigure[] {
 
 export async function getPaths(endpointUrl: string): Promise<Set<string>> {
     try {
-        const resp = await axios.get<{ paths: { [path: string]: unknown } }>(endpointUrl, {
-            headers: { "accept-encoding": "gzip" }
-        });
-        if (resp.status !== 200) {
-            logger.error({
-                message: "Fetching faults failed: " + resp.statusText,
-                method: "collect-os-key-figures.getPaths"
-            });
+        const resp = await ky
+            .get(endpointUrl, {
+                retry: {
+                    limit: 3
+                }
+            })
+            .json();
 
-            return new Set<string>();
-        }
+        const schema: OpenApiSchema = openapiSchema.parse(resp);
 
-        const paths = resp.data.paths;
+        const paths = schema.paths;
 
         const output = new Set<string>();
         // eslint-disable-next-line guard-for-in
@@ -380,8 +383,11 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
 
         return output;
     } catch (error) {
-        if (error instanceof AxiosError && error.response && error.response.status === 403) {
-            throw new HttpError(403, error.message);
+        if (error instanceof HTTPError) {
+            logger.error({
+                message: `Fetching OpenApi description from ${endpointUrl} failed with: ${error.message}`,
+                method: "collect-os-key-figures.getPaths"
+            });
         }
         throw error;
     }
