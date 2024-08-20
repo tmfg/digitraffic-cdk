@@ -1304,6 +1304,9 @@ importers:
       '@rollup/plugin-terser':
         specifier: ^0.4.4
         version: 0.4.4(rollup@4.20.0)
+      '@rollup/plugin-typescript':
+        specifier: ~11.1.6
+        version: 11.1.6(rollup@4.20.0)(tslib@2.6.3)(typescript@5.5.4)
       '@rushstack/eslint-config':
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.5.4)
@@ -4295,6 +4298,19 @@ packages:
       rollup: ^2.0.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
+        optional: true
+
+  '@rollup/plugin-typescript@11.1.6':
+    resolution: {integrity: sha512-R92yOmIACgYdJ7dJ97p4K69I8gg6IEHt8M7dUBxN3W6nrO8uUxX5ixl0yU/N3aZTi8WhPuICvOHXQvF6FaykAA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^2.14.0||^3.0.0||^4.0.0
+      tslib: '*'
+      typescript: '>=3.7.0'
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+      tslib:
         optional: true
 
   '@rollup/pluginutils@5.1.0':
@@ -10788,6 +10804,15 @@ snapshots:
       terser: 5.31.6
     optionalDependencies:
       rollup: 4.20.0
+
+  '@rollup/plugin-typescript@11.1.6(rollup@4.20.0)(tslib@2.6.3)(typescript@5.5.4)':
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@4.20.0)
+      resolve: 1.22.8
+      typescript: 5.5.4
+    optionalDependencies:
+      rollup: 4.20.0
+      tslib: 2.6.3
 
   '@rollup/pluginutils@5.1.0(rollup@4.20.0)':
     dependencies:

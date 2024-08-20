@@ -61,6 +61,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
-    "globby": "^14.0.2"
+    "globby": "^14.0.2",
+    "@rollup/plugin-typescript": "~11.1.6"
   }
 }
