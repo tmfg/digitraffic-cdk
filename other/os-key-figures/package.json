@@ -12,7 +12,7 @@
     "cdk": "cdk",
     "ci:eslint-report": "echo 'No eslint report available'",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "heft test --clean"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.627.0",
@@ -38,6 +38,7 @@
     "@types/mysql": "2.15.26",
     "@types/node": "20.14.8",
     "@types/sinon": "17.0.3",
+    "@jest/globals": "29.7.0",
     "dotenv": "~16.4.5",
     "esbuild": "0.23.0",
     "eslint": "^8.57.0",

@@ -1,11 +1,10 @@
-export {};
-require("dotenv").config({
+import dotenv from "dotenv";
+dotenv.config({
     path: "./.env.test",
     override: true
 });
-const nock = require("nock");
-
-const collectOsKeyFigures = require("../../lambda/collect-os-key-figures");
+import nock from "nock";
+import * as collectOsKeyFigures from "../../lambda/collect-os-key-figures.js";
 
 test("getPaths throws HttpError with statuscode 403", async () => {
     const basePath = "http://localhost";
@@ -16,7 +15,7 @@ test("getPaths throws HttpError with statuscode 403", async () => {
         .then(() => {
             fail("Should throw HttpError");
         })
-        .catch((error) => {
+        .catch((error: any) => {
             expect(error.constructor.name).toBe("HttpError");
         });
 });
