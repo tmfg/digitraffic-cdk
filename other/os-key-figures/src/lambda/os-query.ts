@@ -4,10 +4,13 @@ import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { IncomingMessage } from "http";
+import { HttpRequest } from "@smithy/protocol-http";
+import { Sha256 } from "@aws-crypto/sha256-browser";
+import { SignatureV4 } from "@smithy/signature-v4";
+import type { AwsCredentialIdentity } from "@aws-sdk/types";
+import { NodeHttpHandler } from "@smithy/node-http-handler";
 
 const AWS = AWSx as any;
-
-const region = "eu-west-1";
 
 function handleResponseFromOs(
     successCallback: (result: Record<string, unknown>) => void,
@@ -43,27 +46,36 @@ function handleResponseFromOs(
     };
 }
 
-function addCredentialsToOsRequest(req: AWSx.HttpRequest) {
-    const creds = new AWS.EnvironmentCredentials("AWS");
-    const signer = new AWS.Signers.V4(req, "es");
-    signer.addAuthorization(creds, new Date());
+async function signOsRequest(request: HttpRequest, credentials: AwsCredentialIdentity) {
+    const signer = new SignatureV4({
+        credentials,
+        region: "eu-west-1",
+        service: "es",
+        sha256: Sha256
+    });
+
+    const signedRequest = (await signer.sign(request)) as HttpRequest;
+    return signedRequest;
 }
 
-function createRequestForOs(endpoint: AWSx.Endpoint, query: string, path: string) {
-    const req = new AWS.HttpRequest(endpoint);
+function createRequestForOs(vpcEndpoint: string, osEndpoint: string, query: string, path: string): HttpRequest {
     const index = "ft-digitraffic-access*";
 
-    req.method = "POST";
-    req.path = `/${index}/${path}`;
-    req.region = region;
-    req.headers.Host = endpoint.host;
-    req.headers["Content-Type"] = "application/json";
-    req.body = query;
-
-    return req;
+    const request = new HttpRequest({
+        method: "POST",
+        path: `/${index}/${path}`,
+        protocol: "https",
+        body: query,
+        hostname: vpcEndpoint,
+        headers: {
+            "Content-Type": "application/json",
+            host: osEndpoint
+        }
+    });
+    return request;
 }
 
-function handleRequest(client: AWS.NodeHttpClient, req, callback) {
+function handleRequest(client: any, req: any, callback: any) {
     client.handleRequest(req, null, callback, function (err: Error) {
         logger.error({
             message: "Error: " + err.message,
@@ -72,12 +84,15 @@ function handleRequest(client: AWS.NodeHttpClient, req, callback) {
     });
 }
 
-export async function fetchDataFromOs(endpoint: AWSx.Endpoint, query: string, path: string): Promise<any> {
-    const req = createRequestForOs(endpoint, query, path);
+export async function fetchDataFromOs(vpcEndpoint: string, osEndpoint: string,, query: string, path: string, credentials: AwsCredentialIdentity): Promise<any> {
+    
+    const request = createRequestForOs(vpcEndpoint, osEndpoint, query, path);
 
-    addCredentialsToOsRequest(req);
+    const signedRequest = await signOsRequest(request, credentials);
 
-    const client = new AWS.NodeHttpClient();
+    const client = new NodeHttpHandler();
+
+
 
     const makeRequest = async (): Promise<Record<string, unknown>> => {
         return new Promise((resolve, reject) => {
@@ -89,6 +104,7 @@ export async function fetchDataFromOs(endpoint: AWSx.Endpoint, query: string, pa
                     reject(new HttpError(code, message));
                 }
             );
+            const { response } = await client.handle(signedRequest);
             handleRequest(client, req, callback);
         });
     };

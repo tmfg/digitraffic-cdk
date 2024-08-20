@@ -1,20 +1,14 @@
-import * as AWS from "aws-sdk";
-import { fetchDataFromOs } from "./os-query.js";
-import { osQueries } from "../os-queries.js";
-import axios, { AxiosError } from "axios";
-import mysql from "mysql";
-
-import { retryRequest } from "@digitraffic/common/dist/utils/retry";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import {
-    openapiSchema,
-    type OpenApiSchema
-} from "../../../../lib/digitraffic-common/src/types/openapi-schema.mjs";
+import { openapiSchema, type OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import ky, { HTTPError } from "ky";
+import mysql from "mysql";
+import { osQueries } from "../os-queries.js";
+import { fetchDataFromOs } from "./os-query.js";
+import { EnvKeys } from "../env.js";
 
-const ES_ENDPOINT = getEnvVariable("ES_ENDPOINT");
-const endpoint = new AWS.Endpoint(ES_ENDPOINT);
+const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
+const OS_VPC_ENDPOINT = getEnvVariable(EnvKeys.OS_VPC_ENDPOINT);
 
 const currentDate = new Date();
 const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1, 0, 0, 0, 0);
@@ -86,7 +80,7 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
     }
 
     logger.info({
-        message: `ES: ${ES_ENDPOINT}, MySQL: ${
+        message: `OS: ${OS_HOST}, MySQL: ${
             mysqlOpts.host
         },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
             .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
@@ -125,20 +119,35 @@ async function getKibanaResult(
         };
 
         if (keyFigure.type === "count") {
-            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_count");
+            const keyFigureResponse = await fetchDataFromOs(OS_VPC_ENDPOINT, OS_HOST, query, "_count");
             keyFigureResult.value = keyFigureResponse.count;
         } else if (keyFigure.type === "agg") {
-            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_search?size=0");
+            const keyFigureResponse = await fetchDataFromOs(
+                OS_VPC_ENDPOINT,
+                OS_HOST,
+                query,
+                "_search?size=0"
+            );
             keyFigureResult.value = keyFigureResponse.aggregations.agg.value;
         } else if (keyFigure.type === "field_agg") {
-            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_search?size=0");
+            const keyFigureResponse = await fetchDataFromOs(
+                OS_VPC_ENDPOINT,
+                OS_HOST,
+                query,
+                "_search?size=0"
+            );
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
                 value[removeIllegalChars(bucket.key)] = bucket.doc_count;
             }
             keyFigureResult.value = value;
         } else if (keyFigure.type === "sub_agg") {
-            const keyFigureResponse = await fetchDataFromOs(endpoint, query, "_search?size=0");
+            const keyFigureResponse = await fetchDataFromOs(
+                OS_VPC_ENDPOINT,
+                OS_HOST,
+                query,
+                "_search?size=0"
+            );
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
                 value[removeIllegalChars(bucket.key)] = bucket.agg.value;
@@ -315,12 +324,9 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
 }
 
 export async function getApiPaths(): Promise<{ transportType: string; paths: Set<string> }[]> {
-    const railSwaggerPaths = await retryRequest(getPaths, "https://rata.digitraffic.fi/swagger/openapi.json");
-    const roadSwaggerPaths = await retryRequest(getPaths, "https://tie.digitraffic.fi/swagger/openapi.json");
-    const marineSwaggerPaths = await retryRequest(
-        getPaths,
-        "https://meri.digitraffic.fi/swagger/openapi.json"
-    );
+    const railSwaggerPaths = await getPaths("https://rata.digitraffic.fi/swagger/openapi.json");
+    const roadSwaggerPaths = await getPaths("https://tie.digitraffic.fi/swagger/openapi.json");
+    const marineSwaggerPaths = await getPaths("https://meri.digitraffic.fi/swagger/openapi.json");
 
     railSwaggerPaths.add("/api/v2/graphql/");
     railSwaggerPaths.add("/api/v1/trains/history");
@@ -359,7 +365,7 @@ export function getKeyFigureOsQueries(): KeyFigure[] {
 
 export async function getPaths(endpointUrl: string): Promise<Set<string>> {
     try {
-        const resp = await ky
+        const response = await ky
             .get(endpointUrl, {
                 retry: {
                     limit: 3
@@ -367,7 +373,7 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
             })
             .json();
 
-        const schema: OpenApiSchema = openapiSchema.parse(resp);
+        const schema: OpenApiSchema = openapiSchema.parse(response);
 
         const paths = schema.paths;
 
