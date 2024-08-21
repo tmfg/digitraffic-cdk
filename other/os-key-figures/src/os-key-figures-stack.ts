@@ -4,7 +4,7 @@ import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { AnyPrincipal, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { AssetCode, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { AssetCode, Function, Runtime, type FunctionProps } from "aws-cdk-lib/aws-lambda";
 import * as events from "aws-cdk-lib/aws-events";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -12,8 +12,10 @@ import { Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import * as s3 from "aws-cdk-lib/aws-s3";
 
 export interface Props {
-    readonly openSearchEndpoint: string;
+    readonly openSearchVPCEndpoint: string;
+    readonly openSearchHost: string;
     readonly openSearchDomainArn: string;
+    readonly openSearchLambdaRoleArn: string;
     readonly slackWebhook: string;
     readonly mysql: {
         readonly password: string;
@@ -35,20 +37,14 @@ export class OsKeyFiguresStack extends Stack {
         const vpc = this.createVpc();
         const sg = this.createSecurityGroup(allowedIps, vpc);
 
-        const serverlessCluster = this.createDatabase(osKeyFiguresProps.mysql.database, id, vpc, sg);
-
-        this.createCollectOsKeyFiguresLambda(osKeyFiguresProps, vpc, serverlessCluster);
-        this.createVisualizationsLambda(osKeyFiguresProps, vpc, serverlessCluster);
+        this.createCollectOsKeyFiguresLambda(osKeyFiguresProps, vpc, sg);
+        this.createVisualizationsLambda(osKeyFiguresProps, vpc, sg);
     }
 
-    private createVisualizationsLambda(
-        osKeyFiguresProps: Props,
-        vpc: Vpc,
-        serverlessCluster: ServerlessCluster
-    ) {
-        const lambdaRole = new Role(this, "CreateVisualizationsRole", {
+    private createVisualizationsLambda(osKeyFiguresProps: Props, vpc: Vpc, sg: SecurityGroup) {
+        const lambdaRole = new Role(this, "CreateKeyFigureVisualizationsRole", {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: "CreateVisualizationsRoleRole"
+            roleName: "CreateKeyFigureVisualizationsRole"
         });
 
         const htmlBucket = new s3.Bucket(this, "os-key-figure-visualizations", {
@@ -83,8 +79,8 @@ export class OsKeyFiguresStack extends Stack {
             })
         );
 
-        const functionName = "CreateVisualizations";
-        const lambdaConf = {
+        const functionName = "CreateKeyFigureVisualizations";
+        const lambdaConf: FunctionProps = {
             role: lambdaRole,
             functionName: functionName,
             code: new AssetCode("dist/lambda"),
@@ -93,9 +89,10 @@ export class OsKeyFiguresStack extends Stack {
             timeout: Duration.minutes(15),
             logRetention: RetentionDays.ONE_YEAR,
             vpc: vpc,
+            securityGroups: [sg],
             memorySize: 256,
             environment: {
-                MYSQL_ENDPOINT: serverlessCluster.clusterEndpoint.hostname,
+                MYSQL_ENDPOINT: osKeyFiguresProps.mysql.host,
                 MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
                 MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
                 MYSQL_DATABASE: osKeyFiguresProps.mysql.database,
@@ -112,31 +109,12 @@ export class OsKeyFiguresStack extends Stack {
         rule.addTarget(target);
     }
 
-    private createCollectOsKeyFiguresLambda(
-        osKeyFiguresProps: Props,
-        vpc: Vpc,
-        serverlessCluster: ServerlessCluster
-    ) {
+    private createCollectOsKeyFiguresLambda(osKeyFiguresProps: Props, vpc: Vpc, sg: SecurityGroup) {
         const lambdaRole = new Role(this, "CollectOsKeyFiguresRole", {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: "CollectOsKeyFiguresRole"
         });
 
-        lambdaRole.addToPolicy(
-            new PolicyStatement({
-                actions: [
-                    "es:DescribeElasticsearchDomain",
-                    "es:DescribeElasticsearchDomains",
-                    "es:DescribeElasticsearchDomainConfig",
-                    "es:ESHttpPost",
-                    "es:ESHttpPut"
-                ],
-                resources: [
-                    osKeyFiguresProps.openSearchDomainArn,
-                    `${osKeyFiguresProps.openSearchDomainArn}/*`
-                ]
-            })
-        );
         lambdaRole.addToPolicy(
             new PolicyStatement({
                 actions: [
@@ -154,7 +132,7 @@ export class OsKeyFiguresStack extends Stack {
         );
 
         const functionName = "CollectOsKeyFigures";
-        const lambdaConf = {
+        const lambdaConf: FunctionProps = {
             role: lambdaRole,
             functionName: functionName,
             code: new AssetCode("dist/lambda"),
@@ -163,10 +141,13 @@ export class OsKeyFiguresStack extends Stack {
             timeout: Duration.minutes(15),
             logRetention: RetentionDays.ONE_YEAR,
             vpc: vpc,
-            memorySize: 256,
+            securityGroups: [sg],
+            memorySize: 1024,
             environment: {
-                OS_ENDPOINT: osKeyFiguresProps.openSearchEndpoint,
-                MYSQL_ENDPOINT: serverlessCluster.clusterEndpoint.hostname,
+                ROLE: osKeyFiguresProps.openSearchLambdaRoleArn,
+                OS_HOST: osKeyFiguresProps.openSearchHost,
+                OS_VPC_ENDPOINT: osKeyFiguresProps.openSearchVPCEndpoint,
+                MYSQL_ENDPOINT: osKeyFiguresProps.mysql.host,
                 MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
                 MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
                 MYSQL_DATABASE: osKeyFiguresProps.mysql.database,
@@ -238,64 +219,14 @@ export class OsKeyFiguresStack extends Stack {
     }
 
     private createSecurityGroup(solitaCidrs: string[], vpc: Vpc): SecurityGroup {
-        const jenkinsSg = new SecurityGroup(this, "OsKeyFiguresSG", {
+        const sg = new SecurityGroup(this, "OsKeyFiguresSG", {
             vpc,
             securityGroupName: "OsKeyFiguresSG",
             allowAllOutbound: true
         });
         solitaCidrs.forEach((ip) => {
-            jenkinsSg.addIngressRule(Peer.ipv4(ip), Port.tcp(3306), "", false);
+            sg.addIngressRule(Peer.ipv4(ip), Port.tcp(3306), "", false);
         });
-        return jenkinsSg;
-    }
-
-    private createDatabase(name: string, id: string, vpc: Vpc, sg: SecurityGroup): ServerlessCluster {
-        const databaseUsername = "oskeyfiguredb";
-
-        const databaseCredentialsSecret = new Secret(this, "DBCredentialsSecret", {
-            secretName: `${id}-credentials`,
-            generateSecretString: {
-                secretStringTemplate: JSON.stringify({
-                    username: databaseUsername
-                }),
-                excludePunctuation: true,
-                includeSpace: false,
-                generateStringKey: "password"
-            }
-        });
-
-        new StringParameter(this, "DBCredentialsArn", {
-            parameterName: `${id}-credentials-arn`,
-            stringValue: databaseCredentialsSecret.secretArn
-        });
-
-        const dbConfig: ServerlessClusterProps = {
-            clusterIdentifier: `main-${id}-cluster`,
-            engine: DatabaseClusterEngine.AURORA_MYSQL,
-            vpc: vpc,
-            securityGroups: [sg],
-            deletionProtection: true,
-            defaultDatabaseName: name,
-            enableDataApi: true,
-            credentials: {
-                username: databaseCredentialsSecret.secretValueFromJson("username").toString(),
-                password: databaseCredentialsSecret.secretValueFromJson("password")
-            },
-            backupRetention: Duration.days(14),
-            scaling: {
-                autoPause: Duration.hours(1),
-                maxCapacity: 4,
-                minCapacity: 2
-            }
-        };
-
-        const cluster = new ServerlessCluster(this, "DBCluster", dbConfig);
-
-        new StringParameter(this, "DBResourceArn", {
-            parameterName: `${id}-resource-arn`,
-            stringValue: cluster.clusterArn
-        });
-
-        return cluster;
+        return sg;
     }
 }
