@@ -9,7 +9,7 @@
     "bundle": "rollup -c",
     "bundle:watch": "npm run bundle -- --watch",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
-    "publish:cdk": "npm run bundle && cp dist/cli/*.mjs ../../common/scripts/",
+    "publish:cdk": "npm run bundle && cp dist/*.js ../../common/scripts/",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean --watch"
   },
@@ -42,6 +42,8 @@
     "rollup": "~4.17.2",
     "typescript": "~5.5.2",
     "@rollup/plugin-typescript": "~11.1.6",
-    "lodash": "~4.17.21"
+    "lodash": "~4.17.21",
+    "@types/async": "~3.2.24",
+    "async": "~3.2.6"
   }
 }

@@ -12,8 +12,8 @@
 !config/*.json
 
 !dist/
-!dist/cli/
-!dist/cli/*.mjs
+!dist/
+!dist/*.js
 
 !src/
 !src/**/

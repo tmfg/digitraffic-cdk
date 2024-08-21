@@ -272,6 +272,9 @@ importers:
       '@rushstack/heft-jest-plugin':
         specifier: ^0.12.7
         version: 0.12.7(@rushstack/heft@0.66.25(@types/node@20.14.8))(@types/node@20.14.8)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.14.8)(typescript@5.5.4))
+      '@types/async':
+        specifier: ~3.2.24
+        version: 3.2.24
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -287,6 +290,9 @@ importers:
       '@types/node':
         specifier: 20.14.8
         version: 20.14.8
+      async:
+        specifier: ~3.2.6
+        version: 3.2.6
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -5186,6 +5192,9 @@ packages:
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
 
+  '@types/async@3.2.24':
+    resolution: {integrity: sha512-8iHVLHsCCOBKjCF2KwFe0p9Z3rfM9mL+sSP8btyR5vTjJRAqpBYD28/ZLgXPf0pjG1VxOvtCV/BgXkQbpSe8Hw==}
+
   '@types/aws-lambda@8.10.143':
     resolution: {integrity: sha512-u5vzlcR14ge/4pMTTMDQr3MF0wEe38B2F9o84uC4F43vN5DGTy63npRrB6jQhyt+C0lGv4ZfiRcRkqJoZuPnmg==}
 
@@ -5643,8 +5652,8 @@ packages:
     resolution: {integrity: sha512-LFRg7178Fw5R4FAEwZxVqiRI8IxSM+Ay2UBrHoCerXNme+kMMMfz7T3xDGV/c2fer87hcrtgJGsnSOfUrPK6ng==}
     engines: {node: '>=18'}
 
-  async@3.2.5:
-    resolution: {integrity: sha512-baNZyqaaLhyLVKm/DlvdW051MSgO6b8eVfIezl9E5PqWxFgzLm/wQntEW4zOytVburDEr0JlALEpdOFwvErLsg==}
+  async@3.2.6:
+    resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
@@ -12773,6 +12782,8 @@ snapshots:
 
   '@types/argparse@1.0.38': {}
 
+  '@types/async@3.2.24': {}
+
   '@types/aws-lambda@8.10.143': {}
 
   '@types/babel__core@7.20.5':
@@ -13364,7 +13375,7 @@ snapshots:
 
   ast-module-types@6.0.0: {}
 
-  async@3.2.5: {}
+  async@3.2.6: {}
 
   asynckit@0.4.0: {}
 
@@ -14876,7 +14887,7 @@ snapshots:
 
   jake@10.9.2:
     dependencies:
-      async: 3.2.5
+      async: 3.2.6
       chalk: 4.1.2
       filelist: 1.0.4
       minimatch: 3.1.2
@@ -15778,7 +15789,7 @@ snapshots:
 
   node-ttl@0.2.0:
     dependencies:
-      async: 3.2.5
+      async: 3.2.6
 
   normalize-path@3.0.0: {}
 
