@@ -19,6 +19,12 @@ jest.mock("aws-sdk", () => {
 import aws from "aws-sdk";
 import { retry } from "@digitraffic/common/dist/utils/retry";
 import * as osQuery from "../../lambda/os-query.js";
+import type { AwsCredentialIdentity } from "@aws-sdk/types";
+
+const mockCredentials: AwsCredentialIdentity = {
+    accessKeyId: "mockAccessKeyId",
+    secretAccessKey: "mockSecretAccessKey"
+};
 
 test("fetchDataFromOs retries after a response of 429", async () => {
     nock("http://localhost")
@@ -26,6 +32,6 @@ test("fetchDataFromOs retries after a response of 429", async () => {
         .reply(429)
         .post("/dt-nginx-*/path")
         .reply(200, { foo: "bar" });
-    await osQuery.fetchDataFromOs(new aws.Endpoint("http://localhost"), "query", "path");
+    await osQuery.fetchDataFromOs("vpcEndpoint", "osHost", "query", "path", mockCredentials);
     //expect(retry.retryCount).toBe(1);
 }, 10000);
