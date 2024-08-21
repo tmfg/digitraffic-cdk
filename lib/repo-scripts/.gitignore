@@ -13,7 +13,7 @@
 
 !dist/
 !dist/
-!dist/*.js
+!dist/*.mjs
 
 !src/
 !src/**/

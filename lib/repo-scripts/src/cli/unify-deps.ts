@@ -136,7 +136,8 @@ async function main(): Promise<void> {
             const packageJsonPath = `${project.fullPath}/package.json`;
             const packageJson = (await fs.readJson(packageJsonPath)) as unknown as PackageJson;
             const updated = updateVersions(dependencies, packageJson);
-            await fs.writeJson(packageJsonPath, updated);
+            const output = `${JSON.stringify(updated, null, 2)}\n`;
+            await fs.writeFile(packageJsonPath, output);
         }
     );
 }
