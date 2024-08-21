@@ -6,7 +6,11 @@ import mysql from "mysql";
 import { osQueries } from "../os-queries.js";
 import { fetchDataFromOs } from "./os-query.js";
 import { EnvKeys } from "../env.js";
+import type { AwsCredentialIdentity } from "@aws-sdk/types";
+import type { AssumeRoleRequest } from "aws-sdk/clients/sts.js";
+import STS from "aws-sdk/clients/sts.js";
 
+const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
 const OS_VPC_ENDPOINT = getEnvVariable(EnvKeys.OS_VPC_ENDPOINT);
 
@@ -59,7 +63,35 @@ export interface KeyFigureLambdaEvent {
     readonly PART?: number;
 }
 
+const sts = new STS({ apiVersion: "2011-06-15" });
+
+async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
+    const roleToAssume = {
+        RoleArn: roleArn,
+        RoleSessionName: "OS_Session",
+        DurationSeconds: 900
+    } as AssumeRoleRequest;
+
+    return await new Promise((resolve, reject) => {
+        sts.assumeRole(roleToAssume, (err, data) => {
+            if (err || !data?.Credentials) {
+                reject(err);
+            } else {
+                resolve({
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    accessKeyId: data.Credentials.AccessKeyId!,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    secretAccessKey: data.Credentials.SecretAccessKey!,
+                    sessionToken: data.Credentials.SessionToken
+                });
+            }
+        });
+    });
+}
+
 export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => {
+    const credentials = await assumeRole(ROLE_ARN);
+
     const apiPaths = (await getApiPaths()).filter((s) => s.transportType === event.TRANSPORT_TYPE);
     const firstPath = apiPaths[0];
 
@@ -90,13 +122,14 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
 
     const keyFigureQueries = getKeyFigureOsQueries();
 
-    const kibanaResults = await getKibanaResults(keyFigureQueries, apiPaths, event);
+    const kibanaResults = await getKibanaResults(credentials, keyFigureQueries, apiPaths, event);
     await persistToDatabase(kibanaResults);
 
     return Promise.resolve(true);
 };
 
 async function getKibanaResult(
+    credentials: AwsCredentialIdentity,
     keyFigures: KeyFigure[],
     start: Date,
     end: Date,
@@ -119,14 +152,21 @@ async function getKibanaResult(
         };
 
         if (keyFigure.type === "count") {
-            const keyFigureResponse = await fetchDataFromOs(OS_VPC_ENDPOINT, OS_HOST, query, "_count");
+            const keyFigureResponse = await fetchDataFromOs(
+                OS_VPC_ENDPOINT,
+                OS_HOST,
+                query,
+                "_count",
+                credentials
+            );
             keyFigureResult.value = keyFigureResponse.count;
         } else if (keyFigure.type === "agg") {
             const keyFigureResponse = await fetchDataFromOs(
                 OS_VPC_ENDPOINT,
                 OS_HOST,
                 query,
-                "_search?size=0"
+                "_search?size=0",
+                credentials
             );
             keyFigureResult.value = keyFigureResponse.aggregations.agg.value;
         } else if (keyFigure.type === "field_agg") {
@@ -134,7 +174,8 @@ async function getKibanaResult(
                 OS_VPC_ENDPOINT,
                 OS_HOST,
                 query,
-                "_search?size=0"
+                "_search?size=0",
+                credentials
             );
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
@@ -146,7 +187,8 @@ async function getKibanaResult(
                 OS_VPC_ENDPOINT,
                 OS_HOST,
                 query,
-                "_search?size=0"
+                "_search?size=0",
+                credentials
             );
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
@@ -167,6 +209,7 @@ async function getKibanaResult(
 }
 
 export async function getKibanaResults(
+    credentials: AwsCredentialIdentity,
     keyFigures: KeyFigure[],
     apiPaths: { transportType: string; paths: Set<string> }[],
     event: KeyFigureLambdaEvent
@@ -181,6 +224,7 @@ export async function getKibanaResults(
             });
             kibanaResults.push(
                 getKibanaResult(
+                    credentials,
                     keyFigures,
                     startDate,
                     endDate,
@@ -198,6 +242,7 @@ export async function getKibanaResults(
             });
             kibanaResults.push(
                 getKibanaResult(
+                    credentials,
                     keyFigures,
                     startDate,
                     endDate,

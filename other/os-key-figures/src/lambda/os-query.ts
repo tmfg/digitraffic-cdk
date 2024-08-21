@@ -1,23 +1,20 @@
 import "source-map-support/register";
-import * as AWSx from "aws-sdk";
 import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { IncomingMessage } from "http";
-import { HttpRequest } from "@smithy/protocol-http";
+import { HttpRequest, HttpResponse } from "@smithy/protocol-http";
 import { Sha256 } from "@aws-crypto/sha256-browser";
 import { SignatureV4 } from "@smithy/signature-v4";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 
-const AWS = AWSx as any;
 
 function handleResponseFromOs(
+    response: HttpResponse,
     successCallback: (result: Record<string, unknown>) => void,
     failedCallback: (code: number, message: string) => void
 ) {
-    return (httpResp: IncomingMessage) => {
-        const statusCode = httpResp.statusCode;
+        const statusCode = response.statusCode;
         logger.info({
             message: `OpenSearch responded with status code ${statusCode}`,
             method: "os-query.handleResponseFromEs"
@@ -25,25 +22,25 @@ function handleResponseFromOs(
         if (statusCode && (statusCode < 200 || statusCode >= 300)) {
             failedCallback(
                 statusCode,
-                `OpenSearch responded with status code ${httpResp.statusCode}. The error message was: ${httpResp.statusMessage}`
+                `OpenSearch responded with status code ${statusCode}. The error message was: ${response.reason}`
             );
             return;
         }
-        let respBody = "";
-        httpResp.on("data", function (chunk: any) {
-            respBody += chunk;
+        let responseBody = "";
+        response.body.on("data", function (chunk: string) {
+            responseBody += chunk;
         });
-        httpResp.on("end", function (chunk: any) {
+        response.body.on("end", function () {
             try {
-                successCallback(JSON.parse(respBody));
+                successCallback(JSON.parse(responseBody));
             } catch (e) {
                 logger.info({
-                    message: `Failed to parse response body: ${respBody}`,
+                    message: `Failed to parse response body: ${responseBody}`,
                     method: "os-query.handleResponseFromEs"
                 });
             }
         });
-    };
+
 }
 
 async function signOsRequest(request: HttpRequest, credentials: AwsCredentialIdentity) {
@@ -75,15 +72,6 @@ function createRequestForOs(vpcEndpoint: string, osEndpoint: string, query: stri
     return request;
 }
 
-function handleRequest(client: any, req: any, callback: any) {
-    client.handleRequest(req, null, callback, function (err: Error) {
-        logger.error({
-            message: "Error: " + err.message,
-            method: "os-query.handleRequest"
-        });
-    });
-}
-
 export async function fetchDataFromOs(vpcEndpoint: string, osEndpoint: string,, query: string, path: string, credentials: AwsCredentialIdentity): Promise<any> {
     
     const request = createRequestForOs(vpcEndpoint, osEndpoint, query, path);
@@ -92,11 +80,10 @@ export async function fetchDataFromOs(vpcEndpoint: string, osEndpoint: string,, 
 
     const client = new NodeHttpHandler();
 
-
-
     const makeRequest = async (): Promise<Record<string, unknown>> => {
         return new Promise((resolve, reject) => {
-            const callback = handleResponseFromOs(
+            const { response } = await client.handle(signedRequest);
+            handleResponseFromOs(response,
                 (result) => {
                     resolve(result);
                 },
@@ -104,10 +91,9 @@ export async function fetchDataFromOs(vpcEndpoint: string, osEndpoint: string,, 
                     reject(new HttpError(code, message));
                 }
             );
-            const { response } = await client.handle(signedRequest);
-            handleRequest(client, req, callback);
         });
     };
+
     try {
         return await retryRequest(makeRequest);
     } catch (error: unknown) {
