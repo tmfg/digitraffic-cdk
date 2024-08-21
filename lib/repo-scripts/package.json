@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run build:clean && npm run bundle -- --log-level=warning",
+    "build": "npm run build:clean && npm run bundle",
     "build:clean": "heft build --clean",
     "build:watch": "npm run build -- --watch",
-    "bundle": "esbuild --bundle src/cli/*.ts --outdir=dist/cli --platform=node --target=node20 --format=esm --out-extension:.js=.mjs --banner:js='import { createRequire } from \"module\"; const require = createRequire(import.meta.url);'",
+    "bundle": "rollup -c",
     "bundle:watch": "npm run bundle -- --watch",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "publish:cdk": "npm run bundle && cp dist/cli/*.mjs ../../common/scripts/",
@@ -24,8 +24,12 @@
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
+    "@digitraffic/eslint-config": "workspace:*",
+    "@rollup/plugin-commonjs": "~25.0.7",
+    "@rollup/plugin-json": "~6.1.0",
+    "@rollup/plugin-node-resolve": "~15.2.3",
+    "@rollup/plugin-terser": "~0.4.4",
     "@rushstack/eslint-config": "^3.7.1",
     "@rushstack/heft": "^0.66.25",
     "@rushstack/heft-jest-plugin": "^0.12.7",
@@ -33,10 +37,11 @@
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
     "@types/lodash": "4.17.7",
-    "@types/lodash-es": "4.17.12",
     "@types/node": "20.14.8",
-    "esbuild": "0.23.0",
     "eslint": "^8.57.0",
-    "typescript": "~5.5.2"
+    "rollup": "~4.17.2",
+    "typescript": "~5.5.2",
+    "@rollup/plugin-typescript": "~11.1.6",
+    "lodash": "~4.17.21"
   }
 }

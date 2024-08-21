@@ -6,6 +6,7 @@
 !package.json
 !README.md
 !tsconfig.json
+!rollup.config.js
 
 !config/
 !config/*.json
