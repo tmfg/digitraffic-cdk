@@ -87,7 +87,7 @@ export class OsKeyFiguresStack extends Stack {
             logRetention: RetentionDays.ONE_YEAR,
             vpc: vpc,
             securityGroups: [sg],
-            memorySize: 256,
+            memorySize: 512,
             environment: {
                 MYSQL_ENDPOINT: osKeyFiguresProps.mysql.host,
                 MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
@@ -139,7 +139,7 @@ export class OsKeyFiguresStack extends Stack {
             logRetention: RetentionDays.ONE_YEAR,
             vpc: vpc,
             securityGroups: [sg],
-            memorySize: 1024,
+            memorySize: 512,
             environment: {
                 ROLE: osKeyFiguresProps.openSearchLambdaRoleArn,
                 OS_HOST: osKeyFiguresProps.openSearchHost,

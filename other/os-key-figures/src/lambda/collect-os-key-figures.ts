@@ -9,6 +9,10 @@ import { EnvKeys } from "../env.js";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import type { AssumeRoleRequest } from "aws-sdk/clients/sts.js";
 import STS from "aws-sdk/clients/sts.js";
+import {
+    getAccountNameFilterFromTransportTypeName,
+    getTransportTypeFilterFromAccountNameFilter
+} from "../util/filter.js";
 
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
@@ -21,10 +25,6 @@ const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 0, 
 
 const KEY_FIGURES_TABLE_NAME = "key_figures";
 const DUPLICATES_TABLE_NAME = "duplicates";
-
-const MARINE_ACCOUNT_NAME = getEnvVariable("MARINE_ACCOUNT_NAME");
-const RAIL_ACCOUNT_NAME = getEnvVariable("RAIL_ACCOUNT_NAME");
-const ROAD_ACCOUNT_NAME = getEnvVariable("ROAD_ACCOUNT_NAME");
 
 const mysqlOpts = {
     host: getEnvVariable("MYSQL_ENDPOINT"),
@@ -292,34 +292,6 @@ async function insertFigures(kibanaResults: KeyFigureResult[], tableName: string
     }
 }
 
-function getTransportTypeFilterFromAccountNameFilter(filter: string): string | undefined {
-    if (
-        filter.includes(RAIL_ACCOUNT_NAME) &&
-        filter.includes(ROAD_ACCOUNT_NAME) &&
-        filter.includes(MARINE_ACCOUNT_NAME)
-    ) {
-        return "@transport_type:*";
-    } else if (filter.includes(MARINE_ACCOUNT_NAME)) {
-        return "@transport_type:marine";
-    } else if (filter.includes(RAIL_ACCOUNT_NAME)) {
-        return "@transport_type:rail";
-    } else if (filter.includes(ROAD_ACCOUNT_NAME)) {
-        return "@transport_type:road";
-    } else return undefined;
-}
-
-function getAccountNameFilterFromTransportTypeName(transportTypeName: string): string | undefined {
-    if (transportTypeName.trim() === "*") {
-        return `(accountName:${RAIL_ACCOUNT_NAME} OR accountName:${ROAD_ACCOUNT_NAME} OR accountName:${MARINE_ACCOUNT_NAME})`;
-    } else if (transportTypeName.trim() === "marine") {
-        return `accountName:${MARINE_ACCOUNT_NAME}`;
-    } else if (transportTypeName.trim() === "rail") {
-        return `accountName:${RAIL_ACCOUNT_NAME}`;
-    } else if (transportTypeName.trim() === "road") {
-        return `accountName:${ROAD_ACCOUNT_NAME}`;
-    } else return undefined;
-}
-
 async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
     const CREATE_KEY_FIGURES_TABLE =
         "CREATE TABLE ?? ( `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `from` DATE NOT NULL, `to` DATE NOT NULL, `name` VARCHAR(100) NOT NULL,`filter` VARCHAR(1000) NOT NULL, `query` VARCHAR(1000) NOT NULL, `value` JSON NOT NULL, PRIMARY KEY (`id`))";
@@ -419,11 +391,10 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
             .json();
 
         const schema: OpenApiSchema = openapiSchema.parse(response);
-
         const paths = schema.paths;
 
         const output = new Set<string>();
-        // eslint-disable-next-line guard-for-in
+
         for (const pathsKey in paths) {
             const splitResult = pathsKey.split("{")[0];
             if (!splitResult) {
@@ -431,7 +402,6 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
             }
             output.add(splitResult.endsWith("/") ? splitResult : splitResult + "/");
         }
-
         return output;
     } catch (error) {
         if (error instanceof HTTPError) {
