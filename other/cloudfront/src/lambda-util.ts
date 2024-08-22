@@ -1,5 +1,3 @@
-import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-
 interface Response {
     headers: Record<
         string,
@@ -65,8 +63,9 @@ export function addWeathercamImageLastModifiedHeaderFromXAmzMeta(response: Respo
     }
 }
 
-export function createAndLogError(method: LoggerMethodType, message: string): Error {
-    logger.error({
+export function createAndLogError(method: string, message: string): Error {
+    // eslint-disable-next-line no-console
+    console.error({
         method,
         message
     });

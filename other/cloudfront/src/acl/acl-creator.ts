@@ -4,11 +4,16 @@ import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder";
 import type { WafRules } from "./waf-rules.js";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
-export function createWebAcl(stack: Stack, environment: string, rules: WafRules): CfnWebACL {
-    const aclBuilder = new AclBuilder(stack);
+export function createWebAcl(
+    stack: Stack,
+    environment: string,
+    rules: WafRules,
+    distributionName: string
+): CfnWebACL {
+    const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
 
     aclBuilder
-        .withAWSManagedRules(rules.awsCommonRules)
+        .withAWSManagedRules(rules.awsCommonRuleSets, rules.excludedRules)
         .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
         .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
         .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
@@ -18,7 +23,7 @@ export function createWebAcl(stack: Stack, environment: string, rules: WafRules)
 
     const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
         // group name must begin with aws-waf-logs!!!!
-        logGroupName: `aws-waf-logs-${environment}`,
+        logGroupName: `aws-waf-logs-${distributionName}-${environment}`,
         removalPolicy: RemovalPolicy.RETAIN
     });
 

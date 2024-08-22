@@ -1,10 +1,5 @@
-import {
-    addCorsHeaders,
-    addWeathercamImageLastModifiedHeaderFromXAmzMeta,
-    createAndLogError
-} from "../lambda-util.js";
+import { addCorsHeaders, createAndLogError } from "../lambda-util.js";
 import type { CloudFrontResponseHandler } from "aws-lambda";
-import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
