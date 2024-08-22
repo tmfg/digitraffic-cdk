@@ -285,6 +285,14 @@ async function getRowAmountWithDateNameFilter(
 
 async function insertFigures(kibanaResults: KeyFigureResult[], tableName: string) {
     for (const result of kibanaResults) {
+        /**
+         * Even though the actual filter used in the os queries is by accountName:[name], 
+           it is converted to @transport_type:[rail|road|marine|*] for the db entry. 
+           
+           This is because originally the queries were filtered by the (now non-existent) field @transport_type 
+           and this filter was entered as is in the db data. The db data on the other hand is used by other applications 
+           which categorize the data based on the value of @transport_type in the 'filter' column.   
+         */
         // prettier-ignore
         await query(`INSERT INTO \`${tableName}\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
                          VALUES ('${startDate.toISOString().substring(0, 10)}', '${endDate.toISOString().substring(0, 10)}', '${result.query}',
