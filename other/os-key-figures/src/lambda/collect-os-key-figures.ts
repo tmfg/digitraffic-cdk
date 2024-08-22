@@ -1,14 +1,14 @@
+import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { openapiSchema, type OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import ky, { HTTPError } from "ky";
-import mysql from "mysql";
-import { osQueries } from "../os-queries.js";
-import { fetchDataFromOs } from "./os-query.js";
-import { EnvKeys } from "../env.js";
-import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import type { AssumeRoleRequest } from "aws-sdk/clients/sts.js";
 import STS from "aws-sdk/clients/sts.js";
+import ky, { HTTPError } from "ky";
+import mysql from "mysql";
+import { OpenSearch, OpenSearchApiMethod } from "../api/opensearch.js";
+import { EnvKeys } from "../env.js";
+import { osQueries } from "../os-queries.js";
 import {
     getAccountNameFilterFromTransportTypeName,
     getTransportTypeFilterFromAccountNameFilter
@@ -17,6 +17,7 @@ import {
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
 const OS_VPC_ENDPOINT = getEnvVariable(EnvKeys.OS_VPC_ENDPOINT);
+const OS_INDEX = getEnvVariable(EnvKeys.OS_INDEX);
 
 const currentDate = new Date();
 const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1, 0, 0, 0, 0);
@@ -91,6 +92,7 @@ async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
 
 export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => {
     const credentials = await assumeRole(ROLE_ARN);
+    const openSearchApi = new OpenSearch(OS_HOST, OS_VPC_ENDPOINT, credentials);
 
     const apiPaths = (await getApiPaths()).filter((s) => s.transportType === event.TRANSPORT_TYPE);
     const firstPath = apiPaths[0];
@@ -122,14 +124,14 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
 
     const keyFigureQueries = getKeyFigureOsQueries();
 
-    const kibanaResults = await getKibanaResults(credentials, keyFigureQueries, apiPaths, event);
+    const kibanaResults = await getKibanaResults(openSearchApi, keyFigureQueries, apiPaths, event);
     await persistToDatabase(kibanaResults);
 
     return Promise.resolve(true);
 };
 
 async function getKibanaResult(
-    credentials: AwsCredentialIdentity,
+    openSearchApi: OpenSearch,
     keyFigures: KeyFigure[],
     start: Date,
     end: Date,
@@ -152,30 +154,24 @@ async function getKibanaResult(
         };
 
         if (keyFigure.type === "count") {
-            const keyFigureResponse = await fetchDataFromOs(
-                OS_VPC_ENDPOINT,
-                OS_HOST,
-                query,
-                "_count",
-                credentials
+            const keyFigureResponse = await openSearchApi.makeOsQuery(
+                OS_INDEX,
+                OpenSearchApiMethod.COUNT,
+                query
             );
             keyFigureResult.value = keyFigureResponse.count;
         } else if (keyFigure.type === "agg") {
-            const keyFigureResponse = await fetchDataFromOs(
-                OS_VPC_ENDPOINT,
-                OS_HOST,
-                query,
-                "_search?size=0",
-                credentials
+            const keyFigureResponse = await openSearchApi.makeOsQuery(
+                OS_INDEX,
+                `${OpenSearchApiMethod.SEARCH}?size=0`,
+                query
             );
             keyFigureResult.value = keyFigureResponse.aggregations.agg.value;
         } else if (keyFigure.type === "field_agg") {
-            const keyFigureResponse = await fetchDataFromOs(
-                OS_VPC_ENDPOINT,
-                OS_HOST,
-                query,
-                "_search?size=0",
-                credentials
+            const keyFigureResponse = await openSearchApi.makeOsQuery(
+                OS_INDEX,
+                `${OpenSearchApiMethod.SEARCH}?size=0`,
+                query
             );
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
@@ -183,12 +179,10 @@ async function getKibanaResult(
             }
             keyFigureResult.value = value;
         } else if (keyFigure.type === "sub_agg") {
-            const keyFigureResponse = await fetchDataFromOs(
-                OS_VPC_ENDPOINT,
-                OS_HOST,
-                query,
-                "_search?size=0",
-                credentials
+            const keyFigureResponse = await openSearchApi.makeOsQuery(
+                OS_INDEX,
+                `${OpenSearchApiMethod.SEARCH}?size=0`,
+                query
             );
             const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
@@ -209,7 +203,7 @@ async function getKibanaResult(
 }
 
 export async function getKibanaResults(
-    credentials: AwsCredentialIdentity,
+    openSearchApi: OpenSearch,
     keyFigures: KeyFigure[],
     apiPaths: { transportType: string; paths: Set<string> }[],
     event: KeyFigureLambdaEvent
@@ -224,7 +218,7 @@ export async function getKibanaResults(
             });
             kibanaResults.push(
                 getKibanaResult(
-                    credentials,
+                    openSearchApi,
                     keyFigures,
                     startDate,
                     endDate,
@@ -242,7 +236,7 @@ export async function getKibanaResults(
             });
             kibanaResults.push(
                 getKibanaResult(
-                    credentials,
+                    openSearchApi,
                     keyFigures,
                     startDate,
                     endDate,

@@ -24,6 +24,13 @@ test("account name to transport type filter string conversion works", async () =
         ]!} OR accountName:${process.env["ROAD_ACCOUNT_NAME"]!})`
     );
     expect(allAccountsFilter1).toEqual(`@transport_type:*`);
+    // the order shouldn't matter
+    const allAccountsFilter2 = getTransportTypeFilterFromAccountNameFilter(
+        `(accountName:${process.env["ROAD_ACCOUNT_NAME"]!} OR accountName:${process.env[
+            "MARINE_ACCOUNT_NAME"
+        ]!} OR accountName:${process.env["RAIL_ACCOUNT_NAME"]!})`
+    );
+    expect(allAccountsFilter2).toEqual(`@transport_type:*`);
 });
 
 test("transport type to account name filter string conversion works", async () => {
