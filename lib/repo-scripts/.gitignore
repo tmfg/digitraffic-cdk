@@ -3,10 +3,12 @@
 !.eslintignore
 !.eslintrc.cjs
 !.gitignore
-!package.json
 !README.md
-!tsconfig.json
+!command-line.json
+!package.json
 !rollup.config.js
+!rush-plugin-manifest.json
+!tsconfig.json
 
 !config/
 !config/*.json

@@ -5,9 +5,8 @@
   "scripts": {
     "build": "npm run build:clean && npm run bundle",
     "build:clean": "heft build --clean",
-    "build:watch": "npm run build -- --watch",
+    "build:watch": "heft build-watch --clean",
     "bundle": "rollup -c",
-    "bundle:watch": "npm run bundle -- --watch",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "publish:cdk": "npm run bundle && cp dist/*.mjs ../../common/scripts/",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
