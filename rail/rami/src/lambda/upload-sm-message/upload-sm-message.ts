@@ -8,8 +8,20 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         return LambdaResponse.badRequest("Empty message body");
     }
 
-    const validationResult = validateIncomingSmMessage(messageBody);
+    const body = JSON.stringify(messageBody);
 
+    logger.info({
+        method: "UploadSmMessage.handler",
+        message: "Received valid SM message",
+        customSizeBytes: body.length
+    });
+
+    logger.debug(body);
+
+    await sendSmMessage(messageBody);
+
+//    const validationResult = validateIncomingSmMessage(messageBody);
+/*
     if(validationResult.valid) {
         const body = JSON.stringify(messageBody);
 
@@ -36,7 +48,7 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
             errors: validationResult.errors, 
             message: messageBody
         });     
-    }
+    }*/
 
     return LambdaResponse.ok("OK");
 

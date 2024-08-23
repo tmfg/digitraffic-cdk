@@ -19,9 +19,9 @@ export async function sendRosmMessage(validationResult: Valid<unknown>): Promise
     }
 }
 
-export async function sendSmMessage(validationResult: Valid<unknown>): Promise<void> {
+export async function sendSmMessage(message: unknown): Promise<void> {
     if(SM_SQS_URL.result === "ok") {
-        await sendToSqs(SM_SQS_URL.value, JSON.stringify(validationResult.value));
+        await sendToSqs(SM_SQS_URL.value, JSON.stringify(message));
     } else {
         throw new Error(`${RamiEnvKeys.SM_SQS_URL} env variable not defined!`);
     }
