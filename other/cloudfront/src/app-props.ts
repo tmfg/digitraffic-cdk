@@ -141,8 +141,8 @@ export class CFDomain extends CFOrigin {
     apiKey?: string;
     cfName?: string;
     headers: Record<string, string> = {};
-    // appears as "response timeout" in the console and as "read timeout" in cdk interfaces 
-    responseTimeout: Duration
+    // appears as "response timeout" in the console and as "read timeout" in cdk interfaces
+    responseTimeout: Duration;
 
     constructor(domainName: string, ...behaviors: CFBehavior[]) {
         super(behaviors);
@@ -216,7 +216,7 @@ export class CFDomain extends CFOrigin {
 
     public withResponseTimeout(seconds: number): this {
         if (seconds > 60 || seconds < 1) {
-            throw new Error(`Invalid response timeout value (range is 1-60 seconds)`)
+            throw new Error(`Invalid response timeout value (range is 1-60 seconds)`);
         }
         this.responseTimeout = Duration.seconds(seconds);
 
@@ -258,7 +258,7 @@ export interface DistributionProps {
     readonly environmentName: string;
     readonly aliasNames: string[];
     readonly acmCertRef?: string;
-    readonly aclRules?: WafRules;
+    readonly aclRules?: WafRules[];
     readonly origins: CFOrigin[];
     readonly disableShieldAdvanced?: boolean;
 }

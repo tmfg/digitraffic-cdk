@@ -10,6 +10,8 @@ export class WafRules {
     readonly perIpAndQueryWithHeader?: number;
     readonly perIpAndQueryWithoutHeader?: number;
 
+    readonly isCountOnly?: boolean;
+
     constructor(
         awsCommonRuleSets: "all" | AWSManagedWafRule[],
         digitrafficHeaderRules: boolean,
@@ -17,7 +19,8 @@ export class WafRules {
         perIpWithoutHeader: number,
         perIpAndQueryWithHeader?: number,
         perIpAndQueryWithoutHeader?: number,
-        excludedRules?: ExcludedAWSRules
+        excludedRules?: ExcludedAWSRules,
+        isCountOnly: boolean = false
     ) {
         this.awsCommonRuleSets = awsCommonRuleSets;
         this.digitrafficHeaderRules = digitrafficHeaderRules;
@@ -26,6 +29,7 @@ export class WafRules {
         this.perIpAndQueryWithHeader = perIpAndQueryWithHeader;
         this.perIpAndQueryWithoutHeader = perIpAndQueryWithoutHeader;
         this.excludedRules = excludedRules;
+        this.isCountOnly = isCountOnly;
     }
 
     private static checkLimits(
@@ -66,6 +70,24 @@ export class WafRules {
             perIpAndQueryWithHeader,
             perIpAndQueryWithoutHeader,
             excludedRules
+        );
+    }
+
+    static per5minCount(
+        perIpWithHeader: number,
+        perIpWithoutHeader: number,
+        perIpAndQueryWithHeader?: number,
+        perIpAndQueryWithoutHeader?: number
+    ): WafRules {
+        return new WafRules(
+            [],
+            true,
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader,
+            undefined,
+            true
         );
     }
 
