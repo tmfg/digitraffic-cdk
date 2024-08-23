@@ -13,10 +13,6 @@
 !config/
 !config/*.json
 
-!dist/
-!dist/
-!dist/*.mjs
-
 !src/
 !src/**/
 !src/**/*.ts
