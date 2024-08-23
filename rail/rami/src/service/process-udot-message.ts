@@ -1,7 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
 import type { Connection } from "mysql2/promise";
-import { inDatabase, inTransaction } from "../util/database.js";
+import { inDatabase } from "../util/database.js";
 import type { UnknownDelayOrTrackMessage, UnknownDelayOrTrack } from "../model/dt-rosm-message.js";
 import { insertOrUpdate } from "../dao/udot.js";
 

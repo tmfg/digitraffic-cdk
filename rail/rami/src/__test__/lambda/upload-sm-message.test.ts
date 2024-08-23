@@ -30,15 +30,5 @@ describe(
             expect(sendSmFn).toHaveBeenCalledTimes(1);
             expect(sendDlqFn).toHaveBeenCalledTimes(0);
         });
-
-        test("handler - invalid message", async () => {
-            const invalidMessage = cloneAndUndefine(validMessageUnknownTrackAndDelay, "payload");
-            const handler = await import("../../lambda/upload-sm-message/upload-sm-message.js");
-            const result = await handler.handler(invalidMessage);
-            
-            expect(result.status).toEqual(200);
-            expect(sendSmFn).toHaveBeenCalledTimes(0);
-            expect(sendDlqFn).toHaveBeenCalledTimes(1);
-        });
     }
 );

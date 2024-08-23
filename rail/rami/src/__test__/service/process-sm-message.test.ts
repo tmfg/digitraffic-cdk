@@ -4,7 +4,7 @@ import { realMessage, validMessage2 } from "../testdata-sm.js";
 import { createSmMessage } from "../testdata-util.js";
 
 describe("parse sm messages", () => {
-    function expectMessage(processedMessage: UnknownDelayOrTrackMessage | undefined, index: number, delayUnknown: boolean, trackUnknown: boolean, type: number,
+    function expectMessage(processedMessage: UnknownDelayOrTrackMessage | undefined, index: number, unknownDelay: boolean, unknownTrack: boolean, type: number,
         trainNumber: number = 8122, departureDate: string = "2024-06-19"
     ): void {
         if(!processedMessage) {
@@ -20,8 +20,8 @@ describe("parse sm messages", () => {
             throw new Error("No data at index " + index);
         }
 
-        expect(data.unknownDelay).toEqual(delayUnknown);
-        expect(data.unknownTrack).toEqual(trackUnknown);
+        expect(data.unknownDelay).toEqual(unknownDelay);
+        expect(data.unknownTrack).toEqual(unknownTrack);
         expect(data.type).toEqual(type);
     }
 
@@ -79,7 +79,7 @@ describe("parse sm messages", () => {
 
     test("parseSmMessage - valid scheduledMessage with onwardCalls", () => {
         const processedMessage = parseUDOTMessage(validMessage2);
-
+        
         expectMessage(processedMessage, 0, false, false, 0, 762, "2024-03-19");
         expectMessage(processedMessage, 1, false, false, 1, 762, "2024-03-19");
         expectMessage(processedMessage, 2, true, false, 0, 762, "2024-03-19");

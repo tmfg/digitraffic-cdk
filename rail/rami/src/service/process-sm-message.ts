@@ -39,7 +39,7 @@ function ramiSmMessageToUDOTMessage(message: z.infer<typeof ramiSmMessageSchema>
 
     mcj.onwardCalls.forEach(oc => {
         data.push(...parseMonitoredCall(oc));
-    });  
+    });
 
     return { messageId, trainNumber, departureDate, vehicleJourneyName, data };
 }

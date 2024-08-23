@@ -1,5 +1,6 @@
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { attachQueueToApiGatewayResource } from "@digitraffic/common/dist/aws/infra/sqs-integration";
 import {
   MonitoredDBFunction,
   MonitoredFunction,
@@ -12,6 +13,7 @@ import { EndpointType, Model, type Resource } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { RamiEnvKeys } from "./keys.js";
+import { RequestValidator } from "aws-cdk-lib/aws-apigateway";
 
 export class IntegrationApi {
   readonly integrationApi: DigitrafficRestApi;
@@ -33,7 +35,7 @@ export class IntegrationApi {
       .addResource("incoming");
 
         this.createUploadRosmMessageResource(stack, resource, rosmSqs, dlq);
-        this.createUploadSmMessageResource(stack, resource, smSqs, dlq);
+        this.createNewUploadSmMessageResource(stack, resource, smSqs);
     }
 
     createUploadRosmMessageResource(
@@ -74,6 +76,23 @@ export class IntegrationApi {
         return uploadLambda;
     }
 
+    createNewUploadSmMessageResource(
+        stack: DigitrafficStack,
+        resource: Resource,
+        dlq: Queue
+    ): void {
+        const activeResource = resource.addResource("sm");
+
+        const requestValidator = new RequestValidator(stack, "RequestValidator", {
+            validateRequestBody: false,
+            validateRequestParameters: false,
+            requestValidatorName: "StopMonitoringIntegrationRequestValidator",
+            restApi: this.integrationApi
+        });
+
+        attachQueueToApiGatewayResource(stack, dlq, activeResource, requestValidator, "StopMonitoring", true);
+    }
+
     createUploadSmMessageResource(
         stack: DigitrafficStack,
         resource: Resource,
@@ -85,11 +104,11 @@ export class IntegrationApi {
         const uploadLambda = MonitoredFunction.create(stack, functionName, {
             functionName,
             timeout: Duration.seconds(15),
-            memorySize: 256,
+            memorySize: 512,
             code: new AssetCode("dist/lambda/upload-sm-message"),
             handler: "upload-sm-message.handler",
             runtime: Runtime.NODEJS_20_X,
-            reservedConcurrentExecutions: 10,
+            reservedConcurrentExecutions: 24,
             environment: { 
                 [RamiEnvKeys.SM_SQS_URL]: smSqs.queueUrl, 
                 [RamiEnvKeys.DLQ_URL]: dlq.queueUrl 
