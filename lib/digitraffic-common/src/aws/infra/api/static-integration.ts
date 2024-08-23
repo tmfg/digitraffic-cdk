@@ -1,4 +1,4 @@
-import { MockIntegration, PassthroughBehavior, Resource } from "aws-cdk-lib/aws-apigateway";
+import { MockIntegration, PassthroughBehavior, type Resource } from "aws-cdk-lib/aws-apigateway";
 import { MediaType } from "../../types/mediatypes.js";
 
 const INTEGRATION_RESPONSE_200 = `{
@@ -17,8 +17,8 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         resource: Resource,
         mediaType: MediaType,
         response: string,
-        enableCors = true,
-        apiKeyRequired = true,
+        enableCors: boolean = true,
+        apiKeyRequired: boolean = true,
         headers: Record<string, string> = {},
     ) {
         if (enableCors) {
@@ -50,10 +50,10 @@ export class DigitrafficStaticIntegration extends MockIntegration {
     static json<K>(
         resource: Resource,
         response: K,
-        enableCors = true,
-        apiKeyRequired = true,
+        enableCors: boolean = true,
+        apiKeyRequired: boolean = true,
         headers: Record<string, string> = {},
-    ) {
+    ): DigitrafficStaticIntegration {
         return new DigitrafficStaticIntegration(
             resource,
             MediaType.APPLICATION_JSON,

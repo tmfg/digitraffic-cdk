@@ -1,7 +1,6 @@
 import { RESPONSE_DEFAULT_LAMBDA } from "../../../aws/infra/api/response.js";
 import etag from "etag";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
 //const velocity = require("velocityjs");
 import velocity from "velocityjs";
 
@@ -15,10 +14,10 @@ interface VelocityContext {
 }
 
 describe("response tests", () => {
-    function generateEtagValueFromString(body: string) {
+    function generateEtagValueFromString(body: string): string {
         return generateEtagValueFromBase64String(Buffer.from(body).toString("base64"));
     }
-    function generateEtagValueFromBase64String(bodyBase64: string) {
+    function generateEtagValueFromBase64String(bodyBase64: string): string {
         return etag(bodyBase64);
     }
 
@@ -27,12 +26,7 @@ describe("response tests", () => {
         fileName?: string,
         timestamp?: Date,
     ): [string, VelocityContext] {
-        // eslint-disable-next-line
-        const compile = new velocity.Compile(
-            // eslint-disable-next-line
-            velocity.parse(RESPONSE_DEFAULT_LAMBDA),
-        );
-        // eslint-disable-next-line
+        const compile = new velocity.Compile(velocity.parse(RESPONSE_DEFAULT_LAMBDA));
         const output = compile.render({
             input: {
                 path: () => ({
@@ -72,7 +66,7 @@ describe("response tests", () => {
         contentType?: string,
         fileName?: string,
         timestamp?: Date,
-    ) {
+    ): void {
         expect(output).toEqual(TEST_BODY);
         expect(context).toMatchObject({
             responseOverride: {
@@ -94,7 +88,6 @@ describe("response tests", () => {
     });
 
     test("test 200 - filename", () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
         const [output, context] = generateResponse(200, "test.txt");
 
         assertOutputAndContext(output, context, undefined, undefined, 'attachment; filename="test.txt"');
@@ -102,14 +95,12 @@ describe("response tests", () => {
 
     test("test 200 - filename and timestamp", () => {
         const now = new Date();
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
         const [output, context] = generateResponse(200, "test.txt", now);
 
         assertOutputAndContext(output, context, undefined, undefined, 'attachment; filename="test.txt"', now);
     });
 
     test("test 204", () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
         const [output, context] = generateResponse(204);
 
         assertOutputAndContext(output, context, 204, "text/plain");

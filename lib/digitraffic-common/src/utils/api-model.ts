@@ -2,11 +2,13 @@ import {
     type JsonSchema,
     JsonSchemaType,
     JsonSchemaVersion,
-    Model,
-    RequestValidator,
-    RestApi,
+    type Model,
+    type RequestValidator,
+    type RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import type { ModelWithReference } from "../aws/types/model-with-reference.js";
+
+type ModelReferenceUrl = `https://apigateway.amazonaws.com/restapis/${string}/models/${string}`;
 
 /**
  * Get a reference to an OpenAPI model object in a REST API.
@@ -14,7 +16,7 @@ import type { ModelWithReference } from "../aws/types/model-with-reference.js";
  * @param modelId Id of the referenced object
  * @param restApiId Id of the REST API
  */
-export function getModelReference(modelId: string, restApiId: string) {
+export function getModelReference(modelId: string, restApiId: string): ModelReferenceUrl {
     return `https://apigateway.amazonaws.com/restapis/${restApiId}/models/${modelId}`;
 }
 
@@ -58,7 +60,7 @@ export function addServiceModel(modelName: string, api: RestApi, schema: JsonSch
 export function addSimpleServiceModel(
     modelName: string,
     api: RestApi,
-    contentType = "application/xml",
+    contentType: `${string}/${string}` = "application/xml",
 ): Model {
     return api.addModel(modelName, {
         contentType,
@@ -110,7 +112,6 @@ export function featureSchema(modelReference: string) {
 }
 
 /**
- *
  * Creates a JSON Schema for a GeoJSON Feature Collection. Can be used to generate OpenAPI descriptions.
  * @param modelReference Reference to a model object, in this case Features.
  */

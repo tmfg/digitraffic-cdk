@@ -11,9 +11,9 @@ import {
     type MethodResponse,
     PassthroughBehavior,
 } from "aws-cdk-lib/aws-apigateway";
-import { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
+import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 import { BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE } from "../../types/errors.js";
-import { MediaType } from "../../types/mediatypes.js";
+import type { MediaType } from "../../types/mediatypes.js";
 
 /// @deprecated
 export const RESPONSE_200_OK: IntegrationResponse = {
@@ -72,9 +72,7 @@ export function methodResponse(
 }
 
 interface IntegrationOptions {
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
     requestParameters?: { [dest: string]: string };
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
     requestTemplates?: { [contentType: string]: string };
     responses?: IntegrationResponse[];
     disableCors?: boolean;

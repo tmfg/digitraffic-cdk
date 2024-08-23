@@ -10,7 +10,7 @@ export enum EnvKeys {
 export function envValue(key: string, defaultValue?: string): string {
     const value = process.env[key];
 
-    if (value == null) {
+    if (value === null || value === undefined) {
         if (defaultValue) {
             return defaultValue;
         }

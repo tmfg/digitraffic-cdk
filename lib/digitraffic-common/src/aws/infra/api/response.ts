@@ -47,7 +47,7 @@ $util.base64Decode($inputRoot.body)`;
  * @param sunset Sunset date as string in ISO 8601 date-time format (YYYY-MM-DD)
  */
 
-export const getDeprecatedDefaultLambdaResponse = (sunset: string) => {
+export const getDeprecatedDefaultLambdaResponse = (sunset: string): string => {
     const setDeprecationHeaders = `#set ($context.responseOverride.header.Deprecation = 'true')
 #set ($context.responseOverride.header.Sunset = '${dateFromIsoString(sunset).toUTCString()}')`;
     return RESPONSE_DEFAULT_LAMBDA.concat(setDeprecationHeaders);
@@ -108,8 +108,8 @@ export class DigitrafficMethodResponse {
         statusCode: string,
         model: IModel,
         mediaType: MediaType,
-        disableCors = false,
-        deprecation = false,
+        disableCors: boolean = false,
+        deprecation: boolean = false,
     ): MethodResponse {
         return {
             statusCode,
@@ -128,15 +128,21 @@ export class DigitrafficMethodResponse {
         };
     }
 
-    static response200(model: IModel, mediaType = MediaType.APPLICATION_JSON) {
+    static response200(model: IModel, mediaType: MediaType = MediaType.APPLICATION_JSON): MethodResponse {
         return DigitrafficMethodResponse.response("200", model, mediaType, false);
     }
 
-    static response500(model = Model.EMPTY_MODEL, mediaType = MediaType.APPLICATION_JSON) {
+    static response500(
+        model: IModel = Model.EMPTY_MODEL,
+        mediaType: MediaType = MediaType.APPLICATION_JSON,
+    ): MethodResponse {
         return DigitrafficMethodResponse.response("500", model, mediaType, false);
     }
 
-    static response400(model = Model.EMPTY_MODEL, mediaType = MediaType.APPLICATION_JSON) {
+    static response400(
+        model: IModel = Model.EMPTY_MODEL,
+        mediaType: MediaType = MediaType.APPLICATION_JSON,
+    ): MethodResponse {
         return DigitrafficMethodResponse.response("400", model, mediaType, false);
     }
 }

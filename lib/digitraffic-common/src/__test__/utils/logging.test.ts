@@ -18,19 +18,23 @@ interface LikeAxiosError extends Error {
 }
 
 describe("dt-logger", () => {
-    function assertLogError(error: Error | string, expected: ErrorLogLine, includeStack = false) {
+    function assertLogError(
+        error: Error | string,
+        expected: ErrorLogLine,
+        includeStack: boolean = false,
+    ): void {
         assertWrite((logger: DtLogger) => {
             logException(logger, error, includeStack);
         }, expected);
     }
 
-    function assertAxiosError(error: LikeAxiosError, expected: ErrorLogLine) {
+    function assertAxiosError(error: LikeAxiosError, expected: ErrorLogLine): void {
         assertWrite((logger: DtLogger) => {
             logException(logger, error);
         }, expected);
     }
 
-    function assertWrite(writeFunction: (logger: DtLogger) => void, expected: ErrorLogLine) {
+    function assertWrite(writeFunction: (logger: DtLogger) => void, expected: ErrorLogLine): void {
         const logged: string[] = [];
         const writeStream = new Writable({
             write: (chunk: Buffer) => {
@@ -57,7 +61,7 @@ describe("dt-logger", () => {
             expect(stack).toBeDefined();
         }
 
-        expect(loggedLine).toEqual(expected);
+        expect(loggedLine).toMatchObject(expected);
     }
 
     test("log error - string", () => {

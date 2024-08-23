@@ -1,4 +1,4 @@
-import { type IApiKey, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { IApiKey, RestApi } from "aws-cdk-lib/aws-apigateway";
 
 /**
  * Creates an usage plan for a REST API with a single API key

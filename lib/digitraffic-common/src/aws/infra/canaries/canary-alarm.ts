@@ -1,7 +1,7 @@
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import type { CanaryParameters } from "./canary-parameters.js";
 import { Alarm, ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
-import { Canary } from "aws-cdk-lib/aws-synthetics";
+import type { Canary } from "aws-cdk-lib/aws-synthetics";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { Topic } from "aws-cdk-lib/aws-sns";
 

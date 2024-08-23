@@ -1,4 +1,4 @@
-import { Asserter } from "../../test/asserter.js";
+import { Asserter } from "../asserter.js";
 import * as Geometry from "../../utils/geometry.js";
 
 const TAMPERE_WGS84_X = 23.761290078;

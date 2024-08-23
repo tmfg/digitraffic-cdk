@@ -8,7 +8,11 @@ const LOG_LINE: LoggableType = {
 };
 
 describe("dt-logger", () => {
-    function assertLog<T>(config: LoggerConfiguration, message: LoggableType, expected: NonNullable<T>) {
+    function assertLog<T>(
+        config: LoggerConfiguration,
+        message: LoggableType,
+        expected: NonNullable<T>,
+    ): void {
         assertWrite(
             config,
             (logger: DtLogger) => {
@@ -18,7 +22,7 @@ describe("dt-logger", () => {
         );
     }
 
-    function assertDebug<T>(config: LoggerConfiguration, message: unknown, expected: NonNullable<T>) {
+    function assertDebug<T>(config: LoggerConfiguration, message: unknown, expected: NonNullable<T>): void {
         assertWrite(
             config,
             (logger: DtLogger) => {
@@ -32,7 +36,7 @@ describe("dt-logger", () => {
         config: LoggerConfiguration,
         writeFunction: (logger: DtLogger) => void,
         expected: NonNullable<T>,
-    ) {
+    ): void {
         const logged: string[] = [];
         const writeStream = new Writable({
             write: (chunk: Buffer) => {
@@ -53,7 +57,9 @@ describe("dt-logger", () => {
         console.info(loggedLine);
 
         if (typeof expected === "object" && "stack" in expected && expected.stack) {
+            // eslint-disable-next-line dot-notation
             const stack = loggedLine["stack"];
+            // eslint-disable-next-line dot-notation
             delete loggedLine["stack"];
             delete expected.stack;
 

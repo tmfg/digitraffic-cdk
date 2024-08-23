@@ -48,7 +48,7 @@ const PARAMETERS = {
 export type ReadParameterType = keyof typeof PARAMETERS;
 export type WriteParameterType = Exclude<Exclude<ReadParameterType, "topic.alarm">, "topic.warning">;
 
-export function getParameterValue(scope: Construct, parameterType: ReadParameterType) {
+export function getParameterValue(scope: Construct, parameterType: ReadParameterType): string {
     const parameterName = PARAMETERS[parameterType].parameterName;
     return StringParameter.valueForStringParameter(scope, parameterName);
 }

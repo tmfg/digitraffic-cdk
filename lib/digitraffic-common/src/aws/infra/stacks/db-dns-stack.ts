@@ -22,7 +22,7 @@ export class DbDnsStack extends Stack {
         this.createDnsRecords(isc);
     }
 
-    createDnsRecords(isc: InfraStackConfiguration) {
+    createDnsRecords(isc: InfraStackConfiguration): void {
         const vpc = importVpc(this, isc.environmentName);
         const zone = new PrivateHostedZone(this, "DNSHostedZone", {
             zoneName: isc.environmentName + ".local",

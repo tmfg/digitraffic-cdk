@@ -16,7 +16,7 @@ export class DigitrafficIntegration<T extends string> {
     readonly parameters: ApiParameter[] = [];
     readonly sunset?: string;
 
-    constructor(lambda: IFunction, mediaType = MediaType.TEXT_PLAIN, sunset?: string) {
+    constructor(lambda: IFunction, mediaType: MediaType = MediaType.TEXT_PLAIN, sunset?: string) {
         this.lambda = lambda;
         this.mediaType = mediaType;
         this.sunset = sunset;
@@ -67,8 +67,8 @@ export class DigitrafficIntegration<T extends string> {
         return new LambdaIntegration(this.lambda, {
             proxy: false,
             integrationResponses,
-            requestParameters: this.parameters.length == 0 ? undefined : this.createRequestParameters(),
-            requestTemplates: this.parameters.length == 0 ? undefined : this.createRequestTemplates(),
+            requestParameters: this.parameters.length === 0 ? undefined : this.createRequestParameters(),
+            requestTemplates: this.parameters.length === 0 ? undefined : this.createRequestTemplates(),
             passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
         });
     }

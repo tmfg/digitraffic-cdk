@@ -15,8 +15,8 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "aws-cdk-lib": "~2.151.0",
-    "constructs": "10.3.0"
+    "aws-cdk-lib": "^2.151.0",
+    "constructs": "~10.3.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -26,10 +26,10 @@
     "@rushstack/heft": "^0.66.25",
     "@rushstack/heft-jest-plugin": "^0.12.7",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "20.14.8",
+    "@types/node": "20.14.9",
     "eslint": "^8.57.0",
     "ts-node": "^10.9.2",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.4"
   },
   "externals": [
     "aws-sdk"

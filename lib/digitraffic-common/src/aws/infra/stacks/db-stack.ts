@@ -1,6 +1,12 @@
-import { InstanceType, type ISecurityGroup, type IVpc, SecurityGroup, SubnetType } from "aws-cdk-lib/aws-ec2";
 import {
-    AuroraPostgresEngineVersion,
+    type InstanceType,
+    type ISecurityGroup,
+    type IVpc,
+    SecurityGroup,
+    SubnetType,
+} from "aws-cdk-lib/aws-ec2";
+import {
+    type AuroraPostgresEngineVersion,
     CfnDBInstance,
     Credentials,
     DatabaseCluster,
@@ -11,7 +17,7 @@ import {
     type IParameterGroup,
     ParameterGroup,
 } from "aws-cdk-lib/aws-rds";
-import { Construct } from "constructs/lib/construct.js";
+import type { Construct } from "constructs/lib/construct.js";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
 import { exportValue, importVpc } from "../import-util.js";
@@ -59,13 +65,13 @@ export interface ClusterImportConfiguration {
  */
 
 export class DbStack extends Stack {
-    public static CLUSTER_PORT = 5432;
+    public static CLUSTER_PORT: number = 5432;
 
-    public static CLUSTER_IDENTIFIER_EXPORT_NAME = "db-cluster";
-    public static CLUSTER_READ_ENDPOINT_EXPORT_NAME = "db-cluster-reader-endpoint";
-    public static CLUSTER_WRITE_ENDPOINT_EXPORT_NAME = "db-cluster-writer-endpoint";
+    public static CLUSTER_IDENTIFIER_EXPORT_NAME: string = "db-cluster";
+    public static CLUSTER_READ_ENDPOINT_EXPORT_NAME: string = "db-cluster-reader-endpoint";
+    public static CLUSTER_WRITE_ENDPOINT_EXPORT_NAME: string = "db-cluster-writer-endpoint";
 
-    public clusterIdentifier = "";
+    public clusterIdentifier: string = "";
 
     constructor(scope: Construct, id: string, isc: InfraStackConfiguration, configuration: DbConfiguration) {
         super(scope, id, {
