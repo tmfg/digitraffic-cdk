@@ -1,7 +1,8 @@
-import type { AWSManagedWafRule } from "@digitraffic/common/dist/aws/infra/acl-builder";
+import type { AWSManagedWafRule, ExcludedAWSRules } from "@digitraffic/common/dist/aws/infra/acl-builder";
 
 export class WafRules {
-    readonly awsCommonRules: "all" | AWSManagedWafRule[];
+    readonly awsCommonRuleSets: "all" | AWSManagedWafRule[];
+    readonly excludedRules: ExcludedAWSRules | undefined;
     readonly digitrafficHeaderRules: boolean;
 
     readonly perIpWithHeader: number;
@@ -10,19 +11,21 @@ export class WafRules {
     readonly perIpAndQueryWithoutHeader?: number;
 
     constructor(
-        awsCommonRules: "all" | AWSManagedWafRule[],
+        awsCommonRuleSets: "all" | AWSManagedWafRule[],
         digitrafficHeaderRules: boolean,
         perIpWithHeader: number,
         perIpWithoutHeader: number,
         perIpAndQueryWithHeader?: number,
-        perIpAndQueryWithoutHeader?: number
+        perIpAndQueryWithoutHeader?: number,
+        excludedRules?: ExcludedAWSRules
     ) {
-        this.awsCommonRules = awsCommonRules;
+        this.awsCommonRuleSets = awsCommonRuleSets;
         this.digitrafficHeaderRules = digitrafficHeaderRules;
         this.perIpWithHeader = perIpWithHeader;
         this.perIpWithoutHeader = perIpWithoutHeader;
         this.perIpAndQueryWithHeader = perIpAndQueryWithHeader;
         this.perIpAndQueryWithoutHeader = perIpAndQueryWithoutHeader;
+        this.excludedRules = excludedRules;
     }
 
     private static checkLimits(
@@ -45,7 +48,8 @@ export class WafRules {
         perIpWithHeader: number,
         perIpWithoutHeader: number,
         perIpAndQueryWithHeader?: number,
-        perIpAndQueryWithoutHeader?: number
+        perIpAndQueryWithoutHeader?: number,
+        excludedRules?: ExcludedAWSRules
     ): WafRules {
         WafRules.checkLimits(
             perIpWithHeader,
@@ -60,16 +64,18 @@ export class WafRules {
             perIpWithHeader,
             perIpWithoutHeader,
             perIpAndQueryWithHeader,
-            perIpAndQueryWithoutHeader
+            perIpAndQueryWithoutHeader,
+            excludedRules
         );
     }
 
     static per5minWithSelectedCommon(
-        awsCommonRules: "all" | AWSManagedWafRule[],
+        awsCommonRuleSets: "all" | AWSManagedWafRule[],
         perIpWithHeader: number,
         perIpWithoutHeader: number,
         perIpAndQueryWithHeader?: number,
-        perIpAndQueryWithoutHeader?: number
+        perIpAndQueryWithoutHeader?: number,
+        excludedRules?: ExcludedAWSRules
     ): WafRules {
         WafRules.checkLimits(
             perIpWithHeader,
@@ -79,12 +85,13 @@ export class WafRules {
         );
 
         return new WafRules(
-            awsCommonRules,
+            awsCommonRuleSets,
             true,
             perIpWithHeader,
             perIpWithoutHeader,
             perIpAndQueryWithHeader,
-            perIpAndQueryWithoutHeader
+            perIpAndQueryWithoutHeader,
+            excludedRules
         );
     }
 }

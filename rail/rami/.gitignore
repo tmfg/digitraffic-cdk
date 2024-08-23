@@ -14,4 +14,4 @@
 !src/**/
 !src/**/*.ts
 !src/**/model/**/*.json
-src/bin/*.ts
+/src/bin
