@@ -38,7 +38,7 @@ jobs:
         id: report
         run: |
           mkdir -p eslint/${{ github.ref_name }}
-          pnpm ci:eslint-report -o eslint/${{ github.ref_name }}/index.html
+          pnpm eslint-report -o eslint/${{ github.ref_name }}/index.html
         continue-on-error: true
 
       - name: Upload pages artifact
