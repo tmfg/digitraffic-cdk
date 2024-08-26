@@ -7,12 +7,12 @@ import { LogGroup } from "aws-cdk-lib/aws-logs";
 export function createWebAcl(
     stack: Stack,
     environment: string,
-    rules_collection: WafRules[],
+    rulesCollection: WafRules[],
     distributionName: string
 ): CfnWebACL {
     const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
 
-    for (const rules of rules_collection) {
+    for (const rules of rulesCollection) {
         if (rules.isCountOnly) {
             aclBuilder
                 .withCountDigitrafficUserIp(rules.perIpWithHeader)
