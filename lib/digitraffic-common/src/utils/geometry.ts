@@ -61,6 +61,7 @@ function coordinatePair(coordinate: Position): string {
  * @param features List of Features
  * @param lastUpdated Last updated date
  */
+// eslint-disable-next-line @rushstack/no-new-null
 export function createFeatureCollection(features: Feature[], lastUpdated: Date | null): FeatureCollection {
     return {
         type: "FeatureCollection",
@@ -119,16 +120,19 @@ function distanceBetweenWGS84PointsInKm(
  * @param pos1 first position
  * @param pos2 second position
  */
-export function distanceBetweenPositionsInKm(pos1: Position, pos2: Position) {
-    if (pos1.length < 2 || pos1.length > 3 || pos2.length < 2 || pos2.length > 3) {
+export function distanceBetweenPositionsInKm(pos1: Position, pos2: Position): number {
+    const [pos10, pos11] = pos1;
+    const [pos20, pos21] = pos2;
+    if (pos1.length > 3 || pos2.length > 3 || !pos10 || !pos11 || !pos20 || !pos21) {
         throw Error(
             `Illegal Positions ${pos1.toString()} and ${pos2.toString()}. Both must have length between 2 or 3.`,
         );
     }
-    return distanceBetweenWGS84PointsInKm(pos1[0]!, pos1[1]!, pos2[0]!, pos2[1]!);
+
+    return distanceBetweenWGS84PointsInKm(pos10, pos11, pos20, pos21);
 }
 
-export function areDistinctPositions(previous: Position, next: Position) {
+export function areDistinctPositions(previous: Position, next: Position): boolean {
     return previous[0] !== next[0] || previous[1] !== next[1];
 }
 
@@ -137,11 +141,19 @@ export function areDistinctPositions(previous: Position, next: Position) {
  * @param pos1
  * @param pos2
  */
-export function distanceBetweenPositionsInM(pos1: Position, pos2: Position) {
+export function distanceBetweenPositionsInM(pos1: Position, pos2: Position): number {
     return distanceBetweenPositionsInKm(pos1, pos2) * 1000; // km -> m
 }
 
-export function createGmlLineString(geometry: Geometry, srsName = "EPSG:4326") {
+export interface GmlLineString {
+    srsName: `${string}:${string}`;
+    posList: string;
+}
+
+export function createGmlLineString(
+    geometry: Geometry,
+    srsName: `${string}:${string}` = "EPSG:4326",
+): GmlLineString {
     const posList = createPosList(geometry);
 
     return {
@@ -150,7 +162,7 @@ export function createGmlLineString(geometry: Geometry, srsName = "EPSG:4326") {
     };
 }
 
-function createPosList(geometry: Geometry) {
+function createPosList(geometry: Geometry): string {
     if (geometry.type === "Point") {
         return positionToList(geometry.coordinates);
     } else if (geometry.type === "LineString") {
@@ -162,19 +174,19 @@ function createPosList(geometry: Geometry) {
     throw new Error("unknown geometry type " + JSON.stringify(geometry));
 }
 
-function polygonToList(positions: Position[][], precision = 8) {
+function polygonToList(positions: Position[][], precision: number = 8): string {
     return positions.map((p) => lineStringToList(p, precision)).join(" ");
 }
 
-function lineStringToList(positions: Position[], precision = 8) {
+function lineStringToList(positions: Position[], precision: number = 8): string {
     return positions.map((p) => positionToList(p, precision)).join(" ");
 }
 
-export function positionToList(position: Position, precision = 8) {
+export function positionToList(position: Position, precision: number = 8): string {
     return position.map((n) => n.toPrecision(precision)).join(" ");
 }
 
 // Converts numeric degrees to radians
-function toRadians(angdeg: number) {
+function toRadians(angdeg: number): number {
     return angdeg * DEGREES_TO_RADIANS;
 }

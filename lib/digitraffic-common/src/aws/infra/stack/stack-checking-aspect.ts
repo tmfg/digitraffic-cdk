@@ -47,13 +47,19 @@ export class StackCheckingAspect implements IAspect {
         this.checkLogGroupRetention(node);
     }
 
-    private isWhitelisted(key: string) {
+    private isWhitelisted(key: string): boolean | undefined {
         return this.whitelistedResources?.some((wl) => {
+            // eslint-disable-next-line @rushstack/security/no-unsafe-regexp
             return key.matchAll(new RegExp(wl, "g"));
         });
     }
 
-    private addAnnotation(node: IConstruct, key: ResourceType | string, message: string, isError = true) {
+    private addAnnotation(
+        node: IConstruct,
+        key: ResourceType | string,
+        message: string,
+        isError: boolean = true,
+    ): void {
         const resourceKey = `${node.node.path}/${key}`;
         const isWhiteListed = this.isWhitelisted(resourceKey);
         const annotationMessage = `${resourceKey}:${message}`;
@@ -67,7 +73,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private checkStack(node: IConstruct) {
+    private checkStack(node: IConstruct): void {
         if (node instanceof DigitrafficStack) {
             if (
                 (node.stackName.includes("Test") || node.stackName.includes("Tst")) &&
@@ -89,7 +95,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private checkFunction(node: IConstruct) {
+    private checkFunction(node: IConstruct): void {
         if (node instanceof CfnFunction) {
             if (!node.reservedConcurrentExecutions) {
                 this.addAnnotation(
@@ -135,7 +141,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private checkTags(node: IConstruct) {
+    private checkTags(node: IConstruct): void {
         if (node instanceof Stack) {
             if (!node.tags.tagValues()[SOLUTION_KEY]) {
                 this.addAnnotation(node, ResourceType.tagSolution, "Solution tag is missing");
@@ -143,7 +149,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private checkBucket(node: IConstruct) {
+    private checkBucket(node: IConstruct): void {
         if (node instanceof CfnBucket) {
             const c = node.publicAccessBlockConfiguration as
                 | CfnBucket.PublicAccessBlockConfigurationProperty
@@ -161,24 +167,27 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private static isValidPath(path: string): boolean {
+    private static isValidPath(path: string | undefined): boolean {
+        if (!path) {
+            return false;
+        }
         // if path includes . or { check only the trailing part of path
         if (path.includes(".")) {
-            return this.isValidPath(path.split(".")[0]!);
+            return this.isValidPath(path.split(".")[0]);
         }
 
         if (path.includes("{")) {
-            return this.isValidPath(path.split("{")[0]!);
+            return this.isValidPath(path.split("{")[0]);
         }
 
         return kebabCase(path) === path;
     }
 
-    private static isValidQueryString(name: string) {
+    private static isValidQueryString(name: string): boolean {
         return snakeCase(name) === name;
     }
 
-    private checkResourceCasing(node: IConstruct) {
+    private checkResourceCasing(node: IConstruct): void {
         if (node instanceof CfnResource) {
             if (!StackCheckingAspect.isValidPath(node.pathPart)) {
                 this.addAnnotation(node, ResourceType.resourcePath, "Path part should be in kebab-case");
@@ -204,7 +213,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private checkQueueEncryption(node: IConstruct) {
+    private checkQueueEncryption(node: IConstruct): void {
         if (node instanceof CfnQueue) {
             if (!node.kmsMasterKeyId) {
                 this.addAnnotation(node, ResourceType.queueEncryption, "Queue must have encryption enabled");
@@ -212,9 +221,10 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private checkLogGroupRetention(node: IConstruct) {
+    private checkLogGroupRetention(node: IConstruct): void {
         if (node instanceof LogRetention) {
             const child = node.node.defaultChild as unknown as Record<string, Record<string, string>>;
+            // eslint-disable-next-line dot-notation
             const retention = child?.["_cfnProperties"]?.["RetentionInDays"];
 
             if (!retention) {

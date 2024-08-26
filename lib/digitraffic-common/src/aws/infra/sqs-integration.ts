@@ -1,14 +1,14 @@
 import { Aws } from "aws-cdk-lib";
 import {
     AwsIntegration,
-    PassthroughBehavior,
-    RequestValidator,
-    Resource,
     type IModel,
+    PassthroughBehavior,
+    type RequestValidator,
+    type Resource,
 } from "aws-cdk-lib/aws-apigateway";
-import { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 
 export function attachQueueToApiGatewayResource(
     stack: Construct,
@@ -18,7 +18,7 @@ export function attachQueueToApiGatewayResource(
     resourceName: string,
     apiKeyRequired: boolean,
     requestModels?: Record<string, IModel>,
-) {
+): void {
     // role for API Gateway
     const apiGwRole = new Role(stack, `${resourceName}APIGatewayToSQSRole`, {
         assumedBy: new ServicePrincipal("apigateway.amazonaws.com"),

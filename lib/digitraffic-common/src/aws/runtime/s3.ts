@@ -1,5 +1,5 @@
 import type { ObjectCannedACL } from "@aws-sdk/client-s3";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import { type NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { logger } from "./dt-logger-default.js";
 
@@ -10,7 +10,7 @@ export async function uploadToS3(
     objectName: string,
     cannedAcl?: ObjectCannedACL,
     contentType?: string,
-) {
+): Promise<void> {
     const command = new PutObjectCommand({
         Bucket: bucketName,
         Key: objectName,

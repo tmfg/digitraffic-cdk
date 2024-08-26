@@ -3,6 +3,7 @@ import type { ValueOf } from "./util-types.js";
 /**
  * Adds `null` as an accepted type to all properties in given type.
  */
+// eslint-disable-next-line @rushstack/no-new-null
 export type Nullable<Obj> = { [Key in keyof Obj]: Obj[Key] | null };
 
 type RequiredKeys<Obj> = ValueOf<{

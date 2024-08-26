@@ -20,7 +20,8 @@ const getSecretValueMock =
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(getSecretValueMock);
 
-function mockSecret<T>(secret: null | T) {
+// eslint-disable-next-line @rushstack/no-new-null
+function mockSecret<T>(secret: null | T): void {
     if (!secret) {
         getSecretValueMock.mockImplementation(() => Promise.resolve(emptySecret));
     } else {
@@ -30,6 +31,7 @@ function mockSecret<T>(secret: null | T) {
     }
 }
 
+// eslint-disable-next-line dot-notation
 process.env["AWS_REGION"] = "eu-west-1";
 
 const secret = await import("../../aws/runtime/secrets/secret.js");

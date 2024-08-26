@@ -43,7 +43,7 @@ describe("acl-builder tests", () => {
             const acl = aclBuilder.build();
             // Check that the rule exists and a custom response is defined
             expect(acl.rules).toHaveLength(1);
-            expect(Object.keys(acl.customResponseBodies as Record<any, any>)).toHaveLength(1);
+            expect(Object.keys(acl.customResponseBodies as Record<string, unknown>)).toHaveLength(1);
             // Check that the rule does throttle
             const throttleRule = (acl.rules! as Array<CfnWebACL.RuleProperty>)[0]!;
             expect((throttleRule.statement as CfnWebACL.StatementProperty).rateBasedStatement).toBeDefined();

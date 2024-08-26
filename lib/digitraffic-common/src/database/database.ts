@@ -14,17 +14,14 @@ import pgpImport from "pg-promise";
 const pgp = pgpImport();
 
 // convert numeric types to number instead of string
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 pgp.pg.types.setTypeParser(pgp.pg.types.builtins.INT8, (value: string) => {
     return parseInt(value);
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 pgp.pg.types.setTypeParser(pgp.pg.types.builtins.FLOAT8, (value: string) => {
     return parseFloat(value);
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 pgp.pg.types.setTypeParser(pgp.pg.types.builtins.NUMERIC, (value: string) => {
     return parseFloat(value);
 });
@@ -54,7 +51,6 @@ export function initDbConnection(
 ): DTDatabase {
     const finalUrl = `postgresql://${username}:${password}@${url}?application_name=${applicationName}`;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return pgp(finalUrl, options);
 }
 
