@@ -1,6 +1,7 @@
 import { CfnIPSet, CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import type { Construct } from "constructs";
 import { logger } from "../runtime/dt-logger-default.js";
+import { zipWith, range, concat } from "lodash-es";
 
 interface RuleProperty {
     action?: CfnWebACL.RuleActionProperty;
@@ -17,6 +18,10 @@ export type ExcludedAWSRules = {
     [key in AWSManagedWafRule]?: string[];
 };
 
+export type CfnWebAclRuleProperty = {
+    [P in keyof CfnWebACL.RuleProperty as Exclude<P, "priority">]: CfnWebACL.RuleProperty[P];
+};
+
 /**
  * Builder class for building CfnWebACL.
  *
@@ -26,7 +31,8 @@ export type ExcludedAWSRules = {
  */
 export class AclBuilder {
     readonly _construct: Construct;
-    readonly _rules: CfnWebACL.RuleProperty[] = [];
+    readonly _countRules: CfnWebAclRuleProperty[] = [];
+    readonly _blockRules: CfnWebAclRuleProperty[] = [];
     readonly _name: string = "WebACL";
 
     _scope: string = "CLOUDFRONT";
@@ -46,19 +52,19 @@ export class AclBuilder {
         excludedRules: ExcludedAWSRules = {},
     ): AclBuilder {
         if (this.isRuleDefined(rules, "CommonRuleSet")) {
-            this._rules.push(createAWSCommonRuleSet(excludedRules?.CommonRuleSet));
+            this._blockRules.push(createAWSCommonRuleSet(excludedRules?.CommonRuleSet));
         }
 
         if (this.isRuleDefined(rules, "AmazonIpReputationList")) {
-            this._rules.push(createAWSReputationList(excludedRules?.AmazonIpReputationList));
+            this._blockRules.push(createAWSReputationList(excludedRules?.AmazonIpReputationList));
         }
 
         if (this.isRuleDefined(rules, "KnownBadInputsRuleSet")) {
-            this._rules.push(createAWSKnownBadInput(excludedRules?.KnownBadInputsRuleSet));
+            this._blockRules.push(createAWSKnownBadInput(excludedRules?.KnownBadInputsRuleSet));
         }
 
         if (this.isRuleDefined(rules, "SQLiRuleSet")) {
-            this._rules.push(createAWSAntiSQLInjection(excludedRules?.SQLiRuleSet));
+            this._blockRules.push(createAWSAntiSQLInjection(excludedRules?.SQLiRuleSet));
         }
 
         return this;
@@ -71,9 +77,8 @@ export class AclBuilder {
             addresses,
         });
 
-        this._rules.push({
+        this._blockRules.push({
             name: "IpBlocklist",
-            priority: 10,
             action: { block: {} },
             statement: {
                 ipSetReferenceStatement: {
@@ -92,28 +97,33 @@ export class AclBuilder {
 
     withThrottleRule(
         name: string,
-        priority: number,
         limit: number,
-        customResponseBodyKey: string,
         isHeaderRequired: boolean,
         isBasedOnIpAndUriPath: boolean,
+        customResponseBodyKey?: string,
     ): AclBuilder {
-        this._rules.push({
+        const isBlockRule = !!customResponseBodyKey;
+        const rules = isBlockRule ? this._blockRules : this._countRules;
+        const action = isBlockRule
+            ? {
+                  block: {
+                      customResponse: {
+                          responseCode: 429,
+                          customResponseBodyKey,
+                      },
+                  },
+              }
+            : {
+                  count: {},
+              };
+        rules.push({
             name,
-            priority,
             visibilityConfig: {
                 sampledRequestsEnabled: true,
                 cloudWatchMetricsEnabled: true,
                 metricName: name,
             },
-            action: {
-                block: {
-                    customResponse: {
-                        responseCode: 429,
-                        customResponseBodyKey,
-                    },
-                },
-            },
+            action,
             statement: createThrottleStatement(limit, isHeaderRequired, isBasedOnIpAndUriPath),
         });
 
@@ -134,76 +144,92 @@ export class AclBuilder {
         return this;
     }
 
-    // eslint-disable-next-line @rushstack/no-new-null
-    withThrottleDigitrafficUserIp(limit: number | null | undefined): AclBuilder {
-        if (limit === null || limit === undefined) {
-            this._logMissingLimit("withThrottleDigitrafficUserIp");
+    withThrottleDigitrafficUserIp(limit: number | undefined): AclBuilder {
+        if (limit === undefined) {
             return this;
         }
         const customResponseBodyKey = `IP_THROTTLE_DIGITRAFFIC_USER_${limit}`;
         this._addThrottleResponseBody(customResponseBodyKey, limit);
         return this.withThrottleRule(
             "ThrottleRuleWithDigitrafficUser",
-            1,
             limit,
-            customResponseBodyKey,
             true,
             false,
+            customResponseBodyKey,
         );
     }
 
-    // eslint-disable-next-line @rushstack/no-new-null
-    withThrottleDigitrafficUserIpAndUriPath(limit: number | null | undefined): AclBuilder {
-        if (limit === null || limit === undefined) {
-            this._logMissingLimit("withThrottleDigitrafficUserIpAndUriPath");
+    withThrottleDigitrafficUserIpAndUriPath(limit: number | undefined): AclBuilder {
+        if (limit === undefined) {
             return this;
         }
         const customResponseBodyKey = `IP_PATH_THROTTLE_DIGITRAFFIC_USER_${limit}`;
         this._addThrottleResponseBody(customResponseBodyKey, limit);
         return this.withThrottleRule(
             "ThrottleRuleIPQueryWithDigitrafficUser",
-            2,
             limit,
+            true,
+            true,
             customResponseBodyKey,
-            true,
-            true,
         );
     }
 
-    // eslint-disable-next-line @rushstack/no-new-null
-    withThrottleAnonymousUserIp(limit: number | null | undefined): AclBuilder {
-        if (limit === null || limit === undefined) {
-            this._logMissingLimit("withThrottleAnonymousUserIp");
+    withThrottleAnonymousUserIp(limit: number | undefined): AclBuilder {
+        if (limit === undefined) {
             return this;
         }
         const customResponseBodyKey = `IP_THROTTLE_ANONYMOUS_USER_${limit}`;
         this._addThrottleResponseBody(customResponseBodyKey, limit);
         return this.withThrottleRule(
             "ThrottleRuleWithAnonymousUser",
-            3,
             limit,
+            false,
+            false,
             customResponseBodyKey,
-            false,
-            false,
         );
     }
 
-    // eslint-disable-next-line @rushstack/no-new-null
-    withThrottleAnonymousUserIpAndUriPath(limit: number | null | undefined): AclBuilder {
-        if (limit === null || limit === undefined) {
-            this._logMissingLimit("withThrottleAnonymousUserIpAndUriPath");
+    withThrottleAnonymousUserIpAndUriPath(limit: number | undefined): AclBuilder {
+        if (limit === undefined) {
             return this;
         }
         const customResponseBodyKey = `IP_PATH_THROTTLE_ANONYMOUS_USER_${limit}`;
         this._addThrottleResponseBody(customResponseBodyKey, limit);
         return this.withThrottleRule(
             "ThrottleRuleIPQueryWithAnonymousUser",
-            4,
             limit,
-            customResponseBodyKey,
             false,
             true,
+            customResponseBodyKey,
         );
+    }
+
+    withCountDigitrafficUserIp(limit: number | undefined) {
+        if (limit === undefined) {
+            return this;
+        }
+        return this.withThrottleRule(`CountRuleWithDigitrafficUser${limit}`, limit, true, false);
+    }
+
+    withCountDigitrafficUserIpAndUriPath(limit: number | undefined) {
+        if (limit === undefined) {
+            return this;
+        }
+        return this.withThrottleRule(`CountRuleIPQueryWithDigitrafficUser${limit}`, limit, true, true);
+    }
+
+    withCountAnonymousUserIp(limit: number | undefined) {
+        if (limit === undefined) {
+            return this;
+        }
+        return this.withThrottleRule(`CountRuleWithAnonymousUser${limit}`, limit, false, false);
+    }
+
+    withCountAnonymousUserIpAndUriPath(limit: number | undefined) {
+        if (limit === undefined) {
+            return this;
+        }
+        return this.withThrottleRule(`CountRuleIPQueryWithAnonymousUser${limit}`, limit, false, true);
     }
 
     _isCustomResponseBodyKeySet(key: string): boolean {
@@ -219,27 +245,33 @@ export class AclBuilder {
         }
     }
 
-    _logMissingLimit(method: string): void {
-        logger.warn({
-            method: `acl-builder.${method}`,
-            message: `'limit' was not defined. Not setting a throttle rule for ${this._name}`,
-        });
-    }
-
     public build(): CfnWebACL {
-        if (this._rules.length === 0) {
+        const addPriority = (rule: CfnWebAclRuleProperty, priority: number): CfnWebACL.RuleProperty => ({
+            ...rule,
+            priority,
+        });
+        const rules: CfnWebACL.RuleProperty[] = concat(
+            zipWith(this._countRules, range(this._countRules.length), addPriority),
+            zipWith(
+                this._blockRules,
+                range(this._blockRules.length).map((n) => n + this._countRules.length),
+                addPriority,
+            ),
+        );
+
+        if (rules.length === 0) {
             throw new Error("No rules defined for WebACL");
         }
 
-        const uniqueRuleNames = new Set(this._rules.map((rule) => rule.name));
+        const uniqueRuleNames = new Set(rules.map((rule) => rule.name));
 
-        if (uniqueRuleNames.size !== this._rules.length) {
+        if (uniqueRuleNames.size !== rules.length) {
             throw new Error(
                 "Tried to create an Access Control List with multiple rules having the same name",
             );
         }
 
-        const acl = new CfnWebACL(this._construct, this._name, {
+        return new CfnWebACL(this._construct, this._name, {
             defaultAction: { allow: {} },
             scope: this._scope,
             visibilityConfig: {
@@ -247,11 +279,9 @@ export class AclBuilder {
                 metricName: "WAF-Blocked",
                 sampledRequestsEnabled: false,
             },
-            rules: this._rules,
+            rules,
             customResponseBodies: this._customResponseBodies,
         });
-
-        return acl;
     }
 }
 
@@ -328,8 +358,8 @@ function createThrottleStatement(
     };
 }
 
-function createAWSCommonRuleSet(excludedRules: string[] = []): CfnWebACL.RuleProperty {
-    return createRuleProperty("AWS-AWSManagedRulesCommonRuleSet", 70, {
+function createAWSCommonRuleSet(excludedRules: string[] = []): CfnWebAclRuleProperty {
+    return createRuleProperty("AWS-AWSManagedRulesCommonRuleSet", {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
@@ -344,8 +374,8 @@ function createAWSCommonRuleSet(excludedRules: string[] = []): CfnWebACL.RulePro
     });
 }
 
-function createAWSReputationList(excludedRules: string[] = []): CfnWebACL.RuleProperty {
-    return createRuleProperty("AWS-AWSManagedRulesAmazonIpReputationList", 80, {
+function createAWSReputationList(excludedRules: string[] = []): CfnWebAclRuleProperty {
+    return createRuleProperty("AWS-AWSManagedRulesAmazonIpReputationList", {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
@@ -356,8 +386,8 @@ function createAWSReputationList(excludedRules: string[] = []): CfnWebACL.RulePr
     });
 }
 
-function createAWSKnownBadInput(excludedRules: string[] = []): CfnWebACL.RuleProperty {
-    return createRuleProperty("AWS-AWSManagedRulesKnownBadInputsRuleSet", 90, {
+function createAWSKnownBadInput(excludedRules: string[] = []): CfnWebAclRuleProperty {
+    return createRuleProperty("AWS-AWSManagedRulesKnownBadInputsRuleSet", {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
@@ -368,8 +398,8 @@ function createAWSKnownBadInput(excludedRules: string[] = []): CfnWebACL.RulePro
     });
 }
 
-function createAWSAntiSQLInjection(excludedRules: string[] = []): CfnWebACL.RuleProperty {
-    return createRuleProperty("AWS-AWSManagedRulesSQLiRuleSet", 100, {
+function createAWSAntiSQLInjection(excludedRules: string[] = []): CfnWebAclRuleProperty {
+    return createRuleProperty("AWS-AWSManagedRulesSQLiRuleSet", {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
@@ -382,14 +412,12 @@ function createAWSAntiSQLInjection(excludedRules: string[] = []): CfnWebACL.Rule
 
 function createRuleProperty(
     name: string,
-    priority: number,
     rule: RuleProperty,
     overrideAction: boolean = true,
-): CfnWebACL.RuleProperty {
+): CfnWebAclRuleProperty {
     return {
         ...{
             name,
-            priority,
             visibilityConfig: {
                 sampledRequestsEnabled: true,
                 cloudWatchMetricsEnabled: true,
