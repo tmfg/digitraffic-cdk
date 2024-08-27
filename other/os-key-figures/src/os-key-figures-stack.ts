@@ -21,10 +21,7 @@ export interface Props {
         readonly user: string;
     };
     readonly allowedIpAddresses: string[];
-    readonly rdsAllowedSecurityGroups: {
-        readonly bastion: string;
-        readonly digitrafficMonthly: string;
-    };
+    readonly rdsSecurityGroupId: string;
     readonly marineAccountName: string;
     readonly railAccountName: string;
     readonly roadAccountName: string;
@@ -37,16 +34,14 @@ export class OsKeyFiguresStack extends Stack {
 
         const collectOsKeyFiguresLambdaSg = this.createCollectOsKeyFiguresLambda(osKeyFiguresProps, vpc);
         const createKeyFigureVisualizationsLambdaSg = this.createVisualizationsLambda(osKeyFiguresProps, vpc);
-        const bastionSg = SecurityGroup.fromSecurityGroupId(
-            this,
-            "BastionSG",
-            osKeyFiguresProps.rdsAllowedSecurityGroups.bastion
-        );
 
-        this.createDatabaseSecurityGroup(
-            [collectOsKeyFiguresLambdaSg, createKeyFigureVisualizationsLambdaSg, bastionSg],
-            vpc
+        const rdsSg = SecurityGroup.fromSecurityGroupId(
+            this,
+            "DatabaseSG",
+            osKeyFiguresProps.rdsSecurityGroupId
         );
+        rdsSg.addIngressRule(collectOsKeyFiguresLambdaSg, Port.tcp(3306));
+        rdsSg.addIngressRule(createKeyFigureVisualizationsLambdaSg, Port.tcp(3306));
     }
 
     private createVisualizationsLambda(osKeyFiguresProps: Props, vpc: Vpc): SecurityGroup {
