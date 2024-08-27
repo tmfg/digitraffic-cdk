@@ -215,6 +215,9 @@ importers:
       velocityjs:
         specifier: ^2.0.6
         version: 2.0.6
+      zod:
+        specifier: 3.23.8
+        version: 3.23.8
 
   ../../lib/repo-scripts:
     dependencies:

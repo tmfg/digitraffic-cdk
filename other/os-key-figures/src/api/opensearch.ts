@@ -12,7 +12,7 @@ export enum OpenSearchApiMethod {
     SEARCH = "_search"
 }
 
-type OpenSearchApiMethodWithParams = `${OpenSearchApiMethod}` | `${OpenSearchApiMethod}?${string}`;
+type OpenSearchApiMethodAndParams = `${OpenSearchApiMethod}` | `${OpenSearchApiMethod}?${string}`;
 
 export class OpenSearch {
     private readonly actualHost: string;
@@ -25,7 +25,7 @@ export class OpenSearch {
         this.credentials = credentials;
     }
 
-    async makeOsQuery(index: string, method: OpenSearchApiMethodWithParams, query: string): Promise<any> {
+    async makeOsQuery(index: string, method: OpenSearchApiMethodAndParams, query: string): Promise<any> {
         const request = new HttpRequest({
             method: "POST",
             path: `/${index}/${method}`,

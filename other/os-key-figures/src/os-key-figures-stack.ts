@@ -21,6 +21,10 @@ export interface Props {
         readonly user: string;
     };
     readonly allowedIpAddresses: string[];
+    readonly rdsAllowedSecurityGroups: {
+        readonly bastion: string;
+        readonly digitrafficMonthly: string;
+    };
     readonly marineAccountName: string;
     readonly railAccountName: string;
     readonly roadAccountName: string;
@@ -31,19 +35,21 @@ export class OsKeyFiguresStack extends Stack {
         super(app, id, props);
         const vpc = this.createVpc();
 
-        const collectOsKeyFiguresLambda = this.createCollectOsKeyFiguresLambda(osKeyFiguresProps, vpc);
-        const createKeyFigureVisualizationsLambda = this.createVisualizationsLambda(osKeyFiguresProps, vpc);
+        const collectOsKeyFiguresLambdaSg = this.createCollectOsKeyFiguresLambda(osKeyFiguresProps, vpc);
+        const createKeyFigureVisualizationsLambdaSg = this.createVisualizationsLambda(osKeyFiguresProps, vpc);
+        const bastionSg = SecurityGroup.fromSecurityGroupId(
+            this,
+            "BastionSG",
+            osKeyFiguresProps.rdsAllowedSecurityGroups.bastion
+        );
 
-        const sg = this.createDatabaseSecurityGroup(
-            [
-                ...collectOsKeyFiguresLambda.connections.securityGroups,
-                ...createKeyFigureVisualizationsLambda.connections.securityGroups
-            ],
+        this.createDatabaseSecurityGroup(
+            [collectOsKeyFiguresLambdaSg, createKeyFigureVisualizationsLambdaSg, bastionSg],
             vpc
         );
     }
 
-    private createVisualizationsLambda(osKeyFiguresProps: Props, vpc: Vpc) {
+    private createVisualizationsLambda(osKeyFiguresProps: Props, vpc: Vpc): SecurityGroup {
         const lambdaRole = new Role(this, "CreateKeyFigureVisualizationsRole", {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: "CreateKeyFigureVisualizationsRole"
@@ -114,10 +120,10 @@ export class OsKeyFiguresStack extends Stack {
         const target = new LambdaFunction(lambdaFunction);
         rule.addTarget(target);cdk
         */
-        return createKeyFigureVisualizationsLambda;
+        return lambdaSecurityGroup;
     }
 
-    private createCollectOsKeyFiguresLambda(osKeyFiguresProps: Props, vpc: Vpc) {
+    private createCollectOsKeyFiguresLambda(osKeyFiguresProps: Props, vpc: Vpc): SecurityGroup {
         const lambdaRole = new Role(this, "CollectOsKeyFiguresRole", {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: "CollectOsKeyFiguresRole"
@@ -214,7 +220,7 @@ export class OsKeyFiguresStack extends Stack {
             })
         );
         */
-        return collectOsKeyFiguresLambda;
+        return lambdaSecurityGroup;
     }
 
     private createVpc(): Vpc {
