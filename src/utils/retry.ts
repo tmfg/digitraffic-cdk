@@ -16,7 +16,6 @@ export type RetryPredicate = (error: unknown) => boolean;
  */
 export const timeoutFunctions = (function () {
     return {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         noTimeout: (_: number): number => {
             return 0;
         },
@@ -43,7 +42,6 @@ export const retryPredicates = (function () {
             }
             return false;
         },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         alwaysRetry: (_: unknown): boolean => {
             return true;
         },
@@ -66,7 +64,7 @@ async function retryRecursive<T>(
     retryCountInj: number,
     logError: RetryLogError,
     timeoutBetweenRetries: TimeoutFn,
-    retryPredicate: RetryPredicate
+    retryPredicate: RetryPredicate,
 ): Promise<T> {
     const asyncFnTimeout = 30 * 60 * 1000; // 30 minutes
     if (!isFinite(retries)) {
@@ -77,14 +75,11 @@ async function retryRecursive<T>(
     }
     try {
         // NOTE, a Promise cannot be cancelled. So if the asyncFn calls multiple async/await paris and the first one takes 31 minutes to complete,
-        // then the rest of async/await pairs will be called even though AysncTimeoutError is allready thrown.
+        // then the rest of async/await pairs will be called even though AsyncTimeoutError is already thrown.
         const result: T = await Promise.race([
             asyncFn(),
-            new Promise<never>((_, reject) =>
-                setTimeout(
-                    () => reject(new AsyncTimeoutError()),
-                    asyncFnTimeout
-                )
+            new Promise<never>((_resolve, reject) =>
+                setTimeout(() => reject(new AsyncTimeoutError()), asyncFnTimeout),
             ),
         ]);
         return result;
@@ -96,9 +91,7 @@ async function retryRecursive<T>(
                 message: readPossibleErrorMessage(error),
                 method: "retry.retryRecursive",
             });
-        } else if (
-            logError === RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS
-        ) {
+        } else if (logError === RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS) {
             if (remainingRetries < 0) {
                 logger.error({
                     message: readPossibleErrorMessage(error),
@@ -128,9 +121,7 @@ async function retryRecursive<T>(
             retryCount = retryCountInj;
             const milliseconds = timeoutBetweenRetries(retryCountInj);
             if (milliseconds > 0) {
-                await new Promise((resolve) =>
-                    setTimeout(resolve, milliseconds)
-                );
+                await new Promise((resolve) => setTimeout(resolve, milliseconds));
             }
             return retryRecursive(
                 asyncFn,
@@ -138,7 +129,7 @@ async function retryRecursive<T>(
                 retryCountInj,
                 logError,
                 timeoutBetweenRetries,
-                retryPredicate
+                retryPredicate,
             );
         } else {
             throw new Error("Retry predicate failed");
@@ -157,10 +148,10 @@ async function retryRecursive<T>(
  */
 export async function retry<T>(
     asyncFn: () => Promise<T>,
-    retries = 3,
-    logError = RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
+    retries: number = 3,
+    logError: RetryLogError = RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
     timeoutBetweenRetries: TimeoutFn = timeoutFunctions.noTimeout,
-    retryPredicate: RetryPredicate = retryPredicates.alwaysRetry
+    retryPredicate: RetryPredicate = retryPredicates.alwaysRetry,
 ): Promise<T> {
     retryCount = 0;
 
@@ -168,20 +159,10 @@ export async function retry<T>(
         message: `Retrying with ${retries} retries`,
         method: "retry.retry",
     });
-    return retryRecursive(
-        asyncFn,
-        retries,
-        0,
-        logError,
-        timeoutBetweenRetries,
-        retryPredicate
-    );
+    return retryRecursive(asyncFn, retries, 0, logError, timeoutBetweenRetries, retryPredicate);
 }
 
-function wrapArgsToFn<T>(
-    fn: (...args: unknown[]) => Promise<T>,
-    ...args: unknown[]
-): () => Promise<T> {
+function wrapArgsToFn<T>(fn: (...args: unknown[]) => Promise<T>, ...args: unknown[]): () => Promise<T> {
     return async () => await fn(...args);
 }
 
@@ -195,6 +176,6 @@ export async function retryRequest<T>(
         5,
         RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
         timeoutFunctions.exponentialTimeout,
-        retryPredicates.retryBasedOnStatusCode
+        retryPredicates.retryBasedOnStatusCode,
     );
 }

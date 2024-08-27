@@ -6,7 +6,7 @@ describe("response tests", () => {
         const integrationResponse = DigitrafficStaticIntegration.createIntegrationResponse(
             "FakeResource",
             MediaType.APPLICATION_JSON,
-            { "test-header": "test-value" }
+            { "test-header": "test-value" },
         );
         expect(integrationResponse).toEqual({
             responseParameters: {

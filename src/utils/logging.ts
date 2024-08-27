@@ -21,8 +21,8 @@ const functionName = getEnvVariableOrElse("AWS_LAMBDA_FUNCTION_NAME", "test");
  */
 export function createExceptionLogger(
     logger: DtLogger | undefined = undefined,
-    includeStack = false
-) {
+    includeStack: boolean = false,
+): (error: unknown) => void {
     let thatLogger: DtLogger;
     if (logger) {
         thatLogger = logger;
@@ -47,22 +47,14 @@ export function createExceptionLogger(
  * @see {@link DtLogger.log}
  * @see {@link createExceptionLogger} for a curried setup
  */
-export function logException(
-    logger: DtLogger,
-    error: unknown,
-    includeStack = false
-) {
+export function logException(logger: DtLogger, error: unknown, includeStack: boolean = false): void {
     const message =
-        error instanceof Error
-            ? error.message
-            : typeof error === "string"
-            ? error
-            : JSON.stringify(error);
+        error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
 
-    const stack =
-        error instanceof Error && includeStack ? error.stack : undefined;
+    const stack = error instanceof Error && includeStack ? error.stack : undefined;
 
     // In case error is AxiosError, log the custom code property.
+    // eslint-disable-next-line dot-notation
     const customCode = (error as Record<string, string>)["code"];
 
     logger.error({

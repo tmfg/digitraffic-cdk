@@ -1,10 +1,11 @@
 import { getEnvVariableOrElse } from "../../../utils/utils.js";
-import { DtLogger } from "../../runtime/dt-logger.js";
-import { LambdaResponse } from "../../types/lambda-response.js";
+import { logger } from "../../runtime/dt-logger-default.js";
+import type { DtLogger } from "../../runtime/dt-logger.js";
+import type { LambdaResponse } from "../../types/lambda-response.js";
 
 export type LoggingHandler = (
     method: () => Promise<LambdaResponse>,
-    logger: DtLogger
+    logger: DtLogger,
 ) => Promise<LambdaResponse>;
 
 export type ErrorHandler = (error: unknown, logger: DtLogger) => LambdaResponse;
@@ -31,11 +32,10 @@ export class HandlerFactory {
             try {
                 return await method();
             } finally {
-                console.info(
-                    "method=%s.handler tookMs=%d",
-                    functionName,
-                    Date.now() - start
-                );
+                logger.info({
+                    method: `${functionName}.handler`,
+                    tookMs: Date.now() - start,
+                });
             }
         };
 
@@ -44,21 +44,21 @@ export class HandlerFactory {
         };
     }
 
-    withLoggingHandler(loggingHandler: LoggingHandler) {
+    withLoggingHandler(loggingHandler: LoggingHandler): HandlerFactory {
         this.loggingHandler = loggingHandler;
         return this;
     }
 
-    withErrorHandler(errorHandler: ErrorHandler) {
+    withErrorHandler(errorHandler: ErrorHandler): HandlerFactory {
         this.errorHandler = errorHandler;
         return this;
     }
 
     createEventHandler(
         handler: (event: unknown) => Promise<LambdaResponse>,
-        logger: DtLogger
-    ) {
-        return async (event: unknown) => {
+        logger: DtLogger,
+    ): (event: unknown) => Promise<LambdaResponse> {
+        return async (event) => {
             return await this.loggingHandler(async () => {
                 try {
                     return await handler(event);

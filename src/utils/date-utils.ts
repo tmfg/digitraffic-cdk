@@ -34,14 +34,12 @@ export function countDiffInSeconds(start: Date, end: Date): number {
 export function dateFromIsoString(isoString: string): Date {
     const parsed = new Date(isoString);
     if (!isValidDate(parsed)) {
-        throw new Error(
-            `Could not parse iso date-time string: "${isoString}" to date`
-        );
+        throw new Error(`Could not parse iso date-time string: "${isoString}" to date`);
     }
     return parsed;
 }
 
-function isValidDate(d: unknown) {
+function isValidDate(d: unknown): d is Date {
     return d instanceof Date && !isNaN(d.getTime());
 }
 

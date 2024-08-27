@@ -1,5 +1,6 @@
 import type { Writable } from "stream";
-import { mapKeys, lowerFirst } from "lodash-es";
+import { lowerFirst, mapKeys } from "lodash-es";
+import { getEnvVariableOrElse } from "../../utils/utils.js";
 
 /** Logging level */
 export type LOG_LEVEL = "DEBUG" | "INFO" | "WARN" | "ERROR";
@@ -35,7 +36,15 @@ export interface CustomParams {
     customApiKey?: never;
     [key: `custom${Capitalize<string>}Count`]: number;
 
-    [key: `custom${Capitalize<string>}`]: string | number | bigint | boolean | Date | null | undefined;
+    [key: `custom${Capitalize<string>}`]:
+        | string
+        | number
+        | bigint
+        | boolean
+        | Date
+        // eslint-disable-next-line @rushstack/no-new-null
+        | null
+        | undefined;
 }
 
 /**
@@ -83,8 +92,9 @@ export class DtLogger {
      * @param {LoggerConfiguration?} [config] - Accepts configuration options @see {@link LoggerConfiguration}
      */
     constructor(config?: LoggerConfiguration) {
-        this.lambdaName = config?.lambdaName ?? process.env["AWS_LAMBDA_FUNCTION_NAME"];
-        this.runtime = config?.runTime ?? process.env["AWS_EXECUTION_ENV"];
+        this.lambdaName =
+            config?.lambdaName ?? getEnvVariableOrElse("AWS_LAMBDA_FUNCTION_NAME", "unknown lambda name");
+        this.runtime = config?.runTime ?? getEnvVariableOrElse("AWS_EXECUTION_ENV", "unknown runtime");
         this.writeStream = config?.writeStream ?? process.stdout;
     }
 
@@ -169,8 +179,11 @@ export class DtLogger {
     }
 }
 
-function removePrefix(prefix: string, loggable: LoggableType) {
+/**
+ * Removes given prefixes from the keys of the object.
+ */
+function removePrefix(prefix: string, loggable: LoggableType): LoggableType {
     return mapKeys(loggable, (_index, key: string) =>
         key.startsWith(prefix) ? lowerFirst(key.replace(prefix, "")) : key,
-    );
+    ) as unknown as LoggableType;
 }

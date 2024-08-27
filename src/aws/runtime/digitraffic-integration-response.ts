@@ -15,17 +15,11 @@ export abstract class DigitrafficIntegrationResponse {
         return this.create("501", mediaType ?? MediaType.TEXT_PLAIN);
     }
 
-    static create(
-        statusCode: string,
-        mediaType: MediaType,
-        sunset?: string
-    ): IntegrationResponse {
+    static create(statusCode: string, mediaType: MediaType, sunset?: string): IntegrationResponse {
         return {
             statusCode,
             responseTemplates: {
-                [mediaType]: sunset
-                    ? getDeprecatedDefaultLambdaResponse(sunset)
-                    : RESPONSE_DEFAULT_LAMBDA,
+                [mediaType]: sunset ? getDeprecatedDefaultLambdaResponse(sunset) : RESPONSE_DEFAULT_LAMBDA,
             },
         };
     }

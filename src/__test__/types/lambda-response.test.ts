@@ -16,11 +16,9 @@ describe("lambda-response", () => {
         expectedJson: T,
         expectedStatus: number,
         expectedFilename?: string,
-        expectedTimestamp?: Date
-    ) {
-        const body = JSON.parse(
-            Buffer.from(response.body, "base64").toString()
-        ) as unknown;
+        expectedTimestamp?: Date,
+    ): void {
+        const body = JSON.parse(Buffer.from(response.body, "base64").toString()) as unknown;
 
         expect(body).toEqual(expectedJson);
         expect(response.status).toEqual(expectedStatus);
@@ -33,8 +31,8 @@ describe("lambda-response", () => {
         expectedString: string,
         expectedStatus: number,
         expectedFilename?: string,
-        expectedTimestamp?: Date
-    ) {
+        expectedTimestamp?: Date,
+    ): void {
         const body = Buffer.from(response.body, "base64").toString();
 
         expect(body).toEqual(expectedString);
@@ -56,10 +54,7 @@ describe("lambda-response", () => {
     });
 
     test("okJson - with fileName and timestamp", () => {
-        const response = LambdaResponse.okJson(
-            TEST_JSON,
-            TEST_FILENAME
-        ).withTimestamp(TEST_TIMESTAMP);
+        const response = LambdaResponse.okJson(TEST_JSON, TEST_FILENAME).withTimestamp(TEST_TIMESTAMP);
 
         assertJson(response, TEST_JSON, 200, TEST_FILENAME, TEST_TIMESTAMP);
     });
@@ -67,16 +62,10 @@ describe("lambda-response", () => {
     test("okBinary - with fileName and timestamp", () => {
         const response = LambdaResponse.okBinary(
             Buffer.from(TEST_MESSAGE).toString("base64"),
-            TEST_FILENAME
+            TEST_FILENAME,
         ).withTimestamp(TEST_TIMESTAMP);
 
-        assertBinary(
-            response,
-            TEST_MESSAGE,
-            200,
-            TEST_FILENAME,
-            TEST_TIMESTAMP
-        );
+        assertBinary(response, TEST_MESSAGE, 200, TEST_FILENAME, TEST_TIMESTAMP);
     });
 
     test("badRequest", () => {

@@ -1,5 +1,5 @@
-import { Construct } from "constructs";
-import { CfnDocumentationPart, Resource } from "aws-cdk-lib/aws-apigateway";
+import type { Construct } from "constructs";
+import { CfnDocumentationPart, type Resource } from "aws-cdk-lib/aws-apigateway";
 
 // Documentation parts are objects that describe an API Gateway API or parts of an API
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-documenting-api.html
@@ -17,8 +17,9 @@ export function addQueryParameterDescription(
     name: string,
     description: string,
     resource: Resource,
-    stack: Construct
-) {
+    stack: Construct,
+): void {
+    // eslint-disable-next-line no-new
     new CfnDocumentationPart(stack, `${name}Documentation`, {
         restApiId: resource.api.restApiId,
         location: {
@@ -41,8 +42,9 @@ export function addDocumentation(
     methodDescription: string,
     documentationProperties: object,
     resource: Resource,
-    stack: Construct
-) {
+    stack: Construct,
+): void {
+    // eslint-disable-next-line no-new
     new CfnDocumentationPart(stack, `${methodDescription}Documentation`, {
         restApiId: resource.api.restApiId,
         location: {
@@ -64,8 +66,8 @@ export function addTags(
     methodDescription: string,
     tags: string[],
     resource: Resource,
-    stack: Construct
-) {
+    stack: Construct,
+): void {
     addDocumentation(methodDescription, { tags }, resource, stack);
 }
 
@@ -85,8 +87,8 @@ export function addTagsAndSummary(
     tags: string[],
     summary: string,
     resource: Resource,
-    stack: Construct
-) {
+    stack: Construct,
+): void {
     addDocumentation(methodDescription, { tags, summary }, resource, stack);
 }
 
@@ -105,7 +107,7 @@ export class DocumentationPart {
     private constructor(
         parameterName: string,
         documentationProperties: DocumentationProperties,
-        type: string
+        type: string,
     ) {
         this.parameterName = parameterName;
         this.documentationProperties = documentationProperties;
@@ -120,23 +122,15 @@ export class DocumentationPart {
         return this;
     }
 
-    static queryParameter(parameterName: string, description: string) {
-        return new DocumentationPart(
-            parameterName,
-            { description },
-            "QUERY_PARAMETER"
-        );
+    static queryParameter(parameterName: string, description: string): DocumentationPart {
+        return new DocumentationPart(parameterName, { description }, "QUERY_PARAMETER");
     }
 
-    static pathParameter(parameterName: string, description: string) {
-        return new DocumentationPart(
-            parameterName,
-            { description },
-            "PATH_PARAMETER"
-        );
+    static pathParameter(parameterName: string, description: string): DocumentationPart {
+        return new DocumentationPart(parameterName, { description }, "PATH_PARAMETER");
     }
 
-    static method(tags: string[], name: string, summary: string) {
+    static method(tags: string[], name: string, summary: string): DocumentationPart {
         return new DocumentationPart(name, { tags, summary }, "METHOD");
     }
 }

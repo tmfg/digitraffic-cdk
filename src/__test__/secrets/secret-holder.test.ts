@@ -14,9 +14,8 @@ const SECRET_WITH_PREFIX = {
 
 const emptySecret: GetSecretValueCommandOutput = { $metadata: {} };
 
-const getSecretValueMock = jest.fn<
-    (arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>
->();
+const getSecretValueMock =
+    jest.fn<(arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>>();
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(getSecretValueMock);
@@ -24,24 +23,26 @@ jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(getSec
 const { SecretHolder } = await import("../../aws/runtime/secrets/secret-holder.js");
 const { DatabaseEnvironmentKeys } = await import("../../database/database.js");
 
-function mockSecret<T>(secret: null | T) {
+// eslint-disable-next-line @rushstack/no-new-null
+function mockSecret<T>(secret: null | T): void {
     if (!secret) {
         getSecretValueMock.mockImplementation(() => Promise.resolve(emptySecret));
     } else {
         getSecretValueMock.mockImplementation(() =>
-            Promise.resolve({ ...emptySecret, ...{ SecretString: JSON.stringify(secret) } })
+            Promise.resolve({ ...emptySecret, ...{ SecretString: JSON.stringify(secret) } }),
         );
     }
 }
 
 describe("SecretHolder - tests", () => {
     beforeEach(() => {
+        // eslint-disable-next-line dot-notation
         process.env["SECRET_ID"] = "test-id";
+        // eslint-disable-next-line dot-notation
         process.env["AWS_REGION"] = "eu-west-1";
     });
 
     afterEach(() => {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete process.env[DatabaseEnvironmentKeys.DB_USER];
     });
 

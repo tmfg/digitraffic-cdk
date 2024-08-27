@@ -24,8 +24,10 @@ import { EnvKeys } from "../aws/runtime/environment.js";
  * @param b second array to compare
  */
 export function bothArraysHasSameValues(
+    // eslint-disable-next-line @rushstack/no-new-null
     a: null | undefined | unknown[],
-    b: null | undefined | unknown[]
+    // eslint-disable-next-line @rushstack/no-new-null
+    b: null | undefined | unknown[],
 ): boolean {
     if ((a && !b) || (!a && b)) {
         return false;
@@ -55,7 +57,7 @@ export function getFirst<T>(array: T[], sortFunction?: (a: T) => number): T {
 }
 
 function getFirstOrLast<T>(getFirst: boolean, array: T[], sortFunction?: (a: T) => number): T {
-    if (array.length == 0) {
+    if (array.length === 0) {
         throw new Error(`can't get ${getFirst ? "first" : "last"} from empty array!`);
     }
 
@@ -119,7 +121,7 @@ export function getEnvVariableSafe(key: string): Either<string> {
  * @param key Environment key
  * @param value Environment variable value
  */
-export function setEnvVariable(key: string, value: string) {
+export function setEnvVariable(key: string, value: string): void {
     process.env[key] = value;
 }
 
@@ -148,7 +150,7 @@ export function getEnvVariableOrElse<T>(key: string, orElse: T): string | T {
     return getEnvVariableOr(key, () => orElse);
 }
 
-export function setSecretOverideAwsRegionEnv(region: string) {
+export function setSecretOverideAwsRegionEnv(region: string): void {
     setEnvVariable(EnvKeys.SECRET_OVERRIDE_AWS_REGION, region);
 }
 
@@ -167,7 +169,7 @@ export function hasOwnPropertySafe(object: object, propertyName: string): boolea
  * Return an error message from the given object hat might be an Error object.
  * @param maybeError
  */
-export function getErrorMessage(maybeError: unknown) {
+export function getErrorMessage(maybeError: unknown): string {
     if (maybeError instanceof Error) {
         return maybeError.name + ": " + maybeError.message;
     }
@@ -177,6 +179,7 @@ export function getErrorMessage(maybeError: unknown) {
 /**
  * @param value
  */
+// eslint-disable-next-line @rushstack/no-new-null
 export function isDefined<T>(value: T | undefined | null): value is T {
     return value !== undefined && value !== null;
 }

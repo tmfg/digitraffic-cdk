@@ -5,17 +5,17 @@ import {
     LoggingFormat,
     SystemLogLevel,
 } from "aws-cdk-lib/aws-lambda";
-import { Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
-import { ComparisonOperator, Metric } from "aws-cdk-lib/aws-cloudwatch";
-import { DigitrafficStack } from "./stack.js";
+import { ComparisonOperator, type Metric } from "aws-cdk-lib/aws-cloudwatch";
+import type { DigitrafficStack } from "./stack.js";
 import type { ITopic } from "aws-cdk-lib/aws-sns";
 import {
     databaseFunctionProps,
     type LambdaEnvironment,
     type MonitoredFunctionParameters,
 } from "./lambda-configs.js";
-import { TrafficType } from "../../../types/traffictype.js";
+import type { TrafficType } from "../../../types/traffictype.js";
 import { chain } from "lodash-es";
 
 /**
@@ -69,74 +69,6 @@ export class MonitoredFunction extends Function {
     };
 
     /**
-     * Create new MonitoredFunction.  Use topics from given DigitrafficStack.
-     *
-     * @param stack DigitrafficStack
-     * @param id Lambda construct Id
-     * @param functionProps Lambda function properties
-     * @param props Monitored function properties
-     */
-    static create(
-        stack: DigitrafficStack,
-        id: string,
-        functionProps: FunctionProps,
-        props?: Partial<MonitoredFunctionProps>,
-    ): MonitoredFunction {
-        if (props === MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
-            throw new Error(
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                `Function ${functionProps
-                    .functionName!} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`,
-            );
-        }
-
-        return new MonitoredFunction(
-            stack,
-            id,
-            functionProps,
-            stack.alarmTopic,
-            stack.warningTopic,
-            stack.configuration.production,
-            stack.configuration.trafficType,
-            props,
-        );
-    }
-
-    /**
-     * Create new MonitoredFunction.  Use topics from given DigitrafficStack.  Generate names from given name and configuration shortName.
-     *
-     * For example, shortName FOO and given name update-things will create function FOO-UpdateThings and use code from lambda/update-things/update-things.ts method handler.
-     *
-     * @param stack DigitrafficStack
-     * @param name param-case name
-     * @param environment Lambda environment
-     * @param functionParameters Lambda function parameters
-     */
-    static createV2(
-        stack: DigitrafficStack,
-        name: string,
-        environment: LambdaEnvironment,
-        functionParameters?: Partial<MonitoredFunctionParameters>,
-    ): MonitoredFunction {
-        const functionName = functionParameters?.functionName ??
-            `${stack.configuration.shortName}-${chain(name)
-                .camelCase()
-                .startCase()
-                .replace(/\s/g, "")
-                .value()
-            }`;
-        const functionProps = databaseFunctionProps(
-            stack,
-            environment,
-            functionName,
-            name,
-            functionParameters,
-        );
-
-        return MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
-    }
-
-    /**
      * @param scope Stack
      * @param id Lambda construct Id
      * @param functionProps Lambda function properties
@@ -153,6 +85,7 @@ export class MonitoredFunction extends Function {
         alarmSnsTopic: ITopic,
         warningSnsTopic: ITopic,
         production: boolean,
+        // eslint-disable-next-line @rushstack/no-new-null
         trafficType: TrafficType | null,
         props?: MonitoredFunctionProps,
     ) {
@@ -250,6 +183,73 @@ export class MonitoredFunction extends Function {
         }
     }
 
+    /**
+     * Create new MonitoredFunction.  Use topics from given DigitrafficStack.
+     *
+     * @param stack DigitrafficStack
+     * @param id Lambda construct Id
+     * @param functionProps Lambda function properties
+     * @param props Monitored function properties
+     */
+    static create(
+        stack: DigitrafficStack,
+        id: string,
+        functionProps: FunctionProps,
+        props?: Partial<MonitoredFunctionProps>,
+    ): MonitoredFunction {
+        if (props === MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
+            throw new Error(
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                `Function ${functionProps.functionName!} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`,
+            );
+        }
+
+        return new MonitoredFunction(
+            stack,
+            id,
+            functionProps,
+            stack.alarmTopic,
+            stack.warningTopic,
+            stack.configuration.production,
+            stack.configuration.trafficType,
+            props,
+        );
+    }
+
+    /**
+     * Create new MonitoredFunction.  Use topics from given DigitrafficStack.  Generate names from given name and configuration shortName.
+     *
+     * For example, shortName FOO and given name update-things will create function FOO-UpdateThings and use code from lambda/update-things/update-things.ts method handler.
+     *
+     * @param stack DigitrafficStack
+     * @param name param-case name
+     * @param environment Lambda environment
+     * @param functionParameters Lambda function parameters
+     */
+    static createV2(
+        stack: DigitrafficStack,
+        name: string,
+        environment: LambdaEnvironment,
+        functionParameters?: Partial<MonitoredFunctionParameters>,
+    ): MonitoredFunction {
+        const functionName =
+            functionParameters?.functionName ??
+            `${stack.configuration.shortName}-${chain(name)
+                .camelCase()
+                .startCase()
+                .replace(/\s/g, "")
+                .value()}`;
+        const functionProps = databaseFunctionProps(
+            stack,
+            environment,
+            functionName,
+            name,
+            functionParameters,
+        );
+
+        return MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
+    }
+
     private createAlarm(
         stack: Stack,
         metric: Metric,
@@ -263,7 +263,7 @@ export class MonitoredFunction extends Function {
         datapointsToAlarm: number,
         comparisonOperator: ComparisonOperator,
         alarmProps?: MonitoredFunctionAlarmProps,
-    ) {
+    ): void {
         metric
             .createAlarm(stack, `${this.node.id}-${alarmId}`, {
                 alarmName: `${trafficType ?? ""} ${stack.stackName} ${this.functionName} ${alarmName}`.trim(),
@@ -306,13 +306,13 @@ export class MonitoredDBFunction {
         environment?: LambdaEnvironment,
         functionParameters?: Partial<MonitoredFunctionParameters>,
     ): MonitoredFunction {
-        const functionName = functionParameters?.functionName ??
+        const functionName =
+            functionParameters?.functionName ??
             `${stack.configuration.shortName}-${chain(name)
                 .camelCase()
                 .startCase()
                 .replace(/\s/g, "")
-                .value()
-            }`;
+                .value()}`;
         const env = environment ? environment : stack.createLambdaEnvironment();
         const functionProps = databaseFunctionProps(stack, env, functionName, name, functionParameters);
 

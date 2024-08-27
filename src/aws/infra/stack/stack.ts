@@ -3,11 +3,11 @@ import { type ISecurityGroup, type IVpc, SecurityGroup, Vpc } from "aws-cdk-lib/
 import { type ITopic, Topic } from "aws-cdk-lib/aws-sns";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { type ISecret, Secret } from "aws-cdk-lib/aws-secretsmanager";
-import { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
+import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 
 import { StackCheckingAspect } from "./stack-checking-aspect.js";
-import { Construct } from "constructs";
-import { TrafficType } from "../../../types/traffictype.js";
+import type { Construct } from "constructs";
+import type { TrafficType } from "../../../types/traffictype.js";
 import type { DBLambdaEnvironment } from "./lambda-configs.js";
 
 const SSM_ROOT = "/digitraffic";
@@ -75,28 +75,28 @@ export class DigitrafficStack extends Stack {
             this.lambdaDbSg = SecurityGroup.fromSecurityGroupId(
                 this,
                 "LambdaDbSG",
-                configuration.lambdaDbSgId
+                configuration.lambdaDbSgId,
             );
         }
 
         this.alarmTopic = Topic.fromTopicArn(
             this,
             "AlarmTopic",
-            StringParameter.fromStringParameterName(this, "AlarmTopicParam", SSM_KEY_ALARM_TOPIC).stringValue
+            StringParameter.fromStringParameterName(this, "AlarmTopicParam", SSM_KEY_ALARM_TOPIC).stringValue,
         );
         this.warningTopic = Topic.fromTopicArn(
             this,
             "WarningTopic",
             StringParameter.fromStringParameterName(this, "WarningTopicParam", SSM_KEY_WARNING_TOPIC)
-                .stringValue
+                .stringValue,
         );
 
         this.addAspects();
     }
 
-    addAspects() {
+    addAspects(): void {
         Aspects.of(this).add(
-            new StackCheckingAspect(this.configuration.shortName, this.configuration.whitelistedResources)
+            new StackCheckingAspect(this.configuration.shortName, this.configuration.whitelistedResources),
         );
     }
 
@@ -122,7 +122,7 @@ export class DigitrafficStack extends Stack {
         return this.secret;
     }
 
-    grantSecret(...lambdas: AWSFunction[]) {
+    grantSecret(...lambdas: AWSFunction[]): void {
         const secret = this.getSecret();
         lambdas.forEach((l: AWSFunction) => secret.grantRead(l));
     }

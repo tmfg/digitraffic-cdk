@@ -11,9 +11,9 @@ import {
     type MethodResponse,
     PassthroughBehavior,
 } from "aws-cdk-lib/aws-apigateway";
-import { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
+import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 import { BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE } from "../../types/errors.js";
-import { MediaType } from "../../types/mediatypes.js";
+import type { MediaType } from "../../types/mediatypes.js";
 
 /// @deprecated
 export const RESPONSE_200_OK: IntegrationResponse = {
@@ -60,7 +60,7 @@ export function methodResponse(
     status: string,
     contentType: MediaType,
     model: IModel,
-    parameters?: Record<string, boolean>
+    parameters?: Record<string, boolean>,
 ): MethodResponse {
     return {
         statusCode: status,
@@ -72,9 +72,7 @@ export function methodResponse(
 }
 
 interface IntegrationOptions {
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
     requestParameters?: { [dest: string]: string };
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
     requestTemplates?: { [contentType: string]: string };
     responses?: IntegrationResponse[];
     disableCors?: boolean;
@@ -91,7 +89,7 @@ interface IntegrationOptions {
  */
 export function defaultIntegration(
     lambdaFunction: AWSFunction,
-    options?: IntegrationOptions
+    options?: IntegrationOptions,
 ): LambdaIntegration {
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
@@ -103,14 +101,13 @@ export function defaultIntegration(
         ],
         requestParameters: options?.requestParameters ?? {},
         requestTemplates: options?.requestTemplates ?? {},
-        passthroughBehavior:
-            options?.passthroughBehavior ?? PassthroughBehavior.WHEN_NO_MATCH,
+        passthroughBehavior: options?.passthroughBehavior ?? PassthroughBehavior.WHEN_NO_MATCH,
     });
 }
 
 export function getResponse(
     response: IntegrationResponse,
-    options?: IntegrationOptions
+    options?: IntegrationOptions,
 ): IntegrationResponse {
     if (options?.xml) {
         response = { ...response, ...RESPONSE_XML };

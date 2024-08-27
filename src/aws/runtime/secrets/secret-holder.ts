@@ -9,7 +9,7 @@ const DEFAULT_PREFIX = "";
 const DEFAULT_SECRET_KEY = "SECRET";
 const DEFAULT_CONFIGURATION = {
     ttl: 5 * 60, // timeout secrets in 5 minutes
-};
+} as const;
 
 /**
  * Utility class for getting secrets from Secret Manager.
@@ -21,30 +21,28 @@ const DEFAULT_CONFIGURATION = {
  *
  * If you want secret manager to get values from different region than the lambda runtime is running, you can override this by
  * setting the region with utils setSecretOverideAwsRegionEnv method.
- *
  */
 export class SecretHolder<Secret extends GenericSecret> {
     private readonly secretId: string;
     private readonly prefix: string;
     private readonly expectedKeys: string[];
 
-    private readonly secretCache;
+    private readonly secretCache: NodeTtl;
 
     constructor(
         secretId: string,
-        prefix = "",
+        prefix: string = "",
         expectedKeys: string[] = [],
-        configuration = DEFAULT_CONFIGURATION
+        configuration: typeof DEFAULT_CONFIGURATION = DEFAULT_CONFIGURATION,
     ) {
         this.secretId = secretId;
         this.prefix = prefix;
         this.expectedKeys = expectedKeys;
 
-        // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         this.secretCache = new NodeTtl(configuration);
     }
 
-    private async initSecret() {
+    private async initSecret(): Promise<void> {
         const secretValue = await getSecret<Secret>(this.secretId);
 
         logger.info({
@@ -52,27 +50,20 @@ export class SecretHolder<Secret extends GenericSecret> {
             message: "Refreshing secret " + this.secretId,
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
     }
 
     public static create<S extends GenericSecret>(
-        prefix = DEFAULT_PREFIX,
-        expectedKeys: string[] = []
-    ) {
-        return new SecretHolder<S>(
-            getEnvVariable("SECRET_ID"),
-            prefix,
-            expectedKeys
-        );
+        prefix: string = DEFAULT_PREFIX,
+        expectedKeys: string[] = [],
+    ): SecretHolder<S> {
+        return new SecretHolder<S>(getEnvVariable("SECRET_ID"), prefix, expectedKeys);
     }
 
     public async get(): Promise<Secret> {
         const secret = await this.getSecret<Secret>();
         const parsedSecret =
-            this.prefix === DEFAULT_PREFIX
-                ? secret
-                : this.parseSecret(secret, `${this.prefix}.`);
+            this.prefix === DEFAULT_PREFIX ? secret : this.parseSecret(secret, `${this.prefix}.`);
 
         if (this.expectedKeys.length > 0) {
             checkExpectedSecretKeys(this.expectedKeys, parsedSecret);
@@ -87,8 +78,12 @@ export class SecretHolder<Secret extends GenericSecret> {
 
         for (const key in secret) {
             if (key.startsWith(prefix)) {
-                const withoutPrefix:string = key.substring(skip);
-                parsed[withoutPrefix] = secret[key]!;
+                const withoutPrefix: string = key.substring(skip);
+                // skip undefined values
+                if (!secret[key]) {
+                    continue;
+                }
+                parsed[withoutPrefix] = secret[key];
             }
         }
 
@@ -102,6 +97,6 @@ export class SecretHolder<Secret extends GenericSecret> {
             await this.initSecret();
         }
 
-        return secret ?? (this.secretCache.get(DEFAULT_SECRET_KEY));
+        return secret ?? this.secretCache.get(DEFAULT_SECRET_KEY);
     }
 }

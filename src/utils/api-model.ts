@@ -2,11 +2,13 @@ import {
     type JsonSchema,
     JsonSchemaType,
     JsonSchemaVersion,
-    Model,
-    RequestValidator,
-    RestApi,
+    type Model,
+    type RequestValidator,
+    type RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import type { ModelWithReference } from "../aws/types/model-with-reference.js";
+
+type ModelReferenceUrl = `https://apigateway.amazonaws.com/restapis/${string}/models/${string}`;
 
 /**
  * Get a reference to an OpenAPI model object in a REST API.
@@ -14,7 +16,7 @@ import type { ModelWithReference } from "../aws/types/model-with-reference.js";
  * @param modelId Id of the referenced object
  * @param restApiId Id of the REST API
  */
-export function getModelReference(modelId: string, restApiId: string) {
+export function getModelReference(modelId: string, restApiId: string): ModelReferenceUrl {
     return `https://apigateway.amazonaws.com/restapis/${restApiId}/models/${modelId}`;
 }
 
@@ -24,7 +26,7 @@ export function getModelReference(modelId: string, restApiId: string) {
  * @param api REST API
  */
 export function addDefaultValidator(api: RestApi): RequestValidator {
-    return api.addRequestValidator('DefaultValidator', {
+    return api.addRequestValidator("DefaultValidator", {
         validateRequestParameters: true,
         validateRequestBody: true,
     });
@@ -40,7 +42,7 @@ export function addDefaultValidator(api: RestApi): RequestValidator {
  */
 export function addServiceModel(modelName: string, api: RestApi, schema: JsonSchema): ModelWithReference {
     const mwr = api.addModel(modelName, {
-        contentType: 'application/json',
+        contentType: "application/json",
         modelName,
         schema,
     }) as ModelWithReference;
@@ -55,7 +57,11 @@ export function addServiceModel(modelName: string, api: RestApi, schema: JsonSch
  * @param api
  * @param contentType
  */
-export function addSimpleServiceModel(modelName: string, api: RestApi, contentType = 'application/xml'): Model {
+export function addSimpleServiceModel(
+    modelName: string,
+    api: RestApi,
+    contentType: `${string}/${string}` = "application/xml",
+): Model {
     return api.addModel(modelName, {
         contentType,
         modelName,
@@ -86,27 +92,26 @@ export function featureSchema(modelReference: string) {
     return {
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,
-        description: 'GeoJson Feature',
-        required: ['type', 'properties', 'geometry'],
+        description: "GeoJson Feature",
+        required: ["type", "properties", "geometry"],
         properties: {
             type: {
                 type: JsonSchemaType.STRING,
-                description: 'Feature',
-                enum: ['Feature'],
+                description: "Feature",
+                enum: ["Feature"],
             },
             properties: {
                 ref: modelReference,
             },
             geometry: {
                 type: JsonSchemaType.OBJECT,
-                description: 'GeoJSON geometry',
+                description: "GeoJSON geometry",
             },
         },
     };
 }
 
 /**
- *
  * Creates a JSON Schema for a GeoJSON Feature Collection. Can be used to generate OpenAPI descriptions.
  * @param modelReference Reference to a model object, in this case Features.
  */
@@ -114,13 +119,13 @@ export function geojsonSchema(modelReference: string) {
     return {
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,
-        description: 'GeoJson FeatureCollection',
-        required: ['type', 'features'],
+        description: "GeoJson FeatureCollection",
+        required: ["type", "features"],
         properties: {
             type: {
                 type: JsonSchemaType.STRING,
-                description: 'FeatureCollection',
-                enum: ['FeatureCollection'],
+                description: "FeatureCollection",
+                enum: ["FeatureCollection"],
             },
             features: {
                 type: JsonSchemaType.ARRAY,

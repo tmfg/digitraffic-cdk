@@ -1,4 +1,4 @@
-name: 'Mirror repo to public'
+name: "Mirror repo to public"
 on:
   push:
     branches:
