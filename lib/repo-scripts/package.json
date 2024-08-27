@@ -30,7 +30,7 @@
     "@rollup/plugin-node-resolve": "~15.2.3",
     "@rollup/plugin-terser": "~0.4.4",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.66.25",
+    "@rushstack/heft": "^0.67.0",
     "@rushstack/heft-jest-plugin": "^0.12.7",
     "@types/fs-extra": "11.0.4",
     "@types/heft-jest": "1.0.6",

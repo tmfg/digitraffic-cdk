@@ -61,8 +61,8 @@ describe("acl-builder tests", () => {
         for (const aclBuilder of [
             createBuilder().withThrottleDigitrafficUserIp(undefined),
             createBuilder().withThrottleDigitrafficUserIpAndUriPath(undefined),
-            createBuilder().withThrottleAnonymousUserIp(null),
-            createBuilder().withThrottleAnonymousUserIpAndUriPath(null),
+            createBuilder().withThrottleAnonymousUserIp(undefined),
+            createBuilder().withThrottleAnonymousUserIpAndUriPath(undefined),
         ]) {
             expect(() => aclBuilder.build()).toThrowError("No rules");
         }
