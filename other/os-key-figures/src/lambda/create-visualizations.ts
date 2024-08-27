@@ -417,7 +417,7 @@ export async function handler(): Promise<boolean> {
     const filters = (await query("select distinct filter from key_figures")) as { filter: string }[];
     logger.info({ message: filters.toString(), method: "create-visualizations.handler" });
 
-    const bucketName = "eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw";
+    const bucketName = "oskeyfiguresstackprod-oskeyfigurevisualizations73f-oynuqnnd3bhb";
     await uploadToS3(s3, bucketName, await createIndex(), `index.html`, undefined, "text/html");
 
     for (const row of filters) {
