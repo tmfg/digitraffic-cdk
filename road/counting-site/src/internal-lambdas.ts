@@ -1,4 +1,3 @@
-import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { CountingSitesEnvKeys } from "./keys.js";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
@@ -12,7 +11,6 @@ export class InternalLambdas {
         Scheduler.everyHour(stack, "RuleForMetadataUpdate", updateMetadataLambda);
         Scheduler.everyHour(stack, "RuleForDataUpdate", updateDataLambda);
 
-        new DigitrafficLogSubscriptions(stack, updateMetadataLambda, updateDataLambda);
         stack.grantSecret(updateMetadataLambda, updateDataLambda);
     }
 
