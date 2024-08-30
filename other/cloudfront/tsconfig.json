@@ -1,7 +1,6 @@
 {
   "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
   "compilerOptions": {
-    "noEmit": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,

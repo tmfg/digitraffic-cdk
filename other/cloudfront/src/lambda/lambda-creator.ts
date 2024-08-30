@@ -61,13 +61,13 @@ export function createWeathercamHttpHeaders(stack: Stack, edgeLambdaRole: Role):
 }
 
 export function createIndexHtml(stack: Stack): Cloudfront.Function {
-    const body = readBodyWithVersion("src/lambda/lambda-index-html.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-index-html.js");
 
     return createCloudfrontFunction(stack, "index-html", body);
 }
 
 export function createHistoryPath(stack: Stack): Cloudfront.Function {
-    const body = readBodyWithVersion("src/lambda/lambda-redirect-history.js");
+    const body = readBodyWithVersion("dist/lambda/lambda-redirect-history.js");
 
     return createCloudfrontFunction(stack, "history-redirect", body);
 }

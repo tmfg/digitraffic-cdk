@@ -5,7 +5,7 @@ import terser from "@rollup/plugin-terser";
 import json from "@rollup/plugin-json";
 import { globby } from "globby";
 
-const inputs = (await globby([`src/lambda/**/*.ts`])).filter((input) => !input.includes("lambda-creator"));
+const inputs = (await globby([`lib/lambda/**/*.js`])).filter((input) => !input.includes("lambda-creator"));
 
 const defaultPlugins = [
     nodeResolve({
@@ -20,7 +20,7 @@ const defaultPlugins = [
 const excludeTerser = ["lambda-redirect-history", "lambda-index-html"];
 
 export default inputs.map((input) => {
-    const outputFile = input.replace("src/", "dist/").replace(".ts", ".js");
+    const outputFile = input.replace("lib/", "dist/");
 
     const plugins = [...defaultPlugins];
 
@@ -32,7 +32,7 @@ export default inputs.map((input) => {
         output: {
             inlineDynamicImports: true,
             file: outputFile,
-            format: "es"
+            format: "cjs"
         },
         input,
         plugins
