@@ -140,11 +140,11 @@ importers:
         specifier: ^7.18.0
         version: 7.18.0(eslint@8.57.0)(typescript@5.5.4)
       aws-cdk-lib:
-        specifier: ^2.154.1
-        version: 2.154.1(constructs@10.3.0)
+        specifier: ^2.155.0
+        version: 2.155.0(constructs@10.3.0)
       aws-sdk:
-        specifier: ^2.1682.0
-        version: 2.1683.0
+        specifier: ^2.1686.0
+        version: 2.1686.0
       change-case:
         specifier: ^5.4.4
         version: 5.4.4
@@ -214,6 +214,9 @@ importers:
       velocityjs:
         specifier: ^2.0.6
         version: 2.0.6
+      zod:
+        specifier: ~3.23.8
+        version: 3.23.8
 
   ../../lib/repo-scripts:
     dependencies:
@@ -310,7 +313,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.8.27-1
-        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       '@middy/core':
         specifier: ^5.4.2
         version: 5.4.6
@@ -622,7 +625,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       amazon-cognito-identity-js:
         specifier: 6.3.12
         version: 6.3.12
@@ -710,7 +713,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -822,7 +825,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       '@middy/core':
         specifier: ^5.4.2
         version: 5.4.6
@@ -1040,7 +1043,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -1234,7 +1237,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -1459,7 +1462,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -1621,7 +1624,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -1691,7 +1694,7 @@ importers:
         version: 3.609.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       '@smithy/node-http-handler':
         specifier: ~3.1.0
         version: 3.1.4
@@ -1789,7 +1792,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -1874,7 +1877,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -1938,7 +1941,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.8.27-1
-        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: 2.154.1
         version: 2.154.1(constructs@10.3.0)
@@ -2011,7 +2014,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.8.16-1
-        version: 2024.8.16-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.8.16-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       '@middy/core':
         specifier: ^5.4.2
         version: 5.4.6
@@ -2163,7 +2166,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -2263,7 +2266,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -2372,7 +2375,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -2436,7 +2439,7 @@ importers:
         version: 3.637.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -2527,7 +2530,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -2706,7 +2709,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       aws-cdk-lib:
         specifier: ^2.151.0
         version: 2.154.1(constructs@10.3.0)
@@ -2785,7 +2788,7 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       '@rgrove/parse-xml':
         specifier: 4.1.0
         version: 4.1.0
@@ -5591,12 +5594,34 @@ packages:
       - yaml
       - mime-types
 
+  aws-cdk-lib@2.155.0:
+    resolution: {integrity: sha512-QGzDhLldBXsyOUmhgtZ98PiOUS2g1Mb5MO08FiOvQn3+KSyJjQdq0GoyxtDpCNGLaWmIfcyrtB9aDhod38fl9g==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      constructs: ^10.0.0
+    bundledDependencies:
+      - '@balena/dockerignore'
+      - case
+      - fs-extra
+      - ignore
+      - jsonschema
+      - minimatch
+      - punycode
+      - semver
+      - table
+      - yaml
+      - mime-types
+
   aws-lambda@1.0.7:
     resolution: {integrity: sha512-9GNFMRrEMG5y3Jvv+V4azWvc+qNWdWLTjDdhf/zgMlz8haaaLWv0xeAIWxz9PuWUBawsVxy0zZotjCdR3Xq+2w==}
     hasBin: true
 
   aws-sdk@2.1683.0:
     resolution: {integrity: sha512-uy53mN2oHU0Jx5tkH7qG6h/42DeMAQD5jMi/6294hVgGCa29MK/ZiFIOdkEJNS9tbB03RTabg+5i4c6DxBpG8g==}
+    engines: {node: '>= 10.0.0'}
+
+  aws-sdk@2.1686.0:
+    resolution: {integrity: sha512-N2VZPWKFtSPlHro+MJzxESNT8B8+3iX1TYg8m/lswGy9gHELY0PX3BGukMNbxhp5u0WKApzZR1fkNTajRGrFvw==}
     engines: {node: '>= 10.0.0'}
 
   aws-ssl-profiles@1.1.1:
@@ -10072,7 +10097,7 @@ snapshots:
       pg-native: 3.1.0
       pg-promise: 11.9.1(pg-native@3.1.0)
 
-  '@digitraffic/common@2024.8.16-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))':
+  '@digitraffic/common@2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.637.0
       '@aws-sdk/client-s3': 3.637.0
@@ -10080,7 +10105,28 @@ snapshots:
       '@aws-sdk/client-sns': 3.637.0
       '@aws-sdk/lib-storage': 3.637.0(@aws-sdk/client-s3@3.637.0)
       aws-cdk-lib: 2.154.1(constructs@10.3.0)
-      aws-sdk: 2.1683.0
+      aws-sdk: 2.1686.0
+      change-case: 5.4.4
+      constructs: 10.3.0
+      date-fns: 3.6.0
+      date-fns-tz: 3.1.3(date-fns@3.6.0)
+      etag: 1.8.1
+      geojson-validation: 1.0.2
+      ky: 1.7.1
+      lodash: 4.17.21
+      node-ttl: 0.2.0
+      pg-native: 3.1.0
+      pg-promise: 11.9.1(pg-native@3.1.0)
+
+  '@digitraffic/common@2024.8.16-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))':
+    dependencies:
+      '@aws-sdk/client-api-gateway': 3.637.0
+      '@aws-sdk/client-s3': 3.637.0
+      '@aws-sdk/client-secrets-manager': 3.637.0
+      '@aws-sdk/client-sns': 3.637.0
+      '@aws-sdk/lib-storage': 3.637.0(@aws-sdk/client-s3@3.637.0)
+      aws-cdk-lib: 2.154.1(constructs@10.3.0)
+      aws-sdk: 2.1686.0
       change-case: 5.4.4
       constructs: 10.3.0
       date-fns: 3.6.0
@@ -10102,6 +10148,27 @@ snapshots:
       '@aws-sdk/lib-storage': 3.637.0(@aws-sdk/client-s3@3.637.0)
       aws-cdk-lib: 2.154.1(constructs@10.3.0)
       aws-sdk: 2.1683.0
+      change-case: 5.4.4
+      constructs: 10.3.0
+      date-fns: 3.6.0
+      date-fns-tz: 3.1.3(date-fns@3.6.0)
+      etag: 1.8.1
+      geojson-validation: 1.0.2
+      ky: 1.7.1
+      lodash-es: 4.17.21
+      node-ttl: 0.2.0
+      pg-native: 3.1.0
+      pg-promise: 11.9.1(pg-native@3.1.0)
+
+  '@digitraffic/common@2024.8.27-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1686.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))':
+    dependencies:
+      '@aws-sdk/client-api-gateway': 3.637.0
+      '@aws-sdk/client-s3': 3.637.0
+      '@aws-sdk/client-secrets-manager': 3.637.0
+      '@aws-sdk/client-sns': 3.637.0
+      '@aws-sdk/lib-storage': 3.637.0(@aws-sdk/client-s3@3.637.0)
+      aws-cdk-lib: 2.154.1(constructs@10.3.0)
+      aws-sdk: 2.1686.0
       change-case: 5.4.4
       constructs: 10.3.0
       date-fns: 3.6.0
@@ -13032,6 +13099,14 @@ snapshots:
       '@aws-cdk/cloud-assembly-schema': 36.0.18
       constructs: 10.3.0
 
+  aws-cdk-lib@2.155.0(constructs@10.3.0):
+    dependencies:
+      '@aws-cdk/asset-awscli-v1': 2.2.202
+      '@aws-cdk/asset-kubectl-v20': 2.1.2
+      '@aws-cdk/asset-node-proxy-agent-v6': 2.0.3
+      '@aws-cdk/cloud-assembly-schema': 36.0.18
+      constructs: 10.3.0
+
   aws-lambda@1.0.7:
     dependencies:
       aws-sdk: 2.1683.0
@@ -13040,6 +13115,19 @@ snapshots:
       watchpack: 2.4.2
 
   aws-sdk@2.1683.0:
+    dependencies:
+      buffer: 4.9.2
+      events: 1.1.1
+      ieee754: 1.1.13
+      jmespath: 0.16.0
+      querystring: 0.2.0
+      sax: 1.2.1
+      url: 0.10.3
+      util: 0.12.5
+      uuid: 8.0.0
+      xml2js: 0.6.2
+
+  aws-sdk@2.1686.0:
     dependencies:
       buffer: 4.9.2
       events: 1.1.1
@@ -13201,7 +13289,7 @@ snapshots:
   buffer@4.9.2:
     dependencies:
       base64-js: 1.5.1
-      ieee754: 1.1.13
+      ieee754: 1.2.1
       isarray: 1.0.0
 
   buffer@5.6.0:
