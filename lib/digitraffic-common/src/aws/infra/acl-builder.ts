@@ -204,28 +204,28 @@ export class AclBuilder {
         );
     }
 
-    withCountDigitrafficUserIp(limit: number | undefined) {
+    withCountDigitrafficUserIp(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
         return this.withThrottleRule(`CountRuleWithDigitrafficUser${limit}`, limit, true, false);
     }
 
-    withCountDigitrafficUserIpAndUriPath(limit: number | undefined) {
+    withCountDigitrafficUserIpAndUriPath(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
         return this.withThrottleRule(`CountRuleIPQueryWithDigitrafficUser${limit}`, limit, true, true);
     }
 
-    withCountAnonymousUserIp(limit: number | undefined) {
+    withCountAnonymousUserIp(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
         return this.withThrottleRule(`CountRuleWithAnonymousUser${limit}`, limit, false, false);
     }
 
-    withCountAnonymousUserIpAndUriPath(limit: number | undefined) {
+    withCountAnonymousUserIpAndUriPath(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }

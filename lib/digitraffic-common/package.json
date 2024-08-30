@@ -1,6 +1,6 @@
 {
   "name": "@digitraffic/common",
-  "version": "2024.8.27-1",
+  "version": "2024.8.30-1",
   "description": "",
   "type": "module",
   "repository": {
@@ -46,6 +46,7 @@
     "./dist/types/http-error": "./dist/types/http-error.js",
     "./dist/types/language": "./dist/types/language.js",
     "./dist/types/traffictype": "./dist/types/traffictype.js",
+    "./dist/types/openapi-schema": "./dist/types/openapi-schema.js",
     "./dist/test/testutils": "./dist/__test__/testutils.js",
     "./dist/test/db-testutils": "./dist/__test__/db-testutils.js",
     "./dist/test/httpserver": "./dist/__test__/httpserver.js",
@@ -133,7 +134,8 @@
     "lodash-es": "~4.17.21",
     "node-ttl": "^0.2.0",
     "pg-native": "^3.1.0",
-    "pg-promise": "^11.9.1"
+    "pg-promise": "^11.9.1",
+    "zod": "~3.23.8"
   },
   "devDependencies": {
     "@aws-sdk/client-api-gateway": "^3.637.0",
@@ -159,8 +161,8 @@
     "@types/node": "20.14.9",
     "@typescript-eslint/eslint-plugin": "~7.14.1",
     "@typescript-eslint/parser": "^7.18.0",
-    "aws-cdk-lib": "^2.154.1",
-    "aws-sdk": "^2.1682.0",
+    "aws-cdk-lib": "^2.155.0",
+    "aws-sdk": "^2.1686.0",
     "change-case": "^5.4.4",
     "constructs": "~10.3.0",
     "date-fns": "~3.6.0",
@@ -183,6 +185,7 @@
     "rimraf": "^6.0.1",
     "ts-jest": "^29.2.5",
     "typescript": "~5.5.4",
-    "velocityjs": "^2.0.6"
+    "velocityjs": "^2.0.6",
+    "zod": "~3.23.8"
   }
 }
