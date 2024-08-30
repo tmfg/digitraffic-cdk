@@ -33,6 +33,12 @@
       "shellCommand": "node common/scripts/check-dependencies.mjs"
     },
     {
+      "name": "repo:unify-deps",
+      "commandKind": "global",
+      "summary": "Checks if dependencies are declared correctly",
+      "shellCommand": "node common/scripts/unify-deps.mjs"
+    },
+    {
       "name": "ci:eslint-report",
       "commandKind": "bulk",
       "summary": "Used by the Github Actions to create eslint report.",

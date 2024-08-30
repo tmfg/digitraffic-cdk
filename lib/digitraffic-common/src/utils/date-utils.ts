@@ -39,7 +39,7 @@ export function dateFromIsoString(isoString: string): Date {
     return parsed;
 }
 
-function isValidDate(d: unknown) {
+function isValidDate(d: unknown): d is Date {
     return d instanceof Date && !isNaN(d.getTime());
 }
 

@@ -1,7 +1,7 @@
 import { HandlerFactory } from "../../../aws/infra/api/handler-factory.js";
 import type { ErrorHandler, LoggingHandler } from "../../../aws/infra/api/handler-factory.js";
 import { DtLogger } from "../../../aws/runtime/dt-logger.js";
-import { LambdaResponse } from "../../../aws/types/lambda-response.js";
+import type { LambdaResponse } from "../../../aws/types/lambda-response.js";
 import { jest } from "@jest/globals";
 
 const logger = new DtLogger();

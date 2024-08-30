@@ -1,4 +1,4 @@
-import { Role } from "aws-cdk-lib/aws-iam";
+import type { Role } from "aws-cdk-lib/aws-iam";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { CfnCanary } from "aws-cdk-lib/aws-synthetics";
 import { Schedule } from "aws-cdk-lib/aws-events";
@@ -6,7 +6,7 @@ import { Duration } from "aws-cdk-lib";
 
 import type { CanaryParameters } from "./canary-parameters.js";
 import { DigitrafficCanary } from "./canary.js";
-import { DigitrafficStack } from "../stack/stack.js";
+import type { DigitrafficStack } from "../stack/stack.js";
 
 export class DatabaseCanary extends DigitrafficCanary {
     constructor(stack: DigitrafficStack, role: Role, secret: ISecret, params: CanaryParameters) {
@@ -47,7 +47,6 @@ export class DatabaseCanary extends DigitrafficCanary {
     }
 
     /**
-     *
      * @param stack
      * @param role
      * @param name name of the typescipt file without -db -suffix. Max len is 10 char if @param canaryName is not given.
@@ -59,7 +58,7 @@ export class DatabaseCanary extends DigitrafficCanary {
         role: Role,
         name: string,
         params: Partial<CanaryParameters> = {},
-        canaryName = name,
+        canaryName: string = name,
     ): DatabaseCanary {
         const secret = stack.getSecret();
         return new DatabaseCanary(stack, role, secret, {

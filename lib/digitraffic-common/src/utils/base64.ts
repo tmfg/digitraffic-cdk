@@ -2,7 +2,7 @@
  * Decode given string from base64 to ascii
  * @param str string
  */
-export function decodeBase64ToAscii(str: string) {
+export function decodeBase64ToAscii(str: string): string {
     return decodeBase64(str, "ascii");
 }
 
@@ -11,6 +11,6 @@ export function decodeBase64ToAscii(str: string) {
  * @param str
  * @param encoding
  */
-export function decodeBase64(str: string, encoding: BufferEncoding) {
+export function decodeBase64(str: string, encoding: BufferEncoding): string {
     return Buffer.from(str, "base64").toString(encoding);
 }

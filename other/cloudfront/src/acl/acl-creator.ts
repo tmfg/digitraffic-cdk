@@ -7,17 +7,27 @@ import { LogGroup } from "aws-cdk-lib/aws-logs";
 export function createWebAcl(
     stack: Stack,
     environment: string,
-    rules: WafRules,
+    rulesCollection: WafRules[],
     distributionName: string
 ): CfnWebACL {
     const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
 
-    aclBuilder
-        .withAWSManagedRules(rules.awsCommonRuleSets, rules.excludedRules)
-        .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
-        .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
-        .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
-        .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
+    for (const rules of rulesCollection) {
+        if (rules.isCountOnly) {
+            aclBuilder
+                .withCountDigitrafficUserIp(rules.perIpWithHeader)
+                .withCountDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
+                .withCountAnonymousUserIp(rules.perIpWithoutHeader)
+                .withCountAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
+        } else {
+            aclBuilder
+                .withAWSManagedRules(rules.awsCommonRuleSets, rules.excludedRules)
+                .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
+                .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
+                .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
+                .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
+        }
+    }
 
     const acl = aclBuilder.build();
 

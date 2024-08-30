@@ -1,4 +1,4 @@
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import { Rule } from "aws-cdk-lib/aws-events";
 import type { ITopic } from "aws-cdk-lib/aws-sns";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";

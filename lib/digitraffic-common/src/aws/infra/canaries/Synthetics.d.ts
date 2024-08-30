@@ -13,9 +13,9 @@ declare module "Synthetics" {
     export function executeHttpStep<T>(
         name: string,
         requestOptions: RequestOptions,
-        callback: JsonCheckerFunction<T>,
+        callback: (t: T, body: string, message: any) => Promise<void>,
     ): Promise<void>;
     export function getConfiguration(): SyntheticsConfiguration;
 
-    export function executeStep(s: string, f: () => void, c: Record<string, boolean>);
+    export function executeStep(s: string, f: () => void, c: Record<string, boolean>): void;
 }

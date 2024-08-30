@@ -6,23 +6,38 @@ import {
     type IResource,
     type JsonSchema,
     MethodLoggingLevel,
-    Model,
-    Resource,
+    type Model,
+    type Resource,
     type ResourceOptions,
     ResponseType,
     RestApi,
     type RestApiProps,
 } from "aws-cdk-lib/aws-apigateway";
 import { AnyPrincipal, Effect, PolicyDocument, PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 import { getModelReference } from "../../../utils/api-model.js";
 import { MediaType } from "../../types/mediatypes.js";
 import type { ModelWithReference } from "../../types/model-with-reference.js";
-import { DocumentationPart, type DocumentationProperties } from "../documentation.js";
+import type { DocumentationPart, DocumentationProperties } from "../documentation.js";
 import { createDefaultUsagePlan, createUsagePlan } from "../usage-plans.js";
-import { DigitrafficStack } from "./stack.js";
+import type { DigitrafficStack } from "./stack.js";
 
 import { set } from "lodash-es";
+
+export const PUBLIC_REST_API_CORS_CONFIG = {
+    defaultCorsPreflightOptions: {
+        allowOrigins: Cors.ALL_ORIGINS,
+        allowHeaders: [
+            "Content-Type",
+            "X-Amz-Date",
+            "Authorization",
+            "X-Api-Key",
+            "X-Amz-Security-Token",
+            "Digitraffic-User",
+        ],
+        allowMethods: ["OPTIONS", "GET", "HEAD"],
+    },
+} as const satisfies Pick<ResourceOptions, "defaultCorsPreflightOptions">;
 
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];
@@ -36,7 +51,7 @@ export class DigitrafficRestApi extends RestApi {
         config?: Partial<RestApiProps>,
     ) {
         const policyDocument =
-            allowFromIpAddresses == null
+            allowFromIpAddresses === null || allowFromIpAddresses === undefined
                 ? createDefaultPolicyDocument()
                 : createIpRestrictionPolicyDocument(allowFromIpAddresses);
 
@@ -81,7 +96,7 @@ export class DigitrafficRestApi extends RestApi {
         return newKeyId;
     }
 
-    addJsonModel(modelName: string, schema: JsonSchema) {
+    addJsonModel(modelName: string, schema: JsonSchema): ModelWithReference {
         return this.getModelWithReference(
             this.addModel(modelName, {
                 contentType: MediaType.APPLICATION_JSON,
@@ -91,7 +106,7 @@ export class DigitrafficRestApi extends RestApi {
         );
     }
 
-    addCSVModel(modelName: string) {
+    addCSVModel(modelName: string): ModelWithReference {
         return this.getModelWithReference(
             this.addModel(modelName, {
                 contentType: MediaType.TEXT_CSV,
@@ -115,13 +130,14 @@ export class DigitrafficRestApi extends RestApi {
         resourceName: string,
         type: string,
         properties: DocumentationProperties,
-    ) {
+    ): void {
         const location: CfnDocumentationPart.LocationProperty = {
             type,
             path: resource.path,
             name: type !== "METHOD" ? parameterName : undefined,
         };
 
+        // eslint-disable-next-line no-new
         new CfnDocumentationPart(this.stack, resourceName, {
             restApiId: resource.api.restApiId,
             location,
@@ -129,7 +145,7 @@ export class DigitrafficRestApi extends RestApi {
         });
     }
 
-    documentResource(resource: Resource, ...documentationPart: DocumentationPart[]) {
+    documentResource(resource: Resource, ...documentationPart: DocumentationPart[]): void {
         if (this.enableDocumentation) {
             documentationPart.forEach((dp) =>
                 this.addDocumentationPart(
@@ -141,11 +157,16 @@ export class DigitrafficRestApi extends RestApi {
                 ),
             );
         } else {
+            // eslint-disable-next-line no-console
             console.info("Skipping documentation for %s", resource.path);
         }
     }
 
-    addResourceWithCorsOptionsSubTree(resource: Resource, pathPart: string, config?: ResourceOptions) {
+    addResourceWithCorsOptionsSubTree(
+        resource: Resource,
+        pathPart: string,
+        config?: ResourceOptions,
+    ): Resource {
         const mergedConfig: ResourceOptions = {
             ...PUBLIC_REST_API_CORS_CONFIG,
             ...config,
@@ -159,7 +180,7 @@ export class DigitrafficRestApi extends RestApi {
      * @param apiResource
      */
     addCorsOptions(apiResource: IResource): void {
-        apiResource.addCorsPreflight(PUBLIC_REST_API_CORS_CONFIG.defaultCorsPreflightOptions!);
+        apiResource.addCorsPreflight(PUBLIC_REST_API_CORS_CONFIG.defaultCorsPreflightOptions);
     }
 }
 
@@ -170,7 +191,8 @@ export class DigitrafficRestApi extends RestApi {
  * @param restApi RestApi
  * @param stack Construct
  */
-export function add404Support(restApi: RestApi, stack: Construct) {
+export function add404Support(restApi: RestApi, stack: Construct): void {
+    // eslint-disable-next-line no-new
     new GatewayResponse(stack, `MissingAuthenticationTokenResponse-${restApi.restApiName}`, {
         restApi,
         type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
@@ -181,7 +203,8 @@ export function add404Support(restApi: RestApi, stack: Construct) {
     });
 }
 
-export function add401Support(restApi: RestApi, stack: Construct) {
+export function add401Support(restApi: RestApi, stack: Construct): void {
+    // eslint-disable-next-line no-new
     new GatewayResponse(stack, `AuthenticationFailedResponse-${restApi.restApiName}`, {
         restApi,
         type: ResponseType.UNAUTHORIZED,
@@ -206,7 +229,8 @@ export function setReturnCodeForMissingAuthenticationToken(
     message: string,
     restApi: RestApi,
     stack: Construct,
-) {
+): void {
+    // eslint-disable-next-line no-new
     new GatewayResponse(stack, `MissingAuthenticationTokenResponse-${restApi.restApiName}`, {
         restApi,
         type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
@@ -224,7 +248,7 @@ export function createRestApi(
     allowFromIpAddresses?: string[] | undefined,
 ): RestApi {
     const policyDocument =
-        allowFromIpAddresses == null
+        allowFromIpAddresses === null || allowFromIpAddresses === undefined
             ? createDefaultPolicyDocument()
             : createIpRestrictionPolicyDocument(allowFromIpAddresses);
     const restApi = new RestApi(stack, apiId, {
@@ -239,7 +263,7 @@ export function createRestApi(
     return restApi;
 }
 
-export function createDefaultPolicyDocument() {
+export function createDefaultPolicyDocument(): PolicyDocument {
     return new PolicyDocument({
         statements: [
             new PolicyStatement({
@@ -269,18 +293,3 @@ export function createIpRestrictionPolicyDocument(allowFromIpAddresses: string[]
         ],
     });
 }
-
-export const PUBLIC_REST_API_CORS_CONFIG: Partial<ResourceOptions> = {
-    defaultCorsPreflightOptions: {
-        allowOrigins: Cors.ALL_ORIGINS,
-        allowHeaders: [
-            "Content-Type",
-            "X-Amz-Date",
-            "Authorization",
-            "X-Api-Key",
-            "X-Amz-Security-Token",
-            "Digitraffic-User",
-        ],
-        allowMethods: ["OPTIONS", "GET", "HEAD"],
-    },
-};

@@ -12,7 +12,6 @@ describe("ArrayUtils", () => {
         expect(ArrayUtils.bothArraysHasSameValues(null, undefined)).toEqual(true);
         expect(ArrayUtils.bothArraysHasSameValues(["a"], undefined)).toEqual(false);
         expect(ArrayUtils.bothArraysHasSameValues(["a"], null)).toEqual(false);
-        /* eslint-enable */
         expect(ArrayUtils.bothArraysHasSameValues(["a", "b"], ["a", "a"])).toEqual(false);
         expect(ArrayUtils.bothArraysHasSameValues(["a", "a", "a"], ["a", "b", "c"])).toEqual(false);
 

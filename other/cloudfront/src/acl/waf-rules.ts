@@ -5,20 +5,26 @@ export class WafRules {
     readonly excludedRules: ExcludedAWSRules | undefined;
     readonly digitrafficHeaderRules: boolean;
 
-    readonly perIpWithHeader: number;
-    readonly perIpWithoutHeader: number;
+    readonly perIpWithHeader?: number;
+    readonly perIpWithoutHeader?: number;
     readonly perIpAndQueryWithHeader?: number;
     readonly perIpAndQueryWithoutHeader?: number;
+
+    readonly isCountOnly?: boolean;
 
     constructor(
         awsCommonRuleSets: "all" | AWSManagedWafRule[],
         digitrafficHeaderRules: boolean,
-        perIpWithHeader: number,
-        perIpWithoutHeader: number,
+        perIpWithHeader?: number,
+        perIpWithoutHeader?: number,
         perIpAndQueryWithHeader?: number,
         perIpAndQueryWithoutHeader?: number,
-        excludedRules?: ExcludedAWSRules
+        excludedRules?: ExcludedAWSRules,
+        isCountOnly: boolean = false
     ) {
+        if (!isCountOnly && (perIpWithHeader === undefined || perIpWithoutHeader === undefined)) {
+            throw new Error("You must provide limits for throttling ips");
+        }
         this.awsCommonRuleSets = awsCommonRuleSets;
         this.digitrafficHeaderRules = digitrafficHeaderRules;
         this.perIpWithHeader = perIpWithHeader;
@@ -26,6 +32,7 @@ export class WafRules {
         this.perIpAndQueryWithHeader = perIpAndQueryWithHeader;
         this.perIpAndQueryWithoutHeader = perIpAndQueryWithoutHeader;
         this.excludedRules = excludedRules;
+        this.isCountOnly = isCountOnly;
     }
 
     private static checkLimits(
@@ -66,6 +73,24 @@ export class WafRules {
             perIpAndQueryWithHeader,
             perIpAndQueryWithoutHeader,
             excludedRules
+        );
+    }
+
+    static per5minCount(
+        perIpWithHeader?: number,
+        perIpWithoutHeader?: number,
+        perIpAndQueryWithHeader?: number,
+        perIpAndQueryWithoutHeader?: number
+    ): WafRules {
+        return new WafRules(
+            [],
+            true,
+            perIpWithHeader,
+            perIpWithoutHeader,
+            perIpAndQueryWithHeader,
+            perIpAndQueryWithoutHeader,
+            undefined,
+            true
         );
     }
 

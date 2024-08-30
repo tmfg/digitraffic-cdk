@@ -66,6 +66,7 @@
       "packageName": "@digitraffic/common",
       "projectFolder": "lib/digitraffic-common",
       "versionPolicyName": "DigitrafficCommon",
+      "decoupledLocalDependencies": ["@digitraffic/eslint-config"],
       "tags": ["library"]
     },
 

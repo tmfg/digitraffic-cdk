@@ -17,7 +17,7 @@ describe("lambda-response", () => {
         expectedStatus: number,
         expectedFilename?: string,
         expectedTimestamp?: Date,
-    ) {
+    ): void {
         const body = JSON.parse(Buffer.from(response.body, "base64").toString()) as unknown;
 
         expect(body).toEqual(expectedJson);
@@ -32,7 +32,7 @@ describe("lambda-response", () => {
         expectedStatus: number,
         expectedFilename?: string,
         expectedTimestamp?: Date,
-    ) {
+    ): void {
         const body = Buffer.from(response.body, "base64").toString();
 
         expect(body).toEqual(expectedString);

@@ -19,7 +19,7 @@ function getSmClient(): SecretsManager {
 
 export type GenericSecret = Record<string, string>;
 
-export async function getSecret<Secret>(secretId: string, prefix = ""): Promise<Secret> {
+export async function getSecret<Secret>(secretId: string, prefix: string = ""): Promise<Secret> {
     const secretObj = await getSmClient().getSecretValue({
         SecretId: secretId,
     });
@@ -46,7 +46,11 @@ function parseSecret<Secret>(secret: GenericSecret, prefix: string): Secret {
     for (const key in secret) {
         if (key.startsWith(prefix)) {
             const withoutPrefix: string = key.substring(skip);
-            parsed[withoutPrefix] = secret[key]!;
+            // skip undefined values
+            if (!secret[key]) {
+                continue;
+            }
+            parsed[withoutPrefix] = secret[key];
         }
     }
 

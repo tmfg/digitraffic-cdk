@@ -10,7 +10,7 @@ describe("CommonDateUtilsTest", () => {
     });
 
     test("dateFromIsoString fails", () => {
-        expect(() => CommonDateUtils.dateFromIsoString(ISO + "foobar")).toThrowError();
+        expect(() => CommonDateUtils.dateFromIsoString(ISO + "foobar")).toThrow();
     });
 
     test("countDiffMs", () => {

@@ -1,4 +1,4 @@
-import { getRandomInteger } from "../../test/testutils.js";
+import { getRandomInteger } from "../../__test__/testutils.js";
 import { retry, RetryLogError } from "../../utils/retry.js";
 import { logger } from "../../aws/runtime/dt-logger-default.js";
 import { jest } from "@jest/globals";
@@ -123,7 +123,7 @@ describe("Promise utils tests", () => {
 
     test("retry - use without mocks without retry", async () => {
         const val = 1;
-        const fn = () => Promise.resolve(val);
+        const fn: Parameters<typeof retry>[0] = () => Promise.resolve(val);
 
         const ret = await retry(fn);
 
@@ -133,7 +133,7 @@ describe("Promise utils tests", () => {
     test("retry - use without mocks with retry", async () => {
         let i = 0;
         const val = 1;
-        const fn = () => {
+        const fn: Parameters<typeof retry>[0] = () => {
             if (i < 3) {
                 i++;
                 throw new Error("not yet");

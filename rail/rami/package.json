@@ -31,8 +31,8 @@
     "@middy/sqs-partial-batch-failure": "^5.4.2",
     "ajv": "~8.17.1",
     "ajv-formats": "~3.0.1",
-    "aws-cdk-lib": "~2.151.0",
-    "constructs": "10.3.0",
+    "aws-cdk-lib": "^2.151.0",
+    "constructs": "~10.3.0",
     "date-fns": "~3.6.0",
     "date-fns-tz": "~3.1.3",
     "mysql2": "~3.11.0",
@@ -47,17 +47,17 @@
     "@digitraffic-cdk/testing": "workspace: *",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.66.25",
+    "@rushstack/heft": "^0.67.0",
     "@rushstack/heft-jest-plugin": "^0.12.7",
     "@types/aws-lambda": "8.10.143",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
     "@types/lodash": "4.17.7",
-    "@types/node": "20.14.8",
+    "@types/node": "20.14.9",
     "esbuild": "0.23.0",
     "eslint": "^8.57.0",
-    "lodash": "~4.17.21",
-    "parallelshell": "3.0.2",
-    "typescript": "~5.5.2"
+    "lodash": "^4.17.21",
+    "parallelshell": "^3.0.2",
+    "typescript": "~5.5.4"
   }
 }

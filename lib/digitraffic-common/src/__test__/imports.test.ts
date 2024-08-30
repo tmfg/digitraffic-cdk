@@ -81,17 +81,17 @@ test("traffictype import ok?", () => {
 });
 
 test("testutils import ok?", () => {
-    const testutils = import("../test/testutils.js");
+    const testutils = import("../__test__/testutils.js");
     return expect(testutils).resolves.toBeDefined();
 });
 
 test("dbTestutils import ok?", () => {
-    const dbTestutils = import("../test/db-testutils.js");
+    const dbTestutils = import("../__test__/db-testutils.js");
     return expect(dbTestutils).resolves.toBeDefined();
 });
 
 test("asserter import ok?", () => {
-    const asserter = import("../test/asserter.js");
+    const asserter = import("../__test__/asserter.js");
     return expect(asserter).resolves.toBeDefined();
 });
 
