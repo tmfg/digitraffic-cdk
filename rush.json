@@ -191,6 +191,12 @@
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "other"]
     },
+    {
+      "packageName": "test-api-stack",
+      "projectFolder": "other/test-api-stack",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "other"]
+    },
 
     // rail
     {

@@ -1,5 +1,5 @@
 import { addCorsHeaders, createAndLogError } from "../lambda-util.js";
-import type { CloudFrontRequest, CloudFrontRequestEventRecord, CloudFrontRequestHandler } from "aws-lambda";
+import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";
 

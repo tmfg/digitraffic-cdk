@@ -309,8 +309,8 @@ importers:
         specifier: ^3.624.0
         version: 3.637.0
       '@digitraffic/common':
-        specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+        specifier: 2024.8.27-1
+        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
       '@middy/core':
         specifier: ^5.4.2
         version: 5.4.6
@@ -1930,6 +1930,70 @@ importers:
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
+      typescript:
+        specifier: ~5.5.4
+        version: 5.5.4
+
+  ../../other/test-api-stack:
+    dependencies:
+      '@digitraffic/common':
+        specifier: 2024.8.27-1
+        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.637.0)(@aws-sdk/client-s3@3.637.0)(@aws-sdk/client-secrets-manager@3.637.0)(@aws-sdk/client-sns@3.637.0)(@aws-sdk/lib-storage@3.637.0(@aws-sdk/client-s3@3.637.0))(aws-cdk-lib@2.154.1(constructs@10.3.0))(aws-sdk@2.1683.0)(change-case@5.4.4)(constructs@10.3.0)(date-fns-tz@3.1.3(date-fns@3.6.0))(date-fns@3.6.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.1.0)(pg-promise@11.9.1(pg-native@3.1.0))
+      aws-cdk-lib:
+        specifier: 2.154.1
+        version: 2.154.1(constructs@10.3.0)
+      constructs:
+        specifier: 10.3.0
+        version: 10.3.0
+      zod:
+        specifier: 3.23.8
+        version: 3.23.8
+    devDependencies:
+      '@digitraffic-cdk/digitraffic-cdk-rig':
+        specifier: workspace:*
+        version: link:../../tools/rig
+      '@digitraffic-cdk/testing':
+        specifier: workspace:*
+        version: link:../../tools/testing
+      '@digitraffic-cdk/toolchain':
+        specifier: workspace:*
+        version: link:../../tools/toolchain
+      '@digitraffic/eslint-config':
+        specifier: workspace:*
+        version: link:../../tools/eslint-config
+      '@jest/globals':
+        specifier: 29.7.0
+        version: 29.7.0
+      '@rushstack/eslint-config':
+        specifier: ^3.7.1
+        version: 3.7.1(eslint@8.57.0)(typescript@5.5.4)
+      '@rushstack/heft':
+        specifier: ^0.67.0
+        version: 0.67.0(@types/node@20.14.9)
+      '@rushstack/heft-jest-plugin':
+        specifier: ^0.12.7
+        version: 0.12.9(@rushstack/heft@0.67.0(@types/node@20.14.9))(@types/node@20.14.9)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.4))
+      '@types/aws-lambda':
+        specifier: 8.10.137
+        version: 8.10.137
+      '@types/heft-jest':
+        specifier: 1.0.6
+        version: 1.0.6
+      '@types/jest':
+        specifier: 29.5.12
+        version: 29.5.12
+      '@types/node':
+        specifier: 20.14.9
+        version: 20.14.9
+      esbuild:
+        specifier: 0.23.0
+        version: 0.23.0
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
+      parallelshell:
+        specifier: 3.0.2
+        version: 3.0.2
       typescript:
         specifier: ~5.5.4
         version: 5.5.4
@@ -5043,6 +5107,9 @@ packages:
 
   '@types/async@3.2.24':
     resolution: {integrity: sha512-8iHVLHsCCOBKjCF2KwFe0p9Z3rfM9mL+sSP8btyR5vTjJRAqpBYD28/ZLgXPf0pjG1VxOvtCV/BgXkQbpSe8Hw==}
+
+  '@types/aws-lambda@8.10.137':
+    resolution: {integrity: sha512-YNFwzVarXAOXkjuFxONyDw1vgRNzyH8AuyN19s0bM+ChSu/bzxb5XPxYFLXoqoM+tvgzwR3k7fXcEOW125yJxg==}
 
   '@types/aws-lambda@8.10.143':
     resolution: {integrity: sha512-u5vzlcR14ge/4pMTTMDQr3MF0wEe38B2F9o84uC4F43vN5DGTy63npRrB6jQhyt+C0lGv4ZfiRcRkqJoZuPnmg==}
@@ -12361,6 +12428,8 @@ snapshots:
   '@types/argparse@1.0.38': {}
 
   '@types/async@3.2.24': {}
+
+  '@types/aws-lambda@8.10.137': {}
 
   '@types/aws-lambda@8.10.143': {}
 

@@ -59,8 +59,7 @@ function createFaultsResource(stack: DigitrafficStack, publicApi: DigitrafficRes
     const faultsResource = v1Resource.addResource("faults");
 
     const getFaultsIntegration = new DigitrafficIntegration(getFaultsLambda, MediaType.APPLICATION_GEOJSON)
-        .addQueryParameter("language")
-        .addQueryParameter("fixed_in_hours")
+        .passAllQueryParameters()
         .build();
 
     ["GET", "HEAD"].forEach((httpMethod) => {

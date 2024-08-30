@@ -33,42 +33,49 @@ describe("integration tests", () => {
     });
 
     test("query parameter", () => {
-        const i = createIntegration().addQueryParameter("q1");
+        const i = createIntegration()
+            .addQueryParameter("q1");
 
         const t = createTemplate(i);
         expectAssignmentInTemplate(t, "q1");
     });
 
     test("multivaluequery parameter", () => {
-        const i = createIntegration().addMultiValueQueryParameter("m1");
+        const i = createIntegration()
+            .addMultiValueQueryParameter("m1");
 
         const t = createTemplate(i);
         expectAssignmentInTemplate(t, "m1");
     });
 
     test("all parameters", () => {
-        const i = createIntegration().passAllQueryParameters();
+        const i = createIntegration()
+            .passAllQueryParameters();
 
         const t = createTemplate(i);
         expectAssignmentInTemplate(t, "$paramName");
     });
 
     test("path parameter", () => {
-        const i = createIntegration().addPathParameter("p1");
+        const i = createIntegration()
+            .addPathParameter("p1");
 
         const t = createTemplate(i);
         expectAssignmentInTemplate(t, "p1");
     });
 
     test("context parameter", () => {
-        const i = createIntegration().addContextParameter("c1");
+        const i = createIntegration()
+            .addContextParameter("c1");
 
         const t = createTemplate(i);
         expectAssignmentInTemplate(t, "c1");
     });
 
     test("all parameters and header", () => {
-        const i = createIntegration().passAllQueryParameters().addHeaderParameter("h1");
+        const i = createIntegration()
+            .passAllQueryParameters()
+            .addHeaderParameter("h1");
 
         const t = createTemplate(i);
         expectAssignmentInTemplate(t, "$paramName");
@@ -77,7 +84,9 @@ describe("integration tests", () => {
 
     test("all parameters & parameter - fail", () => {
         expect(() => {
-            createIntegration().passAllQueryParameters().addQueryParameter("q1");
+            createIntegration()
+                .passAllQueryParameters()
+                .addQueryParameter("q1");
         }).toThrow();
     });
 });
