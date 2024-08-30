@@ -19,8 +19,10 @@ Apparantely the Angular app doesn't function well if it is missing.
  */
 // @ts-ignore
 function handler(event: CloudfrontEvent): CloudfrontEvent["request"] | CloudfrontResponse {
-    const request = event.request;
-    const uri = request.uri;
+    // eslint-disable-next-line
+    var request = event.request;
+    // eslint-disable-next-line
+    var uri = request.uri;
 
     if (uri.match(/^\/history$/)) {
         return {
