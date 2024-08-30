@@ -26,7 +26,7 @@ export class DigitrafficIntegration<T extends string> {
 
     constructor(
         lambda: IFunction,
-        mediaType = MediaType.TEXT_PLAIN,
+        mediaType: MediaType = MediaType.TEXT_PLAIN,
         sunset?: string,
     ) {
         this.lambda = lambda;
@@ -93,9 +93,6 @@ export class DigitrafficIntegration<T extends string> {
             proxy: false,
             integrationResponses,
             requestParameters: undefined,
-            // this.parameters.length === 0
-            //     ? undefined
-            //     : this.createRequestParameters(),
             requestTemplates: this.parameters.length === 0 && !this._passAllQueryParameters
                 ? undefined
                 : this.createRequestTemplates(),

@@ -202,7 +202,7 @@ export class AclBuilder {
         );
     }
 
-    withCountDigitrafficUserIp(limit: number | undefined) {
+    withCountDigitrafficUserIp(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
@@ -214,7 +214,7 @@ export class AclBuilder {
         );
     }
 
-    withCountDigitrafficUserIpAndUriPath(limit: number | undefined) {
+    withCountDigitrafficUserIpAndUriPath(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
@@ -226,7 +226,7 @@ export class AclBuilder {
         );
     }
 
-    withCountAnonymousUserIp(limit: number | undefined) {
+    withCountAnonymousUserIp(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
@@ -238,7 +238,7 @@ export class AclBuilder {
         );
     }
 
-    withCountAnonymousUserIpAndUriPath(limit: number | undefined) {
+    withCountAnonymousUserIpAndUriPath(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
