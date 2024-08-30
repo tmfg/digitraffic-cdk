@@ -5,7 +5,11 @@ import terser from "@rollup/plugin-terser";
 import json from "@rollup/plugin-json";
 import { globby } from "globby";
 
-const inputs = (await globby([`lib/lambda/**/*.js`])).filter((input) => !input.includes("lambda-creator"));
+const excludedFiles = ["lambda-creator", "lambda-stream-to-elastic", "logging-util"];
+
+const inputs = (await globby([`src/lambda/**/*.ts`])).filter((input) => {
+    return !excludedFiles.some((file) => input.includes(file));
+});
 
 const defaultPlugins = [
     nodeResolve({
@@ -17,10 +21,19 @@ const defaultPlugins = [
     json()
 ];
 
-const excludeTerser = ["lambda-redirect-history", "lambda-index-html"];
+const excludeTerser = [
+    "lambda-redirect-history",
+    "lambda-index-html",
+    "lambda-stream-to-elastic",
+    "logging-util"
+];
+//const moduleJs = ["lambda-stream-to-elastic", "logging-util"]
 
 export default inputs.map((input) => {
-    const outputFile = input.replace("lib/", "dist/");
+    const isOutputEsm = false; // moduleJs.some((esm) => input.includes(esm))
+    const outputFile = isOutputEsm
+        ? input.replace("src/", "dist/").replace("ts", "mjs")
+        : input.replace("src/", "dist/").replace("ts", "cjs");
 
     const plugins = [...defaultPlugins];
 
@@ -32,7 +45,7 @@ export default inputs.map((input) => {
         output: {
             inlineDynamicImports: true,
             file: outputFile,
-            format: "cjs"
+            format: isOutputEsm ? "es" : "cjs"
         },
         input,
         plugins

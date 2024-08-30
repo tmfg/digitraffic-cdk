@@ -21,7 +21,7 @@
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff CloudfrontRoadTest",
     "cdk-diff-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test deploy CloudfrontStatusTest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
-    "compile-lambdas": "rollup -c",
+    "compile-lambdas": "rollup -c && esbuild src/lambda/stream-to-elastic/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda/stream-to-elastic --target=node20,es2022",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
@@ -30,7 +30,8 @@
     "@digitraffic/common": "2024.8.27-1",
     "aws-cdk-lib": "^2.151.0",
     "constructs": "~10.3.0",
-    "lodash-es": "~4.17.21"
+    "lodash-es": "~4.17.21",
+    "aws-sdk": "^2.1670.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -46,7 +47,6 @@
     "@types/jest": "29.5.12",
     "@types/lodash-es": "4.17.7",
     "@types/node": "20.14.9",
-    "aws-sdk": "^2.1670.0",
     "esbuild": "0.23.0",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
