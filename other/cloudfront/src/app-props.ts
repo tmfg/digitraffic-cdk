@@ -195,7 +195,7 @@ export class CFDomain extends CFOrigin {
     }
 
     static mqtt(domainName: string): CFDomain {
-        const domain = new CFDomain(domainName, CFBehavior.passAll("mqtt*").allowHttpAndHttps());
+        const domain = new CFDomain(domainName, CFBehavior.passAll("mqtt*").httpsOnly());
 
         domain.originProtocolPolicy = OriginProtocolPolicy.HTTP_ONLY;
 
