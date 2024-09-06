@@ -1573,9 +1573,6 @@ importers:
       mysql:
         specifier: ^2.18.1
         version: 2.18.1
-      source-map-support:
-        specifier: ^0.5.21
-        version: 0.5.21
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
