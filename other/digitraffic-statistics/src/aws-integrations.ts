@@ -1,12 +1,17 @@
 import { AwsIntegration, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 import { Bucket } from "aws-cdk-lib/aws-s3";
-import { DigitrafficStatisticsStack } from "./digitraffic-statistics-stack";
+import type { DigitrafficStatisticsStack } from "./digitraffic-statistics-stack.js";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import path from "path";
 import { Duration } from "aws-cdk-lib";
-import * as s3 from "aws-cdk-lib/aws-s3";
+import type { IBucket } from "aws-cdk-lib/aws-s3";
 import * as iam from "aws-cdk-lib/aws-iam";
-import { IVpc, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
+import { type IVpc, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export class StatisticsIntegrations {
     readonly apiStatisticsS3Integration: AwsIntegration;
@@ -103,7 +108,7 @@ export class StatisticsIntegrations {
         });
     }
 
-    private createS3ExecutionRole(stack: DigitrafficStatisticsStack, bucket: s3.IBucket): iam.Role {
+    private createS3ExecutionRole(stack: DigitrafficStatisticsStack, bucket: IBucket): iam.Role {
         const executeRole = new iam.Role(stack, "digitraffic-api-statistics-apigw-s3-integration-role", {
             assumedBy: new iam.ServicePrincipal("apigateway.amazonaws.com"),
             roleName: "digitraffic-api-statistics-apigw-s3-integration-role"

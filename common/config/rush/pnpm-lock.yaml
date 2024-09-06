@@ -1470,21 +1470,42 @@ importers:
         specifier: ~10.3.0
         version: 10.3.0
     devDependencies:
+      '@digitraffic-cdk/digitraffic-cdk-rig':
+        specifier: workspace:*
+        version: link:../../tools/rig
       '@digitraffic-cdk/toolchain':
         specifier: workspace:*
         version: link:../../tools/toolchain
       '@digitraffic/eslint-config':
         specifier: workspace:*
         version: link:../../tools/eslint-config
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
       '@rushstack/eslint-config':
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.5.4)
+      '@rushstack/heft':
+        specifier: ^0.67.0
+        version: 0.67.0(@types/node@20.14.9)
+      '@rushstack/heft-jest-plugin':
+        specifier: ^0.12.7
+        version: 0.12.9(@rushstack/heft@0.67.0(@types/node@20.14.9))(@types/node@20.14.9)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.5.4))
       '@types/aws-lambda':
         specifier: 8.10.143
         version: 8.10.143
+      '@types/heft-jest':
+        specifier: 1.0.6
+        version: 1.0.6
+      '@types/jest':
+        specifier: 29.5.12
+        version: 29.5.12
       '@types/node':
         specifier: 20.14.9
         version: 20.14.9
+      esbuild:
+        specifier: 0.23.0
+        version: 0.23.0
       eslint:
         specifier: ^8.57.0
         version: 8.57.0

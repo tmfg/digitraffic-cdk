@@ -1,15 +1,13 @@
-import {DigitrafficStatisticsStack} from "./digitraffic-statistics-stack";
+import type { DigitrafficStatisticsStack } from "./digitraffic-statistics-stack.js";
 import * as apigw from "aws-cdk-lib/aws-apigateway";
 import * as iam from "aws-cdk-lib/aws-iam";
-import {AwsIntegration, LambdaIntegration, RestApi} from "aws-cdk-lib/aws-apigateway";
-import {StatisticsIntegrations} from "./aws-integrations";
+import type { AwsIntegration, LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { StatisticsIntegrations } from "./aws-integrations.js";
 
 export class StatisticsApi {
-
     readonly restApi: RestApi;
 
     constructor(stack: DigitrafficStatisticsStack, integrations: StatisticsIntegrations) {
-
         this.restApi = this.createRestApi(stack);
 
         this.createDigitrafficApiStatisticsEndPoint(this.restApi, integrations.apiStatisticsS3Integration);
@@ -22,52 +20,64 @@ export class StatisticsApi {
             restApiName: "digitraffic-statistics-api",
             policy: this.createApiIpRestrictionPolicy(stack.statisticsProps.allowedIpAddresses),
             deployOptions: {
-                stageName: "prod",
-            },
+                stageName: "prod"
+            }
         });
     }
 
-    private createDigitrafficApiStatisticsEndPoint(restApi: RestApi, apiStatisticsS3Integration: AwsIntegration) {
+    private createDigitrafficApiStatisticsEndPoint(
+        restApi: RestApi,
+        apiStatisticsS3Integration: AwsIntegration
+    ) {
         restApi.root
             .addResource("digitraffic-api-statistics")
             .addResource("{key}")
             .addMethod("GET", apiStatisticsS3Integration, {
-                methodResponses: [{
-                    statusCode: "200",
-                    responseParameters: {
-                        "method.response.header.Content-Type": true,
-                    },
-                }],
+                methodResponses: [
+                    {
+                        statusCode: "200",
+                        responseParameters: {
+                            "method.response.header.Content-Type": true
+                        }
+                    }
+                ],
                 requestParameters: {
-                    "method.request.path.key": true,
+                    "method.request.path.key": true
                 }
             });
     }
 
-    private createDigitrafficMonthlyEndpoint(restApi: RestApi, digitrafficMonthlyLambdaIntegration: LambdaIntegration) {
-        const digitrafficMonthly = restApi.root.addResource("digitraffic-monthly",
-            {
-                defaultIntegration: digitrafficMonthlyLambdaIntegration,
-            });
+    private createDigitrafficMonthlyEndpoint(
+        restApi: RestApi,
+        digitrafficMonthlyLambdaIntegration: LambdaIntegration
+    ) {
+        const digitrafficMonthly = restApi.root.addResource("digitraffic-monthly", {
+            defaultIntegration: digitrafficMonthlyLambdaIntegration
+        });
         digitrafficMonthly.addProxy({
             defaultIntegration: digitrafficMonthlyLambdaIntegration,
-            anyMethod: true,
+            anyMethod: true
         });
         digitrafficMonthly.addMethod("GET");
     }
 
-    private createKibanaRedirectEndpoint(restApi: RestApi, kibanaRedirectLambdaIntegration: LambdaIntegration) {
+    private createKibanaRedirectEndpoint(
+        restApi: RestApi,
+        kibanaRedirectLambdaIntegration: LambdaIntegration
+    ) {
         const kibanaRedirect = restApi.root.addResource("kibana", {
-            defaultIntegration: kibanaRedirectLambdaIntegration,
+            defaultIntegration: kibanaRedirectLambdaIntegration
         });
 
         kibanaRedirect.addMethod("GET", kibanaRedirectLambdaIntegration, {
-            methodResponses: [{
-                statusCode: "301",
-                responseParameters: {
-                    "method.response.header.Location": true,
-                },
-            }]
+            methodResponses: [
+                {
+                    statusCode: "301",
+                    responseParameters: {
+                        "method.response.header.Location": true
+                    }
+                }
+            ]
         });
     }
 
@@ -78,20 +88,20 @@ export class StatisticsApi {
                     effect: iam.Effect.ALLOW,
                     actions: ["execute-api:Invoke"],
                     principals: [new iam.AnyPrincipal()],
-                    resources: ["*"],
+                    resources: ["*"]
                 }),
                 new iam.PolicyStatement({
                     effect: iam.Effect.DENY,
                     actions: ["execute-api:Invoke"],
                     conditions: {
-                        "NotIpAddress": {
-                            "aws:SourceIp": allowedIpAddresses,
-                        },
+                        NotIpAddress: {
+                            "aws:SourceIp": allowedIpAddresses
+                        }
                     },
                     principals: [new iam.AnyPrincipal()],
-                    resources: ["*"],
-                }),
-            ],
+                    resources: ["*"]
+                })
+            ]
         });
     }
 }
