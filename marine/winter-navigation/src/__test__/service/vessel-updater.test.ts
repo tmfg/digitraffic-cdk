@@ -4,6 +4,7 @@ import { jest } from "@jest/globals";
 import { type Response } from "../../model/apidata.js";
 import type { Deleted, Vessel } from "../../model/apidata.js";
 import { IbnetApi } from "../../api/ibnet-api.js";
+import { updateVessels } from "../../service/vessel-updater.js";
 
 const VESSEL_1: Vessel = {
     rv: 0,
@@ -25,8 +26,6 @@ async function mockApiResponseAndUpdate(response: Response<Vessel>): Promise<voi
     jest.spyOn(IbnetApi.prototype, "getVessels").mockImplementation((from: number, to: number) =>
         Promise.resolve(response)
     );
-
-    const { updateVessels } = await import("../../service/vessel-updater.js");
 
     await updateVessels(new IbnetApi("", ""), 0, 1);
 }

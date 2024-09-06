@@ -4,6 +4,7 @@ import { jest } from "@jest/globals";
 import { type Response } from "../../model/apidata.js";
 import type { Deleted, Location } from "../../model/apidata.js";
 import { IbnetApi } from "../../api/ibnet-api.js";
+import { updateLocations } from "../../service/location-updater.js";
 
 const LOCATION_1: Location = {
     name: "name",
@@ -36,8 +37,6 @@ async function mockApiResponseAndUpdate(response: Response<Location>): Promise<v
     jest.spyOn(IbnetApi.prototype, "getLocations").mockImplementation((from: number, to: number) =>
         Promise.resolve(response)
     );
-
-    const { updateLocations } = await import("../../service/location-updater.js");
 
     await updateLocations(new IbnetApi("", ""), 0, 1);
 }
