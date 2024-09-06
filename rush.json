@@ -120,6 +120,12 @@
       "tags": ["cdk", "marine"]
     },
     {
+      "packageName": "winter-navigation",
+      "projectFolder": "marine/winter-navigation",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "marine"]
+    },
+    {
       "packageName": "voyage-plan-gateway",
       "projectFolder": "marine/voyage-plan-gateway",
       "decoupledLocalDependencies": ["@digitraffic/common"],

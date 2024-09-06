@@ -15,9 +15,8 @@ One-off builds can also be run with `pnpm build`
 
 ## Creating a new project
 
-Copy a previous project as a base. Change the project name in package.json.  
-If the project is a new top-level project (such as marine/road),
-update the workspaces configuration in the top level package.json file.
+Copy a template project from template/esm as a base. Change the project name in package.json.  
+Also update rush.json to include new project.
 
 ## Adding dependencies
 
