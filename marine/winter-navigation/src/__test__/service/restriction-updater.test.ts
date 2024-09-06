@@ -4,6 +4,7 @@ import { jest } from "@jest/globals";
 import { type Response } from "../../model/apidata.js";
 import type { Deleted, Restriction } from "../../model/apidata.js";
 import { IbnetApi } from "../../api/ibnet-api.js";
+import { updateRestrictions } from "../../service/restriction-updater.js";
 
 const RESTRICTION_1: Restriction = {
     rv: 0,
@@ -26,8 +27,6 @@ async function mockApiResponseAndUpdate(response: Response<Restriction>): Promis
     jest.spyOn(IbnetApi.prototype, "getRestrictions").mockImplementation((from: number, to: number) =>
         Promise.resolve(response)
     );
-
-    const { updateRestrictions } = await import("../../service/restriction-updater.js");
 
     await updateRestrictions(new IbnetApi("", ""), 0, 1);
 }

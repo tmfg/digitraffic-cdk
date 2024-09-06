@@ -4,6 +4,7 @@ import { jest } from "@jest/globals";
 import { type Response } from "../../model/apidata.js";
 import type { Deleted, Source } from "../../model/apidata.js";
 import { IbnetApi } from "../../api/ibnet-api.js";
+import { updateSources } from "../../service/source-updater.js";
 
 const SOURCE_1: Source = {
     rv: 0,
@@ -26,8 +27,6 @@ async function mockApiResponseAndUpdate(response: Response<Source>): Promise<voi
     jest.spyOn(IbnetApi.prototype, "getSources").mockImplementation((from: number, to: number) =>
         Promise.resolve(response)
     );
-
-    const { updateSources } = await import("../../service/source-updater.js");
 
     await updateSources(new IbnetApi("", ""), 0, 1);
 }

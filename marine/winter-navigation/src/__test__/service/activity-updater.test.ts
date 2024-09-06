@@ -4,6 +4,7 @@ import { jest } from "@jest/globals";
 import { type Response } from "../../model/apidata.js";
 import type { Deleted, Activity } from "../../model/apidata.js";
 import { IbnetApi } from "../../api/ibnet-api.js";
+import { updateActivities } from "../../service/activity-updater.js";
 
 const ACTIVITY_1: Activity = {
     rv: 0,
@@ -26,8 +27,6 @@ async function mockApiResponseAndUpdate(response: Response<Activity>): Promise<v
     jest.spyOn(IbnetApi.prototype, "getActivities").mockImplementation((from: number, to: number) =>
         Promise.resolve(response)
     );
-
-    const { updateActivities } = await import("../../service/activity-updater.js");
 
     await updateActivities(new IbnetApi("", ""), 0, 1);
 }
