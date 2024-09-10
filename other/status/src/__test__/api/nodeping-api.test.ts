@@ -86,6 +86,34 @@ describe("NodePing API test", () => {
         expect(api.checkNeedsUpdate(check)).toBe(true);
     });
 
+    test("checkNeedsUpdate - extra endpoint url changed", () => {
+        const api = makeApi();
+        const check = makeCheck();
+
+        expect(
+            api.checkNeedsUpdate(check, {
+                name: "name",
+                method: EndpointHttpMethod.HEAD,
+                protocol: EndpointProtocol.HTTP,
+                url: "https://new.url.com"
+            })
+        ).toBe(true);
+    });
+
+    test("checkDontNeedUpdate - extra endpoint url not changed", () => {
+        const api = makeApi();
+        const check = makeCheck();
+
+        expect(
+            api.checkNeedsUpdate(check, {
+                name: "name",
+                method: EndpointHttpMethod.HEAD,
+                protocol: EndpointProtocol.HTTP,
+                url: "http://some.url"
+            })
+        ).toBe(false);
+    });
+
     test("checkNeedsUpdate - http method not explicitly configured - needs to be HEAD", () => {
         const api = makeApi();
         const check = makeCheck({ method: EndpointHttpMethod.GET });
@@ -425,6 +453,7 @@ function makeCheck(options?: {
     interval?: number;
     headers?: Record<string, string>;
     notifications?: NodePingNotification[];
+    target?: string;
 }): NodePingCheck {
     return {
         _id: randomString(),
@@ -435,7 +464,7 @@ function makeCheck(options?: {
         interval: options?.interval ?? 1,
         notifications: options?.notifications ?? [],
         parameters: {
-            target: "http://some.url",
+            target: options?.target ?? "http://some.url",
             method: options?.method ?? EndpointHttpMethod.HEAD,
             threshold: options?.timeout ?? 30,
             sendheaders: options?.headers ?? {

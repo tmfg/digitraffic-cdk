@@ -485,6 +485,14 @@ export class NodePingApi {
                 needsUpdate = true;
             }
 
+            if (correspondingExtraEndpoint && check.parameters.target !== correspondingExtraEndpoint?.url) {
+                logger.info({
+                    method,
+                    message: `${messagePrefix} url was not ${correspondingExtraEndpoint?.url}, instead: ${check.parameters.target}`
+                });
+                needsUpdate = true;
+            }
+
             const digitrafficUser = Object.entries(check.parameters.sendheaders ?? {}).find(
                 (e) => e[0].toLowerCase() === "digitraffic-user"
             )?.[1];
