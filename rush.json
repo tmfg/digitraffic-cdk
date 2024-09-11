@@ -140,12 +140,6 @@
       "tags": ["cdk", "other"]
     },
     {
-      "packageName": "cloudwatch-logs-recipient",
-      "projectFolder": "other/cloudwatch-logs-recipient",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "other"]
-    },
-    {
       "packageName": "digitraffic-statistics",
       "projectFolder": "other/digitraffic-statistics",
       "decoupledLocalDependencies": ["@digitraffic/common"],

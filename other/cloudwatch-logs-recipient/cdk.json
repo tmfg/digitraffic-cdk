@@ -1,3 +1,0 @@
-{
-  "app": "node lib/bin/cloudwatch-logs-recipient-app.js"
-}
