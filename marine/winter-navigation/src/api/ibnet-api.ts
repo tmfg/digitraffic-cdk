@@ -1,16 +1,11 @@
-import type {
-    EndpointResponse,
-    Response,
-    Location,
-    Restriction,
-    Vessel,
-    Activity,
-    Source
-} from "../model/apidata.js";
+import type { EndpointResponse } from "../model/apidata.js";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
+
+export type ApiPath = "location" | "restriction" | "vessel" | "activity" | "source" | "port-suspension"
+    | "port-suspension-location" | "queue" | "dirway" | "dirwaypoint";
 
 export class IbnetApi {
     private _baseUrl: string;
@@ -21,17 +16,17 @@ export class IbnetApi {
         this._authHeaderValue = authHeaderValue;
     }
 
-    fetchFromUrl<T>(url: string): Promise<T> {
+    async fetchFromUrl<T>(url: string): Promise<T> {
         logger.debug("Fetching from " + url);
-
+        
         return ky
             .get(url, {
-                timeout: 10000,
+                timeout: 20000,
                 headers: {
                     Authorization: `Basic ${this._authHeaderValue}`,
                     Accept: MediaType.APPLICATION_JSON
                 }
-            })
+            })            
             .then(async (resp) => {
                 if (resp.status !== 200) {
                     logger.error({
@@ -44,10 +39,14 @@ export class IbnetApi {
                 }
 
                 return await resp.json<T>();
+            })
+            .catch(error => {
+                logger.debug("error:" + JSON.stringify(error));
+                throw error;
             });
     }
 
-    async fetch<T>(path: string, from: number, to: number): Promise<T[]> {
+    async fetch<T>(path: ApiPath, from: number, to: number): Promise<T[]> {
         const start = Date.now();
         const url = `${this._baseUrl}${path}?from=${from}&to=${to}`;
 
@@ -66,28 +65,14 @@ export class IbnetApi {
     }
 
     async getCurrentVersion(): Promise<number> {
-        const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
+        try {
+            const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
 
-        return response.toRv;
-    }
+            return response.toRv;
+        } catch(error) {
+            logger.debug("got error! " + JSON.stringify(error));
 
-    getLocations(from: number, to: number): Promise<Response<Location>> {
-        return this.fetch("location", from, to);
-    }
-
-    getRestrictions(from: number, to: number): Promise<Response<Restriction>> {
-        return this.fetch("restriction", from, to);
-    }
-
-    getVessels(from: number, to: number): Promise<Response<Vessel>> {
-        return this.fetch("vessel", from, to);
-    }
-
-    getActivities(from: number, to: number): Promise<Response<Activity>> {
-        return this.fetch("activity", from, to);
-    }
-
-    getSources(from: number, to: number): Promise<Response<Source>> {
-        return this.fetch("source", from, to);
+            return 0;
+        }
     }
 }

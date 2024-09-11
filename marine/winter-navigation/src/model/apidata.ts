@@ -37,7 +37,7 @@ export interface Restriction extends BaseAttributes {
 export interface Vessel extends BaseAttributes {
     readonly name: string;
     readonly callsign?: string;
-    readonly shortcode: string;
+    readonly shortcode?: string;
     readonly imo?: number;
     readonly mmsi?: number;
     readonly type?: string;
@@ -59,4 +59,39 @@ export interface Activity extends BaseAttributes {
     readonly public_comment?: string;
     readonly start_time: Date;
     readonly end_time?: Date;
+}
+
+export interface PortSuspension extends BaseAttributes {
+    readonly start_time: Date;
+    readonly end_time?: Date;
+    readonly prenotification: boolean;
+    readonly ports_closed: boolean;
+    readonly due_to: string;
+    readonly specifications?: string;
+}
+
+export interface PortSuspensionLocation extends BaseAttributes {
+    readonly suspension_id: string;
+    readonly location_id: string;
+}
+
+export interface Queue extends BaseAttributes {
+    readonly icebreaker_id: string;
+    readonly vessel_id: string;
+    readonly start_time: Date;
+    readonly end_time: Date;
+    readonly order_num: number;
+}
+
+export interface Dirway extends BaseAttributes {
+    readonly name: string;
+    readonly description: string;
+}
+
+export interface Dirwaypoint extends BaseAttributes {
+    readonly dirway_id: string;
+    readonly order_num: number;
+    readonly name: string;
+    readonly latitude: number;
+    readonly longitude: number;
 }
