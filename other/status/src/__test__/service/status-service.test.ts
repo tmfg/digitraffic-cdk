@@ -318,8 +318,8 @@ describe("StatusServiceTest", () => {
         const secret: UpdateStatusSecret = await secretHolder.get();
         const githubBranch = "master";
         const endpoints: string[] = [
-            "road/api/maintenance/v1/tracking/routes",
-            "road/api/maintenance/v1/tracking/routes/latest"
+            "/api/maintenance/v1/tracking/routes",
+            "/api/maintenance/v1/tracking/routes/latest"
         ];
 
         const check0 = makeNodepingCheck("Road", endpoints[0]!);
@@ -449,7 +449,7 @@ function makeNodepingCheck(category: "Road" | "Marine" | "Rail", url: string): N
         interval: 1,
         notifications: [],
         parameters: {
-            target: "http://some.url",
+            target: url,
             method: EndpointHttpMethod.HEAD,
             threshold: 1000,
             sendheaders: {
