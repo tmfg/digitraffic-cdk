@@ -22,7 +22,7 @@ const PS_UPDATE_ACTIVITIES = new pgPromise.PreparedStatement({
     text: SQL_UPDATE_ACTIVITIES
 });
 
-export function saveAll(db: DTDatabase, activities: Activity[]): Promise<unknown> {
+export function saveAllActivities(db: DTDatabase, activities: Activity[]): Promise<unknown> {
     return Promise.all(
         activities.map(async (a) => {
             return db.any(PS_UPDATE_ACTIVITIES, [

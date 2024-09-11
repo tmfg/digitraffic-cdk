@@ -20,7 +20,7 @@ const PS_UPDATE_SOURCES = new pgPromise.PreparedStatement({
     text: SQL_UPDATE_SOURCES
 });
 
-export function saveAll(db: DTDatabase, sources: Source[]): Promise<unknown> {
+export function saveAllSources(db: DTDatabase, sources: Source[]): Promise<unknown> {
     return Promise.all(
         sources.map(async (s) => {
             return db.any(PS_UPDATE_SOURCES, [s.id, s.name, s.shortname, s.nationality, s.type, s.vessel_id]);

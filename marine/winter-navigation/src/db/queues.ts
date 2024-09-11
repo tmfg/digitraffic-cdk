@@ -16,24 +16,14 @@ do update set
 `;
 
 const PS_UPDATE_QUEUES = new pgPromise.PreparedStatement({
-  name: "update-queues",
-  text: SQL_UPDATE_QUEUES,
+    name: "update-queues",
+    text: SQL_UPDATE_QUEUES
 });
 
-export function saveAllQueues(
-  db: DTDatabase,
-  queues: Queue[],
-): Promise<unknown> {
-  return Promise.all(
-    queues.map(async (q) => {
-      return db.any(PS_UPDATE_QUEUES, [
-        q.id,
-        q.icebreaker_id,
-        q.vessel_id,
-        q.start_time,
-        q.end_time,
-        q.order_num,
-      ]);
-    }),
-  );
+export function saveAllQueues(db: DTDatabase, queues: Queue[]): Promise<unknown> {
+    return Promise.all(
+        queues.map(async (q) => {
+            return db.any(PS_UPDATE_QUEUES, [q.id, q.icebreaker_id, q.vessel_id, q.start_time, q.end_time, q.order_num]);
+        })
+    );
 }

@@ -10,40 +10,28 @@ do update set
     version = $2,
     modified = now()`;
 
-const SQL_GET_DATA_VERSION =
-  `select version from wn_data_version where table_name = $1`;
+const SQL_GET_DATA_VERSION = `select version from wn_data_version where table_name = $1`;
 
 const PS_UPDATE_DATA_VERSION = new pgPromise.PreparedStatement({
-  name: "update-data-version",
-  text: SQL_UPDATE_DATA_VERSION,
+    name: "update-data-version",
+    text: SQL_UPDATE_DATA_VERSION
 });
 
 const PS_GET_DATA_VERSION = new pgPromise.PreparedStatement({
-  name: "get-data-version",
-  text: SQL_GET_DATA_VERSION,
+    name: "get-data-version",
+    text: SQL_GET_DATA_VERSION
 });
 
-export function updateDataVersion(
-  db: DTDatabase,
-  tableName: TableName,
-  version: number,
-): Promise<unknown> {
-  return db.any(PS_UPDATE_DATA_VERSION, [tableName, version]);
+export function updateDataVersion(db: DTDatabase, tableName: TableName, version: number): Promise<unknown> {
+    return db.any(PS_UPDATE_DATA_VERSION, [tableName, version]);
 }
 
 interface Versionable {
-  version: number;
+    version: number
 }
 
-export async function getDataVersion(
-  db: DTDatabase,
-  tableName: TableName,
-): Promise<number> {
-  return await db.oneOrNone(
-    PS_GET_DATA_VERSION,
-    [tableName],
-    (row: Versionable) => {
-      return row?.version;
-    },
-  ) ?? 0;
+export async function getDataVersion(db: DTDatabase, tableName: TableName): Promise<number> {
+    return await db.oneOrNone(PS_GET_DATA_VERSION, [tableName], (row: Versionable) => {
+        return row?.version
+    }) ?? 0;
 }

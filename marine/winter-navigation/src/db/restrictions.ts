@@ -19,7 +19,7 @@ const PS_UPDATE_RESTRICTIONS = new pgPromise.PreparedStatement({
     text: SQL_UPDATE_RESTRICTIONS
 });
 
-export function saveAll(db: DTDatabase, restrictions: Restriction[]): Promise<unknown> {
+export function saveAllRestrictions(db: DTDatabase, restrictions: Restriction[]): Promise<unknown> {
     return Promise.all(
         restrictions.map(async (r) => {
             return db.any(PS_UPDATE_RESTRICTIONS, [

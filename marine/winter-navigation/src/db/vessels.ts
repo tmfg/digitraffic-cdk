@@ -21,7 +21,7 @@ const PS_UPDATE_VESSELS = new pgPromise.PreparedStatement({
     text: SQL_UPDATE_VESSELS
 });
 
-export function saveAll(db: DTDatabase, vessels: Vessel[]): Promise<unknown> {
+export function saveAllVessels(db: DTDatabase, vessels: Vessel[]): Promise<unknown> {
     return Promise.all(
         vessels.map(async (v) => {
             return db.any(PS_UPDATE_VESSELS, [v.id, v.name, v.callsign, v.shortcode, v.imo, v.mmsi, v.type]);

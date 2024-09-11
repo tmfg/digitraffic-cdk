@@ -14,7 +14,12 @@ async function truncate(db: DTDatabase): Promise<void> {
             t.none("DELETE FROM wn_restriction"),
             t.none("DELETE FROM wn_vessel"),
             t.none("DELETE FROM wn_activity"),
-            t.none("DELETE FROM wn_source")
+            t.none("DELETE FROM wn_source"),
+            t.none("DELETE FROM wn_queue"),
+            t.none("DELETE FROM wn_dirway"),
+            t.none("DELETE FROM wn_dirwaypoint"),
+            t.none("DELETE FROM wn_port_suspension"),
+            t.none("DELETE FROM wn_port_suspension_location"),
         ]);
     });
 }
@@ -27,44 +32,4 @@ export async function assertCountFromTable(
 ): Promise<void> {
     await assertCount(db, `select count(*) from ${tableName}`, count);
     await assertCount(db, `select count(*) from ${tableName} where deleted = true`, deletedCount);
-}
-
-export async function assertLocationCount(
-    db: DTDatabase,
-    count: number,
-    deletedCount: number = 0
-): Promise<void> {
-    await assertCountFromTable(db, "wn_location", count, deletedCount);
-}
-
-export async function assertRestrictionCount(
-    db: DTDatabase,
-    count: number,
-    deletedCount: number = 0
-): Promise<void> {
-    await assertCountFromTable(db, "wn_restriction", count, deletedCount);
-}
-
-export async function assertActivityCount(
-    db: DTDatabase,
-    count: number,
-    deletedCount: number = 0
-): Promise<void> {
-    await assertCountFromTable(db, "wn_activity", count, deletedCount);
-}
-
-export async function assertSourceCount(
-    db: DTDatabase,
-    count: number,
-    deletedCount: number = 0
-): Promise<void> {
-    await assertCountFromTable(db, "wn_source", count, deletedCount);
-}
-
-export async function assertVesselCount(
-    db: DTDatabase,
-    count: number,
-    deletedCount: number = 0
-): Promise<void> {
-    await assertCountFromTable(db, "wn_vessel", count, deletedCount);
 }
