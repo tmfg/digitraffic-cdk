@@ -40,7 +40,7 @@ export class DataUpdater {
     }
 
     async updateObjects<T extends BaseAttributes | Deleted>(db: DTDatabase, tableName: TableName, to: number,
-        apiPath: ApiPath, saveObjects: SaveFunction<T>) {
+        apiPath: ApiPath, saveObjects: SaveFunction<T>): Promise<void> {
         const start = Date.now();
 
         const from = await getDataVersion(db, tableName);
