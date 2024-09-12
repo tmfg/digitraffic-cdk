@@ -17,9 +17,18 @@ do update set
     deleted = false
 `;
 
+const SQL_GET_ACTIVITIES = `select icebreaker_id, vessel_id, type, reason, public_comment, start_time, end_time
+from wn_activity
+where deleted = false`;
+
 const PS_UPDATE_ACTIVITIES = new pgPromise.PreparedStatement({
     name: "update-activities",
     text: SQL_UPDATE_ACTIVITIES
+});
+
+const PS_GET_ACTIVITIES = new pgPromise.PreparedStatement({
+    name: "get-activities",
+    text: SQL_GET_ACTIVITIES
 });
 
 export function saveAllActivities(db: DTDatabase, activities: Activity[]): Promise<unknown> {
@@ -38,3 +47,8 @@ export function saveAllActivities(db: DTDatabase, activities: Activity[]): Promi
         })
     );
 }
+
+export async function getActivities(db: DTDatabase): Promise<Activity[]> {
+    return db.manyOrNone(PS_GET_ACTIVITIES);
+}
+

@@ -16,9 +16,27 @@ do update set
     deleted = false
 `;
 
+const SQL_GET_VESSEL = `select id, name, callsign, shortcode, imo, mmsi, type, deleted
+from wn_vessel
+where id = $1`;
+
+const SQL_GET_VESSELS = `select id, name, callsign, shortcode, imo, mmsi, type, deleted
+from wn_vessel
+where deleted = false`;
+
 const PS_UPDATE_VESSELS = new pgPromise.PreparedStatement({
     name: "update-vessels",
     text: SQL_UPDATE_VESSELS
+});
+
+const PS_GET_VESSEL = new pgPromise.PreparedStatement({
+    name: "get-vessel",
+    text: SQL_GET_VESSEL
+});
+
+const PS_GET_VESSELS = new pgPromise.PreparedStatement({
+    name: "get-vessels",
+    text: SQL_GET_VESSELS
 });
 
 export function saveAllVessels(db: DTDatabase, vessels: Vessel[]): Promise<unknown> {
@@ -28,3 +46,12 @@ export function saveAllVessels(db: DTDatabase, vessels: Vessel[]): Promise<unkno
         })
     );
 }
+
+export async function getVessel(db: DTDatabase, locationId: string): Promise<Vessel | null> {
+    return db.oneOrNone(PS_GET_VESSEL, [locationId]);
+}
+
+export async function getVessels(db: DTDatabase): Promise<Vessel[]> {
+    return db.manyOrNone(PS_GET_VESSELS);
+}
+

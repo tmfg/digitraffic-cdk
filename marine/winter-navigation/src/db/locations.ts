@@ -17,12 +17,21 @@ do update set
     deleted = false
 `;
 
+const SQL_GET_LOCATION = `select id, name, type, locode_list, nationality, latitude, longitude, winterport, deleted
+from wn_location 
+where id = $1`;
+
 const SQL_GET_LOCATIONS = `select id, name, type, locode_list, nationality, latitude, longitude, winterport
 from wn_location where deleted = false`;
 
 const PS_UPDATE_LOCATIONS = new pgPromise.PreparedStatement({
     name: "update-locations",
     text: SQL_UPDATE_LOCATIONS
+});
+
+const PS_GET_LOCATION = new pgPromise.PreparedStatement({
+    name: "get-location",
+    text: SQL_GET_LOCATION
 });
 
 const PS_GET_LOCATIONS = new pgPromise.PreparedStatement({
@@ -45,6 +54,10 @@ export async function saveAllLocations(db: DTDatabase, locations: Location[]): P
             ]);
         })
     );
+}
+
+export async function getLocation(db: DTDatabase, locationId: string): Promise<Location | null> {
+    return db.oneOrNone(PS_GET_LOCATION, [locationId]);
 }
 
 export async function getLocations(db: DTDatabase): Promise<Location[]> {

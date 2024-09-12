@@ -2,41 +2,41 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { getLocation, getLocations } from "../../service/location-service.js";
+import { getVessel, getVessels } from "../../service/vessel-service.js";
 import { z, ZodError } from "zod";
 
 const proxyHolder = ProxyHolder.create();
 
-const GetLocationSchema = z.object({
-    "location-id": z.string().optional()
+const GetVesselSchema = z.object({
+    "vessel-id": z.string().optional()
 }).strict();
 
 export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
 
     try {
-        const getLocationEvent = GetLocationSchema.parse(event);
+        const getVesselEvent = GetVesselSchema.parse(event);
         await proxyHolder.setCredentials();
         
-        // get single location
-        if(getLocationEvent["location-id"]) {
-            const [location, lastUpdated] = await getLocation(getLocationEvent["location-id"]);
+        // get single vessel
+        if(getVesselEvent["vessel-id"]) {
+            const [vessel, lastUpdated] = await getVessel(getVesselEvent["vessel-id"]);
 
-            if(!location) {
+            if(!vessel) {
                 return LambdaResponse.notFound();
             }
 
             return lastUpdated
-                ? LambdaResponse.okJson(location).withTimestamp(lastUpdated)
-                : LambdaResponse.okJson(location);    
+                ? LambdaResponse.okJson(vessel).withTimestamp(lastUpdated)
+                : LambdaResponse.okJson(vessel);    
         } 
         
-        // get all locations
-        const [locations, lastUpdated] = await getLocations();
+        // get all vessels
+        const [vessels, lastUpdated] = await getVessels();
         
         return lastUpdated
-            ? LambdaResponse.okJson(locations).withTimestamp(lastUpdated)
-            : LambdaResponse.okJson(locations);    
+            ? LambdaResponse.okJson(vessels).withTimestamp(lastUpdated)
+            : LambdaResponse.okJson(vessels);    
     } catch (error) {
         if (error instanceof ZodError) {
             return LambdaResponse.badRequest(JSON.stringify(error.issues));
@@ -47,7 +47,7 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
         return LambdaResponse.internalError();
     } finally {
         logger.info({
-            method: "GetLocations.handler",
+            method: "GetVessels.handler",
             tookMs: Date.now() - start
         });
     }
