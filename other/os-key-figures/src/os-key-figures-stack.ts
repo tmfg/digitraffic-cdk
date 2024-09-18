@@ -30,6 +30,7 @@ export interface Props {
 export class OsKeyFiguresStack extends Stack {
     constructor(app: App, id: string, osKeyFiguresProps: Props, props?: StackProps) {
         super(app, id, props);
+        // vpc also used by stack UpdateOSMonitorsProd since it requires OS access
         const vpc = this.createVpc();
 
         const collectOsKeyFiguresLambdaSg = this.createCollectOsKeyFiguresLambda(osKeyFiguresProps, vpc);
