@@ -163,14 +163,14 @@ async function getKibanaResult(
         } else if (keyFigure.type === "agg") {
             const keyFigureResponse = await openSearchApi.makeOsQuery(
                 OS_INDEX,
-                `${OpenSearchApiMethod.SEARCH}?size=0`,
+                `${OpenSearchApiMethod.SEARCH}`,
                 query
             );
             keyFigureResult.value = keyFigureResponse.aggregations.agg.value;
         } else if (keyFigure.type === "field_agg") {
             const keyFigureResponse = await openSearchApi.makeOsQuery(
                 OS_INDEX,
-                `${OpenSearchApiMethod.SEARCH}?size=0`,
+                `${OpenSearchApiMethod.SEARCH}`,
                 query
             );
             const value: { [key: string]: unknown } = {};
@@ -181,7 +181,7 @@ async function getKibanaResult(
         } else if (keyFigure.type === "sub_agg") {
             const keyFigureResponse = await openSearchApi.makeOsQuery(
                 OS_INDEX,
-                `${OpenSearchApiMethod.SEARCH}?size=0`,
+                `${OpenSearchApiMethod.SEARCH}`,
                 query
             );
             const value: { [key: string]: unknown } = {};
@@ -240,9 +240,10 @@ export async function getKibanaResults(
                     keyFigures,
                     startDate,
                     endDate,
-                    `${getAccountNameFilterFromTransportTypeName(
-                        apiPath.transportType
-                    )} AND @fields.request_uri:\\"${path}\\"`
+                    // without using .keyword, OpenSearch query strings will produce unfortunate partial matches
+                    // at the same time, some URIs in the logs have trailing slashes while others do not, hence the OR statement for two versions of the same URI below
+                    // prettier-ignore
+                    `${getAccountNameFilterFromTransportTypeName(apiPath.transportType)} AND (request.keyword:\\"${path}\\" OR request.keyword:\\"${path.replace(/\/$/, '')}\\")`
                 )
             );
         }
@@ -261,7 +262,13 @@ async function getRowAmountWithDateNameFilter(
         const resultKey = "count";
         const existingRowsFromDate = (await query(
             "SELECT COUNT(*) AS ? FROM ?? WHERE `from` = ? AND `name` = ? AND `filter` = ?;",
-            [resultKey, KEY_FIGURES_TABLE_NAME, isoDate, name, filter]
+            [
+                resultKey,
+                KEY_FIGURES_TABLE_NAME,
+                isoDate,
+                name,
+                getTransportTypeFilterFromAccountNameFilter(filter) ?? "null"
+            ]
         )) as { count: number }[];
         const firstRow = existingRowsFromDate[0];
         if (!firstRow) {
@@ -280,7 +287,7 @@ async function getRowAmountWithDateNameFilter(
 async function insertFigures(kibanaResults: KeyFigureResult[], tableName: string) {
     for (const result of kibanaResults) {
         /**
-         * Even though the actual filter used in the os queries is by accountName:[name], 
+         * Even though the actual filter used in the os queries is by accountName.keyword:[name], 
            it is converted to @transport_type:[rail|road|marine|*] for the db entry. 
            
            This is because originally the queries were filtered by the (now non-existent) field @transport_type 
@@ -328,7 +335,6 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
             });
             await query("DROP TABLE IF EXISTS ??", [DUPLICATES_TABLE_NAME]);
             await query(CREATE_KEY_FIGURES_TABLE, [DUPLICATES_TABLE_NAME]);
-            await query(CREATE_KEY_FIGURES_INDEX, [DUPLICATES_TABLE_NAME]);
             await insertFigures(kibanaResults, DUPLICATES_TABLE_NAME);
         } else {
             await insertFigures(kibanaResults, KEY_FIGURES_TABLE_NAME);

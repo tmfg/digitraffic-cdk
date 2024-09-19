@@ -3,7 +3,14 @@ import { Peer, Port, SecurityGroup, Vpc, type ISecurityGroup } from "aws-cdk-lib
 import * as events from "aws-cdk-lib/aws-events";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { AnyPrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import {
+    AnyPrincipal,
+    Effect,
+    ManagedPolicy,
+    PolicyStatement,
+    Role,
+    ServicePrincipal
+} from "aws-cdk-lib/aws-iam";
 import { AssetCode, Function, Runtime, type FunctionProps } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import * as s3 from "aws-cdk-lib/aws-s3";
@@ -11,7 +18,6 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 export interface Props {
     readonly openSearchVPCEndpoint: string;
     readonly openSearchHost: string;
-    readonly openSearchDomainArn: string;
     readonly openSearchLambdaRoleArn: string;
     readonly slackWebhook: string;
     readonly mysql: {
@@ -25,6 +31,7 @@ export interface Props {
     readonly marineAccountName: string;
     readonly railAccountName: string;
     readonly roadAccountName: string;
+    readonly osIndex: string;
 }
 
 export class OsKeyFiguresStack extends Stack {
@@ -151,17 +158,26 @@ export class OsKeyFiguresStack extends Stack {
                 ROLE: osKeyFiguresProps.openSearchLambdaRoleArn,
                 OS_HOST: osKeyFiguresProps.openSearchHost,
                 OS_VPC_ENDPOINT: osKeyFiguresProps.openSearchVPCEndpoint,
+                OS_INDEX: osKeyFiguresProps.osIndex,
                 MYSQL_ENDPOINT: osKeyFiguresProps.mysql.host,
                 MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
                 MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
                 MYSQL_DATABASE: osKeyFiguresProps.mysql.database,
-                SLACK_WEBHOOK: osKeyFiguresProps.slackWebhook,
                 MARINE_ACCOUNT_NAME: osKeyFiguresProps.marineAccountName,
                 RAIL_ACCOUNT_NAME: osKeyFiguresProps.railAccountName,
                 ROAD_ACCOUNT_NAME: osKeyFiguresProps.roadAccountName
             }
         };
+
         const collectOsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
+
+        collectOsKeyFiguresLambda.addToRolePolicy(
+            new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ["sts:AssumeRole"],
+                resources: [osKeyFiguresProps.openSearchLambdaRoleArn]
+            })
+        );
 
         // deploy rules when ready for production use
         /*

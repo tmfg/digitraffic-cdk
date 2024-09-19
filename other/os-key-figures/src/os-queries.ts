@@ -1,5 +1,7 @@
+/* prettier-ignore */
+
 // OpenSearch queries
-// the json keys of queries are intentionally left quoted - easier to copy and paste elsewhere when necessary
+// the json keys of queries are intentionally left quoted - easier to copy and paste for testing in the UI
 export const osQueries = [
     {
         name: 'Http req',
@@ -82,7 +84,8 @@ export const osQueries = [
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'agg',
     },
@@ -111,7 +114,8 @@ export const osQueries = [
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'agg',
     },
@@ -149,7 +153,8 @@ export const osQueries = [
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
@@ -187,7 +192,8 @@ export const osQueries = [
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
@@ -225,7 +231,8 @@ export const osQueries = [
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'sub_agg',
     },
@@ -263,7 +270,8 @@ export const osQueries = [
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
@@ -292,7 +300,8 @@ export const osQueries = [
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
