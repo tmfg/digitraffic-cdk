@@ -56,8 +56,8 @@ export async function saveAllLocations(db: DTDatabase, locations: Location[]): P
     );
 }
 
-export async function getLocation(db: DTDatabase, locationId: string): Promise<Location | null> {
-    return db.oneOrNone(PS_GET_LOCATION, [locationId]);
+export async function getLocation(db: DTDatabase, locationId: string): Promise<Location | undefined> {
+    return await db.oneOrNone(PS_GET_LOCATION, [locationId]) ?? undefined;
 }
 
 export async function getLocations(db: DTDatabase): Promise<Location[]> {

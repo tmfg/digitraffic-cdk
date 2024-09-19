@@ -47,8 +47,8 @@ export function saveAllVessels(db: DTDatabase, vessels: Vessel[]): Promise<unkno
     );
 }
 
-export async function getVessel(db: DTDatabase, locationId: string): Promise<Vessel | null> {
-    return db.oneOrNone(PS_GET_VESSEL, [locationId]);
+export async function getVessel(db: DTDatabase, locationId: string): Promise<Vessel | undefined> {
+    return await db.oneOrNone(PS_GET_VESSEL, [locationId]) ?? undefined;
 }
 
 export async function getVessels(db: DTDatabase): Promise<Vessel[]> {
