@@ -297,6 +297,7 @@
     {
       "packageName": "@digitraffic-cdk/testing",
       "projectFolder": "tools/testing",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["internal"]
     }
   ]
