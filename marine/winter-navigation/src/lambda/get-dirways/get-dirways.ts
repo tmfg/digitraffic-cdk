@@ -6,7 +6,7 @@ import { getDirways } from "../../service/dirway-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
+export const handler = async (_event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
 
     try {

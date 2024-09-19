@@ -1,19 +1,21 @@
 import type { Activity, Dirway, Dirwaypoint, Location, PortSuspension, PortSuspensionLocation, Queue, Restriction, Source, Vessel } from "../../model/apidata.js";
 import { createTestFunctions } from "./data-updater-testutil.js";
 
-const ACTIVITY_1: Activity = {
+export const ACTIVITY_1: Activity = {
     rv: 0,
     id: "id1",
+    vessel_id: "id1",
     change_time: new Date(),
     deleted: undefined,
     start_time: new Date(),
     icebreaker_id: "",
+    reason: "tell my why?",
     type: ""
 };
 
 const ACTIVITY_1_1: Activity = { ...ACTIVITY_1, ...{ rv: 1, text_compilation: "foo" } };
 
-const LOCATION_1: Location = {
+export const LOCATION_1: Location = {
     name: "name",
     type: "type",
     locode_list: "",
@@ -35,10 +37,10 @@ const LOCATION_1_1: Location = {
     }
 };
 
-const RESTRICTION_1: Restriction = {
+export const RESTRICTION_1: Restriction = {
     rv: 0,
     id: "id1",
-    location_id: "location_1",
+    location_id: "id1",
     change_time: new Date(),
     deleted: undefined,
     start_time: new Date(),
@@ -59,7 +61,7 @@ const SOURCE_1: Source = {
 
 const SOURCE_1_1: Source = { ...SOURCE_1, ...{ rv: 1, text_compilation: "foo" } };
 
-const VESSEL_1: Vessel = {
+export const VESSEL_1: Vessel = {
     rv: 0,
     id: "id1",
     change_time: new Date(),
@@ -84,7 +86,7 @@ const QUEUE_1: Queue = {
 
 const QUEUE_1_1: Queue = { ...QUEUE_1, ...{ rv: 1, order_num: 2}};
 
-const DIRWAY_1: Dirway = {
+export const DIRWAY_1: Dirway = {
     id: "id1",
     name: "name",
     description: "empty",
@@ -95,9 +97,9 @@ const DIRWAY_1: Dirway = {
 
 const DIRWAY_1_1: Dirway = { ...DIRWAY_1, ... {rv: 1, description: "foo" }}
 
-const DIRWAYPOINT_1: Dirwaypoint = {
+export const DIRWAYPOINT_1: Dirwaypoint = {
     id: "id1",
-    dirway_id: "",
+    dirway_id: "id1",
     order_num: 0,
     name: "",
     latitude: 0,
@@ -109,22 +111,22 @@ const DIRWAYPOINT_1: Dirwaypoint = {
 
 const DIRWAYPOINT_1_1 = {...DIRWAYPOINT_1, ...{rv: 1, name: "foo" }};
 
-const PORT_SUSPENSION_1: PortSuspension = {
+export const PORT_SUSPENSION_1: PortSuspension = {
     start_time: new Date(),
     prenotification: false,
     ports_closed: false,
-    due_to: "",
+    due_to: "no reason",
     rv: 0,
-    id: "id1",
+    id: "id1",    
     change_time: new Date(),
     deleted: undefined
 };
 
 const PORT_SUSPENSION_1_1: PortSuspension = {...PORT_SUSPENSION_1, ...{rv: 1, due_to: "foo"}};
 
-const PORT_SUSPENSION_LOCATION_1: PortSuspensionLocation = {
-    suspension_id: "",
-    location_id: "",
+export const PORT_SUSPENSION_LOCATION_1: PortSuspensionLocation = {
+    suspension_id: "id1",
+    location_id: "id1",
     rv: 0,
     id: "id1",
     change_time: new Date(),

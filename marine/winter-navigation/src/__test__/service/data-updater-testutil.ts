@@ -9,7 +9,7 @@ import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 export async function mockApiResponseAndUpdate<T>(mockedApiPath: ApiPath, response: Response<T>): Promise<void> {
     jest.spyOn(IbnetApi.prototype, "getCurrentVersion").mockResolvedValue(0);
 
-    jest.spyOn(IbnetApi.prototype, "fetch").mockImplementation((apiPath: ApiPath, from: number, to: number) => {
+    jest.spyOn(IbnetApi.prototype, "fetch").mockImplementation((apiPath: ApiPath, _from: number, _to: number) => {
             const apiResponse = apiPath === mockedApiPath ? response : [];
 
             return Promise.resolve(apiResponse);
