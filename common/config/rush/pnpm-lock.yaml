@@ -541,9 +541,6 @@ importers:
       aws-sdk:
         specifier: ^2.1670.0
         version: 2.1683.0
-      axios:
-        specifier: ^1.7.2
-        version: 1.7.5
       constructs:
         specifier: ~10.3.0
         version: 10.3.0
