@@ -1,6 +1,7 @@
 module.exports = {
     extends: ["@rushstack/eslint-config/profile/node"],
     plugins: ["deprecation"],
+    ignorePatterns: ["*", "!src/", "!src/**", '*.d.ts'],
     overrides: [
         {
             files: ["*.ts", "*.tsx"],
