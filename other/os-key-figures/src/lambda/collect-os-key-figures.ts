@@ -10,8 +10,9 @@ import { OpenSearch, OpenSearchApiMethod } from "../api/opensearch.js";
 import { EnvKeys } from "../env.js";
 import { osQueries } from "../os-queries.js";
 import {
-    getAccountNameFilterFromTransportTypeName,
-    getTransportTypeFilterFromAccountNameFilter
+    getAccountNameOsFilterFromTransportTypeName,
+    getOsUriFilterFromPath,
+    getTransportTypeDbFilterFromAccountNameFilter
 } from "../util/filter.js";
 
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
@@ -56,12 +57,25 @@ export interface KeyFigure {
 
 export interface KeyFigureResult extends KeyFigure {
     value: unknown;
-    filter: string;
+    filter: KeyFigureFilter;
 }
 
 export interface KeyFigureLambdaEvent {
-    readonly TRANSPORT_TYPE: string;
+    readonly TRANSPORT_TYPE: TransportType;
     readonly PART?: number;
+}
+
+export type TransportType = "marine" | "rail" | "road" | "*";
+
+export type DbFilter = `@transport_type:${TransportType}${"" | ` AND ${string}`}`;
+export type OsAccountNameFilter = `${
+    | `accountName.keyword:${string}`
+    | `(accountName.keyword:${string} OR accountName.keyword:${string} OR accountName.keyword:${string})`}`;
+export type OsFilter = `${OsAccountNameFilter}${"" | ` AND (${string} OR ${string})`}`;
+
+interface KeyFigureFilter {
+    dbFilter: DbFilter;
+    osFilter: OsFilter;
 }
 
 const sts = new STS({ apiVersion: "2011-06-15" });
@@ -101,18 +115,6 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
         throw new Error("No paths found");
     }
 
-    const pathsToProcess = [...firstPath.paths];
-    const middleIndex = Math.ceil(pathsToProcess.length / 2);
-
-    const firstHalf = pathsToProcess.splice(0, middleIndex);
-    const secondHalf = pathsToProcess.splice(-middleIndex);
-
-    if (event.PART === 1) {
-        firstPath.paths = new Set(firstHalf);
-    } else if (event.PART === 2) {
-        firstPath.paths = new Set(secondHalf);
-    }
-
     logger.info({
         message: `OS: ${OS_HOST}, MySQL: ${
             mysqlOpts.host
@@ -135,15 +137,17 @@ async function getKibanaResult(
     keyFigures: KeyFigure[],
     start: Date,
     end: Date,
-    filter: string
+    filter: KeyFigureFilter
 ): Promise<KeyFigureResult[]> {
     const output: KeyFigureResult[] = [];
+
+    logger.debug("Querying with filters: " + JSON.stringify(filter));
 
     for (const keyFigure of keyFigures) {
         const query = keyFigure.query
             .replace("START_TIME", start.toISOString())
             .replace("END_TIME", end.toISOString())
-            .replace("accountName:*", filter);
+            .replace("accountName:*", filter.osFilter);
 
         const keyFigureResult: KeyFigureResult = {
             type: keyFigure.type,
@@ -205,26 +209,33 @@ async function getKibanaResult(
 export async function getKibanaResults(
     openSearchApi: OpenSearch,
     keyFigures: KeyFigure[],
-    apiPaths: { transportType: string; paths: Set<string> }[],
+    apiPaths: { transportType: TransportType; paths: Set<string> }[],
     event: KeyFigureLambdaEvent
 ): Promise<KeyFigureResult[]> {
     const kibanaResults = [];
 
-    if (!event.PART || event.PART === 1) {
-        for (const apiPath of apiPaths) {
-            logger.info({
-                message: `Running: ${apiPath.transportType}`,
+    for (const apiPath of apiPaths) {
+        logger.info({
+            message: `Running: ${apiPath.transportType}`,
+            method: "collect-os-key-figures.getKibanaResults"
+        });
+        try {
+            const osFilter = getAccountNameOsFilterFromTransportTypeName(apiPath.transportType);
+            if (!osFilter) {
+                throw new Error("Could not parse OS search filter from transport type");
+            }
+            kibanaResults.push(
+                getKibanaResult(openSearchApi, keyFigures, startDate, endDate, {
+                    osFilter: osFilter,
+                    dbFilter: `@transport_type:${apiPath.transportType}`
+                })
+            );
+        } catch (error: unknown) {
+            logger.error({
+                message: "Error getting OS query results: " + (error instanceof Error && error.message),
                 method: "collect-os-key-figures.getKibanaResults"
             });
-            kibanaResults.push(
-                getKibanaResult(
-                    openSearchApi,
-                    keyFigures,
-                    startDate,
-                    endDate,
-                    `${getAccountNameFilterFromTransportTypeName(apiPath.transportType)}`
-                )
-            );
+            throw error;
         }
     }
 
@@ -240,17 +251,16 @@ export async function getKibanaResults(
                     keyFigures,
                     startDate,
                     endDate,
-                    // without using .keyword, OpenSearch query strings will produce unfortunate partial matches
-                    // at the same time, some URIs in the logs have trailing slashes while others do not, hence the OR statement for two versions of the same URI below
                     // prettier-ignore
-                    `${getAccountNameFilterFromTransportTypeName(apiPath.transportType)} AND (request.keyword:\\"${path}\\" OR request.keyword:\\"${path.replace(/\/$/, '')}\\")`
+                    {osFilter: `${getAccountNameOsFilterFromTransportTypeName(apiPath.transportType)} AND ${getOsUriFilterFromPath(path)}` as OsFilter,
+                    dbFilter: `@transport_type:${apiPath.transportType} AND ${getOsUriFilterFromPath(path)}`}
                 )
             );
         }
     }
 
-    const foo = await Promise.all(kibanaResults);
-    return foo.flat();
+    const results = await Promise.all(kibanaResults);
+    return results.flat();
 }
 
 async function getRowAmountWithDateNameFilter(
@@ -267,7 +277,7 @@ async function getRowAmountWithDateNameFilter(
                 KEY_FIGURES_TABLE_NAME,
                 isoDate,
                 name,
-                getTransportTypeFilterFromAccountNameFilter(filter) ?? "null"
+                getTransportTypeDbFilterFromAccountNameFilter(filter) ?? "null"
             ]
         )) as { count: number }[];
         const firstRow = existingRowsFromDate[0];
@@ -297,7 +307,7 @@ async function insertFigures(kibanaResults: KeyFigureResult[], tableName: string
         // prettier-ignore
         await query(`INSERT INTO \`${tableName}\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
                          VALUES ('${startDate.toISOString().substring(0, 10)}', '${endDate.toISOString().substring(0, 10)}', '${result.query}',
-                                 '${JSON.stringify(result.value)}', '${result.name}', '${getTransportTypeFilterFromAccountNameFilter(result.filter)}');`);
+                                 '${JSON.stringify(result.value)}', '${result.name}', '${result.filter.dbFilter}');`);
     }
 }
 
@@ -324,7 +334,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
         const existingRows = await getRowAmountWithDateNameFilter(
             startIsoDate,
             kibanaResult.name,
-            kibanaResult.filter
+            kibanaResult.filter.dbFilter
         );
 
         // save duplicate rows to a separate table if current set of results already exists in database
@@ -348,7 +358,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
     }
 }
 
-export async function getApiPaths(): Promise<{ transportType: string; paths: Set<string> }[]> {
+export async function getApiPaths(): Promise<{ transportType: TransportType; paths: Set<string> }[]> {
     const railSwaggerPaths = await getPaths("https://rata.digitraffic.fi/swagger/openapi.json");
     const roadSwaggerPaths = await getPaths("https://tie.digitraffic.fi/swagger/openapi.json");
     const marineSwaggerPaths = await getPaths("https://meri.digitraffic.fi/swagger/openapi.json");
