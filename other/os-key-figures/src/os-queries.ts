@@ -11,7 +11,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -22,7 +22,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -39,7 +44,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:* AND httpStatusCode:200",
+                                "query": "NOT log_line:* AND accountName.keyword:* AND httpStatusCode:200",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -50,7 +55,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }                 
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -68,7 +78,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -79,7 +89,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -98,7 +113,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -109,7 +124,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -137,7 +157,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -148,7 +168,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -176,7 +201,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -187,7 +212,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -215,7 +245,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -226,7 +256,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -254,7 +289,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -265,7 +300,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -284,7 +324,7 @@ export const osQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND accountName:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -295,7 +335,12 @@ export const osQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]

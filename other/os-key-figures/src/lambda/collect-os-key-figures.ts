@@ -5,14 +5,14 @@ import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { AssumeRoleRequest } from "aws-sdk/clients/sts.js";
 import STS from "aws-sdk/clients/sts.js";
 import ky, { HTTPError } from "ky";
-import mysql from "mysql";
 import { OpenSearch, OpenSearchApiMethod } from "../api/opensearch.js";
 import { EnvKeys } from "../env.js";
 import { osQueries } from "../os-queries.js";
+import { query } from "../util/db.js";
 import {
     getAccountNameOsFilterFromTransportTypeName,
-    getOsUriFilterFromPath,
-    getTransportTypeDbFilterFromAccountNameFilter
+    getTransportTypeDbFilterFromAccountNameFilter,
+    getUriFiltersFromPath
 } from "../util/filter.js";
 
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
@@ -27,27 +27,6 @@ const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 0, 
 
 const KEY_FIGURES_TABLE_NAME = "key_figures";
 const DUPLICATES_TABLE_NAME = "duplicates";
-
-const mysqlOpts = {
-    host: getEnvVariable("MYSQL_ENDPOINT"),
-    user: getEnvVariable("MYSQL_USERNAME"),
-    password: getEnvVariable("MYSQL_PASSWORD"),
-    database: getEnvVariable("MYSQL_DATABASE")
-};
-
-const connection = mysql.createConnection(mysqlOpts);
-
-const query = (sql: string, values?: string[]) => {
-    return new Promise((resolve, reject) => {
-        connection.query(sql, values, (error, rows) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(rows);
-            }
-        });
-    });
-};
 
 export interface KeyFigure {
     query: string;
@@ -65,13 +44,29 @@ export interface KeyFigureLambdaEvent {
     readonly PART?: number;
 }
 
-export type TransportType = "marine" | "rail" | "road" | "*";
+export const transportType = {
+    ALL: "*",
+    MARINE: "marine",
+    RAIL: "rail",
+    ROAD: "road"
+} as const;
 
-export type DbFilter = `@transport_type:${TransportType}${"" | ` AND ${string}`}`;
+export const OS_REQUEST_FIELD = "request";
+export const OS_ACCOUNT_NAME_FIELD = "accountName.keyword";
+export const DB_TRANSPORT_TYPE_FIELD = "@transport_type";
+export const DB_REQUEST_FIELD = "@fields.request_uri";
+
+export type TransportType = (typeof transportType)[keyof typeof transportType];
+
+export type DbTransportTypeFilter = `${typeof DB_TRANSPORT_TYPE_FIELD}:${TransportType}`;
+export type DbUriFilter = `${typeof DB_REQUEST_FIELD}:\\"${string}\\"`;
+export type DbFilter = `${DbTransportTypeFilter}${"" | ` AND ${DbUriFilter}`}`;
+
 export type OsAccountNameFilter = `${
-    | `accountName.keyword:${string}`
-    | `(accountName.keyword:${string} OR accountName.keyword:${string} OR accountName.keyword:${string})`}`;
-export type OsFilter = `${OsAccountNameFilter}${"" | ` AND (${string} OR ${string})`}`;
+    | `${typeof OS_ACCOUNT_NAME_FIELD}:${string}`
+    | `(${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string})`}`;
+export type OsUriFilter = `${typeof OS_REQUEST_FIELD}:\\"${string}\\"`;
+export type OsFilter = `${OsAccountNameFilter}${"" | ` AND ${OsUriFilter}`}`;
 
 interface KeyFigureFilter {
     dbFilter: DbFilter;
@@ -116,9 +111,7 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
     }
 
     logger.info({
-        message: `OS: ${OS_HOST}, MySQL: ${
-            mysqlOpts.host
-        },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
+        message: `OS: ${OS_HOST},  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
             .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
             .join(",")}`,
         method: "collect-os-key-figures.handler"
@@ -126,7 +119,7 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
 
     const keyFigureQueries = getKeyFigureOsQueries();
 
-    const kibanaResults = await getKibanaResults(openSearchApi, keyFigureQueries, apiPaths, event);
+    const kibanaResults = await getKibanaResults(openSearchApi, keyFigureQueries, apiPaths);
     await persistToDatabase(kibanaResults);
 
     return Promise.resolve(true);
@@ -147,7 +140,7 @@ async function getKibanaResult(
         const query = keyFigure.query
             .replace("START_TIME", start.toISOString())
             .replace("END_TIME", end.toISOString())
-            .replace("accountName:*", filter.osFilter);
+            .replace("accountName.keyword:*", filter.osFilter);
 
         const keyFigureResult: KeyFigureResult = {
             type: keyFigure.type,
@@ -209,8 +202,7 @@ async function getKibanaResult(
 export async function getKibanaResults(
     openSearchApi: OpenSearch,
     keyFigures: KeyFigure[],
-    apiPaths: { transportType: TransportType; paths: Set<string> }[],
-    event: KeyFigureLambdaEvent
+    apiPaths: { transportType: TransportType; paths: Set<string> }[]
 ): Promise<KeyFigureResult[]> {
     const kibanaResults = [];
 
@@ -246,15 +238,14 @@ export async function getKibanaResults(
                 method: "collect-os-key-figures.getKibanaResults"
             });
             kibanaResults.push(
-                getKibanaResult(
-                    openSearchApi,
-                    keyFigures,
-                    startDate,
-                    endDate,
-                    // prettier-ignore
-                    {osFilter: `${getAccountNameOsFilterFromTransportTypeName(apiPath.transportType)} AND ${getOsUriFilterFromPath(path)}` as OsFilter,
-                    dbFilter: `@transport_type:${apiPath.transportType} AND ${getOsUriFilterFromPath(path)}`}
-                )
+                getKibanaResult(openSearchApi, keyFigures, startDate, endDate, {
+                    osFilter: `${getAccountNameOsFilterFromTransportTypeName(apiPath.transportType)} AND ${
+                        getUriFiltersFromPath(path).osFilter
+                    }` as OsFilter,
+                    dbFilter: `${DB_TRANSPORT_TYPE_FIELD}:${apiPath.transportType} AND ${
+                        getUriFiltersFromPath(path).dbFilter
+                    }`
+                })
             );
         }
     }
@@ -297,12 +288,12 @@ async function getRowAmountWithDateNameFilter(
 async function insertFigures(kibanaResults: KeyFigureResult[], tableName: string) {
     for (const result of kibanaResults) {
         /**
-         * Even though the actual filter used in the os queries is by accountName.keyword:[name], 
-           it is converted to @transport_type:[rail|road|marine|*] for the db entry. 
+         * Even though the actual filters used in the OS queries is by accountName.keyword:[name] and request:[uri], 
+           they are converted to @transport_type:[rail|road|marine|*] and @fields.request_uri:[uri] for the database entry. 
            
-           This is because originally the queries were filtered by the (now non-existent) field @transport_type 
-           and this filter was entered as is in the db data. The db data on the other hand is used by other applications 
-           which categorize the data based on the value of @transport_type in the 'filter' column.   
+           This is because originally the queries were filtered by the (now non-existent) fields @transport_type and @fields.request_uri.
+           These filter strings were entered verbatim in the db data in a single column called `filter`. 
+           The values of column `filter` are on the other hand used by other applications which categorize data based on the value of this column.   
          */
         // prettier-ignore
         await query(`INSERT INTO \`${tableName}\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
@@ -374,19 +365,19 @@ export async function getApiPaths(): Promise<{ transportType: TransportType; pat
 
     return [
         {
-            transportType: "*",
+            transportType: transportType.ALL,
             paths: new Set()
         },
         {
-            transportType: "rail",
+            transportType: transportType.RAIL,
             paths: railSwaggerPaths
         },
         {
-            transportType: "road",
+            transportType: transportType.ROAD,
             paths: roadSwaggerPaths
         },
         {
-            transportType: "marine",
+            transportType: transportType.MARINE,
             paths: marineSwaggerPaths
         }
     ];

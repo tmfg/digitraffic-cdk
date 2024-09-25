@@ -1,5 +1,15 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import type { OsAccountNameFilter, TransportType } from "../lambda/collect-os-key-figures.js";
+import {
+    DB_REQUEST_FIELD,
+    OS_REQUEST_FIELD,
+    transportType,
+    type DbFilter,
+    type DbUriFilter,
+    type OsAccountNameFilter,
+    type OsFilter,
+    type OsUriFilter,
+    type TransportType
+} from "../lambda/collect-os-key-figures.js";
 
 const MARINE_ACCOUNT_NAME = getEnvVariable("MARINE_ACCOUNT_NAME");
 const RAIL_ACCOUNT_NAME = getEnvVariable("RAIL_ACCOUNT_NAME");
@@ -30,21 +40,22 @@ export function getTransportTypeDbFilterFromAccountNameFilter(filter: string): s
 export function getAccountNameOsFilterFromTransportTypeName(
     transportTypeName: TransportType
 ): OsAccountNameFilter | undefined {
-    if (transportTypeName.trim() === "*") {
+    if (transportTypeName.trim() === transportType.ALL) {
         return `(accountName.keyword:${RAIL_ACCOUNT_NAME} OR accountName.keyword:${ROAD_ACCOUNT_NAME} OR accountName.keyword:${MARINE_ACCOUNT_NAME})`;
-    } else if (transportTypeName.trim() === "marine") {
+    } else if (transportTypeName.trim() === transportType.MARINE) {
         return `accountName.keyword:${MARINE_ACCOUNT_NAME}`;
-    } else if (transportTypeName.trim() === "rail") {
+    } else if (transportTypeName.trim() === transportType.RAIL) {
         return `accountName.keyword:${RAIL_ACCOUNT_NAME}`;
-    } else if (transportTypeName.trim() === "road") {
+    } else if (transportTypeName.trim() === transportType.ROAD) {
         return `accountName.keyword:${ROAD_ACCOUNT_NAME}`;
     } else return undefined;
 }
 
-// without using .keyword for filtering request URIs, OpenSearch query strings will produce unfortunate partial matches
-// at the same time, some URIs in the logs have trailing slashes while others do not, hence the OR statement for two versions of the same URI below
-export function getOsUriFilterFromPath(path: string) {
-    if (path.trim().endsWith("/")) {
-        return `(request.keyword:\\"${path}\\" OR request.keyword:\\"${path.replace(/\/$/, "")}\\")`;
-    } else return `(request.keyword:\\"${path}\/\\" OR request.keyword:\\"${path}\\")`;
+export function getUriFiltersFromPath(path: string): { osFilter: OsUriFilter; dbFilter: DbUriFilter } {
+    return {
+        // Remove trailing slash from path received from swagger, some have them. It is unclear if all paths in swagger
+        // correspond to paths in log lines. Removing the slash should produce the correct match
+        osFilter: `${OS_REQUEST_FIELD}:\\"${path.replace(/\/$/, "")}\\"`,
+        dbFilter: `${DB_REQUEST_FIELD}:\\"${path}\\"`
+    };
 }
