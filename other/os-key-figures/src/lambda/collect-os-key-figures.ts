@@ -240,13 +240,7 @@ async function getRowAmountWithDateNameFilter(
         const resultKey = "count";
         const existingRowsFromDate = (await query(
             "SELECT COUNT(*) AS ? FROM ?? WHERE `from` = ? AND `name` = ? AND `filter` = ?;",
-            [
-                resultKey,
-                KEY_FIGURES_TABLE_NAME,
-                isoDate,
-                name,
-                getTransportTypeDbFilterFromAccountNameFilter(filter) ?? "null"
-            ]
+            [resultKey, KEY_FIGURES_TABLE_NAME, isoDate, name, filter]
         )) as { count: number }[];
         const firstRow = existingRowsFromDate[0];
         if (!firstRow) {

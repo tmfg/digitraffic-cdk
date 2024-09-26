@@ -13,5 +13,5 @@ export type DbFilter = `${DbTransportTypeFilter}${"" | ` AND ${DbUriFilter}`}`;
 export type OsAccountNameFilter = `${
     | `${typeof OS_ACCOUNT_NAME_FIELD}:${string}`
     | `(${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string})`}`;
-export type OsUriFilter = `${typeof OS_REQUEST_FIELD}:\\"${string}\\"`;
+export type OsUriFilter = `${typeof OS_REQUEST_FIELD}:\\"${string}*\\"`;
 export type OsFilter = `${OsAccountNameFilter}${"" | ` AND ${OsUriFilter}`}`;

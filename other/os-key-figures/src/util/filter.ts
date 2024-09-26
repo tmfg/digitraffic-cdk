@@ -46,8 +46,8 @@ export function getAccountNameOsFilterFromTransportTypeName(
 export function getUriFiltersFromPath(path: string): { osFilter: OsUriFilter; dbFilter: DbUriFilter } {
     return {
         // Remove trailing slash from path received from swagger, some have them. It is unclear if all paths in swagger
-        // correspond to paths in log lines. Removing the slash should produce the correct match
-        osFilter: `${OS_REQUEST_FIELD}:\\"${path.replace(/\/$/, "")}\\"`,
+        // correspond to paths in log lines. Removing the slash and adding a wildcard should produce the correct match
+        osFilter: `${OS_REQUEST_FIELD}:\\"${path.replace(/\/$/, "")}*\\"`,
         dbFilter: `${DB_REQUEST_FIELD}:\\"${path}\\"`
     };
 }
