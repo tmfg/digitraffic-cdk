@@ -1,9 +1,9 @@
-import { Role } from "aws-cdk-lib/aws-iam";
+import type { Role } from "aws-cdk-lib/aws-iam";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { CfnCanary } from "aws-cdk-lib/aws-synthetics";
 import type { LambdaEnvironment } from "../stack/lambda-configs.js";
-import { DigitrafficRestApi } from "../stack/rest_apis.js";
-import { DigitrafficStack } from "../stack/stack.js";
+import type { DigitrafficRestApi } from "../stack/rest_apis.js";
+import type { DigitrafficStack } from "../stack/stack.js";
 import { DigitrafficCanary } from "./canary.js";
 import { ENV_API_KEY, ENV_HOSTNAME, ENV_SECRET } from "./canary-keys.js";
 import type { CanaryParameters } from "./canary-parameters.js";
@@ -74,10 +74,12 @@ export class UrlCanary extends DigitrafficCanary {
         const apiKeys = publicApi.apiKeyIds;
 
         if (apiKeys.length > 1) {
+            // eslint-disable-next-line no-console
             console.info("rest api has more than one api key");
         }
 
         if (apiKeys.length === 0) {
+            // eslint-disable-next-line no-console
             console.info("rest api has no api keys");
             return undefined;
         }

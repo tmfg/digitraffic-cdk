@@ -20,6 +20,14 @@
       "shellCommand": "pretty-quick --staged"
     },
     {
+      "name": "build",
+      "commandKind": "bulk",
+      "summary": "Run build step for all projects in the monorepo.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
       "name": "test",
       "commandKind": "bulk",
       "summary": "Run test for all projects in the monorepo.",
@@ -31,6 +39,12 @@
       "commandKind": "global",
       "summary": "Checks if dependencies are declared correctly",
       "shellCommand": "node common/scripts/check-dependencies.mjs"
+    },
+    {
+      "name": "repo:unify-deps",
+      "commandKind": "global",
+      "summary": "Checks if dependencies are declared correctly",
+      "shellCommand": "node common/scripts/unify-deps.mjs"
     },
     {
       "name": "ci:eslint-report",

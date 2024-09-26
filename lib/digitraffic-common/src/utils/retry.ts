@@ -16,7 +16,6 @@ export type RetryPredicate = (error: unknown) => boolean;
  */
 export const timeoutFunctions = (function () {
     return {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         noTimeout: (_: number): number => {
             return 0;
         },
@@ -43,7 +42,6 @@ export const retryPredicates = (function () {
             }
             return false;
         },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         alwaysRetry: (_: unknown): boolean => {
             return true;
         },
@@ -77,10 +75,10 @@ async function retryRecursive<T>(
     }
     try {
         // NOTE, a Promise cannot be cancelled. So if the asyncFn calls multiple async/await paris and the first one takes 31 minutes to complete,
-        // then the rest of async/await pairs will be called even though AysncTimeoutError is allready thrown.
+        // then the rest of async/await pairs will be called even though AsyncTimeoutError is already thrown.
         const result: T = await Promise.race([
             asyncFn(),
-            new Promise<never>((_, reject) =>
+            new Promise<never>((_resolve, reject) =>
                 setTimeout(() => reject(new AsyncTimeoutError()), asyncFnTimeout),
             ),
         ]);
@@ -150,8 +148,8 @@ async function retryRecursive<T>(
  */
 export async function retry<T>(
     asyncFn: () => Promise<T>,
-    retries = 3,
-    logError = RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
+    retries: number = 3,
+    logError: RetryLogError = RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
     timeoutBetweenRetries: TimeoutFn = timeoutFunctions.noTimeout,
     retryPredicate: RetryPredicate = retryPredicates.alwaysRetry,
 ): Promise<T> {

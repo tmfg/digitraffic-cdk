@@ -24,7 +24,7 @@ const GetFaultsSchema = z.object({
         .optional()
         .default(168)
         .or(EmptyStringHours)
-});
+}).strict();
 
 export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();

@@ -23,16 +23,17 @@
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "29.7.0",
+    "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.66.25",
+    "@rushstack/heft": "^0.67.0",
     "@rushstack/heft-jest-plugin": "^0.12.7",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.12",
-    "@types/node": "20.14.8",
+    "@types/node": "20.14.9",
     "esbuild": "0.23.0",
     "eslint": "^8.57.0",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.4"
   }
 }

@@ -3,16 +3,15 @@
 !.eslintignore
 !.eslintrc.cjs
 !.gitignore
-!package.json
 !README.md
-!tscconfig.json
+!command-line.json
+!package.json
+!rollup.config.js
+!rush-plugin-manifest.json
+!tsconfig.json
 
 !config/
 !config/*.json
-
-!dist/
-!dist/cli/
-!dist/cli/*.mjs
 
 !src/
 !src/**/

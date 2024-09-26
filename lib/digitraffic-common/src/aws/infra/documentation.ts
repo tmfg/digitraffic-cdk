@@ -1,5 +1,5 @@
-import { Construct } from "constructs";
-import { CfnDocumentationPart, Resource } from "aws-cdk-lib/aws-apigateway";
+import type { Construct } from "constructs";
+import { CfnDocumentationPart, type Resource } from "aws-cdk-lib/aws-apigateway";
 
 // Documentation parts are objects that describe an API Gateway API or parts of an API
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-documenting-api.html
@@ -18,7 +18,8 @@ export function addQueryParameterDescription(
     description: string,
     resource: Resource,
     stack: Construct,
-) {
+): void {
+    // eslint-disable-next-line no-new
     new CfnDocumentationPart(stack, `${name}Documentation`, {
         restApiId: resource.api.restApiId,
         location: {
@@ -42,7 +43,8 @@ export function addDocumentation(
     documentationProperties: object,
     resource: Resource,
     stack: Construct,
-) {
+): void {
+    // eslint-disable-next-line no-new
     new CfnDocumentationPart(stack, `${methodDescription}Documentation`, {
         restApiId: resource.api.restApiId,
         location: {
@@ -60,7 +62,12 @@ export function addDocumentation(
  * @param resource REST API resource
  * @param stack CloudFormation stack
  */
-export function addTags(methodDescription: string, tags: string[], resource: Resource, stack: Construct) {
+export function addTags(
+    methodDescription: string,
+    tags: string[],
+    resource: Resource,
+    stack: Construct,
+): void {
     addDocumentation(methodDescription, { tags }, resource, stack);
 }
 
@@ -81,7 +88,7 @@ export function addTagsAndSummary(
     summary: string,
     resource: Resource,
     stack: Construct,
-) {
+): void {
     addDocumentation(methodDescription, { tags, summary }, resource, stack);
 }
 
@@ -115,15 +122,15 @@ export class DocumentationPart {
         return this;
     }
 
-    static queryParameter(parameterName: string, description: string) {
+    static queryParameter(parameterName: string, description: string): DocumentationPart {
         return new DocumentationPart(parameterName, { description }, "QUERY_PARAMETER");
     }
 
-    static pathParameter(parameterName: string, description: string) {
+    static pathParameter(parameterName: string, description: string): DocumentationPart {
         return new DocumentationPart(parameterName, { description }, "PATH_PARAMETER");
     }
 
-    static method(tags: string[], name: string, summary: string) {
+    static method(tags: string[], name: string, summary: string): DocumentationPart {
         return new DocumentationPart(name, { tags, summary }, "METHOD");
     }
 }

@@ -2,10 +2,18 @@ name: ESLint
 
 on: [push]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   lint:
     if: github.repository != 'tmfg/digitraffic-common'
     runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,7 +23,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -26,19 +34,26 @@ jobs:
       - name: Install packages
         run: pnpm install
 
-      - name: Create ESLint reports for affected projects
+      - name: Create ESLint report
         id: report
-        run: pnpm eslint-report -o ${{ github.ref_name }}/report.html
+        run: |
+          mkdir -p eslint/${{ github.ref_name }}
+          pnpm eslint-report -o eslint/${{ github.ref_name }}/index.html
         continue-on-error: true
 
-      - name: Publish report
-        id: publish-reports
-        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          GH_PAGES_BRANCH: gh-pages
-          FILE_PATH: ${{ github.ref_name }}/report.html
-          COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
-          LINK_TEXT: ESLint report
+          path: eslint/
+
+      - name: Publish report
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Step summary
+        run: |
+          echo "# ESLint" >> $GITHUB_STEP_SUMMARY
+          echo "[ESLint report](${{ steps.deployment.outputs.page_url }}${{ github.ref_name }}/index.html)" >> $GITHUB_STEP_SUMMARY
 
       - name: Fail on ESLint errors
         run: |

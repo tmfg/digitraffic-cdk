@@ -2,7 +2,7 @@ import type { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
 import { type DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as CachedDao from "@digitraffic/common/dist/database/cached";
 import { booleanDisjoint, buffer, lineString } from "@turf/turf";
-import type { Feature, LineString } from "geojson";
+import type { Feature, LineString, Polygon, MultiPolygon } from "geojson";
 import type { WarningFeature, WarningFeatureCollection } from "../model/warnings.js";
 
 const MAX_DISTANCE_NM = 15;
@@ -31,9 +31,10 @@ export async function findWarningsForVoyagePlan(
     warnings.features = warnings.features.filter(
         (f: Feature) =>
             !booleanDisjoint(
+                // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
                 buffer((f as Feature<LineString>).geometry, MAX_DISTANCE_NM, {
                     units: "nauticalmiles"
-                }),
+                }) as Feature<Polygon | MultiPolygon>,
                 voyageLineString
             )
     );

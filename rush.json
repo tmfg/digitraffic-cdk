@@ -66,6 +66,7 @@
       "packageName": "@digitraffic/common",
       "projectFolder": "lib/digitraffic-common",
       "versionPolicyName": "DigitrafficCommon",
+      "decoupledLocalDependencies": ["@digitraffic/eslint-config"],
       "tags": ["library"]
     },
 
@@ -119,6 +120,12 @@
       "tags": ["cdk", "marine"]
     },
     {
+      "packageName": "winter-navigation",
+      "projectFolder": "marine/winter-navigation",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "marine"]
+    },
+    {
       "packageName": "voyage-plan-gateway",
       "projectFolder": "marine/voyage-plan-gateway",
       "decoupledLocalDependencies": ["@digitraffic/common"],
@@ -135,12 +142,6 @@
     {
       "packageName": "cloudfront",
       "projectFolder": "other/cloudfront",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "other"]
-    },
-    {
-      "packageName": "cloudwatch-logs-recipient",
-      "projectFolder": "other/cloudwatch-logs-recipient",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "other"]
     },
@@ -187,6 +188,12 @@
     {
       "packageName": "swagger-joiner",
       "projectFolder": "other/swagger-joiner",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "test-api-stack",
+      "projectFolder": "other/test-api-stack",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "other"]
     },
@@ -284,6 +291,7 @@
     {
       "packageName": "@digitraffic-cdk/testing",
       "projectFolder": "tools/testing",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["internal"]
     }
   ]

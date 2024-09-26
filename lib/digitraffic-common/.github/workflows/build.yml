@@ -1,9 +1,18 @@
 name: Build
 on: [push]
+permissions:
+  contents: read
+  pages: write
+  actions: read
+  checks: write
+  id-token: write
 jobs:
   build:
     if: github.repository != 'tmfg/digitraffic-common'
     runs-on: ubuntu-20.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -11,7 +20,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -26,7 +35,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pnpm test >> $GITHUB_STEP_SUMMARY
+          pnpm test
 
       - name: Install madge
         run: npm -g install madge
@@ -42,15 +51,22 @@ jobs:
           madge --image dependencies.svg dist
           # run for output
           madge --circular dist
+          mkdir -p madge/${{ github.ref_name }}
+          mv dependencies.svg madge/${{ github.ref_name }}/dependencies.svg
 
-      - name: Publish madge image
-        id: publish-reports
-        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          GH_PAGES_BRANCH: gh-pages
-          FILE_PATH: dependencies.svg
-          COMMIT_MESSAGE: Madge dependency graph in branch $CURRENT_BRANCH
-          LINK_TEXT: Dependency graph
+          path: madge/
+
+      - name: Publish report
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Step summary
+        run: |
+          echo "# Summary" >> $GITHUB_STEP_SUMMARY
+          echo "[Madge report](${{ steps.deployment.outputs.page_url }}/${{ github.ref_name }}/dependencies.svg)" >> $GITHUB_STEP_SUMMARY
 
       - name: Test Report
         uses: dorny/test-reporter@v1

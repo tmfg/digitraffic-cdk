@@ -8,11 +8,25 @@ import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { ComparisonOperator, TreatMissingData } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import type { SQSEvent, SQSHandler, SQSRecord } from "aws-lambda";
-import { DigitrafficStack } from "./stack/stack.js";
+import type { DigitrafficStack } from "./stack/stack.js";
 import { MonitoredFunction } from "./stack/monitoredfunction.js";
-import { ObjectCannedACL, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { type ObjectCannedACL, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type { NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { logger } from "../runtime/dt-logger-default.js";
+
+const DLQ_LAMBDA_CODE = `
+import type { ObjectCannedACL } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { type NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
+import { logger } from "./dt-logger-default.mjs";
+
+
+const bucketName = "__bucketName__";
+
+__upload__
+
+exports.handler = async (event) => __handler__
+` as const;
 
 /**
  * Construct for creating SQS-queues.
@@ -30,6 +44,7 @@ export class DigitrafficSqsQueue extends Queue {
                 queueName,
                 deadLetterQueue: props.deadLetterQueue ?? {
                     maxReceiveCount: 2,
+                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
                     queue: DigitrafficDLQueue.create(stack, name),
                 },
             },
@@ -79,7 +94,7 @@ export class DigitrafficDLQueue {
     }
 }
 
-function addDLQAlarm(stack: DigitrafficStack, dlqName: string, dlq: Queue) {
+function addDLQAlarm(stack: DigitrafficStack, dlqName: string, dlq: Queue): void {
     const alarmName = `${dlqName}-Alarm`;
     dlq.metricNumberOfMessagesReceived({
         period: Duration.minutes(5),
@@ -109,7 +124,7 @@ async function uploadToS3(
     objectName: string,
     cannedAcl?: ObjectCannedACL,
     contentType?: string,
-) {
+): Promise<void> {
     const command = new PutObjectCommand({
         Bucket: bucketName,
         Key: objectName,
@@ -136,22 +151,8 @@ function createHandler(): SQSHandler {
         const s3 = new S3Client({});
         await Promise.all(
             event.Records.map((e: SQSRecord, idx: number) => {
-                uploadToS3(s3, bucketName, e.body, `dlq-${millis}-${idx}.json`);
+                return uploadToS3(s3, bucketName, e.body, `dlq-${millis}-${idx}.json`);
             }),
         );
     };
 }
-
-const DLQ_LAMBDA_CODE = `
-import type { ObjectCannedACL } from "@aws-sdk/client-s3";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { type NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
-import { logger } from "./dt-logger-default.mjs";
-
-
-const bucketName = "__bucketName__";
-
-__upload__
-
-exports.handler = async (event) => __handler__
-`;

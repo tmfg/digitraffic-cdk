@@ -1,15 +1,22 @@
 *
 
-!/.eslintignore
-!/.eslintrc.json
-!/.gitignore
-!/cdk.json
 !/tsconfig.json
 !/package.json
+!/.eslintignore
+!/.eslintrc.cjs
+!/.eslintrc.js
+!/.gitignore
+!/cdk.json
+!/jest.config.js
 
-!/lib/
-!/lib/**/
-!/lib/**/*.ts
+!/config/
+!/config/*.json
+!/src/
+!/src/**/
+!/src/**/*.ts
+/src/bin
+
+
 
 !/digitraffic-figures/
 !/digitraffic-figures/**/

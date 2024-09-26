@@ -1,20 +1,22 @@
-import type { KinesisStreamEvent, KinesisStreamRecord } from "aws-lambda";
-import { findHeaderValue } from "./logging-util.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+// @ts-nocheck
+/* eslint-disable */
+import { KinesisStreamEvent, KinesisStreamRecord } from "aws-lambda";
+import { findHeaderValue } from "./logging-util";
 
-import AWS, { type EnvironmentCredentials, type HttpRequest } from "aws-sdk";
-import type { IncomingMessage } from "http";
-import * as zlib from "zlib";
+import * as AWSx from "aws-sdk";
+const AWS = AWSx as any;
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const zlib = require("zlib");
 
 // camels
+/* eslint-disable camelcase */
 
-// eslint-disable-next-line dot-notation, @typescript-eslint/non-nullable-type-assertion-style
-const appDomain = process.env["APP_DOMAIN"] as string;
+const appDomain = process.env.APP_DOMAIN as string;
 const application = appDomain.split("-")[0];
 const env = appDomain.split("-")[1];
 
-// eslint-disable-next-line dot-notation, @typescript-eslint/non-nullable-type-assertion-style
-const elasticDomain = process.env["ELASTIC_DOMAIN"] as string;
+const elasticDomain = process.env.ELASTIC_DOMAIN as string;
 const endpoint = new AWS.Endpoint(elasticDomain);
 const creds = new AWS.EnvironmentCredentials("AWS");
 
@@ -25,8 +27,7 @@ const COMPRESS_OPTIONS = {
 };
 
 // fields contains all the selected log fields in the order specified in loggint-utils.ts CLOUDFRONT_STREAMING_LOG_FIELDS
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function convertFieldNamesAndFormats(fields: string[]) {
+async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
     // field order comes from documentation https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields
     const timestamp = new Date(1000 * Number(fields[0])).toISOString();
     const ip = fields[1];
@@ -60,19 +61,19 @@ function convertFieldNamesAndFormats(fields: string[]) {
         "@env": env,
         "@fields": {
             remote_addr: ip,
-            body_bytes_sent: responseBytes ? +responseBytes : responseBytes,
+            body_bytes_sent: +responseBytes,
             http_referrer: referrer,
-            http_user_agent: userAgent ? unescape(userAgent) : userAgent,
+            http_user_agent: unescape(userAgent),
             request_method: requestMethod,
-            request_time: timeTaken ? +timeTaken : timeTaken,
+            request_time: +timeTaken,
             request_uri: requestUri,
             request_host: host,
             scheme: requestProtocol,
             server_protocol: httpVersion,
-            status: responseStatus ? +responseStatus : responseStatus,
+            status: +responseStatus,
             upstream_cache_status: resultType,
             http_x_forwarded_for: forwardedFor,
-            upstream_response_time: timeToFirstByte ? +timeToFirstByte : timeToFirstByte,
+            upstream_response_time: +timeToFirstByte,
             http_digitraffic_user: digitrafficUser,
             accept_encoding: acceptEncoding,
             http_x_forwarded_proto: xForwardedProto
@@ -80,8 +81,7 @@ function convertFieldNamesAndFormats(fields: string[]) {
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function transformRecord(record: KinesisStreamRecord) {
+async function transformRecord(record: KinesisStreamRecord): Promise<any> {
     const buffer = Buffer.from(record.kinesis.data, "base64");
     const cloudfrontRealtimeLogData: string = buffer.toString("utf8");
 
@@ -104,32 +104,27 @@ export const handler = async (event: KinesisStreamEvent) => {
     try {
         const action = {
             index: { _index: createIndexName(), _type: "_doc" }
-        };
+        } as any;
 
         //        console.log('using action ' + JSON.stringify(action));
 
-        const data = event.Records.map((record: KinesisStreamRecord) => transformRecord(record));
+        const recordTransformPromises = event.Records.map(async (record: KinesisStreamRecord) =>
+            transformRecord(record)
+        );
 
+        const data = await Promise.all(recordTransformPromises);
         const returnValue = await sendMessageToEs(createBulkMessage(action, data));
 
         if (returnValue.length < 200) {
-            logger.info({
-                method: "lambda-stream-to-elastic.handler",
-                message: "return value " + returnValue
-            });
+            console.log("return value " + returnValue);
         }
-    } catch (e_) {
-        const e = e_ as Error;
-        logger.error({
-            message: "exception: " + e.message,
-            method: "lambda-stream-to-elastic.handler",
-            error: e
-        });
+    } catch (e) {
+        console.log("exception: " + e);
         throw e;
     }
 };
 
-function createBulkMessage(action: unknown, lines: unknown[]): string {
+function createBulkMessage(action: any, lines: any[]): string {
     let message = "";
 
     lines.forEach((line) => {
@@ -142,40 +137,14 @@ function createBulkMessage(action: unknown, lines: unknown[]): string {
     return message;
 }
 
-// Signers API as well as NodeHttpClient are part of private API in AWS SDK v2.
-declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace AWS {
-        // eslint-disable-next-line @typescript-eslint/no-namespace
-        namespace Signers {
-            class V4 {
-                constructor(request: AWS.HttpRequest, serviceName: string, options?: object);
-                addAuthorization(creds: EnvironmentCredentials, date: Date): void;
-            }
-        }
-        class NodeHttpClient {
-            // eslint-disable-next-line @typescript-eslint/ban-types,@rushstack/no-new-null
-            handleRequest(
-                req: HttpRequest,
-                options: object | null,
-                // eslint-disable-next-line @typescript-eslint/ban-types
-                callback: Function,
-                // eslint-disable-next-line @typescript-eslint/ban-types
-                errCallback: Function
-            ): void;
-        }
-    }
-}
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-function sendMessageToEs(message: string): Promise<string> {
-    const request = new AWS.HttpRequest(endpoint, "eu-west-1");
+function sendMessageToEs(message: string): Promise<any> {
+    const request = new AWS.HttpRequest(endpoint);
 
     request.method = "POST";
     request.path = "/_bulk";
-    request.headers["presigned-expires"] = "false";
-    // eslint-disable-next-line dot-notation
-    request.headers["Host"] = endpoint.host;
+    request.region = "eu-west-1";
+    request.headers["presigned-expires"] = false;
+    request.headers.Host = endpoint.host;
     request.body = zlib.gzipSync(message, COMPRESS_OPTIONS);
     request.headers["Content-Type"] = "application/x-ndjson";
     request.headers["Content-Encoding"] = "gzip";
@@ -183,36 +152,27 @@ function sendMessageToEs(message: string): Promise<string> {
     const signer = new AWS.Signers.V4(request, "es");
     signer.addAuthorization(creds, new Date());
 
-    logger.info({
-        message: `sending POST to es unCompressedSize=${message.length} requestSize=${request.body.length}`,
-        method: "lambda-stream-to-elastic.sendMessageToEs"
-    });
+    console.log("sending POST to es unCompressedSize=%d requestSize=%d", message.length, request.body.length);
 
     const client = new AWS.NodeHttpClient();
     return new Promise((resolve, reject) => {
         client.handleRequest(
             request,
             null,
-            function (httpResp: IncomingMessage) {
+            function (httpResp: any) {
                 let respBody = "";
 
-                logger.info({
-                    message: `statuscode ${httpResp.statusCode}`,
-                    method: "lambda-stream-to-elastic.sendMessageToEs"
-                });
+                console.log("statuscode %d", httpResp.statusCode);
 
-                httpResp.on("data", function (chunk: string) {
+                httpResp.on("data", function (chunk: any) {
                     respBody += chunk;
                 });
-                httpResp.on("end", function (chunk: string) {
+                httpResp.on("end", function (chunk: any) {
                     resolve(respBody);
                 });
             },
-            function (err: string) {
-                logger.error({
-                    message: "Error: " + err,
-                    method: "lambda-stream-to-elastic.sendMessageToEs"
-                });
+            function (err: any) {
+                console.log("Error: " + err);
                 reject(new Error(err));
             }
         );

@@ -9,7 +9,7 @@ export class SlackApi {
         this.url = url;
     }
 
-    async notify(text: string) {
+    async notify(text: string): Promise<void> {
         try {
             logger.info({
                 method: "SlackApi.notify",
