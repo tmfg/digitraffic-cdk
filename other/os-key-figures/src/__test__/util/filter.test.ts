@@ -55,7 +55,7 @@ test("transport type to account name filter string conversion works", async () =
 test("uri filters without trailing slash", async () => {
     const path = "/api/data/v1/test";
     const filters = getUriFiltersFromPath(path);
-    expect(filters.osFilter).toMatch(`request:\\"${path}\\"`);
+    expect(filters.osFilter).toMatch(`request:\\"${path}*\\"`);
     expect(filters.dbFilter).toMatch(`@fields.request_uri:\\"${path}\\"`);
 });
 
@@ -63,6 +63,6 @@ test("uri filters with trailing slash", async () => {
     const path = "/api/data/v1/test";
     const pathWithTrailingSlash = "/api/data/v1/test/";
     const filters = getUriFiltersFromPath(pathWithTrailingSlash);
-    expect(filters.osFilter).toMatch(`request:\\"${path}\\"`);
+    expect(filters.osFilter).toMatch(`request:\\"${path}*\\"`);
     expect(filters.dbFilter).toMatch(`@fields.request_uri:\\"${pathWithTrailingSlash}\\"`);
 });
