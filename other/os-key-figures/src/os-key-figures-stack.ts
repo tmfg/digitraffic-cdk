@@ -33,6 +33,7 @@ export interface Props {
     readonly railAccountName: string;
     readonly roadAccountName: string;
     readonly osIndex: string;
+    readonly visualizationsBucketName: string;
 }
 
 export class OsKeyFiguresStack extends Stack {
@@ -110,7 +111,8 @@ export class OsKeyFiguresStack extends Stack {
                 MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
                 MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
                 MYSQL_DATABASE: osKeyFiguresProps.mysql.database,
-                SLACK_WEBHOOK: osKeyFiguresProps.slackWebhook
+                SLACK_WEBHOOK: osKeyFiguresProps.slackWebhook,
+                BUCKET_NAME: osKeyFiguresProps.visualizationsBucketName
             }
         };
         const createKeyFigureVisualizationsLambda = new Function(this, functionName, lambdaConf);

@@ -76,7 +76,7 @@ export class OpenSearch {
         const statusCode = response.statusCode;
         logger.info({
             message: `OpenSearch responded with status code ${statusCode}`,
-            method: "os-query.handleResponseFromEs"
+            method: "os-query.handleResponseFromOs"
         });
         if (statusCode && (statusCode < 200 || statusCode >= 300)) {
             failedCallback(
@@ -95,7 +95,7 @@ export class OpenSearch {
             } catch (e) {
                 logger.info({
                     message: `Failed to parse response body: ${responseBody}`,
-                    method: "os-query.handleResponseFromEs"
+                    method: "os-query.handleResponseFromOs"
                 });
             }
         });
