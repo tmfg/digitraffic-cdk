@@ -1,15 +1,7 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import {
-    DB_REQUEST_FIELD,
-    OS_REQUEST_FIELD,
-    transportType,
-    type DbFilter,
-    type DbUriFilter,
-    type OsAccountNameFilter,
-    type OsFilter,
-    type OsUriFilter,
-    type TransportType
-} from "../lambda/collect-os-key-figures.js";
+import { type DbUriFilter, type OsAccountNameFilter, type OsUriFilter } from "../filter-types.js";
+
+import { DB_REQUEST_FIELD, OS_REQUEST_FIELD, transportType, type TransportType } from "../constants.js";
 
 const MARINE_ACCOUNT_NAME = getEnvVariable("MARINE_ACCOUNT_NAME");
 const RAIL_ACCOUNT_NAME = getEnvVariable("RAIL_ACCOUNT_NAME");

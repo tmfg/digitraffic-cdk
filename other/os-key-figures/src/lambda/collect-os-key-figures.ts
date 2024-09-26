@@ -8,12 +8,14 @@ import ky, { HTTPError } from "ky";
 import { OpenSearch, OpenSearchApiMethod } from "../api/opensearch.js";
 import { EnvKeys } from "../env.js";
 import { osQueries } from "../os-queries.js";
-import { query } from "../util/db.js";
 import {
     getAccountNameOsFilterFromTransportTypeName,
     getTransportTypeDbFilterFromAccountNameFilter,
     getUriFiltersFromPath
 } from "../util/filter.js";
+import { query } from "../util/db.js";
+import type { DbFilter, OsFilter } from "../filter-types.js";
+import { DB_TRANSPORT_TYPE_FIELD, transportType, type TransportType } from "../constants.js";
 
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
@@ -47,30 +49,6 @@ interface KeyFigureFilter {
 export interface KeyFigureLambdaEvent {
     readonly TRANSPORT_TYPE: TransportType;
 }
-
-export const transportType = {
-    ALL: "*",
-    MARINE: "marine",
-    RAIL: "rail",
-    ROAD: "road"
-} as const;
-
-export const OS_REQUEST_FIELD = "request";
-export const OS_ACCOUNT_NAME_FIELD = "accountName.keyword";
-export const DB_TRANSPORT_TYPE_FIELD = "@transport_type";
-export const DB_REQUEST_FIELD = "@fields.request_uri";
-
-export type TransportType = (typeof transportType)[keyof typeof transportType];
-
-export type DbTransportTypeFilter = `${typeof DB_TRANSPORT_TYPE_FIELD}:${TransportType}`;
-export type DbUriFilter = `${typeof DB_REQUEST_FIELD}:\\"${string}\\"`;
-export type DbFilter = `${DbTransportTypeFilter}${"" | ` AND ${DbUriFilter}`}`;
-
-export type OsAccountNameFilter = `${
-    | `${typeof OS_ACCOUNT_NAME_FIELD}:${string}`
-    | `(${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string})`}`;
-export type OsUriFilter = `${typeof OS_REQUEST_FIELD}:\\"${string}\\"`;
-export type OsFilter = `${OsAccountNameFilter}${"" | ` AND ${OsUriFilter}`}`;
 
 const sts = new STS({ apiVersion: "2011-06-15" });
 

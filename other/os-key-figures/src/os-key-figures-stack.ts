@@ -1,5 +1,5 @@
 import { App, Duration, Stack, type StackProps } from "aws-cdk-lib";
-import { Port, SecurityGroup, Vpc, type ISecurityGroup } from "aws-cdk-lib/aws-ec2";
+import { Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import * as events from "aws-cdk-lib/aws-events";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -14,7 +14,7 @@ import {
 import { AssetCode, Function, Runtime, type FunctionProps } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import * as s3 from "aws-cdk-lib/aws-s3";
-import { transportType } from "./lambda/collect-os-key-figures.js";
+import { transportType } from "./constants.js";
 
 export interface Props {
     readonly openSearchVPCEndpoint: string;
