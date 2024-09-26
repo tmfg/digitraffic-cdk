@@ -39,9 +39,13 @@ export interface KeyFigureResult extends KeyFigure {
     filter: KeyFigureFilter;
 }
 
+interface KeyFigureFilter {
+    dbFilter: DbFilter;
+    osFilter: OsFilter;
+}
+
 export interface KeyFigureLambdaEvent {
     readonly TRANSPORT_TYPE: TransportType;
-    readonly PART?: number;
 }
 
 export const transportType = {
@@ -67,11 +71,6 @@ export type OsAccountNameFilter = `${
     | `(${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string} OR ${typeof OS_ACCOUNT_NAME_FIELD}:${string})`}`;
 export type OsUriFilter = `${typeof OS_REQUEST_FIELD}:\\"${string}\\"`;
 export type OsFilter = `${OsAccountNameFilter}${"" | ` AND ${OsUriFilter}`}`;
-
-interface KeyFigureFilter {
-    dbFilter: DbFilter;
-    osFilter: OsFilter;
-}
 
 const sts = new STS({ apiVersion: "2011-06-15" });
 

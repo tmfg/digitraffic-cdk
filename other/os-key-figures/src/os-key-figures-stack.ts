@@ -1,5 +1,5 @@
 import { App, Duration, Stack, type StackProps } from "aws-cdk-lib";
-import { Peer, Port, SecurityGroup, Vpc, type ISecurityGroup } from "aws-cdk-lib/aws-ec2";
+import { Port, SecurityGroup, Vpc, type ISecurityGroup } from "aws-cdk-lib/aws-ec2";
 import * as events from "aws-cdk-lib/aws-events";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -14,6 +14,7 @@ import {
 import { AssetCode, Function, Runtime, type FunctionProps } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import * as s3 from "aws-cdk-lib/aws-s3";
+import { transportType } from "./lambda/collect-os-key-figures.js";
 
 export interface Props {
     readonly openSearchVPCEndpoint: string;
@@ -114,15 +115,13 @@ export class OsKeyFiguresStack extends Stack {
         };
         const createKeyFigureVisualizationsLambda = new Function(this, functionName, lambdaConf);
 
-        // deploy rules when ready for production use
-        /*
         const rule = new Rule(this, "create visualizations dummy", {
             schedule: Schedule.expression("cron(0 5 1 * ? *)")
         });
 
-        const target = new LambdaFunction(lambdaFunction);
-        rule.addTarget(target);cdk
-        */
+        const target = new LambdaFunction(createKeyFigureVisualizationsLambda);
+        rule.addTarget(target);
+
         return lambdaSecurityGroup;
     }
 
@@ -179,14 +178,12 @@ export class OsKeyFiguresStack extends Stack {
             })
         );
 
-        // deploy rules when ready for production use
-        /*
         const rule = new Rule(this, "collect *", {
             schedule: Schedule.expression("cron(0 3 1 * ? *)")
         });
         rule.addTarget(
             new LambdaFunction(collectOsKeyFiguresLambda, {
-                event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: "*" })
+                event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: transportType.ALL })
             })
         );
 
@@ -195,7 +192,7 @@ export class OsKeyFiguresStack extends Stack {
         });
         rule2.addTarget(
             new LambdaFunction(collectOsKeyFiguresLambda, {
-                event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: "rail" })
+                event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: transportType.RAIL })
             })
         );
 
@@ -204,7 +201,7 @@ export class OsKeyFiguresStack extends Stack {
         });
         rule3.addTarget(
             new LambdaFunction(collectOsKeyFiguresLambda, {
-                event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: "marine" })
+                event: events.RuleTargetInput.fromObject({ TRANSPORT_TYPE: transportType.MARINE })
             })
         );
 
@@ -214,24 +211,11 @@ export class OsKeyFiguresStack extends Stack {
         rule1.addTarget(
             new LambdaFunction(collectOsKeyFiguresLambda, {
                 event: events.RuleTargetInput.fromObject({
-                    TRANSPORT_TYPE: "road",
-                    PART: 1
+                    TRANSPORT_TYPE: transportType.ROAD
                 })
             })
         );
 
-        const rule4 = new Rule(this, "collect road 2", {
-            schedule: Schedule.expression("cron(1 4 1 * ? *)")
-        });
-        rule4.addTarget(
-            new LambdaFunction(collectOsKeyFiguresLambda, {
-                event: events.RuleTargetInput.fromObject({
-                    TRANSPORT_TYPE: "road",
-                    PART: 2
-                })
-            })
-        );
-        */
         return lambdaSecurityGroup;
     }
 
@@ -240,17 +224,5 @@ export class OsKeyFiguresStack extends Stack {
             natGateways: 1,
             maxAzs: 2
         });
-    }
-
-    private createDatabaseSecurityGroup(securityGroups: ISecurityGroup[], vpc: Vpc): SecurityGroup {
-        const sg = new SecurityGroup(this, "OsKeyFiguresDatabaseSG", {
-            vpc,
-            securityGroupName: "OsKeyFiguresDatabaseSG",
-            allowAllOutbound: true
-        });
-        securityGroups.forEach((peerSg) => {
-            sg.addIngressRule(peerSg, Port.tcp(3306), "", false);
-        });
-        return sg;
     }
 }
