@@ -1,4 +1,4 @@
-import axios from "axios";
+import ky from "ky";
 import { generateHmacAuthorizationHeader } from "../service/authentication.js";
 
 export enum VisMessageType {
@@ -32,11 +32,13 @@ export async function getMessages(
     apiKey: string
 ): Promise<VisMessagesResponse> {
     const fullUrl = `${privateVisUrl}/getMessage`;
-    const resp = await axios.get(fullUrl, {
-        headers: {
-            Accept: "application/json",
-            Authorization: generateHmacAuthorizationHeader(fullUrl, appId, apiKey)
-        }
-    });
-    return resp.data as VisMessagesResponse;
+    const data = await ky
+        .get<VisMessagesResponse>(fullUrl, {
+            headers: {
+                Accept: "application/json",
+                Authorization: generateHmacAuthorizationHeader(fullUrl, appId, apiKey)
+            }
+        })
+        .json();
+    return data;
 }

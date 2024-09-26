@@ -1,4 +1,4 @@
-import axios from "axios";
+import ky from "ky";
 import type { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
@@ -51,10 +51,10 @@ export function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaResponse>
         handleQueryParam("externalID", event.queryStringParameters, params);
 
         const fullUrl = url + (params.length ? "?" : "") + params.join("&");
-        const resp = await axios.get<string>(fullUrl);
+        const body = await ky.get<string>(fullUrl).text();
         return {
             statusCode: 200,
-            body: resp.data
+            body
         };
     });
 }
