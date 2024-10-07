@@ -21,7 +21,6 @@
     "@digitraffic/common": "2024.7.8-1",
     "aws-cdk-lib": "^2.151.0",
     "aws-sdk": "^2.1670.0",
-    "axios": "^1.7.2",
     "constructs": "~10.3.0",
     "source-map-support": "^0.5.21"
   },

@@ -29,13 +29,13 @@
     "@turf/turf": "7.0.0-alpha.111",
     "aws-cdk-lib": "^2.151.0",
     "aws-sdk": "^2.1670.0",
-    "axios": "^1.7.2",
     "constructs": "~10.3.0",
     "date-fns": "~3.6.0",
     "date-fns-tz": "~3.1.3",
     "source-map-support": "^0.5.21",
     "uuid": "^10.0.0",
-    "xml2js": "^0.6.2"
+    "xml2js": "^0.6.2",
+    "ky": "~1.7.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
