@@ -22,8 +22,9 @@ const defaultPlugins = [
 ];
 
 const excludeTerser = [
-    "lambda-redirect-history",
-    "lambda-index-html",
+    "function-redirect",
+    "function-index-html",
+    "function-redirect-history",
     "lambda-stream-to-elastic",
     "logging-util"
 ];

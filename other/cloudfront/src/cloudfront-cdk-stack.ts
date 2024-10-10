@@ -21,20 +21,18 @@ import { createDistribution } from "./distribution-util.js";
 import { LambdaHolder } from "./lambda-holder.js";
 import {
     createGzipRequirement,
-    createHistoryPath,
     createHttpHeaders,
-    createIndexHtml,
     createIpRestriction,
     createLamHeaders,
     createLamRedirect,
     createWeathercamHttpHeaders,
     createWeathercamRedirect,
-    FunctionType,
     LambdaType
-} from "./lambda/lambda-creator.js";
+} from "./util/lambda-creator.js";
 import { createOriginConfig } from "./origin-configs.js";
 import { createRealtimeLogging } from "./streaming-util.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { createHistoryPath, createIndexHtml, createRedirectFunction, FunctionType } from "./util/function-creator.js";
 
 type ViewerPolicyMap = Record<string, string>;
 
@@ -52,6 +50,7 @@ interface LambdaTypes {
     readonly lambdaTypes: Set<LambdaType>;
     readonly functionTypes: Set<FunctionType>;
     readonly ipRestrictions: Set<string>;
+    readonly redirects: Set<string>;
 }
 
 export class CloudfrontCdkStack extends Stack {
@@ -152,6 +151,7 @@ export class CloudfrontCdkStack extends Stack {
         const lambdaTypes = new Set<LambdaType>();
         const functionTypes = new Set<FunctionType>();
         const ipRestrictions = new Set<string>();
+        const redirects = new Set<string>();
 
         props
             .flatMap((p) => p.origins)
@@ -159,12 +159,17 @@ export class CloudfrontCdkStack extends Stack {
             .forEach((b) => {
                 b.lambdaTypes.forEach((type) => lambdaTypes.add(type));
                 b.functionTypes.forEach((type) => functionTypes.add(type));
+
                 if (b.ipRestriction) {
                     ipRestrictions.add(b.ipRestriction);
                 }
+
+                if(b.redirect) {
+                    redirects.add(b.redirect);
+                }
             });
 
-        return { lambdaTypes, functionTypes, ipRestrictions };
+        return { lambdaTypes, functionTypes, ipRestrictions, redirects };
     }
 
     createLambdaMap(props: DistributionProps[], lParameters: CFLambdaParameters | undefined): LambdaHolder {
@@ -252,6 +257,17 @@ export class CloudfrontCdkStack extends Stack {
             }
         });
 
+        // handle redirects
+        const redirects = lParameters?.redirects;
+
+        types.redirects.forEach((key) => {
+            if(redirects && redirects[key]) {
+                lambdaMap.addRedirect(key, createRedirectFunction(this, redirects[key]))
+            } else {
+                throw new Error("missing lambdaParameter redirect " + key);
+            }
+        });
+
         return lambdaMap;
     }
 
@@ -296,7 +312,7 @@ export class CloudfrontCdkStack extends Stack {
                     ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS.responseHeadersPolicyId;
 
                 // handle swagger
-                if (cb.pathPattern.includes("swagger")) {
+                if (cb.pathPattern === "swagger/*") {
                     // for swagger, disable caching and set s3 cors policy
                     (cb as MutableCacheBehavior).originRequestPolicyId =
                         OriginRequestPolicy.CORS_S3_ORIGIN.originRequestPolicyId;

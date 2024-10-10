@@ -6,11 +6,9 @@ import { findHeaderValue } from "./logging-util";
 import * as AWSx from "aws-sdk";
 const AWS = AWSx as any;
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require("zlib");
 
 // camels
-/* eslint-disable camelcase */
 
 const appDomain = process.env.APP_DOMAIN as string;
 const application = appDomain.split("-")[0];

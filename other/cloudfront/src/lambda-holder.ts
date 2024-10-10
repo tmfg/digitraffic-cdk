@@ -2,12 +2,14 @@ import type { IVersion } from "aws-cdk-lib/aws-lambda";
 import type * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
 import type { LambdaFunctionAssociation, FunctionAssociation } from "aws-cdk-lib/aws-cloudfront";
 import { FunctionEventType, LambdaEdgeEventType } from "aws-cdk-lib/aws-cloudfront";
-import { FunctionType, LambdaType } from "./lambda/lambda-creator.js";
+import { LambdaType } from "./util/lambda-creator.js";
+import { FunctionType } from "./util/function-creator.js";
 
 export class LambdaHolder {
     readonly lambdas: Record<number, IVersion> = {};
     readonly functions: Record<number, Cloudfront.Function> = {};
     readonly restrictions: Record<string, IVersion> = {};
+    readonly redirects: Record<string, Cloudfront.Function> = {};
 
     addLambda(lambdaType: LambdaType, version: IVersion): void {
         this.lambdas[lambdaType] = version;
@@ -19,6 +21,10 @@ export class LambdaHolder {
 
     addRestriction(name: string, version: IVersion): void {
         this.restrictions[name] = version;
+    }
+
+    addRedirect(name: string, version: Cloudfront.Function): void {
+        this.redirects[name] = version;
     }
 
     getFunctionAssociation(functionType: FunctionType): FunctionAssociation {
@@ -45,10 +51,18 @@ export class LambdaHolder {
         };
     }
 
+    getRedirect(name: string): FunctionAssociation {
+        return {
+            eventType: FunctionEventType.VIEWER_REQUEST,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            function: this.redirects[name]!
+        }
+    }
+
     private static getFunctionEventType(functionType: FunctionType): FunctionEventType {
         switch (functionType) {
+            case FunctionType.REDIRECT:
             case FunctionType.INDEX_HTML:
-                return FunctionEventType.VIEWER_REQUEST;
             case FunctionType.HISTORY_REDIRECT:
                 return FunctionEventType.VIEWER_REQUEST;
         }

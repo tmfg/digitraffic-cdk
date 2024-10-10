@@ -7,8 +7,6 @@ const hostName = "EXT_HOST_NAME";
 const hostHeader = [{ key: "host", value: hostName }];
 const sslProtocols = ["TLSv1", "TLSv1.1"];
 
-const VERSION_REDIRECT = "EXT_VERSION";
-
 /*
     This is a edge lambda that should be run at cloudfront at origin request event.
     It checks for querystring and if it exists, it will rewrite the request origin
@@ -31,7 +29,7 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
             callback(err);
             throw err;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+
         const request: CloudFrontRequest = record.cf.request;
 
         const { querystring } = request;

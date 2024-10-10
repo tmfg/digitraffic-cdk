@@ -134,6 +134,10 @@ function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaHolder): Functio
         functionAssociations.push(lambdaMap.getFunctionAssociation(type));
     });
 
+    if (b.redirect) {
+        functionAssociations.push(lambdaMap.getRedirect(b.redirect));
+    }
+
     return functionAssociations;
 }
 

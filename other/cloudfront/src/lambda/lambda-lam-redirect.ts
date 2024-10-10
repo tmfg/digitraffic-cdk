@@ -8,7 +8,6 @@ import type {
     Context,
     CloudFrontRequestHandler,
     CloudFrontRequestCallback,
-    CloudFrontRequestEventRecord,
     CloudFrontRequest
 } from "aws-lambda";
 
@@ -21,6 +20,12 @@ setEnvVariable(EnvKeys.SECRET_ID, "road");
 // Set region for secret reading manually to eu-west-1 as edge lambda is in us-west-1 or "random" region at runtime
 setSecretOverideAwsRegionEnv("eu-west-1");
 const secretHolder = SecretHolder.create<LamSecrets>("tms-history");
+
+export const PATHS = {
+    HISTORY_RAW: "/api/tms/v1/history/raw/",
+    HISTORY: "/ui/tms/history",
+    HISTORY_v1: "/api/tms/v1/history"
+} as const;
 
 export const handler: CloudFrontRequestHandler = async (
     event: CloudFrontRequestEvent,
@@ -35,7 +40,6 @@ export const handler: CloudFrontRequestHandler = async (
             callback(err);
             throw err;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const request: CloudFrontRequest = record.cf.request;
 
         logger.info({
@@ -49,14 +53,14 @@ export const handler: CloudFrontRequestHandler = async (
 
         // This is for raw-data from ongoing or history S3 bucket. History-bucket has data until end of 2021
         // and ongoing-bucket has data from start of the 2022.
-        if (request.uri.includes("/api/tms/v1/history/raw/")) {
+        if (request.uri.includes(PATHS.HISTORY_RAW)) {
             // Adjust uri i.e. /api/tms/v1/history/raw/lamraw_[lam_id]_[yearshort]_[day_number].csv -> /lamraw_[lam_id]_[yearshort]_[day_number].csv
             request.uri = request.uri.substring(request.uri.lastIndexOf("/"));
 
             const parts = request.uri.split("_");
 
             if (Array.isArray(parts) && parts.length > 2) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-non-null-assertion
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const year = parseInt(parts[2]!, 10);
 
                 if (!isNaN(year) && year > 21) {
@@ -87,7 +91,7 @@ export const handler: CloudFrontRequestHandler = async (
             // This is for the SnowLake request and GET works with webpage address (/ui/tms/history) and with api-url.
             // Index.html has been set to do GET to /api/tms/v1/history. Without it, it will default to do get to webpage address.
         } else if (
-            (request.uri.includes("/ui/tms/history") || request.uri.includes("/api/tms/v1/history")) &&
+            (request.uri.includes(PATHS.HISTORY) || request.uri.includes(PATHS.HISTORY_v1)) &&
             request.querystring.length
         ) {
             const newQuery = parseQuery(request.querystring);

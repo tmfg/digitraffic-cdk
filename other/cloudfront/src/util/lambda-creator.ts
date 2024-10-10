@@ -15,11 +15,6 @@ export enum LambdaType {
     LAM_HEADERS
 }
 
-export enum FunctionType {
-    INDEX_HTML,
-    HISTORY_REDIRECT
-}
-
 function readBodyWithVersion(fileName: string): string {
     const versionString = new Date().toISOString();
     const body = fs.readFileSync(fileName);
@@ -60,18 +55,6 @@ export function createWeathercamHttpHeaders(stack: Stack, edgeLambdaRole: Role):
     return createVersionedFunction(stack, edgeLambdaRole, "weathercam-http-headers", body);
 }
 
-export function createIndexHtml(stack: Stack): Cloudfront.Function {
-    const body = readBodyWithVersion("dist/lambda/lambda-index-html.cjs");
-
-    return createCloudfrontFunction(stack, "index-html", body);
-}
-
-export function createHistoryPath(stack: Stack): Cloudfront.Function {
-    const body = readBodyWithVersion("dist/lambda/lambda-redirect-history.cjs");
-
-    return createCloudfrontFunction(stack, "history-redirect", body);
-}
-
 export function createIpRestriction(
     stack: Stack,
     edgeLambdaRole: Role,
@@ -98,16 +81,6 @@ export function createLamHeaders(stack: Stack, edgeLambdaRole: Role): Version {
     const body = readBodyWithVersion("dist/lambda/lambda-lam-headers.cjs");
 
     return createVersionedFunction(stack, edgeLambdaRole, "lam-headers", body);
-}
-
-export function createCloudfrontFunction(
-    stack: Stack,
-    functionName: string,
-    functionBody: string
-): Cloudfront.Function {
-    return new Cloudfront.Function(stack, functionName, {
-        code: Cloudfront.FunctionCode.fromInline(functionBody)
-    });
 }
 
 export function createFunction(
