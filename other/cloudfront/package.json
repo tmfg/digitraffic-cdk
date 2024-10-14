@@ -28,8 +28,8 @@
   },
   "dependencies": {
     "@digitraffic/common": "2024.10.9-1",
-    "aws-cdk-lib": "^2.161.1",
-    "constructs": "~10.3.0",
+    "aws-cdk-lib": "^2.162.0",
+    "constructs": "~10.3.1",
     "lodash-es": "~4.17.21"
   },
   "devDependencies": {
@@ -54,7 +54,7 @@
     "parallelshell": "^3.0.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "~5.5.4",
+    "typescript": "~5.6.3",
     "rollup": "~4.24.0",
     "@rollup/plugin-node-resolve": "~15.3.0",
     "@rollup/plugin-terser": "~0.4.4",

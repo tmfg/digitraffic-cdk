@@ -22,25 +22,25 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "~5.2.0",
-    "@aws-sdk/client-sts": "^3.624.0",
-    "@aws-sdk/types": "^3.609.0",
+    "@aws-sdk/client-sts": "^3.669.0",
+    "@aws-sdk/types": "^3.664.0",
     "@digitraffic/common": "2024.7.8-1",
-    "@smithy/node-http-handler": "~3.1.0",
-    "@smithy/protocol-http": "~4.1.0",
+    "@smithy/node-http-handler": "~3.2.4",
+    "@smithy/protocol-http": "~4.1.4",
     "@smithy/signature-v4": "~3.1.1",
-    "aws-cdk-lib": "^2.151.0",
-    "constructs": "~10.3.0"
+    "aws-cdk-lib": "^2.162.0",
+    "constructs": "~10.3.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.67.0",
-    "@rushstack/heft-jest-plugin": "^0.12.7",
+    "@rushstack/heft": "^0.68.2",
+    "@rushstack/heft-jest-plugin": "^0.12.14",
     "@types/heft-jest": "1.0.6",
     "@types/node": "20.14.9",
-    "esbuild": "0.23.0",
-    "typescript": "~5.5.4"
+    "esbuild": "0.24.0",
+    "typescript": "~5.6.3"
   }
 }
