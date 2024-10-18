@@ -4,10 +4,10 @@ import type {
     RtzVoyagePlan,
     RtzWaypoint
 } from "@digitraffic/common/dist/marine/rtz";
-import { toDate } from "date-fns-tz";
 import { isValid, isAfter } from "date-fns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { point, polygon, booleanPointInPolygon } from "@turf/turf";
+import { TZDate } from "@date-fns/tz";
 
 // roughly the Gulf of Finland, Bothnian Sea/Bay and Northern Baltic
 const SPATIAL_LIMITS = polygon([
@@ -261,9 +261,9 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
 function anyTimestampInFuture(schedule: RtzSchedule, now: Date): boolean {
     const timestamps: Date[] = schedule.scheduleElement.reduce((acc, curr) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const eta = !curr?.$?.eta ? [toDate(curr.$.eta!)] : [];
+        const eta = !curr?.$?.eta ? [new TZDate(curr.$.eta!)] : [];
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const etd = !curr?.$?.etd ? [toDate(curr.$.etd!)] : [];
+        const etd = !curr?.$?.etd ? [new TZDate(curr.$.etd!)] : [];
         return acc.concat(eta, etd);
     }, [] as Date[]);
     return timestamps.some((ts) => validateTimestamp(ts, now));
