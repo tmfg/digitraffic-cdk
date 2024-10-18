@@ -5,7 +5,7 @@ import type { DbFault, FaultFeature } from "../model/fault.js";
 import type { Language } from "@digitraffic/common/dist/types/language";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { subHours } from "date-fns";
-import { fromZonedTime } from "date-fns-tz";
+import { TZDate } from "@date-fns/tz";
 
 // 15 nautical miles
 const BUFFER_RADIUS_METERS = 27780;
@@ -172,7 +172,7 @@ export function findAll<T>(
 function parseHelsinkiTime(date: string | null): Date | undefined {
     if (date !== null) {
         // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
-        return fromZonedTime(date, "Europe/Helsinki");
+        return new TZDate(date, "Europe/Helsinki");
     }
 
     return undefined;
