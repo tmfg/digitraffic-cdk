@@ -24,11 +24,11 @@ const method = `Authorizer.handler` as const;
 
 export const handler: (
     event: APIGatewayRequestAuthorizerEvent,
-    context: Context,
+    _: Context,
     callback: Callback<APIGatewayAuthorizerResult>
 ) => Promise<void> = async function (
     event: APIGatewayRequestAuthorizerEvent,
-    context: Context,
+    _: Context,
     callback: Callback<APIGatewayAuthorizerResult>
 ) {
     logger.debug({
