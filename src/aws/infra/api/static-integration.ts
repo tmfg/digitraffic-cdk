@@ -1,4 +1,11 @@
-import { type IntegrationResponse, MockIntegration, PassthroughBehavior, type Resource } from "aws-cdk-lib/aws-apigateway";
+import {
+    type IModel,
+    type IntegrationResponse,
+    type MethodResponse,
+    MockIntegration,
+    PassthroughBehavior,
+    type Resource,
+} from "aws-cdk-lib/aws-apigateway";
 import { MediaType } from "../../types/mediatypes.js";
 
 const INTEGRATION_RESPONSE_200 = `{
@@ -17,6 +24,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         resource: Resource,
         mediaType: MediaType,
         response: string,
+        model: IModel, 
         enableCors: boolean = true,
         apiKeyRequired: boolean = true,
         headers: Record<string, string> = {},
@@ -42,7 +50,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         ["GET", "HEAD"].forEach((httpMethod) => {
             resource.addMethod(httpMethod, this, {
                 apiKeyRequired,
-                methodResponses: [DigitrafficStaticIntegration.createMethodResponse(headers)],
+                methodResponses: [DigitrafficStaticIntegration.createMethodResponse(headers, mediaType, model)],
             });
         });
     }
@@ -50,6 +58,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
     static json<K>(
         resource: Resource,
         response: K,
+        model: IModel,
         enableCors: boolean = true,
         apiKeyRequired: boolean = true,
         headers: Record<string, string> = {},
@@ -58,6 +67,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
             resource,
             MediaType.APPLICATION_JSON,
             JSON.stringify(response),
+            model,
             enableCors,
             apiKeyRequired,
             headers,
@@ -80,13 +90,16 @@ export class DigitrafficStaticIntegration extends MockIntegration {
         };
     }
 
-    static createMethodResponse(headers: Record<string, string>) {
+    static createMethodResponse(headers: Record<string, string>, mediaType: MediaType, model: IModel): MethodResponse {
         const allowedHeaders = Object.keys(headers);
         const entries = Object.fromEntries(allowedHeaders.map((key) => [key, true]));
 
         return {
             statusCode: "200",
             responseParameters: prefixKeys("method.response.header.", entries),
+            responseModels: {
+                [mediaType]: model
+            }
         };
     }
 }

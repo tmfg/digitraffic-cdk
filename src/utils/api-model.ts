@@ -88,7 +88,7 @@ export function createArraySchema(model: Model, api: RestApi): JsonSchema {
  * Creates a JSON Schema for a GeoJSON Feature. Can be used to generate OpenAPI descriptions.
  * @param modelReference Reference to a model object
  */
-export function featureSchema(modelReference: string) {
+export function featureSchema(modelReference: string): JsonSchema {
     return {
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,
@@ -115,7 +115,7 @@ export function featureSchema(modelReference: string) {
  * Creates a JSON Schema for a GeoJSON Feature Collection. Can be used to generate OpenAPI descriptions.
  * @param modelReference Reference to a model object, in this case Features.
  */
-export function geojsonSchema(modelReference: string) {
+export function geojsonSchema(modelReference: string): JsonSchema {
     return {
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,

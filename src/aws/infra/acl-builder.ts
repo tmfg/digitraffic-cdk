@@ -19,8 +19,8 @@ export type ExcludedAWSRules = {
 };
 
 export type CfnWebAclRuleProperty = {
-    [P in keyof CfnWebACL.RuleProperty as Exclude<P, "priority">]: (CfnWebACL.RuleProperty)[P]
-}
+    [P in keyof CfnWebACL.RuleProperty as Exclude<P, "priority">]: CfnWebACL.RuleProperty[P];
+};
 
 /**
  * Builder class for building CfnWebACL.
@@ -102,18 +102,20 @@ export class AclBuilder {
         isBasedOnIpAndUriPath: boolean,
         customResponseBodyKey?: string,
     ): AclBuilder {
-        const isBlockRule = !!customResponseBodyKey
-        const rules = isBlockRule ? this._blockRules : this._countRules
-        const action = isBlockRule ? {
-            block: {
-                customResponse: {
-                    responseCode: 429,
-                    customResponseBodyKey,
-                },
-            },
-        } : {
-            count: {}
-        }
+        const isBlockRule = !!customResponseBodyKey;
+        const rules = isBlockRule ? this._blockRules : this._countRules;
+        const action = isBlockRule
+            ? {
+                  block: {
+                      customResponse: {
+                          responseCode: 429,
+                          customResponseBodyKey,
+                      },
+                  },
+              }
+            : {
+                  count: {},
+              };
         rules.push({
             name,
             visibilityConfig: {
@@ -153,7 +155,7 @@ export class AclBuilder {
             limit,
             true,
             false,
-            customResponseBodyKey
+            customResponseBodyKey,
         );
     }
 
@@ -168,7 +170,7 @@ export class AclBuilder {
             limit,
             true,
             true,
-            customResponseBodyKey
+            customResponseBodyKey,
         );
     }
 
@@ -183,7 +185,7 @@ export class AclBuilder {
             limit,
             false,
             false,
-            customResponseBodyKey
+            customResponseBodyKey,
         );
     }
 
@@ -198,7 +200,7 @@ export class AclBuilder {
             limit,
             false,
             true,
-            customResponseBodyKey
+            customResponseBodyKey,
         );
     }
 
@@ -206,48 +208,28 @@ export class AclBuilder {
         if (limit === undefined) {
             return this;
         }
-        return this.withThrottleRule(
-          `CountRuleWithDigitrafficUser${limit}`,
-          limit,
-          true,
-          false,
-        );
+        return this.withThrottleRule(`CountRuleWithDigitrafficUser${limit}`, limit, true, false);
     }
 
     withCountDigitrafficUserIpAndUriPath(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
-        return this.withThrottleRule(
-          `CountRuleIPQueryWithDigitrafficUser${limit}`,
-          limit,
-          true,
-          true,
-        );
+        return this.withThrottleRule(`CountRuleIPQueryWithDigitrafficUser${limit}`, limit, true, true);
     }
 
     withCountAnonymousUserIp(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
-        return this.withThrottleRule(
-          `CountRuleWithAnonymousUser${limit}`,
-          limit,
-          false,
-          false,
-        );
+        return this.withThrottleRule(`CountRuleWithAnonymousUser${limit}`, limit, false, false);
     }
 
     withCountAnonymousUserIpAndUriPath(limit: number | undefined): AclBuilder {
         if (limit === undefined) {
             return this;
         }
-        return this.withThrottleRule(
-          `CountRuleIPQueryWithAnonymousUser${limit}`,
-          limit,
-          false,
-          true,
-        );
+        return this.withThrottleRule(`CountRuleIPQueryWithAnonymousUser${limit}`, limit, false, true);
     }
 
     _isCustomResponseBodyKeySet(key: string): boolean {
@@ -266,11 +248,16 @@ export class AclBuilder {
     public build(): CfnWebACL {
         const addPriority = (rule: CfnWebAclRuleProperty, priority: number): CfnWebACL.RuleProperty => ({
             ...rule,
-            priority
-        })
+            priority,
+        });
         const rules: CfnWebACL.RuleProperty[] = concat(
-          zipWith(this._countRules, range(this._countRules.length), addPriority),
-          zipWith(this._blockRules, range(this._blockRules.length).map(n => n + this._countRules.length), addPriority))
+            zipWith(this._countRules, range(this._countRules.length), addPriority),
+            zipWith(
+                this._blockRules,
+                range(this._blockRules.length).map((n) => n + this._countRules.length),
+                addPriority,
+            ),
+        );
 
         if (rules.length === 0) {
             throw new Error("No rules defined for WebACL");
@@ -293,7 +280,9 @@ export class AclBuilder {
                 sampledRequestsEnabled: false,
             },
             rules,
-            customResponseBodies: this._customResponseBodies,
+            ...(this._customResponseBodies && {
+                customResponseBodies: this._customResponseBodies,
+            }),
         });
     }
 }

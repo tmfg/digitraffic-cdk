@@ -10,11 +10,9 @@ interface ApiParameter {
     name: string;
 }
 
-const VELOCITY_ALL_PARAMS = `#set($params = $input.params().get("querystring"))
-#foreach($paramName in $params.keySet())
-  "$paramName":"$util.escapeJavaScript($params.get($paramName))" #if($foreach.hasNext),#end
-#end
-`;
+const VELOCITY_ALL_PARAMS = `#foreach($paramName in $params.keySet())
+    #set($tmp = $paramMap.put($paramName, $params[$paramName]))
+#end`;
 
 export class DigitrafficIntegration<T extends string> {
     readonly lambda: IFunction;
@@ -24,11 +22,7 @@ export class DigitrafficIntegration<T extends string> {
 
     _passAllQueryParameters: boolean;
 
-    constructor(
-        lambda: IFunction,
-        mediaType: MediaType = MediaType.TEXT_PLAIN,
-        sunset?: string,
-    ) {
+    constructor(lambda: IFunction, mediaType: MediaType = MediaType.TEXT_PLAIN, sunset?: string) {
         this.lambda = lambda;
         this.mediaType = mediaType;
         this.sunset = sunset;
@@ -36,9 +30,8 @@ export class DigitrafficIntegration<T extends string> {
     }
 
     passAllQueryParameters(): this {
-        if (this.parameters.some((p) => p.type === "querystring")) {
+        if (this.parameters.some((p) => p.type === "querystring"))
             throw new Error("Can't add query parameters with pass all");
-        }
 
         this._passAllQueryParameters = true;
 
@@ -93,9 +86,10 @@ export class DigitrafficIntegration<T extends string> {
             proxy: false,
             integrationResponses,
             requestParameters: undefined,
-            requestTemplates: this.parameters.length === 0 && !this._passAllQueryParameters
-                ? undefined
-                : this.createRequestTemplates(),
+            requestTemplates:
+                this.parameters.length === 0 && !this._passAllQueryParameters
+                    ? undefined
+                    : this.createRequestTemplates(),
             passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
         });
     }
@@ -111,8 +105,7 @@ export class DigitrafficIntegration<T extends string> {
                     `integration.request.${parameter.type.replace(
                         "multivaluequerystring",
                         "querystring",
-                    )
-                    }.${parameter.name}`
+                    )}.${parameter.name}`
                 ] = `method.request.${parameter.type}.${parameter.name}`;
             });
 
@@ -122,28 +115,39 @@ export class DigitrafficIntegration<T extends string> {
     createRequestTemplates(): Record<string, string> {
         const parameterAssignments: string[] = [];
 
-        if (this._passAllQueryParameters) {
-            parameterAssignments.push(VELOCITY_ALL_PARAMS);
-        }
-
         this.parameters.forEach((parameter: ApiParameter) => {
             if (parameter.type === "context") {
-                parameterAssignments.push(`"${parameter.name}":"$util.parseJson($context.${parameter.name}"`);
+                parameterAssignments.push(`#set($tmp = $paramMap.put('${parameter.name}', $util.escapeJavaScript($context['${parameter.name}'])))`);
             } else if (parameter.type === "multivaluequerystring") {
                 // make multivaluequerystring values to array
-                parameterAssignments.push(
-                    `"${parameter.name}":[#foreach($val in $method.request.multivaluequerystring.get('${parameter.name}'))"$util.escapeJavaScript($val)"#if($foreach.hasNext),#end#end]`,
-                );
+                parameterAssignments.push(`#set($tmp = $paramMap.put('_${parameter.name}', $util.parseJson($method.request.multivaluequerystring['${parameter.name}'])))`);
+            } else if (parameter.type === "path") {
+                parameterAssignments.push(`#set($tmp = $paramMap.put('${parameter.name}', $util.escapeJavaScript($input.params().path['${parameter.name}'])))`);
+            } else if (parameter.type === "header") {
+                parameterAssignments.push(`#set($tmp = $paramMap.put('${parameter.name}', $util.escapeJavaScript($input.params().header['${parameter.name}'])))`);
             } else {
-                parameterAssignments.push(
-                    `"${parameter.name}":"$util.escapeJavaScript($input.params('${parameter.name}'))"`,
-                );
+                parameterAssignments.push(`#set($tmp = $paramMap.put('${parameter.name}', $util.escapeJavaScript($params['${parameter.name}'])))`);
             }
         });
 
+        // parameters starting with _ will be handled as json, and will not be in quotes
+        // (for example multivalueparameters)
+
         return {
-            [MediaType.APPLICATION_JSON]: `{
-    ${parameterAssignments.length > 0 ? parameterAssignments.join(",\n    ") + "\n" : ""}}`,
+            [MediaType.APPLICATION_JSON]: `
+#set($paramMap = {})
+#set($params = $input.params().get("querystring"))
+${parameterAssignments.join("\n")}
+${this._passAllQueryParameters ? VELOCITY_ALL_PARAMS : ""}
+{
+#foreach($paramName in $paramMap.keySet())
+#if( $paramName[0] != '_')
+    "$paramName":"$paramMap.get($paramName)" #if($foreach.hasNext),\n#end
+#else
+    "$paramName.substring(1)":$paramMap.get($paramName) #if($foreach.hasNext),\n#end
+#end
+#end
+}`,
         };
     }
 
