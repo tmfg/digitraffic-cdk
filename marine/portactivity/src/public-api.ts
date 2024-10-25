@@ -12,7 +12,7 @@ import {
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { TimestampMetadata } from "./model/timestamp-metadata.js";
+import { TimestampMetadata, TimestampMetadataSchema } from "./model/timestamp-metadata.js";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
@@ -56,6 +56,11 @@ export class PublicApi {
             this.publicApi,
             LocodeMetadataSchema
         );
+        const timestampMetadataModel = addServiceModel(
+            "TimestampMetadataModel",
+            this.publicApi,
+            TimestampMetadataSchema
+        );
 
         const resource = this.publicApi.root.addResource("api").addResource("v1");
         const metadataResource = resource.addResource("metadata");
@@ -64,7 +69,7 @@ export class PublicApi {
 
         this.createShiplistResource(stack);
 
-        this.createTimestampMetadataResource(metadataResource);
+        this.createTimestampMetadataResource(metadataResource, timestampMetadataModel);
 
         this.createLocodeMetadataResource(stack, metadataResource, locodeMetadataModel);
     }
@@ -164,13 +169,14 @@ export class PublicApi {
         return lambda;
     }
 
-    createTimestampMetadataResource(metadataResource: Resource): void {
+    createTimestampMetadataResource(metadataResource: Resource, timestampMetadataModel: IModel): void {
         const timestampMetadataResource = metadataResource.addResource("timestamps");
 
         new DigitrafficStaticIntegration(
             timestampMetadataResource,
             MediaType.APPLICATION_JSON,
             JSON.stringify(TimestampMetadata),
+            timestampMetadataModel,
             true,
             false
         );

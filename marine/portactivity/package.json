@@ -27,7 +27,7 @@
     "@aws-sdk/client-sns": "^3.669.0",
     "@aws-sdk/client-sqs": "^3.669.0",
     "@aws-sdk/client-ssm": "^3.669.0",
-    "@digitraffic/common": "2024.7.8-1",
+    "@digitraffic/common": "2024.10.25-1",
     "@middy/core": "^5.5.0",
     "@middy/sqs-partial-batch-failure": "^5.5.0",
     "amqplib": "^0.10.3",

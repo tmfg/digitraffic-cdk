@@ -1,3 +1,4 @@
+import { JsonSchemaType, JsonSchemaVersion, type JsonSchema } from "aws-cdk-lib/aws-apigateway";
 import { EventType } from "./timestamp.js";
 
 export enum S211TimeType {
@@ -56,3 +57,31 @@ metadata[EventType.RPS] = {
 };
 
 export const TimestampMetadata = metadata;
+
+export const TimestampMetadataSchema: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT4,
+    type: JsonSchemaType.OBJECT,
+    description: "Timestamp metadata",
+    additionalProperties: {
+        type: JsonSchemaType.OBJECT,
+        required: ["timeType", "stateCode"],
+        properties: {
+            timeType: {
+                type: JsonSchemaType.STRING,
+                enum: ["Actual", "Estimated", "Planned", "Requested"]
+            },
+            stateCode: {
+                type: JsonSchemaType.STRING,
+                enum: [
+                    "Pilotage_Completed",
+                    "Pilotage_Commenced",
+                    "Arrival_Vessel_Berth",
+                    "Departure_Vessel_Berth",
+                    "Arrival_Vessel_Pilotage",
+                    "Pilotage_Confirmed",
+                    "Pilotage_Requested"
+                ]
+            }
+        }
+    }
+};

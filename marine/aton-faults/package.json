@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.669.0",
-    "@digitraffic/common": "2024.8.27-1",
+    "@digitraffic/common": "2024.10.25-1",
     "@middy/core": "^5.5.0",
     "@middy/sqs-partial-batch-failure": "^5.5.0",
     "@turf/turf": "7.0.0-alpha.116",
