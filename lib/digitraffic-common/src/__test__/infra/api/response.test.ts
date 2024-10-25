@@ -1,7 +1,5 @@
 import { RESPONSE_DEFAULT_LAMBDA } from "../../../aws/infra/api/response.js";
 import etag from "etag";
-
-//const velocity = require("velocityjs");
 import velocity from "velocityjs";
 
 const TEST_BODY = "Hello world!";

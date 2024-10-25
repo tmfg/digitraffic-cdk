@@ -280,7 +280,9 @@ export class AclBuilder {
                 sampledRequestsEnabled: false,
             },
             rules,
-            customResponseBodies: this._customResponseBodies,
+            ...(this._customResponseBodies && {
+                customResponseBodies: this._customResponseBodies,
+            }),
         });
     }
 }
