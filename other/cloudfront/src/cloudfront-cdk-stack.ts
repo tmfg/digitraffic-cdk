@@ -1,4 +1,5 @@
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { StackProps } from "aws-cdk-lib";
 import { Annotations, Aspects, Stack } from "aws-cdk-lib";
 import type { CfnDistribution, CloudFrontWebDistribution } from "aws-cdk-lib/aws-cloudfront";
@@ -8,17 +9,18 @@ import {
     OriginRequestPolicy,
     ResponseHeadersPolicy
 } from "aws-cdk-lib/aws-cloudfront";
-import {
-    CompositePrincipal,
-    ManagedPolicy,
-    PolicyStatement,
-    Role,
-    ServicePrincipal
-} from "aws-cdk-lib/aws-iam";
+import { CompositePrincipal, ManagedPolicy, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import type { Construct } from "constructs";
-import type { CFLambdaParameters, CFOrigin, CFProps, DistributionProps, ElasticProps } from "./app-props.js";
+import type { CFLambdaParameters, CFOrigin, CFProps, DistributionProps } from "./app-props.js";
 import { createDistribution } from "./distribution-util.js";
 import { LambdaHolder } from "./lambda-holder.js";
+import { createOriginConfig } from "./origin-configs.js";
+import {
+    createHistoryPath,
+    createIndexHtml,
+    createRedirectFunction,
+    FunctionType
+} from "./util/function-creator.js";
 import {
     createGzipRequirement,
     createHttpHeaders,
@@ -29,10 +31,6 @@ import {
     createWeathercamRedirect,
     LambdaType
 } from "./util/lambda-creator.js";
-import { createOriginConfig } from "./origin-configs.js";
-import { createRealtimeLogging } from "./streaming-util.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { createHistoryPath, createIndexHtml, createRedirectFunction, FunctionType } from "./util/function-creator.js";
 
 type ViewerPolicyMap = Record<string, string>;
 
@@ -57,12 +55,12 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
-        const { distributions, lambdaParameters, bucketLogging, secretsArn } = cloudfrontProps;
+        const { distributions, lambdaParameters, bucketLogging, secretsArn, realtimeLogConfigArn } =
+            cloudfrontProps;
 
         this.validateDefaultBehaviors(distributions);
 
         const lambdaMap = this.createLambdaMap(distributions, lambdaParameters);
-        const realtimeLogConfigArn = this.getLogConfigArn(cloudfrontProps);
 
         distributions.forEach((distributionProps) =>
             this.createDistribution({
@@ -75,25 +73,6 @@ export class CloudfrontCdkStack extends Stack {
         );
 
         Aspects.of(this).add(new StackCheckingAspect());
-    }
-
-    getLogConfigArn(cloudfrontProps: CFProps): string {
-        if (cloudfrontProps.realtimeLogConfigArn) {
-            return cloudfrontProps.realtimeLogConfigArn;
-        }
-
-        if (!cloudfrontProps.elasticProps) {
-            throw new Error("ElasticProps missing from " + cloudfrontProps.elasticAppName);
-        }
-
-        const writeToESRole = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
-
-        return createRealtimeLogging(
-            this,
-            writeToESRole,
-            cloudfrontProps.elasticAppName,
-            cloudfrontProps.elasticProps
-        ).loggingConfig.attrArn;
     }
 
     validateDefaultBehaviors(props: DistributionProps[]): void {
@@ -113,40 +92,6 @@ export class CloudfrontCdkStack extends Stack {
         });
     }
 
-    createWriteToESRole(stack: Construct, elasticProps: ElasticProps): Role {
-        const lambdaRole = new Role(stack, "WriteToElasticRole", {
-            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: "WriteToElasticRole"
-        });
-        lambdaRole.addToPolicy(
-            new PolicyStatement({
-                actions: [
-                    "es:DescribeElasticsearchDomain",
-                    "es:DescribeElasticsearchDomains",
-                    "es:DescribeElasticsearchDomainConfig",
-                    "es:ESHttpPost",
-                    "es:ESHttpPut",
-                    "es:ESHttpGet"
-                ],
-                resources: [elasticProps.elasticArn, `${elasticProps.elasticArn}/*`]
-            })
-        );
-        lambdaRole.addToPolicy(
-            new PolicyStatement({
-                actions: [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents",
-                    "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams"
-                ],
-                resources: ["arn:aws:logs:*:*:*"]
-            })
-        );
-
-        return lambdaRole;
-    }
-
     findLambdaTypes(props: DistributionProps[]): LambdaTypes {
         const lambdaTypes = new Set<LambdaType>();
         const functionTypes = new Set<FunctionType>();
@@ -164,7 +109,7 @@ export class CloudfrontCdkStack extends Stack {
                     ipRestrictions.add(b.ipRestriction);
                 }
 
-                if(b.redirect) {
+                if (b.redirect) {
                     redirects.add(b.redirect);
                 }
             });
@@ -261,8 +206,8 @@ export class CloudfrontCdkStack extends Stack {
         const redirects = lParameters?.redirects;
 
         types.redirects.forEach((key) => {
-            if(redirects && redirects[key]) {
-                lambdaMap.addRedirect(key, createRedirectFunction(this, redirects[key]))
+            if (redirects && redirects[key]) {
+                lambdaMap.addRedirect(key, createRedirectFunction(this, redirects[key]));
             } else {
                 throw new Error("missing lambdaParameter redirect " + key);
             }

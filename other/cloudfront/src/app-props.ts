@@ -271,12 +271,6 @@ export interface DistributionProps {
     readonly disableShieldAdvanced?: boolean;
 }
 
-export interface ElasticProps {
-    readonly streamingProps: StreamingLogProps;
-    readonly elasticDomain: string;
-    readonly elasticArn: string;
-}
-
 export interface StreamingLogProps {
     readonly memorySize?: number;
     readonly batchSize?: number;
@@ -284,9 +278,7 @@ export interface StreamingLogProps {
 }
 
 export interface CFProps {
-    readonly realtimeLogConfigArn?: string; // remove optionality when centralized logging is default
-    readonly elasticProps?: ElasticProps;
-    readonly elasticAppName: string; // remove this when centralized logging is default
+    readonly realtimeLogConfigArn: string;
     readonly distributions: DistributionProps[];
     readonly secretsArn?: string;
     readonly lambdaParameters?: CFLambdaParameters;
