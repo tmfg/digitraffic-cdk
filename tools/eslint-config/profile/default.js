@@ -1,7 +1,7 @@
 module.exports = {
     extends: ["@rushstack/eslint-config/profile/node"],
     plugins: ["deprecation"],
-    ignorePatterns: ["*", "!src/", "!src/**", '*.d.ts'],
+    ignorePatterns: ["*", "!src/", "!src/**", "*.d.ts"],
     overrides: [
         {
             files: ["*.ts", "*.tsx"],
@@ -60,6 +60,16 @@ module.exports = {
                                 ].join("\n")
                             }
                         }
+                    }
+                ],
+                // Do not report unused vars for '_'
+                "@typescript-eslint/no-unused-vars": [
+                    "warn",
+                    {
+                        vars: "all",
+                        args: "none",
+                        caughtErrors: "none",
+                        varsIgnorePattern: "^_$"
                     }
                 ],
 

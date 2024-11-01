@@ -19,13 +19,21 @@ import type { ModelWithReference } from "@digitraffic/common/dist/aws/types/mode
 export class IntegrationOcpiApi {
     publicApi: DigitrafficRestApi;
     lambdaAuthorizer: RequestAuthorizer;
+    // @ts-ignore: TS2564
     ocpiResource: Resource;
+    // @ts-ignore: TS2564
     ocpiEmspResource: Resource;
+    // @ts-ignore: TS2564
     ocpiVersionsResource: Resource;
+    // @ts-ignore: TS2564
     ocpiV2_1_1_Resource: Resource;
+    // @ts-ignore: TS2564
     ocpiV2_1_1_CredentialsResource: Resource;
+    // @ts-ignore: TS2564
     ocpiVersionsResponseModel: ModelWithReference;
+    // @ts-ignore: TS2564
     ocpiV2_1_1VersionEndpointsResponseModel: ModelWithReference;
+    // @ts-ignore: TS2564
     ocpiV2_1_1CredentialsResponseModel: ModelWithReference;
 
     constructor(stack: DigitrafficStack) {
@@ -48,7 +56,7 @@ export class IntegrationOcpiApi {
 
         this.lambdaAuthorizer = this.createLambdaAuthorizer(stack, environment);
         this.createOcpiResources(this.publicApi);
-        this.createOcpiResourcesV2_1_1(this.publicApi);
+        this.createOcpiResourcesV2_1_1();
 
         this.createOcpiModels(this.publicApi);
         this.createOcpiModelsV2_1_1(this.publicApi);
@@ -70,7 +78,7 @@ export class IntegrationOcpiApi {
     // /ocpi/emsp/2.1.1/
     // Credentials module
     // /ocpi/emsp/2.1.1/credentials
-    createOcpiResourcesV2_1_1(publicApi: DigitrafficRestApi): void {
+    createOcpiResourcesV2_1_1(): void {
         this.ocpiV2_1_1_Resource = this.ocpiEmspResource.addResource(VERSION_2_1_1); // /ocpi/emsp/2.1.1/
         this.ocpiV2_1_1_CredentialsResource = this.ocpiV2_1_1_Resource.addResource(OCPI_MODULE_CREDENTIALS); // /ocpi/emsp/2.1.1/credentials
     }
