@@ -17,7 +17,7 @@ export class LamHistoryStack extends DigitrafficStack {
 
         // Create lambda
         // 'this' reference must be passed to all child resources to keep them tied to this stack
-        new InternalLambdas(this, bucket, appProps.logsDestinationArn);
+        new InternalLambdas(this, bucket);
     }
 
     private createBucket(): Bucket {

@@ -1,7 +1,6 @@
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { addDefaultValidator, addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import { type Resource, type RestApi } from "aws-cdk-lib/aws-apigateway";
@@ -118,13 +117,6 @@ function createUpdateRequestHandlerLambda(
     requests.addMethod("POST", new apigateway.LambdaIntegration(updateRequestsHandler), {
         apiKeyRequired: true
     });
-    // Create log subscription
-    createSubscription(
-        updateRequestsHandler,
-        updateRequestsHandler.givenName,
-        stackConfiguration.logsDestinationArn,
-        stack
-    );
 }
 
 function createLambdaRoleWithWriteToSqsAndS3Policy(

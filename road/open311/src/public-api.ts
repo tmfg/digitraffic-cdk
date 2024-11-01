@@ -1,29 +1,28 @@
 import apigateway = require("aws-cdk-lib/aws-apigateway");
-import type * as lambda from "aws-cdk-lib/aws-lambda";
 import { EndpointType } from "aws-cdk-lib/aws-apigateway";
+import type * as lambda from "aws-cdk-lib/aws-lambda";
 
-import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
+import { addTags } from "@digitraffic/common/dist/aws/infra/documentation";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";
 import {
     addDefaultValidator,
     addServiceModel,
     createArraySchema
 } from "@digitraffic/common/dist/utils/api-model";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
-import { addTags } from "@digitraffic/common/dist/aws/infra/documentation";
-import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
-import { default as ServiceSchema } from "./model/service-schema.js";
+import type { Open311Props } from "./app-props.js";
 import { default as RequestSchema } from "./model/request-schema.js";
+import { default as ServiceSchema } from "./model/service-schema.js";
 import { default as StateSchema } from "./model/state-schema.js";
 import { default as SubjectSchema } from "./model/subject-schema.js";
 import { default as SubSubjectSchema } from "./model/subsubject-schema.js";
-import type { Open311Props } from "./app-props.js";
 
 export function create(stack: DigitrafficStack, props: Open311Props): void {
     const publicApi = createApi(stack, props.allowFromIpAddresses);
@@ -55,19 +54,17 @@ export function create(stack: DigitrafficStack, props: Open311Props): void {
 
     createRequestsResource(
         open311Resource,
-        props,
         requestModel,
         requestsModel,
         messageResponseModel,
         validator,
         stack
     );
-    createStatesResource(open311Resource, props, stateModel, messageResponseModel, stack);
-    createSubjectsResource(open311Resource, props, subjectModel, messageResponseModel, stack);
-    createSubSubjectsResource(open311Resource, props, subSubjectModel, messageResponseModel, stack);
+    createStatesResource(open311Resource, stateModel, messageResponseModel, stack);
+    createSubjectsResource(open311Resource, subjectModel, messageResponseModel, stack);
+    createSubSubjectsResource(open311Resource, subSubjectModel, messageResponseModel, stack);
     createServicesResource(
         open311Resource,
-        props,
         serviceModel,
         servicesModel,
         messageResponseModel,
@@ -78,7 +75,6 @@ export function create(stack: DigitrafficStack, props: Open311Props): void {
 
 function createRequestsResource(
     open311Resource: apigateway.Resource,
-    props: Open311Props,
     requestModel: apigateway.Model,
     requestsModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
@@ -89,12 +85,10 @@ function createRequestsResource(
 
     const getRequestsId = "Open311-GetRequests";
     const getRequestsHandler = MonitoredDBFunction.create(stack, getRequestsId);
-    createSubscription(getRequestsHandler, getRequestsId, props.logsDestinationArn, stack);
     createGetRequestsIntegration(requests, getRequestsHandler, requestsModel, messageResponseModel, stack);
 
     const getRequestId = "Open311-GetRequest";
     const getRequestHandler = MonitoredDBFunction.create(stack, getRequestId);
-    createSubscription(getRequestHandler, getRequestId, props.logsDestinationArn, stack);
     createGetRequestIntegration(
         requests,
         getRequestHandler,
@@ -176,7 +170,6 @@ function createGetRequestsIntegration(
 
 function createStatesResource(
     open311Resource: apigateway.Resource,
-    props: Open311Props,
     stateModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
@@ -185,7 +178,6 @@ function createStatesResource(
 
     const getStatesId = "Open311-GetStates";
     const getStatesHandler = MonitoredDBFunction.create(stack, getStatesId);
-    createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetStates",
         states,
@@ -198,7 +190,6 @@ function createStatesResource(
 
 function createSubjectsResource(
     open311Resource: apigateway.Resource,
-    props: Open311Props,
     subjectModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
@@ -206,7 +197,6 @@ function createSubjectsResource(
     const subjects = open311Resource.addResource("subjects");
     const getSubjectsId = "Open311-GetSubjects";
     const getSubjectsHandler = MonitoredDBFunction.create(stack, getSubjectsId);
-    createSubscription(getSubjectsHandler, getSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetSubjects",
         subjects,
@@ -219,7 +209,6 @@ function createSubjectsResource(
 
 function createSubSubjectsResource(
     open311Resource: apigateway.Resource,
-    props: Open311Props,
     subSubjectModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     stack: DigitrafficStack
@@ -227,7 +216,6 @@ function createSubSubjectsResource(
     const subSubjects = open311Resource.addResource("subsubjects");
     const getSubSubjectsId = "Open311-GetSubSubjects";
     const getSubSubjectsHandler = MonitoredDBFunction.create(stack, getSubSubjectsId);
-    createSubscription(getSubSubjectsHandler, getSubSubjectsId, props.logsDestinationArn, stack);
     createGetLocalizedResourceIntegration(
         "GetSubSubjects",
         subSubjects,
@@ -240,7 +228,6 @@ function createSubSubjectsResource(
 
 function createServicesResource(
     open311Resource: apigateway.Resource,
-    props: Open311Props,
     serviceModel: apigateway.Model,
     servicesModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
@@ -251,7 +238,6 @@ function createServicesResource(
 
     const getServicesId = "Open311-GetServices";
     const getServicesHandler = MonitoredDBFunction.create(stack, getServicesId);
-    createSubscription(getServicesHandler, getServicesId, props.logsDestinationArn, stack);
     createGetResourcesIntegration(
         services,
         getServicesHandler,
@@ -263,7 +249,6 @@ function createServicesResource(
 
     const getServiceId = "Open311-GetService";
     const getServiceHandler = MonitoredDBFunction.create(stack, getServiceId);
-    createSubscription(getServiceHandler, getServiceId, props.logsDestinationArn, stack);
     createGetServiceIntegration(
         services,
         getServiceHandler,

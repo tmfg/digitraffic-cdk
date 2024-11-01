@@ -1,12 +1,11 @@
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
 import { LamHistoryEnvKeys } from "./keys.js";
 
 export class InternalLambdas {
-    constructor(stack: DigitrafficStack, bucket: Bucket, logsDestinationArn: string | undefined) {
+    constructor(stack: DigitrafficStack, bucket: Bucket) {
         const updateDataLambda = createDataUpdateLambda(stack, bucket.bucketName);
 
         // Allow lambda to read from secrets manager
@@ -17,11 +16,6 @@ export class InternalLambdas {
 
         // Run once a day
         Scheduler.everyDay(stack, "LamHistoryUpdateRule", updateDataLambda);
-
-        // Create log subscription
-        if (logsDestinationArn) {
-            createSubscription(updateDataLambda, updateDataLambda.givenName, logsDestinationArn, stack);
-        }
     }
 }
 

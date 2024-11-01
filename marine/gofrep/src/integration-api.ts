@@ -1,3 +1,21 @@
+import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import {
+    defaultIntegration,
+    getResponse,
+    RESPONSE_200_OK,
+    RESPONSE_400_BAD_REQUEST,
+    RESPONSE_500_SERVER_ERROR
+} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import {
+    add404Support,
+    createDefaultPolicyDocument
+} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import {
     EndpointType,
     type IModel,
@@ -8,27 +26,8 @@ import {
     RestApi
 } from "aws-cdk-lib/aws-apigateway";
 import type { Construct } from "constructs";
-import {
-    add404Support,
-    createDefaultPolicyDocument
-} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { FormalityResponseJson } from "./model/formality.js";
-import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import {
-    defaultIntegration,
-    getResponse,
-    RESPONSE_200_OK,
-    RESPONSE_400_BAD_REQUEST,
-    RESPONSE_500_SERVER_ERROR
-} from "@digitraffic/common/dist/aws/infra/api/responses";
-import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { MessageModel, DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { EpcMessageSchema } from "./model/epcmessage_schema.js";
+import { FormalityResponseJson } from "./model/formality.js";
 
 export function create(stack: DigitrafficStack, apikey: string): void {
     const api = createRestApi(stack, "GOFREP-Public", "GOFREP public API");
@@ -103,7 +102,6 @@ function createReceiveMrsReportResource(
             timeout: 10
         })
     );
-    createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
 
     // eslint-disable-next-line deprecation/deprecation
     const integration = defaultIntegration(handler, {
