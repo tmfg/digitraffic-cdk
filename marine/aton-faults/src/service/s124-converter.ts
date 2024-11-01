@@ -1,4 +1,4 @@
-import { format, formatInTimeZone } from "date-fns-tz";
+import { format } from "date-fns";
 import type { DbFault } from "../model/fault.js";
 import type { Feature, Geometry } from "geojson";
 import * as wkx from "wkx";
@@ -13,6 +13,7 @@ import type {
 } from "../model/dataset.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { WarningFeatureProperties } from "../model/warnings.js";
+import { TZDate } from "@date-fns/tz";
 
 const YEAR_MONTH_DAY = "yyyy-MM-dd";
 const HOUR_MINUTE_SECOND = "HH:MM:SSXXX";
@@ -190,8 +191,8 @@ function createFixedDateRangeForWarning(p: WarningFeatureProperties): S124FixedD
         const vet = new Date(p.validityEndTime);
 
         return {
-            timeOfDayStart: formatInTimeZone(vst, "UTC", HOUR_MINUTE_SECOND),
-            timeOfDayEnd: formatInTimeZone(vet, "UTC", HOUR_MINUTE_SECOND),
+            timeOfDayStart: format(new TZDate(vst, "UTC"), HOUR_MINUTE_SECOND),
+            timeOfDayEnd: format(new TZDate(vet, "UTC"), HOUR_MINUTE_SECOND),
             dateStart: {
                 date: format(vst, YEAR_MONTH_DAY)
             },
@@ -202,7 +203,7 @@ function createFixedDateRangeForWarning(p: WarningFeatureProperties): S124FixedD
     }
 
     return {
-        timeOfDayStart: formatInTimeZone(vst, "UTC", HOUR_MINUTE_SECOND),
+        timeOfDayStart: format(new TZDate(vst, "UTC"), HOUR_MINUTE_SECOND),
         dateStart: {
             date: format(vst, YEAR_MONTH_DAY)
         }
@@ -222,7 +223,7 @@ function createFixedDateRangeForFault(fault: DbFault): S124FixedDateRange {
     }
 
     return {
-        timeOfDayStart: formatInTimeZone(new Date(fault.entry_timestamp), "UTC", HOUR_MINUTE_SECOND),
+        timeOfDayStart: format(new TZDate(fault.entry_timestamp, "UTC"), HOUR_MINUTE_SECOND),
         dateStart: {
             date: format(new Date(fault.entry_timestamp), YEAR_MONTH_DAY)
         }

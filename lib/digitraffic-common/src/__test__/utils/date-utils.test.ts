@@ -25,10 +25,17 @@ describe("CommonDateUtilsTest", () => {
         expect(CommonDateUtils.countDiffInSeconds(start, end)).toEqual(1234);
     });
 
-    test("dateFromIsoString", () => {
+    test("dateToUTCString - preserves UTC from parsed string", () => {
         const date = parseISO("2023-01-01T00:00Z");
         expect(CommonDateUtils.dateToUTCString(date, CommonDateUtils.MYSQL_DATETIME_FORMAT)).toEqual(
             "2023-01-01 00:00",
+        );
+    });
+
+    test("dateToUTCString - +02:00 to UTC from parsed string", () => {
+        const date = parseISO("2023-01-01T00:00+02:00");
+        expect(CommonDateUtils.dateToUTCString(date, CommonDateUtils.MYSQL_DATETIME_FORMAT)).toEqual(
+            "2022-12-31 22:00",
         );
     });
 });

@@ -31,11 +31,10 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.7.8-1",
+    "@digitraffic/common": "2024.10.25-1",
     "aws-cdk-lib": "^2.162.0",
     "constructs": "~10.3.1",
-    "date-fns": "~3.6.0",
-    "date-fns-tz": "~3.2.0",
+    "date-fns": "~4.1.0",
     "geojson": "^0.5.0",
     "geojson-validation": "^1.0.2",
     "ky": "^1.7.2",

@@ -1,4 +1,5 @@
-import { formatInTimeZone } from "date-fns-tz";
+import { TZDate } from "@date-fns/tz";
+import { format } from "date-fns";
 
 /**
  * Constant for the 1970-01-01T00:00:00Z epoch Date.
@@ -46,6 +47,6 @@ function isValidDate(d: unknown): d is Date {
 /**
  * Formats a date in UTC in the given format, regardless of system time zone
  */
-export function dateToUTCString(date: Date, format: string): string {
-    return formatInTimeZone(date, UTC, format);
+export function dateToUTCString(date: Date, formatString: string): string {
+    return format(new TZDate(date, UTC), formatString);
 }

@@ -3,8 +3,9 @@ import type { ActiveMaintenance, CStateStatus, PinnedIssue } from "../api/cstate
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { jest } from "@jest/globals";
-import { formatInTimeZone } from "date-fns-tz";
 import { StatusEnvKeys } from "../keys.js";
+import { format } from "date-fns";
+import { TZDate } from "@date-fns/tz";
 
 const SERVER_PORT = 8091 as const;
 export const C_STATE_PAGE_URL = `http://localhost:${SERVER_PORT}`;
@@ -146,7 +147,7 @@ function toISOStringWOZ(date: Date): string {
 // cState uses utc iso strings without zone and T in content files
 // and "2024-02-20 08:36:51.671186 +0000 UTC" in jsons
 function toCStateJsonDateTimeFormat(date: Date): string {
-    return formatInTimeZone(date, "UTC", C_STATE_JSON_DATE_FORMAT);
+    return format(new TZDate(date, "UTC"), C_STATE_JSON_DATE_FORMAT);
 }
 
 export function emptySecretHolder(): SecretHolder<UpdateStatusSecret> {

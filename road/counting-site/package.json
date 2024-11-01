@@ -28,7 +28,7 @@
     "aws-cdk-lib": "^2.162.0",
     "constructs": "~10.3.1",
     "csv-writer": "^1.6.0",
-    "date-fns": "~3.6.0",
+    "date-fns": "~4.1.0",
     "geojson": "^0.5.0",
     "geojson-validation": "^1.0.2",
     "ky": "^1.7.2",
