@@ -30,7 +30,6 @@ export interface MonitoredApp {
 
 export interface Props {
     readonly defaultLambdaDurationSeconds: number;
-    readonly logsDestinationArn: string;
     readonly secretId: string;
     readonly nodePingTimeoutSeconds: number;
     readonly nodePingCheckInterval: number;

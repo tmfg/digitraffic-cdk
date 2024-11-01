@@ -1,29 +1,26 @@
-import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
-import { Duration, type Stack } from "aws-cdk-lib";
 import {
     defaultLambdaConfiguration,
     type LambdaEnvironment
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import {
-    createSubscription,
-    DigitrafficLogSubscriptions
-} from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import type { Topic } from "aws-cdk-lib/aws-sns";
-import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import type { VoyagePlanGatewayProps } from "./app-props.js";
-import { VoyagePlanEnvKeys } from "./keys.js";
-import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import { Duration, type Stack } from "aws-cdk-lib";
 import { ComparisonOperator, TreatMissingData } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
+import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import type { Topic } from "aws-cdk-lib/aws-sns";
+import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
+import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
+import type { VoyagePlanGatewayProps } from "./app-props.js";
+import { VoyagePlanEnvKeys } from "./keys.js";
 
 export function create(
     secret: ISecret,
@@ -109,7 +106,6 @@ function createProcessVisMessagesLambda(
     secret.grantRead(lambda);
     notifyTopic.addSubscription(new LambdaSubscription(lambda));
     sendRouteQueue.grantSendMessages(lambda);
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 
     return lambda;
 }
@@ -173,7 +169,6 @@ function createProcessDLQLambda(
     });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
-    createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
 
     const statement = new PolicyStatement();
     statement.addActions("s3:PutObject");
