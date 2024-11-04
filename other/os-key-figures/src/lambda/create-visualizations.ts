@@ -30,6 +30,8 @@ const conn = mysql.createConnection(mysqlOpts);
 
 const query = util.promisify(conn.query).bind(conn);
 
+const BUCKET_NAME = getEnvVariable("BUCKET_NAME");
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createGraph(id: string, otsikko: string, data: any): string {
     return `
@@ -417,7 +419,7 @@ export async function handler(): Promise<boolean> {
     const filters = (await query("select distinct filter from key_figures")) as { filter: string }[];
     logger.info({ message: filters.toString(), method: "create-visualizations.handler" });
 
-    const bucketName = "eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw";
+    const bucketName = BUCKET_NAME;
     await uploadToS3(s3, bucketName, await createIndex(), `index.html`, undefined, "text/html");
 
     for (const row of filters) {

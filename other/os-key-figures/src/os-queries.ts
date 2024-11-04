@@ -1,4 +1,8 @@
-export const esQueries = [
+/* prettier-ignore */
+
+// OpenSearch queries
+// the json keys of queries are intentionally left quoted - easier to copy and paste for testing in the UI
+export const osQueries = [
     {
         name: 'Http req',
         query:
@@ -7,7 +11,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -18,7 +22,12 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -35,7 +44,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:* AND @fields.status:200",
+                                "query": "NOT log_line:* AND accountName.keyword:* AND httpStatusCode:200",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -46,7 +55,12 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }                 
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
@@ -59,12 +73,12 @@ export const esQueries = [
         name: 'Bytes out',
         query:
             {
-                "aggs": {"agg": {"sum": {"field": "@fields.body_bytes_sent"}}},
+                "aggs": {"agg": {"sum": {"field": "bytes"}}},
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -75,12 +89,18 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'agg',
     },
@@ -88,12 +108,12 @@ export const esQueries = [
         name: 'Unique IPs',
         query:
             {
-                "aggs": {"agg": {"cardinality": {"field": "@fields.remote_addr.keyword"}}},
+                "aggs": {"agg": {"cardinality": {"field": "clientIp"}}},
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -104,12 +124,18 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'agg',
     },
@@ -120,7 +146,7 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_referrer.keyword",
+                            "field": "httpReferrer.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
                             "size": 10
@@ -131,7 +157,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -142,12 +168,18 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
@@ -158,7 +190,7 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_digitraffic_user.keyword",
+                            "field": "httpDigitrafficUser.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
                             "size": 100
@@ -169,7 +201,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -180,12 +212,18 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
@@ -196,18 +234,18 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_digitraffic_user.keyword",
+                            "field": "httpDigitrafficUser.keyword",
                             "order": {"agg": "desc"},
                             "missing": "__missing__",
                             "size": 100
-                        }, "aggs": {"agg": {"sum": {"field": "@fields.body_bytes_sent"}}}
+                        }, "aggs": {"agg": {"sum": {"field": "bytes"}}}
                     }
                 },
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -218,12 +256,18 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'sub_agg',
     },
@@ -234,7 +278,7 @@ export const esQueries = [
                 "aggs": {
                     "agg": {
                         "terms": {
-                            "field": "@fields.http_user_agent.keyword",
+                            "field": "agent.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
                             "size": 10
@@ -245,7 +289,7 @@ export const esQueries = [
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -256,12 +300,18 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
@@ -269,12 +319,12 @@ export const esQueries = [
         name: 'Top 10 IPs',
         query:
             {
-                "aggs": {"agg": {"terms": {"field": "@fields.remote_addr.keyword", "size": 10}}},
+                "aggs": {"agg": {"terms": {"field": "clientIp", "size": 10}}},
                 "query": {
                     "bool": {
                         "must": [{
                             "query_string": {
-                                "query": "NOT log_line:* AND @transport_type:*",
+                                "query": "NOT log_line:* AND accountName.keyword:*",
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
@@ -285,12 +335,18 @@ export const esQueries = [
                                     "term": {
                                         "skip_statistics": true
                                     }
-                                }
+                                },
+                                {
+                                    "wildcard": {
+                                        "httpHost": "*.integration.digitraffic.fi"
+                                    }
+                                }      
                             ]
                         ,
                         "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
-                }
+                },
+                "size": 0
             },
         type: 'field_agg',
     },
