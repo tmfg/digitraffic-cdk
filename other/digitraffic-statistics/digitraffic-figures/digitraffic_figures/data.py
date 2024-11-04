@@ -1,10 +1,8 @@
-import os
-import time
-
-import pandas as pd
-import numpy as np
-
 import digitraffic_figures.secret_manager as secret_manager
+import numpy as np
+import os
+import pandas as pd
+import time
 from sqlalchemy import create_engine, text
 
 TEBI = pow(1024, 4)
@@ -110,7 +108,7 @@ def fetch_data_from_database(logger):
 
     secret["database"] = os.getenv("DB_DATABASE")
 
-    url = "mysql+pymysql://{username}:{password}@{host}:{port}/{database}".format(
+    url = "mysql+pymysql://{username}:{password}@{endpoint}:3306/{database}".format(
         **secret
     )
     engine = create_engine(url)
@@ -121,7 +119,7 @@ def fetch_data_from_database(logger):
         )
 
     logger.info(
-        f"method=data.fetch_data_from_database took={time.time()-start} mesasage=read data from database"
+        f"method=data.fetch_data_from_database took={time.time() - start} mesasage=read data from database"
     )
 
     return df
@@ -149,6 +147,6 @@ def create_dataframe(logger=None):
 
     df = make_adjustments(df)
 
-    logger.info(f"method=data.create_dataframe took={time.time()-start}")
+    logger.info(f"method=data.create_dataframe took={time.time() - start}")
 
     return df
