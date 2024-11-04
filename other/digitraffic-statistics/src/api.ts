@@ -12,7 +12,6 @@ export class StatisticsApi {
 
         this.createDigitrafficApiStatisticsEndPoint(this.restApi, integrations.apiStatisticsS3Integration);
         this.createDigitrafficMonthlyEndpoint(this.restApi, integrations.digitrafficMonthlyLambdaIntegration);
-        this.createKibanaRedirectEndpoint(this.restApi, integrations.kibanaRedirectLambdaIntegration);
     }
 
     private createRestApi(stack: DigitrafficStatisticsStack): RestApi {
@@ -28,7 +27,7 @@ export class StatisticsApi {
     private createDigitrafficApiStatisticsEndPoint(
         restApi: RestApi,
         apiStatisticsS3Integration: AwsIntegration
-    ) {
+    ): void {
         restApi.root
             .addResource("digitraffic-api-statistics")
             .addResource("{key}")
@@ -50,7 +49,7 @@ export class StatisticsApi {
     private createDigitrafficMonthlyEndpoint(
         restApi: RestApi,
         digitrafficMonthlyLambdaIntegration: LambdaIntegration
-    ) {
+    ): void {
         const digitrafficMonthly = restApi.root.addResource("digitraffic-monthly", {
             defaultIntegration: digitrafficMonthlyLambdaIntegration
         });
@@ -59,26 +58,6 @@ export class StatisticsApi {
             anyMethod: true
         });
         digitrafficMonthly.addMethod("GET");
-    }
-
-    private createKibanaRedirectEndpoint(
-        restApi: RestApi,
-        kibanaRedirectLambdaIntegration: LambdaIntegration
-    ) {
-        const kibanaRedirect = restApi.root.addResource("kibana", {
-            defaultIntegration: kibanaRedirectLambdaIntegration
-        });
-
-        kibanaRedirect.addMethod("GET", kibanaRedirectLambdaIntegration, {
-            methodResponses: [
-                {
-                    statusCode: "301",
-                    responseParameters: {
-                        "method.response.header.Location": true
-                    }
-                }
-            ]
-        });
     }
 
     private createApiIpRestrictionPolicy(allowedIpAddresses: string[]): iam.PolicyDocument {

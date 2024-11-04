@@ -8,7 +8,7 @@ import { StatisticsApi } from "./api.js";
 import cdk = require("aws-cdk-lib");
 
 interface DigitrafficStatisticsProps {
-    readonly vpcName: string;
+    readonly vpcId: string;
     readonly dbSecretArn: string;
     readonly certificateArn: string;
     readonly visualizationsBucketArn: string;
@@ -23,9 +23,6 @@ interface DigitrafficStatisticsProps {
         readonly DB_DATABASE: string;
         readonly DB_SECRET_ARN: string;
         readonly SECRET: string;
-    };
-    readonly kibanaLambdaEnv: {
-        readonly KIBANA_URL: string;
     };
 }
 
@@ -48,7 +45,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
         this.setupStatisticsDomain(this, statisticsApi);
     }
 
-    private setupStatisticsDomain(stack: DigitrafficStatisticsStack, statisticsApi: StatisticsApi) {
+    private setupStatisticsDomain(stack: DigitrafficStatisticsStack, statisticsApi: StatisticsApi): void {
         const domainName = stack.statisticsProps.domainName;
         const apigwDomainName = new apigw.DomainName(this, "domain", {
             domainName: domainName,

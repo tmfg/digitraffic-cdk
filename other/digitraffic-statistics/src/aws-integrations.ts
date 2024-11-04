@@ -1,14 +1,13 @@
 import { AwsIntegration, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
+import type { IBucket } from "aws-cdk-lib/aws-s3";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import type { DigitrafficStatisticsStack } from "./digitraffic-statistics-stack.js";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import path from "path";
+import path, { dirname } from "path";
 import { Duration } from "aws-cdk-lib";
-import type { IBucket } from "aws-cdk-lib/aws-s3";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { type IVpc, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,11 +15,10 @@ const __dirname = dirname(__filename);
 export class StatisticsIntegrations {
     readonly apiStatisticsS3Integration: AwsIntegration;
     readonly digitrafficMonthlyLambdaIntegration: LambdaIntegration;
-    readonly kibanaRedirectLambdaIntegration: LambdaIntegration;
 
     constructor(stack: DigitrafficStatisticsStack) {
-        const vpc = Vpc.fromLookup(stack, "EsKeyFiguresVPC", {
-            vpcName: stack.statisticsProps.vpcName
+        const vpc = Vpc.fromLookup(stack, "OsKeyFiguresVPC", {
+            vpcId: stack.statisticsProps.vpcId
         });
 
         const digitrafficMonthlySg = new SecurityGroup(stack, "digitraffic-monthly-sg", {
@@ -37,13 +35,12 @@ export class StatisticsIntegrations {
             vpc,
             digitrafficMonthlySg
         );
-        this.kibanaRedirectLambdaIntegration = this.createKibanaRedirectLambdaIntegration(stack);
     }
 
-    private createDbAccessIngressRule(stack: DigitrafficStatisticsStack, sg: SecurityGroup) {
+    private createDbAccessIngressRule(stack: DigitrafficStatisticsStack, sg: SecurityGroup): void {
         const rdsEsKeyFiguresSg = SecurityGroup.fromLookupById(
             stack,
-            "es-key-figures-sg",
+            "os-key-figures-sg",
             stack.statisticsProps.rdsSgId
         );
         rdsEsKeyFiguresSg.addIngressRule(Peer.securityGroupId(sg.securityGroupId), Port.tcp(3306));
@@ -69,16 +66,6 @@ export class StatisticsIntegrations {
         return new LambdaIntegration(digitrafficMonthlyFunction, {
             proxy: true
         });
-    }
-
-    private createKibanaRedirectLambdaIntegration(stack: DigitrafficStatisticsStack) {
-        const kibanaRedirectFunction = new lambda.Function(stack, "kibana-redirect", {
-            runtime: lambda.Runtime.NODEJS_20_X,
-            handler: "kibana-redirect.handler",
-            code: lambda.Code.fromAsset(path.join(__dirname, "/lambda")),
-            environment: stack.statisticsProps.kibanaLambdaEnv
-        });
-        return new LambdaIntegration(kibanaRedirectFunction);
     }
 
     private createApiStatisticsS3Integration(stack: DigitrafficStatisticsStack): AwsIntegration {
