@@ -4,7 +4,6 @@ import {
     MonitoredFunction
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { type Bucket } from "aws-cdk-lib/aws-s3";
@@ -35,7 +34,7 @@ export function createProcessQueueAndDlqLambda(
     stack: DigitrafficStack
 ): void {
     createProcessQueueLambda(queueAndDLQ.queue, sqsExtendedMessageBucketArn, stackConfiguration, stack);
-    createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stackConfiguration, stack);
+    createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stack);
 }
 
 function createProcessQueueLambda(
@@ -66,20 +65,9 @@ function createProcessQueueLambda(
         })
     );
     secret?.grantRead(processQueueLambda);
-    createSubscription(
-        processQueueLambda,
-        processQueueLambda.givenName,
-        stackConfiguration.logsDestinationArn,
-        stack
-    );
 }
 
-function createProcessDLQLambda(
-    dlqBucket: Bucket,
-    dlq: Queue,
-    stackConfiguration: MaintenanceTrackingStackConfiguration,
-    stack: DigitrafficStack
-): void {
+function createProcessDLQLambda(dlqBucket: Bucket, dlq: Queue, stack: DigitrafficStack): void {
     const lambdaEnv = stack.createLambdaEnvironment();
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME] = dlqBucket.bucketName;
 
@@ -90,13 +78,6 @@ function createProcessDLQLambda(
     });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
-
-    createSubscription(
-        processDLQLambda,
-        processDLQLambda.givenName,
-        stackConfiguration.logsDestinationArn,
-        stack
-    );
 
     const statement = new PolicyStatement();
     statement.addActions("s3:PutObject");

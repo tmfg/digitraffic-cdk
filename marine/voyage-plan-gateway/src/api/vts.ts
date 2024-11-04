@@ -1,4 +1,4 @@
-import axios from "axios";
+import ky from "ky";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -11,16 +11,17 @@ export class VtsApi {
 
     async sendVoyagePlan(voyagePlan: string): Promise<void> {
         const start = Date.now();
-        const resp = await axios.post(this.url, voyagePlan, {
+        const response = await ky.post(this.url, {
             headers: {
                 "Content-Type": MediaType.APPLICATION_XML
-            }
+            },
+            body: voyagePlan
         });
-        if (resp.status !== 200) {
+        if (!response.ok) {
             logger.error({
                 method: "VtsApi.uploadArea",
-                customStatus: resp.status,
-                message: "status text: " + resp.statusText
+                customStatus: response.status,
+                message: "status text: " + response.statusText
             });
 
             throw new Error("Failed to send voyage plan to VTS");

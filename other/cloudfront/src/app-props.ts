@@ -1,7 +1,8 @@
 import { Duration } from "aws-cdk-lib";
 import { CloudFrontAllowedMethods, OriginProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
 import type { WafRules } from "./acl/waf-rules.js";
-import { FunctionType, LambdaType } from "./lambda/lambda-creator.js";
+import { LambdaType } from "./util/lambda-creator.js";
+import { FunctionType } from "./util/function-creator.js";
 
 export class CFBehavior {
     readonly path: string;
@@ -16,6 +17,7 @@ export class CFBehavior {
     readonly functionTypes: Set<FunctionType> = new Set<FunctionType>();
 
     ipRestriction: string;
+    redirect: string;
 
     constructor(path: string) {
         this.path = path;
@@ -73,6 +75,12 @@ export class CFBehavior {
 
     public httpOnly(): this {
         this.viewerProtocolPolicy = "http-only";
+
+        return this;
+    }
+
+    public withRedirect(name: string): this {
+        this.redirect = name;
 
         return this;
     }
@@ -150,8 +158,8 @@ export class CFDomain extends CFOrigin {
         this.responseTimeout = Duration.seconds(30);
     }
 
-    static passAllDomain(domainName: string, path: string = "*"): CFDomain {
-        return new CFDomain(domainName, CFBehavior.passAll(path));
+    static redirect(parameterName: string = "root"): CFDomain {
+        return new CFDomain("www.digitraffic.fi", CFBehavior.passAll("*").withRedirect(parameterName));
     }
 
     static apiGateway(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
@@ -263,12 +271,6 @@ export interface DistributionProps {
     readonly disableShieldAdvanced?: boolean;
 }
 
-export interface ElasticProps {
-    readonly streamingProps: StreamingLogProps;
-    readonly elasticDomain: string;
-    readonly elasticArn: string;
-}
-
 export interface StreamingLogProps {
     readonly memorySize?: number;
     readonly batchSize?: number;
@@ -276,9 +278,7 @@ export interface StreamingLogProps {
 }
 
 export interface CFProps {
-    readonly realtimeLogConfigArn?: string; // remove optionality when centralized logging is default
-    readonly elasticProps?: ElasticProps;
-    readonly elasticAppName: string; // remove this when centralized logging is default
+    readonly realtimeLogConfigArn: string;
     readonly distributions: DistributionProps[];
     readonly secretsArn?: string;
     readonly lambdaParameters?: CFLambdaParameters;
@@ -293,5 +293,6 @@ export interface CFLambdaParameters {
     readonly weathercamDomainName?: string;
     readonly weathercamHostName?: string;
     readonly ipRestrictions?: Record<string, string>;
+    readonly redirects?: Record<string, string>;
     readonly smRef?: string;
 }

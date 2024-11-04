@@ -9,6 +9,13 @@ import queryStringHelper from "querystring";
 import { createAndLogError } from "../lambda-util.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
+export const HEADERS = {
+    CONTENT_DISPOSITION: "Content-Disposition",
+    CONTENT_TYPE: "Content-Type",
+    REMAPPED_HOST: "x-amzn-remapped-host",
+    X_API_KEY: "x-api-key"
+} as const;
+
 /*
     This is an edge lambda that should be run at cloudfront at viewer response event.
     It adds CORS headers to a response.
@@ -30,35 +37,30 @@ export const handler: CloudFrontResponseHandler = (
             callback(err);
             throw err;
         }
-        const request = record.cf.request;
-        const response = record.cf.response;
-
+        const { request, response } = record.cf;
         const { headers } = response;
 
-        const headerContentDisp = "Content-Disposition";
-        const headerContentType = "Content-Type";
-
-        if (Utils.hasOwnPropertySafe(headers, "x-amzn-remapped-host")) {
+        if (Utils.hasOwnPropertySafe(headers, HEADERS.REMAPPED_HOST)) {
             // Create filename
             const filename = createFilename(request);
 
-            headers[headerContentDisp.toLowerCase()] = [
+            headers[HEADERS.CONTENT_DISPOSITION.toLowerCase()] = [
                 {
-                    key: headerContentDisp,
+                    key: HEADERS.CONTENT_DISPOSITION,
                     value: 'attachment; filename="' + filename + '"'
                 }
             ];
 
-            headers[headerContentType.toLowerCase()] = [
+            headers[HEADERS.CONTENT_TYPE.toLowerCase()] = [
                 {
-                    key: headerContentType,
+                    key: HEADERS.CONTENT_TYPE,
                     value: "text/csv; charset=utf-8"
                 }
             ];
         }
 
         // Delete apikey that SnowFlake is returning for some reason
-        delete headers["x-api-key"];
+        delete headers[HEADERS.X_API_KEY];
         delete headers["x-amzn-remapped-x-forwarded-for"];
         delete headers["x-amzn-remapped-host"];
 
@@ -80,9 +82,13 @@ export const handler: CloudFrontResponseHandler = (
 function createFilename(
     request: Omit<CloudFrontRequest, "body" | "headers" | "method" | "origin" | "clientIp">
 ): string {
+    // eslint-disable-next-line dot-notation
     const type = request["uri"].substring(1); // ie. uri=/liikennemaara
+    // eslint-disable-next-line dot-notation
     const params = queryStringHelper.parse(request["querystring"]); // ie. tyyppi=h&pvm=2023-03-01&loppu=&lam_type=option1&piste=1
+    // eslint-disable-next-line dot-notation
     const subType = typeof params["tyyppi"] === "string" ? params["tyyppi"] : ""; // ie. v (vuosi), h (tunti), vrk (vuorokausi), ...
+    // eslint-disable-next-line dot-notation
     const dateOrWeek = getDateOrWeek(params["pvm"], params["viikko"]); // One of these should always exist
     return `${type}_${subType}_${dateOrWeek}.csv`;
 }

@@ -1,11 +1,9 @@
-import * as events from "aws-cdk-lib/aws-events";
-import type * as lambda from "aws-cdk-lib/aws-lambda";
-import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { Duration } from "aws-cdk-lib";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import type { Open311Props } from "./app-props.js";
+import { Duration } from "aws-cdk-lib";
+import * as events from "aws-cdk-lib/aws-events";
+import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
+import type * as lambda from "aws-cdk-lib/aws-lambda";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type IntegrationEnv = {
@@ -14,7 +12,7 @@ type IntegrationEnv = {
     ENDPOINT_URL: string;
 };
 // returns lambda names for log group subscriptions
-export function create(stack: DigitrafficStack, props: Open311Props): void {
+export function create(stack: DigitrafficStack): void {
     const integrationEnvVars: IntegrationEnv = {
         ENDPOINT_USER: stack.getSecret().secretValueFromJson("open311.integration.username").unsafeUnwrap(),
         ENDPOINT_PASS: stack
@@ -24,10 +22,10 @@ export function create(stack: DigitrafficStack, props: Open311Props): void {
         ENDPOINT_URL: stack.getSecret().secretValueFromJson("open311.integration.endpoint_url").unsafeUnwrap()
     };
 
-    const updateServicesLambda = createUpdateServicesLambda(props, integrationEnvVars, stack);
-    const updateStatesLambda = createUpdateStatesLambda(props, integrationEnvVars, stack);
-    const updateSubjectsLambda = createUpdateSubjectsLambda(props, integrationEnvVars, stack);
-    const updateSubSubjectsLambda = createUpdateSubSubjectsLambda(props, integrationEnvVars, stack);
+    const updateServicesLambda = createUpdateServicesLambda(integrationEnvVars, stack);
+    const updateStatesLambda = createUpdateStatesLambda(integrationEnvVars, stack);
+    const updateSubjectsLambda = createUpdateSubjectsLambda(integrationEnvVars, stack);
+    const updateSubSubjectsLambda = createUpdateSubSubjectsLambda(integrationEnvVars, stack);
 
     const updateMetaDataRuleId = "Open311-UpdateMetadataRule";
     const updateMetaDataRule = new events.Rule(stack, updateMetaDataRuleId, {
@@ -41,43 +39,36 @@ export function create(stack: DigitrafficStack, props: Open311Props): void {
 }
 
 function createUpdateServicesLambda(
-    props: Open311Props,
     integrationEnvVars: IntegrationEnv,
     stack: DigitrafficStack
 ): lambda.Function {
     const updateServicesId = "UpdateServices";
 
     const updateServicesLambda = MonitoredDBFunction.create(stack, updateServicesId, integrationEnvVars);
-    createSubscription(updateServicesLambda, updateServicesId, props.logsDestinationArn, stack);
     return updateServicesLambda;
 }
 
 function createUpdateStatesLambda(
-    props: Open311Props,
     integrationEnvVars: IntegrationEnv,
     stack: DigitrafficStack
 ): lambda.Function {
     const updateStatesId = "UpdateStates";
 
     const updateStatesLambda = MonitoredDBFunction.create(stack, updateStatesId, integrationEnvVars);
-    createSubscription(updateStatesLambda, updateStatesId, props.logsDestinationArn, stack);
     return updateStatesLambda;
 }
 
 function createUpdateSubjectsLambda(
-    props: Open311Props,
     integrationEnvVars: IntegrationEnv,
     stack: DigitrafficStack
 ): lambda.Function {
     const updateSubjectsId = "Open311-UpdateSubjects";
 
     const updateSubjectsLambda = MonitoredDBFunction.create(stack, updateSubjectsId, integrationEnvVars);
-    createSubscription(updateSubjectsLambda, updateSubjectsId, props.logsDestinationArn, stack);
     return updateSubjectsLambda;
 }
 
 function createUpdateSubSubjectsLambda(
-    props: Open311Props,
     integrationEnvVars: IntegrationEnv,
     stack: DigitrafficStack
 ): lambda.Function {
@@ -88,6 +79,5 @@ function createUpdateSubSubjectsLambda(
         updateSubSubjectsId,
         integrationEnvVars
     );
-    createSubscription(updateSubSubjectsLambda, updateSubSubjectsId, props.logsDestinationArn, stack);
     return updateSubSubjectsLambda;
 }

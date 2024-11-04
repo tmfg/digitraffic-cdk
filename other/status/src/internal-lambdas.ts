@@ -1,15 +1,14 @@
+import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { Duration, type Stack } from "aws-cdk-lib";
 import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { type ISecret, Secret } from "aws-cdk-lib/aws-secretsmanager";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import type { ITopic } from "aws-cdk-lib/aws-sns";
 import type { Props } from "./app-props.js";
 import { StatusEnvKeys } from "./keys.js";
-import type { ITopic } from "aws-cdk-lib/aws-sns";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
-import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
-import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
 export function create(
     stack: Stack,
@@ -75,8 +74,6 @@ function createUpdateStatusesLambda(
     secret.grantRead(lambda);
 
     Scheduler.everyHour(stack, "UpdateStatusesRule", lambda);
-
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
 
 function createHandleMaintenanceLambda(
@@ -115,8 +112,6 @@ function createHandleMaintenanceLambda(
     secret.grantRead(lambda);
 
     Scheduler.everyMinute(stack, "HandleMaintenanceRule", lambda);
-
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
 
 function createCheckComponentStatesLambda(
@@ -153,8 +148,6 @@ function createCheckComponentStatesLambda(
     secret.grantRead(lambda);
 
     Scheduler.everyHour(stack, "CheckComponentStatesRule", lambda);
-
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
 
 function createTestSlackNotifyLambda(
@@ -191,5 +184,4 @@ function createTestSlackNotifyLambda(
     );
 
     secret.grantRead(lambda);
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }

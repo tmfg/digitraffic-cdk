@@ -9,37 +9,44 @@ interface Response {
     >;
 }
 
+export const AC_HEADERS = {
+    ALLOW_ORIGIN: "access-control-allow-origin",
+    ALLOW_METHODS: "access-control-allow-methods",
+    ALLOW_HEADERS: "access-control-allow-headers",
+    EXPOSE_HEADERS: "access-control-expose-headers"
+} as const;
+
 export function addCorsHeaders(response: Response): void {
     const responseHeaders = response.headers;
-    responseHeaders["access-control-allow-origin"] = [
+    responseHeaders[AC_HEADERS.ALLOW_ORIGIN] = [
         {
-            key: "access-control-allow-origin",
+            key: AC_HEADERS.ALLOW_ORIGIN,
             value: "*"
         }
     ];
-    responseHeaders["access-control-allow-methods"] = [
+    responseHeaders[AC_HEADERS.ALLOW_METHODS] = [
         {
-            key: "access-control-allow-methods",
+            key: AC_HEADERS.ALLOW_METHODS,
             value: "GET, POST, OPTIONS"
         }
     ];
-    responseHeaders["access-control-allow-headers"] = [
+    responseHeaders[AC_HEADERS.ALLOW_HEADERS] = [
         {
-            key: "access-control-allow-headers",
+            key: AC_HEADERS.ALLOW_HEADERS,
             value: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Digitraffic-User"
         }
     ];
-    responseHeaders["access-control-expose-headers"] = [
+    responseHeaders[AC_HEADERS.EXPOSE_HEADERS] = [
         {
-            key: "access-control-expose-headers",
+            key: AC_HEADERS.EXPOSE_HEADERS,
             value: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Digitraffic-User"
         }
     ];
 }
 
-const xAmzLastModifiedHeader = "x-amz-meta-last-modified";
-const xAmzLastModifiedHeaderUpper = "X-Amz-Meta-Last-Modified";
-const lastModifiedHeader = "last-modified";
+export const xAmzLastModifiedHeader = "x-amz-meta-last-modified" as const;
+export const xAmzLastModifiedHeaderUpper = "X-Amz-Meta-Last-Modified" as const;
+export const lastModifiedHeader = "last-modified" as const;
 
 export function addWeathercamImageLastModifiedHeaderFromXAmzMeta(response: Response): void {
     const responseHeaders = response.headers;

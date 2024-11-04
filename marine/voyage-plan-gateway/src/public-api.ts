@@ -1,3 +1,12 @@
+import { defaultLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import {
+    add404Support,
+    createDefaultPolicyDocument
+} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import type { Stack } from "aws-cdk-lib";
 import {
     EndpointType,
     LambdaIntegration,
@@ -6,19 +15,9 @@ import {
     RestApi
 } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode } from "aws-cdk-lib/aws-lambda";
-import type { Stack } from "aws-cdk-lib";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { defaultLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import type { VoyagePlanGatewayProps } from "./app-props.js";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import {
-    add404Support,
-    createDefaultPolicyDocument
-} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { VoyagePlanGatewayProps } from "./app-props.js";
 import { VoyagePlanEnvKeys } from "./keys.js";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export function create(secret: ISecret, props: VoyagePlanGatewayProps, stack: DigitrafficStack): void {
     const api = createRestApi(stack, "VPGW-Public", "VPGW public API");
@@ -69,7 +68,6 @@ function createVtsProxyHandler(
         })
     );
     secret.grantRead(handler);
-    createSubscription(handler, functionName, props.logsDestinationArn, stack);
     const integration = new LambdaIntegration(handler, {
         proxy: true
     });

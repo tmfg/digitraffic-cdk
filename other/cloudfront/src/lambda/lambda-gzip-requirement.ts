@@ -3,12 +3,16 @@ import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
+export const NOT_ACCEPTABLE = {
+    status: "406",
+    statusDescription: "Not Acceptable",
+    body: "Use of gzip compression is required with Accept-Encoding: gzip header."
+};
+
 /*
     This is a edge lambda that should be run at cloudfront at origin request event.
     It checks the request for accept-encoding header and if it does not contains gzip return 406.
     It also intercepts HTTP OPTIONS preflight requests to return CORS data.
-
-    Please see lambda-versions.ts
  */
 export const handler: CloudFrontRequestHandler = (event, context, callback) => {
     const records = event.Records;
@@ -36,14 +40,10 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
             };
             addCorsHeaders(response);
             callback(null, response);
-        } else if (!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {
-            const response = {
-                status: "406",
-                statusDescription: "Not Acceptable",
-                body: "Use of gzip compression is required with Accept-Encoding: gzip header."
-            };
-
-            callback(null, response);
+            return;
+        } else if (!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {           
+            callback(null, NOT_ACCEPTABLE);
+            return;
         }
 
         // correct header, please continue
@@ -67,16 +67,6 @@ function isAcceptGzipHeaderPresent(request: CloudFrontRequest): boolean {
     // everything will be lower-case, so no problemos!
     const headers = request.headers;
     const acceptHeader = headers["accept-encoding"];
-    if (!acceptHeader) {
-        return false;
-    }
-    const acceptHeaderValue = acceptHeader[0];
 
-    return (
-        // eslint-disable-next-line eqeqeq
-        acceptHeaderValue != null &&
-        // eslint-disable-next-line eqeqeq
-        acceptHeaderValue.value != null &&
-        acceptHeaderValue.value.indexOf("gzip") > -1
-    );
+    return !!acceptHeader && (acceptHeader[0]?.value?.indexOf("gzip") ?? 0) > -1;
 }

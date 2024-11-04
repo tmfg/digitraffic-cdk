@@ -1,23 +1,22 @@
-import type { IModel, IntegrationResponse, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
 import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { addDefaultValidator, addServiceModel } from "@digitraffic/common/dist/utils/api-model";
+import type { IModel, IntegrationResponse, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 
-import * as SseSchema from "./model/sse-schema.js";
-import * as ApiResponseSchema from "./model/api-response-schema.js";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     defaultIntegration,
     getResponse,
     RESPONSE_200_OK
 } from "@digitraffic/common/dist/aws/infra/api/responses";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { DigitrafficMethodResponse, MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
-import { BAD_REQUEST_MESSAGE, ERROR_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { BAD_REQUEST_MESSAGE, ERROR_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import * as ApiResponseSchema from "./model/api-response-schema.js";
+import * as SseSchema from "./model/sse-schema.js";
 
 export function createIntegrationApiAndHandlerLambda(secret: ISecret, stack: DigitrafficStack): void {
     const integrationApi: RestApi = createRestApi(stack, "SSE-Integration", "SSE Data Integration API");
@@ -105,12 +104,5 @@ function createUpdateRequestHandlerLambda(
         ]
     });
 
-    // Create log subscription
-    createSubscription(
-        updateSseDataLambda,
-        lambdaFunctionName,
-        stack.configuration.logsDestinationArn,
-        stack
-    );
     return updateSseDataLambda;
 }
