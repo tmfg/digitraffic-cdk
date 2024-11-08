@@ -1,7 +1,7 @@
 import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { DigitrafficApi } from "../api/digitraffic-api.js";
 import type { NodePingApi, NodePingCheck, NodePingContact } from "../api/nodeping-api.js";
-import { EndpointHttpMethod, type MonitoredApp, type MonitoredEndpoint } from "../app-props.js";
+import { type MonitoredApp, type MonitoredEndpoint } from "../app-props.js";
 import type { AppWithEndpoints } from "../model/app-with-endpoints.js";
 import type { UpdateStatusSecret } from "../secret.js";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
@@ -139,6 +139,10 @@ async function updateNodePingChecksForApp(
     // Slack contacts
     const internalContactIds = [secret.nodePingContactIdSlack1, secret.nodePingContactIdSlack2];
 
+    logger.info({
+        method,
+        message: `Creating missing checks for app ${appWithEndpoints.app}`
+    });
     await createChecks(
         missingChecks,
         internalContactIds,
@@ -156,12 +160,13 @@ async function updateNodePingChecksForApp(
         internalContactIds,
         githubActionsContactId,
         nodePingApi,
-        appWithEndpoints.extraEndpoints
+        appWithEndpoints.extraEndpoints,
+        appWithEndpoints.app
     );
 
     logger.info({
         method,
-        message: `Updating components and checks for app ${appWithEndpoints.app} done`,
+        message: `Updating and checks for app ${appWithEndpoints.app} done`,
         tookMs: Date.now() - start
     });
 }
@@ -183,6 +188,8 @@ async function createChecks(
     appWithEndpoints: AppWithEndpoints,
     nodePingApi: NodePingApi
 ): Promise<void> {
+    const method = `${SERVICE}.createChecks` as const satisfies LoggerMethodType;
+    const start = Date.now();
     for (const missingCheck of missingChecks) {
         const correspondingExtraEndpoint = appWithEndpoints.extraEndpoints.find(
             (e) => e.name === missingCheck
@@ -198,6 +205,12 @@ async function createChecks(
             correspondingExtraEndpoint
         );
     }
+    logger.info({
+        method,
+        message: `Creating missing checks for app ${appWithEndpoints.app}`,
+        tookMs: Date.now() - start,
+        customCount: missingChecks.length
+    });
 }
 
 export async function updateChecks(
@@ -205,24 +218,37 @@ export async function updateChecks(
     internalContactIds: string[],
     githubActionsContactId: string,
     nodePingApi: NodePingApi,
-    extraEndpoints: MonitoredEndpoint[]
+    extraEndpoints: MonitoredEndpoint[],
+    app: string
 ): Promise<void> {
+    const method = `${SERVICE}.updateChecks` as const satisfies LoggerMethodType;
+    const start = Date.now();
+    let count = 0;
     for (const check of checks) {
-        const correspondingExtraEndpoint = extraEndpoints.find((e) => e.url === check.parameters.target);
+        // Ie. updating mqtt url matches only for label as url has changed.
+        const correspondingExtraEndpoint = extraEndpoints.find(
+            (e) => e.url === check.parameters.target || e.name.toLowerCase() === check.label.toLowerCase()
+        );
 
         const checksContactIds = getContactIds(check.label, internalContactIds, githubActionsContactId);
 
         if (nodePingApi.checkNeedsUpdate(check, correspondingExtraEndpoint, checksContactIds)) {
             await nodePingApi.updateNodepingCheck(
                 check._id,
-                check.type,
-                correspondingExtraEndpoint?.method ?? EndpointHttpMethod.HEAD,
+                check.parameters.target,
                 checksContactIds,
                 check.label,
                 correspondingExtraEndpoint
             );
+            count++;
         }
     }
+    logger.info({
+        method,
+        message: `Updating existing checks for app ${app}`,
+        tookMs: Date.now() - start,
+        customCount: count
+    });
 }
 
 /**
@@ -238,13 +264,13 @@ export async function updateComponentsAndChecks(
     gitHubBranch: string,
     gitHubWorkflowFile: string
 ): Promise<void> {
-    const endpoints: AppWithEndpoints[] = await Promise.all(
+    const appsWithEndpoints: AppWithEndpoints[] = await Promise.all(
         apps.map((app) => digitrafficApi.getAppWithEndpoints(app))
     );
 
-    for (const endpoint of endpoints) {
+    for (const appWithEndpoints of appsWithEndpoints) {
         await updateNodePingChecksForApp(
-            endpoint,
+            appWithEndpoints,
             secret,
             nodePingApi,
             gitHubOwner,

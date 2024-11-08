@@ -220,29 +220,21 @@ describe("StatusServiceTest", () => {
         );
     });
 
-    test("updateChecks - check is updated", async () => {
+    test("updateChecks - check not updated", async () => {
         const secret: UpdateStatusSecret = await secretHolder.get();
         const nodePingApi = new NodePingApi(emptySecretHolder(), 1000, 10, 1);
 
-        const checks: NodePingCheck[] = [
-            {
-                _id: randomString(),
-                label: randomString(),
-                type: "HTTPADV",
-                state: 1,
-                enable: "active",
-                interval: 1,
-                notifications: [],
-                parameters: {
-                    target: "http://some.url",
-                    method: EndpointHttpMethod.HEAD,
-                    threshold: 10,
-                    sendheaders: {}
-                }
-            }
-        ];
-
         const slackContact = makeContact(secret.nodePingContactIdSlack1);
+        const ghActionsContact = makeContact(`GitHub Actions for status master`);
+        const slackContactId = _.keys(slackContact.addresses)[0]!;
+        const ghContactId = _.keys(ghActionsContact.addresses)[0]!;
+
+        const check = makeNodepingCheck("Road", "http://some.url");
+        check.notifications.push(
+            { [secret.nodePingContactIdSlack1]: { delay: 0, schedule: "All" } },
+            { [ghContactId]: { delay: 0, schedule: "All" } }
+        );
+        const checks: NodePingCheck[] = [check];
 
         const nodePingApiCreateNodepingCheckSpy = jest
             .spyOn(nodePingApi, "createNodepingCheck")
@@ -252,15 +244,9 @@ describe("StatusServiceTest", () => {
             .spyOn(nodePingApi, "updateNodepingCheck")
             .mockReturnValue(Promise.resolve());
 
-        await StatusService.updateChecks(
-            checks,
-            [_.keys(slackContact.addresses)[0]!],
-            "gh-contact-id",
-            nodePingApi,
-            []
-        );
+        await StatusService.updateChecks(checks, [slackContactId], ghContactId, nodePingApi, [], "Road");
 
-        expect(nodePingApiUpdateSpy).toHaveBeenCalledTimes(1);
+        expect(nodePingApiUpdateSpy).toHaveBeenCalledTimes(0);
         expect(nodePingApiCreateNodepingCheckSpy).not.toHaveBeenCalled();
     });
 
@@ -322,7 +308,7 @@ describe("StatusServiceTest", () => {
             "/api/maintenance/v1/tracking/routes/latest"
         ];
 
-        const check0 = makeNodepingCheck("Road", endpoints[0]!);
+        const check0 = makeNodepingCheck("Road", endpoints[0]!, 1000);
         const checks: NodePingCheck[] = [check0];
 
         const slackContact1 = makeContact(secret.nodePingContactIdSlack1);
@@ -439,7 +425,11 @@ function makeContact(contactId: string): NodePingContact {
     };
 }
 
-function makeNodepingCheck(category: "Road" | "Marine" | "Rail", url: string): NodePingCheck {
+function makeNodepingCheck(
+    category: "Road" | "Marine" | "Rail",
+    url: string,
+    timeout: number = 10
+): NodePingCheck {
     return {
         _id: randomString(),
         label: `${category} ${url}`,
@@ -451,7 +441,7 @@ function makeNodepingCheck(category: "Road" | "Marine" | "Rail", url: string): N
         parameters: {
             target: url,
             method: EndpointHttpMethod.HEAD,
-            threshold: 1000,
+            threshold: timeout,
             sendheaders: {
                 "accept-encoding": "gzip",
                 "digitraffic-user": NODEPING_DIGITRAFFIC_USER

@@ -83,7 +83,7 @@ export interface NodePingCheckPostPutData {
     threshold: number | undefined;
     enabled?: boolean;
     follow?: boolean;
-    method: EndpointHttpMethod;
+    method: EndpointHttpMethod | undefined;
     notifications: NodePingNotification[];
     postdata?: string;
     sendheaders: Record<string, string>;
@@ -348,9 +348,10 @@ export class NodePingApi {
 
         const checkMethod = extraData?.method ?? EndpointHttpMethod.HEAD;
 
+        const type = extraData?.protocol === EndpointProtocol.WebSocket ? "WEBSOCKET" : "HTTPADV";
         const data: NodePingCheckPostPutData = {
             label: endpoint.includes(appName) ? endpoint : `${appName} ${endpoint}`,
-            type: extraData?.protocol === EndpointProtocol.WebSocket ? "WEBSOCKET" : "HTTPADV",
+            type,
             target: extraData?.url ?? `https://${hostPart}.digitraffic.fi${endpoint}`,
             interval: this.checkIntervalMinutes,
             threshold: this.checkTimeoutSeconds,
@@ -360,6 +361,12 @@ export class NodePingApi {
             method: checkMethod,
             notifications: this.createNotificationsPostData(contactIds)
         };
+
+        if (type === "WEBSOCKET") {
+            // Fix if type is changed and there is method other than head -> clear to default value
+            data.method = undefined;
+        }
+
         if (extraData?.sendData) {
             data.postdata = extraData.sendData;
             data.sendheaders["content-type"] = MediaType.APPLICATION_JSON;
@@ -392,8 +399,7 @@ export class NodePingApi {
 
     async updateNodepingCheck(
         id: string,
-        type: "WEBSOCKET" | "HTTPADV",
-        checkMethod: EndpointHttpMethod,
+        currentTarget: string,
         contactIds: string[],
         checkLabel: string,
         extraData?: MonitoredEndpoint
@@ -401,9 +407,11 @@ export class NodePingApi {
         const method = `${SERVICE}.updateNodepingCheck` as const satisfies LoggerMethodType;
         const start = Date.now();
 
+        const checkMethod = extraData?.method ?? EndpointHttpMethod.HEAD;
         const data: NodePingCheckPutData = {
             id,
-            type,
+            type: extraData?.protocol === EndpointProtocol.WebSocket ? "WEBSOCKET" : "HTTPADV",
+            target: extraData?.url ?? currentTarget,
             threshold: this.checkTimeoutSeconds,
             method: checkMethod,
             interval: this.checkIntervalMinutes,
@@ -476,23 +484,6 @@ export class NodePingApi {
         }
 
         if (check.type.toUpperCase() === "HTTPADV") {
-            const checkMethod = correspondingExtraEndpoint?.method ?? EndpointHttpMethod.HEAD;
-            if (check.parameters.method !== checkMethod) {
-                logger.info({
-                    method,
-                    message: `${messagePrefix} method was not ${EndpointHttpMethod.HEAD}, instead: ${check.parameters.method}`
-                });
-                needsUpdate = true;
-            }
-
-            if (correspondingExtraEndpoint && check.parameters.target !== correspondingExtraEndpoint?.url) {
-                logger.info({
-                    method,
-                    message: `${messagePrefix} url was not ${correspondingExtraEndpoint?.url}, instead: ${check.parameters.target}`
-                });
-                needsUpdate = true;
-            }
-
             const digitrafficUser = Object.entries(check.parameters.sendheaders ?? {}).find(
                 (e) => e[0].toLowerCase() === "digitraffic-user"
             )?.[1];
@@ -503,6 +494,27 @@ export class NodePingApi {
                 });
                 needsUpdate = true;
             }
+        }
+
+        const checkMethod = correspondingExtraEndpoint?.method ?? EndpointHttpMethod.HEAD;
+        // In case of Websocket method is not relevant
+        if (
+            correspondingExtraEndpoint?.protocol !== EndpointProtocol.WebSocket &&
+            check.parameters.method !== checkMethod
+        ) {
+            logger.info({
+                method,
+                message: `${messagePrefix} method was not ${EndpointHttpMethod.HEAD}, instead: ${check.parameters.method}`
+            });
+            needsUpdate = true;
+        }
+
+        if (correspondingExtraEndpoint && check.parameters.target !== correspondingExtraEndpoint?.url) {
+            logger.info({
+                method,
+                message: `${messagePrefix} url was not ${correspondingExtraEndpoint?.url}, instead: ${check.parameters.target}`
+            });
+            needsUpdate = true;
         }
 
         const currentContactIds = check.notifications.flatMap((n) => _.keys(n));

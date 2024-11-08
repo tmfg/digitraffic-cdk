@@ -332,9 +332,7 @@ describe("NodePing API test", () => {
         await testCreateNodepingCheck("MQTT", [randomString(), randomString()], "meri", "Marine", {
             name: "Marine MQTT",
             url: "/mqtt",
-            protocol: EndpointProtocol.WebSocket,
-            method: EndpointHttpMethod.POST,
-            sendData: '{ "app": "marine" }'
+            protocol: EndpointProtocol.WebSocket
         } satisfies MonitoredEndpoint);
     });
 });
@@ -405,14 +403,30 @@ async function testCreateNodepingCheck(
 
                 const postData = data as NodePingCheckPostPutData;
 
+                console.debug(JSON.stringify(postData));
+
                 await expectTokenAndCustomeridInData(postData);
-                expect(postData.type).toEqual(
-                    extraData?.protocol === EndpointProtocol.WebSocket ? "WEBSOCKET" : "HTTPADV"
-                );
+
+                if (extraData?.protocol) {
+                    expect(postData.type).toEqual(
+                        extraData.protocol === EndpointProtocol.WebSocket ? "WEBSOCKET" : "HTTPADV"
+                    );
+                } else {
+                    expect(postData.type).toEqual("HTTPADV");
+                }
+
                 expect(postData.target).toEqual(
                     extraData?.url ? extraData?.url : `https://${hostPart}.digitraffic.fi${endpoint}`
                 );
-                expect(postData.method).toEqual(extraData?.method ?? EndpointHttpMethod.HEAD);
+
+                if (extraData?.method) {
+                    expect(postData.method).toEqual(extraData.method);
+                } else if (extraData?.protocol === EndpointProtocol.WebSocket) {
+                    expect(postData.method).toBeUndefined();
+                } else {
+                    expect(postData.method).toEqual(EndpointHttpMethod.HEAD);
+                }
+
                 if (extraData?.sendData) {
                     expect(postData.postdata).toEqual(extraData?.sendData);
                 }
@@ -423,10 +437,8 @@ async function testCreateNodepingCheck(
                 expect(postData.enabled).toEqual(true);
                 expect(postData.follow).toEqual(true);
                 expect(postData.sendheaders).toEqual(NODEPING_SENT_HEADERS);
-
                 expect(postData.notifications).toEqual(expectedNotifications);
 
-                console.log(JSON.stringify(postData));
                 return Promise.resolve({
                     status: 200,
                     data: {}
