@@ -5,7 +5,7 @@
 !.gitignore
 !cdk.json
 !package.json
-!tscconfig.json
+!tsconfig.json
 
 !/config/
 !/config/*.json
