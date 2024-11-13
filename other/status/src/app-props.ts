@@ -33,7 +33,6 @@ export interface Props {
     readonly secretId: string;
     readonly nodePingTimeoutSeconds: number;
     readonly nodePingCheckInterval: number;
-    readonly monitoredApps: MonitoredApp[];
     readonly allowFromIpAddresses: string[];
     readonly cStatePageUrl: string;
     readonly gitHubRepo: string;

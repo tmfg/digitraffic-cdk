@@ -46,7 +46,6 @@ function createUpdateStatusesLambda(
     props: Props
 ): void {
     const environment: LambdaEnvironment = createCommonEnv(props);
-    environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
 
     const functionName = "Status-UpdateStatuses";
     const lambdaConf: FunctionProps = {

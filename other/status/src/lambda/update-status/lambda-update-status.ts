@@ -1,4 +1,3 @@
-import type { MonitoredApp } from "../../app-props.js";
 import type { UpdateStatusSecret } from "../../secret.js";
 import { NodePingApi } from "../../api/nodeping-api.js";
 import * as StatusService from "../../service/status-service.js";
@@ -6,13 +5,13 @@ import { DigitrafficApi } from "../../api/digitraffic-api.js";
 import { StatusEnvKeys } from "../../keys.js";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { monitoredApps } from "../../monitored-apps.js";
 
 // Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
 const DEFAULT_TIMEOUT_MS = 25000 as const;
 
 const secretHolder = SecretHolder.create<UpdateStatusSecret>();
 
-const apps = JSON.parse(getEnvVariable(StatusEnvKeys.APPS)) as MonitoredApp[];
 const checkTimeout = Number(getEnvVariable(StatusEnvKeys.CHECK_TIMEOUT_SECONDS));
 const checkInterval = Number(getEnvVariable(StatusEnvKeys.INTERVAL_MINUTES));
 
@@ -29,7 +28,7 @@ export const handler = async (): Promise<void> => {
     const nodePingApi = new NodePingApi(secretHolder, DEFAULT_TIMEOUT_MS, checkTimeout, checkInterval);
 
     await StatusService.updateComponentsAndChecks(
-        apps,
+        monitoredApps,
         digitrafficApi,
         nodePingApi,
         secretHolder,
