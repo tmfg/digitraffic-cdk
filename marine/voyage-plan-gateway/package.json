@@ -22,20 +22,20 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@aws-sdk/client-sns": "^3.669.0",
-    "@aws-sdk/client-sqs": "^3.669.0",
-    "@aws-sdk/client-s3": "^3.669.0",
+    "@aws-sdk/client-sns": "^3.687.0",
+    "@aws-sdk/client-sqs": "^3.687.0",
+    "@aws-sdk/client-s3": "^3.687.0",
     "@digitraffic/common": "2024.10.25-1",
     "@turf/turf": "7.0.0-alpha.111",
-    "aws-cdk-lib": "^2.162.0",
-    "aws-sdk": "^2.1691.0",
-    "constructs": "~10.3.1",
+    "aws-cdk-lib": "^2.166.0",
+    "aws-sdk": "^2.1692.0",
+    "constructs": "~10.4.2",
     "date-fns": "~4.1.0",
-    "@date-fns/tz": "1.1.2",
+    "@date-fns/tz": "1.2.0",
     "source-map-support": "^0.5.21",
     "uuid": "^10.0.0",
     "xml2js": "^0.6.2",
-    "ky": "^1.7.2"
+    "ky": "1.7.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -44,12 +44,12 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.2",
-    "@rushstack/heft-jest-plugin": "^0.12.14",
+    "@rushstack/heft": "^0.68.6",
+    "@rushstack/heft-jest-plugin": "^0.12.18",
     "@types/aws-lambda": "8.10.145",
     "@types/heft-jest": "1.0.6",
-    "@types/jest": "29.5.13",
-    "@types/node": "20.14.9",
+    "@types/jest": "29.5.14",
+    "@types/node": "20.17.6",
     "@types/openlayers": "4.6.23",
     "@types/uuid": "10.0.0",
     "@types/xml2js": "0.4.14",
@@ -59,7 +59,7 @@
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
     "parallelshell": "^3.0.2",
-    "ts-jest": "^29.2.4",
+    "ts-jest": "^29.2.5",
     "typescript": "~5.6.3"
   }
 }

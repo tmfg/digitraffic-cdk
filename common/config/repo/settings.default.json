@@ -1,5 +1,0 @@
-{
-  "git-submodules": [
-    { "path": "lib/digitraffic-common", "url": "https://github.com/tmfg/digitraffic-common.git" }
-  ]
-}
