@@ -2411,8 +2411,19 @@
     }
 }
 .swagger-ui .sans-serif {
-    font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica, helvetica neue, ubuntu,
-        roboto, noto, segoe ui, arial, sans-serif;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        avenir next,
+        avenir,
+        helvetica,
+        helvetica neue,
+        ubuntu,
+        roboto,
+        noto,
+        segoe ui,
+        arial,
+        sans-serif;
 }
 .swagger-ui .serif {
     font-family: georgia, serif;
@@ -2428,13 +2439,22 @@
     font-family: Consolas, monaco, monospace;
 }
 .swagger-ui .courier {
-    font-family: Courier Next, courier, monospace;
+    font-family:
+        Courier Next,
+        courier,
+        monospace;
 }
 .swagger-ui .helvetica {
-    font-family: helvetica neue, helvetica, sans-serif;
+    font-family:
+        helvetica neue,
+        helvetica,
+        sans-serif;
 }
 .swagger-ui .avenir {
-    font-family: avenir next, avenir, sans-serif;
+    font-family:
+        avenir next,
+        avenir,
+        sans-serif;
 }
 .swagger-ui .athelas {
     font-family: athelas, georgia, serif;
@@ -2446,10 +2466,14 @@
     font-family: times, serif;
 }
 .swagger-ui .bodoni {
-    font-family: Bodoni MT, serif;
+    font-family:
+        Bodoni MT,
+        serif;
 }
 .swagger-ui .calisto {
-    font-family: Calisto MT, serif;
+    font-family:
+        Calisto MT,
+        serif;
 }
 .swagger-ui .garamond {
     font-family: garamond, serif;
@@ -7259,7 +7283,7 @@
     position: relative;
 }
 .swagger-ui .opblock .tab-header .tab-item.active h4 span:after {
-    background: gray;
+    background: grey;
     bottom: -15px;
     content: "";
     height: 4px;
@@ -7658,7 +7682,6 @@
     background: #333;
     border-radius: 4px;
     font-size: 12px;
-    -webkit-hyphens: auto;
     hyphens: auto;
     margin: 0;
     padding: 10px;
@@ -7775,7 +7798,9 @@
     transform: translate(-50%, -50%);
 }
 .swagger-ui .loading-container .loading:before {
-    animation: rotation 1s linear infinite, opacity 0.5s;
+    animation:
+        rotation 1s linear infinite,
+        opacity 0.5s;
     backface-visibility: hidden;
     border: 2px solid rgba(85, 85, 85, 0.1);
     border-radius: 100%;
@@ -7891,7 +7916,7 @@
 }
 .swagger-ui .btn {
     background: transparent;
-    border: 2px solid gray;
+    border: 2px solid grey;
     border-radius: 4px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     color: #3b4151;
@@ -8336,7 +8361,7 @@
     transform: rotate(0deg);
 }
 .swagger-ui .model-toggle:after {
-    background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>')
+    background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>')
         50% no-repeat;
     background-size: 100%;
     content: "";
@@ -8653,7 +8678,7 @@
 }
 .swagger-ui .parameter__extension,
 .swagger-ui .parameter__in {
-    color: gray;
+    color: grey;
     font-family: monospace;
     font-size: 12px;
     font-style: italic;
@@ -8693,7 +8718,7 @@
     min-width: 6em;
 }
 .swagger-ui .response__extension {
-    color: gray;
+    color: grey;
     font-family: monospace;
     font-size: 12px;
     font-style: italic;

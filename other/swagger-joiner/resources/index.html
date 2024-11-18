@@ -11,9 +11,11 @@
         <!-- The initial config of Consent Mode -->
         <script type="text/javascript">
             window.dataLayer = window.dataLayer || [];
+
             function gtag() {
                 dataLayer.push(arguments);
             }
+
             gtag("consent", "default", {
                 ad_storage: "denied",
                 analytics_storage: "denied",
@@ -53,6 +55,7 @@
                     }
                     return number;
                 }
+
                 var now = new Date();
                 return (
                     now.getUTCFullYear() +
@@ -90,5 +93,6 @@
         <script src="./swagger-ui-bundle.js" charset="UTF-8"></script>
         <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"></script>
         <script src="./dt-swagger.js" charset="UTF-8"></script>
+        <!--    <script src="./swagger-initializer.js" charset="UTF-8"> </script>-->
     </body>
 </html>
