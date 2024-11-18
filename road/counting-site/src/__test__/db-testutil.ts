@@ -8,25 +8,9 @@ export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
 
 function truncate(db: DTDatabase): Promise<void> {
     return db.tx(async (t) => {
-        await t.none("DELETE FROM counting_site_data");
-        await t.none("DELETE FROM counting_site_counter");
-        await t.none("DELETE FROM counting_site_domain");
         await t.none("DELETE FROM data_updated");
-    });
-}
-
-export async function insertDomain(db: DTDatabase, domainName: string): Promise<void> {
-    await db.tx((t) => {
-        return t.none(
-            `
-                insert into counting_site_domain("name", description, created)
-                values(
-                       $1,
-                       'description',
-                       current_date)                
-            `,
-            [domainName]
-        );
+        await t.none("DELETE FROM cs2_site");
+        await t.none("DELETE FROM cs2_data");
     });
 }
 

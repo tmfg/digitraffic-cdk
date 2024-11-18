@@ -1,7 +1,7 @@
 import type { Construct } from "constructs";
 import { InternalLambdas } from "./internal-lambdas.js";
 import { Canaries } from "./canaries.js";
-import { PublicApi } from "./public-api.js";
+import { PublicApiV2 } from "./public-api-v2.js";
 import {
     DigitrafficStack,
     type StackConfiguration,
@@ -17,8 +17,8 @@ export class CountingSiteCdkStack extends DigitrafficStack {
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
         new InternalLambdas(this);
-        const publicApi = new PublicApi(this);
+        const publicApiV2 = new PublicApiV2(this);
 
-        new Canaries(this, publicApi.publicApi);
+        new Canaries(this, publicApiV2.publicApi);
     }
 }

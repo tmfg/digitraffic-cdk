@@ -1,4 +1,3 @@
-import * as UpdateService from "../../service/update.js";
 import type { CountingSitesSecret } from "../../model/counting-sites-secret.js";
 import { CountingSitesEnvKeys } from "../../keys.js";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
@@ -6,12 +5,13 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { updateMetadata } from "../../service/update-service.js";
+import type { Domain } from "../../model/v2/types.js";
 
-const domainName = getEnvVariable(CountingSitesEnvKeys.DOMAIN_NAME);
-const domainPrefix = getEnvVariable(CountingSitesEnvKeys.DOMAIN_PREFIX);
+const domainName = getEnvVariable(CountingSitesEnvKeys.DOMAIN_NAME) as Domain;
 
 const proxyHolder = ProxyHolder.create();
-const secretHolder = SecretHolder.create<CountingSitesSecret>(domainPrefix);
+const secretHolder = SecretHolder.create<CountingSitesSecret>("cs");
 
 export const handler = async (): Promise<void> => {
     const start = Date.now();
@@ -19,7 +19,7 @@ export const handler = async (): Promise<void> => {
     await proxyHolder
         .setCredentials()
         .then(() => secretHolder.get())
-        .then((secret) => UpdateService.updateMetadataForDomain(domainName, secret.apiKey, secret.url))
+        .then((secret) => updateMetadata(secret.url, secret.apiKey, domainName))
         .catch((error: Error) => {
             logException(logger, error);
         })

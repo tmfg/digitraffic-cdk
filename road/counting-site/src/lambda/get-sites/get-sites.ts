@@ -2,34 +2,35 @@ import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-respon
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { getSites } from "../../service/api-service.js";
 import { z, ZodError } from "zod";
-import { findSiteData } from "../../service/api-service.js";
-import { AllTravelModes } from "../../model/v2/types.js";
 
 const proxyHolder = ProxyHolder.create();
 
-const GetValuesSchema = z.object({
-    date: z.string().date(),
-    siteId: z.coerce.number().optional(),
-    travelMode: z.enum(AllTravelModes).optional(),
-}).strict();
+const GetSitesSchema = z
+    .object({
+        siteId: z.coerce.number().optional(),
+        domain: z.string().optional()
+    })
+    .strict();
 
 export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
 
     try {
-        const getValuesEvent = GetValuesSchema.parse(event);
-        const dateAsDate = new Date(getValuesEvent.date);
+        const getSitesEvent = GetSitesSchema.parse(event);
+
         await proxyHolder.setCredentials();
 
-        const [data, lastModified] = await findSiteData(
-                dateAsDate,
-                getValuesEvent.siteId,
-                getValuesEvent.travelMode
-            );
-        
-        return LambdaResponse.okJson(data).withTimestamp(lastModified);
-    } catch(error) {
+        const [featureCollection, lastModified] = await getSites(getSitesEvent.siteId, getSitesEvent.domain);
+
+        // give 404 only if siteId was set
+        if (getSitesEvent.siteId && featureCollection.features.length === 0) {
+            return LambdaResponse.notFound();
+        }
+
+        return LambdaResponse.okJson(featureCollection).withTimestamp(lastModified);
+    } catch (error) {
         if (error instanceof ZodError) {
             return LambdaResponse.badRequest(JSON.stringify(error.issues));
         }
@@ -39,8 +40,8 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
         return LambdaResponse.internalError();
     } finally {
         logger.info({
-            method: "GetValues.handler",
+            method: "GetSites.handler",
             tookMs: Date.now() - start
         });
-    };
+    }
 };

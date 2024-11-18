@@ -5,44 +5,20 @@ import {
     HeaderChecker,
     UrlChecker
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
-import type { DbData } from "../model/data.js";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { constants } from "http2";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { ResultDomain } from "../model/domain.js";
-import type { ResultUserTypes } from "../model/usertype.js";
+import type { ResponseValue } from "../model/v2/response-model.js";
 
-const BASE_URL = "/prod/api/counting-site/v1/";
-const USERTYPES_URL = BASE_URL + "user-types";
-const DOMAINS_URL = BASE_URL + "domains";
+const BASE_URL = "/prod/api/counting-site/v2beta/";
 const DIRECTIONS_URL = BASE_URL + "directions";
-
+const TRAVEL_MODES_URL = BASE_URL + "travel-modes";
 const VALUES_URL = BASE_URL + "values";
-const COUNTERS_URL = BASE_URL + "counters";
+const SITES_URL = BASE_URL + "sites";
 const CSV_URL = BASE_URL + "values.csv";
 
 export const handler = async (): Promise<string> => {
     const checker = await UrlChecker.createV2();
-
-    // check user types
-    await checker.expect403WithoutApiKey(USERTYPES_URL);
-    await checker.expect200(
-        USERTYPES_URL,
-        ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
-        ContentChecker.checkJson((userTypes: ResultUserTypes) => {
-            Asserter.assertLengthGreaterThan(Object.keys(userTypes), 1);
-        })
-    );
-
-    // check domains
-    await checker.expect403WithoutApiKey(DOMAINS_URL);
-    await checker.expect200(
-        DOMAINS_URL,
-        ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
-        ContentChecker.checkJson((domains: ResultDomain[]) => {
-            Asserter.assertLengthGreaterThan(domains, 1);
-        })
-    );
 
     // check directions
     await checker.expect403WithoutApiKey(DIRECTIONS_URL);
@@ -55,60 +31,42 @@ export const handler = async (): Promise<string> => {
     );
 
     // json values
-    await checker.expect403WithoutApiKey(VALUES_URL + "?counter_id=4");
+    await checker.expect403WithoutApiKey(VALUES_URL + "?siteId=1&date=2024-10-01");
     await checker.expect200(
-        VALUES_URL + "?counter_id=9999999",
+        VALUES_URL + "?siteId=1&date=2024-10-01",
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
-        ContentChecker.checkJson((json: DbData[]) => {
+        ContentChecker.checkJson((json: ResponseValue[]) => {
             Asserter.assertLength(json, 0);
         })
     );
     await checker.expect200(
-        VALUES_URL + "?counter_id=4",
+        VALUES_URL + "?siteId=300035277&date=2024-10-01",
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
         HeaderChecker.checkHeaderMissing(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
-        ContentChecker.checkJson((json: DbData[]) => {
+        ContentChecker.checkJson((json: ResponseValue[]) => {
             Asserter.assertLengthGreaterThan(json, 10);
         })
     );
-    await checker.expect400(VALUES_URL + "?counter_id=4&year=2300&month=5");
-    await checker.expect400(VALUES_URL + "?counter_id=4&year=bad_input&month=5");
+    await checker.expect400(VALUES_URL + "?date=bad_input");
 
-    // counters
-    await checker.expect403WithoutApiKey(COUNTERS_URL + "?domain_name=Oulu");
-    await checker.expect200(
-        COUNTERS_URL + "?domain_name=Moscow",
-        GeoJsonChecker.validFeatureCollection((fc) => {
-            Asserter.assertLength(fc.features, 0);
-        })
-    );
-    await checker.expect200(
-        COUNTERS_URL + "?domain_name=Oulu",
-        ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
-        GeoJsonChecker.validFeatureCollection((fc) => {
-            Asserter.assertLengthGreaterThan(fc.features, 1);
-        })
-    );
-    await checker.expect200(
-        COUNTERS_URL,
+    // sites
+    await checker.expect403WithoutApiKey(SITES_URL);
+    await checker.expect200(SITES_URL + "/300035277", 
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
         GeoJsonChecker.validFeatureCollection((fc) => {
             Asserter.assertLengthGreaterThan(fc.features, 1);
         })
     );
 
-    // counter
-    await checker.expect403WithoutApiKey(COUNTERS_URL + "/13");
-    await checker.expect200(COUNTERS_URL + "/13", GeoJsonChecker.validFeatureCollection());
-    await checker.expect404(COUNTERS_URL + "/013");
-    await checker.expect404(COUNTERS_URL + "/999999");
-    await checker.expect404(COUNTERS_URL + "/bad_input");
-    await checker.expect404(COUNTERS_URL + "/.9");
-
+    // travel-modes
+    await checker.expect403WithoutApiKey(TRAVEL_MODES_URL);
+    await checker.expect200(TRAVEL_MODES_URL);
+    
+    
     // csv values
-    await checker.expect403WithoutApiKey(CSV_URL + "?year=2022&month=01&counter_id=15");
+    await checker.expect403WithoutApiKey(CSV_URL + "?year=2024&month=10&siteId=300035277");
     await checker.expect200(
-        CSV_URL + "?year=2022&month=01&counter_id=15",
+        CSV_URL + "?year=2024&month=10&siteId=300035277",
         ContentTypeChecker.checkContentType(MediaType.TEXT_CSV),
         HeaderChecker.checkHeaderExists(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
         ContentChecker.checkResponse((body) => {
@@ -116,14 +74,13 @@ export const handler = async (): Promise<string> => {
         })
     );
     await checker.expect200(
-        CSV_URL + "?year=2022&month=01&counter_id=-21",
+        CSV_URL + "?year=2022&month=10&siteId=300035277",
         ContentChecker.checkResponse((body) => {
             Asserter.assertLength(body.split("\n"), 2); // just header
         })
     );
-    await checker.expect400(CSV_URL + "?year=2021");
-    await checker.expect400(CSV_URL + "?year=2021&month=34&counter_id=15");
-    await checker.expect400(CSV_URL + "?year=bad_input&month=3&counter_id=15");
+    
+    await checker.expect400(CSV_URL + "?date=bad_input");
 
     return checker.done();
 };

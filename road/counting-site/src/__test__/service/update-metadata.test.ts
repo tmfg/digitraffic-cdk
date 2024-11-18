@@ -1,105 +1,75 @@
-import { updateMetadataForDomain } from "../../service/update.js";
-import { dbTestBase, insertCounter, insertDomain } from "../db-testutil.js";
-import * as CounterDAO from "../../dao/counter.js";
+import { dbTestBase } from "../db-testutil.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { DbCounter } from "../../model/counter.js";
 import { jest } from "@jest/globals";
 import ky from "ky";
 import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
-
-const DOMAIN_NAME = "TEST_DOMAIN";
+import type { DbSite } from "../../model/v2/db-model.js";
+import { getAllSites } from "../../dao/site.js";
+import { updateMetadata } from "../../service/update-service.js";
+import { insertSite, TEST_SITE_1 } from "../lambda/get-sites.test.js";
 
 describe(
     "update tests",
     dbTestBase((db: DTDatabase) => {
-        async function assertCountersInDb(
-            domain: string,
-            expected: number,
-            fn?: (x: DbCounter[]) => void
+        
+        async function assertSitesInDb(
+            totalCount: number,
+            deletedCount: number = 0,
+            fn?: (x: DbSite[]) => void
         ): Promise<void> {
-            const counters = await CounterDAO.findAllCountersForUpdateForDomain(db, domain);
-            expect(counters).toHaveLength(expected);
+            const sites = await getAllSites(db);
+            const deleted = sites.filter(s => s.removed_timestamp);
+
+            expect(sites).toHaveLength(totalCount);
+            expect(deleted).toHaveLength(deletedCount);
 
             if (fn) {
-                fn(counters);
+                fn(sites);
             }
         }
 
-        test("updateMetadataForDomain - empty", async () => {
-            await assertCountersInDb(DOMAIN_NAME, 0);
-            await insertDomain(db, DOMAIN_NAME);
+        test("updateMetadata - empty", async () => {
+            await assertSitesInDb(0);
 
             const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
-
-            await updateMetadataForDomain(DOMAIN_NAME, "", "");
-
+            await updateMetadata("", "", "Fintraffic");
             expect(server).toHaveBeenCalled();
 
-            await assertCountersInDb(DOMAIN_NAME, 0);
-        });
+            await assertSitesInDb(0);
+        });  
 
-        const RESPONSE_ONE_COUNTER = [
-                {
-                    name: "DOMAINNAME",
-                    channels: [
-                        {
-                            id: 1,
-                            domain: "D",
-                            name: "COUNTERNAME",
-                            latitude: 10,
-                            longitude: 10,
-                            userType: 1,
-                            interval: 15,
-                            sens: 1
-                        }
-                    ]
-                }
-            ] as const;        
+        test("updateMetadata - insert", async () => {
+            await assertSitesInDb(0);
 
-        test("updateMetadataForDomain - insert", async () => {
-            await insertDomain(db, DOMAIN_NAME);
-            await assertCountersInDb(DOMAIN_NAME, 0);
-
-            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify(RESPONSE_ONE_COUNTER)));
-
-            await updateMetadataForDomain(DOMAIN_NAME, "", "");
-
+            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify([TEST_SITE_1])));
+            await updateMetadata("", "", "Fintraffic");
             expect(server).toHaveBeenCalled();
 
-            await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
-                expect(counters[0]!.name).toEqual("DOMAINNAME COUNTERNAME");
+            await assertSitesInDb(1, 0, (sites: DbSite[]) => {
+                expect(sites[0]!.name).toEqual(TEST_SITE_1.name);
             });
-
-            await assertCountersInDb("WRONG", 0);
         });
 
-        test("updateMetadataForDomain - update", async () => {
-            await insertDomain(db, DOMAIN_NAME);
-            await insertCounter(db, 1, DOMAIN_NAME, 1);
-            await assertCountersInDb(DOMAIN_NAME, 1);
+        test("updateMetadata - update", async () => {
+            await insertSite(db);
+            await assertSitesInDb(1);
 
-            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify(RESPONSE_ONE_COUNTER)));
-
-            await updateMetadataForDomain(DOMAIN_NAME, "", "");
+            const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify([TEST_SITE_1])));
+            await updateMetadata("", "", "Fintraffic");
 
             expect(server).toHaveBeenCalled();
-            await assertCountersInDb(DOMAIN_NAME, 1);
+            await assertSitesInDb(1);
         });
 
-        test("updateMetadataForDomain - remove", async () => {
-            await insertDomain(db, DOMAIN_NAME);
-            await insertCounter(db, 1, DOMAIN_NAME, 1);
-            await assertCountersInDb(DOMAIN_NAME, 1);
+        test("updateMetadata - remove", async () => {
+            await insertSite(db);
+            await assertSitesInDb(1);
 
             const server = jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
-
-            await updateMetadataForDomain(DOMAIN_NAME, "", "");
+            await updateMetadata("", "", "Fintraffic");
 
             expect(server).toHaveBeenCalled();
-
-            await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
-                expect(counters[0]!.removed_timestamp).not.toBeNull();
-            });
+            await assertSitesInDb(1, 1);
         });
     })
 );

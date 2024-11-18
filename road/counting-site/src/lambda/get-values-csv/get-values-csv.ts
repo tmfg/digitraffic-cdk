@@ -1,40 +1,46 @@
-import * as CountingSitesService from "../../service/counting-sites.js";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { validate, type ValuesQueryParameters } from "../../model/parameters.js";
+//import { validate, type ValuesQueryParameters } from "../../model/parameters.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { z, ZodError } from "zod";
+import { findSiteDataForMonth } from "../../service/api-service.js";
+import { AllTravelModes } from "../../model/v2/types.js";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = (event: ValuesQueryParameters): Promise<LambdaResponse> => {
+const GetCsvValuesSchema = z.object({
+    year: z.coerce.number().refine(year => year > 2023, "Year must be > 2023"),
+    month: z.coerce.number().refine(month => month > 0 && month < 13, "Month must be between 1 and 12"),
+    siteId: z.coerce.number(),
+    travelMode: z.enum(AllTravelModes).optional(),
+}).strict();
+
+export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
 
-    const validationError = validate(event);
-    if (validationError) {
-        return Promise.resolve(LambdaResponse.badRequest(validationError));
-    }
+    try {
+        const getCsvValuesEvent = GetCsvValuesSchema.parse(event);
+        const filename = `${getCsvValuesEvent.year}-${getCsvValuesEvent.month}.csv`;
 
-    const year = event.year || new Date().getUTCFullYear();
-    const month = event.month || new Date().getUTCMonth() + 1;
+        await proxyHolder.setCredentials();
 
-    const filename = `${year}-${month}.csv`;
+        const [data, timestamp] = await findSiteDataForMonth(getCsvValuesEvent.year, getCsvValuesEvent.month, getCsvValuesEvent.siteId, getCsvValuesEvent.travelMode); 
 
-    return proxyHolder
-        .setCredentials()
-        .then(() => CountingSitesService.getValuesForMonth(year, month, event.domain_name, event.counter_id))
-        .then((data) => {
-            return LambdaResponse.ok(data[0], filename).withTimestamp(data[1]);
-        })
-        .catch((error: Error) => {
-            logException(logger, error);
+        return LambdaResponse.ok(data, filename).withTimestamp(timestamp);
 
-            return LambdaResponse.internalError();
-        })
-        .finally(() => {
-            logger.info({
-                method: "CountingSites.GetCSVData",
-                tookMs: Date.now() - start
-            });
+    } catch(error) {
+        if (error instanceof ZodError) {
+            return LambdaResponse.badRequest(JSON.stringify(error.issues));
+        }
+
+        logException(logger, error);
+
+        return LambdaResponse.internalError();
+    } finally {
+        logger.info({
+            method: "GetValuesCsv.handler",
+            tookMs: Date.now() - start
         });
+    }
 };

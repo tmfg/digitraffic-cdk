@@ -4,27 +4,26 @@ import { DataType } from "@digitraffic/common/dist/database/last-updated";
 export const handler = (): Promise<string> => {
     const checker = DatabaseCountChecker.createForProxy();
 
-    checker.expectOneOrMore("domains not empty", "select count(*) from counting_site_domain");
-
+    checker.expectOneOrMore("sites not empty", "select count(*) from cs2_site");
+    
     checker.expectOneOrMore(
-        "counters data updated in last 48 hours",
-        "select count(*) from counting_site_counter where last_data_timestamp > now() - interval '48 hours'"
+        "site data updated in last 48 hours",
+        "select count(*) from cs2_site where last_data_timestamp > now() - interval '48 hours'"
     );
-
+    
     checker.expectOneOrMore(
         "data updated in last 48 hours",
-        "select count(*) from counting_site_data where data_timestamp > now() - interval '48 hours'"
+        "select count(*) from cs2_data where data_timestamp > now() - interval '48 hours'"
     );
-
+    
     checker.expectOneOrMore(
         "data has values in last 48 hours",
         `with data as (
-                select counter_id, sum(count) from counting_site_data csd
+                select site_id, sum(counts) from cs2_data
                 where data_timestamp > now() - interval '48 hours'
-                group by counter_id
+                group by site_id
             ) 
-            select count(*) from data
-            where sum > 0`
+            select count(*) from data`
     );
 
     checker.expectOneOrMore(

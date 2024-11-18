@@ -28,15 +28,14 @@ export async function findWarningsForVoyagePlan(
     );
 
     // filter out warnings not in the route
-    warnings.features = warnings.features.filter(
-        (f: Feature) =>
-            !booleanDisjoint(
-                buffer((f as Feature<LineString>).geometry, MAX_DISTANCE_NM, {
-                    units: "nauticalmiles"
-                }),
-                voyageLineString
-            )
-    );
+    warnings.features = warnings.features.filter((f: Feature) => {
+        const feature = (f as Feature<LineString>).geometry;
+        const buffered = buffer(feature, MAX_DISTANCE_NM, {
+            units: "nauticalmiles"
+        });
+
+        return buffered && !booleanDisjoint(buffered, voyageLineString);
+    });
 
     return warnings;
 }

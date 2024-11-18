@@ -1,141 +1,95 @@
-import { default as pgPromise } from "pg-promise";
-import type { ApiData, DbCsvData, DbData } from "../model/data.js";
+import type { ApiData } from "../model/v2/api-model.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { nullNumber, nullString } from "./counter.js";
+import type { DbCsvData, DbValues } from "../model/v2/db-model.js";
+import type { TravelMode } from "../model/v2/types.js";
+import { database } from "./db.js";
 
-const SQL_INSERT_VALUES = `insert into counting_site_data(id, counter_id, data_timestamp, count, status, interval)
-    values (NEXTVAL('counting_site_data_id_seq'), $1, $2, $3, $4, $5)`;
+async function findLastModified(db: DTDatabase, startDate: Date, endDate: Date, siteId?: number, travelMode?: TravelMode): Promise<Date> {
+    let creator = database.selectFrom("cs2_data")    
+        .select(({fn}) => fn("max", ["modified"]).as("modified"))
+        .where("data_timestamp", ">=", startDate)
+        .where("data_timestamp", "<", endDate);
 
-const SQL_FIND_VALUES = `select csd.counter_id, csd.data_timestamp, csd.interval, csd.count, csd.status  
-    from counting_site_data csd, counting_site_counter csc
-    where csd.counter_id = csc.id
-    and data_timestamp >= $1 and data_timestamp < $2
-    and (csc.domain_name = $3 or $3 is null)
-    and (csd.counter_id = $4 or $4 is null)
-    order by 1`;
+    if(siteId) creator = creator.where("site_id", "=", siteId);
+    if(travelMode) creator = creator.where("travel_mode", "=", travelMode);
+    
+    const compiled = creator.compile();
+    return (await db.one<DbModified>(compiled.sql, compiled.parameters)).modified ?? new Date();
+}
 
-const SQL_FIND_VALUES_FOR_MONTH = `select csc.domain_name, csc.name counter_name, csut.name user_type, csd.data_timestamp, csd.interval, csd.count, csd.status, csd.modified 
-    from counting_site_data csd, counting_site_counter csc, counting_site_user_type csut 
-    where csd.counter_id = csc.id
-    and csc.user_type_id = csut.id 
-    and data_timestamp >= $1 and data_timestamp < $2
-    and (csc.domain_name = $3 or $3 is null)
-    and (csd.counter_id = $4 or $4 is null)
-    order by 1, 2, 3, 4`;
-
-const PS_INSERT_COUNTER_VALUES = new pgPromise.PreparedStatement({
-    name: "insert-values",
-    text: SQL_INSERT_VALUES
-});
-
-const PS_GET_VALUES = new pgPromise.PreparedStatement({
-    name: "find-values",
-    text: SQL_FIND_VALUES
-});
-
-const PS_GET_VALUES_LAST_MODIFIED = new pgPromise.PreparedStatement({
-    name: "find-values-last-modified",
-    text: `
-    select max(sub.modified) as modified
-    from (
-        select csd.modified as modified
-        from counting_site_data csd, counting_site_counter csc
-        where csd.counter_id = csc.id
-            and data_timestamp >= $1
-            and data_timestamp < $2
-            and (csc.domain_name = $3 or $3 is null)
-            and (csd.counter_id = $4 or $4 is null)
-        UNION
-        select to_timestamp(0) as modified
-      ) sub`
-});
-
-const PS_FIND_VALUES_FOR_MONTH = new pgPromise.PreparedStatement({
-    name: "find-data-for-month",
-    text: SQL_FIND_VALUES_FOR_MONTH
-});
-
-const PS_FIND_VALUES_FOR_MONTH_LAST_MODIFIED = new pgPromise.PreparedStatement({
-    name: "find-data-for-month-last-modified",
-    text: `
-    select max(sub.modified) as modified
-    from(
-        select csc.modified 
-        from counting_site_data csd, counting_site_counter csc, counting_site_user_type csut 
-        where csd.counter_id = csc.id
-        and csc.user_type_id = csut.id 
-        and data_timestamp >= $1 and data_timestamp < $2
-        and (csc.domain_name = $3 or $3 is null)
-        and (csd.counter_id = $4 or $4 is null)
-        UNION
-        select to_timestamp(0) as modified
-    ) sub`
-});
-
-export async function insertCounterValues(
+export async function findValuesForDate(
     db: DTDatabase,
+    date: Date,
+    siteId?: number,
+    travelMode?: TravelMode,
+): Promise<[DbValues[], Date]> {
+    // calculate timerange for data
+    const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+
+    const modified = await findLastModified(db, startDate, endDate, siteId, travelMode);
+
+    let creator = database.selectFrom("cs2_data")
+        .select(["site_id", "travel_mode", "direction", "data_timestamp", "granularity", "counts"])
+        .where("data_timestamp", ">=", startDate)
+        .where("data_timestamp", "<", endDate);
+
+    if(siteId) creator = creator.where("site_id", "=", siteId);
+    if(travelMode) creator = creator.where("travel_mode", "=", travelMode);
+
+    creator = creator.orderBy(["site_id", "travel_mode", "direction", "data_timestamp"]);
+
+    const compiled = creator.compile();
+    const data = await db.manyOrNone(compiled.sql, compiled.parameters);
+
+    return [data, modified];
+}
+
+export async function findCsvValuesForMonth(
+    db: DTDatabase,
+    year: number,
+    month: number,
     siteId: number,
-    interval: number,
-    data: ApiData[]
-): Promise<void> {
-    await Promise.allSettled(
-        data.map((d) => {
-            return db.none(PS_INSERT_COUNTER_VALUES, [siteId, d.date, d.counts, d.status, interval]);
-        })
-    );
-}
-
-export function findValues(
-    db: DTDatabase,
-    year: number,
-    month: number,
-    counterId: string,
-    domainName: string
-): Promise<[DbData[], Date]> {
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
-    const endDate = new Date(new Date(startDate).setMonth(month));
-
-    return db
-        .one(PS_GET_VALUES_LAST_MODIFIED, [startDate, endDate, nullString(domainName), nullNumber(counterId)])
-        .then((modified: DbModified) => {
-            return db
-                .manyOrNone(PS_GET_VALUES, [
-                    startDate,
-                    endDate,
-                    nullString(domainName),
-                    nullNumber(counterId)
-                ])
-                .then((data: DbData[]) => [data, modified.modified]);
-        });
-}
-
-export function findDataForMonth(
-    db: DTDatabase,
-    year: number,
-    month: number,
-    domainName: string,
-    counterId: string
+    travelMode?: TravelMode
 ): Promise<[DbCsvData[], Date]> {
     const startDate = new Date(Date.UTC(year, month - 1, 1));
     const endDate = new Date(new Date(startDate).setMonth(month));
 
-    return db
-        .one(PS_FIND_VALUES_FOR_MONTH_LAST_MODIFIED, [
-            startDate,
-            endDate,
-            nullString(domainName),
-            nullNumber(counterId)
-        ])
-        .then((modified: DbModified) => {
-            return db
-                .manyOrNone(PS_FIND_VALUES_FOR_MONTH, [
-                    startDate,
-                    endDate,
-                    nullString(domainName),
-                    nullNumber(counterId)
-                ])
-                .then((data: DbCsvData[]) => [data, modified.modified]);
-        });
+    const modified = await findLastModified(db, startDate, endDate, siteId, travelMode);
+
+    let creator = database.selectFrom("cs2_data")
+        .leftJoin("cs2_site", "cs2_data.site_id", "cs2_site.id")
+        .select(["name", "travel_mode", "direction", "cs2_data.granularity", "data_timestamp", "counts"])
+        .where("data_timestamp", ">=", startDate)
+        .where("data_timestamp", "<", endDate)
+        .where("cs2_data.site_id", "=", siteId)
+        .orderBy(["travel_mode", "direction", "cs2_data.granularity", "data_timestamp"])
+
+    if(travelMode) creator = creator.where("travel_mode", "=", travelMode);
+
+    const compiled = creator.compile();
+    const data = await db.manyOrNone(compiled.sql, compiled.parameters);
+
+    return [data, modified];
+}
+
+export async function addSiteData(db: DTDatabase, siteId: number, data: ApiData[]): Promise<void> {
+    await Promise.all(data.map(async d => {
+        await Promise.all(d.data.map((point) => {
+            const compiled = database.insertInto("cs2_data")
+            .values({
+                site_id: siteId,
+                travel_mode: d.travelMode,
+                direction: d.direction,
+                data_timestamp: point.timestamp,
+                granularity: point.granularity,
+                counts: point.counts
+            }).compile();
+
+            return db.none(compiled.sql, compiled.parameters);
+        }));
+    }));
 }
 
 interface DbModified {

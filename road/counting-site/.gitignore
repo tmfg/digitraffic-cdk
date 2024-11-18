@@ -1,5 +1,7 @@
 *
 
+/meta.json
+
 !/.eslintignore
 !/.eslintrc.cjs
 !/.eslintrc.js

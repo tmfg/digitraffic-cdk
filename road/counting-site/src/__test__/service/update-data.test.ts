@@ -1,64 +1,80 @@
-import { EcoCounterApi } from "../../api/eco-counter.js";
-import { updateDataForDomain } from "../../service/update.js";
-import { dbTestBase, insertCounter, insertDomain } from "../db-testutil.js";
+import { dbTestBase } from "../db-testutil.js";
 import * as DataDAO from "../../dao/data.js";
 
-import type { ApiData } from "../../model/data.js";
+//import type { ApiData } from "../../model/v1/data.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { jest } from "@jest/globals";
-
-const DOMAIN_NAME = "TEST_DOMAIN";
+import type { ApiData } from "../../model/v2/api-model.js";
+import { insertSite } from "../lambda/get-sites.test.js";
+import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
+import ky from "ky";
+import { updateData } from "../../service/update-service.js";
 
 describe(
     "update tests",
     dbTestBase((db: DTDatabase) => {
         const EMPTY_DATA: ApiData[] = [];
 
-        async function assertDataInDb(expected: number, counterId: string): Promise<void> {
-            const [data, lastModified] = await DataDAO.findValues(db, 2015, 9, counterId, "");
+        async function assertDataInDb(expected: number, siteId: number): Promise<void> {
+            const [data, lastModified] = await DataDAO.findValuesForDate(db, new Date(), siteId);
             expect(data).toHaveLength(expected);
             expect(lastModified).toBeDefined();
         }
 
-        test("updateDataForDomain - no counters", async () => {
-            await insertDomain(db, DOMAIN_NAME);
-            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(EMPTY_DATA);
+        test("updateDataForDomain - no data", async () => {
+            await insertSite(db);
 
-            await updateDataForDomain(DOMAIN_NAME, "", "");
+            const server = jest
+                .spyOn(ky, "get")
+                .mockImplementation(() => mockKyResponse(200, JSON.stringify(EMPTY_DATA)));
+            await updateData("", "", "Fintraffic");
 
-            expect(counterApiResponse).not.toHaveBeenCalled();
-        });
-
-        test("updateDataForDomain - one counter no data", async () => {
-            await insertDomain(db, DOMAIN_NAME);
-            await insertCounter(db, 1, DOMAIN_NAME, 1);
-            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(EMPTY_DATA);
-
-            await updateDataForDomain(DOMAIN_NAME, "", "");
-
-            expect(counterApiResponse).toHaveBeenCalled();
+            expect(server).toHaveBeenCalled();
+            await assertDataInDb(0, 0);
         });
 
         const RESPONSE_DATA: ApiData[] = [
             {
-                date: "2015-09-25T05:00:00+0000",
-                isoDate: new Date("2015-09-25T05:00:00+0200"),
-                counts: 1,
-                status: 1
+                travelMode: "bike",
+                direction: "in",
+                data: [
+                    {
+                        timestamp: new Date(),
+                        granularity: "P1D",
+                        counts: 1
+                    },
+                    {
+                        timestamp: new Date(),
+                        granularity: "P1M",
+                        counts: 2
+                    }
+                ]
+            },
+            {
+                travelMode: "car",
+                direction: "in",
+                data: [
+                    {
+                        timestamp: new Date(),
+                        granularity: "P1D",
+                        counts: 2
+                    }
+                ]
             }
         ];
 
-        test("updateDataForDomain - one counter and data", async () => {
-            await insertDomain(db, DOMAIN_NAME);
-            await insertCounter(db, 1, DOMAIN_NAME, 1);
-            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
+        test("updateDataForDomain - two counter and data", async () => {
+            await insertSite(db);
 
-            await updateDataForDomain(DOMAIN_NAME, "", "");
+            const server = jest
+                .spyOn(ky, "get")
+                .mockImplementation(() => mockKyResponse(200, JSON.stringify(RESPONSE_DATA)));
+            await updateData("", "", "Fintraffic");
 
-            await assertDataInDb(1, "1");
-            expect(counterApiResponse).toHaveBeenCalled();
+            expect(server).toHaveBeenCalled();
+            await assertDataInDb(3, 1);
         });
-
+        /*
         test("updateDataForDomain - one counter and data, last update week ago", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
@@ -67,7 +83,7 @@ describe(
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 
-            await assertDataInDb(1, "1");
+            await assertDataInDb(1, 1);
             expect(counterApiResponse).toHaveBeenCalled();
         });
 
@@ -80,8 +96,8 @@ describe(
             await updateDataForDomain(DOMAIN_NAME, "", "");
 
             // timestamp said the data was just updated, so no new data was added
-            await assertDataInDb(0, "1");
+            await assertDataInDb(0, 1);
             expect(counterApiResponse).not.toHaveBeenCalled();
-        });
+        });*/
     })
 );
