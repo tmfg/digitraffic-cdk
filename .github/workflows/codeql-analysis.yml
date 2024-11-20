@@ -30,10 +30,6 @@ jobs:
       with:
         node-version: 20
 
-    # Post Checkout repository step will fail if .gitmodules doesn't exist.
-    - name: Run rush repo:init
-      run: node common/scripts/install-run-rush.js repo:init
-
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
