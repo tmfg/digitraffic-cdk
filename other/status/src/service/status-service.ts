@@ -141,7 +141,7 @@ async function updateNodePingChecksForApp(
 
     logger.info({
         method,
-        message: `Creating missing checks for app ${appWithEndpoints.app}`
+        message: `Creating missing checks for app ${appWithEndpoints.app} start`
     });
     await createChecks(
         missingChecks,
@@ -207,7 +207,7 @@ async function createChecks(
     }
     logger.info({
         method,
-        message: `Creating missing checks for app ${appWithEndpoints.app}`,
+        message: `Creating missing checks for app ${appWithEndpoints.app} end`,
         tookMs: Date.now() - start,
         customCount: missingChecks.length
     });

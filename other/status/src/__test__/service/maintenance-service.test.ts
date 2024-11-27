@@ -29,7 +29,8 @@ describe("MaintenanceServiceTest", () => {
     async function testHandleMaintenance(
         expectMaintenanceChecksTo: MaintenanceChecksTo = "none",
         cStateApiActiveMaintenance: ActiveMaintenance | undefined = undefined,
-        nodePingApi_getNodePingChecks: NodePingCheck[] = []
+        nodePingApi_getNodePingChecks: NodePingCheck[] = [],
+        nodePingApi_getNodePingChecksSecondCall: NodePingCheck[] = []
     ): Promise<void> {
         const stubCStateApiIsActiveMaintenances = jest
             .spyOn(cStateApi, "isActiveMaintenances")
@@ -45,7 +46,13 @@ describe("MaintenanceServiceTest", () => {
 
         const stubGetNodePingChecks = jest
             .spyOn(nodePingApi, "getNodePingChecks")
-            .mockReturnValue(Promise.resolve(nodePingApi_getNodePingChecks));
+            .mockReturnValueOnce(Promise.resolve(nodePingApi_getNodePingChecks));
+        if (expectMaintenanceChecksTo === "enabled") {
+            // Second call
+            stubGetNodePingChecks.mockReturnValueOnce(
+                Promise.resolve(nodePingApi_getNodePingChecksSecondCall)
+            );
+        }
         const stubDisableNodePingChecks = jest
             .spyOn(nodePingApi, "disableNodePingChecks")
             .mockReturnValue(Promise.resolve());
@@ -59,7 +66,12 @@ describe("MaintenanceServiceTest", () => {
         expect(stubCStateApiIsActiveMaintenances).toHaveBeenCalledTimes(0);
         expect(stubCStateApiFindActiveMaintenance).toHaveBeenCalledTimes(1);
 
-        expect(stubGetNodePingChecks).toHaveBeenCalledTimes(1);
+        if (expectMaintenanceChecksTo === "enabled") {
+            // Extra call after enabling checks to see there is no more enabled checks
+            expect(stubGetNodePingChecks).toHaveBeenCalledTimes(2);
+        } else {
+            expect(stubGetNodePingChecks).toHaveBeenCalledTimes(1);
+        }
 
         const enabledCount = nodePingApi_getNodePingChecks
             .filter((c) => c.enable === "active")
@@ -73,7 +85,20 @@ describe("MaintenanceServiceTest", () => {
             expect(stubDisableNodePingChecks).not.toHaveBeenCalled();
             expect(stubCStateApiTriggerUpdateMaintenanceGithubAction).toHaveBeenCalledTimes(0);
             expect(stubSlackNotifyApi).toHaveBeenCalledTimes(1);
-            expect(stubSlackNotifyApi).toHaveBeenCalledWith(expect.stringContaining("enabled"));
+            expect(stubSlackNotifyApi).toHaveBeenCalledWith(
+                expect.stringContaining("Maintenance has ended!")
+            );
+            // If there is still NodePing checks disabled then message should contain notice of it.
+            if (nodePingApi_getNodePingChecksSecondCall.length) {
+                expect(stubSlackNotifyApi).toHaveBeenCalledWith(
+                    expect.stringContaining(
+                        `but still ${nodePingApi_getNodePingChecksSecondCall.length} are in inactive state`
+                    )
+                );
+            } else {
+                expect(stubSlackNotifyApi).toHaveBeenCalledWith(expect.not.stringContaining(`but`));
+            }
+
             expect(stubSlackNotifyApi).toHaveBeenCalledWith(
                 expect.stringContaining(disabledCount.toString())
             );
@@ -102,6 +127,14 @@ describe("MaintenanceServiceTest", () => {
 
     test("No maintenance on CState & checks disabled -> checks enabled", async () =>
         await testHandleMaintenance("enabled", undefined, getNodePingChecks(10, false)));
+
+    test("No maintenance on CState & checks disabled -> checks enabled but sill found one enabled checks", async () =>
+        await testHandleMaintenance(
+            "enabled",
+            undefined,
+            getNodePingChecks(10, false),
+            getNodePingChecks(1, false)
+        ));
 
     test("Maintenance on CState & checks disabled -> no change", async () =>
         await testHandleMaintenance("none", getActiveMaintenance(), getNodePingChecks(10, false)));
