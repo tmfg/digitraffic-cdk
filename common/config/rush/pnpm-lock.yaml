@@ -2198,106 +2198,6 @@ importers:
         specifier: ~5.6.3
         version: 5.6.3
 
-  ../../road/charging-network:
-    dependencies:
-      '@digitraffic/common':
-        specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
-      aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
-      axios:
-        specifier: ^1.7.7
-        version: 1.7.7
-      compare-versions:
-        specifier: ^6.1.1
-        version: 6.1.1
-      constructs:
-        specifier: ~10.4.2
-        version: 10.4.2
-      geojson:
-        specifier: ^0.5.0
-        version: 0.5.0
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      pg-native:
-        specifier: ^3.2.0
-        version: 3.2.0
-      pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
-      spex:
-        specifier: ^3.4.0
-        version: 3.4.0
-      uuid:
-        specifier: ^10.0.0
-        version: 10.0.0
-    devDependencies:
-      '@digitraffic-cdk/digitraffic-cdk-rig':
-        specifier: workspace:*
-        version: link:../../tools/rig
-      '@digitraffic-cdk/testing':
-        specifier: workspace:*
-        version: link:../../tools/testing
-      '@digitraffic-cdk/toolchain':
-        specifier: workspace:*
-        version: link:../../tools/toolchain
-      '@digitraffic/eslint-config':
-        specifier: workspace:*
-        version: link:../../tools/eslint-config
-      '@jest/globals':
-        specifier: ^29.7.0
-        version: 29.7.0
-      '@rushstack/eslint-config':
-        specifier: ^3.7.1
-        version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
-      '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
-      '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
-      '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
-      '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
-      '@types/heft-jest':
-        specifier: 1.0.6
-        version: 1.0.6
-      '@types/jest':
-        specifier: 29.5.14
-        version: 29.5.14
-      '@types/lodash':
-        specifier: 4.17.13
-        version: 4.17.13
-      '@types/node':
-        specifier: 20.17.6
-        version: 20.17.6
-      '@types/semver':
-        specifier: 7.5.8
-        version: 7.5.8
-      '@types/sinon':
-        specifier: 17.0.3
-        version: 17.0.3
-      '@types/uuid':
-        specifier: 10.0.0
-        version: 10.0.0
-      esbuild:
-        specifier: 0.24.0
-        version: 0.24.0
-      eslint:
-        specifier: ^8.57.0
-        version: 8.57.0
-      nock:
-        specifier: ~13.5.4
-        version: 13.5.5
-      typescript:
-        specifier: ~5.6.3
-        version: 5.6.3
-
   ../../road/counting-site:
     dependencies:
       '@digitraffic/common':
@@ -2327,9 +2227,6 @@ importers:
       kysely:
         specifier: 0.27.4
         version: 0.27.4
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
       pg-native:
         specifier: ^3.2.0
         version: 3.2.0
@@ -6038,9 +5935,6 @@ packages:
 
   commondir@1.0.1:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
-
-  compare-versions@6.1.1:
-    resolution: {integrity: sha512-4hm4VPpIecmlg59CHXnRDnqGplJFrbLG4aFEl5vl6cK1u76ws3LLvX7ikFnTDl5vo39sjWD6AaDPYodJp/NNHg==}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -14193,8 +14087,6 @@ snapshots:
   commist@3.2.0: {}
 
   commondir@1.0.1: {}
-
-  compare-versions@6.1.1: {}
 
   concat-map@0.0.1: {}
 

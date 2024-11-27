@@ -132,13 +132,13 @@ export class PublicApiV2 {
 
         this.publicApi.documentResource(
             sitesResource,
-            DocumentationPart.method(COUNTING_SITE_TAGS_V2, "GetSites", "Return all sites")
+            DocumentationPart.method(COUNTING_SITE_TAGS_V2, "GetSites", "Return all sites"),
+            DocumentationPart.queryParameter("domain", "Site domain")
         );
 
         this.publicApi.documentResource(
             siteResource,
             DocumentationPart.method(COUNTING_SITE_TAGS_V2, "GetSite", "Return one site"),
-            DocumentationPart.queryParameter("domain", "Site domain"),
             DocumentationPart.pathParameter("siteId", "Site id")
         );
     }
@@ -161,7 +161,7 @@ export class PublicApiV2 {
                 apiKeyRequired: true,
                 requestParameters: {
                     "method.request.querystring.siteId": false,
-                    "method.request.querystring.date": true,
+                    "method.request.querystring.date": false,
                     "method.request.querystring.travelMode": false
                 },
                 methodResponses: [
@@ -175,7 +175,7 @@ export class PublicApiV2 {
             valuesResource,
             DocumentationPart.method(COUNTING_SITE_TAGS_V2, "GetData", "Return counter values."),
             DocumentationPart.queryParameter("siteId", "Site id"),
-            DocumentationPart.queryParameter("date", "Date"),
+            DocumentationPart.queryParameter("date", "Date.  Default yesterday."),
             DocumentationPart.queryParameter("travelMode", "Travel Mode")
         );
     }

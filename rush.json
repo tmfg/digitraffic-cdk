@@ -214,12 +214,6 @@
 
     // road
     {
-      "packageName": "charging-network",
-      "projectFolder": "road/charging-network",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "road"]
-    },
-    {
       "packageName": "counting-sites",
       "projectFolder": "road/counting-site",
       "decoupledLocalDependencies": ["@digitraffic/common"],
