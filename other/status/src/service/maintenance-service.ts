@@ -44,20 +44,37 @@ export async function handleMaintenance(
         );
 
         // No active maintenance found and there is disabled checks -> enable checks
+        // This should happen only once as here we notice that maintenance has ended and we re-enable all checks
     } else if (!activeMaintenance && disabledChecksCount) {
         logger.info({
             method: method,
             message: `No active maintenances found, enabling ${disabledChecksCount} disabled NodePing checks`
         });
         await nodePingApi.enableNodePingChecks();
-        const checksToEnable = JSON.stringify(disabledChecks.map((c) => c.label));
 
-        logger.info({
-            method: method,
-            message: `NodePing checks enabled ${disabledChecksCount}, maintenance has ended!\n(Enabled: ${checksToEnable})`
-        });
+        const checksAfterEnable = await nodePingApi.getNodePingChecks();
+        const disabledChecksAfterEnable = nodePingApi.getDisabledNodePingChecks(checksAfterEnable);
+        const disabledChecksCountAfterEnable = disabledChecksAfterEnable.length;
+        const checksToEnable = JSON.stringify(disabledChecksAfterEnable.map((c) => c.label));
 
-        await slackNotifyApi.notify(`NodePing checks enabled ${disabledChecksCount}. Maintenance has ended!`);
+        if (disabledChecksCountAfterEnable > 0) {
+            const message = [
+                `Maintenance has ended! Enabled ${disabledChecksCount} NodePing checks but still ${disabledChecksCountAfterEnable}`,
+                `are in inactive state. Enable or delete from NodePing: ${checksToEnable}.`
+            ].join(" ");
+            logger.error({
+                method: method,
+                message
+            });
+            await slackNotifyApi.notify(message);
+        } else {
+            const message = `Maintenance has ended! Enabled ${disabledChecksCount} NodePing checks.`;
+            logger.info({
+                method: method,
+                message
+            });
+            await slackNotifyApi.notify(message);
+        }
     } else {
         logger.info({
             method: method,

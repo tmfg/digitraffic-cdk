@@ -28,8 +28,6 @@ jobs:
 
       # - name: Verify Change Logs
       #   run: node common/scripts/install-run-rush.js change --verify
-      - name: Init submodule
-        run: node common/scripts/git-submodule-extra.mjs init
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
       - name: Rush rebuild
