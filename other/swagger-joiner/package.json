@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.687.0",
-    "@aws-sdk/client-s3": "^3.687.0",
+    "@aws-sdk/client-s3": "^3.709.0",
     "@digitraffic/common": "2024.7.8-1",
     "aws-cdk-lib": "^2.172.0",
     "constructs": "~10.4.2",
