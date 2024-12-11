@@ -10,7 +10,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.166.0",
+    "aws-cdk-lib": "^2.172.0",
     "constructs": "~10.4.2",
     "source-map-support": "^0.5.21"
   },

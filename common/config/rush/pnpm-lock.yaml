@@ -20,10 +20,10 @@ importers:
         version: 3.687.0(@aws-sdk/client-s3@3.687.0)
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
@@ -41,14 +41,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -95,17 +95,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.1)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@rushstack/heft-lint-plugin':
         specifier: ^0.5.0
-        version: 0.5.5(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)
+        version: 0.5.5(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)
       '@rushstack/heft-typescript-plugin':
         specifier: ^0.5.30
-        version: 0.5.35(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)
+        version: 0.5.35(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)
       '@smithy/fetch-http-handler':
         specifier: 3.2.9
         version: 3.2.9
@@ -113,14 +113,14 @@ importers:
         specifier: ^3.5.0
         version: 3.6.0
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/etag':
         specifier: ^1.8.3
         version: 1.8.3
       '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
+        specifier: 7946.0.15
+        version: 7946.0.15
       '@types/geojson-validation':
         specifier: ^1.0.3
         version: 1.0.3
@@ -143,8 +143,8 @@ importers:
         specifier: ^7.18.0
         version: 7.18.0(eslint@8.57.1)(typescript@5.6.3)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
@@ -179,8 +179,8 @@ importers:
         specifier: ^16.0.0
         version: 16.0.0
       ky:
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -197,8 +197,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
@@ -215,8 +215,8 @@ importers:
         specifier: ^2.0.6
         version: 2.0.6
       zod:
-        specifier: ~3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
 
   ../../lib/repo-scripts:
     dependencies:
@@ -270,11 +270,11 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/async':
         specifier: ~3.2.24
         version: 3.2.24
@@ -309,14 +309,14 @@ importers:
   ../../marine/aton-faults:
     dependencies:
       '@aws-sdk/client-sqs':
-        specifier: ^3.687.0
-        version: 3.687.0
+        specifier: ^3.709.0
+        version: 3.709.0
       '@date-fns/tz':
         specifier: 1.2.0
         version: 1.2.0
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       '@middy/core':
         specifier: ^5.5.0
         version: 5.5.1
@@ -327,8 +327,8 @@ importers:
         specifier: 7.0.0-alpha.116
         version: 7.0.0-alpha.116
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -336,8 +336,8 @@ importers:
         specifier: ~4.1.0
         version: 4.1.0
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       parse-link-header:
         specifier: ^2.0.0
         version: 2.0.0
@@ -345,8 +345,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       spex:
         specifier: ^3.4.0
         version: 3.4.0
@@ -363,8 +363,8 @@ importers:
         specifier: ^0.6.2
         version: 0.6.2
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -385,17 +385,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
+        specifier: 7946.0.15
+        version: 7946.0.15
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -431,10 +431,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
@@ -448,8 +448,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       parse-link-header:
         specifier: ^2.0.0
         version: 2.0.0
@@ -457,8 +457,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       spex:
         specifier: ^3.4.0
         version: 3.4.0
@@ -488,17 +488,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
+        specifier: 7946.0.15
+        version: 7946.0.15
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -534,10 +534,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
@@ -567,14 +567,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -622,13 +622,13 @@ importers:
         version: 3.687.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       amazon-cognito-identity-js:
         specifier: 6.3.12
         version: 6.3.12
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -639,8 +639,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       undici:
         specifier: ^6.20.0
         version: 6.20.1
@@ -664,14 +664,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -710,10 +710,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -727,14 +727,14 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       pg-native:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -755,17 +755,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
+        specifier: 7946.0.15
+        version: 7946.0.15
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -812,8 +812,8 @@ importers:
         specifier: ^3.687.0
         version: 3.687.0
       '@aws-sdk/client-sqs':
-        specifier: ^3.687.0
-        version: 3.687.0
+        specifier: ^3.709.0
+        version: 3.709.0
       '@aws-sdk/client-ssm':
         specifier: ^3.687.0
         version: 3.687.0
@@ -822,7 +822,7 @@ importers:
         version: 1.2.0
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       '@middy/core':
         specifier: ^5.5.0
         version: 5.5.1
@@ -833,8 +833,8 @@ importers:
         specifier: ^0.10.3
         version: 0.10.4
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -842,8 +842,8 @@ importers:
         specifier: ~4.1.0
         version: 4.1.0
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -851,8 +851,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       spex:
         specifier: ^3.4.0
         version: 3.4.0
@@ -879,17 +879,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/amqplib':
         specifier: 0.10.5
         version: 0.10.5
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -940,22 +940,22 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       pg-native:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -985,14 +985,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1037,10 +1037,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1048,8 +1048,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -1070,14 +1070,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1121,20 +1121,20 @@ importers:
         specifier: ^3.687.0
         version: 3.687.0
       '@aws-sdk/client-sqs':
-        specifier: ^3.687.0
-        version: 3.687.0
+        specifier: ^3.709.0
+        version: 3.709.0
       '@date-fns/tz':
         specifier: 1.2.0
         version: 1.2.0
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       '@turf/turf':
         specifier: 7.0.0-alpha.111
         version: 7.0.0-alpha.111
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
@@ -1145,8 +1145,8 @@ importers:
         specifier: ~4.1.0
         version: 4.1.0
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -1176,14 +1176,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1231,16 +1231,16 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.8.30-1
-        version: 2024.8.30-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.8.30-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -1248,11 +1248,11 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -1273,11 +1273,11 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1304,10 +1304,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1328,11 +1328,11 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1353,10 +1353,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.10.9-1
-        version: 2024.10.9-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.9-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1398,14 +1398,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1456,10 +1456,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1480,14 +1480,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1510,8 +1510,8 @@ importers:
   ../../other/elasticsearch:
     dependencies:
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1545,10 +1545,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1569,14 +1569,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1615,7 +1615,7 @@ importers:
         version: 3.686.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       '@smithy/node-http-handler':
         specifier: ~3.2.5
         version: 3.2.5
@@ -1626,8 +1626,8 @@ importers:
         specifier: ~3.1.1
         version: 3.1.2
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1645,11 +1645,11 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.1)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1673,7 +1673,7 @@ importers:
         version: 3.687.0
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       '@smithy/node-http-handler':
         specifier: ~3.2.5
         version: 3.2.5
@@ -1684,8 +1684,8 @@ importers:
         specifier: ~3.1.1
         version: 3.1.2
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-lambda:
         specifier: ^1.0.7
         version: 1.0.7
@@ -1696,8 +1696,8 @@ importers:
         specifier: ~10.4.2
         version: 10.4.2
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       mysql:
         specifier: ^2.18.1
         version: 2.18.1
@@ -1724,14 +1724,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1775,14 +1775,14 @@ importers:
         specifier: ~5.6.3
         version: 5.6.3
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
 
   ../../other/patchmanager:
     dependencies:
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -1800,11 +1800,11 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1828,10 +1828,10 @@ importers:
         version: 3.687.0
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -1842,8 +1842,8 @@ importers:
         specifier: ~4.1.0
         version: 4.1.0
       ky:
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1873,14 +1873,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.1)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1913,22 +1913,22 @@ importers:
         version: 3.687.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
       ky:
-        specifier: 1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -1946,14 +1946,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -1977,16 +1977,16 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.8.27-1
-        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.8.27-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -2007,14 +2007,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2046,14 +2046,14 @@ importers:
         specifier: ^3.687.0
         version: 3.687.0
       '@aws-sdk/client-sqs':
-        specifier: ^3.687.0
-        version: 3.687.0
+        specifier: ^3.709.0
+        version: 3.709.0
       '@date-fns/tz':
         specifier: 1.2.0
         version: 1.2.0
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       '@middy/core':
         specifier: ^5.5.0
         version: 5.5.1
@@ -2067,8 +2067,8 @@ importers:
         specifier: ~3.0.1
         version: 3.0.1(ajv@8.17.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -2085,8 +2085,8 @@ importers:
         specifier: ^3.4.0
         version: 3.4.0
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
     devDependencies:
       '@babel/preset-env':
         specifier: ~7.26.0
@@ -2107,14 +2107,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2147,10 +2147,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
@@ -2171,14 +2171,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2202,13 +2202,13 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.10.9-1
-        version: 2024.10.9-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.9-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       '@std/csv':
         specifier: npm:@jsr/std__csv@1.0.3
         version: '@jsr/std__csv@1.0.3'
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ^10.4.2
         version: 10.4.2
@@ -2222,8 +2222,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       ky:
-        specifier: ^1.7.2
-        version: 1.7.2
+        specifier: 1.7.3
+        version: 1.7.3
       kysely:
         specifier: 0.27.4
         version: 0.27.4
@@ -2231,11 +2231,11 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       zod:
-        specifier: 3.23.8
-        version: 3.23.8
+        specifier: 3.24.1
+        version: 3.24.1
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -2256,17 +2256,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
+        specifier: 7946.0.15
+        version: 7946.0.15
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2311,10 +2311,10 @@ importers:
         version: 3.687.0
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -2338,14 +2338,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2371,14 +2371,14 @@ importers:
         specifier: ^3.687.0
         version: 3.687.0
       '@aws-sdk/client-sqs':
-        specifier: ^3.687.0
-        version: 3.687.0
+        specifier: ^3.709.0
+        version: 3.709.0
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -2395,14 +2395,14 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       spex:
         specifier: ^3.4.0
         version: 3.4.0
       sqs-extended-client:
         specifier: ^1.0.0
-        version: 1.0.0(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-sqs@3.687.0)
+        version: 1.0.0(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-sqs@3.709.0)
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -2423,14 +2423,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2466,10 +2466,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.10.25-1
-        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -2486,8 +2486,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       spex:
         specifier: ^3.4.0
         version: 3.4.0
@@ -2511,17 +2511,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
+        specifier: 7946.0.15
+        version: 7946.0.15
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2551,10 +2551,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
@@ -2568,8 +2568,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -2599,14 +2599,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2645,10 +2645,10 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -2659,8 +2659,8 @@ importers:
         specifier: ~4.1.0
         version: 4.1.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       wkx:
         specifier: ^0.5.0
         version: 0.5.0
@@ -2681,17 +2681,17 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/geojson':
-        specifier: 7946.0.14
-        version: 7946.0.14
+        specifier: 7946.0.15
+        version: 7946.0.15
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2724,13 +2724,13 @@ importers:
     dependencies:
       '@digitraffic/common':
         specifier: 2024.7.8-1
-        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))
+        version: 2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))
       '@rgrove/parse-xml':
         specifier: 4.2.0
         version: 4.2.0
       aws-cdk-lib:
-        specifier: ^2.166.0
-        version: 2.166.0(constructs@10.4.2)
+        specifier: ^2.172.0
+        version: 2.172.0(constructs@10.4.2)
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -2738,8 +2738,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.1
-        version: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+        specifier: ^11.10.2
+        version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
     devDependencies:
       '@aws-sdk/client-api-gateway':
         specifier: ^3.687.0
@@ -2763,14 +2763,14 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/aws-lambda':
-        specifier: 8.10.145
-        version: 8.10.145
+        specifier: 8.10.146
+        version: 8.10.146
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2833,11 +2833,11 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.0)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2878,17 +2878,17 @@ importers:
   ../../tools/rig:
     dependencies:
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@22.9.0)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@22.9.0)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@22.9.0))(@types/node@22.9.0)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@22.9.0))(@types/node@22.9.0)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
       '@rushstack/heft-lint-plugin':
         specifier: ^0.5.0
-        version: 0.5.5(@rushstack/heft@0.68.6(@types/node@22.9.0))(@types/node@22.9.0)
+        version: 0.5.5(@rushstack/heft@0.68.10(@types/node@22.9.0))(@types/node@22.9.0)
       '@rushstack/heft-typescript-plugin':
         specifier: ^0.5.30
-        version: 0.5.35(@rushstack/heft@0.68.6(@types/node@22.9.0))(@types/node@22.9.0)
+        version: 0.5.35(@rushstack/heft@0.68.10(@types/node@22.9.0))(@types/node@22.9.0)
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -2919,7 +2919,7 @@ importers:
         version: link:../toolchain
       '@digitraffic/common':
         specifier: 2024.8.30-1
-        version: 2024.8.30-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)
+        version: 2024.8.30-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)
       '@digitraffic/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
@@ -2927,11 +2927,11 @@ importers:
         specifier: ^29.7.0
         version: 29.7.0
       '@rushstack/heft':
-        specifier: ^0.68.6
-        version: 0.68.6(@types/node@20.17.6)
+        specifier: ^0.68.10
+        version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.12.18
-        version: 0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.14.0
+        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -3033,8 +3033,8 @@ packages:
     resolution: {integrity: sha512-GROVmhLv89EgoH0nc5//46l0G4E/oieu0Qmk5y5ljn7oTkx0aggsvn1j+v3hKT0W58UjqH46uQoE6HKnXwAHzQ==}
     engines: {node: '>=16.0.0'}
 
-  '@aws-sdk/client-sqs@3.687.0':
-    resolution: {integrity: sha512-J058iWTsZbL6LpLy3czOx1i9AUJ/okhmYKAmk0rD+dEo5edBaaYTxRpxJW4JqqYVBZmvW+8kUO6IXw3ULa8+yA==}
+  '@aws-sdk/client-sqs@3.709.0':
+    resolution: {integrity: sha512-qVMDxAnUbA/BnMf+utUZ+eoy6F4T7RsHnwor674/Bn5TsRPfGXYPTCpqqGZDTj4DYew6/G8ePpb3YwClVOqNRg==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/client-ssm@3.687.0':
@@ -3047,24 +3047,50 @@ packages:
     peerDependencies:
       '@aws-sdk/client-sts': ^3.687.0
 
+  '@aws-sdk/client-sso-oidc@3.709.0':
+    resolution: {integrity: sha512-1w6egz17QQy661lNCRmZZlqIANEbD6g2VFAQIJbVwSiu7brg+GUns+mT1eLLLHAMQc1sL0Ds8/ybSK2SrgGgIA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sts': ^3.709.0
+
   '@aws-sdk/client-sso@3.687.0':
     resolution: {integrity: sha512-dfj0y9fQyX4kFill/ZG0BqBTLQILKlL7+O5M4F9xlsh2WNuV2St6WtcOg14Y1j5UODPJiJs//pO+mD1lihT5Kw==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/client-sso@3.709.0':
+    resolution: {integrity: sha512-Qxeo8cN0jNy6Wnbqq4wucffAGJM6sJjofoTgNtPA6cC7sPYx7aYC6OAAAo6NaMRY+WywOKdS9Wgjx2QYRxKx7w==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/client-sts@3.687.0':
     resolution: {integrity: sha512-SQjDH8O4XCTtouuCVYggB0cCCrIaTzUZIkgJUpOsIEJBLlTbNOb/BZqUShAQw2o9vxr2rCeOGjAQOYPysW/Pmg==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/client-sts@3.709.0':
+    resolution: {integrity: sha512-cBAvlPg6yslXNL385UUGFPw+XY+lA9BzioNdIFkMo3fEUlTShogTtiWz4LsyLHoN6LhKojssP9DSmmWKWjCZIw==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/core@3.686.0':
     resolution: {integrity: sha512-Xt3DV4DnAT3v2WURwzTxWQK34Ew+iiLzoUoguvLaZrVMFOqMMrwVjP+sizqIaHp1j7rGmFcN5I8saXnsDLuQLA==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/core@3.709.0':
+    resolution: {integrity: sha512-7kuSpzdOTAE026j85wq/fN9UDZ70n0OHw81vFqMWwlEFtm5IQ/MRCLKcC4HkXxTdfy1PqFlmoXxWqeBa15tujw==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/credential-provider-env@3.686.0':
     resolution: {integrity: sha512-osD7lPO8OREkgxPiTWmA1i6XEmOth1uW9HWWj/+A2YGCj1G/t2sHu931w4Qj9NWHYZtbTTXQYVRg+TErALV7nQ==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/credential-provider-env@3.709.0':
+    resolution: {integrity: sha512-ZMAp9LSikvHDFVa84dKpQmow6wsg956Um20cKuioPpX2GGreJFur7oduD+tRJT6FtIOHn+64YH+0MwiXLhsaIQ==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/credential-provider-http@3.686.0':
     resolution: {integrity: sha512-xyGAD/f3vR/wssUiZrNFWQWXZvI4zRm2wpHhoHA1cC2fbRMNFYtFn365yw6dU7l00ZLcdFB1H119AYIUZS7xbw==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/credential-provider-http@3.709.0':
+    resolution: {integrity: sha512-lIS7XLwCOyJnLD70f+VIRr8DNV1HPQe9oN6aguYrhoczqz7vDiVZLe3lh714cJqq9rdxzFypK5DqKHmcscMEPQ==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/credential-provider-ini@3.687.0':
@@ -3073,16 +3099,34 @@ packages:
     peerDependencies:
       '@aws-sdk/client-sts': ^3.687.0
 
+  '@aws-sdk/credential-provider-ini@3.709.0':
+    resolution: {integrity: sha512-qCF8IIGcPoUp+Ib3ANhbF5gElxFd+kIrtv2/1tKdvhudMANstQbMiWV0LTH47ZZR6c3as4iSrm09NZnpEoD/pA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sts': ^3.709.0
+
   '@aws-sdk/credential-provider-node@3.687.0':
     resolution: {integrity: sha512-Pqld8Nx11NYaBUrVk3bYiGGpLCxkz8iTONlpQWoVWFhSOzlO7zloNOaYbD2XgFjjqhjlKzE91drs/f41uGeCTA==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/credential-provider-node@3.709.0':
+    resolution: {integrity: sha512-4HRX9KYWPSjO5O/Vg03YAsebKpvTjTvpK1n7zHYBmlLMBLxUrVsL1nNKKC5p2/7OW3RL8XR1ki3QkoV7kGRxUQ==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/credential-provider-process@3.686.0':
     resolution: {integrity: sha512-sXqaAgyzMOc+dm4CnzAR5Q6S9OWVHyZjLfW6IQkmGjqeQXmZl24c4E82+w64C+CTkJrFLzH1VNOYp1Hy5gE6Qw==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/credential-provider-process@3.709.0':
+    resolution: {integrity: sha512-IAC+jPlGQII6jhIylHOwh3RgSobqlgL59nw2qYTURr8hMCI0Z1p5y2ee646HTVt4WeCYyzUAXfxr6YI/Vitv+Q==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/credential-provider-sso@3.687.0':
     resolution: {integrity: sha512-N1YCoE7DovIRF2ReyRrA4PZzF0WNi4ObPwdQQkVxhvSm7PwjbWxrfq7rpYB+6YB1Uq3QPzgVwUFONE36rdpxUQ==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/credential-provider-sso@3.709.0':
+    resolution: {integrity: sha512-rYdTDOxazS2GdGScelsRK5CAkktRLCCdRjlwXaxrcW57j749hEqxcF5uTv9RD6WBwInfedcSywErNZB+hylQlg==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/credential-provider-web-identity@3.686.0':
@@ -3090,6 +3134,12 @@ packages:
     engines: {node: '>=16.0.0'}
     peerDependencies:
       '@aws-sdk/client-sts': ^3.686.0
+
+  '@aws-sdk/credential-provider-web-identity@3.709.0':
+    resolution: {integrity: sha512-2lbDfE0IQ6gma/7BB2JpkjW5G0wGe4AS0x80oybYAYYviJmUtIR3Cn2pXun6bnAWElt4wYKl4su7oC36rs5rNA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sts': ^3.709.0
 
   '@aws-sdk/lib-storage@3.687.0':
     resolution: {integrity: sha512-LAJOH1Ddm8vlA6j8WyFAt1Ithfj58XuJN1d2WJSDZLhGDGQp3+nDFzovOKODw/Bc9x6ZnDYm9rE+QMTbGSvqkA==}
@@ -3113,6 +3163,10 @@ packages:
     resolution: {integrity: sha512-+Yc6rO02z+yhFbHmRZGvEw1vmzf/ifS9a4aBjJGeVVU+ZxaUvnk+IUZWrj4YQopUQ+bSujmMUzJLXSkbDq7yuw==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/middleware-host-header@3.709.0':
+    resolution: {integrity: sha512-8gQYCYAaIw4lOCd5WYdf15Y/61MgRsAnrb2eiTl+icMlUOOzl8aOl5iDwm/Idp0oHZTflwxM4XSvGXO83PRWcw==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/middleware-location-constraint@3.686.0':
     resolution: {integrity: sha512-pCLeZzt5zUGY3NbW4J/5x3kaHyJEji4yqtoQcUlJmkoEInhSxJ0OE8sTxAfyL3nIOF4yr6L2xdaLCqYgQT8Aog==}
     engines: {node: '>=16.0.0'}
@@ -3121,8 +3175,16 @@ packages:
     resolution: {integrity: sha512-cX43ODfA2+SPdX7VRxu6gXk4t4bdVJ9pkktbfnkE5t27OlwNfvSGGhnHrQL8xTOFeyQ+3T+oowf26gf1OI+vIg==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/middleware-logger@3.709.0':
+    resolution: {integrity: sha512-jDoGSccXv9zebnpUoisjWd5u5ZPIalrmm6TjvPzZ8UqzQt3Beiz0tnQwmxQD6KRc7ADweWP5Ntiqzbw9xpVajg==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/middleware-recursion-detection@3.686.0':
     resolution: {integrity: sha512-jF9hQ162xLgp9zZ/3w5RUNhmwVnXDBlABEUX8jCgzaFpaa742qR/KKtjjZQ6jMbQnP+8fOCSXFAVNMU+s6v81w==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/middleware-recursion-detection@3.709.0':
+    resolution: {integrity: sha512-PObL/wLr4lkfbQ0yXUWaoCWu/jcwfwZzCjsUiXW/H6hW9b/00enZxmx7OhtJYaR6xmh/Lcx5wbhIoDCbzdv0tw==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/middleware-sdk-api-gateway@3.686.0':
@@ -3133,8 +3195,8 @@ packages:
     resolution: {integrity: sha512-YGHYqiyRiNNucmvLrfx3QxIkjSDWR/+cc72bn0lPvqFUQBRHZgmYQLxVYrVZSmRzzkH2FQ1HsZcXhOafLbq4vQ==}
     engines: {node: '>=16.0.0'}
 
-  '@aws-sdk/middleware-sdk-sqs@3.686.0':
-    resolution: {integrity: sha512-Y3qcir1LrDCEf3b+X5DcTDxKyPS1tfIKIMOj29QbjGeH8CbajwwpVqIkMkTBihKZeGrNfvVMOAT7nBxl+shcEw==}
+  '@aws-sdk/middleware-sdk-sqs@3.709.0':
+    resolution: {integrity: sha512-K4FXDa/0VIl0zAOvuwpBN3vIKOXAVt7r+FK5MlhIwRHzUC6Ig5NoZd2nmxzSVwj/MjbXwZTNnUGTs1+EGCPh6Q==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/middleware-ssec@3.686.0':
@@ -3145,8 +3207,16 @@ packages:
     resolution: {integrity: sha512-nUgsKiEinyA50CaDXojAkOasAU3Apdg7Qox6IjNUC4ZjgOu7QWsCDB5N28AYMUt06cNYeYQdfMX1aEzG85a1Mg==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/middleware-user-agent@3.709.0':
+    resolution: {integrity: sha512-ooc9ZJvgkjPhi9q05XwSfNTXkEBEIfL4hleo5rQBKwHG3aTHvwOM7LLzhdX56QZVa6sorPBp6fwULuRDSqiQHw==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/region-config-resolver@3.686.0':
     resolution: {integrity: sha512-6zXD3bSD8tcsMAVVwO1gO7rI1uy2fCD3czgawuPGPopeLiPpo6/3FoUWCQzk2nvEhj7p9Z4BbjwZGSlRkVrXTw==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/region-config-resolver@3.709.0':
+    resolution: {integrity: sha512-/NoCAMEVKAg3kBKOrNtgOfL+ECt6nrl+L7q2SyYmrcY4tVCmwuECVqewQaHc03fTnJijfKLccw0Fj+6wOCnB6w==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/signature-v4-multi-region@3.687.0':
@@ -3159,8 +3229,18 @@ packages:
     peerDependencies:
       '@aws-sdk/client-sso-oidc': ^3.686.0
 
+  '@aws-sdk/token-providers@3.709.0':
+    resolution: {integrity: sha512-q5Ar6k71nci43IbULFgC8a89d/3EHpmd7HvBzqVGRcHnoPwh8eZDBfbBXKH83NGwcS1qPSRYiDbVfeWPm4/1jA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-sso-oidc': ^3.709.0
+
   '@aws-sdk/types@3.686.0':
     resolution: {integrity: sha512-xFnrb3wxOoJcW2Xrh63ZgFo5buIu9DF7bOHnwoUxHdNpUXicUh0AHw85TjXxyxIAd0d1psY/DU7QHoNI3OswgQ==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/types@3.709.0':
+    resolution: {integrity: sha512-ArtLTMxgjf13Kfu3gWH3Ez9Q5TkDdcRZUofpKH3pMGB/C6KAbeSCtIIDKfoRTUABzyGlPyCrZdnFjKyH+ypIpg==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/util-arn-parser@3.679.0':
@@ -3171,6 +3251,10 @@ packages:
     resolution: {integrity: sha512-7msZE2oYl+6QYeeRBjlDgxQUhq/XRky3cXE0FqLFs2muLS7XSuQEXkpOXB3R782ygAP6JX0kmBxPTLurRTikZg==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/util-endpoints@3.709.0':
+    resolution: {integrity: sha512-Mbc7AtL5WGCTKC16IGeUTz+sjpC3ptBda2t0CcK0kMVw3THDdcSq6ZlNKO747cNqdbwUvW34oHteUiHv4/z88Q==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/util-locate-window@3.568.0':
     resolution: {integrity: sha512-3nh4TINkXYr+H41QaPelCceEB2FXP3fxp93YZXB/kqJvX0U9j0N0Uk45gvsjmEPzG8XxkPEeLIfT2I1M7A6Lig==}
     engines: {node: '>=16.0.0'}
@@ -3178,8 +3262,20 @@ packages:
   '@aws-sdk/util-user-agent-browser@3.686.0':
     resolution: {integrity: sha512-YiQXeGYZegF1b7B2GOR61orhgv79qmI0z7+Agm3NXLO6hGfVV3kFUJbXnjtH1BgWo5hbZYW7HQ2omGb3dnb6Lg==}
 
+  '@aws-sdk/util-user-agent-browser@3.709.0':
+    resolution: {integrity: sha512-/rL2GasJzdTWUURCQKFldw2wqBtY4k4kCiA2tVZSKg3y4Ey7zO34SW8ebaeCE2/xoWOyLR2/etdKyphoo4Zrtg==}
+
   '@aws-sdk/util-user-agent-node@3.687.0':
     resolution: {integrity: sha512-idkP6ojSTZ4ek1pJ8wIN7r9U3KR5dn0IkJn3KQBXQ58LWjkRqLtft2vxzdsktWwhPKjjmIKl1S0kbvqLawf8XQ==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      aws-crt: '>=1.0.0'
+    peerDependenciesMeta:
+      aws-crt:
+        optional: true
+
+  '@aws-sdk/util-user-agent-node@3.709.0':
+    resolution: {integrity: sha512-trBfzSCVWy7ILgqhEXgiuM7hfRCw4F4a8IK90tjk9YL0jgoJ6eJuOp7+DfCtHJaygoBxD3cdMFkOu+lluFmGBA==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       aws-crt: '>=1.0.0'
@@ -4306,8 +4402,20 @@ packages:
     peerDependencies:
       jsep: ^0.4.0||^1.0.0
 
+  '@jsep-plugin/assignment@1.3.0':
+    resolution: {integrity: sha512-VVgV+CXrhbMI3aSusQyclHkenWSAm95WaiKrMxRFam3JSUiIaQjoMIw2sEs/OX4XifnqeQUN4DYbJjlA8EfktQ==}
+    engines: {node: '>= 10.16.0'}
+    peerDependencies:
+      jsep: ^0.4.0||^1.0.0
+
   '@jsep-plugin/regex@1.0.3':
     resolution: {integrity: sha512-XfZgry4DwEZvSFtS/6Y+R48D7qJYJK6R9/yJFyUFHCIUMEEHuJ4X95TDgJp5QkmzfLYvapMPzskV5HpIDrREug==}
+    engines: {node: '>= 10.16.0'}
+    peerDependencies:
+      jsep: ^0.4.0||^1.0.0
+
+  '@jsep-plugin/regex@1.0.4':
+    resolution: {integrity: sha512-q7qL4Mgjs1vByCaTnDFcBnV9HS7GVPJX5vyVoCgZHNSC9rjwIlmbXG5sUuorR5ndfHAIlJ8pVStxvjXHbNvtUg==}
     engines: {node: '>= 10.16.0'}
     peerDependencies:
       jsep: ^0.4.0||^1.0.0
@@ -4531,10 +4639,14 @@ packages:
     resolution: {integrity: sha512-qIhNBEwAZ+Ceh/axEbW4UoUP5F/hzzmjkYFZZuKQd91LWcWKKVriiy0izcx5uYMIJEtm5F0JhS/OUykO0xEpLg==}
     engines: {node: '>=10.13.0'}
 
-  '@rushstack/heft-jest-plugin@0.12.18':
-    resolution: {integrity: sha512-aHtHIdQiW7uxihUvc2SicfCfKEGGkxm9+qjMvktCn3m/f0GBP7aAGByuJR1+aJM4oO9HnUeRpI4hqD0QXBcVyg==}
+  '@rushstack/heft-config-file@0.16.1':
+    resolution: {integrity: sha512-9cgriyprJJb0b7zWBBhM75FicLQ8/NPEHrd5Dy1KRYWtEDVvg47+16RIJcco12dfLwAc2DJ9w6DH6a1omCGr/w==}
+    engines: {node: '>=10.13.0'}
+
+  '@rushstack/heft-jest-plugin@0.14.0':
+    resolution: {integrity: sha512-517Q6X2C4thJXz4zXRl7MYqphCUDGmYHLEKbl7DhcaQKN14jEaJ/dMh698Y0nnbEjl7DxIqJc4nzkfmflM/4wg==}
     peerDependencies:
-      '@rushstack/heft': ^0.68.6
+      '@rushstack/heft': ^0.68.10
       jest-environment-jsdom: ^29.5.0
       jest-environment-node: ^29.5.0
     peerDependenciesMeta:
@@ -4553,10 +4665,18 @@ packages:
     peerDependencies:
       '@rushstack/heft': 0.68.6
 
-  '@rushstack/heft@0.68.6':
-    resolution: {integrity: sha512-effhdx7MzVQqVms1Fwh7Ey9qsBJ2y47+PTv3qM2fh+M/mprKDL6iex6Mnb6KwkN3C8f744dTXHxNKdF3+6fOnQ==}
+  '@rushstack/heft@0.68.10':
+    resolution: {integrity: sha512-oN7vtr8AsNt1tqg7AAYsslHybuxZ3ek36BKRz3LrsZEoC6Iop9VtPIc4AvPHytRgvc8+ZYVVQhRiHWE8Lan5sw==}
     engines: {node: '>=10.13.0'}
     hasBin: true
+
+  '@rushstack/node-core-library@5.10.0':
+    resolution: {integrity: sha512-2pPLCuS/3x7DCd7liZkqOewGM0OzLyCacdvOe8j6Yrx9LkETGnxul1t7603bIaB8nUAooORcct9fFDOQMbWAgw==}
+    peerDependencies:
+      '@types/node': '*'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   '@rushstack/node-core-library@5.9.0':
     resolution: {integrity: sha512-MMsshEWkTbXqxqFxD4gcIUWQOCeBChlGczdZbHfqmNZQFLHB3yWxDFSMHFUdu2/OB9NUk7Awn5qRL+rws4HQNg==}
@@ -4566,8 +4686,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@rushstack/operation-graph@0.2.33':
-    resolution: {integrity: sha512-bokTOAt8jNAMiMZuMs83GXK4GkfAVbj3mx7g0hYuyqTVw7M/EgJO7eL2S/WjqyLxljwHL3cesXSY+csvhbbggA==}
+  '@rushstack/operation-graph@0.2.34':
+    resolution: {integrity: sha512-PRnqdQuwlV/BRx27UebdlDSYWZk467dtAWiguXhMk3O8zyhEvZ1Wy/BNShumBOU/TqPBmJu0WLjTGv/XrHol4Q==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
@@ -4585,11 +4705,19 @@ packages:
       '@types/node':
         optional: true
 
+  '@rushstack/terminal@0.14.3':
+    resolution: {integrity: sha512-csXbZsAdab/v8DbU1sz7WC2aNaKArcdS/FPmXMOXEj/JBBZMvDK0+1b4Qao0kkG0ciB1Qe86/Mb68GjH6/TnMw==}
+    peerDependencies:
+      '@types/node': '*'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   '@rushstack/tree-pattern@0.3.4':
     resolution: {integrity: sha512-9uROnkiHWsQqxW6HirXABfTRlgzhYp6tevbYIGkwKQ09VaayUBkvFvt/urDKMwlo+tGU0iQQLuVige6c48wTgw==}
 
-  '@rushstack/ts-command-line@4.23.0':
-    resolution: {integrity: sha512-jYREBtsxduPV6ptNq8jOKp9+yx0ld1Tb/Tkdnlj8gTjazl1sF3DwX2VbluyYrNd0meWIL0bNeer7WDf5tKFjaQ==}
+  '@rushstack/ts-command-line@4.23.1':
+    resolution: {integrity: sha512-40jTmYoiu/xlIpkkRsVfENtBq4CW3R4azbL0Vmda+fMwHWqss6wwf/Cy/UJmMqIzpfYc2OTnjYP1ZLD3CmyeCA==}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -4620,6 +4748,10 @@ packages:
     resolution: {integrity: sha512-0XuhuHQlEqbNQZp7QxxrFTdVWdwxch4vjxYgfInF91hZFkPxf9QDrdQka0KfxFMPqLNzSw0b95uGTrLliQUavQ==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/abort-controller@3.1.9':
+    resolution: {integrity: sha512-yiW0WI30zj8ZKoSYNx90no7ugVn3khlyH/z5W8qtKBtVE6awRALbhSG+2SAHA1r6bO/6M9utxYKVZ3PCJ1rWxw==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/chunked-blob-reader-native@3.0.1':
     resolution: {integrity: sha512-VEYtPvh5rs/xlyqpm5NRnfYLZn+q0SRPELbvBV+C/G7IQ+ouTuo+NKKa3ShG5OaFR8NYVMXls9hPYLTvIKKDrQ==}
 
@@ -4630,12 +4762,24 @@ packages:
     resolution: {integrity: sha512-Uh0Sz9gdUuz538nvkPiyv1DZRX9+D15EKDtnQP5rYVAzM/dnYk3P8cg73jcxyOitPgT3mE3OVj7ky7sibzHWkw==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/config-resolver@3.0.13':
+    resolution: {integrity: sha512-Gr/qwzyPaTL1tZcq8WQyHhTZREER5R1Wytmz4WnVGL4onA3dNk6Btll55c8Vr58pLdvWZmtG8oZxJTw3t3q7Jg==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/core@2.5.1':
     resolution: {integrity: sha512-DujtuDA7BGEKExJ05W5OdxCoyekcKT3Rhg1ZGeiUWaz2BJIWXjZmsG/DIP4W48GHno7AQwRsaCb8NcBgH3QZpg==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/core@2.5.5':
+    resolution: {integrity: sha512-G8G/sDDhXA7o0bOvkc7bgai6POuSld/+XhNnWAbpQTpLv2OZPvyqQ58tLPPlz0bSNsXktldDDREIv1LczFeNEw==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/credential-provider-imds@3.2.5':
     resolution: {integrity: sha512-4FTQGAsuwqTzVMmiRVTn0RR9GrbRfkP0wfu/tXWVHd2LgNpTY0uglQpIScXK4NaEyXbB3JmZt8gfVqO50lP8wg==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/credential-provider-imds@3.2.8':
+    resolution: {integrity: sha512-ZCY2yD0BY+K9iMXkkbnjo+08T2h8/34oHd0Jmh6BZUSZwaaGlGCyBT/3wnS7u7Xl33/EEfN4B6nQr3Gx5bYxgw==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/eventstream-codec@3.1.7':
@@ -4663,8 +4807,15 @@ packages:
   '@smithy/fetch-http-handler@4.0.0':
     resolution: {integrity: sha512-MLb1f5tbBO2X6K4lMEKJvxeLooyg7guq48C2zKr4qM7F2Gpkz4dc+hdSgu77pCJ76jVqFBjZczHYAs6dp15N+g==}
 
+  '@smithy/fetch-http-handler@4.1.2':
+    resolution: {integrity: sha512-R7rU7Ae3ItU4rC0c5mB2sP5mJNbCfoDc8I5XlYjIZnquyUwec7fEo78F6DA3SmgJgkU1qTMcZJuGblxZsl10ZA==}
+
   '@smithy/hash-blob-browser@3.1.7':
     resolution: {integrity: sha512-4yNlxVNJifPM5ThaA5HKnHkn7JhctFUHvcaz6YXxHlYOSIrzI6VKQPTN8Gs1iN5nqq9iFcwIR9THqchUCouIfg==}
+
+  '@smithy/hash-node@3.0.11':
+    resolution: {integrity: sha512-emP23rwYyZhQBvklqTtwetkQlqbNYirDiEEwXl2v0GYWMnCzxst7ZaRAnWuy28njp5kAH54lvkdG37MblZzaHA==}
+    engines: {node: '>=16.0.0'}
 
   '@smithy/hash-node@3.0.8':
     resolution: {integrity: sha512-tlNQYbfpWXHimHqrvgo14DrMAgUBua/cNoz9fMYcDmYej7MAmUcjav/QKQbFc3NrcPxeJ7QClER4tWZmfwoPng==}
@@ -4673,6 +4824,9 @@ packages:
   '@smithy/hash-stream-node@3.1.7':
     resolution: {integrity: sha512-xMAsvJ3hLG63lsBVi1Hl6BBSfhd8/Qnp8fC06kjOpJvyyCEXdwHITa5Kvdsk6gaAXLhbZMhQMIGvgUbfnJDP6Q==}
     engines: {node: '>=16.0.0'}
+
+  '@smithy/invalid-dependency@3.0.11':
+    resolution: {integrity: sha512-NuQmVPEJjUX6c+UELyVz8kUx8Q539EDeNwbRyu4IIF8MeV7hUtq1FB3SHVyki2u++5XLMFqngeMKk7ccspnNyQ==}
 
   '@smithy/invalid-dependency@3.0.8':
     resolution: {integrity: sha512-7Qynk6NWtTQhnGTTZwks++nJhQ1O54Mzi7fz4PqZOiYXb4Z1Flpb2yRvdALoggTS8xjtohWUM+RygOtB30YL3Q==}
@@ -4685,6 +4839,9 @@ packages:
     resolution: {integrity: sha512-+Fsu6Q6C4RSJiy81Y8eApjEB5gVtM+oFKTffg+jSuwtvomJJrhUJBu2zS8wjXSgH/g1MKEWrzyChTBe6clb5FQ==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/md5-js@3.0.11':
+    resolution: {integrity: sha512-3NM0L3i2Zm4bbgG6Ymi9NBcxXhryi3uE8fIfHJZIOfZVxOkGdjdgjR9A06SFIZCfnEIWKXZdm6Yq5/aPXFFhsQ==}
+
   '@smithy/md5-js@3.0.8':
     resolution: {integrity: sha512-LwApfTK0OJ/tCyNUXqnWCKoE2b4rDSr4BJlDAVCkiWYeHESr+y+d5zlAanuLW6fnitVJRD/7d9/kN/ZM9Su4mA==}
 
@@ -4692,20 +4849,44 @@ packages:
     resolution: {integrity: sha512-T4dIdCs1d/+/qMpwhJ1DzOhxCZjZHbHazEPJWdB4GDi2HjIZllVzeBEcdJUN0fomV8DURsgOyrbEUzg3vzTaOg==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/middleware-content-length@3.0.13':
+    resolution: {integrity: sha512-zfMhzojhFpIX3P5ug7jxTjfUcIPcGjcQYzB9t+rv0g1TX7B0QdwONW+ATouaLoD7h7LOw/ZlXfkq4xJ/g2TrIw==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/middleware-endpoint@3.2.1':
     resolution: {integrity: sha512-wWO3xYmFm6WRW8VsEJ5oU6h7aosFXfszlz3Dj176pTij6o21oZnzkCLzShfmRaaCHDkBXWBdO0c4sQAvLFP6zA==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/middleware-endpoint@3.2.5':
+    resolution: {integrity: sha512-VhJNs/s/lyx4weiZdXSloBgoLoS8osV0dKIain8nGmx7of3QFKu5BSdEuk1z/U8x9iwes1i+XCiNusEvuK1ijg==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/middleware-retry@3.0.25':
     resolution: {integrity: sha512-m1F70cPaMBML4HiTgCw5I+jFNtjgz5z5UdGnUbG37vw6kh4UvizFYjqJGHvicfgKMkDL6mXwyPp5mhZg02g5sg==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/middleware-retry@3.0.30':
+    resolution: {integrity: sha512-6323RL2BvAR3VQpTjHpa52kH/iSHyxd/G9ohb2MkBk2Ucu+oMtRXT8yi7KTSIS9nb58aupG6nO0OlXnQOAcvmQ==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/middleware-serde@3.0.11':
+    resolution: {integrity: sha512-KzPAeySp/fOoQA82TpnwItvX8BBURecpx6ZMu75EZDkAcnPtO6vf7q4aH5QHs/F1s3/snQaSFbbUMcFFZ086Mw==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/middleware-serde@3.0.8':
     resolution: {integrity: sha512-Xg2jK9Wc/1g/MBMP/EUn2DLspN8LNt+GMe7cgF+Ty3vl+Zvu+VeZU5nmhveU+H8pxyTsjrAkci8NqY6OuvZnjA==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/middleware-stack@3.0.11':
+    resolution: {integrity: sha512-1HGo9a6/ikgOMrTrWL/WiN9N8GSVYpuRQO5kjstAq4CvV59bjqnh7TbdXGQ4vxLD3xlSjfBjq5t1SOELePsLnA==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/middleware-stack@3.0.8':
     resolution: {integrity: sha512-d7ZuwvYgp1+3682Nx0MD3D/HtkmZd49N3JUndYWQXfRZrYEnCWYc8BHcNmVsPAp9gKvlurdg/mubE6b/rPS9MA==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/node-config-provider@3.1.12':
+    resolution: {integrity: sha512-O9LVEu5J/u/FuNlZs+L7Ikn3lz7VB9hb0GtPT9MQeiBmtK8RSY3ULmsZgXhe6VAlgTw0YO+paQx4p8xdbs43vQ==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/node-config-provider@3.1.9':
@@ -4716,6 +4897,14 @@ packages:
     resolution: {integrity: sha512-PkOwPNeKdvX/jCpn0A8n9/TyoxjGZB8WVoJmm9YzsnAgggTj4CrjpRHlTQw7dlLZ320n1mY1y+nTRUDViKi/3w==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/node-http-handler@3.3.2':
+    resolution: {integrity: sha512-t4ng1DAd527vlxvOfKFYEe6/QFBcsj7WpNlWTyjorwXXcKw3XlltBGbyHfSJ24QT84nF+agDha9tNYpzmSRZPA==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/property-provider@3.1.11':
+    resolution: {integrity: sha512-I/+TMc4XTQ3QAjXfOcUWbSS073oOEAxgx4aZy8jHaf8JQnRkq2SZWw8+PfDtBvLUjcGMdxl+YwtzWe6i5uhL/A==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/property-provider@3.1.8':
     resolution: {integrity: sha512-ukNUyo6rHmusG64lmkjFeXemwYuKge1BJ8CtpVKmrxQxc6rhUX0vebcptFA9MmrGsnLhwnnqeH83VTU9hwOpjA==}
     engines: {node: '>=16.0.0'}
@@ -4724,16 +4913,36 @@ packages:
     resolution: {integrity: sha512-hsjtwpIemmCkm3ZV5fd/T0bPIugW1gJXwZ/hpuVubt2hEUApIoUTrf6qIdh9MAWlw0vjMrA1ztJLAwtNaZogvg==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/protocol-http@4.1.8':
+    resolution: {integrity: sha512-hmgIAVyxw1LySOwkgMIUN0kjN8TG9Nc85LJeEmEE/cNEe2rkHDUWhnJf2gxcSRFLWsyqWsrZGw40ROjUogg+Iw==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/querystring-builder@3.0.11':
+    resolution: {integrity: sha512-u+5HV/9uJaeLj5XTb6+IEF/dokWWkEqJ0XiaRRogyREmKGUgZnNecLucADLdauWFKUNbQfulHFEZEdjwEBjXRg==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/querystring-builder@3.0.8':
     resolution: {integrity: sha512-btYxGVqFUARbUrN6VhL9c3dnSviIwBYD9Rz1jHuN1hgh28Fpv2xjU1HeCeDJX68xctz7r4l1PBnFhGg1WBBPuA==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/querystring-parser@3.0.11':
+    resolution: {integrity: sha512-Je3kFvCsFMnso1ilPwA7GtlbPaTixa3WwC+K21kmMZHsBEOZYQaqxcMqeFFoU7/slFjKDIpiiPydvdJm8Q/MCw==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/querystring-parser@3.0.8':
     resolution: {integrity: sha512-BtEk3FG7Ks64GAbt+JnKqwuobJNX8VmFLBsKIwWr1D60T426fGrV2L3YS5siOcUhhp6/Y6yhBw1PSPxA5p7qGg==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/service-error-classification@3.0.11':
+    resolution: {integrity: sha512-QnYDPkyewrJzCyaeI2Rmp7pDwbUETe+hU8ADkXmgNusO1bgHBH7ovXJiYmba8t0fNfJx75fE8dlM6SEmZxheog==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/service-error-classification@3.0.8':
     resolution: {integrity: sha512-uEC/kCCFto83bz5ZzapcrgGqHOh/0r69sZ2ZuHlgoD5kYgXJEThCoTuw/y1Ub3cE7aaKdznb+jD9xRPIfIwD7g==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/shared-ini-file-loader@3.1.12':
+    resolution: {integrity: sha512-1xKSGI+U9KKdbG2qDvIR9dGrw3CNx+baqJfyr0igKEpjbHL5stsqAesYBzHChYHlelWtb87VnLWlhvfCz13H8Q==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/shared-ini-file-loader@3.1.9':
@@ -4748,13 +4957,28 @@ packages:
     resolution: {integrity: sha512-NsV1jF4EvmO5wqmaSzlnTVetemBS3FZHdyc5CExbDljcyJCEEkJr8ANu2JvtNbVg/9MvKAWV44kTrGS+Pi4INg==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/signature-v4@4.2.4':
+    resolution: {integrity: sha512-5JWeMQYg81TgU4cG+OexAWdvDTs5JDdbEZx+Qr1iPbvo91QFGzjy0IkXAKaXUHqmKUJgSHK0ZxnCkgZpzkeNTA==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/smithy-client@3.4.2':
     resolution: {integrity: sha512-dxw1BDxJiY9/zI3cBqfVrInij6ShjpV4fmGHesGZZUiP9OSE/EVfdwdRz0PgvkEvrZHpsj2htRaHJfftE8giBA==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/smithy-client@3.5.0':
+    resolution: {integrity: sha512-Y8FeOa7gbDfCWf7njrkoRATPa5eNLUEjlJS5z5rXatYuGkCb80LbHcu8AQR8qgAZZaNHCLyo2N+pxPsV7l+ivg==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/types@3.6.0':
     resolution: {integrity: sha512-8VXK/KzOHefoC65yRgCn5vG1cysPJjHnOVt9d0ybFQSmJgQj152vMn4EkYhGuaOmnnZvCPav/KnYyE6/KsNZ2w==}
     engines: {node: '>=16.0.0'}
+
+  '@smithy/types@3.7.2':
+    resolution: {integrity: sha512-bNwBYYmN8Eh9RyjS1p2gW6MIhSO2rl7X9QeLM8iTdcGRP+eDiIWDt66c9IysCc22gefKszZv+ubV9qZc7hdESg==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/url-parser@3.0.11':
+    resolution: {integrity: sha512-TmlqXkSk8ZPhfc+SQutjmFr5FjC0av3GZP4B/10caK1SbRwe/v+Wzu/R6xEKxoNqL+8nY18s1byiy6HqPG37Aw==}
 
   '@smithy/url-parser@3.0.8':
     resolution: {integrity: sha512-4FdOhwpTW7jtSFWm7SpfLGKIBC9ZaTKG5nBF0wK24aoQKQyDIKUw3+KFWCQ9maMzrgTJIuOvOnsV2lLGW5XjTg==}
@@ -4786,16 +5010,32 @@ packages:
     resolution: {integrity: sha512-fRw7zymjIDt6XxIsLwfJfYUfbGoO9CmCJk6rjJ/X5cd20+d2Is7xjU5Kt/AiDt6hX8DAf5dztmfP5O82gR9emA==}
     engines: {node: '>= 10.0.0'}
 
+  '@smithy/util-defaults-mode-browser@3.0.30':
+    resolution: {integrity: sha512-nLuGmgfcr0gzm64pqF2UT4SGWVG8UGviAdayDlVzJPNa6Z4lqvpDzdRXmLxtOdEjVlTOEdpZ9dd3ZMMu488mzg==}
+    engines: {node: '>= 10.0.0'}
+
   '@smithy/util-defaults-mode-node@3.0.25':
     resolution: {integrity: sha512-H3BSZdBDiVZGzt8TG51Pd2FvFO0PAx/A0mJ0EH8a13KJ6iUCdYnw/Dk/MdC1kTd0eUuUGisDFaxXVXo4HHFL1g==}
+    engines: {node: '>= 10.0.0'}
+
+  '@smithy/util-defaults-mode-node@3.0.30':
+    resolution: {integrity: sha512-OD63eWoH68vp75mYcfYyuVH+p7Li/mY4sYOROnauDrtObo1cS4uWfsy/zhOTW8F8ZPxQC1ZXZKVxoxvMGUv2Ow==}
     engines: {node: '>= 10.0.0'}
 
   '@smithy/util-endpoints@2.1.4':
     resolution: {integrity: sha512-kPt8j4emm7rdMWQyL0F89o92q10gvCUa6sBkBtDJ7nV2+P7wpXczzOfoDJ49CKXe5CCqb8dc1W+ZdLlrKzSAnQ==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/util-endpoints@2.1.7':
+    resolution: {integrity: sha512-tSfcqKcN/Oo2STEYCABVuKgJ76nyyr6skGl9t15hs+YaiU06sgMkN7QYjo0BbVw+KT26zok3IzbdSOksQ4YzVw==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/util-hex-encoding@3.0.0':
     resolution: {integrity: sha512-eFndh1WEK5YMUYvy3lPlVmYY/fZcQE1D8oSf41Id2vCeIkKJXPcYDCZD+4+xViI6b1XSd7tE+s5AmXzz5ilabQ==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/util-middleware@3.0.11':
+    resolution: {integrity: sha512-dWpyc1e1R6VoXrwLoLDd57U1z6CwNSdkM69Ie4+6uYh2GC7Vg51Qtan7ITzczuVpqezdDTKJGJB95fFvvjU/ow==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/util-middleware@3.0.3':
@@ -4806,12 +5046,20 @@ packages:
     resolution: {integrity: sha512-p7iYAPaQjoeM+AKABpYWeDdtwQNxasr4aXQEA/OmbOaug9V0odRVDy3Wx4ci8soljE/JXQo+abV0qZpW8NX0yA==}
     engines: {node: '>=16.0.0'}
 
+  '@smithy/util-retry@3.0.11':
+    resolution: {integrity: sha512-hJUC6W7A3DQgaee3Hp9ZFcOxVDZzmBIRBPlUAk8/fSOEl7pE/aX7Dci0JycNOnm9Mfr0KV2XjIlUOcGWXQUdVQ==}
+    engines: {node: '>=16.0.0'}
+
   '@smithy/util-retry@3.0.8':
     resolution: {integrity: sha512-TCEhLnY581YJ+g1x0hapPz13JFqzmh/pMWL2KEFASC51qCfw3+Y47MrTmea4bUE5vsdxQ4F6/KFbUeSz22Q1ow==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/util-stream@3.2.1':
     resolution: {integrity: sha512-R3ufuzJRxSJbE58K9AEnL/uSZyVdHzud9wLS8tIbXclxKzoe09CRohj2xV8wpx5tj7ZbiJaKYcutMm1eYgz/0A==}
+    engines: {node: '>=16.0.0'}
+
+  '@smithy/util-stream@3.3.2':
+    resolution: {integrity: sha512-sInAqdiVeisUGYAv/FrXpmJ0b4WTFmciTRqzhb7wVuem9BHvhIG7tpiYHLDWrl2stOokNZpTTGqz3mzB2qFwXg==}
     engines: {node: '>=16.0.0'}
 
   '@smithy/util-uri-escape@3.0.0':
@@ -5212,8 +5460,8 @@ packages:
   '@types/async@3.2.24':
     resolution: {integrity: sha512-8iHVLHsCCOBKjCF2KwFe0p9Z3rfM9mL+sSP8btyR5vTjJRAqpBYD28/ZLgXPf0pjG1VxOvtCV/BgXkQbpSe8Hw==}
 
-  '@types/aws-lambda@8.10.145':
-    resolution: {integrity: sha512-dtByW6WiFk5W5Jfgz1VM+YPA21xMXTuSFoLYIDY0L44jDLLflVPtZkYuu3/YxpGcvjzKFBZLU+GyKjR0HOYtyw==}
+  '@types/aws-lambda@8.10.146':
+    resolution: {integrity: sha512-3BaDXYTh0e6UCJYL/jwV/3+GRslSc08toAiZSmleYtkAUyV5rtvdPYxrG/88uqvTuT6sb27WE9OS90ZNTIuQ0g==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -5254,8 +5502,8 @@ packages:
   '@types/geojson-validation@1.0.3':
     resolution: {integrity: sha512-S+Ka75g23eK33jblC6u3Tc7GKrBfo0VuHhydPw9WdWRib7sGPAubUbNiUkdTrX9dl5F18/iD8ERzH31AYLFiKg==}
 
-  '@types/geojson@7946.0.14':
-    resolution: {integrity: sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==}
+  '@types/geojson@7946.0.15':
+    resolution: {integrity: sha512-9oSxFzDCT2Rj6DfcHF8G++jxBKS7mBqXl5xrRW+Kbvjry6Uduya2iiwqHPhVXpasAVMBYKkEPGgKhd3+/HZ6xA==}
 
   '@types/geojson@7946.0.8':
     resolution: {integrity: sha512-1rkryxURpr6aWP7R786/UQOkJ3PcpQiWkAXBmdWc7ryFWqN6a4xfK7BtjXvFBKO9LjQ+MWQSWxYeZX1OApnArA==}
@@ -5682,8 +5930,8 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  aws-cdk-lib@2.166.0:
-    resolution: {integrity: sha512-FAsIz/CpczbMrcShgvTWNp3kcGN6IDojJWNLqHioTRsTekcyN3OPmKvQJXUNWL0fnhTd8biFXC2esg6kM19xZw==}
+  aws-cdk-lib@2.172.0:
+    resolution: {integrity: sha512-SbFn2FyKhsHQpS7M3qeMWnRKtBHELkY3rmejk07cPlJ/BCJk/af8eKyeiNEEB0AZSfIeP4ImZCLNy9JS34mlPw==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       constructs: ^10.0.0
@@ -7119,6 +7367,10 @@ packages:
     resolution: {integrity: sha512-i1rBX5N7VPl0eYb6+mHNp52sEuaS2Wi8CDYx1X5sn9naevL78+265XJqy1qENEk7mRKwS06NHpUqiBwR7qeodw==}
     engines: {node: '>= 10.16.0'}
 
+  jsep@1.4.0:
+    resolution: {integrity: sha512-B7qPcEVE3NVkmSJbaYxvv4cHkVW7DQsZz13pUMrfS8z8Q/BuShN+gcTXrUlPiGqM2/t/EEaI030bpxMqY8gMlw==}
+    engines: {node: '>= 10.16.0'}
+
   jsesc@2.5.2:
     resolution: {integrity: sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==}
     engines: {node: '>=4'}
@@ -7168,6 +7420,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  jsonpath-plus@10.2.0:
+    resolution: {integrity: sha512-T9V+8iNYKFL2n2rF+w02LBOT2JjDnTjioaNFrxRy0Bv1y/hNsqR/EBK7Ojy2ythRHwmz2cRIls+9JitQGZC/sw==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
   jsts@2.7.1:
     resolution: {integrity: sha512-x2wSZHEBK20CY+Wy+BPE7MrFQHW6sIsdaGUMEqmGAio+3gFzQaBYPwLRonUfQf9Ak8pBieqj9tUofX1+WtAEIg==}
     engines: {node: '>= 12'}
@@ -7186,8 +7443,8 @@ packages:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
 
-  ky@1.7.2:
-    resolution: {integrity: sha512-OzIvbHKKDpi60TnF9t7UUVAF1B4mcqc02z5PIvrm08Wyb+yOcz63GRvEuVxNT18a9E1SrNouhB4W2NNLeD7Ykg==}
+  ky@1.7.3:
+    resolution: {integrity: sha512-Sz49ZWR/BjNOq+2UK1k9ONZUVq8eyuCj30Zgc8VrRNtFlTBZduzuvehUd5kjQF6/Fms3Ir3EYqzJryw9tRvsSw==}
     engines: {node: '>=18'}
 
   kysely@0.27.4:
@@ -7647,11 +7904,11 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
-  pg-promise@11.10.1:
-    resolution: {integrity: sha512-TceugkypE+VkHTjlklMmLYLN5hUDbM9dIhKZQq2onxN9F//6X6Q5czQ7Ms5sCi0JB5pkbt8fgoC7OLHM2EVI7Q==}
+  pg-promise@11.10.2:
+    resolution: {integrity: sha512-wK4yjxZdfxBmAMcs40q6IsC1SOzdLilc1yNvJqlbOjtm2syayqLDCt1JQ9lhS6yNSgVlGOQZT88yb/SADJmEBw==}
     engines: {node: '>=14.0'}
     peerDependencies:
-      pg-query-stream: 4.7.0
+      pg-query-stream: 4.7.1
 
   pg-protocol@1.7.0:
     resolution: {integrity: sha512-hTK/mE36i8fDDhgDFjy6xNOG+LCorxLG3WO17tku+ij6sVHXh1jQUJ8hYAnRhNla4QVD2H8er/FOjc/+EgC6yQ==}
@@ -7668,8 +7925,8 @@ packages:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
 
-  pg@8.13.0:
-    resolution: {integrity: sha512-34wkUTh3SxTClfoHB3pQ7bIMvw9dpFU1audQQeZG837fmHfHpr14n/AELVDoOYVDW2h5RDWU78tFjkD+erSBsw==}
+  pg@8.13.1:
+    resolution: {integrity: sha512-OUir1A0rPNZlX//c7ksiu7crsGZTKSOXJPgtNiHGIlC9H0lO+NC6ZDYksSgBYY/thSWhnSRBv8w1lieNNGATNQ==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
@@ -8635,8 +8892,8 @@ packages:
     resolution: {integrity: sha512-b4JR1PFR10y1mKjhHY9LaGo6tmrgjit7hxVIeAmyMw3jegXR4dhYqLaQF5zMXZxY7tLpMyJeLjr1C4rLmkVe8g==}
     engines: {node: '>=12.20'}
 
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+  zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
   zx@8.2.0:
     resolution: {integrity: sha512-ec7Z1Ki9h4CsKqbMjZ8H7G1PbbZYErscxT314LF66Ljx1YRENisqa5m9IN2VjbYgOKxdv5t0MbVd3Hf+II3e7w==}
@@ -8936,49 +9193,49 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sqs@3.687.0':
+  '@aws-sdk/client-sqs@3.709.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/client-sso-oidc': 3.687.0(@aws-sdk/client-sts@3.687.0)
-      '@aws-sdk/client-sts': 3.687.0
-      '@aws-sdk/core': 3.686.0
-      '@aws-sdk/credential-provider-node': 3.687.0(@aws-sdk/client-sso-oidc@3.687.0(@aws-sdk/client-sts@3.687.0))(@aws-sdk/client-sts@3.687.0)
-      '@aws-sdk/middleware-host-header': 3.686.0
-      '@aws-sdk/middleware-logger': 3.686.0
-      '@aws-sdk/middleware-recursion-detection': 3.686.0
-      '@aws-sdk/middleware-sdk-sqs': 3.686.0
-      '@aws-sdk/middleware-user-agent': 3.687.0
-      '@aws-sdk/region-config-resolver': 3.686.0
-      '@aws-sdk/types': 3.686.0
-      '@aws-sdk/util-endpoints': 3.686.0
-      '@aws-sdk/util-user-agent-browser': 3.686.0
-      '@aws-sdk/util-user-agent-node': 3.687.0
-      '@smithy/config-resolver': 3.0.10
-      '@smithy/core': 2.5.1
-      '@smithy/fetch-http-handler': 4.0.0
-      '@smithy/hash-node': 3.0.8
-      '@smithy/invalid-dependency': 3.0.8
-      '@smithy/md5-js': 3.0.8
-      '@smithy/middleware-content-length': 3.0.10
-      '@smithy/middleware-endpoint': 3.2.1
-      '@smithy/middleware-retry': 3.0.25
-      '@smithy/middleware-serde': 3.0.8
-      '@smithy/middleware-stack': 3.0.8
-      '@smithy/node-config-provider': 3.1.9
-      '@smithy/node-http-handler': 3.2.5
-      '@smithy/protocol-http': 4.1.5
-      '@smithy/smithy-client': 3.4.2
-      '@smithy/types': 3.6.0
-      '@smithy/url-parser': 3.0.8
+      '@aws-sdk/client-sso-oidc': 3.709.0(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/client-sts': 3.709.0
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/credential-provider-node': 3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/middleware-host-header': 3.709.0
+      '@aws-sdk/middleware-logger': 3.709.0
+      '@aws-sdk/middleware-recursion-detection': 3.709.0
+      '@aws-sdk/middleware-sdk-sqs': 3.709.0
+      '@aws-sdk/middleware-user-agent': 3.709.0
+      '@aws-sdk/region-config-resolver': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@aws-sdk/util-endpoints': 3.709.0
+      '@aws-sdk/util-user-agent-browser': 3.709.0
+      '@aws-sdk/util-user-agent-node': 3.709.0
+      '@smithy/config-resolver': 3.0.13
+      '@smithy/core': 2.5.5
+      '@smithy/fetch-http-handler': 4.1.2
+      '@smithy/hash-node': 3.0.11
+      '@smithy/invalid-dependency': 3.0.11
+      '@smithy/md5-js': 3.0.11
+      '@smithy/middleware-content-length': 3.0.13
+      '@smithy/middleware-endpoint': 3.2.5
+      '@smithy/middleware-retry': 3.0.30
+      '@smithy/middleware-serde': 3.0.11
+      '@smithy/middleware-stack': 3.0.11
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/node-http-handler': 3.3.2
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      '@smithy/url-parser': 3.0.11
       '@smithy/util-base64': 3.0.0
       '@smithy/util-body-length-browser': 3.0.0
       '@smithy/util-body-length-node': 3.0.0
-      '@smithy/util-defaults-mode-browser': 3.0.25
-      '@smithy/util-defaults-mode-node': 3.0.25
-      '@smithy/util-endpoints': 2.1.4
-      '@smithy/util-middleware': 3.0.8
-      '@smithy/util-retry': 3.0.8
+      '@smithy/util-defaults-mode-browser': 3.0.30
+      '@smithy/util-defaults-mode-node': 3.0.30
+      '@smithy/util-endpoints': 2.1.7
+      '@smithy/util-middleware': 3.0.11
+      '@smithy/util-retry': 3.0.11
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
     transitivePeerDependencies:
@@ -9078,6 +9335,51 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
+  '@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0)':
+    dependencies:
+      '@aws-crypto/sha256-browser': 5.2.0
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/client-sts': 3.709.0
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/credential-provider-node': 3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/middleware-host-header': 3.709.0
+      '@aws-sdk/middleware-logger': 3.709.0
+      '@aws-sdk/middleware-recursion-detection': 3.709.0
+      '@aws-sdk/middleware-user-agent': 3.709.0
+      '@aws-sdk/region-config-resolver': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@aws-sdk/util-endpoints': 3.709.0
+      '@aws-sdk/util-user-agent-browser': 3.709.0
+      '@aws-sdk/util-user-agent-node': 3.709.0
+      '@smithy/config-resolver': 3.0.13
+      '@smithy/core': 2.5.5
+      '@smithy/fetch-http-handler': 4.1.2
+      '@smithy/hash-node': 3.0.11
+      '@smithy/invalid-dependency': 3.0.11
+      '@smithy/middleware-content-length': 3.0.13
+      '@smithy/middleware-endpoint': 3.2.5
+      '@smithy/middleware-retry': 3.0.30
+      '@smithy/middleware-serde': 3.0.11
+      '@smithy/middleware-stack': 3.0.11
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/node-http-handler': 3.3.2
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      '@smithy/url-parser': 3.0.11
+      '@smithy/util-base64': 3.0.0
+      '@smithy/util-body-length-browser': 3.0.0
+      '@smithy/util-body-length-node': 3.0.0
+      '@smithy/util-defaults-mode-browser': 3.0.30
+      '@smithy/util-defaults-mode-node': 3.0.30
+      '@smithy/util-endpoints': 2.1.7
+      '@smithy/util-middleware': 3.0.11
+      '@smithy/util-retry': 3.0.11
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - aws-crt
+
   '@aws-sdk/client-sso@3.687.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
@@ -9116,6 +9418,49 @@ snapshots:
       '@smithy/util-endpoints': 2.1.4
       '@smithy/util-middleware': 3.0.8
       '@smithy/util-retry': 3.0.8
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - aws-crt
+
+  '@aws-sdk/client-sso@3.709.0':
+    dependencies:
+      '@aws-crypto/sha256-browser': 5.2.0
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/middleware-host-header': 3.709.0
+      '@aws-sdk/middleware-logger': 3.709.0
+      '@aws-sdk/middleware-recursion-detection': 3.709.0
+      '@aws-sdk/middleware-user-agent': 3.709.0
+      '@aws-sdk/region-config-resolver': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@aws-sdk/util-endpoints': 3.709.0
+      '@aws-sdk/util-user-agent-browser': 3.709.0
+      '@aws-sdk/util-user-agent-node': 3.709.0
+      '@smithy/config-resolver': 3.0.13
+      '@smithy/core': 2.5.5
+      '@smithy/fetch-http-handler': 4.1.2
+      '@smithy/hash-node': 3.0.11
+      '@smithy/invalid-dependency': 3.0.11
+      '@smithy/middleware-content-length': 3.0.13
+      '@smithy/middleware-endpoint': 3.2.5
+      '@smithy/middleware-retry': 3.0.30
+      '@smithy/middleware-serde': 3.0.11
+      '@smithy/middleware-stack': 3.0.11
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/node-http-handler': 3.3.2
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      '@smithy/url-parser': 3.0.11
+      '@smithy/util-base64': 3.0.0
+      '@smithy/util-body-length-browser': 3.0.0
+      '@smithy/util-body-length-node': 3.0.0
+      '@smithy/util-defaults-mode-browser': 3.0.30
+      '@smithy/util-defaults-mode-node': 3.0.30
+      '@smithy/util-endpoints': 2.1.7
+      '@smithy/util-middleware': 3.0.11
+      '@smithy/util-retry': 3.0.11
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
     transitivePeerDependencies:
@@ -9166,6 +9511,51 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
+  '@aws-sdk/client-sts@3.709.0':
+    dependencies:
+      '@aws-crypto/sha256-browser': 5.2.0
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/client-sso-oidc': 3.709.0(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/credential-provider-node': 3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/middleware-host-header': 3.709.0
+      '@aws-sdk/middleware-logger': 3.709.0
+      '@aws-sdk/middleware-recursion-detection': 3.709.0
+      '@aws-sdk/middleware-user-agent': 3.709.0
+      '@aws-sdk/region-config-resolver': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@aws-sdk/util-endpoints': 3.709.0
+      '@aws-sdk/util-user-agent-browser': 3.709.0
+      '@aws-sdk/util-user-agent-node': 3.709.0
+      '@smithy/config-resolver': 3.0.13
+      '@smithy/core': 2.5.5
+      '@smithy/fetch-http-handler': 4.1.2
+      '@smithy/hash-node': 3.0.11
+      '@smithy/invalid-dependency': 3.0.11
+      '@smithy/middleware-content-length': 3.0.13
+      '@smithy/middleware-endpoint': 3.2.5
+      '@smithy/middleware-retry': 3.0.30
+      '@smithy/middleware-serde': 3.0.11
+      '@smithy/middleware-stack': 3.0.11
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/node-http-handler': 3.3.2
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      '@smithy/url-parser': 3.0.11
+      '@smithy/util-base64': 3.0.0
+      '@smithy/util-body-length-browser': 3.0.0
+      '@smithy/util-body-length-node': 3.0.0
+      '@smithy/util-defaults-mode-browser': 3.0.30
+      '@smithy/util-defaults-mode-node': 3.0.30
+      '@smithy/util-endpoints': 2.1.7
+      '@smithy/util-middleware': 3.0.11
+      '@smithy/util-retry': 3.0.11
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - aws-crt
+
   '@aws-sdk/core@3.686.0':
     dependencies:
       '@aws-sdk/types': 3.686.0
@@ -9180,12 +9570,34 @@ snapshots:
       fast-xml-parser: 4.4.1
       tslib: 2.6.3
 
+  '@aws-sdk/core@3.709.0':
+    dependencies:
+      '@aws-sdk/types': 3.709.0
+      '@smithy/core': 2.5.5
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/property-provider': 3.1.11
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/signature-v4': 4.2.4
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      '@smithy/util-middleware': 3.0.11
+      fast-xml-parser: 4.4.1
+      tslib: 2.6.3
+
   '@aws-sdk/credential-provider-env@3.686.0':
     dependencies:
       '@aws-sdk/core': 3.686.0
       '@aws-sdk/types': 3.686.0
       '@smithy/property-provider': 3.1.8
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@aws-sdk/credential-provider-env@3.709.0':
+    dependencies:
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@smithy/property-provider': 3.1.11
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@aws-sdk/credential-provider-http@3.686.0':
@@ -9199,6 +9611,19 @@ snapshots:
       '@smithy/smithy-client': 3.4.2
       '@smithy/types': 3.6.0
       '@smithy/util-stream': 3.2.1
+      tslib: 2.6.3
+
+  '@aws-sdk/credential-provider-http@3.709.0':
+    dependencies:
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@smithy/fetch-http-handler': 4.1.2
+      '@smithy/node-http-handler': 3.3.2
+      '@smithy/property-provider': 3.1.11
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      '@smithy/util-stream': 3.3.2
       tslib: 2.6.3
 
   '@aws-sdk/credential-provider-ini@3.687.0(@aws-sdk/client-sso-oidc@3.687.0(@aws-sdk/client-sts@3.687.0))(@aws-sdk/client-sts@3.687.0)':
@@ -9215,6 +9640,25 @@ snapshots:
       '@smithy/property-provider': 3.1.8
       '@smithy/shared-ini-file-loader': 3.1.9
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
+
+  '@aws-sdk/credential-provider-ini@3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))(@aws-sdk/client-sts@3.709.0)':
+    dependencies:
+      '@aws-sdk/client-sts': 3.709.0
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/credential-provider-env': 3.709.0
+      '@aws-sdk/credential-provider-http': 3.709.0
+      '@aws-sdk/credential-provider-process': 3.709.0
+      '@aws-sdk/credential-provider-sso': 3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))
+      '@aws-sdk/credential-provider-web-identity': 3.709.0(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/types': 3.709.0
+      '@smithy/credential-provider-imds': 3.2.8
+      '@smithy/property-provider': 3.1.11
+      '@smithy/shared-ini-file-loader': 3.1.12
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
     transitivePeerDependencies:
       - '@aws-sdk/client-sso-oidc'
@@ -9239,6 +9683,25 @@ snapshots:
       - '@aws-sdk/client-sts'
       - aws-crt
 
+  '@aws-sdk/credential-provider-node@3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))(@aws-sdk/client-sts@3.709.0)':
+    dependencies:
+      '@aws-sdk/credential-provider-env': 3.709.0
+      '@aws-sdk/credential-provider-http': 3.709.0
+      '@aws-sdk/credential-provider-ini': 3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/credential-provider-process': 3.709.0
+      '@aws-sdk/credential-provider-sso': 3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))
+      '@aws-sdk/credential-provider-web-identity': 3.709.0(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/types': 3.709.0
+      '@smithy/credential-provider-imds': 3.2.8
+      '@smithy/property-provider': 3.1.11
+      '@smithy/shared-ini-file-loader': 3.1.12
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - '@aws-sdk/client-sts'
+      - aws-crt
+
   '@aws-sdk/credential-provider-process@3.686.0':
     dependencies:
       '@aws-sdk/core': 3.686.0
@@ -9246,6 +9709,15 @@ snapshots:
       '@smithy/property-provider': 3.1.8
       '@smithy/shared-ini-file-loader': 3.1.9
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@aws-sdk/credential-provider-process@3.709.0':
+    dependencies:
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@smithy/property-provider': 3.1.11
+      '@smithy/shared-ini-file-loader': 3.1.12
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@aws-sdk/credential-provider-sso@3.687.0(@aws-sdk/client-sso-oidc@3.687.0(@aws-sdk/client-sts@3.687.0))':
@@ -9262,6 +9734,20 @@ snapshots:
       - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
+  '@aws-sdk/credential-provider-sso@3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))':
+    dependencies:
+      '@aws-sdk/client-sso': 3.709.0
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/token-providers': 3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))
+      '@aws-sdk/types': 3.709.0
+      '@smithy/property-provider': 3.1.11
+      '@smithy/shared-ini-file-loader': 3.1.12
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
+      - aws-crt
+
   '@aws-sdk/credential-provider-web-identity@3.686.0(@aws-sdk/client-sts@3.687.0)':
     dependencies:
       '@aws-sdk/client-sts': 3.687.0
@@ -9269,6 +9755,15 @@ snapshots:
       '@aws-sdk/types': 3.686.0
       '@smithy/property-provider': 3.1.8
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@aws-sdk/credential-provider-web-identity@3.709.0(@aws-sdk/client-sts@3.709.0)':
+    dependencies:
+      '@aws-sdk/client-sts': 3.709.0
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@smithy/property-provider': 3.1.11
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0)':
@@ -9321,6 +9816,13 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@aws-sdk/middleware-host-header@3.709.0':
+    dependencies:
+      '@aws-sdk/types': 3.709.0
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@aws-sdk/middleware-location-constraint@3.686.0':
     dependencies:
       '@aws-sdk/types': 3.686.0
@@ -9333,11 +9835,24 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@aws-sdk/middleware-logger@3.709.0':
+    dependencies:
+      '@aws-sdk/types': 3.709.0
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@aws-sdk/middleware-recursion-detection@3.686.0':
     dependencies:
       '@aws-sdk/types': 3.686.0
       '@smithy/protocol-http': 4.1.5
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@aws-sdk/middleware-recursion-detection@3.709.0':
+    dependencies:
+      '@aws-sdk/types': 3.709.0
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@aws-sdk/middleware-sdk-api-gateway@3.686.0':
@@ -9364,11 +9879,11 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
 
-  '@aws-sdk/middleware-sdk-sqs@3.686.0':
+  '@aws-sdk/middleware-sdk-sqs@3.709.0':
     dependencies:
-      '@aws-sdk/types': 3.686.0
-      '@smithy/smithy-client': 3.4.2
-      '@smithy/types': 3.6.0
+      '@aws-sdk/types': 3.709.0
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
       '@smithy/util-hex-encoding': 3.0.0
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
@@ -9389,6 +9904,16 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@aws-sdk/middleware-user-agent@3.709.0':
+    dependencies:
+      '@aws-sdk/core': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@aws-sdk/util-endpoints': 3.709.0
+      '@smithy/core': 2.5.5
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@aws-sdk/region-config-resolver@3.686.0':
     dependencies:
       '@aws-sdk/types': 3.686.0
@@ -9396,6 +9921,15 @@ snapshots:
       '@smithy/types': 3.6.0
       '@smithy/util-config-provider': 3.0.0
       '@smithy/util-middleware': 3.0.8
+      tslib: 2.6.3
+
+  '@aws-sdk/region-config-resolver@3.709.0':
+    dependencies:
+      '@aws-sdk/types': 3.709.0
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/types': 3.7.2
+      '@smithy/util-config-provider': 3.0.0
+      '@smithy/util-middleware': 3.0.11
       tslib: 2.6.3
 
   '@aws-sdk/signature-v4-multi-region@3.687.0':
@@ -9416,9 +9950,23 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@aws-sdk/token-providers@3.709.0(@aws-sdk/client-sso-oidc@3.709.0(@aws-sdk/client-sts@3.709.0))':
+    dependencies:
+      '@aws-sdk/client-sso-oidc': 3.709.0(@aws-sdk/client-sts@3.709.0)
+      '@aws-sdk/types': 3.709.0
+      '@smithy/property-provider': 3.1.11
+      '@smithy/shared-ini-file-loader': 3.1.12
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@aws-sdk/types@3.686.0':
     dependencies:
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@aws-sdk/types@3.709.0':
+    dependencies:
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@aws-sdk/util-arn-parser@3.679.0':
@@ -9432,6 +9980,13 @@ snapshots:
       '@smithy/util-endpoints': 2.1.4
       tslib: 2.6.3
 
+  '@aws-sdk/util-endpoints@3.709.0':
+    dependencies:
+      '@aws-sdk/types': 3.709.0
+      '@smithy/types': 3.7.2
+      '@smithy/util-endpoints': 2.1.7
+      tslib: 2.6.3
+
   '@aws-sdk/util-locate-window@3.568.0':
     dependencies:
       tslib: 2.6.3
@@ -9443,12 +9998,27 @@ snapshots:
       bowser: 2.11.0
       tslib: 2.6.3
 
+  '@aws-sdk/util-user-agent-browser@3.709.0':
+    dependencies:
+      '@aws-sdk/types': 3.709.0
+      '@smithy/types': 3.7.2
+      bowser: 2.11.0
+      tslib: 2.6.3
+
   '@aws-sdk/util-user-agent-node@3.687.0':
     dependencies:
       '@aws-sdk/middleware-user-agent': 3.687.0
       '@aws-sdk/types': 3.686.0
       '@smithy/node-config-provider': 3.1.9
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@aws-sdk/util-user-agent-node@3.709.0':
+    dependencies:
+      '@aws-sdk/middleware-user-agent': 3.709.0
+      '@aws-sdk/types': 3.709.0
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@aws-sdk/util-utf8-browser@3.259.0':
@@ -10312,7 +10882,7 @@ snapshots:
       gonzales-pe: 4.3.0
       node-source-walk: 7.0.0
 
-  '@digitraffic/common@2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)':
+  '@digitraffic/common@2024.10.25-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.687.0
       '@aws-sdk/client-s3': 3.687.0
@@ -10320,50 +10890,50 @@ snapshots:
       '@aws-sdk/client-sns': 3.687.0
       '@aws-sdk/lib-storage': 3.687.0(@aws-sdk/client-s3@3.687.0)
       '@date-fns/tz': 1.2.0
-      '@smithy/fetch-http-handler': 4.0.0
-      aws-cdk-lib: 2.166.0(constructs@10.4.2)
+      '@smithy/fetch-http-handler': 4.1.2
+      aws-cdk-lib: 2.172.0(constructs@10.4.2)
       change-case: 5.4.4
       constructs: 10.4.2
       date-fns: 4.1.0
       etag: 1.8.1
       geojson-validation: 1.0.2
-      ky: 1.7.2
+      ky: 1.7.3
       lodash-es: 4.17.21
       node-ttl: 0.2.0
       pg-native: 3.2.0
-      pg-promise: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
-      zod: 3.23.8
+      pg-promise: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
+      zod: 3.24.1
 
-  '@digitraffic/common@2024.10.9-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@smithy/fetch-http-handler@4.0.0)(aws-cdk-lib@2.166.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)':
+  '@digitraffic/common@2024.10.9-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(@smithy/fetch-http-handler@4.1.2)(aws-cdk-lib@2.172.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.687.0
       '@aws-sdk/client-s3': 3.687.0
       '@aws-sdk/client-secrets-manager': 3.687.0
       '@aws-sdk/client-sns': 3.687.0
       '@aws-sdk/lib-storage': 3.687.0(@aws-sdk/client-s3@3.687.0)
-      '@smithy/fetch-http-handler': 4.0.0
-      aws-cdk-lib: 2.166.0(constructs@10.4.2)
+      '@smithy/fetch-http-handler': 4.1.2
+      aws-cdk-lib: 2.172.0(constructs@10.4.2)
       change-case: 5.4.4
       constructs: 10.4.2
       date-fns: 4.1.0
       date-fns-tz: 3.1.3(date-fns@4.1.0)
       etag: 1.8.1
       geojson-validation: 1.0.2
-      ky: 1.7.2
+      ky: 1.7.3
       lodash-es: 4.17.21
       node-ttl: 0.2.0
       pg-native: 3.2.0
-      pg-promise: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
-      zod: 3.23.8
+      pg-promise: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
+      zod: 3.24.1
 
-  '@digitraffic/common@2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))':
+  '@digitraffic/common@2024.7.8-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.687.0
       '@aws-sdk/client-s3': 3.687.0
       '@aws-sdk/client-secrets-manager': 3.687.0
       '@aws-sdk/client-sns': 3.687.0
       '@aws-sdk/lib-storage': 3.687.0(@aws-sdk/client-s3@3.687.0)
-      aws-cdk-lib: 2.166.0(constructs@10.4.2)
+      aws-cdk-lib: 2.172.0(constructs@10.4.2)
       aws-sdk: 2.1692.0
       change-case: 5.4.4
       constructs: 10.4.2
@@ -10371,20 +10941,20 @@ snapshots:
       date-fns-tz: 3.1.3(date-fns@4.1.0)
       etag: 1.8.1
       geojson-validation: 1.0.2
-      ky: 1.7.2
+      ky: 1.7.3
       lodash: 4.17.21
       node-ttl: 0.2.0
       pg-native: 3.2.0
-      pg-promise: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+      pg-promise: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
 
-  '@digitraffic/common@2024.8.27-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))':
+  '@digitraffic/common@2024.8.27-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.687.0
       '@aws-sdk/client-s3': 3.687.0
       '@aws-sdk/client-secrets-manager': 3.687.0
       '@aws-sdk/client-sns': 3.687.0
       '@aws-sdk/lib-storage': 3.687.0(@aws-sdk/client-s3@3.687.0)
-      aws-cdk-lib: 2.166.0(constructs@10.4.2)
+      aws-cdk-lib: 2.172.0(constructs@10.4.2)
       aws-sdk: 2.1692.0
       change-case: 5.4.4
       constructs: 10.4.2
@@ -10392,20 +10962,20 @@ snapshots:
       date-fns-tz: 3.1.3(date-fns@4.1.0)
       etag: 1.8.1
       geojson-validation: 1.0.2
-      ky: 1.7.2
+      ky: 1.7.3
       lodash-es: 4.17.21
       node-ttl: 0.2.0
       pg-native: 3.2.0
-      pg-promise: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
+      pg-promise: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
 
-  '@digitraffic/common@2024.8.30-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.166.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.2)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))))(zod@3.23.8)':
+  '@digitraffic/common@2024.8.30-1(@aws-sdk/client-api-gateway@3.687.0)(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-secrets-manager@3.687.0)(@aws-sdk/client-sns@3.687.0)(@aws-sdk/lib-storage@3.687.0(@aws-sdk/client-s3@3.687.0))(aws-cdk-lib@2.172.0(constructs@10.4.2))(aws-sdk@2.1692.0)(change-case@5.4.4)(constructs@10.4.2)(date-fns-tz@3.1.3(date-fns@4.1.0))(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.3)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))))(zod@3.24.1)':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.687.0
       '@aws-sdk/client-s3': 3.687.0
       '@aws-sdk/client-secrets-manager': 3.687.0
       '@aws-sdk/client-sns': 3.687.0
       '@aws-sdk/lib-storage': 3.687.0(@aws-sdk/client-s3@3.687.0)
-      aws-cdk-lib: 2.166.0(constructs@10.4.2)
+      aws-cdk-lib: 2.172.0(constructs@10.4.2)
       aws-sdk: 2.1692.0
       change-case: 5.4.4
       constructs: 10.4.2
@@ -10413,12 +10983,12 @@ snapshots:
       date-fns-tz: 3.1.3(date-fns@4.1.0)
       etag: 1.8.1
       geojson-validation: 1.0.2
-      ky: 1.7.2
+      ky: 1.7.3
       lodash-es: 4.17.21
       node-ttl: 0.2.0
       pg-native: 3.2.0
-      pg-promise: 11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)))
-      zod: 3.23.8
+      pg-promise: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
+      zod: 3.24.1
 
   '@digitraffic/eslint-config@3.0.1(@rushstack/eslint-config@3.7.1(eslint@8.57.1)(typescript@5.6.3))(@typescript-eslint/eslint-plugin@7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3))(eslint-plugin-deprecation@3.0.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3)':
     dependencies:
@@ -10883,9 +11453,17 @@ snapshots:
     dependencies:
       jsep: 1.3.9
 
+  '@jsep-plugin/assignment@1.3.0(jsep@1.4.0)':
+    dependencies:
+      jsep: 1.4.0
+
   '@jsep-plugin/regex@1.0.3(jsep@1.3.9)':
     dependencies:
       jsep: 1.3.9
+
+  '@jsep-plugin/regex@1.0.4(jsep@1.4.0)':
+    dependencies:
+      jsep: 1.4.0
 
   '@jsr/std__bytes@1.0.4': {}
 
@@ -11190,19 +11768,38 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@rushstack/heft-jest-plugin@0.12.18(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))':
+  '@rushstack/heft-config-file@0.16.1(@types/node@20.17.6)':
+    dependencies:
+      '@rushstack/node-core-library': 5.10.0(@types/node@20.17.6)
+      '@rushstack/rig-package': 0.5.3
+      '@rushstack/terminal': 0.14.3(@types/node@20.17.6)
+      jsonpath-plus: 10.2.0
+    transitivePeerDependencies:
+      - '@types/node'
+
+  '@rushstack/heft-config-file@0.16.1(@types/node@22.9.0)':
+    dependencies:
+      '@rushstack/node-core-library': 5.10.0(@types/node@22.9.0)
+      '@rushstack/rig-package': 0.5.3
+      '@rushstack/terminal': 0.14.3(@types/node@22.9.0)
+      jsonpath-plus: 10.2.0
+    transitivePeerDependencies:
+      - '@types/node'
+
+  '@rushstack/heft-jest-plugin@0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))':
     dependencies:
       '@jest/core': 29.5.0(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@jest/reporters': 29.5.0
       '@jest/transform': 29.5.0
-      '@rushstack/heft': 0.68.6(@types/node@20.17.6)
-      '@rushstack/heft-config-file': 0.15.8(@types/node@20.17.6)
-      '@rushstack/node-core-library': 5.9.0(@types/node@20.17.6)
-      '@rushstack/terminal': 0.14.2(@types/node@20.17.6)
+      '@rushstack/heft': 0.68.10(@types/node@20.17.6)
+      '@rushstack/heft-config-file': 0.16.1(@types/node@20.17.6)
+      '@rushstack/node-core-library': 5.10.0(@types/node@20.17.6)
+      '@rushstack/terminal': 0.14.3(@types/node@20.17.6)
       jest-config: 29.5.0(@types/node@20.17.6)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       jest-resolve: 29.5.0
       jest-snapshot: 29.5.0
       lodash: 4.17.21
+      punycode: 2.3.1
     optionalDependencies:
       jest-environment-node: 29.7.0
     transitivePeerDependencies:
@@ -11212,19 +11809,20 @@ snapshots:
       - supports-color
       - ts-node
 
-  '@rushstack/heft-jest-plugin@0.12.18(@rushstack/heft@0.68.6(@types/node@22.9.0))(@types/node@22.9.0)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))':
+  '@rushstack/heft-jest-plugin@0.14.0(@rushstack/heft@0.68.10(@types/node@22.9.0))(@types/node@22.9.0)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))':
     dependencies:
       '@jest/core': 29.5.0(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
       '@jest/reporters': 29.5.0
       '@jest/transform': 29.5.0
-      '@rushstack/heft': 0.68.6(@types/node@22.9.0)
-      '@rushstack/heft-config-file': 0.15.8(@types/node@22.9.0)
-      '@rushstack/node-core-library': 5.9.0(@types/node@22.9.0)
-      '@rushstack/terminal': 0.14.2(@types/node@22.9.0)
+      '@rushstack/heft': 0.68.10(@types/node@22.9.0)
+      '@rushstack/heft-config-file': 0.16.1(@types/node@22.9.0)
+      '@rushstack/node-core-library': 5.10.0(@types/node@22.9.0)
+      '@rushstack/terminal': 0.14.3(@types/node@22.9.0)
       jest-config: 29.5.0(@types/node@22.9.0)(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
       jest-resolve: 29.5.0
       jest-snapshot: 29.5.0
       lodash: 4.17.21
+      punycode: 2.3.1
     optionalDependencies:
       jest-environment-node: 29.7.0
     transitivePeerDependencies:
@@ -11234,25 +11832,25 @@ snapshots:
       - supports-color
       - ts-node
 
-  '@rushstack/heft-lint-plugin@0.5.5(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)':
+  '@rushstack/heft-lint-plugin@0.5.5(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)':
     dependencies:
-      '@rushstack/heft': 0.68.6(@types/node@20.17.6)
+      '@rushstack/heft': 0.68.10(@types/node@20.17.6)
       '@rushstack/node-core-library': 5.9.0(@types/node@20.17.6)
       semver: 7.5.4
     transitivePeerDependencies:
       - '@types/node'
 
-  '@rushstack/heft-lint-plugin@0.5.5(@rushstack/heft@0.68.6(@types/node@22.9.0))(@types/node@22.9.0)':
+  '@rushstack/heft-lint-plugin@0.5.5(@rushstack/heft@0.68.10(@types/node@22.9.0))(@types/node@22.9.0)':
     dependencies:
-      '@rushstack/heft': 0.68.6(@types/node@22.9.0)
+      '@rushstack/heft': 0.68.10(@types/node@22.9.0)
       '@rushstack/node-core-library': 5.9.0(@types/node@22.9.0)
       semver: 7.5.4
     transitivePeerDependencies:
       - '@types/node'
 
-  '@rushstack/heft-typescript-plugin@0.5.35(@rushstack/heft@0.68.6(@types/node@20.17.6))(@types/node@20.17.6)':
+  '@rushstack/heft-typescript-plugin@0.5.35(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)':
     dependencies:
-      '@rushstack/heft': 0.68.6(@types/node@20.17.6)
+      '@rushstack/heft': 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-config-file': 0.15.8(@types/node@20.17.6)
       '@rushstack/node-core-library': 5.9.0(@types/node@20.17.6)
       '@types/tapable': 1.0.6
@@ -11261,9 +11859,9 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@rushstack/heft-typescript-plugin@0.5.35(@rushstack/heft@0.68.6(@types/node@22.9.0))(@types/node@22.9.0)':
+  '@rushstack/heft-typescript-plugin@0.5.35(@rushstack/heft@0.68.10(@types/node@22.9.0))(@types/node@22.9.0)':
     dependencies:
-      '@rushstack/heft': 0.68.6(@types/node@22.9.0)
+      '@rushstack/heft': 0.68.10(@types/node@22.9.0)
       '@rushstack/heft-config-file': 0.15.8(@types/node@22.9.0)
       '@rushstack/node-core-library': 5.9.0(@types/node@22.9.0)
       '@types/tapable': 1.0.6
@@ -11272,14 +11870,14 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@rushstack/heft@0.68.6(@types/node@20.17.6)':
+  '@rushstack/heft@0.68.10(@types/node@20.17.6)':
     dependencies:
-      '@rushstack/heft-config-file': 0.15.8(@types/node@20.17.6)
-      '@rushstack/node-core-library': 5.9.0(@types/node@20.17.6)
-      '@rushstack/operation-graph': 0.2.33(@types/node@20.17.6)
+      '@rushstack/heft-config-file': 0.16.1(@types/node@20.17.6)
+      '@rushstack/node-core-library': 5.10.0(@types/node@20.17.6)
+      '@rushstack/operation-graph': 0.2.34(@types/node@20.17.6)
       '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.14.2(@types/node@20.17.6)
-      '@rushstack/ts-command-line': 4.23.0(@types/node@20.17.6)
+      '@rushstack/terminal': 0.14.3(@types/node@20.17.6)
+      '@rushstack/ts-command-line': 4.23.1(@types/node@20.17.6)
       '@types/tapable': 1.0.6
       fast-glob: 3.3.2
       git-repo-info: 2.1.1
@@ -11289,14 +11887,14 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@rushstack/heft@0.68.6(@types/node@22.9.0)':
+  '@rushstack/heft@0.68.10(@types/node@22.9.0)':
     dependencies:
-      '@rushstack/heft-config-file': 0.15.8(@types/node@22.9.0)
-      '@rushstack/node-core-library': 5.9.0(@types/node@22.9.0)
-      '@rushstack/operation-graph': 0.2.33(@types/node@22.9.0)
+      '@rushstack/heft-config-file': 0.16.1(@types/node@22.9.0)
+      '@rushstack/node-core-library': 5.10.0(@types/node@22.9.0)
+      '@rushstack/operation-graph': 0.2.34(@types/node@22.9.0)
       '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.14.2(@types/node@22.9.0)
-      '@rushstack/ts-command-line': 4.23.0(@types/node@22.9.0)
+      '@rushstack/terminal': 0.14.3(@types/node@22.9.0)
+      '@rushstack/ts-command-line': 4.23.1(@types/node@22.9.0)
       '@types/tapable': 1.0.6
       fast-glob: 3.3.2
       git-repo-info: 2.1.1
@@ -11305,6 +11903,32 @@ snapshots:
       watchpack: 2.4.0
     transitivePeerDependencies:
       - '@types/node'
+
+  '@rushstack/node-core-library@5.10.0(@types/node@20.17.6)':
+    dependencies:
+      ajv: 8.13.0
+      ajv-draft-04: 1.0.0(ajv@8.13.0)
+      ajv-formats: 3.0.1(ajv@8.13.0)
+      fs-extra: 7.0.1
+      import-lazy: 4.0.0
+      jju: 1.4.0
+      resolve: 1.22.8
+      semver: 7.5.4
+    optionalDependencies:
+      '@types/node': 20.17.6
+
+  '@rushstack/node-core-library@5.10.0(@types/node@22.9.0)':
+    dependencies:
+      ajv: 8.13.0
+      ajv-draft-04: 1.0.0(ajv@8.13.0)
+      ajv-formats: 3.0.1(ajv@8.13.0)
+      fs-extra: 7.0.1
+      import-lazy: 4.0.0
+      jju: 1.4.0
+      resolve: 1.22.8
+      semver: 7.5.4
+    optionalDependencies:
+      '@types/node': 22.9.0
 
   '@rushstack/node-core-library@5.9.0(@types/node@20.17.6)':
     dependencies:
@@ -11332,17 +11956,17 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.9.0
 
-  '@rushstack/operation-graph@0.2.33(@types/node@20.17.6)':
+  '@rushstack/operation-graph@0.2.34(@types/node@20.17.6)':
     dependencies:
-      '@rushstack/node-core-library': 5.9.0(@types/node@20.17.6)
-      '@rushstack/terminal': 0.14.2(@types/node@20.17.6)
+      '@rushstack/node-core-library': 5.10.0(@types/node@20.17.6)
+      '@rushstack/terminal': 0.14.3(@types/node@20.17.6)
     optionalDependencies:
       '@types/node': 20.17.6
 
-  '@rushstack/operation-graph@0.2.33(@types/node@22.9.0)':
+  '@rushstack/operation-graph@0.2.34(@types/node@22.9.0)':
     dependencies:
-      '@rushstack/node-core-library': 5.9.0(@types/node@22.9.0)
-      '@rushstack/terminal': 0.14.2(@types/node@22.9.0)
+      '@rushstack/node-core-library': 5.10.0(@types/node@22.9.0)
+      '@rushstack/terminal': 0.14.3(@types/node@22.9.0)
     optionalDependencies:
       '@types/node': 22.9.0
 
@@ -11365,20 +11989,34 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.9.0
 
+  '@rushstack/terminal@0.14.3(@types/node@20.17.6)':
+    dependencies:
+      '@rushstack/node-core-library': 5.10.0(@types/node@20.17.6)
+      supports-color: 8.1.1
+    optionalDependencies:
+      '@types/node': 20.17.6
+
+  '@rushstack/terminal@0.14.3(@types/node@22.9.0)':
+    dependencies:
+      '@rushstack/node-core-library': 5.10.0(@types/node@22.9.0)
+      supports-color: 8.1.1
+    optionalDependencies:
+      '@types/node': 22.9.0
+
   '@rushstack/tree-pattern@0.3.4': {}
 
-  '@rushstack/ts-command-line@4.23.0(@types/node@20.17.6)':
+  '@rushstack/ts-command-line@4.23.1(@types/node@20.17.6)':
     dependencies:
-      '@rushstack/terminal': 0.14.2(@types/node@20.17.6)
+      '@rushstack/terminal': 0.14.3(@types/node@20.17.6)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
     transitivePeerDependencies:
       - '@types/node'
 
-  '@rushstack/ts-command-line@4.23.0(@types/node@22.9.0)':
+  '@rushstack/ts-command-line@4.23.1(@types/node@22.9.0)':
     dependencies:
-      '@rushstack/terminal': 0.14.2(@types/node@22.9.0)
+      '@rushstack/terminal': 0.14.3(@types/node@22.9.0)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -11418,6 +12056,11 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/abort-controller@3.1.9':
+    dependencies:
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/chunked-blob-reader-native@3.0.1':
     dependencies:
       '@smithy/util-base64': 3.0.0
@@ -11435,6 +12078,14 @@ snapshots:
       '@smithy/util-middleware': 3.0.8
       tslib: 2.6.3
 
+  '@smithy/config-resolver@3.0.13':
+    dependencies:
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/types': 3.7.2
+      '@smithy/util-config-provider': 3.0.0
+      '@smithy/util-middleware': 3.0.11
+      tslib: 2.6.3
+
   '@smithy/core@2.5.1':
     dependencies:
       '@smithy/middleware-serde': 3.0.8
@@ -11446,12 +12097,31 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
 
+  '@smithy/core@2.5.5':
+    dependencies:
+      '@smithy/middleware-serde': 3.0.11
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/types': 3.7.2
+      '@smithy/util-body-length-browser': 3.0.0
+      '@smithy/util-middleware': 3.0.11
+      '@smithy/util-stream': 3.3.2
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+
   '@smithy/credential-provider-imds@3.2.5':
     dependencies:
       '@smithy/node-config-provider': 3.1.9
       '@smithy/property-provider': 3.1.8
       '@smithy/types': 3.6.0
       '@smithy/url-parser': 3.0.8
+      tslib: 2.6.3
+
+  '@smithy/credential-provider-imds@3.2.8':
+    dependencies:
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/property-provider': 3.1.11
+      '@smithy/types': 3.7.2
+      '@smithy/url-parser': 3.0.11
       tslib: 2.6.3
 
   '@smithy/eventstream-codec@3.1.7':
@@ -11500,11 +12170,26 @@ snapshots:
       '@smithy/util-base64': 3.0.0
       tslib: 2.6.3
 
+  '@smithy/fetch-http-handler@4.1.2':
+    dependencies:
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/querystring-builder': 3.0.11
+      '@smithy/types': 3.7.2
+      '@smithy/util-base64': 3.0.0
+      tslib: 2.6.3
+
   '@smithy/hash-blob-browser@3.1.7':
     dependencies:
       '@smithy/chunked-blob-reader': 4.0.0
       '@smithy/chunked-blob-reader-native': 3.0.1
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@smithy/hash-node@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+      '@smithy/util-buffer-from': 3.0.0
+      '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
 
   '@smithy/hash-node@3.0.8':
@@ -11520,6 +12205,11 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
 
+  '@smithy/invalid-dependency@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/invalid-dependency@3.0.8':
     dependencies:
       '@smithy/types': 3.6.0
@@ -11531,6 +12221,12 @@ snapshots:
 
   '@smithy/is-array-buffer@3.0.0':
     dependencies:
+      tslib: 2.6.3
+
+  '@smithy/md5-js@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+      '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
 
   '@smithy/md5-js@3.0.8':
@@ -11545,6 +12241,12 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/middleware-content-length@3.0.13':
+    dependencies:
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/middleware-endpoint@3.2.1':
     dependencies:
       '@smithy/core': 2.5.1
@@ -11554,6 +12256,17 @@ snapshots:
       '@smithy/types': 3.6.0
       '@smithy/url-parser': 3.0.8
       '@smithy/util-middleware': 3.0.8
+      tslib: 2.6.3
+
+  '@smithy/middleware-endpoint@3.2.5':
+    dependencies:
+      '@smithy/core': 2.5.5
+      '@smithy/middleware-serde': 3.0.11
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/shared-ini-file-loader': 3.1.12
+      '@smithy/types': 3.7.2
+      '@smithy/url-parser': 3.0.11
+      '@smithy/util-middleware': 3.0.11
       tslib: 2.6.3
 
   '@smithy/middleware-retry@3.0.25':
@@ -11568,14 +12281,43 @@ snapshots:
       tslib: 2.6.3
       uuid: 9.0.1
 
+  '@smithy/middleware-retry@3.0.30':
+    dependencies:
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/service-error-classification': 3.0.11
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      '@smithy/util-middleware': 3.0.11
+      '@smithy/util-retry': 3.0.11
+      tslib: 2.6.3
+      uuid: 9.0.1
+
+  '@smithy/middleware-serde@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/middleware-serde@3.0.8':
     dependencies:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/middleware-stack@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/middleware-stack@3.0.8':
     dependencies:
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@smithy/node-config-provider@3.1.12':
+    dependencies:
+      '@smithy/property-provider': 3.1.11
+      '@smithy/shared-ini-file-loader': 3.1.12
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@smithy/node-config-provider@3.1.9':
@@ -11593,6 +12335,19 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/node-http-handler@3.3.2':
+    dependencies:
+      '@smithy/abort-controller': 3.1.9
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/querystring-builder': 3.0.11
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
+  '@smithy/property-provider@3.1.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/property-provider@3.1.8':
     dependencies:
       '@smithy/types': 3.6.0
@@ -11603,10 +12358,26 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/protocol-http@4.1.8':
+    dependencies:
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
+  '@smithy/querystring-builder@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+      '@smithy/util-uri-escape': 3.0.0
+      tslib: 2.6.3
+
   '@smithy/querystring-builder@3.0.8':
     dependencies:
       '@smithy/types': 3.6.0
       '@smithy/util-uri-escape': 3.0.0
+      tslib: 2.6.3
+
+  '@smithy/querystring-parser@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@smithy/querystring-parser@3.0.8':
@@ -11614,9 +12385,18 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/service-error-classification@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
+
   '@smithy/service-error-classification@3.0.8':
     dependencies:
       '@smithy/types': 3.6.0
+
+  '@smithy/shared-ini-file-loader@3.1.12':
+    dependencies:
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
 
   '@smithy/shared-ini-file-loader@3.1.9':
     dependencies:
@@ -11644,6 +12424,17 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.6.3
 
+  '@smithy/signature-v4@4.2.4':
+    dependencies:
+      '@smithy/is-array-buffer': 3.0.0
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/types': 3.7.2
+      '@smithy/util-hex-encoding': 3.0.0
+      '@smithy/util-middleware': 3.0.11
+      '@smithy/util-uri-escape': 3.0.0
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+
   '@smithy/smithy-client@3.4.2':
     dependencies:
       '@smithy/core': 2.5.1
@@ -11654,8 +12445,28 @@ snapshots:
       '@smithy/util-stream': 3.2.1
       tslib: 2.6.3
 
+  '@smithy/smithy-client@3.5.0':
+    dependencies:
+      '@smithy/core': 2.5.5
+      '@smithy/middleware-endpoint': 3.2.5
+      '@smithy/middleware-stack': 3.0.11
+      '@smithy/protocol-http': 4.1.8
+      '@smithy/types': 3.7.2
+      '@smithy/util-stream': 3.3.2
+      tslib: 2.6.3
+
   '@smithy/types@3.6.0':
     dependencies:
+      tslib: 2.6.3
+
+  '@smithy/types@3.7.2':
+    dependencies:
+      tslib: 2.6.3
+
+  '@smithy/url-parser@3.0.11':
+    dependencies:
+      '@smithy/querystring-parser': 3.0.11
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@smithy/url-parser@3.0.8':
@@ -11700,6 +12511,14 @@ snapshots:
       bowser: 2.11.0
       tslib: 2.6.3
 
+  '@smithy/util-defaults-mode-browser@3.0.30':
+    dependencies:
+      '@smithy/property-provider': 3.1.11
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      bowser: 2.11.0
+      tslib: 2.6.3
+
   '@smithy/util-defaults-mode-node@3.0.25':
     dependencies:
       '@smithy/config-resolver': 3.0.10
@@ -11710,14 +12529,35 @@ snapshots:
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/util-defaults-mode-node@3.0.30':
+    dependencies:
+      '@smithy/config-resolver': 3.0.13
+      '@smithy/credential-provider-imds': 3.2.8
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/property-provider': 3.1.11
+      '@smithy/smithy-client': 3.5.0
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/util-endpoints@2.1.4':
     dependencies:
       '@smithy/node-config-provider': 3.1.9
       '@smithy/types': 3.6.0
       tslib: 2.6.3
 
+  '@smithy/util-endpoints@2.1.7':
+    dependencies:
+      '@smithy/node-config-provider': 3.1.12
+      '@smithy/types': 3.7.2
+      tslib: 2.6.3
+
   '@smithy/util-hex-encoding@3.0.0':
     dependencies:
+      tslib: 2.6.3
+
+  '@smithy/util-middleware@3.0.11':
+    dependencies:
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@smithy/util-middleware@3.0.3':
@@ -11728,6 +12568,12 @@ snapshots:
   '@smithy/util-middleware@3.0.8':
     dependencies:
       '@smithy/types': 3.6.0
+      tslib: 2.6.3
+
+  '@smithy/util-retry@3.0.11':
+    dependencies:
+      '@smithy/service-error-classification': 3.0.11
+      '@smithy/types': 3.7.2
       tslib: 2.6.3
 
   '@smithy/util-retry@3.0.8':
@@ -11741,6 +12587,17 @@ snapshots:
       '@smithy/fetch-http-handler': 4.0.0
       '@smithy/node-http-handler': 3.2.5
       '@smithy/types': 3.6.0
+      '@smithy/util-base64': 3.0.0
+      '@smithy/util-buffer-from': 3.0.0
+      '@smithy/util-hex-encoding': 3.0.0
+      '@smithy/util-utf8': 3.0.0
+      tslib: 2.6.3
+
+  '@smithy/util-stream@3.3.2':
+    dependencies:
+      '@smithy/fetch-http-handler': 4.1.2
+      '@smithy/node-http-handler': 3.3.2
+      '@smithy/types': 3.7.2
       '@smithy/util-base64': 3.0.0
       '@smithy/util-buffer-from': 3.0.0
       '@smithy/util-hex-encoding': 3.0.0
@@ -12889,28 +13746,28 @@ snapshots:
 
   '@types/async@3.2.24': {}
 
-  '@types/aws-lambda@8.10.145': {}
+  '@types/aws-lambda@8.10.146': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
       '@babel/parser': 7.25.3
-      '@babel/types': 7.25.2
+      '@babel/types': 7.26.0
       '@types/babel__generator': 7.6.8
       '@types/babel__template': 7.4.4
       '@types/babel__traverse': 7.20.6
 
   '@types/babel__generator@7.6.8':
     dependencies:
-      '@babel/types': 7.25.2
+      '@babel/types': 7.26.0
 
   '@types/babel__template@7.4.4':
     dependencies:
       '@babel/parser': 7.25.3
-      '@babel/types': 7.25.2
+      '@babel/types': 7.26.0
 
   '@types/babel__traverse@7.20.6':
     dependencies:
-      '@babel/types': 7.25.2
+      '@babel/types': 7.26.0
 
   '@types/body-parser@1.19.5':
     dependencies:
@@ -12954,7 +13811,7 @@ snapshots:
 
   '@types/geojson-validation@1.0.3': {}
 
-  '@types/geojson@7946.0.14': {}
+  '@types/geojson@7946.0.15': {}
 
   '@types/geojson@7946.0.8': {}
 
@@ -13792,7 +14649,7 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.0.0
 
-  aws-cdk-lib@2.166.0(constructs@10.4.2):
+  aws-cdk-lib@2.172.0(constructs@10.4.2):
     dependencies:
       '@aws-cdk/asset-awscli-v1': 2.2.209
       '@aws-cdk/asset-kubectl-v20': 2.1.3
@@ -13856,7 +14713,7 @@ snapshots:
   babel-plugin-jest-hoist@29.6.3:
     dependencies:
       '@babel/template': 7.25.0
-      '@babel/types': 7.25.2
+      '@babel/types': 7.26.0
       '@types/babel__core': 7.20.5
       '@types/babel__traverse': 7.20.6
 
@@ -15832,6 +16689,8 @@ snapshots:
 
   jsep@1.3.9: {}
 
+  jsep@1.4.0: {}
+
   jsesc@2.5.2: {}
 
   jsesc@3.0.2: {}
@@ -15881,6 +16740,12 @@ snapshots:
       '@jsep-plugin/regex': 1.0.3(jsep@1.3.9)
       jsep: 1.3.9
 
+  jsonpath-plus@10.2.0:
+    dependencies:
+      '@jsep-plugin/assignment': 1.3.0(jsep@1.4.0)
+      '@jsep-plugin/regex': 1.0.4(jsep@1.4.0)
+      jsep: 1.4.0
+
   jsts@2.7.1: {}
 
   jsx-ast-utils@3.3.5:
@@ -15898,7 +16763,7 @@ snapshots:
 
   kleur@3.0.3: {}
 
-  ky@1.7.2: {}
+  ky@1.7.3: {}
 
   kysely@0.27.4: {}
 
@@ -16359,9 +17224,9 @@ snapshots:
 
   pg-connection-string@2.7.0: {}
 
-  pg-cursor@2.12.1(pg@8.13.0(pg-native@3.2.0)):
+  pg-cursor@2.12.1(pg@8.13.1(pg-native@3.2.0)):
     dependencies:
-      pg: 8.13.0(pg-native@3.2.0)
+      pg: 8.13.1(pg-native@3.2.0)
 
   pg-int8@1.0.1: {}
 
@@ -16372,26 +17237,26 @@ snapshots:
       libpq: 1.8.13
       pg-types: 1.13.0
 
-  pg-pool@3.7.0(pg@8.13.0(pg-native@3.2.0)):
+  pg-pool@3.7.0(pg@8.13.1(pg-native@3.2.0)):
     dependencies:
-      pg: 8.13.0(pg-native@3.2.0)
+      pg: 8.13.1(pg-native@3.2.0)
 
-  pg-promise@11.10.1(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0))):
+  pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0))):
     dependencies:
       assert-options: 0.8.2
-      pg: 8.13.0(pg-native@3.2.0)
+      pg: 8.13.1(pg-native@3.2.0)
       pg-minify: 1.6.5
-      pg-query-stream: 4.7.0(pg@8.13.0(pg-native@3.2.0))
+      pg-query-stream: 4.7.0(pg@8.13.1(pg-native@3.2.0))
       spex: 3.4.0
     transitivePeerDependencies:
       - pg-native
 
   pg-protocol@1.7.0: {}
 
-  pg-query-stream@4.7.0(pg@8.13.0(pg-native@3.2.0)):
+  pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)):
     dependencies:
-      pg: 8.13.0(pg-native@3.2.0)
-      pg-cursor: 2.12.1(pg@8.13.0(pg-native@3.2.0))
+      pg: 8.13.1(pg-native@3.2.0)
+      pg-cursor: 2.12.1(pg@8.13.1(pg-native@3.2.0))
 
   pg-types@1.13.0:
     dependencies:
@@ -16409,10 +17274,10 @@ snapshots:
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
 
-  pg@8.13.0(pg-native@3.2.0):
+  pg@8.13.1(pg-native@3.2.0):
     dependencies:
       pg-connection-string: 2.7.0
-      pg-pool: 3.7.0(pg@8.13.0(pg-native@3.2.0))
+      pg-pool: 3.7.0(pg@8.13.1(pg-native@3.2.0))
       pg-protocol: 1.7.0
       pg-types: 2.2.0
       pgpass: 1.0.5
@@ -16857,10 +17722,10 @@ snapshots:
 
   sqlstring@2.3.3: {}
 
-  sqs-extended-client@1.0.0(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-sqs@3.687.0):
+  sqs-extended-client@1.0.0(@aws-sdk/client-s3@3.687.0)(@aws-sdk/client-sqs@3.709.0):
     dependencies:
       '@aws-sdk/client-s3': 3.687.0
-      '@aws-sdk/client-sqs': 3.687.0
+      '@aws-sdk/client-sqs': 3.709.0
       uuid: 9.0.1
 
   stack-utils@2.0.6:
@@ -17422,7 +18287,7 @@ snapshots:
 
   yocto-queue@1.1.1: {}
 
-  zod@3.23.8: {}
+  zod@3.24.1: {}
 
   zx@8.2.0:
     optionalDependencies:

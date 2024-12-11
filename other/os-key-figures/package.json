@@ -21,10 +21,10 @@
     "@smithy/signature-v4": "~3.1.1",
     "@aws-sdk/client-s3": "^3.687.0",
     "@digitraffic/common": "2024.10.25-1",
-    "aws-cdk-lib": "^2.166.0",
+    "aws-cdk-lib": "^2.172.0",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1692.0",
-    "ky": "1.7.2",
+    "ky": "1.7.3",
     "constructs": "~10.4.2",
     "mysql": "^2.18.1",
     "source-map-support": "^0.5.21"
@@ -35,9 +35,9 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.6",
-    "@rushstack/heft-jest-plugin": "^0.12.18",
-    "@types/aws-lambda": "8.10.145",
+    "@rushstack/heft": "^0.68.10",
+    "@rushstack/heft-jest-plugin": "^0.14.0",
+    "@types/aws-lambda": "8.10.146",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
     "@types/mysql": "2.15.26",
@@ -53,6 +53,6 @@
     "parallelshell": "3.0.2",
     "sinon": "18.0.0",
     "typescript": "~5.6.3",
-    "zod": "3.23.8"
+    "zod": "3.24.1"
   }
 }

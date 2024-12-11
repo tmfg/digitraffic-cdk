@@ -23,11 +23,11 @@
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.687.0",
-    "@aws-sdk/client-sqs": "^3.687.0",
+    "@aws-sdk/client-sqs": "^3.709.0",
     "@aws-sdk/client-s3": "^3.687.0",
     "@digitraffic/common": "2024.10.25-1",
     "@turf/turf": "7.0.0-alpha.111",
-    "aws-cdk-lib": "^2.166.0",
+    "aws-cdk-lib": "^2.172.0",
     "aws-sdk": "^2.1692.0",
     "constructs": "~10.4.2",
     "date-fns": "~4.1.0",
@@ -35,7 +35,7 @@
     "source-map-support": "^0.5.21",
     "uuid": "^10.0.0",
     "xml2js": "^0.6.2",
-    "ky": "1.7.2"
+    "ky": "1.7.3"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -44,9 +44,9 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.6",
-    "@rushstack/heft-jest-plugin": "^0.12.18",
-    "@types/aws-lambda": "8.10.145",
+    "@rushstack/heft": "^0.68.10",
+    "@rushstack/heft-jest-plugin": "^0.14.0",
+    "@types/aws-lambda": "8.10.146",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
     "@types/node": "20.17.6",
