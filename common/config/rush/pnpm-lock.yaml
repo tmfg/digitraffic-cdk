@@ -27,6 +27,9 @@ importers:
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
+      constructs:
+        specifier: ~10.4.2
+        version: 10.4.2
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -95,11 +98,11 @@ importers:
         specifier: ^3.7.1
         version: 3.7.1(eslint@8.57.1)(typescript@5.6.3)
       '@rushstack/heft':
-        specifier: ^0.68.10
+        specifier: ^0.68.6
         version: 0.68.10(@types/node@20.17.6)
       '@rushstack/heft-jest-plugin':
-        specifier: ^0.14.0
-        version: 0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+        specifier: ^0.12.18
+        version: 0.12.18(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
       '@rushstack/heft-lint-plugin':
         specifier: ^0.5.0
         version: 0.5.5(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)
@@ -113,14 +116,14 @@ importers:
         specifier: ^3.5.0
         version: 3.6.0
       '@types/aws-lambda':
-        specifier: 8.10.146
-        version: 8.10.146
+        specifier: 8.10.145
+        version: 8.10.145
       '@types/etag':
         specifier: ^1.8.3
         version: 1.8.3
       '@types/geojson':
-        specifier: 7946.0.15
-        version: 7946.0.15
+        specifier: 7946.0.14
+        version: 7946.0.14
       '@types/geojson-validation':
         specifier: ^1.0.3
         version: 1.0.3
@@ -143,7 +146,7 @@ importers:
         specifier: ^7.18.0
         version: 7.18.0(eslint@8.57.1)(typescript@5.6.3)
       aws-cdk-lib:
-        specifier: ^2.172.0
+        specifier: ^2.166.0
         version: 2.172.0(constructs@10.4.2)
       aws-sdk:
         specifier: ^2.1692.0
@@ -179,7 +182,7 @@ importers:
         specifier: ^16.0.0
         version: 16.0.0
       ky:
-        specifier: 1.7.3
+        specifier: ^1.7.2
         version: 1.7.3
       lodash:
         specifier: ^4.17.21
@@ -197,7 +200,7 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       pg-promise:
-        specifier: ^11.10.2
+        specifier: ^11.10.1
         version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.0(pg@8.13.1(pg-native@3.2.0)))
       prettier:
         specifier: ^3.3.3
@@ -215,8 +218,8 @@ importers:
         specifier: ^2.0.6
         version: 2.0.6
       zod:
-        specifier: 3.24.1
-        version: 3.24.1
+        specifier: ~3.23.8
+        version: 3.23.8
 
   ../../lib/repo-scripts:
     dependencies:
@@ -4396,20 +4399,8 @@ packages:
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
-  '@jsep-plugin/assignment@1.2.1':
-    resolution: {integrity: sha512-gaHqbubTi29aZpVbBlECRpmdia+L5/lh2BwtIJTmtxdbecEyyX/ejAOg7eQDGNvGOUmPY7Z2Yxdy9ioyH/VJeA==}
-    engines: {node: '>= 10.16.0'}
-    peerDependencies:
-      jsep: ^0.4.0||^1.0.0
-
   '@jsep-plugin/assignment@1.3.0':
     resolution: {integrity: sha512-VVgV+CXrhbMI3aSusQyclHkenWSAm95WaiKrMxRFam3JSUiIaQjoMIw2sEs/OX4XifnqeQUN4DYbJjlA8EfktQ==}
-    engines: {node: '>= 10.16.0'}
-    peerDependencies:
-      jsep: ^0.4.0||^1.0.0
-
-  '@jsep-plugin/regex@1.0.3':
-    resolution: {integrity: sha512-XfZgry4DwEZvSFtS/6Y+R48D7qJYJK6R9/yJFyUFHCIUMEEHuJ4X95TDgJp5QkmzfLYvapMPzskV5HpIDrREug==}
     engines: {node: '>= 10.16.0'}
     peerDependencies:
       jsep: ^0.4.0||^1.0.0
@@ -4642,6 +4633,18 @@ packages:
   '@rushstack/heft-config-file@0.16.1':
     resolution: {integrity: sha512-9cgriyprJJb0b7zWBBhM75FicLQ8/NPEHrd5Dy1KRYWtEDVvg47+16RIJcco12dfLwAc2DJ9w6DH6a1omCGr/w==}
     engines: {node: '>=10.13.0'}
+
+  '@rushstack/heft-jest-plugin@0.12.18':
+    resolution: {integrity: sha512-aHtHIdQiW7uxihUvc2SicfCfKEGGkxm9+qjMvktCn3m/f0GBP7aAGByuJR1+aJM4oO9HnUeRpI4hqD0QXBcVyg==}
+    peerDependencies:
+      '@rushstack/heft': ^0.68.6
+      jest-environment-jsdom: ^29.5.0
+      jest-environment-node: ^29.5.0
+    peerDependenciesMeta:
+      jest-environment-jsdom:
+        optional: true
+      jest-environment-node:
+        optional: true
 
   '@rushstack/heft-jest-plugin@0.14.0':
     resolution: {integrity: sha512-517Q6X2C4thJXz4zXRl7MYqphCUDGmYHLEKbl7DhcaQKN14jEaJ/dMh698Y0nnbEjl7DxIqJc4nzkfmflM/4wg==}
@@ -5460,6 +5463,9 @@ packages:
   '@types/async@3.2.24':
     resolution: {integrity: sha512-8iHVLHsCCOBKjCF2KwFe0p9Z3rfM9mL+sSP8btyR5vTjJRAqpBYD28/ZLgXPf0pjG1VxOvtCV/BgXkQbpSe8Hw==}
 
+  '@types/aws-lambda@8.10.145':
+    resolution: {integrity: sha512-dtByW6WiFk5W5Jfgz1VM+YPA21xMXTuSFoLYIDY0L44jDLLflVPtZkYuu3/YxpGcvjzKFBZLU+GyKjR0HOYtyw==}
+
   '@types/aws-lambda@8.10.146':
     resolution: {integrity: sha512-3BaDXYTh0e6UCJYL/jwV/3+GRslSc08toAiZSmleYtkAUyV5rtvdPYxrG/88uqvTuT6sb27WE9OS90ZNTIuQ0g==}
 
@@ -5501,6 +5507,9 @@ packages:
 
   '@types/geojson-validation@1.0.3':
     resolution: {integrity: sha512-S+Ka75g23eK33jblC6u3Tc7GKrBfo0VuHhydPw9WdWRib7sGPAubUbNiUkdTrX9dl5F18/iD8ERzH31AYLFiKg==}
+
+  '@types/geojson@7946.0.14':
+    resolution: {integrity: sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==}
 
   '@types/geojson@7946.0.15':
     resolution: {integrity: sha512-9oSxFzDCT2Rj6DfcHF8G++jxBKS7mBqXl5xrRW+Kbvjry6Uduya2iiwqHPhVXpasAVMBYKkEPGgKhd3+/HZ6xA==}
@@ -7363,10 +7372,6 @@ packages:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
 
-  jsep@1.3.9:
-    resolution: {integrity: sha512-i1rBX5N7VPl0eYb6+mHNp52sEuaS2Wi8CDYx1X5sn9naevL78+265XJqy1qENEk7mRKwS06NHpUqiBwR7qeodw==}
-    engines: {node: '>= 10.16.0'}
-
   jsep@1.4.0:
     resolution: {integrity: sha512-B7qPcEVE3NVkmSJbaYxvv4cHkVW7DQsZz13pUMrfS8z8Q/BuShN+gcTXrUlPiGqM2/t/EEaI030bpxMqY8gMlw==}
     engines: {node: '>= 10.16.0'}
@@ -8891,6 +8896,9 @@ packages:
   yocto-queue@1.1.1:
     resolution: {integrity: sha512-b4JR1PFR10y1mKjhHY9LaGo6tmrgjit7hxVIeAmyMw3jegXR4dhYqLaQF5zMXZxY7tLpMyJeLjr1C4rLmkVe8g==}
     engines: {node: '>=12.20'}
+
+  zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
 
   zod@3.24.1:
     resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
@@ -11449,17 +11457,9 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
-  '@jsep-plugin/assignment@1.2.1(jsep@1.3.9)':
-    dependencies:
-      jsep: 1.3.9
-
   '@jsep-plugin/assignment@1.3.0(jsep@1.4.0)':
     dependencies:
       jsep: 1.4.0
-
-  '@jsep-plugin/regex@1.0.3(jsep@1.3.9)':
-    dependencies:
-      jsep: 1.3.9
 
   '@jsep-plugin/regex@1.0.4(jsep@1.4.0)':
     dependencies:
@@ -11785,6 +11785,28 @@ snapshots:
       jsonpath-plus: 10.2.0
     transitivePeerDependencies:
       - '@types/node'
+
+  '@rushstack/heft-jest-plugin@0.12.18(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))':
+    dependencies:
+      '@jest/core': 29.5.0(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+      '@jest/reporters': 29.5.0
+      '@jest/transform': 29.5.0
+      '@rushstack/heft': 0.68.10(@types/node@20.17.6)
+      '@rushstack/heft-config-file': 0.15.8(@types/node@20.17.6)
+      '@rushstack/node-core-library': 5.9.0(@types/node@20.17.6)
+      '@rushstack/terminal': 0.14.2(@types/node@20.17.6)
+      jest-config: 29.5.0(@types/node@20.17.6)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))
+      jest-resolve: 29.5.0
+      jest-snapshot: 29.5.0
+      lodash: 4.17.21
+    optionalDependencies:
+      jest-environment-node: 29.7.0
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - node-notifier
+      - supports-color
+      - ts-node
 
   '@rushstack/heft-jest-plugin@0.14.0(@rushstack/heft@0.68.10(@types/node@20.17.6))(@types/node@20.17.6)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@20.17.6)(typescript@5.6.3))':
     dependencies:
@@ -13746,6 +13768,8 @@ snapshots:
 
   '@types/async@3.2.24': {}
 
+  '@types/aws-lambda@8.10.145': {}
+
   '@types/aws-lambda@8.10.146': {}
 
   '@types/babel__core@7.20.5':
@@ -13810,6 +13834,8 @@ snapshots:
       '@types/node': 20.17.6
 
   '@types/geojson-validation@1.0.3': {}
+
+  '@types/geojson@7946.0.14': {}
 
   '@types/geojson@7946.0.15': {}
 
@@ -16687,8 +16713,6 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  jsep@1.3.9: {}
-
   jsep@1.4.0: {}
 
   jsesc@2.5.2: {}
@@ -16736,9 +16760,9 @@ snapshots:
 
   jsonpath-plus@10.1.0:
     dependencies:
-      '@jsep-plugin/assignment': 1.2.1(jsep@1.3.9)
-      '@jsep-plugin/regex': 1.0.3(jsep@1.3.9)
-      jsep: 1.3.9
+      '@jsep-plugin/assignment': 1.3.0(jsep@1.4.0)
+      '@jsep-plugin/regex': 1.0.4(jsep@1.4.0)
+      jsep: 1.4.0
 
   jsonpath-plus@10.2.0:
     dependencies:
@@ -18286,6 +18310,8 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yocto-queue@1.1.1: {}
+
+  zod@3.23.8: {}
 
   zod@3.24.1: {}
 
