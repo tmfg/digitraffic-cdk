@@ -29,7 +29,7 @@ export class PublicApi {
 
         const disruptionModel = addServiceModel("DisruptionModel", publicApi, DisruptionSchema);
         const featureModel = addServiceModel(
-            "FeatureModel",
+            "DisruptionFeatureModel",
             publicApi,
             featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId))
         );

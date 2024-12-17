@@ -18,7 +18,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
     const faultModel = publicApi.addJsonModel("FaultModel", faultsSchema);
     const featureModel = publicApi.addJsonModel(
-        "FeatureModel",
+        "FaultFeatureModel",
         featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId))
     );
     const faultsModel = publicApi.addJsonModel(
