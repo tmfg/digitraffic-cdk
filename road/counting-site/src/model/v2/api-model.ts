@@ -9,7 +9,7 @@ export interface ApiSite {
         readonly lat: number;
         readonly lon: number;
     };
-    readonly granularity: Granularity;
+    readonly granularity?: Granularity;
     readonly travelModes: TravelMode[];
     readonly directional: boolean;
 }

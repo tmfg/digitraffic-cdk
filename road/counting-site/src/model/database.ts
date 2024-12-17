@@ -10,7 +10,7 @@ export interface SiteTable {
     custom_id: string | null
     latitude: number
     longitude: number
-    granularity: Granularity
+    granularity: Granularity | null
     directional: boolean
     travel_modes: TravelMode[]
     removed_timestamp: Date | null

@@ -8,13 +8,11 @@ import { AllTravelModes } from "../../model/v2/types.js";
 
 const proxyHolder = ProxyHolder.create();
 
-const GetValuesSchema = z
-    .object({
-        date: z.string().date().optional(),
-        siteId: z.coerce.number().optional(),
-        travelMode: z.enum(AllTravelModes).optional()
-    })
-    .strict();
+const GetValuesSchema = z.object({
+    date: z.string().date().optional(),
+    siteId: z.coerce.number().optional(),
+    travelMode: z.enum(AllTravelModes).optional(),
+}).strict();
 
 export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();

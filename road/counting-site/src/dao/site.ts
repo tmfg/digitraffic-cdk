@@ -127,7 +127,7 @@ export async function updateSites(db: DTDatabase, sites: ApiSite[]): Promise<voi
                 .set("custom_id", s.customId)
                 .set("latitude", s.location.lat)
                 .set("longitude", s.location.lon)
-                .set("granularity", s.granularity)
+                .set("granularity", s.granularity ?? null)
                 .set("directional", s.directional)
                 .set("travel_modes", s.travelModes)
                 .set("removed_timestamp", sql`null`)

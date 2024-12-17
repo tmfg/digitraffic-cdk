@@ -44,7 +44,7 @@ export class PublicApiV2 {
         const apiResource = publicApi.root.addResource("api");
         const csResource = apiResource.addResource("counting-site");
 
-        return publicApi.addResourceWithCorsOptionsSubTree(csResource, "v2beta");
+        return publicApi.addResourceWithCorsOptionsSubTree(csResource, "v2");
     }
 
     createTravelModesEndpoint(v2Resource: Resource): void {
@@ -120,6 +120,9 @@ export class PublicApiV2 {
 
             sitesResource.addMethod(httpMethod, sitesIntegration, {
                 apiKeyRequired: true,
+                requestParameters: {
+                    "method.request.querystring.domain": false,
+                },
                 methodResponses: [
                     DigitrafficMethodResponse.response200(
                         geoJsonResponseModel,
