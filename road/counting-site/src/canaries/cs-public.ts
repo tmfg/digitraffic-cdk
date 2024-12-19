@@ -10,7 +10,7 @@ import { constants } from "http2";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import type { ResponseValue } from "../model/v2/response-model.js";
 
-const BASE_URL = "/prod/api/counting-site/v2beta/";
+const BASE_URL = "/prod/api/counting-site/v2/";
 const DIRECTIONS_URL = BASE_URL + "directions";
 const TRAVEL_MODES_URL = BASE_URL + "travel-modes";
 const VALUES_URL = BASE_URL + "values";
