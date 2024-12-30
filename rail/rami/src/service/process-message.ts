@@ -17,7 +17,6 @@ import { ramiMessageSchema } from "../model/zod-schema/rami-message.js";
 
 interface DeliveryPoint {
     readonly id: string;
-    readonly nameLong?: string;
 }
 
 interface TextContent {

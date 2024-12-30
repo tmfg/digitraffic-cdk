@@ -22,7 +22,7 @@ export const monitoredJourneyScheduledMessage = z
                             .describe(
                                 "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
                             ),
-                        nameLong: z.string().optional()
+                        nameLong: z.string().optional().nullable()
                     })
                     .describe("point where to deliver the scheduled message")
             )
