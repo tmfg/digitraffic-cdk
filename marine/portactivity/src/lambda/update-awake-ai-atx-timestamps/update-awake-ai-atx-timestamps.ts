@@ -9,10 +9,11 @@ import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-hold
 import WebSocket from "ws";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { type UpdateAwakeAiATXTimestampsSecret } from "../../model/secret.js";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const expectedKeys = [PortactivitySecretKeys.AWAKE_ATX_URL, PortactivitySecretKeys.AWAKE_ATX_AUTH];
 
-const rdsHolder = RdsHolder.create();
+const rdsHolder: RdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>("awake", expectedKeys);
 
 const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
@@ -38,5 +39,6 @@ export async function handler(__: unknown, context: Context): Promise<void> {
             });
 
             await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)));
-        });
+        })
+        .catch((error) => logException(logger, error));
 }
