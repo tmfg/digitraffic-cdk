@@ -54,7 +54,13 @@ export async function updateData(url: string, apiKey: string, domain: Domain): P
 
     return await inDatabase(async (db: DTDatabase) => {
         await Promise.all(sitesInDb.map(async (site: DbSite) => {
-                if (isDataUpdateNeeded(site)) {
+                if(site.removed_timestamp) {
+                    logger.info({
+                        method: "V2UpdateService.updateDataForDomain",
+                        message: `Skipping removed site ${site.id}`
+                    })
+                }
+                else if (isDataUpdateNeeded(site)) {
                     // either last update timestamp + 1 day or ten days ago(for first time)
                     const fromStamp = site.last_data_timestamp ?? startOfDay(subDays(new Date(), 10));
                     const endStamp = addDays(fromStamp, 1);
@@ -78,7 +84,7 @@ export async function updateData(url: string, apiKey: string, domain: Domain): P
                 } else {
                     logger.info({
                         method: "V2UpdateService.updateDataForDomain",
-                        message: `no need to update ${site.id}, last updated ${JSON.stringify(site.last_data_timestamp)}`
+                        message: `Skipping ${site.id}, last updated ${JSON.stringify(site.last_data_timestamp)}`
                     });
                 }
 
