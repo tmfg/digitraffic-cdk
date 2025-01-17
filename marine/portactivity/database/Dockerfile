@@ -1,4 +1,4 @@
-FROM flyway/flyway:10.19-alpine
+FROM flyway/flyway:11.2.0-alpine
 
 ARG ENVIRONMENT=dev
 
