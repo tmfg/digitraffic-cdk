@@ -49,7 +49,10 @@ describe("integration tests", () => {
                 parseJson: (data: unknown) => JSON.stringify(data)
             },
             context: {
-                c1: "context1"
+                c1: "context1",
+                authorizer: {
+                    c2: "context2"
+                }
             }
         });
     }
@@ -134,6 +137,16 @@ describe("integration tests", () => {
         const t = createTemplate(i);
         expect(t).toEqual({
             c1: "context1"
+        });
+    });
+
+    test("context parameter authorizer", () => {
+        const i = createIntegration()
+            .addContextParameter("authorizer.c2");
+
+        const t = createTemplate(i);
+        expect(t).toEqual({
+            "authorizer.c2": "context2"
         });
     });
 

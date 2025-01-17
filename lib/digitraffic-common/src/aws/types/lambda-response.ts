@@ -43,29 +43,36 @@ export class LambdaResponse {
     /**
      * Create LambdaResponse for HTTP 400
      */
-    static badRequest(body: string): LambdaResponse {
-        return this.createForString(400, body);
+    static badRequest(error: string): LambdaResponse {
+        return this.createForString(400, error);
     }
 
     /**
      * Create LambdaResponse for HTTP 404
      */
-    static notFound(): LambdaResponse {
-        return this.createForString(404, "Not found");
+    static notFound(error: string = "Not found"): LambdaResponse {
+        return this.createForString(404, error);
     }
 
     /**
      * Create LambdaResponse for HTTP 500
      */
-    static internalError(): LambdaResponse {
-        return this.createForString(500, "Internal error");
+    static internalError(error: string = "Internal error"): LambdaResponse {
+        return this.createForString(500, error);
+    }
+
+    /**
+     * Create LambdaResponse for HTTP 401
+     */
+    static unauthorized(error: string = "Unauthorized"): LambdaResponse {
+        return this.createForString(401, error);
     }
 
     /**
      * Create LambdaResponse for HTTP 501
      */
-    static notImplemented(): LambdaResponse {
-        return this.createForString(501, "Not implemented");
+    static notImplemented(error: string = "Not implemented"): LambdaResponse {
+        return this.createForString(501, error);
     }
 
     private static createForString(status: number, body: string, fileName?: string): LambdaResponse {

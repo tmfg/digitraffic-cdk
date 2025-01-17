@@ -4,7 +4,6 @@
  */
 {
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
-
   /**
    * (Required) This specifies the version of the Rush engine to be used in this repo.
    * Rush's "version selector" feature ensures that the globally installed tool will
@@ -16,42 +15,34 @@
    * path segment in the "$schema" field for all your Rush config files.  This will ensure
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
-  "rushVersion": "5.140.1",
-
-  "pnpmVersion": "9.12.3",
   "nodeSupportedVersionRange": ">=20.10.0 <21.0.0",
+  "rushVersion": "5.145.0",
+  "pnpmVersion": "9.15.4",
   "ensureConsistentVersions": false,
-
   "repository": {
     "url": "https://github.com/fintraffic-vts/mcp-cdk",
     "defaultBranch": "master",
     "defaultRemote": "origin"
   },
-
   "allowedProjectTags": ["internal", "cdk", "library", "marine", "rail", "road", "other", "aviation"],
-
   "eventHooks": {
     /**
      * The list of shell commands to run before the Rush installation starts
      */
     "preRushInstall": [],
-
     /**
      * The list of shell commands to run after the Rush installation finishes
      */
     "postRushInstall": [],
-
     /**
      * The list of shell commands to run before the Rush build command starts
      */
     "preRushBuild": [],
-
     /**
      * The list of shell commands to run after the Rush build command finishes
      */
     "postRushBuild": []
   },
-
   "projects": [
     // aviation
     {
@@ -60,7 +51,6 @@
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "aviation"]
     },
-
     // libraries
     {
       "packageName": "@digitraffic/common",
@@ -69,7 +59,6 @@
       "decoupledLocalDependencies": ["@digitraffic/eslint-config"],
       "tags": ["library"]
     },
-
     // marine
     {
       "packageName": "aton-faults",
@@ -131,7 +120,6 @@
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "marine"]
     },
-
     // other
     {
       "packageName": "digitraffic-aws-github-oidc",
@@ -197,7 +185,6 @@
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "other"]
     },
-
     // rail
     {
       "packageName": "rail-rata-cdk",
@@ -211,7 +198,6 @@
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "rail"]
     },
-
     // road
     {
       "packageName": "counting-sites",
@@ -255,7 +241,6 @@
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "road"]
     },
-
     // internal / tools
     {
       "packageName": "@digitraffic-cdk/esm-template",

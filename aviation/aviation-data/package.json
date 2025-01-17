@@ -15,10 +15,10 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.7.8-1",
-    "@aws-sdk/lib-storage": "^3.709.0",
-    "@aws-sdk/client-s3": "^3.709.0",
-    "aws-cdk-lib": "^2.172.0",
+    "@digitraffic/common": "2025.1.17-1",
+    "@aws-sdk/lib-storage": "^3.721.0",
+    "@aws-sdk/client-s3": "^3.721.0",
+    "aws-cdk-lib": "^2.173.4",
     "aws-sdk": "^2.1692.0",
     "constructs": "~10.4.2"
   },
@@ -27,9 +27,9 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.10",
-    "@rushstack/heft-jest-plugin": "^0.14.0",
-    "@types/aws-lambda": "8.10.146",
+    "@rushstack/heft": "^0.68.11",
+    "@rushstack/heft-jest-plugin": "^0.14.1",
+    "@types/aws-lambda": "8.10.147",
     "@types/heft-jest": "1.0.6",
     "@types/node": "20.17.6",
     "eslint": "^8.57.0",

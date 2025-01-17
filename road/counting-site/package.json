@@ -24,18 +24,18 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.1.10-1",
-    "@std/csv": "npm:@jsr/std__csv@1.0.4",
-    "aws-cdk-lib": "^2.175.1",
+    "@digitraffic/common": "2025.1.17-1",
+    "@std/csv": "npm:@jsr/std__csv@1.0.3",
+    "aws-cdk-lib": "^2.173.4",
     "constructs": "^10.4.2",
     "date-fns": "^4.1.0",
     "geojson": "^0.5.0",
     "geojson-validation": "^1.0.2",
-    "ky": "1.7.4",
+    "ky": "^1.7.4",
     "kysely": "0.27.5",
     "pg-native": "^3.2.0",
     "pg-promise": "^11.10.2",
-    "zod": "3.24.1"
+    "zod": "~3.24.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -44,8 +44,8 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.13",
-    "@rushstack/heft-jest-plugin": "^0.14.0",
+    "@rushstack/heft": "^0.68.11",
+    "@rushstack/heft-jest-plugin": "^0.14.1",
     "@types/aws-lambda": "8.10.147",
     "@types/geojson": "7946.0.15",
     "@types/heft-jest": "1.0.6",

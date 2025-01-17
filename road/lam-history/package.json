@@ -23,11 +23,11 @@
     "test_": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.709.0",
-    "@aws-sdk/client-secrets-manager": "^3.687.0",
-    "@digitraffic/common": "2024.7.8-1",
-    "aws-cdk-lib": "^2.172.0",
-    "axios": "^1.7.7",
+    "@aws-sdk/client-s3": "^3.721.0",
+    "@aws-sdk/client-secrets-manager": "^3.721.0",
+    "@digitraffic/common": "2025.1.17-1",
+    "aws-cdk-lib": "^2.173.4",
+    "axios": "^1.7.9",
     "constructs": "~10.4.2"
   },
   "devDependencies": {
@@ -36,13 +36,13 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.10",
-    "@rushstack/heft-jest-plugin": "^0.14.0",
-    "@types/aws-lambda": "8.10.146",
+    "@rushstack/heft": "^0.68.11",
+    "@rushstack/heft-jest-plugin": "^0.14.1",
+    "@types/aws-lambda": "8.10.147",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
     "@types/node": "20.17.6",
-    "esbuild": "0.24.0",
+    "esbuild": "0.24.2",
     "eslint": "^8.57.0",
     "typescript": "~5.6.3"
   }

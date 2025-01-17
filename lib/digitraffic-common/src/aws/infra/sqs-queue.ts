@@ -39,15 +39,27 @@ export class DigitrafficSqsQueue extends Queue {
         const queueName = `${stack.configuration.shortName}-${name}-Queue`;
         const queueProps = {
             ...props,
-            ...{
-                encryption: QueueEncryption.KMS_MANAGED,
-                queueName,
-                deadLetterQueue: props.deadLetterQueue ?? {
-                    maxReceiveCount: 2,
-                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                    queue: DigitrafficDLQueue.create(stack, name),
-                },
+            encryption: QueueEncryption.KMS_MANAGED,
+            queueName,
+            deadLetterQueue: props.deadLetterQueue ?? {
+                maxReceiveCount: 2,
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                queue: DigitrafficDLQueue.create(stack, name),
             },
+        };
+
+        return new DigitrafficSqsQueue(stack, queueName, queueProps);
+    }
+
+    /**
+     * Create a fifo with given name.  No DLQ created!
+     */
+    static createFifo(stack: DigitrafficStack, name: string, props: QueueProps): DigitrafficSqsQueue {
+        const queueName = `${stack.configuration.shortName}-${name}-Queue.fifo`;
+        const queueProps = {
+            ...props,
+            encryption: QueueEncryption.KMS_MANAGED,
+            queueName
         };
 
         return new DigitrafficSqsQueue(stack, queueName, queueProps);

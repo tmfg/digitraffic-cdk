@@ -72,3 +72,4 @@ const lambda = MonitoredDBFunction.create(stack, 'get-metadata');
 ```
 
 See the documentation for more information.
+

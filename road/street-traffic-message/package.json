@@ -24,9 +24,9 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2024.7.8-1",
-    "aws-cdk-lib": "^2.172.0",
-    "axios": "^1.7.7",
+    "@digitraffic/common": "2025.1.17-1",
+    "aws-cdk-lib": "^2.173.4",
+    "axios": "^1.7.9",
     "constructs": "~10.4.2",
     "date-fns": "~4.1.0",
     "pg-promise": "^11.10.2",
@@ -38,19 +38,19 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.10",
-    "@rushstack/heft-jest-plugin": "^0.14.0",
+    "@rushstack/heft": "^0.68.11",
+    "@rushstack/heft-jest-plugin": "^0.14.1",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
     "@types/node": "20.17.6",
-    "esbuild": "0.24.0",
+    "esbuild": "0.24.2",
     "eslint": "^8.57.0",
     "typescript": "~5.6.3",
-    "@types/aws-lambda": "8.10.146",
+    "@types/aws-lambda": "8.10.147",
     "@types/geojson": "7946.0.15",
     "@types/sinon": "17.0.3",
     "@types/xml2js": "0.4.14",
-    "sinon": "18.0.0"
+    "sinon": "19.0.2"
   },
   "externals": [
     "aws-sdk"
