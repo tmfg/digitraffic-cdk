@@ -34,7 +34,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1,
         memorySize: 128,
-        timeout: Duration.seconds(10)
+        timeout: Duration.seconds(30)
     };
 
     const updateDocsLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
@@ -85,7 +85,7 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
         memorySize: 192,
         reservedConcurrentExecutions: 1,
         environment: lambdaEnv,
-        timeout: Duration.seconds(10)
+        timeout: Duration.seconds(30)
     };
 
     const updateSwaggerLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
