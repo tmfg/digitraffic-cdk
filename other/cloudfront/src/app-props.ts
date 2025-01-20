@@ -269,6 +269,7 @@ export interface DistributionProps {
     readonly aclRules?: WafRules[];
     readonly origins: CFOrigin[];
     readonly disableShieldAdvanced?: boolean;
+    readonly geoblock?: string[];
 }
 
 export interface StreamingLogProps {

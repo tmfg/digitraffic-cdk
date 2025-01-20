@@ -1,5 +1,5 @@
 import type { SourceConfiguration } from "aws-cdk-lib/aws-cloudfront";
-import { CloudFrontWebDistribution, HttpVersion, SecurityPolicyProtocol } from "aws-cdk-lib/aws-cloudfront";
+import { CloudFrontWebDistribution, GeoRestriction, HttpVersion, SecurityPolicyProtocol } from "aws-cdk-lib/aws-cloudfront";
 import type { CfnResource, Stack } from "aws-cdk-lib";
 import { Tags } from "aws-cdk-lib";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
@@ -48,6 +48,10 @@ export function createDistribution(
     return createDistributionWithStreamingLogging(stack, createDistributionProps, viewerCertificate, webAcl);
 }
 
+function createGeoRestriction(distributionProps: DistributionProps): GeoRestriction | undefined {
+    return distributionProps.geoblock ? GeoRestriction.denylist(...distributionProps.geoblock) : undefined
+}
+
 function createDistributionWithStreamingLogging(
     stack: Stack,
     createDistributionProps: CreateDistributionProps,
@@ -60,7 +64,8 @@ function createDistributionWithStreamingLogging(
         viewerCertificate,
         webACLId: webAcl?.attrArn,
         httpVersion: HttpVersion.HTTP2_AND_3,
-        defaultRootObject: "index.html"
+        defaultRootObject: "index.html",
+        geoRestriction: createGeoRestriction(distributionProps)
     });
 
     if (!distributionProps.disableShieldAdvanced) {
