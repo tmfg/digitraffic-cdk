@@ -24,7 +24,17 @@
     "defaultBranch": "master",
     "defaultRemote": "origin"
   },
-  "allowedProjectTags": ["internal", "cdk", "library", "marine", "rail", "road", "other", "aviation"],
+  "allowedProjectTags": [
+    "internal",
+    "cdk",
+    "library",
+    "marine",
+    "rail",
+    "road",
+    "other",
+    "aviation"
+  ],
+
   "eventHooks": {
     /**
      * The list of shell commands to run before the Rush installation starts

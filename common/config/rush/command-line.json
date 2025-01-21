@@ -2,7 +2,7 @@
  * This configuration file defines custom commands for the "rush" command-line.
  * More documentation is available on the Rush website: https://rushjs.io
  */
- {
+{
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
 
   /**
@@ -11,14 +11,6 @@
    * "rush my-global-command --help".
    */
   "commands": [
-    {
-      "name": "prettier",
-      "commandKind": "global",
-      "summary": "Used by the pre-commit Git Hook. This command invokes Prettier to reformat staged changes.",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "rush-prettier",
-      "shellCommand": "pretty-quick --staged"
-    },
     {
       "name": "build",
       "commandKind": "bulk",
@@ -71,19 +63,19 @@
       "associatedCommands": ["common-subtree"],
       "alternatives": [
         {
-          "name":  "pull",
+          "name": "pull",
           "description": "pull changes to common subtree"
         },
         {
-          "name":  "push",
+          "name": "push",
           "description": "push changes to common subtree"
         },
         {
-          "name":  "diff",
+          "name": "diff",
           "description": "diff against some branch in common"
         },
         {
-          "name":  "subtree-add",
+          "name": "subtree-add",
           "description": "Add common as subtree"
         }
       ]
@@ -98,5 +90,4 @@
       "associatedCommands": ["common-subtree"]
     }
   ]
-
 }

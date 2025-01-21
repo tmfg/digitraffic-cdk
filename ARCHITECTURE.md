@@ -1,6 +1,7 @@
-# Architecture
+# Architecture foobar
+
 ```
-Project quux, directory quux
+     Project quux, directory quux
 
 bin
 └───quux-app.ts (ignored by git)
@@ -30,8 +31,9 @@ test
 │
 └───lambda
     └───update-foos.test.ts
-
 ```
+
 - separate source code to own directories by category as described above
 - Lambdas are in their own directories to facilitate bundling (lambda.AssetCode)
-- document implicit dependencies, e.g. to run tests, use database from digitraffic-road/dbroad 
+- document implicit dependencies, e.g. to run tests, use database from
+  digitraffic-road/dbroad

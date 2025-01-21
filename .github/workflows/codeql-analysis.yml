@@ -2,47 +2,47 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   schedule:
-    - cron: '22 20 * * 0'
+    - cron: "22 20 * * 0"
 
 jobs:
   analyze:
     if: github.repository == 'tmfg/digitraffic-cdk'
     name: Analyze
     runs-on: ubuntu-latest
-    
+
     permissions:
       security-events: write
 
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript', 'python' ]
-        
+        language: ["javascript", "python"]
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-        # Digitraffic-common has its own repo.
-        # Common/scripts and swagger-joiner/resources are 3rd party code.
-        config: |
-          paths-ignore:
-            - lib/digitraffic-common
-            - common/scripts
-            - other/swagger-joiner/resources
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # Digitraffic-common has its own repo.
+          # Common/scripts and swagger-joiner/resources are 3rd party code.
+          config: |
+            paths-ignore:
+              - lib/digitraffic-common
+              - common/scripts
+              - other/swagger-joiner/resources
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{matrix.language}}"
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"

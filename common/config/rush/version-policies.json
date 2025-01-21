@@ -21,9 +21,9 @@
      * is changed.
      */
     "definitionName": "individualVersion",
-  
+
     "policyName": "DigitrafficCommon",
-    
+
     /**
      * (Optional) When publishing is managed by Rush, by default the "rush change" command will
      * request changes for any projects that are modified by a pull request. These change entries

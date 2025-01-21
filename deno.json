@@ -1,0 +1,17 @@
+{
+  "exclude": [
+    "*/**/*",
+    "**/pnpm-lock.yaml",
+    "**/shrinkwrap.json",
+    "**/dist",
+    "/*/**/lib",
+    "**/node_modules",
+    ".git",
+
+    "common/scripts/install-run*.js",
+    "common/scripts/**/*",
+    "common/config/**/*",
+
+    "lib/digitraffic-common"
+  ]
+}
