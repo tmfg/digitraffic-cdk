@@ -1,4 +1,4 @@
-# Conventions foobar
+# Conventions
 
 # Dependencies
 

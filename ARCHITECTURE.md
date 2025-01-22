@@ -1,4 +1,4 @@
-# Architecture foobar
+# Architecture
 
 ```
      Project quux, directory quux
