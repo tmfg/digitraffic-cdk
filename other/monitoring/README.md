@@ -22,3 +22,20 @@ Currently the following is monitored:
 * max cpu usage
 * max heap usage
 * max network out
+
+## Installation
+
+Cdk bootstrap needst to be done for both regions `eu-west-1` and `us-east-1` i.e.
+```
+npx cdk@latest bootstrap aws://<accountnum>/eu-west-1
+npx cdk@latest bootstrap aws://<accountnum>/us-east-1
+ 
+```
+
+And diff / deploy 
+```
+../../scripts/cdk-diff-and-deploy.sh <project>-<test|pro> <diff|deploy> 
+```
+
+Topics created by the stack can be found from AWS console at Amazon SNS
+Topics

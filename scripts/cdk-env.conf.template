@@ -28,6 +28,12 @@ SCRIPT_DIR=$(dirname "$0")
 #echo SCRIPT_DIR: ${SCRIPT_DIR}
 
 case "$ENV" in
+  ("afir-prod"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("afir-test"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
   ("rail-prod"):
     AWS_PROFILE=<TODO PROFILE>
   ;;
@@ -56,6 +62,12 @@ case "$ENV" in
     AWS_PROFILE=<TODO PROFILE>
   ;;
   ("aviation-test"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("parking-prod"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("parking-test"):
     AWS_PROFILE=<TODO PROFILE>
   ;;
   ("mcp-prod"):
