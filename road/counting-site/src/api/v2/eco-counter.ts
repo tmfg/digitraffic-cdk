@@ -3,6 +3,7 @@ import type { ApiSite, ApiData } from "../../model/v2/api-model.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
+import { TZDate } from "@date-fns/tz";
 
 export const URL_ALL_SITES = "/api/v2/sites?include=domain";
 export const URL_SITE_DATA = "/api/v2/history/traffic/raw";
@@ -60,14 +61,17 @@ export class EcoCounterApi {
     }
 
     getDataForSite(siteId: number, from: Date, to: Date): Promise<ApiData[]> {
-        const fromIsoString = from.toISOString();
-        const toIsoString = to.toISOString();
-        const fromString = fromIsoString.substring(0, 10); // take just date, YYYY-MM-DD
-        const toString = toIsoString.substring(0, 10);
-        const fromTime = fromIsoString.substring(11, 16); // take just time, HH:MM
-        const toTime = toIsoString.substring(11, 16);
-//        const fromTime = "21%3A00";
-  //      const toTime = "21%3A00";
+        // must use Helsinki time with the integration source
+        const tzFrom = new TZDate(from).withTimeZone("Europe/Helsinki");
+        const tzTo = new TZDate(to).withTimeZone("Europe/Helsinki");
+
+        // formats dates to YYYY-MM-DD
+        const fromString = tzFrom.toLocaleDateString("en-CA");
+        const toString = tzTo.toLocaleDateString("en-CA");
+
+        // format times and get HH:MM
+        const fromTime = tzFrom.toLocaleTimeString("en-GB").substring(0, 5);
+        const toTime = tzTo.toLocaleTimeString("en-GB").substring(0, 5);
 
         return this.getFromServer(
             `${URL_SITE_DATA}?siteId=${siteId}&startDate=${fromString}&endDate=${toString}&startTime=${fromTime}&endTime=${toTime}`

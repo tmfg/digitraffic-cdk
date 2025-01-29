@@ -28054,7 +28054,7 @@
       "format": "esm"
     },
     "src/dao/data.ts": {
-      "bytes": 3804,
+      "bytes": 3882,
       "imports": [
         {
           "path": "src/dao/db.ts",
@@ -28485,8 +28485,98 @@
       ],
       "format": "esm"
     },
+    "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/constants/index.js": {
+      "bytes": 223,
+      "imports": [],
+      "format": "esm"
+    },
+    "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzOffset/index.js": {
+      "bytes": 1523,
+      "imports": [],
+      "format": "esm"
+    },
+    "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/mini.js": {
+      "bytes": 6887,
+      "imports": [
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzOffset/index.js",
+          "kind": "import-statement",
+          "original": "../tzOffset/index.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/index.js": {
+      "bytes": 3046,
+      "imports": [
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/mini.js",
+          "kind": "import-statement",
+          "original": "./mini.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tz/index.js": {
+      "bytes": 498,
+      "imports": [
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/index.js",
+          "kind": "import-statement",
+          "original": "../date/index.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzScan/index.js": {
+      "bytes": 2304,
+      "imports": [
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzOffset/index.js",
+          "kind": "import-statement",
+          "original": "../tzOffset/index.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/index.js": {
+      "bytes": 205,
+      "imports": [
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/constants/index.js",
+          "kind": "import-statement",
+          "original": "./constants/index.js"
+        },
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/index.js",
+          "kind": "import-statement",
+          "original": "./date/index.js"
+        },
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/mini.js",
+          "kind": "import-statement",
+          "original": "./date/mini.js"
+        },
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tz/index.js",
+          "kind": "import-statement",
+          "original": "./tz/index.js"
+        },
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzOffset/index.js",
+          "kind": "import-statement",
+          "original": "./tzOffset/index.js"
+        },
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzScan/index.js",
+          "kind": "import-statement",
+          "original": "./tzScan/index.js"
+        }
+      ],
+      "format": "esm"
+    },
     "src/api/v2/eco-counter.ts": {
-      "bytes": 2629,
+      "bytes": 2772,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/aws/types/mediatypes.js",
@@ -28507,6 +28597,11 @@
           "path": "../../common/temp/node_modules/.pnpm/ky@1.7.4/node_modules/ky/distribution/index.js",
           "kind": "import-statement",
           "original": "ky"
+        },
+        {
+          "path": "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/index.js",
+          "kind": "import-statement",
+          "original": "@date-fns/tz"
         }
       ],
       "format": "esm"
@@ -34640,7 +34735,7 @@
       "format": "esm"
     },
     "src/service/update-service.ts": {
-      "bytes": 4886,
+      "bytes": 6257,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/database/database.js",
@@ -43409,7 +43504,7 @@
           "bytesInOutput": 2006
         },
         "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/validator.js": {
-          "bytesInOutput": 12543
+          "bytesInOutput": 12546
         },
         "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/xmlparser/OptionsBuilder.js": {
           "bytesInOutput": 1713
@@ -44636,19 +44731,34 @@
           "bytesInOutput": 280
         },
         "../../common/temp/node_modules/.pnpm/ky@1.7.4/node_modules/ky/distribution/core/Ky.js": {
-          "bytesInOutput": 9603
+          "bytesInOutput": 9606
         },
         "../../common/temp/node_modules/.pnpm/ky@1.7.4/node_modules/ky/distribution/index.js": {
           "bytesInOutput": 656
         },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/constants/index.js": {
+          "bytesInOutput": 59
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/index.js": {
+          "bytesInOutput": 0
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzOffset/index.js": {
+          "bytesInOutput": 892
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/mini.js": {
+          "bytesInOutput": 4236
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/index.js": {
+          "bytesInOutput": 2136
+        },
         "src/api/v2/eco-counter.ts": {
-          "bytesInOutput": 1759
+          "bytesInOutput": 1851
         },
         "../../common/temp/node_modules/.pnpm/date-fns@4.1.0/node_modules/date-fns/constants.js": {
-          "bytesInOutput": 396
+          "bytesInOutput": 429
         },
         "../../common/temp/node_modules/.pnpm/date-fns@4.1.0/node_modules/date-fns/constructFrom.js": {
-          "bytesInOutput": 300
+          "bytesInOutput": 302
         },
         "../../common/temp/node_modules/.pnpm/date-fns@4.1.0/node_modules/date-fns/toDate.js": {
           "bytesInOutput": 94
@@ -44658,6 +44768,12 @@
         },
         "../../common/temp/node_modules/.pnpm/date-fns@4.1.0/node_modules/date-fns/startOfDay.js": {
           "bytesInOutput": 128
+        },
+        "../../common/temp/node_modules/.pnpm/date-fns@4.1.0/node_modules/date-fns/addMinutes.js": {
+          "bytesInOutput": 172
+        },
+        "../../common/temp/node_modules/.pnpm/date-fns@4.1.0/node_modules/date-fns/max.js": {
+          "bytesInOutput": 361
         },
         "../../common/temp/node_modules/.pnpm/date-fns@4.1.0/node_modules/date-fns/isBefore.js": {
           "bytesInOutput": 92
@@ -45260,13 +45376,13 @@
           "bytesInOutput": 261
         },
         "src/dao/data.ts": {
-          "bytesInOutput": 498
+          "bytesInOutput": 561
         },
         "src/service/update-service.ts": {
-          "bytesInOutput": 1690
+          "bytesInOutput": 2576
         }
       },
-      "bytes": 1911691
+      "bytes": 1921214
     },
     "dist/lambda/update-metadata/update-metadata.js": {
       "imports": [
@@ -46056,7 +46172,7 @@
           "bytesInOutput": 2006
         },
         "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/validator.js": {
-          "bytesInOutput": 12543
+          "bytesInOutput": 12546
         },
         "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/xmlparser/OptionsBuilder.js": {
           "bytesInOutput": 1713
@@ -47288,8 +47404,23 @@
         "../../common/temp/node_modules/.pnpm/ky@1.7.4/node_modules/ky/distribution/index.js": {
           "bytesInOutput": 656
         },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/constants/index.js": {
+          "bytesInOutput": 59
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/index.js": {
+          "bytesInOutput": 0
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/tzOffset/index.js": {
+          "bytesInOutput": 892
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/mini.js": {
+          "bytesInOutput": 4236
+        },
+        "../../common/temp/node_modules/.pnpm/@date-fns+tz@1.2.0/node_modules/@date-fns/tz/date/index.js": {
+          "bytesInOutput": 2136
+        },
         "src/api/v2/eco-counter.ts": {
-          "bytesInOutput": 1759
+          "bytesInOutput": 1851
         },
         "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/database/last-updated.js": {
           "bytesInOutput": 717
@@ -47889,7 +48020,7 @@
           "bytesInOutput": 1692
         }
       },
-      "bytes": 1910407
+      "bytes": 1918233
     }
   }
 }

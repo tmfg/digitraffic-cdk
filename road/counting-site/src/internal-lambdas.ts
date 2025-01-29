@@ -9,7 +9,7 @@ export class InternalLambdas {
         const updateDataLambda = InternalLambdas.createUpdateDataLambdaForFintraffic(stack);
 
         Scheduler.everyHour(stack, "RuleForMetadataUpdate", updateMetadataLambda);
-        Scheduler.everyHour(stack, "RuleForDataUpdate", updateDataLambda);
+        Scheduler.everyHour(stack, "RuleForDataUpdate", updateDataLambda);        
 
         stack.grantSecret(updateMetadataLambda, updateDataLambda);
     }

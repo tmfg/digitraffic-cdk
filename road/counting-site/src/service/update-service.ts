@@ -1,6 +1,6 @@
 import { type DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { EcoCounterApi } from "../api/v2/eco-counter.js";
-import { addDays, subDays, startOfDay, isBefore } from "date-fns";
+import { addDays, subDays, startOfDay, isBefore, max, addMinutes } from "date-fns";
 import { DataType, updateLastUpdated } from "@digitraffic/common/dist/database/last-updated";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { ApiSite } from "../model/v2/api-model.js";
@@ -67,20 +67,42 @@ export async function updateData(url: string, apiKey: string, domain: Domain): P
 
                     logger.debug(`Site ${site.id}, last_data_timestamp ${JSON.stringify(site.last_data_timestamp)}, updating from ${JSON.stringify(fromStamp)} to ${JSON.stringify(endStamp)}`);
 
+                    // add one minute to fromStamp, as timestamps are inclusive and we don't want duplicate data
+                    // timestamp resolution is minutes
                     const data = await api.getDataForSite(
                         site.id,
-                        fromStamp,
+                        addMinutes(fromStamp, 1),
                         endStamp
                     );
 
                     logger.info({
                         method: "V2UpdateService.updateDataForDomain",
                         customSite: site.id,
+                        customObjectType: "data",
                         customUpdatedCount: data.length
                     });
 
-                    await addSiteData(db, site.id, data);
-                    await updateSiteTimestamp(db, site.id, endStamp);
+                    const pointCount = await addSiteData(db, site.id, data);                    
+
+                    if(pointCount === 0) {
+                        logger.info({
+                            method: "V2UpdateService.updateDataForDomain",
+                            message: "Skipping update, no values",
+                            customSite: site.id
+                        });
+                    } else {
+                        const actualEndStamp = max(data.flatMap(d => d.data).map(p => p.timestamp));
+
+                        logger.info({
+                            method: "V2UpdateService.updateDataForDomain",
+                            customSite: site.id,
+                            customObjectType: "point",
+                            customUpdatedCount: pointCount,
+                            customEndTime: actualEndStamp
+                        });
+
+                        await updateSiteTimestamp(db, site.id, actualEndStamp);
+                    }
                 } else {
                     logger.info({
                         method: "V2UpdateService.updateDataForDomain",

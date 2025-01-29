@@ -2206,6 +2206,9 @@ importers:
 
   ../../road/counting-site:
     dependencies:
+      '@date-fns/tz':
+        specifier: 1.2.0
+        version: 1.2.0
       '@digitraffic/common':
         specifier: 2025.1.17-1
         version: 2025.1.17-1(@aws-sdk/client-api-gateway@3.721.0)(@aws-sdk/client-s3@3.721.0)(@aws-sdk/client-secrets-manager@3.721.0)(@aws-sdk/client-sns@3.721.0)(@aws-sdk/lib-storage@3.721.0(@aws-sdk/client-s3@3.721.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@4.1.3)(aws-cdk-lib@2.173.4(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.4)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.0)(pg-promise@11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.1(pg@8.13.1(pg-native@3.2.0))))(pg-query-stream@4.7.1(pg@8.13.1(pg-native@3.2.0)))(zod@3.24.1)

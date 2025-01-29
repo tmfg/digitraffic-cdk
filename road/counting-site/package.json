@@ -24,6 +24,7 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.2.0",
     "@digitraffic/common": "2025.1.17-1",
     "@std/csv": "npm:@jsr/std__csv@1.0.3",
     "aws-cdk-lib": "^2.173.4",

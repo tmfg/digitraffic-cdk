@@ -74,7 +74,9 @@ export async function findCsvValuesForMonth(
     return [data, modified];
 }
 
-export async function addSiteData(db: DTDatabase, siteId: number, data: ApiData[]): Promise<void> {
+export async function addSiteData(db: DTDatabase, siteId: number, data: ApiData[]): Promise<number> {
+    let pointCount = 0;
+
     await Promise.all(data.map(async d => {
         await Promise.all(d.data.map((point) => {
             const compiled = database.insertInto("cs2_data")
@@ -87,9 +89,13 @@ export async function addSiteData(db: DTDatabase, siteId: number, data: ApiData[
                 counts: point.counts
             }).compile();
 
+            pointCount++;
+
             return db.none(compiled.sql, compiled.parameters);
         }));
     }));
+
+    return pointCount;
 }
 
 interface DbModified {
