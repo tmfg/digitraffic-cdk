@@ -13,28 +13,32 @@ const CHUNK_SIZE = 10;
 const rdsHolder = RdsHolder.create();
 
 export function handlerFn(sns: SNSClient): () => Promise<void> {
-    return () => {
-        return rdsHolder.setCredentials().then(async () => {
-            const ships = await TimestampService.findETAShipsByLocode(ports);
-            logger.info({
-                method: "TriggerAwakeAiETATimestampsUpdate.handler",
-                customShipTriggerCount: ships.length
-            });
+  return () => {
+    return rdsHolder.setCredentials().then(async () => {
+      const ships = await TimestampService.findETAShipsByLocode(ports);
+      logger.info({
+        method: "TriggerAwakeAiETATimestampsUpdate.handler",
+        customShipTriggerCount: ships.length,
+      });
 
-            for (const ship of ships) {
-                logger.info({
-                    method: "TriggerAwakeAiETATimestampsUpdate.handler",
-                    message: `Triggering ETA update for ship with IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`
-                });
-            }
-
-            for (const chunk of _.chunk(ships, CHUNK_SIZE)) {
-                await sns.send(
-                    new PublishCommand({ Message: JSON.stringify(chunk), TopicArn: publishTopic })
-                );
-            }
+      for (const ship of ships) {
+        logger.info({
+          method: "TriggerAwakeAiETATimestampsUpdate.handler",
+          message:
+            `Triggering ETA update for ship with IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
         });
-    };
+      }
+
+      for (const chunk of _.chunk(ships, CHUNK_SIZE)) {
+        await sns.send(
+          new PublishCommand({
+            Message: JSON.stringify(chunk),
+            TopicArn: publishTopic,
+          }),
+        );
+      }
+    });
+  };
 }
 
 export const handler = handlerFn(new SNSClient({}));

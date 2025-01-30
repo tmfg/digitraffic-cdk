@@ -28022,7 +28022,7 @@
       "format": "esm"
     },
     "src/dao/db.ts": {
-      "bytes": 458,
+      "bytes": 456,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/kysely@0.27.5/node_modules/kysely/dist/esm/index.js",
@@ -28033,7 +28033,7 @@
       "format": "esm"
     },
     "src/dao/site.ts": {
-      "bytes": 5722,
+      "bytes": 5298,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/pg-promise@11.10.2_pg-native@3.2.0_pg-query-stream@4.7.1_pg@8.13.1_pg-native@3.2.0__/node_modules/pg-promise/lib/index.js",
@@ -28054,7 +28054,7 @@
       "format": "esm"
     },
     "src/dao/data.ts": {
-      "bytes": 3882,
+      "bytes": 3922,
       "imports": [
         {
           "path": "src/dao/db.ts",
@@ -28171,7 +28171,7 @@
       "format": "esm"
     },
     "src/service/api-service.ts": {
-      "bytes": 3119,
+      "bytes": 2915,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/database/database.js",
@@ -28207,7 +28207,7 @@
       "format": "esm"
     },
     "src/lambda/get-sites/get-sites.ts": {
-      "bytes": 1593,
+      "bytes": 1519,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/aws/types/lambda-response.js",
@@ -28243,12 +28243,12 @@
       "format": "esm"
     },
     "src/model/v2/types.ts": {
-      "bytes": 589,
+      "bytes": 632,
       "imports": [],
       "format": "esm"
     },
     "src/lambda/get-values-csv/get-values-csv.ts": {
-      "bytes": 1886,
+      "bytes": 1859,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/aws/types/lambda-response.js",
@@ -28289,7 +28289,7 @@
       "format": "esm"
     },
     "src/lambda/get-values/get-values.ts": {
-      "bytes": 1788,
+      "bytes": 1701,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/aws/types/lambda-response.js",
@@ -28330,7 +28330,7 @@
       "format": "esm"
     },
     "src/keys.ts": {
-      "bytes": 66,
+      "bytes": 68,
       "imports": [],
       "format": "esm"
     },
@@ -28576,7 +28576,7 @@
       "format": "esm"
     },
     "src/api/v2/eco-counter.ts": {
-      "bytes": 2772,
+      "bytes": 2488,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/aws/types/mediatypes.js",
@@ -34735,7 +34735,7 @@
       "format": "esm"
     },
     "src/service/update-service.ts": {
-      "bytes": 6257,
+      "bytes": 5624,
       "imports": [
         {
           "path": "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/database/database.js",
@@ -34776,7 +34776,7 @@
       "format": "esm"
     },
     "src/lambda/update-data/update-data.ts": {
-      "bytes": 1360,
+      "bytes": 1295,
       "imports": [
         {
           "path": "src/keys.ts",
@@ -34817,7 +34817,7 @@
       "format": "esm"
     },
     "src/lambda/update-metadata/update-metadata.ts": {
-      "bytes": 1372,
+      "bytes": 1307,
       "imports": [
         {
           "path": "src/keys.ts",
@@ -36437,7 +36437,7 @@
           "bytesInOutput": 447
         },
         "src/lambda/get-sites/get-sites.ts": {
-          "bytesInOutput": 1089
+          "bytesInOutput": 1107
         },
         "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/aws/types/lambda-response.js": {
           "bytesInOutput": 2018
@@ -37466,13 +37466,13 @@
           "bytesInOutput": 1041
         },
         "src/service/api-service.ts": {
-          "bytesInOutput": 374
+          "bytesInOutput": 414
         },
         "../../common/temp/node_modules/.pnpm/zod@3.24.1/node_modules/zod/lib/index.mjs": {
           "bytesInOutput": 122070
         }
       },
-      "bytes": 2018455
+      "bytes": 2018513
     },
     "dist/lambda/get-values-csv/get-values-csv.js": {
       "imports": [
@@ -39052,7 +39052,7 @@
           "bytesInOutput": 447
         },
         "src/lambda/get-values-csv/get-values-csv.ts": {
-          "bytesInOutput": 1317
+          "bytesInOutput": 1359
         },
         "../../common/temp/node_modules/.pnpm/@digitraffic+common@2025.1.17-1_@aws-sdk+client-api-gateway@3.721.0_@aws-sdk+client-s3@3.721._6duwcvukgvvoitdh6pctkahphi/node_modules/@digitraffic/common/dist/aws/types/lambda-response.js": {
           "bytesInOutput": 2018
@@ -40069,7 +40069,7 @@
           "bytesInOutput": 261
         },
         "src/dao/data.ts": {
-          "bytesInOutput": 1443
+          "bytesInOutput": 1515
         },
         "../../common/temp/node_modules/.pnpm/@jsr+std__csv@1.0.3/node_modules/@jsr/std__csv/mod.js": {
           "bytesInOutput": 0
@@ -40090,10 +40090,10 @@
           "bytesInOutput": 885
         },
         "src/model/v2/types.ts": {
-          "bytesInOutput": 147
+          "bytesInOutput": 173
         }
       },
-      "bytes": 2020707
+      "bytes": 2020847
     },
     "dist/lambda/get-values/get-values.js": {
       "imports": [
@@ -42690,7 +42690,7 @@
           "bytesInOutput": 261
         },
         "src/dao/data.ts": {
-          "bytesInOutput": 1443
+          "bytesInOutput": 1531
         },
         "../../common/temp/node_modules/.pnpm/@jsr+std__csv@1.0.3/node_modules/@jsr/std__csv/mod.js": {
           "bytesInOutput": 0
@@ -42708,13 +42708,13 @@
           "bytesInOutput": 1041
         },
         "src/service/api-service.ts": {
-          "bytesInOutput": 504
+          "bytesInOutput": 534
         },
         "src/model/v2/types.ts": {
-          "bytesInOutput": 147
+          "bytesInOutput": 173
         }
       },
-      "bytes": 2020275
+      "bytes": 2020419
     },
     "dist/lambda/update-data/update-data.js": {
       "imports": [
@@ -45379,10 +45379,10 @@
           "bytesInOutput": 561
         },
         "src/service/update-service.ts": {
-          "bytesInOutput": 2576
+          "bytesInOutput": 2516
         }
       },
-      "bytes": 1921214
+      "bytes": 1921154
     },
     "dist/lambda/update-metadata/update-metadata.js": {
       "imports": [
@@ -48017,10 +48017,10 @@
           "bytesInOutput": 261
         },
         "src/service/update-service.ts": {
-          "bytesInOutput": 1692
+          "bytesInOutput": 1736
         }
       },
-      "bytes": 1918233
+      "bytes": 1918277
     }
   }
 }

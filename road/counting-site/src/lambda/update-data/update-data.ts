@@ -14,19 +14,19 @@ const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<CountingSitesSecret>("cs");
 
 export const handler = async (): Promise<void> => {
-    const start = Date.now();
+  const start = Date.now();
 
-    await proxyHolder
-        .setCredentials()
-        .then(() => secretHolder.get())
-        .then((secret) => updateData(secret.url, secret.apiKey, domainName))
-        .catch((error: Error) => {
-            logException(logger, error);
-        })
-        .finally(() => {
-            logger.info({
-                method: `updateData.${domainName}`,
-                tookMs: Date.now() - start
-            });
-        });
+  await proxyHolder
+    .setCredentials()
+    .then(() => secretHolder.get())
+    .then((secret) => updateData(secret.url, secret.apiKey, domainName))
+    .catch((error: Error) => {
+      logException(logger, error);
+    })
+    .finally(() => {
+      logger.info({
+        method: `updateData.${domainName}`,
+        tookMs: Date.now() - start,
+      });
+    });
 };

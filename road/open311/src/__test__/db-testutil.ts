@@ -3,27 +3,32 @@ import * as RequestsDb from "../db/requests.js";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-export function dbTestBase(fn: (db: DTDatabase) => void): ReturnType<typeof commonDbTestBase> {
-    return commonDbTestBase(fn, truncate, "road", "road", "127.0.0.1:54322/road");
+export function dbTestBase(
+  fn: (db: DTDatabase) => void,
+): ReturnType<typeof commonDbTestBase> {
+  return commonDbTestBase(fn, truncate, "road", "road", "127.0.0.1:54322/road");
 }
 
 export async function truncate(db: DTDatabase): Promise<void> {
-    await db.tx(async (t) => {
-        await t.batch([
-            db.none("DELETE FROM open311_service_request"),
-            db.none("DELETE FROM open311_service_request_state"),
-            db.none("DELETE FROM open311_service"),
-            db.none("DELETE FROM open311_subject"),
-            db.none("DELETE FROM open311_subsubject")
-        ]);
-    });
+  await db.tx(async (t) => {
+    await t.batch([
+      db.none("DELETE FROM open311_service_request"),
+      db.none("DELETE FROM open311_service_request_state"),
+      db.none("DELETE FROM open311_service"),
+      db.none("DELETE FROM open311_subject"),
+      db.none("DELETE FROM open311_subsubject"),
+    ]);
+  });
 }
 
-export async function insertServiceRequest(db: DTDatabase, serviceRequests: ServiceRequest[]): Promise<void> {
-    await db.tx(async (t) => {
-        const queries: Promise<null>[] = serviceRequests.map((serviceRequest) => {
-            return t.none(
-                `INSERT INTO open311_service_request(
+export async function insertServiceRequest(
+  db: DTDatabase,
+  serviceRequests: ServiceRequest[],
+): Promise<void> {
+  await db.tx(async (t) => {
+    const queries: Promise<null>[] = serviceRequests.map((serviceRequest) => {
+      return t.none(
+        `INSERT INTO open311_service_request(
                      service_request_id,
                      status,
                      status_notes,
@@ -73,9 +78,9 @@ export async function insertServiceRequest(db: DTDatabase, serviceRequests: Serv
                    $23,
                    $24,
                    $25)`,
-                RequestsDb.createEditObject(serviceRequest)
-            );
-        });
-        await t.batch(queries);
+        RequestsDb.createEditObject(serviceRequest),
+      );
     });
+    await t.batch(queries);
+  });
 }

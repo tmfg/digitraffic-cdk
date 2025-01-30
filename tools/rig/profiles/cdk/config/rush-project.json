@@ -46,7 +46,6 @@
        * These folders should not be tracked by Git.  They must not contain symlinks.
        */
       "outputFolderNames": ["dist"]
-
       /**
        * Disable caching for this operation.  The operation will never be restored from cache.
        * This may be useful if this operation affects state outside of its folder.

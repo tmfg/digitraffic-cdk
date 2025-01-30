@@ -4,61 +4,61 @@ import type { PilotageRoute } from "../model/pilotage.js";
 import _ from "lodash";
 
 const pilotwebToPortnetLocodeMap = {
-    FIKOY: "FIKOK",
+  FIKOY: "FIKOK",
 
-    FIPIE: "FIPRS",
+  FIPIE: "FIPRS",
 
-    FIVAS: "FIVAA",
+  FIVAS: "FIVAA",
 
-    FIKAK: "FIKAS",
+  FIKAK: "FIKAS",
 
-    FIMAN: "FIPOR",
-    FITHK: "FIPOR",
+  FIMAN: "FIPOR",
+  FITHK: "FIPOR",
 
-    FIHEP: "FIUKI",
-    FIKMR: "FIUKI",
+  FIHEP: "FIUKI",
+  FIKMR: "FIUKI",
 
-    FILEV: "FIHKO",
-    FIKVH: "FIHKO",
+  FILEV: "FIHKO",
+  FIKVH: "FIHKO",
 
-    FIVUH: "FIHEL",
-    FI401: "FIHEL",
-    FI402: "FIHEL",
-    FI403: "FIHEL",
-    FI404: "FIHEL",
-    FI405: "FIHEL",
-    FIVAL: "FIHEL",
+  FIVUH: "FIHEL",
+  FI401: "FIHEL",
+  FI402: "FIHEL",
+  FI403: "FIHEL",
+  FI404: "FIHEL",
+  FI405: "FIHEL",
+  FIVAL: "FIHEL",
 
-    FIKHA: "FIKTK",
-    FIKMU: "FIKTK",
-    FIHMN: "FIKTK",
+  FIKHA: "FIKTK",
+  FIKMU: "FIKTK",
+  FIHMN: "FIKTK",
 
-    FITRY: "FITOR",
+  FITRY: "FITOR",
 
-    FIKAU: "FILPP",
-    FILPM: "FILPP",
-    FIMES: "FILPP",
-    FIMUS: "FILPP",
+  FIKAU: "FILPP",
+  FILPM: "FILPP",
+  FIMES: "FILPP",
+  FIMUS: "FILPP",
 
-    FILPP: "FINUI",
+  FILPP: "FINUI",
 
-    FIVRA: "FIVRK",
+  FIVRA: "FIVRK",
 
-    FIEUR: "FIEJO",
-    FIOLK: "FIEJO",
+  FIEUR: "FIEJO",
+  FIOLK: "FIEJO",
 
-    FIKEA: "FIKEM",
-    FIKEV: "FIKEM"
+  FIKEA: "FIKEM",
+  FIKEV: "FIKEM",
 } as const;
 
 export function convertLocation(route: PilotageRoute): Location {
-    return {
-        port: convertPilotwebCodeToPortnetLocode(route.end.code),
-        from: convertPilotwebCodeToPortnetLocode(route.start.code),
-        berth: route.end.berth?.code
-    };
+  return {
+    port: convertPilotwebCodeToPortnetLocode(route.end.code),
+    from: convertPilotwebCodeToPortnetLocode(route.start.code),
+    berth: route.end.berth?.code,
+  };
 }
 
 function convertPilotwebCodeToPortnetLocode(code: string): string {
-    return _.get(pilotwebToPortnetLocodeMap, code, code);
+  return _.get(pilotwebToPortnetLocodeMap, code, code);
 }

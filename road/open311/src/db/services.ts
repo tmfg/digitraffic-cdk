@@ -5,13 +5,13 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 const { PreparedStatement } = pgPromise;
 
 const DELETE_SERVICES_PS = new PreparedStatement({
-    name: "delete-service",
-    text: "DELETE FROM open311_service"
+  name: "delete-service",
+  text: "DELETE FROM open311_service",
 });
 
 const INSERT_SERVICE_PS = new PreparedStatement({
-    name: "insert-service",
-    text: `INSERT INTO open311_service(service_code,
+  name: "insert-service",
+  text: `INSERT INTO open311_service(service_code,
                                        service_name,
                                        description,
                                        metadata,
@@ -24,12 +24,12 @@ const INSERT_SERVICE_PS = new PreparedStatement({
                    $4::boolean,
                    $5,
                    $6,
-                   $7)`
+                   $7)`,
 });
 
 const SELECT_SERVICES_PS = new PreparedStatement({
-    name: "select-services",
-    text: `SELECT service_code,
+  name: "select-services",
+  text: `SELECT service_code,
                   service_name,
                   description,
                   metadata,
@@ -37,12 +37,12 @@ const SELECT_SERVICES_PS = new PreparedStatement({
                   keywords,
                   "group"
            FROM open311_service
-           ORDER BY service_code`
+           ORDER BY service_code`,
 });
 
 const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
-    name: "select-service-by-code",
-    text: `SELECT service_code,
+  name: "select-service-by-code",
+  text: `SELECT service_code,
                   service_name,
                   description,
                   metadata,
@@ -50,82 +50,89 @@ const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
                   keywords,
                   "group"
            FROM open311_service
-           WHERE service_code = $1`
+           WHERE service_code = $1`,
 });
 
 const SELECT_SERVICE_CODES_PS = new PreparedStatement({
-    name: "select-servicecodes",
-    text: "SELECT service_code FROM open311_service"
+  name: "select-servicecodes",
+  text: "SELECT service_code FROM open311_service",
 });
 
 interface ServiceServiceCode {
-    readonly service_code: string;
+  readonly service_code: string;
 }
 
 // eslint-disable-next-line @rushstack/no-new-null
 export function update(services: Service[], db: DTDatabase): Promise<null[]> {
-    return db.tx(async (t) => {
-        await t.none(DELETE_SERVICES_PS);
-        const queries: Promise<null>[] = services.map((service) => {
-            return t.none(INSERT_SERVICE_PS, createEditObject(service));
-        });
-        return await t.batch(queries);
+  return db.tx(async (t) => {
+    await t.none(DELETE_SERVICES_PS);
+    const queries: Promise<null>[] = services.map((service) => {
+      return t.none(INSERT_SERVICE_PS, createEditObject(service));
     });
+    return await t.batch(queries);
+  });
 }
 
-export function findAllServiceCodes(db: DTDatabase): Promise<ServiceServiceCode[]> {
-    return db.manyOrNone(SELECT_SERVICE_CODES_PS);
+export function findAllServiceCodes(
+  db: DTDatabase,
+): Promise<ServiceServiceCode[]> {
+  return db.manyOrNone(SELECT_SERVICE_CODES_PS);
 }
 
 export function findAll(db: DTDatabase): Promise<Service[]> {
-    return db.manyOrNone<Service>(SELECT_SERVICES_PS).then((requests) => requests.map((r) => toService(r)));
+  return db.manyOrNone<Service>(SELECT_SERVICES_PS).then((requests) =>
+    requests.map((r) => toService(r))
+  );
 }
 
 // eslint-disable-next-line @rushstack/no-new-null
-export function find(serviceRequestId: string, db: DTDatabase): Promise<Service | null> {
-    return db
-        .oneOrNone<Service>(SELECT_SERVICE_BY_CODE_PS, [serviceRequestId])
-        .then((r) => (r === null ? null : toService(r)));
+export function find(
+  serviceRequestId: string,
+  db: DTDatabase,
+): Promise<Service | null> {
+  return db
+    .oneOrNone<Service>(SELECT_SERVICE_BY_CODE_PS, [serviceRequestId])
+    .then((r) => (r === null ? null : toService(r)));
 }
 
 function toService(s: Service): Service {
-    return {
-        service_code: s.service_code,
-        service_name: s.service_name,
-        description: s.description,
-        metadata: s.metadata,
-        type: s.type,
-        keywords: s.keywords,
-        group: s.group
-    };
+  return {
+    service_code: s.service_code,
+    service_name: s.service_name,
+    description: s.description,
+    metadata: s.metadata,
+    type: s.type,
+    keywords: s.keywords,
+    group: s.group,
+  };
 }
 
 /**
  * Creates an object with all necessary properties for pg-promise
  */
 function createEditObject(service: Service): unknown[] {
-    const editObject = {
-        ...{
-            service_code: undefined,
-            service_name: undefined,
-            description: undefined,
-            metadata: undefined,
-            type: undefined,
-            keywords: undefined,
-            group: undefined
-        },
-        ...service
-    };
+  const editObject = {
+    ...{
+      service_code: undefined,
+      service_name: undefined,
+      description: undefined,
+      metadata: undefined,
+      type: undefined,
+      keywords: undefined,
+      group: undefined,
+    },
+    ...service,
+  };
 
-    // ordering is important!
-    const ret = [];
-    ret.push(editObject.service_code);
-    ret.push(editObject.service_name);
-    ret.push(editObject.description);
-    ret.push(editObject.metadata);
-    ret.push(editObject.type);
-    ret.push(editObject.keywords);
-    ret.push(editObject.group);
+  // ordering is important!
+  const ret = [];
+  ret.push(editObject.service_code);
+  ret.push(editObject.service_name);
+  ret.push(editObject.description);
+  ret.push(editObject.metadata);
+  ret.push(editObject.type);
+  ret.push(editObject.keywords);
+  ret.push(editObject.group);
 
-    return ret;
+  return ret;
 }

@@ -30,5 +30,6 @@ There is also commands like
 
 And after that?
 
-1. Check weathercam-bucket, you must give permission to created originAccessIdentity
+1. Check weathercam-bucket, you must give permission to created
+   originAccessIdentity
 2. Route53, domain-names should be alias to created cloudfront distributions

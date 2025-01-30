@@ -2,6 +2,6 @@
 require("@rushstack/eslint-config/patch/modern-module-resolution");
 
 module.exports = {
-    extends: ["@digitraffic/eslint-config/profile/default"],
-    parserOptions: { project: "./tsconfig.eslint.json" }
+  extends: ["@digitraffic/eslint-config/profile/default"],
+  parserOptions: { project: "./tsconfig.eslint.json" },
 };

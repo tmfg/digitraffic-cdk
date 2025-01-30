@@ -20,43 +20,49 @@ const sslProtocols = ["TLSv1", "TLSv1.1"];
     https://origin-address/C123.jpg?versionId=123 -> send request to new origin http://DOMAIN_NAME/C123.jpg?versionId=123
  */
 export const handler: CloudFrontRequestHandler = (event, context, callback) => {
-    const records = event.Records;
+  const records = event.Records;
 
-    if (records) {
-        const record = records[0];
-        if (!record) {
-            const err = createAndLogError("lambda-redirect.handler", "Records did not have a record");
-            callback(err);
-            throw err;
-        }
-
-        const request: CloudFrontRequest = record.cf.request;
-
-        const { querystring } = request;
-
-        if (querystring.length > 0) {
-            request.origin = {
-                custom: {
-                    domainName: domainName,
-                    port: 80,
-                    protocol: "http",
-                    path: "",
-                    sslProtocols: sslProtocols,
-                    readTimeout: 5,
-                    keepaliveTimeout: 5,
-                    customHeaders: {}
-                }
-            };
-
-            // eslint-disable-next-line dot-notation
-            request.headers["host"] = hostHeader;
-        }
-
-        // If nothing matches, return request unchanged
-        callback(null, request);
-    } else {
-        const err = createAndLogError("lambda-redirect.handler", "Event did not have records");
-        callback(err);
-        throw err;
+  if (records) {
+    const record = records[0];
+    if (!record) {
+      const err = createAndLogError(
+        "lambda-redirect.handler",
+        "Records did not have a record",
+      );
+      callback(err);
+      throw err;
     }
+
+    const request: CloudFrontRequest = record.cf.request;
+
+    const { querystring } = request;
+
+    if (querystring.length > 0) {
+      request.origin = {
+        custom: {
+          domainName: domainName,
+          port: 80,
+          protocol: "http",
+          path: "",
+          sslProtocols: sslProtocols,
+          readTimeout: 5,
+          keepaliveTimeout: 5,
+          customHeaders: {},
+        },
+      };
+
+      // eslint-disable-next-line dot-notation
+      request.headers["host"] = hostHeader;
+    }
+
+    // If nothing matches, return request unchanged
+    callback(null, request);
+  } else {
+    const err = createAndLogError(
+      "lambda-redirect.handler",
+      "Event did not have records",
+    );
+    callback(err);
+    throw err;
+  }
 };

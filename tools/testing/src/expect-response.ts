@@ -1,49 +1,52 @@
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 
 export class ExpectResponse {
-    private _response: LambdaResponse;
+  private _response: LambdaResponse;
 
-    constructor(response: LambdaResponse) {
-        this._response = response;
-    }
+  constructor(response: LambdaResponse) {
+    this._response = response;
+  }
 
-    static ok(response: LambdaResponse): ExpectResponse {
-        return new ExpectResponse(response)
-            .expectStatus(200);
-    }
+  static ok(response: LambdaResponse): ExpectResponse {
+    return new ExpectResponse(response)
+      .expectStatus(200);
+  }
 
-    static notFound(response: LambdaResponse, body: string = "Not found"): ExpectResponse {
-        return new ExpectResponse(response)
-            .expectStatus(404)
-            .expectBody(body);
-    }
+  static notFound(
+    response: LambdaResponse,
+    body: string = "Not found",
+  ): ExpectResponse {
+    return new ExpectResponse(response)
+      .expectStatus(404)
+      .expectBody(body);
+  }
 
-    expectStatus(expected: number): this {
-        expect(this._response.status).toEqual(expected);
+  expectStatus(expected: number): this {
+    expect(this._response.status).toEqual(expected);
 
-        return this;
-    }
+    return this;
+  }
 
-    expectBody(expected: string): this {
-        const body = Buffer.from(this._response.body, "base64").toString();
+  expectBody(expected: string): this {
+    const body = Buffer.from(this._response.body, "base64").toString();
 
-        expect(body).toEqual(expected);
+    expect(body).toEqual(expected);
 
-        return this;
-    }
+    return this;
+  }
 
-    expectJson<T>(expected: T): this {
-        return this.expectContent((content: T) => {
-            expect(content).toEqual(expected);
-        });
-    }
+  expectJson<T>(expected: T): this {
+    return this.expectContent((content: T) => {
+      expect(content).toEqual(expected);
+    });
+  }
 
-    expectContent<T>(checker: ((t: T) => void)): this {
-        const body = Buffer.from(this._response.body, "base64").toString();
-        const content: T = JSON.parse(body) as T;
-    
-        checker(content);
-    
-        return this;
-    }
+  expectContent<T>(checker: (t: T) => void): this {
+    const body = Buffer.from(this._response.body, "base64").toString();
+    const content: T = JSON.parse(body) as T;
+
+    checker(content);
+
+    return this;
+  }
 }

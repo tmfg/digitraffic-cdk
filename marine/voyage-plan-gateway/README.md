@@ -1,3 +1,5 @@
-# Digitraffic Marine - Voyage plan gateway 
+# Digitraffic Marine - Voyage plan gateway
 
-An STM VIS private side module. See [https://www.seatrafficmanagement.info/developers-forum/vis/](https://www.seatrafficmanagement.info/developers-forum/vis/) for details.
+An STM VIS private side module. See
+[https://www.seatrafficmanagement.info/developers-forum/vis/](https://www.seatrafficmanagement.info/developers-forum/vis/)
+for details.

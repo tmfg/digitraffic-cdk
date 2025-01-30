@@ -10,19 +10,19 @@ const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<PermitsSecret>("ep." + PERMIT_DOMAIN);
 
 export const handler = async () => {
-    const start = Date.now();
+  const start = Date.now();
 
-    return proxyHolder
-        .setCredentials()
-        .then(async () => {
-            const secret = await secretHolder.get();
-            await UpdateService.updatePermits(secret.authKey, secret.url);
-        })
-        .finally(() => {
-            logger.info({
-                method: "update-permits.handler",
-                message: `permit domain: ${PERMIT_DOMAIN}`,
-                tookMs: Date.now() - start
-            });
-        });
+  return proxyHolder
+    .setCredentials()
+    .then(async () => {
+      const secret = await secretHolder.get();
+      await UpdateService.updatePermits(secret.authKey, secret.url);
+    })
+    .finally(() => {
+      logger.info({
+        method: "update-permits.handler",
+        message: `permit domain: ${PERMIT_DOMAIN}`,
+        tookMs: Date.now() - start,
+      });
+    });
 };

@@ -4,20 +4,20 @@ import { DigitrafficSecurityRule } from "../../aws/infra/security-rule.js";
 import { Topic } from "aws-cdk-lib/aws-sns";
 
 describe("security-rule tests", () => {
-    test("create", () => {
-        const app = new App();
-        const stack = new Stack(app);
-        const topic = new Topic(stack, "test");
+  test("create", () => {
+    const app = new App();
+    const stack = new Stack(app);
+    const topic = new Topic(stack, "test");
 
-        new DigitrafficSecurityRule(stack, topic);
+    new DigitrafficSecurityRule(stack, topic);
 
-        const template = Template.fromStack(stack);
+    const template = Template.fromStack(stack);
 
-        template.hasResource("AWS::Events::Rule", {
-            Properties: {
-                EventPattern: {},
-                State: "ENABLED",
-            },
-        });
+    template.hasResource("AWS::Events::Rule", {
+      Properties: {
+        EventPattern: {},
+        State: "ENABLED",
+      },
     });
+  });
 });

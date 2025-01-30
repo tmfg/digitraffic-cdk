@@ -6,49 +6,57 @@ const mockSend = jest.fn(() => Promise.resolve({ items: [] }));
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 jest.spyOn(APIGatewayClient.prototype, "send").mockImplementation(mockSend);
 
-import { exportSwaggerApi, getDocumentationVersion, createDocumentationVersion } from "../apigw-utils.js";
+import {
+  createDocumentationVersion,
+  exportSwaggerApi,
+  getDocumentationVersion,
+} from "../apigw-utils.js";
 
 const TEST_API_ID = "some-api-id" as const;
 
 function expectAGCall(expectedClass: string, expected: unknown): void {
-    expect(mockSend).toHaveBeenCalled();
+  expect(mockSend).toHaveBeenCalled();
 
-    const parameterClass = _.get(mockSend.mock.calls[0], "[0].constructor.name");
-    const input = _.get(mockSend.mock.calls[0], "[0].input");
+  const parameterClass = _.get(mockSend.mock.calls[0], "[0].constructor.name");
+  const input = _.get(mockSend.mock.calls[0], "[0].input");
 
-    expect(parameterClass).toEqual(expectedClass);
-    expect(input).toEqual(expected);
+  expect(parameterClass).toEqual(expectedClass);
+  expect(input).toEqual(expected);
 }
 
 describe("apigw-utils", () => {
-    test("exportSwaggerApi", async () => {
-        await exportSwaggerApi(TEST_API_ID);
+  test("exportSwaggerApi", async () => {
+    await exportSwaggerApi(TEST_API_ID);
 
-        expectAGCall("GetExportCommand", {
-            exportType: "oas30",
-            restApiId: TEST_API_ID,
-            stageName: "prod"
-        });
+    expectAGCall("GetExportCommand", {
+      exportType: "oas30",
+      restApiId: TEST_API_ID,
+      stageName: "prod",
     });
+  });
 
-    test("getDocumentationVersion", async () => {
-        await getDocumentationVersion(TEST_API_ID, new APIGatewayClient());
+  test("getDocumentationVersion", async () => {
+    await getDocumentationVersion(TEST_API_ID, new APIGatewayClient());
 
-        expectAGCall("GetDocumentationVersionsCommand", {
-            limit: 500,
-            restApiId: TEST_API_ID
-        });
+    expectAGCall("GetDocumentationVersionsCommand", {
+      limit: 500,
+      restApiId: TEST_API_ID,
     });
+  });
 
-    test("createDocumentationVersion", async () => {
-        const docVersion = Math.ceil(10 * Math.random());
+  test("createDocumentationVersion", async () => {
+    const docVersion = Math.ceil(10 * Math.random());
 
-        await createDocumentationVersion(TEST_API_ID, docVersion, new APIGatewayClient());
+    await createDocumentationVersion(
+      TEST_API_ID,
+      docVersion,
+      new APIGatewayClient(),
+    );
 
-        expectAGCall("CreateDocumentationVersionCommand", {
-            restApiId: TEST_API_ID,
-            stageName: "prod",
-            documentationVersion: `${docVersion + 1}`
-        });
+    expectAGCall("CreateDocumentationVersionCommand", {
+      restApiId: TEST_API_ID,
+      stageName: "prod",
+      documentationVersion: `${docVersion + 1}`,
     });
+  });
 });

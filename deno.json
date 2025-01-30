@@ -1,15 +1,12 @@
 {
   "exclude": [
-    "*/**/*",
     "**/pnpm-lock.yaml",
     "**/dist",
     "/*/**/lib",
     "**/node_modules",
     ".git",
     ".idea",
-
-    "common/scripts/install-run*.js",
-
-    "lib/digitraffic-common"
+    "other/swagger-joiner/resources/**/*.js",
+    "common/scripts/install-run*.js"
   ]
 }

@@ -10,29 +10,29 @@ import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
  * * It is in a FAILED state
  */
 export class DigitrafficSecurityRule extends Rule {
-    constructor(scope: Construct, topic: ITopic) {
-        const ruleName = "SecurityHubRule";
-        super(scope, ruleName, {
-            ruleName,
-            eventPattern: {
-                source: ["aws.securityhub"],
-                detailType: ["Security Hub Findings - Imported"],
-                detail: {
-                    findings: {
-                        Compliance: {
-                            Status: ["FAILED"],
-                        },
-                        Workflow: {
-                            Status: ["NEW"],
-                        },
-                        Severity: {
-                            Label: ["HIGH", "CRITICAL"],
-                        },
-                    },
-                },
+  constructor(scope: Construct, topic: ITopic) {
+    const ruleName = "SecurityHubRule";
+    super(scope, ruleName, {
+      ruleName,
+      eventPattern: {
+        source: ["aws.securityhub"],
+        detailType: ["Security Hub Findings - Imported"],
+        detail: {
+          findings: {
+            Compliance: {
+              Status: ["FAILED"],
             },
-        });
+            Workflow: {
+              Status: ["NEW"],
+            },
+            Severity: {
+              Label: ["HIGH", "CRITICAL"],
+            },
+          },
+        },
+      },
+    });
 
-        this.addTarget(new SnsTopic(topic));
-    }
+    this.addTarget(new SnsTopic(topic));
+  }
 }

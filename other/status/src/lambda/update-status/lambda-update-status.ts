@@ -12,7 +12,9 @@ const DEFAULT_TIMEOUT_MS = 25000 as const;
 
 const secretHolder = SecretHolder.create<UpdateStatusSecret>();
 
-const checkTimeout = Number(getEnvVariable(StatusEnvKeys.CHECK_TIMEOUT_SECONDS));
+const checkTimeout = Number(
+  getEnvVariable(StatusEnvKeys.CHECK_TIMEOUT_SECONDS),
+);
 const checkInterval = Number(getEnvVariable(StatusEnvKeys.INTERVAL_MINUTES));
 
 const gitHubOwner = getEnvVariable(StatusEnvKeys.GITHUB_OWNER);
@@ -24,17 +26,22 @@ const gitHubWorkflowFile = getEnvVariable(StatusEnvKeys.GITHUB_WORKFLOW_FILE);
  * Updates StatusPage components and NodePing checks
  */
 export const handler = async (): Promise<void> => {
-    const digitrafficApi = new DigitrafficApi();
-    const nodePingApi = new NodePingApi(secretHolder, DEFAULT_TIMEOUT_MS, checkTimeout, checkInterval);
+  const digitrafficApi = new DigitrafficApi();
+  const nodePingApi = new NodePingApi(
+    secretHolder,
+    DEFAULT_TIMEOUT_MS,
+    checkTimeout,
+    checkInterval,
+  );
 
-    await StatusService.updateComponentsAndChecks(
-        monitoredApps,
-        digitrafficApi,
-        nodePingApi,
-        secretHolder,
-        gitHubOwner,
-        gitHubRepo,
-        gitHubBranch,
-        gitHubWorkflowFile
-    );
+  await StatusService.updateComponentsAndChecks(
+    monitoredApps,
+    digitrafficApi,
+    nodePingApi,
+    secretHolder,
+    gitHubOwner,
+    gitHubRepo,
+    gitHubBranch,
+    gitHubWorkflowFile,
+  );
 };

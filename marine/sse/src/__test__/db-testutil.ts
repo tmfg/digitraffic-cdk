@@ -2,21 +2,32 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DbSseReport } from "../db/sse-db.js";
 
-export function dbTestBase(fn: (db: DTDatabase) => void): ReturnType<typeof commonDbTestBase> {
-    return commonDbTestBase(fn, truncate, "marine", "marine", "localhost:54321/marine");
+export function dbTestBase(
+  fn: (db: DTDatabase) => void,
+): ReturnType<typeof commonDbTestBase> {
+  return commonDbTestBase(
+    fn,
+    truncate,
+    "marine",
+    "marine",
+    "localhost:54321/marine",
+  );
 }
 
 export async function truncate(db: DTDatabase): Promise<void> {
-    await db.tx((t) => {
-        return t.batch([db.none("DELETE FROM sse_report")]);
-    });
+  await db.tx((t) => {
+    return t.batch([db.none("DELETE FROM sse_report")]);
+  });
 }
 
-export function findAllSseReports(db: DTDatabase, siteId?: number): Promise<DbSseReport[]> {
-    const where = siteId ? `WHERE site_number=${siteId}` : "";
+export function findAllSseReports(
+  db: DTDatabase,
+  siteId?: number,
+): Promise<DbSseReport[]> {
+  const where = siteId ? `WHERE site_number=${siteId}` : "";
 
-    return db.tx((t) => {
-        return t.manyOrNone(`
+  return db.tx((t) => {
+    return t.manyOrNone(`
             SELECT sse_report_id as "sseReportId",
                    created       as "created",
                    latest        as "latest",
@@ -36,5 +47,5 @@ export function findAllSseReports(db: DTDatabase, siteId?: number): Promise<DbSs
             FROM sse_report ${where}
             ORDER BY site_number, sse_report_id
         `);
-    });
+  });
 }

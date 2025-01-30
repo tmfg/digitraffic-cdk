@@ -11,37 +11,45 @@ import { type UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
 
 const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
-const expectedKeys = [PortactivitySecretKeys.AWAKE_URL, PortactivitySecretKeys.AWAKE_AUTH];
+const expectedKeys = [
+  PortactivitySecretKeys.AWAKE_URL,
+  PortactivitySecretKeys.AWAKE_AUTH,
+];
 
 const rdsHolder = RdsHolder.create();
-const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>("awake", expectedKeys);
+const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>(
+  "awake",
+  expectedKeys,
+);
 
 let service: AwakeAiETDPortService | undefined;
 
 export function handler(event: SNSEvent): Promise<void> {
-    return rdsHolder
-        .setCredentials()
-        .then(() => secretHolder.get())
-        .then(async (secret) => {
-            // always a single event, guaranteed by SNS
-            const locode = event.Records[0]?.Sns.Message as unknown as string;
+  return rdsHolder
+    .setCredentials()
+    .then(() => secretHolder.get())
+    .then(async (secret) => {
+      // always a single event, guaranteed by SNS
+      const locode = event.Records[0]?.Sns.Message as unknown as string;
 
-            if (!service) {
-                service = new AwakeAiETDPortService(
-                    new AwakeAiPortApi(secret.voyagesurl, secret.voyagesauth)
-                );
-            }
-            const timestamps = await service.getAwakeAiTimestamps(locode);
+      if (!service) {
+        service = new AwakeAiETDPortService(
+          new AwakeAiPortApi(secret.voyagesurl, secret.voyagesauth),
+        );
+      }
+      const timestamps = await service.getAwakeAiTimestamps(locode);
 
-            const start = Date.now();
-            logger.info({
-                method: "UpdateAwakeAiETDPortTimestamps.handler",
-                customTimestampsReceivedCount: timestamps.length
-            });
-            await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
-            logger.info({
-                method: "UpdateAwakeAiETDPortTimestamps.handler",
-                tookMs: Date.now() - start
-            });
-        });
+      const start = Date.now();
+      logger.info({
+        method: "UpdateAwakeAiETDPortTimestamps.handler",
+        customTimestampsReceivedCount: timestamps.length,
+      });
+      await Promise.allSettled(
+        timestamps.map((ts) => sendMessage(ts, queueUrl)),
+      );
+      logger.info({
+        method: "UpdateAwakeAiETDPortTimestamps.handler",
+        tookMs: Date.now() - start,
+      });
+    });
 }

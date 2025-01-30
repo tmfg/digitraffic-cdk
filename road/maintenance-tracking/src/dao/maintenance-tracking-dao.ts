@@ -4,22 +4,22 @@ import { type DbNumberId } from "../model/db-data.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum Status {
-    UNHANDLED = "UNHANDLED",
-    HANDLED = "HANDLED",
-    ERROR = "ERROR"
+  UNHANDLED = "UNHANDLED",
+  HANDLED = "HANDLED",
+  ERROR = "ERROR",
 }
 
 export interface DbObservationData {
-    readonly id?: bigint;
-    readonly observationTime: Date;
-    readonly sendingTime: Date;
-    readonly json: string;
-    readonly harjaWorkmachineId: number;
-    readonly harjaContractId: number;
-    readonly sendingSystem: string;
-    readonly status: Status;
-    readonly hash: string;
-    readonly s3Uri: string;
+  readonly id?: bigint;
+  readonly observationTime: Date;
+  readonly sendingTime: Date;
+  readonly json: string;
+  readonly harjaWorkmachineId: number;
+  readonly harjaContractId: number;
+  readonly sendingSystem: string;
+  readonly status: Status;
+  readonly hash: string;
+  readonly s3Uri: string;
 }
 
 const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
@@ -48,34 +48,36 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
 `;
 
 export function insertMaintenanceTrackingObservationData(
-    db: DTDatabase,
-    observations: DbObservationData[]
+  db: DTDatabase,
+  observations: DbObservationData[],
 ): Promise<(DbNumberId | undefined)[]> {
-    return db.tx((t) => {
-        return t.batch(
-            observations.map((observation) =>
-                db
-                    .oneOrNone<
-                        DbNumberId | undefined
-                    >(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
-                    .then((result) => (result === null ? undefined : result))
-            )
-        );
-    });
+  return db.tx((t) => {
+    return t.batch(
+      observations.map((observation) =>
+        db
+          .oneOrNone<
+            DbNumberId | undefined
+          >(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
+          .then((result) => (result === null ? undefined : result))
+      ),
+    );
+  });
 }
 
-const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS = new pgPromise.PreparedStatement({
-    name: "PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS",
-    text: `
+const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS = new pgPromise
+  .PreparedStatement({
+  name: "PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS",
+  text: `
         UPDATE maintenance_tracking
         SET previous_tracking_id = NULL
         WHERE end_time < (now() - $1 * INTERVAL '1 hour')
-`
+`,
 });
 
-const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new pgPromise.PreparedStatement({
-    name: "PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS",
-    text: `
+const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new pgPromise
+  .PreparedStatement({
+  name: "PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS",
+  text: `
         DELETE
         FROM maintenance_tracking tgt
         WHERE end_time < (now() - $1 * INTERVAL '1 hour')
@@ -84,47 +86,59 @@ const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new pgPromise.PreparedS
           -- Delete only, if there is at least one later tracking left to database. We need to leave at least one row/domain
           -- to get last modified date for REST API
           AND EXISTS(SELECT NULL FROM maintenance_tracking t WHERE t.domain = tgt.domain AND t.created > tgt.created);
-`
+`,
 });
 
-export async function cleanMaintenanceTrackingData(db: DTDatabase, hoursToKeep: number): Promise<void> {
-    await db.tx(async (t) => {
-        const cleanUpQuery = t.none(PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS, [
-            hoursToKeep
-        ]);
-        const deleteQuery = t.none(PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS, [hoursToKeep]);
-        // These should and must be run in given order https://github.com/vitaly-t/pg-promise/issues/307
-        try {
-            await t.batch([cleanUpQuery, deleteQuery]);
-        } catch (error) {
-            logger.error({
-                method: "MaintenanceTrackingDao.cleanMaintenanceTrackingData",
-                message: "cleanup failed",
-                error
-            });
-            throw error;
-        }
-    });
+export async function cleanMaintenanceTrackingData(
+  db: DTDatabase,
+  hoursToKeep: number,
+): Promise<void> {
+  await db.tx(async (t) => {
+    const cleanUpQuery = t.none(
+      PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS,
+      [
+        hoursToKeep,
+      ],
+    );
+    const deleteQuery = t.none(
+      PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS,
+      [hoursToKeep],
+    );
+    // These should and must be run in given order https://github.com/vitaly-t/pg-promise/issues/307
+    try {
+      await t.batch([cleanUpQuery, deleteQuery]);
+    } catch (error) {
+      logger.error({
+        method: "MaintenanceTrackingDao.cleanMaintenanceTrackingData",
+        message: "cleanup failed",
+        error,
+      });
+      throw error;
+    }
+  });
 }
 
-const PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS = new pgPromise.PreparedStatement({
-    name: "PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS",
-    text: `
+const PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS = new pgPromise
+  .PreparedStatement({
+  name: "PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS",
+  text: `
         select round(EXTRACT(EPOCH FROM (now() - min(end_time)))/60/60) AS hours
         from maintenance_tracking;
-`
+`,
 });
 
 export function getOldestTrackingHours(db: DTDatabase): Promise<number> {
-    return db
-        .tx((t) => {
-            return t.one(PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS);
-        })
-        .then((result: { hours: number }) => result.hours);
+  return db
+    .tx((t) => {
+      return t.one(PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS);
+    })
+    .then((result: { hours: number }) => result.hours);
 }
 
-export function cloneObservationsWithoutJson(datas: DbObservationData[]): DbObservationData[] {
-    return datas.map((d: DbObservationData) => {
-        return { ...d, json: "{...REMOVED...}" };
-    });
+export function cloneObservationsWithoutJson(
+  datas: DbObservationData[],
+): DbObservationData[] {
+  return datas.map((d: DbObservationData) => {
+    return { ...d, json: "{...REMOVED...}" };
+  });
 }

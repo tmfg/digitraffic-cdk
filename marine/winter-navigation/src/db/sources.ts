@@ -16,14 +16,24 @@ do update set
 `;
 
 const PS_UPDATE_SOURCES = new pgPromise.PreparedStatement({
-    name: "update-sources",
-    text: SQL_UPDATE_SOURCES
+  name: "update-sources",
+  text: SQL_UPDATE_SOURCES,
 });
 
-export function saveAllSources(db: DTDatabase, sources: Source[]): Promise<unknown> {
-    return Promise.all(
-        sources.map(async (s) => {
-            return db.any(PS_UPDATE_SOURCES, [s.id, s.name, s.shortname, s.nationality, s.type, s.vessel_id]);
-        })
-    );
+export function saveAllSources(
+  db: DTDatabase,
+  sources: Source[],
+): Promise<unknown> {
+  return Promise.all(
+    sources.map(async (s) => {
+      return db.any(PS_UPDATE_SOURCES, [
+        s.id,
+        s.name,
+        s.shortname,
+        s.nationality,
+        s.type,
+        s.vessel_id,
+      ]);
+    }),
+  );
 }

@@ -7,8 +7,9 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 const proxyHolder = ProxyHolder.create();
 
 export const handler = nwHandlerFactory.createEventHandler(() => {
-    return proxyHolder.setCredentials().then(async () => {
-        const [featureCollection, lastModified] = await NauticalWarningsService.getArchivedWarnings();
-        return LambdaResponse.okJson(featureCollection).withTimestamp(lastModified);
-    });
+  return proxyHolder.setCredentials().then(async () => {
+    const [featureCollection, lastModified] = await NauticalWarningsService
+      .getArchivedWarnings();
+    return LambdaResponse.okJson(featureCollection).withTimestamp(lastModified);
+  });
 }, logger);

@@ -3,11 +3,11 @@ process.env["SECRET_ID"] = "";
 
 import { AtonEnvKeys } from "../../keys.js";
 import {
-    dbTestBase,
-    insert,
-    insertActiveWarnings,
-    TEST_ACTIVE_WARNINGS_VALID,
-    TEST_ATON_SECRET
+  dbTestBase,
+  insert,
+  insertActiveWarnings,
+  TEST_ACTIVE_WARNINGS_VALID,
+  TEST_ATON_SECRET,
 } from "../db-testutil.js";
 import { newFaultWithGeometry, voyagePlan } from "../testdata.js";
 import { BAD_REQUEST_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
@@ -20,50 +20,51 @@ process.env[AtonEnvKeys.SEND_S124_QUEUE_URL] = "Value_for_test";
 
 import { SQS } from "@aws-sdk/client-sqs";
 
-const { handler }  = await import("../../lambda/upload-voyage-plan/upload-voyage-plan.js");
+const { handler } = await import(
+  "../../lambda/upload-voyage-plan/upload-voyage-plan.js"
+);
 
 // mock SecretHolder & SQS
 jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue(TEST_ATON_SECRET);
 const sendStub = jest.spyOn(SQS.prototype, "sendMessage").mockReturnValue();
 
 describe(
-    "upload-voyage-plan",
-    dbTestBase((db: DTDatabase) => {
-        test("publishes to SNS per fault id", async () => {
-            const fault1 = newFaultWithGeometry(60.285807, 27.321659);
-            const fault2 = newFaultWithGeometry(60.285817, 27.32166);
+  "upload-voyage-plan",
+  dbTestBase((db: DTDatabase) => {
+    test("publishes to SNS per fault id", async () => {
+      const fault1 = newFaultWithGeometry(60.285807, 27.321659);
+      const fault2 = newFaultWithGeometry(60.285817, 27.32166);
 
-            await insert(db, [fault1, fault2]);
-            const uploadEvent: UploadVoyagePlanEvent = {
-                voyagePlan,
-                callbackEndpoint: "some-endpoint"
-            };
+      await insert(db, [fault1, fault2]);
+      const uploadEvent: UploadVoyagePlanEvent = {
+        voyagePlan,
+        callbackEndpoint: "some-endpoint",
+      };
 
-            await handler(uploadEvent);
+      await handler(uploadEvent);
 
-            expect(sendStub).toHaveBeenCalledTimes(2);
-        });
+      expect(sendStub).toHaveBeenCalledTimes(2);
+    });
 
-        test("publishes to SNS per warning id", async () => {
-            await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
+    test("publishes to SNS per warning id", async () => {
+      await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
 
-            const uploadEvent: UploadVoyagePlanEvent = {
-                voyagePlan,
-                callbackEndpoint: "some-endpoint"
-            };
+      const uploadEvent: UploadVoyagePlanEvent = {
+        voyagePlan,
+        callbackEndpoint: "some-endpoint",
+      };
 
-            await handler(uploadEvent);
+      await handler(uploadEvent);
 
-            expect(sendStub).toHaveBeenCalledTimes(2);
-        });
+      expect(sendStub).toHaveBeenCalledTimes(2);
+    });
 
-        test("failed route parsing", async () => {
-            const uploadEvent: UploadVoyagePlanEvent = {
-                voyagePlan: "asdfasdf"
-            };
+    test("failed route parsing", async () => {
+      const uploadEvent: UploadVoyagePlanEvent = {
+        voyagePlan: "asdfasdf",
+      };
 
-            await expect(handler(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
-        });
-    })
+      await expect(handler(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
+    });
+  }),
 );
-

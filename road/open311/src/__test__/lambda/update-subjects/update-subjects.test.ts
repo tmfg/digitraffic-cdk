@@ -13,49 +13,54 @@ process.env["ENDPOINT_PASS"] = "some_pass";
 // eslint-disable-next-line dot-notation
 process.env["ENDPOINT_URL"] = `http://localhost:${SERVER_PORT}`;
 
-const lambda = await import("../../../lambda/update-subjects/lambda-update-subjects.js");
+const lambda = await import(
+  "../../../lambda/update-subjects/lambda-update-subjects.js"
+);
 
 describe(
-    "update-subjects",
-    dbTestBase((db) => {
-        test("update", async () => {
-            jest.spyOn(axios, "get").mockImplementation(
-                (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                    if (_url.match("/subjects")) {
-                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-                        const locale = _url!.match(/\/.+=(.+)/)![1];
-                        return Promise.resolve({
-                            status: 200,
-                            data: fakeSubjects(locale)
-                        });
-                    }
-                    return Promise.resolve({
-                        status: 404
-                    });
-                }
-            );
+  "update-subjects",
+  dbTestBase((db) => {
+    test("update", async () => {
+      jest.spyOn(axios, "get").mockImplementation(
+        (
+          _url: string,
+          _config?: AxiosRequestConfig<unknown>,
+        ): Promise<unknown> => {
+          if (_url.match("/subjects")) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            const locale = _url!.match(/\/.+=(.+)/)![1];
+            return Promise.resolve({
+              status: 200,
+              data: fakeSubjects(locale),
+            });
+          }
+          return Promise.resolve({
+            status: 404,
+          });
+        },
+      );
 
-            const expectedId = 2;
-            await lambda.handler();
+      const expectedId = 2;
+      await lambda.handler();
 
-            const foundSubjectsFi = await SubjectsDb.findAll(Locale.FINNISH, db);
-            expect(foundSubjectsFi.length).toBe(1);
-            expect(foundSubjectsFi[0]!.id).toBe(expectedId);
+      const foundSubjectsFi = await SubjectsDb.findAll(Locale.FINNISH, db);
+      expect(foundSubjectsFi.length).toBe(1);
+      expect(foundSubjectsFi[0]!.id).toBe(expectedId);
 
-            const foundSubjectsSv = await SubjectsDb.findAll(Locale.SWEDISH, db);
-            expect(foundSubjectsSv.length).toBe(1);
-            expect(foundSubjectsSv[0]!.id).toBe(expectedId);
+      const foundSubjectsSv = await SubjectsDb.findAll(Locale.SWEDISH, db);
+      expect(foundSubjectsSv.length).toBe(1);
+      expect(foundSubjectsSv[0]!.id).toBe(expectedId);
 
-            const foundSubjectsEn = await SubjectsDb.findAll(Locale.ENGLISH, db);
-            expect(foundSubjectsEn.length).toBe(1);
-            expect(foundSubjectsEn[0]!.id).toBe(expectedId);
-        });
-    })
+      const foundSubjectsEn = await SubjectsDb.findAll(Locale.ENGLISH, db);
+      expect(foundSubjectsEn.length).toBe(1);
+      expect(foundSubjectsEn[0]!.id).toBe(expectedId);
+    });
+  }),
 );
 
 function fakeSubjects(locale?: string): string {
-    if (locale === "fi") {
-        return `
+  if (locale === "fi") {
+    return `
 <?xml version="1.0" encoding="UTF-8"?>
 <subjects>
     <subject>
@@ -66,8 +71,8 @@ function fakeSubjects(locale?: string): string {
     </subject>
 </subjects>
 `;
-    } else if (locale === "sv") {
-        return `
+  } else if (locale === "sv") {
+    return `
 <?xml version="1.0" encoding="UTF-8"?>
 <subjects>
     <subject>
@@ -78,8 +83,8 @@ function fakeSubjects(locale?: string): string {
     </subject>
 </subjects>
 `;
-    }
-    return `
+  }
+  return `
 <?xml version="1.0" encoding="UTF-8"?>
 <subjects>
     <subject>

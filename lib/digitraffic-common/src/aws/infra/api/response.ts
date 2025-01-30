@@ -1,11 +1,11 @@
 import { MediaType } from "../../types/mediatypes.js";
 import {
-    type IModel,
-    type JsonSchema,
-    JsonSchemaType,
-    JsonSchemaVersion,
-    type MethodResponse,
-    Model,
+  type IModel,
+  type JsonSchema,
+  JsonSchemaType,
+  JsonSchemaVersion,
+  type MethodResponse,
+  Model,
 } from "aws-cdk-lib/aws-apigateway";
 import { dateFromIsoString } from "../../../utils/date-utils.js";
 
@@ -48,31 +48,34 @@ $util.base64Decode($inputRoot.body)`;
  */
 
 export const getDeprecatedDefaultLambdaResponse = (sunset: string): string => {
-    const setDeprecationHeaders = `#set ($context.responseOverride.header.Deprecation = 'true')
-#set ($context.responseOverride.header.Sunset = '${dateFromIsoString(sunset).toUTCString()}')`;
-    return RESPONSE_DEFAULT_LAMBDA.concat(setDeprecationHeaders);
+  const setDeprecationHeaders =
+    `#set ($context.responseOverride.header.Deprecation = 'true')
+#set ($context.responseOverride.header.Sunset = '${
+      dateFromIsoString(sunset).toUTCString()
+    }')`;
+  return RESPONSE_DEFAULT_LAMBDA.concat(setDeprecationHeaders);
 };
 
 const BODY_FROM_INPUT_PATH = "$input.path('$').body";
 
 /// @deprecated
 const messageSchema: JsonSchema = {
-    schema: JsonSchemaVersion.DRAFT4,
-    type: JsonSchemaType.OBJECT,
-    description: "Response with message",
-    properties: {
-        message: {
-            type: JsonSchemaType.STRING,
-            description: "Response message",
-        },
+  schema: JsonSchemaVersion.DRAFT4,
+  type: JsonSchemaType.OBJECT,
+  description: "Response with message",
+  properties: {
+    message: {
+      type: JsonSchemaType.STRING,
+      description: "Response message",
     },
+  },
 };
 
 /// @deprecated
 export const MessageModel = {
-    contentType: MediaType.APPLICATION_JSON,
-    modelName: "MessageResponseModel",
-    schema: messageSchema,
+  contentType: MediaType.APPLICATION_JSON,
+  modelName: "MessageResponseModel",
+  schema: messageSchema,
 };
 
 const NotFoundMessage = "Not found";
@@ -80,7 +83,7 @@ export const NotFoundResponse = JSON.stringify({ message: NotFoundMessage });
 
 const InternalServerErrorMessage = "Error";
 const InternalServerErrorResponse = JSON.stringify({
-    message: InternalServerErrorMessage,
+  message: InternalServerErrorMessage,
 });
 
 const BadRequestMessage = "Bad request";
@@ -88,61 +91,64 @@ const BadRequestResponse = JSON.stringify({ message: BadRequestMessage });
 
 /// @deprecated
 export const BadRequestResponseTemplate = {
-    [MediaType.APPLICATION_JSON]: BadRequestResponse,
+  [MediaType.APPLICATION_JSON]: BadRequestResponse,
 };
 /// @deprecated
 export const NotFoundResponseTemplate = {
-    [MediaType.APPLICATION_JSON]: NotFoundResponse,
+  [MediaType.APPLICATION_JSON]: NotFoundResponse,
 };
 /// @deprecated
 export const XmlResponseTemplate = {
-    [MediaType.APPLICATION_XML]: BODY_FROM_INPUT_PATH,
+  [MediaType.APPLICATION_XML]: BODY_FROM_INPUT_PATH,
 };
 /// @deprecated
 export const InternalServerErrorResponseTemplate = {
-    [MediaType.APPLICATION_JSON]: InternalServerErrorResponse,
+  [MediaType.APPLICATION_JSON]: InternalServerErrorResponse,
 };
 
 export class DigitrafficMethodResponse {
-    static response(
-        statusCode: string,
-        model: IModel,
-        mediaType: MediaType,
-        disableCors: boolean = false,
-        deprecation: boolean = false,
-    ): MethodResponse {
-        return {
-            statusCode,
-            responseModels: {
-                [mediaType]: model,
-            },
-            responseParameters: {
-                ...(!disableCors && {
-                    "method.response.header.Access-Control-Allow-Origin": true,
-                }),
-                ...(deprecation && {
-                    "method.response.header.Deprecation": true,
-                    "method.response.header.Sunset": true,
-                }),
-            },
-        };
-    }
+  static response(
+    statusCode: string,
+    model: IModel,
+    mediaType: MediaType,
+    disableCors: boolean = false,
+    deprecation: boolean = false,
+  ): MethodResponse {
+    return {
+      statusCode,
+      responseModels: {
+        [mediaType]: model,
+      },
+      responseParameters: {
+        ...(!disableCors && {
+          "method.response.header.Access-Control-Allow-Origin": true,
+        }),
+        ...(deprecation && {
+          "method.response.header.Deprecation": true,
+          "method.response.header.Sunset": true,
+        }),
+      },
+    };
+  }
 
-    static response200(model: IModel, mediaType: MediaType = MediaType.APPLICATION_JSON): MethodResponse {
-        return DigitrafficMethodResponse.response("200", model, mediaType, false);
-    }
+  static response200(
+    model: IModel,
+    mediaType: MediaType = MediaType.APPLICATION_JSON,
+  ): MethodResponse {
+    return DigitrafficMethodResponse.response("200", model, mediaType, false);
+  }
 
-    static response500(
-        model: IModel = Model.EMPTY_MODEL,
-        mediaType: MediaType = MediaType.APPLICATION_JSON,
-    ): MethodResponse {
-        return DigitrafficMethodResponse.response("500", model, mediaType, false);
-    }
+  static response500(
+    model: IModel = Model.EMPTY_MODEL,
+    mediaType: MediaType = MediaType.APPLICATION_JSON,
+  ): MethodResponse {
+    return DigitrafficMethodResponse.response("500", model, mediaType, false);
+  }
 
-    static response400(
-        model: IModel = Model.EMPTY_MODEL,
-        mediaType: MediaType = MediaType.APPLICATION_JSON,
-    ): MethodResponse {
-        return DigitrafficMethodResponse.response("400", model, mediaType, false);
-    }
+  static response400(
+    model: IModel = Model.EMPTY_MODEL,
+    mediaType: MediaType = MediaType.APPLICATION_JSON,
+  ): MethodResponse {
+    return DigitrafficMethodResponse.response("400", model, mediaType, false);
+  }
 }

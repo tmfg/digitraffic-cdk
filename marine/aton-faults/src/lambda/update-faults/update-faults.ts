@@ -10,11 +10,11 @@ const envValue = getEnvVariableOrElse(AtonEnvKeys.INTEGRATIONS, undefined);
 const integrations = envValue ? (JSON.parse(envValue) as Integration[]) : [];
 
 export const handler = (): Promise<void> => {
-    return proxyHolder.setCredentials().then(() => updateAllFaults());
+  return proxyHolder.setCredentials().then(() => updateAllFaults());
 };
 
 async function updateAllFaults(): Promise<void> {
-    for (const integration of integrations) {
-        await UpdateFaultsService.updateFaults(integration.url, integration.domain);
-    }
+  for (const integration of integrations) {
+    await UpdateFaultsService.updateFaults(integration.url, integration.domain);
+  }
 }

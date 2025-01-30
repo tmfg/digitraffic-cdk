@@ -3,34 +3,34 @@ import { SignatureV4 } from "@smithy/signature-v4";
 import { Sha256 } from "@aws-crypto/sha256-browser";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
-import { type OSMonitor, opensearchMonitor } from "../monitor/monitor.js";
+import { opensearchMonitor, type OSMonitor } from "../monitor/monitor.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export interface OSResponse {
-    readonly result: string;
-    readonly _shards: {
-        total: number;
-        successful: number;
-        skipped: number;
-        failed: number;
-    };
+  readonly result: string;
+  readonly _shards: {
+    total: number;
+    successful: number;
+    skipped: number;
+    failed: number;
+  };
 }
 
 export interface OSMonitorsResponse extends OSResponse {
-    readonly hits: {
-        hits: {
-            _id: string;
-            _source: {
-                name: string;
-            };
-        }[];
-    };
+  readonly hits: {
+    hits: {
+      _id: string;
+      _source: {
+        name: string;
+      };
+    }[];
+  };
 }
 
 interface MonitorNameAndId {
-    readonly name: string;
-    readonly id: string;
+  readonly name: string;
+  readonly id: string;
 }
 
 type HttpMethod = "POST" | "DELETE";
@@ -39,124 +39,140 @@ const OS_MONITORS_URL_PATH = "/_plugins/_alerting/monitors/";
 const OS_SEARCH_MONITORS_PATH = `${OS_MONITORS_URL_PATH}_search`;
 
 const OS_MONITORS_SEACH = JSON.stringify({
-    size: 100,
-    query: {
-        exists: {
-            field: "monitor"
-        }
-    }
+  size: 100,
+  query: {
+    exists: {
+      field: "monitor",
+    },
+  },
 });
 
 export class OpenSearch {
-    private readonly actualHost: string;
-    private readonly endpointHost: string;
-    private readonly credentials: AwsCredentialIdentity;
+  private readonly actualHost: string;
+  private readonly endpointHost: string;
+  private readonly credentials: AwsCredentialIdentity;
 
-    constructor(actualHost: string, endpointHost: string, credentials: AwsCredentialIdentity) {
-        this.actualHost = actualHost;
-        this.endpointHost = endpointHost;
-        this.credentials = credentials;
+  constructor(
+    actualHost: string,
+    endpointHost: string,
+    credentials: AwsCredentialIdentity,
+  ) {
+    this.actualHost = actualHost;
+    this.endpointHost = endpointHost;
+    this.credentials = credentials;
+  }
+
+  async send(
+    method: HttpMethod,
+    path: string,
+    body: string | undefined = undefined,
+  ): Promise<OSMonitorsResponse | undefined> {
+    const request = new HttpRequest({
+      body,
+      protocol: "https",
+      headers: {
+        "Content-Type": "application/json",
+        host: this.actualHost,
+      },
+      hostname: this.endpointHost,
+      method,
+      path,
+    });
+
+    //        console.info("sending request " + JSON.stringify(request));
+
+    const signer = new SignatureV4({
+      credentials: this.credentials,
+      region: "eu-west-1",
+      service: "es",
+      sha256: Sha256,
+    });
+
+    const signedRequest = (await signer.sign(request)) as HttpRequest;
+    const client = new NodeHttpHandler();
+
+    const { response } = await client.handle(signedRequest);
+
+    // 200 from delete, 201 from create
+    if (response.statusCode > 201) {
+      logger.error({
+        method: "OpenSearch.send",
+        customMethod: method,
+        customStatusCode: response.statusCode,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        customStatusMessage: response.body.statusMessage,
+      });
     }
 
-    async send(
-        method: HttpMethod,
-        path: string,
-        body: string | undefined = undefined
-    ): Promise<OSMonitorsResponse | undefined> {
-        const request = new HttpRequest({
-            body,
-            protocol: "https",
-            headers: {
-                "Content-Type": "application/json",
-                host: this.actualHost
-            },
-            hostname: this.endpointHost,
-            method,
-            path
-        });
+    let responseBody = "";
+    await new Promise((resolve) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      response.body.on("data", (chunk: string) => {
+        responseBody += chunk;
+      });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      response.body.on("end", () => {
+        resolve(responseBody);
+      });
+    }).catch((error) => {
+      logException(logger, error);
 
-        //        console.info("sending request " + JSON.stringify(request));
+      return undefined;
+    });
 
-        const signer = new SignatureV4({
-            credentials: this.credentials,
-            region: "eu-west-1",
-            service: "es",
-            sha256: Sha256
-        });
+    return JSON.parse(responseBody) as OSMonitorsResponse;
+  }
 
-        const signedRequest = (await signer.sign(request)) as HttpRequest;
-        const client = new NodeHttpHandler();
+  async getAllMonitors(): Promise<MonitorNameAndId[]> {
+    const osResponse = await this.send(
+      "POST",
+      OS_SEARCH_MONITORS_PATH,
+      OS_MONITORS_SEACH,
+    );
 
-        const { response } = await client.handle(signedRequest);
+    return osResponse
+      ? osResponse.hits.hits.map((h) => ({
+        name: h._source.name,
+        id: h._id,
+      }))
+      : [];
+  }
 
-        // 200 from delete, 201 from create
-        if (response.statusCode > 201) {
-            logger.error({
-                method: "OpenSearch.send",
-                customMethod: method,
-                customStatusCode: response.statusCode,
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                customStatusMessage: response.body.statusMessage
-            });
-        }
+  async deleteMonitor(id: string): Promise<OSMonitorsResponse | undefined> {
+    const queryUrl = `${OS_MONITORS_URL_PATH}${id}`;
 
-        let responseBody = "";
-        await new Promise((resolve) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            response.body.on("data", (chunk: string) => {
-                responseBody += chunk;
-            });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            response.body.on("end", () => {
-                resolve(responseBody);
-            });
-        }).catch((error) => {
-            logException(logger, error);
+    return this.send("DELETE", queryUrl);
+  }
 
-            return undefined;
-        });
+  addMonitor(monitor: OSMonitor): Promise<OSMonitorsResponse | undefined> {
+    return this.send(
+      "POST",
+      OS_MONITORS_URL_PATH,
+      JSON.stringify(opensearchMonitor(monitor)),
+    );
+  }
 
-        return JSON.parse(responseBody) as OSMonitorsResponse;
-    }
+  async deleteAllMonitors(): Promise<void> {
+    const monitors = await this.getAllMonitors();
 
-    async getAllMonitors(): Promise<MonitorNameAndId[]> {
-        const osResponse = await this.send("POST", OS_SEARCH_MONITORS_PATH, OS_MONITORS_SEACH);
+    logger.info({
+      method: "OpenSearch.deleteAllMonitors",
+      customCount: monitors.length,
+    });
 
-        return osResponse
-            ? osResponse.hits.hits.map((h) => ({
-                  name: h._source.name,
-                  id: h._id
-              }))
-            : [];
-    }
+    await Promise.allSettled(
+      monitors.map(async (monitor) => this.deleteMonitor(monitor.id)),
+    );
+  }
 
-    async deleteMonitor(id: string): Promise<OSMonitorsResponse | undefined> {
-        const queryUrl = `${OS_MONITORS_URL_PATH}${id}`;
+  async addMonitors(monitors: OSMonitor[]): Promise<void> {
+    logger.info({
+      method: "OpenSearch.addMonitors",
+      customCount: monitors.length,
+    });
 
-        return this.send("DELETE", queryUrl);
-    }
-
-    addMonitor(monitor: OSMonitor): Promise<OSMonitorsResponse | undefined> {
-        return this.send("POST", OS_MONITORS_URL_PATH, JSON.stringify(opensearchMonitor(monitor)));
-    }
-
-    async deleteAllMonitors(): Promise<void> {
-        const monitors = await this.getAllMonitors();
-
-        logger.info({
-            method: "OpenSearch.deleteAllMonitors",
-            customCount: monitors.length
-        });
-
-        await Promise.allSettled(monitors.map(async (monitor) => this.deleteMonitor(monitor.id)));
-    }
-
-    async addMonitors(monitors: OSMonitor[]): Promise<void> {
-        logger.info({
-            method: "OpenSearch.addMonitors",
-            customCount: monitors.length
-        });
-
-        await Promise.allSettled(monitors.map(async (monitor) => this.addMonitor(monitor)));
-    }
+    await Promise.allSettled(
+      monitors.map(async (monitor) => this.addMonitor(monitor)),
+    );
+  }
 }

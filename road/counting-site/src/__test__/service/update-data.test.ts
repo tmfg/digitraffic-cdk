@@ -11,70 +11,81 @@ import ky from "ky";
 import { updateData } from "../../service/update-service.js";
 
 describe(
-    "update tests",
-    dbTestBase((db: DTDatabase) => {
-        const EMPTY_DATA: ApiData[] = [];
+  "update tests",
+  dbTestBase((db: DTDatabase) => {
+    const EMPTY_DATA: ApiData[] = [];
 
-        async function assertDataInDb(expected: number, siteId: number): Promise<void> {
-            const [data, lastModified] = await DataDAO.findValuesForDate(db, new Date(), siteId);
-            expect(data).toHaveLength(expected);
-            expect(lastModified).toBeDefined();
-        }
+    async function assertDataInDb(
+      expected: number,
+      siteId: number,
+    ): Promise<void> {
+      const [data, lastModified] = await DataDAO.findValuesForDate(
+        db,
+        new Date(),
+        siteId,
+      );
+      expect(data).toHaveLength(expected);
+      expect(lastModified).toBeDefined();
+    }
 
-        test("updateDataForDomain - no data", async () => {
-            await insertSite(db);
+    test("updateDataForDomain - no data", async () => {
+      await insertSite(db);
 
-            const server = jest
-                .spyOn(ky, "get")
-                .mockImplementation(() => mockKyResponse(200, JSON.stringify(EMPTY_DATA)));
-            await updateData("", "", "Fintraffic");
+      const server = jest
+        .spyOn(ky, "get")
+        .mockImplementation(() =>
+          mockKyResponse(200, JSON.stringify(EMPTY_DATA))
+        );
+      await updateData("", "", "Fintraffic");
 
-            expect(server).toHaveBeenCalled();
-            await assertDataInDb(0, 0);
-        });
+      expect(server).toHaveBeenCalled();
+      await assertDataInDb(0, 0);
+    });
 
-        const RESPONSE_DATA: ApiData[] = [
-            {
-                travelMode: "bike",
-                direction: "in",
-                data: [
-                    {
-                        timestamp: new Date(),
-                        granularity: "P1D",
-                        counts: 1
-                    },
-                    {
-                        timestamp: new Date(),
-                        granularity: "P1M",
-                        counts: 2
-                    }
-                ]
-            },
-            {
-                travelMode: "car",
-                direction: "in",
-                data: [
-                    {
-                        timestamp: new Date(),
-                        granularity: "P1D",
-                        counts: 2
-                    }
-                ]
-            }
-        ];
+    const RESPONSE_DATA: ApiData[] = [
+      {
+        travelMode: "bike",
+        direction: "in",
+        data: [
+          {
+            timestamp: new Date(),
+            granularity: "P1D",
+            counts: 1,
+          },
+          {
+            timestamp: new Date(),
+            granularity: "P1M",
+            counts: 2,
+          },
+        ],
+      },
+      {
+        travelMode: "car",
+        direction: "in",
+        data: [
+          {
+            timestamp: new Date(),
+            granularity: "P1D",
+            counts: 2,
+          },
+        ],
+      },
+    ];
 
-        test("updateDataForDomain - two counter and data", async () => {
-            await insertSite(db);
+    test("updateDataForDomain - two counter and data", async () => {
+      await insertSite(db);
 
-            const server = jest
-                .spyOn(ky, "get")
-                .mockImplementation(() => mockKyResponse(200, JSON.stringify(RESPONSE_DATA)));
-            await updateData("", "", "Fintraffic");
+      const server = jest
+        .spyOn(ky, "get")
+        .mockImplementation(() =>
+          mockKyResponse(200, JSON.stringify(RESPONSE_DATA))
+        );
+      await updateData("", "", "Fintraffic");
 
-            expect(server).toHaveBeenCalled();
-            await assertDataInDb(3, 1);
-        });
-        /*
+      expect(server).toHaveBeenCalled();
+      await assertDataInDb(3, 1);
+    });
+    /*
         test("updateDataForDomain - one counter and data, last update week ago", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
@@ -99,5 +110,5 @@ describe(
             await assertDataInDb(0, 1);
             expect(counterApiResponse).not.toHaveBeenCalled();
         });*/
-    })
+  }),
 );

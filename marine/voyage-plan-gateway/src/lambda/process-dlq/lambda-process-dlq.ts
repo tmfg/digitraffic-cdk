@@ -11,16 +11,16 @@ const s3 = new S3Client();
 const bucketName = getEnvVariable(VoyagePlanEnvKeys.BUCKET_NAME);
 
 export const handler = async (event: SQSEvent): Promise<void[]> => {
-    const millis = new Date().getTime();
+  const millis = new Date().getTime();
 
-    logger.info({
-        method: "vpgwProcessDLQ.handler",
-        customDlqRecordsReceived: event.Records.length
-    });
+  logger.info({
+    method: "vpgwProcessDLQ.handler",
+    customDlqRecordsReceived: event.Records.length,
+  });
 
-    const uploads = event.Records.map((e: SQSRecord, idx: number) =>
-        uploadToS3(s3, bucketName, e.body, `route-${millis}-${idx}.json`)
-    );
+  const uploads = event.Records.map((e: SQSRecord, idx: number) =>
+    uploadToS3(s3, bucketName, e.body, `route-${millis}-${idx}.json`)
+  );
 
-    return Promise.all(uploads);
+  return Promise.all(uploads);
 };

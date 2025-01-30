@@ -2207,7 +2207,7 @@ importers:
   ../../road/counting-site:
     dependencies:
       '@date-fns/tz':
-        specifier: 1.2.0
+        specifier: ^1.2.0
         version: 1.2.0
       '@digitraffic/common':
         specifier: 2025.1.17-1

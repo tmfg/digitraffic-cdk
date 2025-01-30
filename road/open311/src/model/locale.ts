@@ -1,5 +1,5 @@
 export enum Locale {
-    FINNISH = "fi",
-    SWEDISH = "sv",
-    ENGLISH = "en"
+  FINNISH = "fi",
+  SWEDISH = "sv",
+  ENGLISH = "en",
 }

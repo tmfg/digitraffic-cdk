@@ -8,7 +8,7 @@ import NodeTtl from "node-ttl";
 const DEFAULT_PREFIX = "";
 const DEFAULT_SECRET_KEY = "SECRET";
 const DEFAULT_CONFIGURATION = {
-    ttl: 5 * 60, // timeout secrets in 5 minutes
+  ttl: 5 * 60, // timeout secrets in 5 minutes
 } as const;
 
 /**
@@ -23,80 +23,85 @@ const DEFAULT_CONFIGURATION = {
  * setting the region with utils setSecretOverideAwsRegionEnv method.
  */
 export class SecretHolder<Secret extends GenericSecret> {
-    private readonly secretId: string;
-    private readonly prefix: string;
-    private readonly expectedKeys: string[];
+  private readonly secretId: string;
+  private readonly prefix: string;
+  private readonly expectedKeys: string[];
 
-    private readonly secretCache: NodeTtl;
+  private readonly secretCache: NodeTtl;
 
-    constructor(
-        secretId: string,
-        prefix: string = "",
-        expectedKeys: string[] = [],
-        configuration: typeof DEFAULT_CONFIGURATION = DEFAULT_CONFIGURATION,
-    ) {
-        this.secretId = secretId;
-        this.prefix = prefix;
-        this.expectedKeys = expectedKeys;
+  constructor(
+    secretId: string,
+    prefix: string = "",
+    expectedKeys: string[] = [],
+    configuration: typeof DEFAULT_CONFIGURATION = DEFAULT_CONFIGURATION,
+  ) {
+    this.secretId = secretId;
+    this.prefix = prefix;
+    this.expectedKeys = expectedKeys;
 
-        this.secretCache = new NodeTtl(configuration);
+    this.secretCache = new NodeTtl(configuration);
+  }
+
+  private async initSecret(): Promise<void> {
+    const secretValue = await getSecret<Secret>(this.secretId);
+
+    logger.info({
+      method: "SecretHolder.initSecret",
+      message: "Refreshing secret " + this.secretId,
+    });
+
+    this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
+  }
+
+  public static create<S extends GenericSecret>(
+    prefix: string = DEFAULT_PREFIX,
+    expectedKeys: string[] = [],
+  ): SecretHolder<S> {
+    return new SecretHolder<S>(
+      getEnvVariable("SECRET_ID"),
+      prefix,
+      expectedKeys,
+    );
+  }
+
+  public async get(): Promise<Secret> {
+    const secret = await this.getSecret<Secret>();
+    const parsedSecret = this.prefix === DEFAULT_PREFIX
+      ? secret
+      : this.parseSecret(secret, `${this.prefix}.`);
+
+    if (this.expectedKeys.length > 0) {
+      checkExpectedSecretKeys(this.expectedKeys, parsedSecret);
     }
 
-    private async initSecret(): Promise<void> {
-        const secretValue = await getSecret<Secret>(this.secretId);
+    return parsedSecret;
+  }
 
-        logger.info({
-            method: "SecretHolder.initSecret",
-            message: "Refreshing secret " + this.secretId,
-        });
+  private parseSecret(secret: GenericSecret, prefix: string): Secret {
+    const parsed: GenericSecret = {};
+    const skip = prefix.length;
 
-        this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
-    }
-
-    public static create<S extends GenericSecret>(
-        prefix: string = DEFAULT_PREFIX,
-        expectedKeys: string[] = [],
-    ): SecretHolder<S> {
-        return new SecretHolder<S>(getEnvVariable("SECRET_ID"), prefix, expectedKeys);
-    }
-
-    public async get(): Promise<Secret> {
-        const secret = await this.getSecret<Secret>();
-        const parsedSecret =
-            this.prefix === DEFAULT_PREFIX ? secret : this.parseSecret(secret, `${this.prefix}.`);
-
-        if (this.expectedKeys.length > 0) {
-            checkExpectedSecretKeys(this.expectedKeys, parsedSecret);
+    for (const key in secret) {
+      if (key.startsWith(prefix)) {
+        const withoutPrefix: string = key.substring(skip);
+        // skip undefined values
+        if (!secret[key]) {
+          continue;
         }
-
-        return parsedSecret;
+        parsed[withoutPrefix] = secret[key];
+      }
     }
 
-    private parseSecret(secret: GenericSecret, prefix: string): Secret {
-        const parsed: GenericSecret = {};
-        const skip = prefix.length;
+    return parsed as unknown as Secret;
+  }
 
-        for (const key in secret) {
-            if (key.startsWith(prefix)) {
-                const withoutPrefix: string = key.substring(skip);
-                // skip undefined values
-                if (!secret[key]) {
-                    continue;
-                }
-                parsed[withoutPrefix] = secret[key];
-            }
-        }
+  private async getSecret<S>(): Promise<S> {
+    const secret: S | undefined = this.secretCache.get(DEFAULT_SECRET_KEY);
 
-        return parsed as unknown as Secret;
+    if (!secret) {
+      await this.initSecret();
     }
 
-    private async getSecret<S>(): Promise<S> {
-        const secret: S | undefined = this.secretCache.get(DEFAULT_SECRET_KEY);
-
-        if (!secret) {
-            await this.initSecret();
-        }
-
-        return secret ?? this.secretCache.get(DEFAULT_SECRET_KEY);
-    }
+    return secret ?? this.secretCache.get(DEFAULT_SECRET_KEY);
+  }
 }

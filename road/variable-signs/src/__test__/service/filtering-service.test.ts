@@ -1,4 +1,7 @@
-import { TEST_TIMES, isProductionMessage } from "../../service/filtering-service.js";
+import {
+  isProductionMessage,
+  TEST_TIMES,
+} from "../../service/filtering-service.js";
 
 const SITUATION_XML = `<situation id="TEST_ID" version="1715657405376">
     <overallSeverity>high</overallSeverity>
@@ -26,27 +29,29 @@ const SITUATION_XML = `<situation id="TEST_ID" version="1715657405376">
 
 /// interval in hours
 function createTestXml(id: string, interval: number): string {
-    const startTime = new Date(TEST_TIMES[0].start.getTime() + interval*1000*60*60);
-    return SITUATION_XML
-        .replaceAll("TEST_ID", id)
-        .replace("START_TIME", startTime.toUTCString());
+  const startTime = new Date(
+    TEST_TIMES[0].start.getTime() + interval * 1000 * 60 * 60,
+  );
+  return SITUATION_XML
+    .replaceAll("TEST_ID", id)
+    .replace("START_TIME", startTime.toUTCString());
 }
 
-describe("filtering-service-tests", (() => {   
-    test.each`
+describe("filtering-service-tests", () => {
+  test.each`
         name                   | id                 | interval  | success
         ${"filter before"}     | ${"VME/TIO01K502"} | ${-1}     | ${true}
         ${"filter start"}      | ${"VME/TIO01K502"} | ${0}      | ${false}
         ${"filter middle"}     | ${"VME/TIO01K502"} | ${2}      | ${false}
         ${"filter wrong id"}   | ${"wrong"}         | ${2}      | ${true}
     `("isProductionMessage - $name", ({ id, interval, success }) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const value = isProductionMessage(createTestXml(id, interval));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const value = isProductionMessage(createTestXml(id, interval));
 
-        if (success) {
-            expect(value).toBeTruthy();
-        } else {
-            expect(value).toBeFalsy();
-        }
-    });
-}));
+    if (success) {
+      expect(value).toBeTruthy();
+    } else {
+      expect(value).toBeFalsy();
+    }
+  });
+});

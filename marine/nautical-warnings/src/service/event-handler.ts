@@ -4,9 +4,11 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export function handleError(error: unknown): LambdaResponse {
-    logException(logger, error as Error);
+  logException(logger, error as Error);
 
-    return LambdaResponse.internalError();
+  return LambdaResponse.internalError();
 }
 
-export const nwHandlerFactory = new HandlerFactory().withErrorHandler(handleError);
+export const nwHandlerFactory = new HandlerFactory().withErrorHandler(
+  handleError,
+);

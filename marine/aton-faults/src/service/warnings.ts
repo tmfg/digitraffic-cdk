@@ -1,43 +1,49 @@
 import * as CachedDao from "@digitraffic/common/dist/database/cached";
-import { type DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import {
+  type DTDatabase,
+  inDatabaseReadonly,
+} from "@digitraffic/common/dist/database/database";
 import type { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
 import { booleanDisjoint, buffer, lineString } from "@turf/turf";
 import type { Feature, LineString } from "geojson";
-import type { WarningFeature, WarningFeatureCollection } from "../model/warnings.js";
+import type {
+  WarningFeature,
+  WarningFeatureCollection,
+} from "../model/warnings.js";
 
 const MAX_DISTANCE_NM = 15;
 
 export async function findWarningsForVoyagePlan(
-    voyagePlan: RtzVoyagePlan
+  voyagePlan: RtzVoyagePlan,
 ): Promise<WarningFeatureCollection | undefined> {
-    const warnings = await inDatabaseReadonly((db: DTDatabase) => {
-        return CachedDao.getJsonFromCache<WarningFeatureCollection>(
-            db,
-            CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE
-        );
-    });
-
-    if (!warnings) {
-        return undefined;
-    }
-
-    const voyageLineString = lineString(
-        voyagePlan.route.waypoints
-            .flatMap((w) => w.waypoint.flatMap((wp) => wp.position))
-            .map((p) => [p.$.lon, p.$.lat])
+  const warnings = await inDatabaseReadonly((db: DTDatabase) => {
+    return CachedDao.getJsonFromCache<WarningFeatureCollection>(
+      db,
+      CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE,
     );
+  });
 
-    // filter out warnings not in the route
-    warnings.features = warnings.features.filter((f: Feature) => {
-        const feature = (f as Feature<LineString>).geometry;
-        const buffered = buffer(feature, MAX_DISTANCE_NM, {
-            units: "nauticalmiles"
-        });
+  if (!warnings) {
+    return undefined;
+  }
 
-        return buffered && !booleanDisjoint(buffered, voyageLineString);
+  const voyageLineString = lineString(
+    voyagePlan.route.waypoints
+      .flatMap((w) => w.waypoint.flatMap((wp) => wp.position))
+      .map((p) => [p.$.lon, p.$.lat]),
+  );
+
+  // filter out warnings not in the route
+  warnings.features = warnings.features.filter((f: Feature) => {
+    const feature = (f as Feature<LineString>).geometry;
+    const buffered = buffer(feature, MAX_DISTANCE_NM, {
+      units: "nauticalmiles",
     });
 
-    return warnings;
+    return buffered && !booleanDisjoint(buffered, voyageLineString);
+  });
+
+  return warnings;
 }
 
 /**
@@ -47,15 +53,20 @@ export async function findWarningsForVoyagePlan(
  * @param db
  * @param id
  */
-export async function findWarning(db: DTDatabase, id: number): Promise<WarningFeature | undefined> {
-    const warnings = await CachedDao.getJsonFromCache<WarningFeatureCollection>(
-        db,
-        CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE
-    );
+export async function findWarning(
+  db: DTDatabase,
+  id: number,
+): Promise<WarningFeature | undefined> {
+  const warnings = await CachedDao.getJsonFromCache<WarningFeatureCollection>(
+    db,
+    CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE,
+  );
 
-    if (!warnings) {
-        return undefined;
-    }
+  if (!warnings) {
+    return undefined;
+  }
 
-    return warnings.features.find((f: WarningFeature) => f.properties.id === id) ?? undefined;
+  return warnings.features.find((f: WarningFeature) =>
+    f.properties.id === id
+  ) ?? undefined;
 }

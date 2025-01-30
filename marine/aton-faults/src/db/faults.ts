@@ -36,7 +36,8 @@ const ALL_FAULTS_JSON_SQL = `select id,
     and aton_fault.type = aton_fault_type.name_fi
     and aton_fault.aton_type_fi = aton_type.name_fi`;
 
-const UPSERT_FAULTS_SQL = `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_sv, 
+const UPSERT_FAULTS_SQL =
+  `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_sv, 
     aton_type_fi, fairway_number, fairway_name_fi, fairway_name_sv, area_number, geometry)
     values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     on conflict(id)
@@ -99,81 +100,95 @@ const FAULT_IDS_BY_AREA = `select id
 `;
 
 const PS_FAULT_BY_ID = new pgPromise.PreparedStatement({
-    name: "get-fault-by-id",
-    text: GET_FAULT_BY_ID
+  name: "get-fault-by-id",
+  text: GET_FAULT_BY_ID,
 });
 
 const PS_FAULT_IDS_BY_AREA = new pgPromise.PreparedStatement({
-    name: "get-fault-ids-by-area",
-    text: FAULT_IDS_BY_AREA
+  name: "get-fault-ids-by-area",
+  text: FAULT_IDS_BY_AREA,
 });
 
-export function getFaultById(db: DTDatabase, faultId: number): Promise<DbFault | undefined> {
-    return db.oneOrNone(PS_FAULT_BY_ID, [faultId]).then((result: DbFault | null) => result ?? undefined);
+export function getFaultById(
+  db: DTDatabase,
+  faultId: number,
+): Promise<DbFault | undefined> {
+  return db.oneOrNone(PS_FAULT_BY_ID, [faultId]).then((
+    result: DbFault | null,
+  ) => result ?? undefined);
 }
 
 interface DbFaultId {
-    readonly id: string;
+  readonly id: string;
 }
 
-export function findFaultIdsByRoute(db: DTDatabase, route: LineString): Promise<number[]> {
-    const ids = db.tx((t) => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()));
-    // bigints are returned as string by pg-promise since they could overflow
-    // however these are plain integers
-    return ids.then((result: DbFaultId[]) => result.map((r) => Number(r.id)));
+export function findFaultIdsByRoute(
+  db: DTDatabase,
+  route: LineString,
+): Promise<number[]> {
+  const ids = db.tx((t) => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()));
+  // bigints are returned as string by pg-promise since they could overflow
+  // however these are plain integers
+  return ids.then((result: DbFaultId[]) => result.map((r) => Number(r.id)));
 }
 
-export function updateFaults(db: DTDatabase, domain: string, faults: FaultFeature[]): Promise<unknown>[] {
-    const ps = new pgPromise.PreparedStatement({
-        name: "update-faults",
-        text: UPSERT_FAULTS_SQL
-    });
+export function updateFaults(
+  db: DTDatabase,
+  domain: string,
+  faults: FaultFeature[],
+): Promise<unknown>[] {
+  const ps = new pgPromise.PreparedStatement({
+    name: "update-faults",
+    text: UPSERT_FAULTS_SQL,
+  });
 
-    return faults.map((f) => {
-        const p = f.properties;
+  return faults.map((f) => {
+    const p = f.properties;
 
-        return db.none(ps, [
-            p.ID,
-            parseHelsinkiTime(p.FAULT_ENTRY_TIMESTAMP),
-            parseHelsinkiTime(p.FAULT_FIXED_TIMESTAMP),
-            p.FAULT_STATE,
-            p.FAULT_TYPE,
-            domain,
-            p.FAULT_FIXED === 1,
-            p.TL_NUMERO,
-            p.TL_NIMI_FI,
-            p.TL_NIMI_SE,
-            p.TL_TYYPPI_FI,
-            p.VAYLA_JNRO,
-            p.VAYLA_NIMI_FI,
-            p.VAYLA_NIMI_SE,
-            p.MERIALUE_NRO,
-            createGeometry(f.geometry)
-        ]);
-    });
+    return db.none(ps, [
+      p.ID,
+      parseHelsinkiTime(p.FAULT_ENTRY_TIMESTAMP),
+      parseHelsinkiTime(p.FAULT_FIXED_TIMESTAMP),
+      p.FAULT_STATE,
+      p.FAULT_TYPE,
+      domain,
+      p.FAULT_FIXED === 1,
+      p.TL_NUMERO,
+      p.TL_NIMI_FI,
+      p.TL_NIMI_SE,
+      p.TL_TYYPPI_FI,
+      p.VAYLA_JNRO,
+      p.VAYLA_NIMI_FI,
+      p.VAYLA_NIMI_SE,
+      p.MERIALUE_NRO,
+      createGeometry(f.geometry),
+    ]);
+  });
 }
 
 export function findAll<T>(
-    db: DTDatabase,
-    language: Language,
-    fixedInHours: number,
-    conversion: (fault: DbFault) => T
+  db: DTDatabase,
+  language: Language,
+  fixedInHours: number,
+  conversion: (fault: DbFault) => T,
 ): Promise<T[]> {
-    const fixedLimit = subHours(Date.now(), fixedInHours);
-    const ps = new pgPromise.PreparedStatement({
-        name: "get-all-faults",
-        text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString())
-    });
+  const fixedLimit = subHours(Date.now(), fixedInHours);
+  const ps = new pgPromise.PreparedStatement({
+    name: "get-all-faults",
+    text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString()),
+  });
 
-    return db.manyOrNone(ps, [fixedLimit]).then((faults) => faults.map(conversion));
+  return db.manyOrNone(ps, [fixedLimit]).then((faults) =>
+    faults.map(conversion)
+  );
 }
 
 // eslint-disable-next-line @rushstack/no-new-null
 function parseHelsinkiTime(date: string | null): Date | undefined {
-    if (date !== null) {
-        // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
-        return new TZDate(date, "Europe/Helsinki");
-    }
+  if (date !== null) {
+    // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
+    return new TZDate(date, "Europe/Helsinki");
+  }
 
-    return undefined;
+  return undefined;
 }

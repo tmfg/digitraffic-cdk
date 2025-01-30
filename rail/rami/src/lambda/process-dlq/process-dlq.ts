@@ -7,21 +7,21 @@ import { logException } from "@digitraffic/common/dist/utils/logging";
 const bucketName = getEnvVariable(RamiEnvKeys.SQS_DLQ_BUCKET_NAME);
 
 interface DlqEvent {
-    readonly Records: {
-        readonly body: string;
-    }[];
+  readonly Records: {
+    readonly body: string;
+  }[];
 }
 
 export const handler = async (event: DlqEvent): Promise<void> => {
-    const millis = new Date().getTime();
-    logger.info({
-        method: "RAMI-ProcessDLQ.handler",
-        customRamiDLQMessagesReceived: event.Records.length
-    });
-    const uploads = event.Records.map((e, idx: number) =>
-        uploadToS3(bucketName, e.body, `message-${millis}-${idx}.json`)
-    );
-    await Promise.allSettled(uploads).catch((error): void => {
-        logException(logger, error);
-    });
+  const millis = new Date().getTime();
+  logger.info({
+    method: "RAMI-ProcessDLQ.handler",
+    customRamiDLQMessagesReceived: event.Records.length,
+  });
+  const uploads = event.Records.map((e, idx: number) =>
+    uploadToS3(bucketName, e.body, `message-${millis}-${idx}.json`)
+  );
+  await Promise.allSettled(uploads).catch((error): void => {
+    logException(logger, error);
+  });
 };

@@ -14,46 +14,51 @@ process.env["ENDPOINT_PASS"] = "some_pass";
 // eslint-disable-next-line dot-notation
 process.env["ENDPOINT_URL"] = `http://localhost:${SERVER_PORT}`;
 
-const lambda = await import("../../../lambda/update-states/lambda-update-states.js");
+const lambda = await import(
+  "../../../lambda/update-states/lambda-update-states.js"
+);
 
 describe(
-    "update-states",
-    dbTestBase((db: DTDatabase) => {
-        test("update", async () => {
-            jest.spyOn(axios, "get").mockImplementation(
-                (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                    if (_url.match("/states")) {
-                        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-                        const locale = _url!.match(/\/.+=(.+)/)![1];
-                        return Promise.resolve({
-                            status: 200,
-                            data: fakeStates(locale)
-                        });
-                    }
-                    return Promise.resolve({
-                        status: 404
-                    });
-                }
-            );
+  "update-states",
+  dbTestBase((db: DTDatabase) => {
+    test("update", async () => {
+      jest.spyOn(axios, "get").mockImplementation(
+        (
+          _url: string,
+          _config?: AxiosRequestConfig<unknown>,
+        ): Promise<unknown> => {
+          if (_url.match("/states")) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            const locale = _url!.match(/\/.+=(.+)/)![1];
+            return Promise.resolve({
+              status: 200,
+              data: fakeStates(locale),
+            });
+          }
+          return Promise.resolve({
+            status: 404,
+          });
+        },
+      );
 
-            const expectedKey = 1;
+      const expectedKey = 1;
 
-            await lambda.handler();
+      await lambda.handler();
 
-            const foundSubjectsFi = await StatesDb.findAll(Locale.FINNISH, db);
-            expect(foundSubjectsFi.length).toBe(1);
-            expect(foundSubjectsFi[0]!.key).toBe(expectedKey);
+      const foundSubjectsFi = await StatesDb.findAll(Locale.FINNISH, db);
+      expect(foundSubjectsFi.length).toBe(1);
+      expect(foundSubjectsFi[0]!.key).toBe(expectedKey);
 
-            const foundSubjectsEn = await StatesDb.findAll(Locale.ENGLISH, db);
-            expect(foundSubjectsEn.length).toBe(1);
-            expect(foundSubjectsEn[0]!.key).toBe(expectedKey);
-        });
-    })
+      const foundSubjectsEn = await StatesDb.findAll(Locale.ENGLISH, db);
+      expect(foundSubjectsEn.length).toBe(1);
+      expect(foundSubjectsEn[0]!.key).toBe(expectedKey);
+    });
+  }),
 );
 
 function fakeStates(locale?: string): string {
-    if (locale === "fi") {
-        return `
+  if (locale === "fi") {
+    return `
 <?xml version="1.0" encoding="UTF-8"?>
 <states>
     <state>
@@ -63,8 +68,8 @@ function fakeStates(locale?: string): string {
     </state>
 </states>
 `;
-    }
-    return `
+  }
+  return `
 <?xml version="1.0" encoding="UTF-8"?>
 <states>
     <state>

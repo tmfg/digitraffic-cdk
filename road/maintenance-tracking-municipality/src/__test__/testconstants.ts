@@ -25,8 +25,14 @@ export const AUTORI_OPERATION_PAVING = "päällystys";
 export const AUTORI_OPERATION_SALTING = "suolaus";
 
 export const PAIKANNIN_OPERATION_BRUSHING = {
-    name: AUTORI_OPERATION_BRUSHING,
-    id: 1
+  name: AUTORI_OPERATION_BRUSHING,
+  id: 1,
 } as ApiWorkeventIoDevice;
-export const PAIKANNIN_OPERATION_PAVING = { name: AUTORI_OPERATION_PAVING, id: 2 } as ApiWorkeventIoDevice;
-export const PAIKANNIN_OPERATION_SALTING = { name: AUTORI_OPERATION_SALTING, id: 3 } as ApiWorkeventIoDevice;
+export const PAIKANNIN_OPERATION_PAVING = {
+  name: AUTORI_OPERATION_PAVING,
+  id: 2,
+} as ApiWorkeventIoDevice;
+export const PAIKANNIN_OPERATION_SALTING = {
+  name: AUTORI_OPERATION_SALTING,
+  id: 3,
+} as ApiWorkeventIoDevice;

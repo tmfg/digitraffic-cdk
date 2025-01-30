@@ -5,10 +5,10 @@ export const OK_MESSAGE = "OK";
 export const BAD_REQUEST_MESSAGE = "BAD REQUEST";
 
 export class ValidationError extends Error {
-    statusCode: number;
+  statusCode: number;
 
-    constructor(statusCode: number, body: string) {
-        super(body);
-        this.statusCode = statusCode;
-    }
+  constructor(statusCode: number, body: string) {
+    super(body);
+    this.statusCode = statusCode;
+  }
 }

@@ -13,38 +13,46 @@ import type { MonitoredFunction } from "./monitoredfunction.js";
  * @param stack CloudFormation stack
  */
 export function createSubscription(
-    lambda: AWSFunction,
-    lambdaName: string,
-    logDestinationArn: string | undefined,
-    stack: Construct,
+  lambda: AWSFunction,
+  lambdaName: string,
+  logDestinationArn: string | undefined,
+  stack: Construct,
 ): CfnSubscriptionFilter | undefined {
-    if (logDestinationArn === undefined || logDestinationArn === null) {
-        return undefined;
-    }
-    const filter = new CfnSubscriptionFilter(stack, `${lambdaName}LogsSubscription`, {
-        logGroupName: `/aws/lambda/${lambdaName}`,
-        filterPattern: "",
-        destinationArn: logDestinationArn,
-    });
+  if (logDestinationArn === undefined || logDestinationArn === null) {
+    return undefined;
+  }
+  const filter = new CfnSubscriptionFilter(
+    stack,
+    `${lambdaName}LogsSubscription`,
+    {
+      logGroupName: `/aws/lambda/${lambdaName}`,
+      filterPattern: "",
+      destinationArn: logDestinationArn,
+    },
+  );
 
-    filter.node.addDependency(lambda);
+  filter.node.addDependency(lambda);
 
-    return filter;
+  return filter;
 }
 
 export class DigitrafficLogSubscriptions {
-    constructor(stack: DigitrafficStack, ...lambdas: MonitoredFunction[]) {
-        const destinationArn = stack.configuration.logsDestinationArn;
-        if (destinationArn !== undefined) {
-            lambdas.forEach((lambda) => {
-                const filter = new CfnSubscriptionFilter(stack, `${lambda.givenName}LogsSubscription`, {
-                    logGroupName: `/aws/lambda/${lambda.givenName}`,
-                    filterPattern: "",
-                    destinationArn,
-                });
+  constructor(stack: DigitrafficStack, ...lambdas: MonitoredFunction[]) {
+    const destinationArn = stack.configuration.logsDestinationArn;
+    if (destinationArn !== undefined) {
+      lambdas.forEach((lambda) => {
+        const filter = new CfnSubscriptionFilter(
+          stack,
+          `${lambda.givenName}LogsSubscription`,
+          {
+            logGroupName: `/aws/lambda/${lambda.givenName}`,
+            filterPattern: "",
+            destinationArn,
+          },
+        );
 
-                filter.node.addDependency(lambda);
-            });
-        }
+        filter.node.addDependency(lambda);
+      });
     }
+  }
 }

@@ -1,14 +1,15 @@
 import {
-    type JsonSchema,
-    JsonSchemaType,
-    JsonSchemaVersion,
-    type Model,
-    type RequestValidator,
-    type RestApi,
+  type JsonSchema,
+  JsonSchemaType,
+  JsonSchemaVersion,
+  type Model,
+  type RequestValidator,
+  type RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import type { ModelWithReference } from "../aws/types/model-with-reference.js";
 
-type ModelReferenceUrl = `https://apigateway.amazonaws.com/restapis/${string}/models/${string}`;
+type ModelReferenceUrl =
+  `https://apigateway.amazonaws.com/restapis/${string}/models/${string}`;
 
 /**
  * Get a reference to an OpenAPI model object in a REST API.
@@ -16,8 +17,11 @@ type ModelReferenceUrl = `https://apigateway.amazonaws.com/restapis/${string}/mo
  * @param modelId Id of the referenced object
  * @param restApiId Id of the REST API
  */
-export function getModelReference(modelId: string, restApiId: string): ModelReferenceUrl {
-    return `https://apigateway.amazonaws.com/restapis/${restApiId}/models/${modelId}`;
+export function getModelReference(
+  modelId: string,
+  restApiId: string,
+): ModelReferenceUrl {
+  return `https://apigateway.amazonaws.com/restapis/${restApiId}/models/${modelId}`;
 }
 
 /**
@@ -26,10 +30,10 @@ export function getModelReference(modelId: string, restApiId: string): ModelRefe
  * @param api REST API
  */
 export function addDefaultValidator(api: RestApi): RequestValidator {
-    return api.addRequestValidator("DefaultValidator", {
-        validateRequestParameters: true,
-        validateRequestBody: true,
-    });
+  return api.addRequestValidator("DefaultValidator", {
+    validateRequestParameters: true,
+    validateRequestBody: true,
+  });
 }
 
 /**
@@ -40,14 +44,18 @@ export function addDefaultValidator(api: RestApi): RequestValidator {
  * @param schema JSON Schema
  * @return ModelWithReference A model object with a reference to an API Gateway model object.
  */
-export function addServiceModel(modelName: string, api: RestApi, schema: JsonSchema): ModelWithReference {
-    const mwr = api.addModel(modelName, {
-        contentType: "application/json",
-        modelName,
-        schema,
-    }) as ModelWithReference;
-    mwr.modelReference = getModelReference(mwr.modelId, api.restApiId);
-    return mwr;
+export function addServiceModel(
+  modelName: string,
+  api: RestApi,
+  schema: JsonSchema,
+): ModelWithReference {
+  const mwr = api.addModel(modelName, {
+    contentType: "application/json",
+    modelName,
+    schema,
+  }) as ModelWithReference;
+  mwr.modelReference = getModelReference(mwr.modelId, api.restApiId);
+  return mwr;
 }
 
 /**
@@ -58,15 +66,15 @@ export function addServiceModel(modelName: string, api: RestApi, schema: JsonSch
  * @param contentType
  */
 export function addSimpleServiceModel(
-    modelName: string,
-    api: RestApi,
-    contentType: `${string}/${string}` = "application/xml",
+  modelName: string,
+  api: RestApi,
+  contentType: `${string}/${string}` = "application/xml",
 ): Model {
-    return api.addModel(modelName, {
-        contentType,
-        modelName,
-        schema: {},
-    });
+  return api.addModel(modelName, {
+    contentType,
+    modelName,
+    schema: {},
+  });
 }
 
 /**
@@ -76,12 +84,12 @@ export function addSimpleServiceModel(
  * @param api
  */
 export function createArraySchema(model: Model, api: RestApi): JsonSchema {
-    return {
-        type: JsonSchemaType.ARRAY,
-        items: {
-            ref: getModelReference(model.modelId, api.restApiId),
-        },
-    };
+  return {
+    type: JsonSchemaType.ARRAY,
+    items: {
+      ref: getModelReference(model.modelId, api.restApiId),
+    },
+  };
 }
 
 /**
@@ -89,26 +97,26 @@ export function createArraySchema(model: Model, api: RestApi): JsonSchema {
  * @param modelReference Reference to a model object
  */
 export function featureSchema(modelReference: string): JsonSchema {
-    return {
-        schema: JsonSchemaVersion.DRAFT4,
+  return {
+    schema: JsonSchemaVersion.DRAFT4,
+    type: JsonSchemaType.OBJECT,
+    description: "GeoJson Feature",
+    required: ["type", "properties", "geometry"],
+    properties: {
+      type: {
+        type: JsonSchemaType.STRING,
+        description: "Feature",
+        enum: ["Feature"],
+      },
+      properties: {
+        ref: modelReference,
+      },
+      geometry: {
         type: JsonSchemaType.OBJECT,
-        description: "GeoJson Feature",
-        required: ["type", "properties", "geometry"],
-        properties: {
-            type: {
-                type: JsonSchemaType.STRING,
-                description: "Feature",
-                enum: ["Feature"],
-            },
-            properties: {
-                ref: modelReference,
-            },
-            geometry: {
-                type: JsonSchemaType.OBJECT,
-                description: "GeoJSON geometry",
-            },
-        },
-    };
+        description: "GeoJSON geometry",
+      },
+    },
+  };
 }
 
 /**
@@ -116,23 +124,23 @@ export function featureSchema(modelReference: string): JsonSchema {
  * @param modelReference Reference to a model object, in this case Features.
  */
 export function geojsonSchema(modelReference: string): JsonSchema {
-    return {
-        schema: JsonSchemaVersion.DRAFT4,
-        type: JsonSchemaType.OBJECT,
-        description: "GeoJson FeatureCollection",
-        required: ["type", "features"],
-        properties: {
-            type: {
-                type: JsonSchemaType.STRING,
-                description: "FeatureCollection",
-                enum: ["FeatureCollection"],
-            },
-            features: {
-                type: JsonSchemaType.ARRAY,
-                items: {
-                    ref: modelReference,
-                },
-            },
+  return {
+    schema: JsonSchemaVersion.DRAFT4,
+    type: JsonSchemaType.OBJECT,
+    description: "GeoJson FeatureCollection",
+    required: ["type", "features"],
+    properties: {
+      type: {
+        type: JsonSchemaType.STRING,
+        description: "FeatureCollection",
+        enum: ["FeatureCollection"],
+      },
+      features: {
+        type: JsonSchemaType.ARRAY,
+        items: {
+          ref: modelReference,
         },
-    };
+      },
+    },
+  };
 }

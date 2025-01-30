@@ -5,18 +5,22 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const proxyHolder = ProxyHolder.create();
-const secretHolder = SecretHolder.create<NauticalWarningsSecret>("nauticalwarnings");
+const secretHolder = SecretHolder.create<NauticalWarningsSecret>(
+  "nauticalwarnings",
+);
 
 export const handler: () => Promise<void> = () => {
-    const start = Date.now();
-    return proxyHolder
-        .setCredentials()
-        .then(() => secretHolder.get())
-        .then((secret) => NauticalWarningsService.updateNauticalWarnings(secret.url))
-        .finally(() => {
-            logger.info({
-                method: "UpdateNauticalWarnings.handler",
-                tookMs: Date.now() - start
-            });
-        });
+  const start = Date.now();
+  return proxyHolder
+    .setCredentials()
+    .then(() => secretHolder.get())
+    .then((secret) =>
+      NauticalWarningsService.updateNauticalWarnings(secret.url)
+    )
+    .finally(() => {
+      logger.info({
+        method: "UpdateNauticalWarnings.handler",
+        tookMs: Date.now() - start,
+      });
+    });
 };

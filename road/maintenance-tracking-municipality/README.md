@@ -1,6 +1,7 @@
 # Digitraffic Road - Maintenance tracking integration for municipality data
 
-Maintenance tracking municipality integration fetches data from different domains and saves data to db. Data is then .
+Maintenance tracking municipality integration fetches data from different
+domains and saves data to db. Data is then .
 
 ## Run build
 
@@ -10,13 +11,13 @@ Maintenance tracking municipality integration fetches data from different domain
 
 ## Deploy to AWS
 
--   Show changes
-    -   `pnpm run cdk-diff-road-test` or
-    -   `pnpm run cdk-diff-road-prod`
--   Deploy
-    -   `pnpm run cdk-deploy-road-test` or
-    -   `pnpm run cdk-deploy-road-prod`
+- Show changes
+  - `pnpm run cdk-diff-road-test` or
+  - `pnpm run cdk-diff-road-prod`
+- Deploy
+  - `pnpm run cdk-deploy-road-test` or
+  - `pnpm run cdk-deploy-road-prod`
 -
--   Synthesize a CloudFormation template for local inspection (not required)
-    -   `pnpm run cdk-synth-road-test` or
-    -   `pnpm run cdk-synth-road-prod`
+- Synthesize a CloudFormation template for local inspection (not required)
+  - `pnpm run cdk-synth-road-test` or
+  - `pnpm run cdk-synth-road-prod`

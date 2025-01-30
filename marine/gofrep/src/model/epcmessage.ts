@@ -1,5 +1,5 @@
 export interface EpcMessage {
-    readonly EPCMessageHeader: {
-        readonly ShipMessageId: string;
-    };
+  readonly EPCMessageHeader: {
+    readonly ShipMessageId: string;
+  };
 }

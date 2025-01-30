@@ -4,18 +4,18 @@ import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canari
 import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 
 export class Canaries {
-    constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if (stack.configuration.stackFeatures?.enableCanaries ?? true) {
-            const urlRole = new DigitrafficCanaryRole(stack, "aton-url");
+  constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
+    if (stack.configuration.stackFeatures?.enableCanaries ?? true) {
+      const urlRole = new DigitrafficCanaryRole(stack, "aton-url");
 
-            UrlCanary.create(stack, urlRole, publicApi, {
-                name: "aton-public",
-                handler: "public-api.handler",
-                alarm: {
-                    alarmName: "ATON-PublicAPI-Alarm",
-                    topicArn: stack.configuration.warningTopicArn
-                }
-            });
-        }
+      UrlCanary.create(stack, urlRole, publicApi, {
+        name: "aton-public",
+        handler: "public-api.handler",
+        alarm: {
+          alarmName: "ATON-PublicAPI-Alarm",
+          topicArn: stack.configuration.warningTopicArn,
+        },
+      });
     }
+  }
 }

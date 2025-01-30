@@ -24,50 +24,56 @@ import { EnvKeys } from "../aws/runtime/environment.js";
  * @param b second array to compare
  */
 export function bothArraysHasSameValues(
-    // eslint-disable-next-line @rushstack/no-new-null
-    a: null | undefined | unknown[],
-    // eslint-disable-next-line @rushstack/no-new-null
-    b: null | undefined | unknown[],
+  // eslint-disable-next-line @rushstack/no-new-null
+  a: null | undefined | unknown[],
+  // eslint-disable-next-line @rushstack/no-new-null
+  b: null | undefined | unknown[],
 ): boolean {
-    if ((a && !b) || (!a && b)) {
-        return false;
-    } else if (!a && !b) {
-        return true;
-    }
-    const aSet = new Set(a);
-    const bSet = new Set(b);
-    if (aSet.size !== bSet.size) {
-        return false;
-    }
-    return Array.from(aSet).every((value) => bSet.has(value));
+  if ((a && !b) || (!a && b)) {
+    return false;
+  } else if (!a && !b) {
+    return true;
+  }
+  const aSet = new Set(a);
+  const bSet = new Set(b);
+  if (aSet.size !== bSet.size) {
+    return false;
+  }
+  return Array.from(aSet).every((value) => bSet.has(value));
 }
 
 /**
  * Returns the last item on the array.  If the array is empty, throws an error!
  */
 export function getLast<T>(array: T[], sortFunction?: (a: T) => number): T {
-    return getFirstOrLast(false, array, sortFunction);
+  return getFirstOrLast(false, array, sortFunction);
 }
 
 /**
  * Returns the first item on the array.  If the array is empty, throws an error!
  */
 export function getFirst<T>(array: T[], sortFunction?: (a: T) => number): T {
-    return getFirstOrLast(true, array, sortFunction);
+  return getFirstOrLast(true, array, sortFunction);
 }
 
-function getFirstOrLast<T>(getFirst: boolean, array: T[], sortFunction?: (a: T) => number): T {
-    if (array.length === 0) {
-        throw new Error(`can't get ${getFirst ? "first" : "last"} from empty array!`);
-    }
+function getFirstOrLast<T>(
+  getFirst: boolean,
+  array: T[],
+  sortFunction?: (a: T) => number,
+): T {
+  if (array.length === 0) {
+    throw new Error(
+      `can't get ${getFirst ? "first" : "last"} from empty array!`,
+    );
+  }
 
-    const index = getFirst ? 0 : array.length - 1;
+  const index = getFirst ? 0 : array.length - 1;
 
-    if (sortFunction) {
-        return array.sort(sortFunction)[index] as T;
-    }
+  if (sortFunction) {
+    return array.sort(sortFunction)[index] as T;
+  }
 
-    return array[index] as T;
+  return array[index] as T;
 }
 
 /**
@@ -78,9 +84,9 @@ function getFirstOrLast<T>(getFirst: boolean, array: T[], sortFunction?: (a: T) 
  * @See https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html
  */
 export function getAwsEnv(): AwsEnv {
-    return {
-        region: getEnvVariable("AWS_REGION"),
-    };
+  return {
+    region: getEnvVariable("AWS_REGION"),
+  };
 }
 
 /**
@@ -90,11 +96,11 @@ export function getAwsEnv(): AwsEnv {
  * @return string
  */
 export function getEnvVariable(key: string): string {
-    const either = getEnvVariableSafe(key);
-    if (either.result === "error") {
-        throw new Error(either.message);
-    }
-    return either.value;
+  const either = getEnvVariableSafe(key);
+  if (either.result === "error") {
+    throw new Error(either.message);
+  }
+  return either.value;
 }
 
 /**
@@ -105,14 +111,14 @@ export function getEnvVariable(key: string): string {
  * @return Either<string>
  */
 export function getEnvVariableSafe(key: string): Either<string> {
-    const value = process.env[key];
-    if (value === undefined) {
-        return {
-            result: "error",
-            message: `Error: environment variable "${key}" is undefined.`,
-        };
-    }
-    return { result: "ok", value };
+  const value = process.env[key];
+  if (value === undefined) {
+    return {
+      result: "error",
+      message: `Error: environment variable "${key}" is undefined.`,
+    };
+  }
+  return { result: "ok", value };
 }
 
 /**
@@ -122,7 +128,7 @@ export function getEnvVariableSafe(key: string): Either<string> {
  * @param value Environment variable value
  */
 export function setEnvVariable(key: string, value: string): void {
-    process.env[key] = value;
+  process.env[key] = value;
 }
 
 /**
@@ -132,11 +138,11 @@ export function setEnvVariable(key: string, value: string): void {
  * @param fn Alternative function
  */
 export function getEnvVariableOr<T>(key: string, fn: () => T): string | T {
-    const either = getEnvVariableSafe(key);
-    if (either.result === "ok") {
-        return either.value;
-    }
-    return fn();
+  const either = getEnvVariableSafe(key);
+  if (either.result === "ok") {
+    return either.value;
+  }
+  return fn();
 }
 
 /**
@@ -147,11 +153,11 @@ export function getEnvVariableOr<T>(key: string, fn: () => T): string | T {
  * @param orElse Alternative value
  */
 export function getEnvVariableOrElse<T>(key: string, orElse: T): string | T {
-    return getEnvVariableOr(key, () => orElse);
+  return getEnvVariableOr(key, () => orElse);
 }
 
 export function setSecretOverideAwsRegionEnv(region: string): void {
-    setEnvVariable(EnvKeys.SECRET_OVERRIDE_AWS_REGION, region);
+  setEnvVariable(EnvKeys.SECRET_OVERRIDE_AWS_REGION, region);
 }
 
 /**
@@ -161,8 +167,11 @@ export function setSecretOverideAwsRegionEnv(region: string): void {
  * @param propertyName property name to check
  * @see https://eslint.org/docs/latest/rules/no-prototype-builtins
  */
-export function hasOwnPropertySafe(object: object, propertyName: string): boolean {
-    return Object.prototype.hasOwnProperty.call(object, propertyName);
+export function hasOwnPropertySafe(
+  object: object,
+  propertyName: string,
+): boolean {
+  return Object.prototype.hasOwnProperty.call(object, propertyName);
 }
 
 /**
@@ -170,10 +179,10 @@ export function hasOwnPropertySafe(object: object, propertyName: string): boolea
  * @param maybeError
  */
 export function getErrorMessage(maybeError: unknown): string {
-    if (maybeError instanceof Error) {
-        return maybeError.name + ": " + maybeError.message;
-    }
-    return String(maybeError);
+  if (maybeError instanceof Error) {
+    return maybeError.name + ": " + maybeError.message;
+  }
+  return String(maybeError);
 }
 
 /**
@@ -181,5 +190,5 @@ export function getErrorMessage(maybeError: unknown): string {
  */
 // eslint-disable-next-line @rushstack/no-new-null
 export function isDefined<T>(value: T | undefined | null): value is T {
-    return value !== undefined && value !== null;
+  return value !== undefined && value !== null;
 }

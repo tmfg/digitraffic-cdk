@@ -1,6 +1,11 @@
 import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
 import { type Construct } from "constructs";
-import { PrivateHostedZone, RecordSet, RecordTarget, RecordType } from "aws-cdk-lib/aws-route53";
+import {
+  PrivateHostedZone,
+  RecordSet,
+  RecordTarget,
+  RecordType,
+} from "aws-cdk-lib/aws-route53";
 import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
 import { importVpc } from "../import-util.js";
 import { getParameterValue } from "../stack/parameters.js";
@@ -14,59 +19,59 @@ const DEFAULT_RECORD_TTL = Duration.seconds(30);
  * you must remove the zone by hand after.
  */
 export class DbDnsStack extends Stack {
-    constructor(scope: Construct, id: string, isc: InfraStackConfiguration) {
-        super(scope, id, {
-            env: isc.env,
-        });
+  constructor(scope: Construct, id: string, isc: InfraStackConfiguration) {
+    super(scope, id, {
+      env: isc.env,
+    });
 
-        this.createDnsRecords(isc);
-    }
+    this.createDnsRecords(isc);
+  }
 
-    createDnsRecords(isc: InfraStackConfiguration): void {
-        const vpc = importVpc(this, isc.environmentName);
-        const zone = new PrivateHostedZone(this, "DNSHostedZone", {
-            zoneName: isc.environmentName + ".local",
-            vpc,
-        });
+  createDnsRecords(isc: InfraStackConfiguration): void {
+    const vpc = importVpc(this, isc.environmentName);
+    const zone = new PrivateHostedZone(this, "DNSHostedZone", {
+      zoneName: isc.environmentName + ".local",
+      vpc,
+    });
 
-        zone.applyRemovalPolicy(RemovalPolicy.RETAIN);
+    zone.applyRemovalPolicy(RemovalPolicy.RETAIN);
 
-        const clusterReaderEndpoint = getParameterValue(this, "cluster.reader");
-        const clusterWriterEndpoint = getParameterValue(this, "cluster.writer");
+    const clusterReaderEndpoint = getParameterValue(this, "cluster.reader");
+    const clusterWriterEndpoint = getParameterValue(this, "cluster.writer");
 
-        const proxyReaderEndpoint = getParameterValue(this, "proxy.reader");
-        const proxyWriterEndpoint = getParameterValue(this, "proxy.writer");
+    const proxyReaderEndpoint = getParameterValue(this, "proxy.reader");
+    const proxyWriterEndpoint = getParameterValue(this, "proxy.writer");
 
-        new RecordSet(this, "ReaderRecord", {
-            recordType: RecordType.CNAME,
-            recordName: `db-ro.${isc.environmentName}.local`,
-            target: RecordTarget.fromValues(clusterReaderEndpoint),
-            ttl: DEFAULT_RECORD_TTL,
-            zone,
-        });
+    new RecordSet(this, "ReaderRecord", {
+      recordType: RecordType.CNAME,
+      recordName: `db-ro.${isc.environmentName}.local`,
+      target: RecordTarget.fromValues(clusterReaderEndpoint),
+      ttl: DEFAULT_RECORD_TTL,
+      zone,
+    });
 
-        new RecordSet(this, "WriterRecord", {
-            recordType: RecordType.CNAME,
-            recordName: `db.${isc.environmentName}.local`,
-            target: RecordTarget.fromValues(clusterWriterEndpoint),
-            ttl: DEFAULT_RECORD_TTL,
-            zone,
-        });
+    new RecordSet(this, "WriterRecord", {
+      recordType: RecordType.CNAME,
+      recordName: `db.${isc.environmentName}.local`,
+      target: RecordTarget.fromValues(clusterWriterEndpoint),
+      ttl: DEFAULT_RECORD_TTL,
+      zone,
+    });
 
-        new RecordSet(this, "ProxyReaderRecord", {
-            recordType: RecordType.CNAME,
-            recordName: `proxy-ro.${isc.environmentName}.local`,
-            target: RecordTarget.fromValues(proxyReaderEndpoint),
-            ttl: DEFAULT_RECORD_TTL,
-            zone,
-        });
+    new RecordSet(this, "ProxyReaderRecord", {
+      recordType: RecordType.CNAME,
+      recordName: `proxy-ro.${isc.environmentName}.local`,
+      target: RecordTarget.fromValues(proxyReaderEndpoint),
+      ttl: DEFAULT_RECORD_TTL,
+      zone,
+    });
 
-        new RecordSet(this, "ProxyWriterRecord", {
-            recordType: RecordType.CNAME,
-            recordName: `proxy.${isc.environmentName}.local`,
-            target: RecordTarget.fromValues(proxyWriterEndpoint),
-            ttl: DEFAULT_RECORD_TTL,
-            zone,
-        });
-    }
+    new RecordSet(this, "ProxyWriterRecord", {
+      recordType: RecordType.CNAME,
+      recordName: `proxy.${isc.environmentName}.local`,
+      target: RecordTarget.fromValues(proxyWriterEndpoint),
+      ttl: DEFAULT_RECORD_TTL,
+      zone,
+    });
+  }
 }

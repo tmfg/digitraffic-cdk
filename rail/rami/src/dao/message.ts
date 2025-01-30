@@ -1,66 +1,69 @@
 /* eslint-disable @rushstack/no-new-null */
-import { MYSQL_DATETIME_FORMAT, dateToUTCString } from "@digitraffic/common/dist/utils/date-utils";
+import {
+  dateToUTCString,
+  MYSQL_DATETIME_FORMAT,
+} from "@digitraffic/common/dist/utils/date-utils";
 import type { Connection } from "mysql2/promise.js";
 import type { DtRamiMessage } from "../model/dt-rami-message.js";
 import { mapDaysToBits } from "../util/weekdays.js";
 import { inDatabase, inTransaction } from "../util/database.js";
 
 export interface DbRamiAudio {
-    readonly text_fi: string | null;
-    readonly text_sv: string | null;
-    readonly text_en: string | null;
-    readonly delivery_rules: {
-        readonly start_date: Date | null;
-        readonly end_date: Date | null;
-        readonly start_time: string | null;
-        readonly end_time: string | null;
-        readonly days: string | null;
-        readonly delivery_type: string | null;
-        readonly event_type: string | null;
-        readonly delivery_at: Date | null;
-        readonly repetitions: number | null;
-        readonly repeat_every: number | null;
-    };
+  readonly text_fi: string | null;
+  readonly text_sv: string | null;
+  readonly text_en: string | null;
+  readonly delivery_rules: {
+    readonly start_date: Date | null;
+    readonly end_date: Date | null;
+    readonly start_time: string | null;
+    readonly end_time: string | null;
+    readonly days: string | null;
+    readonly delivery_type: string | null;
+    readonly event_type: string | null;
+    readonly delivery_at: Date | null;
+    readonly repetitions: number | null;
+    readonly repeat_every: number | null;
+  };
 }
 
 export interface DbRamiVideo {
-    readonly text_fi: string | null;
-    readonly text_sv: string | null;
-    readonly text_en: string | null;
-    readonly delivery_rules: {
-        readonly start_date: Date | null;
-        readonly end_date: Date | null;
-        readonly start_time: string | null;
-        readonly end_time: string | null;
-        readonly days: string | null;
-        readonly delivery_type: string | null;
-    };
+  readonly text_fi: string | null;
+  readonly text_sv: string | null;
+  readonly text_en: string | null;
+  readonly delivery_rules: {
+    readonly start_date: Date | null;
+    readonly end_date: Date | null;
+    readonly start_time: string | null;
+    readonly end_time: string | null;
+    readonly days: string | null;
+    readonly delivery_type: string | null;
+  };
 }
 
 export interface DbRamiMessage {
-    readonly id: string;
-    readonly version: number;
-    readonly created_source: Date;
-    readonly start_validity: Date;
-    readonly end_validity: Date;
-    readonly train_number: number | null;
-    readonly train_departure_date: string | null;
-    readonly stations: string | null;
-    readonly audio: DbRamiAudio;
-    readonly video: DbRamiVideo;
+  readonly id: string;
+  readonly version: number;
+  readonly created_source: Date;
+  readonly start_validity: Date;
+  readonly end_validity: Date;
+  readonly train_number: number | null;
+  readonly train_departure_date: string | null;
+  readonly stations: string | null;
+  readonly audio: DbRamiAudio;
+  readonly video: DbRamiVideo;
 }
 
 const INSERT_RAMI_MESSAGE =
-    "INSERT INTO rami_message(id, version, message_type, created_source, start_validity, end_validity, train_number, train_departure_date, journey_ref) VALUES (:id, :version, :messageType, :created, :startValidity, :endValidity, :trainNumber, :trainDepartureDate, :journeyRef)";
+  "INSERT INTO rami_message(id, version, message_type, created_source, start_validity, end_validity, train_number, train_departure_date, journey_ref) VALUES (:id, :version, :messageType, :created, :startValidity, :endValidity, :trainNumber, :trainDepartureDate, :journeyRef)";
 
 const INSERT_RAMI_MESSAGE_STATIONS =
-    "INSERT INTO rami_message_station(rami_message_id, rami_message_version, station_short_code) VALUES ?";
+  "INSERT INTO rami_message_station(rami_message_id, rami_message_version, station_short_code) VALUES ?";
 
 const INSERT_RAMI_MESSAGE_VIDEO =
-    "INSERT INTO rami_message_video(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, start_date_time, end_date_time, start_time, end_time, days_of_week) VALUES (:id, :version, :textFi, :textSv, :textEn, :deliveryType, :startDateTime, :endDateTime, :startTime, :endTime, b:days)";
+  "INSERT INTO rami_message_video(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, start_date_time, end_date_time, start_time, end_time, days_of_week) VALUES (:id, :version, :textFi, :textSv, :textEn, :deliveryType, :startDateTime, :endDateTime, :startTime, :endTime, b:days)";
 
 const INSERT_RAMI_MESSAGE_AUDIO =
-    "INSERT INTO rami_message_audio(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, start_date_time, end_date_time, start_time, end_time, days_of_week, event_type, delivery_at, repetitions, repeat_every) VALUES (:id, :version, :textFi, :textSv, :textEn, :deliveryType, :startDateTime, :endDateTime, :startTime, :endTime, b:days, :eventType, :deliveryAt, :repetitions, :repeatEvery)";
+  "INSERT INTO rami_message_audio(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, start_date_time, end_date_time, start_time, end_time, days_of_week, event_type, delivery_at, repetitions, repeat_every) VALUES (:id, :version, :textFi, :textSv, :textEn, :deliveryType, :startDateTime, :endDateTime, :startTime, :endTime, b:days, :eventType, :deliveryAt, :repetitions, :repeatEvery)";
 
 const SET_DELETED = "UPDATE rami_message SET deleted = NOW() WHERE id = ?";
 
@@ -263,118 +266,141 @@ GROUP BY
 `;
 
 export async function findActiveMessages(
-    trainNumber: number | null = null,
-    trainDepartureDate: string | null = null,
-    station: string | null = null,
-    onlyGeneral: boolean | null = null
+  trainNumber: number | null = null,
+  trainDepartureDate: string | null = null,
+  station: string | null = null,
+  onlyGeneral: boolean | null = null,
 ): Promise<DbRamiMessage[]> {
-    const [rows] = await inDatabase(async (conn: Connection) => {
-        return conn.query(FIND_ACTIVE, {
-            trainNumber,
-            trainDepartureDate,
-            station,
-            onlyGeneral
-        });
+  const [rows] = await inDatabase(async (conn: Connection) => {
+    return conn.query(FIND_ACTIVE, {
+      trainNumber,
+      trainDepartureDate,
+      station,
+      onlyGeneral,
     });
-    return rows as DbRamiMessage[];
+  });
+  return rows as DbRamiMessage[];
 }
 
 export async function findMessagesUpdatedAfter(
-    updatedAfter: Date,
-    trainNumber: number | null = null,
-    trainDepartureDate: string | null = null,
-    station: string | null = null,
-    onlyGeneral: boolean | null = null,
-    onlyActive: boolean = true
+  updatedAfter: Date,
+  trainNumber: number | null = null,
+  trainDepartureDate: string | null = null,
+  station: string | null = null,
+  onlyGeneral: boolean | null = null,
+  onlyActive: boolean = true,
 ): Promise<DbRamiMessage[]> {
-    const [rows] = await inDatabase(async (conn: Connection) => {
-        return conn.query(FIND_UPDATED_AFTER, {
-            updatedAfter,
-            trainNumber,
-            trainDepartureDate,
-            station,
-            onlyGeneral,
-            onlyActive
-        });
+  const [rows] = await inDatabase(async (conn: Connection) => {
+    return conn.query(FIND_UPDATED_AFTER, {
+      updatedAfter,
+      trainNumber,
+      trainDepartureDate,
+      station,
+      onlyGeneral,
+      onlyActive,
     });
-    return rows as DbRamiMessage[];
+  });
+  return rows as DbRamiMessage[];
 }
 
 export async function insertMessage(message: DtRamiMessage): Promise<void> {
-    return inTransaction(async (conn: Connection): Promise<void> => {
-        await conn.query(INSERT_RAMI_MESSAGE, createDtRamiMessageInsertValues(message));
-        await conn.query(INSERT_RAMI_MESSAGE_STATIONS, createDtRamiMessageStationInsertValues(message));
-        await conn.query(INSERT_RAMI_MESSAGE_AUDIO, createDtRamiMessageAudioInsertValues(message));
-        await conn.query(INSERT_RAMI_MESSAGE_VIDEO, createDtRamiMessageVideoInsertValues(message));
-    });
+  return inTransaction(async (conn: Connection): Promise<void> => {
+    await conn.query(
+      INSERT_RAMI_MESSAGE,
+      createDtRamiMessageInsertValues(message),
+    );
+    await conn.query(
+      INSERT_RAMI_MESSAGE_STATIONS,
+      createDtRamiMessageStationInsertValues(message),
+    );
+    await conn.query(
+      INSERT_RAMI_MESSAGE_AUDIO,
+      createDtRamiMessageAudioInsertValues(message),
+    );
+    await conn.query(
+      INSERT_RAMI_MESSAGE_VIDEO,
+      createDtRamiMessageVideoInsertValues(message),
+    );
+  });
 }
 
 export async function setMessageDeleted(messageId: string): Promise<void> {
-    return inTransaction(async (conn: Connection) => {
-        await conn.query(SET_DELETED, [messageId]);
-    });
+  return inTransaction(async (conn: Connection) => {
+    await conn.query(SET_DELETED, [messageId]);
+  });
 }
 
 function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown {
-    return {
-        id: message.id,
-        version: message.version,
-        messageType: message.messageType,
-        created: dateToUTCString(message.created, MYSQL_DATETIME_FORMAT),
-        startValidity: dateToUTCString(message.startValidity, MYSQL_DATETIME_FORMAT),
-        endValidity: dateToUTCString(message.endValidity, MYSQL_DATETIME_FORMAT),
-        trainNumber: message.trainNumber ?? null,
-        trainDepartureDate: message.trainDepartureLocalDate ?? null,
-        journeyRef: message.journeyRef ?? null
-    };
+  return {
+    id: message.id,
+    version: message.version,
+    messageType: message.messageType,
+    created: dateToUTCString(message.created, MYSQL_DATETIME_FORMAT),
+    startValidity: dateToUTCString(
+      message.startValidity,
+      MYSQL_DATETIME_FORMAT,
+    ),
+    endValidity: dateToUTCString(message.endValidity, MYSQL_DATETIME_FORMAT),
+    trainNumber: message.trainNumber ?? null,
+    trainDepartureDate: message.trainDepartureLocalDate ?? null,
+    journeyRef: message.journeyRef ?? null,
+  };
 }
 
-function createDtRamiMessageStationInsertValues(message: DtRamiMessage): (string | number)[][][] | null {
-    return message.stations
-        ? [message.stations.map((station) => [message.id, message.version, station])]
-        : null;
+function createDtRamiMessageStationInsertValues(
+  message: DtRamiMessage,
+): (string | number)[][][] | null {
+  return message.stations
+    ? [
+      message.stations.map((station) => [message.id, message.version, station]),
+    ]
+    : null;
 }
 
 function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown {
-    return {
-        id: message.id,
-        version: message.version,
-        textFi: message.video?.textFi ?? null,
-        textSv: message.video?.textSv ?? null,
-        textEn: message.video?.textEn ?? null,
-        deliveryType: message.video?.deliveryType ?? null,
-        startDateTime: message.video?.startDateTime
-            ? dateToUTCString(message.video.startDateTime, MYSQL_DATETIME_FORMAT)
-            : null,
-        endDateTime: message.video?.endDateTime
-            ? dateToUTCString(message.video.endDateTime, MYSQL_DATETIME_FORMAT)
-            : null,
-        startTime: message.video?.startTime ?? null,
-        endTime: message.video?.endTime ?? null,
-        days: message.video?.daysOfWeek ? mapDaysToBits(message.video.daysOfWeek) : "0000000"
-    };
+  return {
+    id: message.id,
+    version: message.version,
+    textFi: message.video?.textFi ?? null,
+    textSv: message.video?.textSv ?? null,
+    textEn: message.video?.textEn ?? null,
+    deliveryType: message.video?.deliveryType ?? null,
+    startDateTime: message.video?.startDateTime
+      ? dateToUTCString(message.video.startDateTime, MYSQL_DATETIME_FORMAT)
+      : null,
+    endDateTime: message.video?.endDateTime
+      ? dateToUTCString(message.video.endDateTime, MYSQL_DATETIME_FORMAT)
+      : null,
+    startTime: message.video?.startTime ?? null,
+    endTime: message.video?.endTime ?? null,
+    days: message.video?.daysOfWeek
+      ? mapDaysToBits(message.video.daysOfWeek)
+      : "0000000",
+  };
 }
 
 function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown {
-    return {
-        id: message.id,
-        version: message.version,
-        textFi: message.audio?.textFi ?? null,
-        textSv: message.audio?.textSv ?? null,
-        textEn: message.audio?.textEn ?? null,
-        deliveryType: message.audio?.deliveryType ?? null,
-        startDateTime: message.audio?.startDateTime
-            ? dateToUTCString(message.audio.startDateTime, MYSQL_DATETIME_FORMAT)
-            : null,
-        endDateTime: message.audio?.endDateTime
-            ? dateToUTCString(message.audio.endDateTime, MYSQL_DATETIME_FORMAT)
-            : null,
-        startTime: message.audio?.startTime ?? null,
-        endTime: message.audio?.endTime ?? null,
-        days: message.audio?.daysOfWeek ? mapDaysToBits(message.audio.daysOfWeek) : "0000000",
-        eventType: message.audio?.eventType ?? null,
-        deliveryAt: message.audio?.deliveryAt ?? null,
-        repetitions: message.audio?.repetitions ?? null,
-        repeatEvery: message.audio?.repeatEvery ?? null
-    };
+  return {
+    id: message.id,
+    version: message.version,
+    textFi: message.audio?.textFi ?? null,
+    textSv: message.audio?.textSv ?? null,
+    textEn: message.audio?.textEn ?? null,
+    deliveryType: message.audio?.deliveryType ?? null,
+    startDateTime: message.audio?.startDateTime
+      ? dateToUTCString(message.audio.startDateTime, MYSQL_DATETIME_FORMAT)
+      : null,
+    endDateTime: message.audio?.endDateTime
+      ? dateToUTCString(message.audio.endDateTime, MYSQL_DATETIME_FORMAT)
+      : null,
+    startTime: message.audio?.startTime ?? null,
+    endTime: message.audio?.endTime ?? null,
+    days: message.audio?.daysOfWeek
+      ? mapDaysToBits(message.audio.daysOfWeek)
+      : "0000000",
+    eventType: message.audio?.eventType ?? null,
+    deliveryAt: message.audio?.deliveryAt ?? null,
+    repetitions: message.audio?.repetitions ?? null,
+    repeatEvery: message.audio?.repeatEvery ?? null,
+  };
 }

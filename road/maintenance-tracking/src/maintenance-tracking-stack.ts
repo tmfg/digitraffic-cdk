@@ -8,46 +8,54 @@ import { type MaintenanceTrackingStackConfiguration } from "./maintenance-tracki
 import * as Sqs from "./sqs.js";
 
 export class MaintenanceTrackingStack extends DigitrafficStack {
-    constructor(scope: Construct, id: string, stackConfiguration: MaintenanceTrackingStackConfiguration) {
-        super(scope, id, stackConfiguration);
+  constructor(
+    scope: Construct,
+    id: string,
+    stackConfiguration: MaintenanceTrackingStackConfiguration,
+  ) {
+    super(scope, id, stackConfiguration);
 
-        const queueAndDLQ = Sqs.createQueue(this);
-        // Create bucket with internal id DLQBucket, that is not going to AWS and must be unique
-        const dlqBucket = new Bucket(this, "DLQBucket", {
-            bucketName: stackConfiguration.sqsDlqBucketName,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
-        });
+    const queueAndDLQ = Sqs.createQueue(this);
+    // Create bucket with internal id DLQBucket, that is not going to AWS and must be unique
+    const dlqBucket = new Bucket(this, "DLQBucket", {
+      bucketName: stackConfiguration.sqsDlqBucketName,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+    });
 
-        // Create bucket for SQS-messages and delete old messages from bucket after 30 day
-        const sqsExtendedMessageBucket = new Bucket(this, "SqsExtendedMessageBucket", {
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-            bucketName: stackConfiguration.sqsMessageBucketName,
-            lifecycleRules: [
-                {
-                    enabled: true,
-                    expiration: Duration.days(31)
-                }
-            ]
-        });
+    // Create bucket for SQS-messages and delete old messages from bucket after 30 day
+    const sqsExtendedMessageBucket = new Bucket(
+      this,
+      "SqsExtendedMessageBucket",
+      {
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+        bucketName: stackConfiguration.sqsMessageBucketName,
+        lifecycleRules: [
+          {
+            enabled: true,
+            expiration: Duration.days(31),
+          },
+        ],
+      },
+    );
 
-        // 'this' reference must be passed to all child resources to keep them tied to this stack
-        // InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
-        IntegrationApi.createIntegrationApiAndHandlerLambda(
-            queueAndDLQ.queue,
-            sqsExtendedMessageBucket.bucketArn,
-            stackConfiguration,
-            this
-        );
+    // 'this' reference must be passed to all child resources to keep them tied to this stack
+    // InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
+    IntegrationApi.createIntegrationApiAndHandlerLambda(
+      queueAndDLQ.queue,
+      sqsExtendedMessageBucket.bucketArn,
+      stackConfiguration,
+      this,
+    );
 
-        InternalLambdas.createProcessQueueAndDlqLambda(
-            queueAndDLQ,
-            dlqBucket,
-            sqsExtendedMessageBucket.bucketArn,
-            stackConfiguration,
-            this
-        );
+    InternalLambdas.createProcessQueueAndDlqLambda(
+      queueAndDLQ,
+      dlqBucket,
+      sqsExtendedMessageBucket.bucketArn,
+      stackConfiguration,
+      this,
+    );
 
-        // Delete over 26 hours old trackings from db
-        InternalLambdas.createCleanMaintenanceTrackingDataLambda(this);
-    }
+    // Delete over 26 hours old trackings from db
+    InternalLambdas.createCleanMaintenanceTrackingDataLambda(this);
+  }
 }

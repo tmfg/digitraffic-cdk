@@ -1,8 +1,14 @@
 import { getShiplist } from "../../service/shiplist.js";
-import { type DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import {
+  type DTDatabase,
+  inDatabaseReadonly,
+} from "@digitraffic/common/dist/database/database";
 import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
+import type {
+  ProxyLambdaRequest,
+  ProxyLambdaResponse,
+} from "@digitraffic/common/dist/aws/types/proxytypes";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
@@ -12,87 +18,94 @@ const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>("shiplist");
 
 export interface ShiplistSecret extends GenericSecret {
-    readonly auth: string;
+  readonly auth: string;
 }
 
 function response(
-    statusCode: number,
-    message: string,
-    contentType: MediaType = MediaType.TEXT_PLAIN
+  statusCode: number,
+  message: string,
+  contentType: MediaType = MediaType.TEXT_PLAIN,
 ): ProxyLambdaResponse {
-    return {
-        statusCode,
-        body: message,
-        headers: {
-            "content-type": contentType
-        }
-    };
+  return {
+    statusCode,
+    body: message,
+    headers: {
+      "content-type": contentType,
+    },
+  };
 }
 
 interface ShiplistParameters {
-    auth: string;
-    locode: string;
-    interval?: string;
+  auth: string;
+  locode: string;
+  interval?: string;
 }
 
 class ValidationError extends Error {
-    statusCode: number;
+  statusCode: number;
 
-    constructor(statusCode: number, body: string) {
-        super(body);
-        this.statusCode = statusCode;
-    }
+  constructor(statusCode: number, body: string) {
+    super(body);
+    this.statusCode = statusCode;
+  }
 }
 
 function validateParameters(
-    parameters: Partial<ShiplistParameters>,
-    secret: ShiplistSecret
+  parameters: Partial<ShiplistParameters>,
+  secret: ShiplistSecret,
 ): ShiplistParameters {
-    if (!parameters.auth) {
-        throw new ValidationError(401, "Missing authentication");
-    }
-    if (parameters.auth !== secret.auth) {
-        throw new ValidationError(403, "Invalid authentication");
-    }
-    if (!parameters.locode) {
-        throw new ValidationError(400, "Missing LOCODE");
-    }
-    if (!IdUtils.isValidLOCODE(parameters.locode)) {
-        throw new ValidationError(400, "Invalid LOCODE");
-    }
+  if (!parameters.auth) {
+    throw new ValidationError(401, "Missing authentication");
+  }
+  if (parameters.auth !== secret.auth) {
+    throw new ValidationError(403, "Invalid authentication");
+  }
+  if (!parameters.locode) {
+    throw new ValidationError(400, "Missing LOCODE");
+  }
+  if (!IdUtils.isValidLOCODE(parameters.locode)) {
+    throw new ValidationError(400, "Invalid LOCODE");
+  }
 
-    return {
-        auth: parameters.auth,
-        locode: parameters.locode,
-        interval: parameters.interval
-    };
+  return {
+    auth: parameters.auth,
+    locode: parameters.locode,
+    interval: parameters.interval,
+  };
 }
 
-export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
-    return rdsHolder
-        .setCredentials()
-        .then(() => secretHolder.get())
-        .then((secret: ShiplistSecret) => {
-            const parameters = validateParameters(event.queryStringParameters, secret);
-            const interval = Number.parseInt(parameters.interval ?? "4*24");
+export const handler = (
+  event: ProxyLambdaRequest,
+): Promise<ProxyLambdaResponse> => {
+  return rdsHolder
+    .setCredentials()
+    .then(() => secretHolder.get())
+    .then((secret: ShiplistSecret) => {
+      const parameters = validateParameters(
+        event.queryStringParameters,
+        secret,
+      );
+      const interval = Number.parseInt(parameters.interval ?? "4*24");
 
-            return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
-                const shiplist = await getShiplist(db, parameters.locode, interval);
+      return inDatabaseReadonly(
+        async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
+          const shiplist = await getShiplist(db, parameters.locode, interval);
 
-                return response(200, getPageSource(shiplist), MediaType.TEXT_HTML);
-            });
-        })
-        .catch((error) => {
-            if (error instanceof ValidationError) {
-                return response(error.statusCode, error.message);
-            }
+          return response(200, getPageSource(shiplist), MediaType.TEXT_HTML);
+        },
+      );
+    })
+    .catch((error) => {
+      if (error instanceof ValidationError) {
+        return response(error.statusCode, error.message);
+      }
 
-            return response(500, "internal error");
-        });
+      return response(500, "internal error");
+    });
 };
 
 function getPageSource(shiplist: PublicApiTimestamp[]): string {
-    return `
+  return `
 <html>
 
 <head>

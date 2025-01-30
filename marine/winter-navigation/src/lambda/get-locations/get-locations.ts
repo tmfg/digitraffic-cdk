@@ -8,47 +8,51 @@ import { z, ZodError } from "zod";
 const proxyHolder = ProxyHolder.create();
 
 const GetLocationSchema = z.object({
-    "location-id": z.string().optional()
+  "location-id": z.string().optional(),
 }).strict();
 
-export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
-    const start = Date.now();
+export const handler = async (
+  event: Record<string, string>,
+): Promise<LambdaResponse> => {
+  const start = Date.now();
 
-    try {
-        const getLocationEvent = GetLocationSchema.parse(event);
-        await proxyHolder.setCredentials();
-        
-        // get single location
-        if(getLocationEvent["location-id"]) {
-            const [location, lastUpdated] = await getLocation(getLocationEvent["location-id"]);
+  try {
+    const getLocationEvent = GetLocationSchema.parse(event);
+    await proxyHolder.setCredentials();
 
-            if(!location) {
-                return LambdaResponse.notFound();
-            }
+    // get single location
+    if (getLocationEvent["location-id"]) {
+      const [location, lastUpdated] = await getLocation(
+        getLocationEvent["location-id"],
+      );
 
-            return lastUpdated
-                ? LambdaResponse.okJson(location).withTimestamp(lastUpdated)
-                : LambdaResponse.okJson(location);    
-        } 
-        
-        // get all locations
-        const [locations, lastUpdated] = await getLocations();
-        
-        return lastUpdated
-            ? LambdaResponse.okJson(locations).withTimestamp(lastUpdated)
-            : LambdaResponse.okJson(locations);    
-    } catch (error) {
-        if (error instanceof ZodError) {
-            return LambdaResponse.badRequest(JSON.stringify(error.issues));
-        }
+      if (!location) {
+        return LambdaResponse.notFound();
+      }
 
-        logException(logger, error, true);
-
-        return LambdaResponse.internalError();
-    } finally {
-        logger.info({
-            method: "GetLocations.handler",
-            tookMs: Date.now() - start
-        });
+      return lastUpdated
+        ? LambdaResponse.okJson(location).withTimestamp(lastUpdated)
+        : LambdaResponse.okJson(location);
     }
+
+    // get all locations
+    const [locations, lastUpdated] = await getLocations();
+
+    return lastUpdated
+      ? LambdaResponse.okJson(locations).withTimestamp(lastUpdated)
+      : LambdaResponse.okJson(locations);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return LambdaResponse.badRequest(JSON.stringify(error.issues));
+    }
+
+    logException(logger, error, true);
+
+    return LambdaResponse.internalError();
+  } finally {
+    logger.info({
+      method: "GetLocations.handler",
+      tookMs: Date.now() - start,
+    });
+  }
 };

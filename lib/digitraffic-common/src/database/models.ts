@@ -1,7 +1,7 @@
 export interface Countable {
-    count: number;
+  count: number;
 }
 
 export interface Identifiable<T> {
-    id: T;
+  id: T;
 }

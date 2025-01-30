@@ -5,40 +5,42 @@ import type { WafRules } from "./waf-rules.js";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
 
 export function createWebAcl(
-    stack: Stack,
-    environment: string,
-    rulesCollection: WafRules[],
-    distributionName: string
+  stack: Stack,
+  environment: string,
+  rulesCollection: WafRules[],
+  distributionName: string,
 ): CfnWebACL {
-    const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
+  const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
 
-    for (const rules of rulesCollection) {
-        if (rules.isCountOnly) {
-            aclBuilder
-                .withCountDigitrafficUserIp(rules.perIpWithHeader)
-                .withCountDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
-                .withCountAnonymousUserIp(rules.perIpWithoutHeader)
-                .withCountAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
-        } else {
-            aclBuilder
-                .withAWSManagedRules(rules.awsCommonRuleSets, rules.excludedRules)
-                .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
-                .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
-                .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
-                .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
-        }
+  for (const rules of rulesCollection) {
+    if (rules.isCountOnly) {
+      aclBuilder
+        .withCountDigitrafficUserIp(rules.perIpWithHeader)
+        .withCountDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
+        .withCountAnonymousUserIp(rules.perIpWithoutHeader)
+        .withCountAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader);
+    } else {
+      aclBuilder
+        .withAWSManagedRules(rules.awsCommonRuleSets, rules.excludedRules)
+        .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
+        .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
+        .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
+        .withThrottleAnonymousUserIpAndUriPath(
+          rules.perIpAndQueryWithoutHeader,
+        );
     }
+  }
 
-    const acl = aclBuilder.build();
+  const acl = aclBuilder.build();
 
-    const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
-        // group name must begin with aws-waf-logs!!!!
-        logGroupName: `aws-waf-logs-${distributionName}-${environment}`,
-        removalPolicy: RemovalPolicy.RETAIN
-    });
+  const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
+    // group name must begin with aws-waf-logs!!!!
+    logGroupName: `aws-waf-logs-${distributionName}-${environment}`,
+    removalPolicy: RemovalPolicy.RETAIN,
+  });
 
-    // logGroup.logGroupArn is not in the right format for this, so have to construct the arn manually
-    /*    new CfnLoggingConfiguration(stack, `AclLogConfig-${environment}`, {
+  // logGroup.logGroupArn is not in the right format for this, so have to construct the arn manually
+  /*    new CfnLoggingConfiguration(stack, `AclLogConfig-${environment}`, {
         logDestinationConfigs: [stack.formatArn({
             arnFormat: ArnFormat.COLON_RESOURCE_NAME,
             service: "logs",
@@ -48,5 +50,5 @@ export function createWebAcl(
         resourceArn: acl.attrArn,
     });*/
 
-    return acl;
+  return acl;
 }

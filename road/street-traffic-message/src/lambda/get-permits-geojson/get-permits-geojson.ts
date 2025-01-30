@@ -6,26 +6,26 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 const holder = ProxyHolder.create();
 
 export const handler = async () => {
-    await holder.setCredentials();
+  await holder.setCredentials();
 
-    const start = Date.now();
+  const start = Date.now();
 
-    return PermitsService.findPermitsInGeojson()
-        .then((result) => {
-            return LambdaResponse.okJson(result);
-        })
-        .catch((error) => {
-            logger.error({
-                method: "get-permits-geojson.handler",
-                error: error
-            });
+  return PermitsService.findPermitsInGeojson()
+    .then((result) => {
+      return LambdaResponse.okJson(result);
+    })
+    .catch((error) => {
+      logger.error({
+        method: "get-permits-geojson.handler",
+        error: error,
+      });
 
-            return LambdaResponse.internalError();
-        })
-        .finally(() => {
-            logger.info({
-                method: "get-permits-geojson.handler",
-                tookMs: Date.now() - start
-            });
-        });
+      return LambdaResponse.internalError();
+    })
+    .finally(() => {
+      logger.info({
+        method: "get-permits-geojson.handler",
+        tookMs: Date.now() - start,
+      });
+    });
 };

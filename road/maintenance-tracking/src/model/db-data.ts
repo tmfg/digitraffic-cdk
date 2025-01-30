@@ -1,3 +1,3 @@
 export interface DbNumberId {
-    readonly id: number;
+  readonly id: number;
 }

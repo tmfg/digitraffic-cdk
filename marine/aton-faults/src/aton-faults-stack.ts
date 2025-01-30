@@ -9,17 +9,17 @@ import { Canaries } from "./canaries.js";
 import type { AtonProps } from "./app-props.js";
 
 export class AtonFaultsStack extends DigitrafficStack {
-    constructor(scope: Construct, id: string, configuration: AtonProps) {
-        super(scope, id, configuration);
+  constructor(scope: Construct, id: string, configuration: AtonProps) {
+    super(scope, id, configuration);
 
-        const s124Queue = DigitrafficSqsQueue.create(this, "SendS124", {
-            receiveMessageWaitTime: Duration.seconds(5),
-            visibilityTimeout: Duration.seconds(60)
-        });
+    const s124Queue = DigitrafficSqsQueue.create(this, "SendS124", {
+      receiveMessageWaitTime: Duration.seconds(5),
+      visibilityTimeout: Duration.seconds(60),
+    });
 
-        IntegrationApi.create(this, s124Queue);
-        InternalLambdas.create(this, s124Queue);
-        const publicApi = PublicApi.create(this);
-        new Canaries(this, publicApi);
-    }
+    IntegrationApi.create(this, s124Queue);
+    InternalLambdas.create(this, s124Queue);
+    const publicApi = PublicApi.create(this);
+    new Canaries(this, publicApi);
+  }
 }

@@ -8,17 +8,17 @@ const baseUrl = "TODO";
 const authHeaderValue = "TODO";
 
 export async function handler(): Promise<void> {
-    const start = Date.now();
+  const start = Date.now();
 
-    try {
-        await proxyHolder.setCredentials();
+  try {
+    await proxyHolder.setCredentials();
 
-        const updater = new DataUpdater(baseUrl, authHeaderValue);
-        await updater.update();
-    } finally {
-        logger.info({
-            method: "UpdateData.handler",
-            tookMs: Date.now() - start
-        });
-    }
+    const updater = new DataUpdater(baseUrl, authHeaderValue);
+    await updater.update();
+  } finally {
+    logger.info({
+      method: "UpdateData.handler",
+      tookMs: Date.now() - start,
+    });
+  }
 }

@@ -1,7 +1,7 @@
 interface CloudfrontEvent {
-    request: {
-        uri: string;
-    };
+  request: {
+    uri: string;
+  };
 }
 
 /*
@@ -13,15 +13,14 @@ interface CloudfrontEvent {
  */
 // @ts-ignore
 export function handler(event: CloudfrontEvent): CloudfrontEvent["request"] {
-    // eslint-disable-next-line
-    var request = event.request;
-    // eslint-disable-next-line
-    var uri = request.uri;
+  // eslint-disable-next-line
+  var request = event.request;
+  // eslint-disable-next-line
+  var uri = request.uri;
 
-    if (uri.endsWith("/")) {
-        request.uri += "index.html";
-    }
+  if (uri.endsWith("/")) {
+    request.uri += "index.html";
+  }
 
-    return request;
+  return request;
 }
-

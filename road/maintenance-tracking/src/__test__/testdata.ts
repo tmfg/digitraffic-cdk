@@ -97,64 +97,79 @@ const TRACKING_JSON_WITH_3_OBSERVATIONS = `{
             ]
         }`;
 
-export function getTrackingJsonWith3Observations(id: string, tyokoneId?: string): string {
-    if (tyokoneId) {
-        return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(REGEXP_ID, id).replace(REGEXP_TK, tyokoneId);
-    }
-    return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(REGEXP_ID, id).replace(REGEXP_TK, "123456789");
+export function getTrackingJsonWith3Observations(
+  id: string,
+  tyokoneId?: string,
+): string {
+  if (tyokoneId) {
+    return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(REGEXP_ID, id).replace(
+      REGEXP_TK,
+      tyokoneId,
+    );
+  }
+  return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(REGEXP_ID, id).replace(
+    REGEXP_TK,
+    "123456789",
+  );
 }
 
 export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
-    id: string,
-    tyokoneId?: string
+  id: string,
+  tyokoneId?: string,
 ): string {
-    const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
-    const trackingJson = JSON.parse(validJson) as TyokoneenseurannanKirjaus;
-    return JSON.stringify(_.omit(trackingJson, "otsikko.lahettaja.jarjestelma"));
+  const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
+  const trackingJson = JSON.parse(validJson) as TyokoneenseurannanKirjaus;
+  return JSON.stringify(_.omit(trackingJson, "otsikko.lahettaja.jarjestelma"));
 }
 
 export function assertObservationData(
-    srcObservations: DbObservationData[],
-    results: DbObservationData[]
+  srcObservations: DbObservationData[],
+  results: DbObservationData[],
 ): void {
-    results.forEach((resultObservation) => {
-        const resultObservationWithoutId = _.omit(resultObservation, "id");
+  results.forEach((resultObservation) => {
+    const resultObservationWithoutId = _.omit(resultObservation, "id");
 
-        const foundSrcObservations = srcObservations.filter(
-            (o) => o.observationTime.getTime() === resultObservationWithoutId.observationTime.getTime()
-        );
-        expect(foundSrcObservations.length).toBe(1);
+    const foundSrcObservations = srcObservations.filter(
+      (o) =>
+        o.observationTime.getTime() ===
+          resultObservationWithoutId.observationTime.getTime(),
+    );
+    expect(foundSrcObservations.length).toBe(1);
 
-        const srcObservation = foundSrcObservations[0];
-        expect(resultObservationWithoutId).toEqual(srcObservation);
-    });
+    const srcObservation = foundSrcObservations[0];
+    expect(resultObservationWithoutId).toEqual(srcObservation);
+  });
 }
 
 export function getRandompId(): string {
-    return getRandomIntegerAsString(100000, 100000000000);
+  return getRandomIntegerAsString(100000, 100000000000);
 }
 
 export function createSQSEventWithBodies(bodies: string[] = []): SQSEvent {
-    const records = bodies.map((body) => {
-        return {
-            body,
-            messageId: "",
-            receiptHandle: `s3://${getEnvVariable(
-                MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
-            )}/${getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL)}/${getRandompId()}`,
-            messageAttributes: {},
-            md5OfBody: "",
-            attributes: {
-                ApproximateReceiveCount: "",
-                SentTimestamp: "",
-                SenderId: "",
-                ApproximateFirstReceiveTimestamp: ""
-            },
-            eventSource: "",
-            eventSourceARN: "",
-            awsRegion: ""
-        } satisfies SQSRecord;
-    });
+  const records = bodies.map((body) => {
+    return {
+      body,
+      messageId: "",
+      receiptHandle: `s3://${
+        getEnvVariable(
+          MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME,
+        )
+      }/${
+        getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL)
+      }/${getRandompId()}`,
+      messageAttributes: {},
+      md5OfBody: "",
+      attributes: {
+        ApproximateReceiveCount: "",
+        SentTimestamp: "",
+        SenderId: "",
+        ApproximateFirstReceiveTimestamp: "",
+      },
+      eventSource: "",
+      eventSourceARN: "",
+      awsRegion: "",
+    } satisfies SQSRecord;
+  });
 
-    return { Records: records } satisfies SQSEvent;
+  return { Records: records } satisfies SQSEvent;
 }

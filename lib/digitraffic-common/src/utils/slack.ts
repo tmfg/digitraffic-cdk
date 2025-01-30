@@ -3,24 +3,24 @@ import { logger } from "../aws/runtime/dt-logger-default.js";
 import { logException } from "./logging.js";
 
 export class SlackApi {
-    private readonly url: string;
+  private readonly url: string;
 
-    constructor(url: string) {
-        this.url = url;
+  constructor(url: string) {
+    this.url = url;
+  }
+
+  async notify(text: string): Promise<void> {
+    try {
+      logger.info({
+        method: "SlackApi.notify",
+        message: "Sending slack notification",
+      });
+
+      await ky.post(this.url, {
+        json: { text: text },
+      });
+    } catch (error) {
+      logException(logger, error);
     }
-
-    async notify(text: string): Promise<void> {
-        try {
-            logger.info({
-                method: "SlackApi.notify",
-                message: "Sending slack notification",
-            });
-
-            await ky.post(this.url, {
-                json: { text: text },
-            });
-        } catch (error) {
-            logException(logger, error);
-        }
-    }
+  }
 }

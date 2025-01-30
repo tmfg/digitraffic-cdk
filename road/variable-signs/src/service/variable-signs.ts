@@ -1,4 +1,7 @@
-import { type DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import {
+  type DTDatabase,
+  inDatabaseReadonly,
+} from "@digitraffic/common/dist/database/database";
 import { isProductionMessage } from "./filtering-service.js";
 import { findAll } from "../db/datex2.js";
 
@@ -24,21 +27,24 @@ const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 `;
 
 export function findActiveSignsDatex2(): Promise<[string, Date]> {
-    return inDatabaseReadonly(async (db: DTDatabase) => {
-        const [datex2DbSituations, lastModified] = await findAll(db);
-        const datex2: string[] = datex2DbSituations
-            .map((d) => d.datex2)
-            .filter(isProductionMessage);
+  return inDatabaseReadonly(async (db: DTDatabase) => {
+    const [datex2DbSituations, lastModified] = await findAll(db);
+    const datex2: string[] = datex2DbSituations
+      .map((d) => d.datex2)
+      .filter(isProductionMessage);
 
-        return [createResponse(datex2, lastModified), lastModified];
-    });
+    return [createResponse(datex2, lastModified), lastModified];
+  });
 }
 
-function createResponse(datex2: string[], lastUpdated: Date | undefined): string {
-    const publicationTime = lastUpdated ?? new Date();
-    const situations = datex2.join("\n");
+function createResponse(
+  datex2: string[],
+  lastUpdated: Date | undefined,
+): string {
+  const publicationTime = lastUpdated ?? new Date();
+  const situations = datex2.join("\n");
 
-    return DATEX2_TEMPLATE
-        .replace("PUBLICATION_TIME", publicationTime.toISOString())
-        .replace("SITUATIONS", situations);
+  return DATEX2_TEMPLATE
+    .replace("PUBLICATION_TIME", publicationTime.toISOString())
+    .replace("SITUATIONS", situations);
 }

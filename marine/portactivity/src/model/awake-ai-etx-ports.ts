@@ -3,29 +3,29 @@
 import type { Locode } from "./locode.js";
 
 export const ETA_PORTS: readonly Locode[] = [
-    "FIKOK",
-    "FIRAU",
-    "FIOUL",
-    "FIKEM",
-    "FIKJO",
-    "FIUKI",
-    "FIPOR"
+  "FIKOK",
+  "FIRAU",
+  "FIOUL",
+  "FIKEM",
+  "FIKJO",
+  "FIUKI",
+  "FIPOR",
 ] as const;
 
 export const ETD_PORTS: readonly Locode[] = [
-    "FIHEL",
-    "FIHKO",
-    "FIKEM",
-    "FIKOK",
-    "FIKTK",
-    "FIMHQ",
-    "FINLI",
-    "FIOUL",
-    "FIPRS",
-    "FIRAU",
-    "FISKV",
-    "FITKU",
-    "FITOR",
-    "FIUKI",
-    "FIVSS"
+  "FIHEL",
+  "FIHKO",
+  "FIKEM",
+  "FIKOK",
+  "FIKTK",
+  "FIMHQ",
+  "FINLI",
+  "FIOUL",
+  "FIPRS",
+  "FIRAU",
+  "FISKV",
+  "FITKU",
+  "FITOR",
+  "FIUKI",
+  "FIVSS",
 ] as const;

@@ -5,10 +5,10 @@ const weekDays = ["MONDAY", "THURSDAY", "SATURDAY"] as WeekDay[];
 const weekDaysAsBits = "1001010";
 
 describe("weekday bitstring mapping", () => {
-    test("mapDaysToBits and mapBitsToDays", () => {
-        const bitString = mapDaysToBits(weekDays);
-        expect(bitString).toEqual(weekDaysAsBits);
-        const backToWeekDays = mapBitsToDays(bitString);
-        expect(backToWeekDays).toEqual(weekDays);
-    });
+  test("mapDaysToBits and mapBitsToDays", () => {
+    const bitString = mapDaysToBits(weekDays);
+    expect(bitString).toEqual(weekDaysAsBits);
+    const backToWeekDays = mapBitsToDays(bitString);
+    expect(backToWeekDays).toEqual(weekDays);
+  });
 });

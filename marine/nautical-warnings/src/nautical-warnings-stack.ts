@@ -7,17 +7,21 @@ import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export type NauticalWarningConfiguration = StackConfiguration & {
-    apiKey: string;
+  apiKey: string;
 };
 
 export class NauticalWarningsStack extends DigitrafficStack {
-    declare readonly secret: ISecret; // override, not optional
+  declare readonly secret: ISecret; // override, not optional
 
-    constructor(scope: Construct, id: string, configuration: NauticalWarningConfiguration) {
-        super(scope, id, configuration);
+  constructor(
+    scope: Construct,
+    id: string,
+    configuration: NauticalWarningConfiguration,
+  ) {
+    super(scope, id, configuration);
 
-        new InternalLambdas(this);
-        const publicApi = new PublicApi(this);
-        new Canaries(this, publicApi);
-    }
+    new InternalLambdas(this);
+    const publicApi = new PublicApi(this);
+    new Canaries(this, publicApi);
+  }
 }

@@ -1,63 +1,69 @@
 export interface ExistsQuery {
-    exists: {
-        field: string;
-    };
+  exists: {
+    field: string;
+  };
 }
 export interface MustQuery {
-    must: Query[];
+  must: Query[];
 }
 
 export interface MustNotQuery {
-    must_not: Query[];
+  must_not: Query[];
 }
 
 export interface ShouldQuery {
-    should: Query[];
-    minimum_should_match: number;
+  should: Query[];
+  minimum_should_match: number;
 }
 
 export interface BoolQuery {
-    bool: {
-        must: Query[];
-        must_not: Query[];
-    };
+  bool: {
+    must: Query[];
+    must_not: Query[];
+  };
 }
 
 export interface MatchPhraseQuery {
-    match_phrase: {
-        [field: string]: { query: string };
-    };
+  match_phrase: {
+    [field: string]: { query: string };
+  };
 }
 
 export interface RangeQuery {
-    range: {
-        [field: string]: {
-            // eslint-disable-next-line @rushstack/no-new-null
-            from: string | number | null;
-            // eslint-disable-next-line @rushstack/no-new-null
-            to: string | number | null;
-            include_lower?: boolean;
-            include_upper?: boolean;
-        };
+  range: {
+    [field: string]: {
+      // eslint-disable-next-line @rushstack/no-new-null
+      from: string | number | null;
+      // eslint-disable-next-line @rushstack/no-new-null
+      to: string | number | null;
+      include_lower?: boolean;
+      include_upper?: boolean;
     };
+  };
 }
 
 export interface ScriptQuery {
-    script: {
-        script: string;
-    };
+  script: {
+    script: string;
+  };
 }
 
 export interface QueryStringQuery {
-    query_string: {
-        query: string
-    }
+  query_string: {
+    query: string;
+  };
 }
 
-export type Query = BoolQuery | MatchPhraseQuery | RangeQuery | ExistsQuery | ScriptQuery | QueryStringQuery;
+export type Query =
+  | BoolQuery
+  | MatchPhraseQuery
+  | RangeQuery
+  | ExistsQuery
+  | ScriptQuery
+  | QueryStringQuery;
 
 export type Order = "asc" | "desc";
 
 export interface Sort {
-    [field: string]: { order: Order };
+  [field: string]: { order: Order };
 }

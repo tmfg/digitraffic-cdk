@@ -16,41 +16,46 @@ const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 const enableETBForAllPorts = getEnvVariable(PortactivityEnvKeys.ENABLE_ETB);
 
 interface SnsETAShip extends Omit<DbETAShip, "eta"> {
-    readonly eta: string;
+  readonly eta: string;
 }
 
-const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>("awake", [
+const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>(
+  "awake",
+  [
     PortactivitySecretKeys.AWAKE_URL,
-    PortactivitySecretKeys.AWAKE_AUTH
-]);
+    PortactivitySecretKeys.AWAKE_AUTH,
+  ],
+);
 
 export const handler = (event: SNSEvent): Promise<void> => {
-    // always a single event, guaranteed by SNS
-    const ships = (JSON.parse(event.Records[0]?.Sns.Message as unknown as string) as SnsETAShip[]).map(
-        (ship) => ({
-            ...ship,
-            eta: parseISO(ship.eta)
-        })
-    );
+  // always a single event, guaranteed by SNS
+  const ships = (JSON.parse(
+    event.Records[0]?.Sns.Message as unknown as string,
+  ) as SnsETAShip[]).map(
+    (ship) => ({
+      ...ship,
+      eta: parseISO(ship.eta),
+    }),
+  );
 
-    return secretHolder.get().then(async (secret) => {
-        if (!service) {
-            service = new AwakeAiETAShipService(
-                new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth),
-                enableETBForAllPorts.toLowerCase() === "true"
-            );
-        }
-        const timestamps = await service.getAwakeAiTimestamps(ships);
+  return secretHolder.get().then(async (secret) => {
+    if (!service) {
+      service = new AwakeAiETAShipService(
+        new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth),
+        enableETBForAllPorts.toLowerCase() === "true",
+      );
+    }
+    const timestamps = await service.getAwakeAiTimestamps(ships);
 
-        const start = Date.now();
-        logger.info({
-            method: "UpdateAwakeAiETAShipTimestamps.handler",
-            customTimestampsReceivedCount: timestamps.length
-        });
-        await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
-        logger.info({
-            method: "UpdateAwakeAiETAShipTimestamps.handler",
-            tookMs: Date.now() - start
-        });
+    const start = Date.now();
+    logger.info({
+      method: "UpdateAwakeAiETAShipTimestamps.handler",
+      customTimestampsReceivedCount: timestamps.length,
     });
+    await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
+    logger.info({
+      method: "UpdateAwakeAiETAShipTimestamps.handler",
+      tookMs: Date.now() - start,
+    });
+  });
 };

@@ -1,9 +1,18 @@
 import pgPromise from "pg-promise";
 import { type ApiTimestamp, EventType } from "../model/timestamp.js";
-import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, type Ports } from "../service/portareas.js";
+import {
+  DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES,
+  type Ports,
+} from "../service/portareas.js";
 import { EventSource } from "../model/eventsource.js";
-import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
-import type { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
+import type {
+  DTDatabase,
+  DTTransaction,
+} from "@digitraffic/common/dist/database/database";
+import type {
+  Countable,
+  Identifiable,
+} from "@digitraffic/common/dist/database/models";
 import { parseISO } from "date-fns";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
@@ -13,49 +22,49 @@ export const VESSEL_LOCATION_AGE_LIMIT = `NOW() - INTERVAL '1 HOURS'`;
 const OLD_TIMESTAMP_INTERVAL = "7 days";
 
 export interface DbTimestamp {
-    readonly event_type: EventType;
-    readonly event_time: Date;
-    readonly event_time_confidence_lower?: string;
-    readonly event_time_confidence_lower_diff?: number;
-    readonly event_time_confidence_upper?: string;
-    readonly event_time_confidence_upper_diff?: number;
-    readonly event_source: string;
-    readonly record_time: Date;
-    readonly ship_mmsi: number;
-    readonly ship_imo: number;
-    readonly location_locode: string;
-    readonly location_portarea?: string;
-    readonly location_from_locode?: string;
-    readonly portcall_id?: number;
-    readonly source_id?: string;
+  readonly event_type: EventType;
+  readonly event_time: Date;
+  readonly event_time_confidence_lower?: string;
+  readonly event_time_confidence_lower_diff?: number;
+  readonly event_time_confidence_upper?: string;
+  readonly event_time_confidence_upper_diff?: number;
+  readonly event_source: string;
+  readonly record_time: Date;
+  readonly ship_mmsi: number;
+  readonly ship_imo: number;
+  readonly location_locode: string;
+  readonly location_portarea?: string;
+  readonly location_from_locode?: string;
+  readonly portcall_id?: number;
+  readonly source_id?: string;
 }
 
 export interface DbETAShip {
-    readonly imo: number;
-    readonly locode: string;
-    readonly port_area_code?: string;
-    readonly portcall_id: number;
-    readonly eta: Date;
+  readonly imo: number;
+  readonly locode: string;
+  readonly port_area_code?: string;
+  readonly portcall_id: number;
+  readonly eta: Date;
 }
 
 export interface DbUpdatedTimestamp {
-    readonly ship_mmsi: number;
-    readonly ship_imo: number;
-    readonly location_locode: string;
+  readonly ship_mmsi: number;
+  readonly ship_imo: number;
+  readonly location_locode: string;
 }
 
 export interface DbTimestampIdAndLocode {
-    readonly id: number;
-    readonly locode: string;
+  readonly id: number;
+  readonly locode: string;
 }
 
 export interface DbImo {
-    readonly imo: number;
+  readonly imo: number;
 }
 
 export interface DbShipStatus {
-    readonly sog: number;
-    readonly nav_stat: number;
+  readonly sog: number;
+  readonly nav_stat: number;
 }
 
 const INSERT_ESTIMATE_SQL = `
@@ -396,195 +405,227 @@ const DELETE_OLD_PILOTAGES_SQL = `
 `.trim();
 
 export function updateTimestamp(
-    db: DTDatabase | DTTransaction,
-    timestamp: ApiTimestamp
-    // eslint-disable-next-line @rushstack/no-new-null
+  db: DTDatabase | DTTransaction,
+  timestamp: ApiTimestamp,
+  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<DbUpdatedTimestamp | null> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "update-timestamps",
-        text: INSERT_ESTIMATE_SQL
-    });
-    return db.oneOrNone(ps, createUpdateValues(timestamp));
+  const ps = new pgPromise.PreparedStatement({
+    name: "update-timestamps",
+    text: INSERT_ESTIMATE_SQL,
+  });
+  return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
 export function removeTimestamps(
-    db: DTDatabase | DTTransaction,
-    source: string,
-    sourceIds: string[]
+  db: DTDatabase | DTTransaction,
+  source: string,
+  sourceIds: string[],
 ): Promise<number[]> {
-    if (sourceIds.length > 0) {
-        return db
-            .manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
-            .then((array: Identifiable<number>[]) => array.map((object) => object.id));
-    }
+  if (sourceIds.length > 0) {
+    return db
+      .manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
+      .then((array: Identifiable<number>[]) =>
+        array.map((object) => object.id)
+      );
+  }
 
-    return Promise.resolve([]);
+  return Promise.resolve([]);
 }
 
-export function findByLocode(db: DTDatabase, locode: string): Promise<DbTimestamp[]> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "find-by-locode",
-        text: SELECT_BY_LOCODE,
-        values: [locode.toUpperCase()]
-    });
-    return db.tx((t) => t.manyOrNone(ps));
+export function findByLocode(
+  db: DTDatabase,
+  locode: string,
+): Promise<DbTimestamp[]> {
+  const ps = new pgPromise.PreparedStatement({
+    name: "find-by-locode",
+    text: SELECT_BY_LOCODE,
+    values: [locode.toUpperCase()],
+  });
+  return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findByMmsi(db: DTDatabase, mmsi: number): Promise<DbTimestamp[]> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "find-by-mmsi",
-        text: SELECT_BY_MMSI,
-        values: [mmsi]
-    });
-    return db.tx((t) => t.manyOrNone(ps));
+export function findByMmsi(
+  db: DTDatabase,
+  mmsi: number,
+): Promise<DbTimestamp[]> {
+  const ps = new pgPromise.PreparedStatement({
+    name: "find-by-mmsi",
+    text: SELECT_BY_MMSI,
+    values: [mmsi],
+  });
+  return db.tx((t) => t.manyOrNone(ps));
 }
 
 export function findByImo(db: DTDatabase, imo: number): Promise<DbTimestamp[]> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "find-by-imo",
-        text: SELECT_BY_IMO,
-        values: [imo]
-    });
-    return db.tx((t) => t.manyOrNone(ps));
+  const ps = new pgPromise.PreparedStatement({
+    name: "find-by-imo",
+    text: SELECT_BY_IMO,
+    values: [imo],
+  });
+  return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findBySource(db: DTDatabase, source: string): Promise<DbTimestamp[]> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "find-by-source",
-        text: SELECT_BY_SOURCE,
-        values: [source]
-    });
-    return db.tx((t) => t.manyOrNone(ps));
+export function findBySource(
+  db: DTDatabase,
+  source: string,
+): Promise<DbTimestamp[]> {
+  const ps = new pgPromise.PreparedStatement({
+    name: "find-by-source",
+    text: SELECT_BY_SOURCE,
+    values: [source],
+  });
+  return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findPortnetETAsByLocodes(db: DTDatabase, locodes: Ports): Promise<DbETAShip[]> {
-    // Prepared statement use not possible due to dynamic IN-list
-    return db.tx((t) => t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
+export function findPortnetETAsByLocodes(
+  db: DTDatabase,
+  locodes: Ports,
+): Promise<DbETAShip[]> {
+  // Prepared statement use not possible due to dynamic IN-list
+  return db.tx((t) =>
+    t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes])
+  );
 }
 
 export function findVtsShipImosTooCloseToPortByPortCallId(
-    db: DTDatabase,
-    portcallIds: number[]
+  db: DTDatabase,
+  portcallIds: number[],
 ): Promise<DbImo[]> {
-    // Prepared statement use not possible due to dynamic IN-list
-    return db.tx((t) => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds]));
+  // Prepared statement use not possible due to dynamic IN-list
+  return db.tx((t) =>
+    t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds])
+  );
 }
 
 export async function findVesselSpeedAndNavStatus(
-    db: DTDatabase,
-    mmsi?: number
+  db: DTDatabase,
+  mmsi?: number,
 ): Promise<DbShipStatus | undefined> {
-    if (mmsi) {
-        const result = await db.oneOrNone<{ sog: number; nav_stat: number }>(FIND_VESSEL_SOG_AND_NAV_STATUS, [
-            mmsi
-        ]);
-        return result
-            ? {
-                  sog: result.sog,
-                  nav_stat: result.nav_stat
-              }
-            : undefined;
-    }
-    return undefined;
+  if (mmsi) {
+    const result = await db.oneOrNone<{ sog: number; nav_stat: number }>(
+      FIND_VESSEL_SOG_AND_NAV_STATUS,
+      [
+        mmsi,
+      ],
+    );
+    return result
+      ? {
+        sog: result.sog,
+        nav_stat: result.nav_stat,
+      }
+      : undefined;
+  }
+  return undefined;
 }
 
 export function findPortnetTimestampsForAnotherLocode(
-    db: DTDatabase | DTTransaction,
-    portcallId: number,
-    locode: string
+  db: DTDatabase | DTTransaction,
+  portcallId: number,
+  locode: string,
 ): Promise<DbTimestampIdAndLocode[]> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "find-by-portcall-id-and-locode",
-        text: SELECT_BY_PORTCALL_ID_AND_LOCODE,
-        values: [portcallId, locode]
-    });
-    return db.manyOrNone(ps);
+  const ps = new pgPromise.PreparedStatement({
+    name: "find-by-portcall-id-and-locode",
+    text: SELECT_BY_PORTCALL_ID_AND_LOCODE,
+    values: [portcallId, locode],
+  });
+  return db.manyOrNone(ps);
 }
 
 // eslint-disable-next-line @rushstack/no-new-null
-export function deleteById(db: DTDatabase | DTTransaction, id: number): Promise<null> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "delete-by-id",
-        text: DELETE_BY_ID,
-        values: [id]
-    });
-    return db.none(ps);
+export function deleteById(
+  db: DTDatabase | DTTransaction,
+  id: number,
+): Promise<null> {
+  const ps = new pgPromise.PreparedStatement({
+    name: "delete-by-id",
+    text: DELETE_BY_ID,
+    values: [id],
+  });
+  return db.none(ps);
 }
 
 export async function findPortcallId(
-    db: DTDatabase,
-    locode: string,
-    eventType: EventType,
-    eventTime: Date,
-    mmsi?: number,
-    imo?: number
+  db: DTDatabase,
+  locode: string,
+  eventType: EventType,
+  eventTime: Date,
+  mmsi?: number,
+  imo?: number,
 ): Promise<number | undefined> {
-    const ps = new pgPromise.PreparedStatement({
-        name: "find-portcall-id",
-        text: FIND_PORTCALL_ID_SQL,
-        values: [mmsi, imo, locode, eventType, eventTime]
-    });
-    const ret = await db.oneOrNone<{ port_call_id: number }>(ps);
-    if (ret) {
-        return ret.port_call_id;
-    }
-    return undefined;
+  const ps = new pgPromise.PreparedStatement({
+    name: "find-portcall-id",
+    text: FIND_PORTCALL_ID_SQL,
+    values: [mmsi, imo, locode, eventType, eventTime],
+  });
+  const ret = await db.oneOrNone<{ port_call_id: number }>(ps);
+  if (ret) {
+    return ret.port_call_id;
+  }
+  return undefined;
 }
 
 export async function findMmsiByImo(
-    db: DTDatabase | DTTransaction,
-    imo?: number
+  db: DTDatabase | DTTransaction,
+  imo?: number,
 ): Promise<number | undefined> {
-    if (imo) {
-        const mmsi = await db.oneOrNone<{ mmsi: number }>(FIND_MMSI_BY_IMO_SQL, [imo]);
-        if (mmsi?.mmsi) {
-            return mmsi.mmsi;
-        }
+  if (imo) {
+    const mmsi = await db.oneOrNone<{ mmsi: number }>(FIND_MMSI_BY_IMO_SQL, [
+      imo,
+    ]);
+    if (mmsi?.mmsi) {
+      return mmsi.mmsi;
     }
+  }
 
-    return undefined;
+  return undefined;
 }
 
 export async function findImoByMmsi(
-    db: DTDatabase | DTTransaction,
-    mmsi?: number
+  db: DTDatabase | DTTransaction,
+  mmsi?: number,
 ): Promise<number | undefined> {
-    if (mmsi) {
-        const imo = await db.oneOrNone<{ imo: number }>(FIND_IMO_BY_MMSI_SQL, [mmsi]);
-        if (imo?.imo) {
-            return imo.imo;
-        }
+  if (mmsi) {
+    const imo = await db.oneOrNone<{ imo: number }>(FIND_IMO_BY_MMSI_SQL, [
+      mmsi,
+    ]);
+    if (imo?.imo) {
+      return imo.imo;
     }
+  }
 
-    return undefined;
+  return undefined;
 }
 
 export async function deleteOldTimestamps(db: DTTransaction): Promise<number> {
-    const ret = await db.one<Countable>(DELETE_OLD_TIMESTAMPS_SQL);
-    return ret.count;
+  const ret = await db.one<Countable>(DELETE_OLD_TIMESTAMPS_SQL);
+  return ret.count;
 }
 
 export async function deleteOldPilotages(db: DTTransaction): Promise<number> {
-    const ret = await db.one<Countable>(DELETE_OLD_PILOTAGES_SQL);
-    return ret.count;
+  const ret = await db.one<Countable>(DELETE_OLD_PILOTAGES_SQL);
+  return ret.count;
 }
 
 export function createUpdateValues(e: ApiTimestamp): unknown[] {
-    return [
-        e.eventType, // event_type
-        parseISO(e.eventTime), // event_time
-        undefined, // event_time_confidence_lower
-        e.eventTimeConfidenceLowerDiff ? Math.floor(e.eventTimeConfidenceLowerDiff) : undefined, // event_time_confidence_lower_diff
-        undefined, // event_time_confidence_upper
-        e.eventTimeConfidenceUpperDiff ? Math.ceil(e.eventTimeConfidenceUpperDiff) : undefined, // event_time_confidence_upper_diff
-        e.source, // event_source
-        parseISO(e.recordTime), // record_time
-        e.location.port, // location_locode
-        e.ship.mmsi && e.ship.mmsi !== 0 ? e.ship.mmsi : undefined, // ship_mmsi
-        e.ship.imo && e.ship.imo !== 0 ? e.ship.imo : undefined, // ship_imo,
-        e.portcallId,
-        e.location.portArea,
-        e.location.from,
-        e.sourceId // source_id
-    ];
+  return [
+    e.eventType, // event_type
+    parseISO(e.eventTime), // event_time
+    undefined, // event_time_confidence_lower
+    e.eventTimeConfidenceLowerDiff
+      ? Math.floor(e.eventTimeConfidenceLowerDiff)
+      : undefined, // event_time_confidence_lower_diff
+    undefined, // event_time_confidence_upper
+    e.eventTimeConfidenceUpperDiff
+      ? Math.ceil(e.eventTimeConfidenceUpperDiff)
+      : undefined, // event_time_confidence_upper_diff
+    e.source, // event_source
+    parseISO(e.recordTime), // record_time
+    e.location.port, // location_locode
+    e.ship.mmsi && e.ship.mmsi !== 0 ? e.ship.mmsi : undefined, // ship_mmsi
+    e.ship.imo && e.ship.imo !== 0 ? e.ship.imo : undefined, // ship_imo,
+    e.portcallId,
+    e.location.portArea,
+    e.location.from,
+    e.sourceId, // source_id
+  ];
 }

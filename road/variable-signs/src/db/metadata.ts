@@ -9,16 +9,19 @@ const SQL_UPDATE_DEVICE = `
         where id = $1
 `;
 
-export async function updateDevice(db: DTTransaction, device: TloikLaite): Promise<void> {
-    await db.none(SQL_UPDATE_DEVICE, [
-        device.tunnus,
-        device.tyyppi,
-        device.sijainti.tieosoite,
-        device.sijainti.ajosuunta,
-        device.sijainti.ajorata,
-        device.sijainti.e,
-        device.sijainti.n
-    ]);
+export async function updateDevice(
+  db: DTTransaction,
+  device: TloikLaite,
+): Promise<void> {
+  await db.none(SQL_UPDATE_DEVICE, [
+    device.tunnus,
+    device.tyyppi,
+    device.sijainti.tieosoite,
+    device.sijainti.ajosuunta,
+    device.sijainti.ajorata,
+    device.sijainti.e,
+    device.sijainti.n,
+  ]);
 }
 
 const SQL_INSERT_DEVICE = `
@@ -26,22 +29,25 @@ const SQL_INSERT_DEVICE = `
     values ($1, null, $2, $3, $4, $5, $6, $7)
 `;
 
-export async function insertDevices(db: DTTransaction, devices: TloikLaite[]): Promise<void> {
-    await db.tx((t) =>
-        t.batch(
-            devices.map((d) =>
-                db.none(SQL_INSERT_DEVICE, [
-                    d.tunnus,
-                    d.tyyppi,
-                    d.sijainti.tieosoite,
-                    d.sijainti.ajosuunta,
-                    d.sijainti.ajorata,
-                    d.sijainti.e,
-                    d.sijainti.n
-                ])
-            )
-        )
-    );
+export async function insertDevices(
+  db: DTTransaction,
+  devices: TloikLaite[],
+): Promise<void> {
+  await db.tx((t) =>
+    t.batch(
+      devices.map((d) =>
+        db.none(SQL_INSERT_DEVICE, [
+          d.tunnus,
+          d.tyyppi,
+          d.sijainti.tieosoite,
+          d.sijainti.ajosuunta,
+          d.sijainti.ajorata,
+          d.sijainti.e,
+          d.sijainti.n,
+        ])
+      ),
+    )
+  );
 }
 
 const SQL_GET_ALL_DEVICES = `
@@ -50,18 +56,22 @@ const SQL_GET_ALL_DEVICES = `
 `;
 
 const PS_GET_ALL_DEVICES = new pgPromise.PreparedStatement({
-    name: "get-all-devices",
-    text: SQL_GET_ALL_DEVICES
+  name: "get-all-devices",
+  text: SQL_GET_ALL_DEVICES,
 });
 
 export function getAllDevices(db: DTTransaction): Promise<DbDevice[]> {
-    return db.manyOrNone(PS_GET_ALL_DEVICES);
+  return db.manyOrNone(PS_GET_ALL_DEVICES);
 }
 
-const SQL_REMOVE_DEVICES = "update device set deleted_date = current_timestamp where id in ($1:list)";
+const SQL_REMOVE_DEVICES =
+  "update device set deleted_date = current_timestamp where id in ($1:list)";
 
-export async function removeDevices(db: DTTransaction, deviceIds: string[]): Promise<void> {
-    if (deviceIds.length > 0) {
-        await Promise.all([db.none(SQL_REMOVE_DEVICES, [deviceIds])]);
-    }
+export async function removeDevices(
+  db: DTTransaction,
+  deviceIds: string[],
+): Promise<void> {
+  if (deviceIds.length > 0) {
+    await Promise.all([db.none(SQL_REMOVE_DEVICES, [deviceIds])]);
+  }
 }

@@ -35,116 +35,133 @@ where (id = $1 or $1 is null)
 and (domain = $2 or $2 is null)`;
 
 const PS_GET_SITES_AS_FEATURE_COLLECTION = new pgPromise.PreparedStatement({
-    name: "get-sites-as-feature-collection",
-    text: SQL_GET_SITES_AS_FEATURE_COLLECTION
+  name: "get-sites-as-feature-collection",
+  text: SQL_GET_SITES_AS_FEATURE_COLLECTION,
 });
 
 interface DbCollection {
-    collection: FeatureCollection;
+  collection: FeatureCollection;
 }
 
 export function getSitesAsFeatureCollection(
-    db: DTDatabase,
-    siteId?: number,
-    domain?: string
+  db: DTDatabase,
+  siteId?: number,
+  domain?: string,
 ): Promise<FeatureCollection> {
-    return db
-        .one<DbCollection>(PS_GET_SITES_AS_FEATURE_COLLECTION, [siteId, domain])
-        .then((r) => r.collection);
+  return db
+    .one<DbCollection>(PS_GET_SITES_AS_FEATURE_COLLECTION, [siteId, domain])
+    .then((r) => r.collection);
 }
 
-export function getAllSites(db: DTDatabase, domain?: Domain): Promise<DbSite[]> {
-    let creator = database
-        .selectFrom("cs2_site")
-        .select([
-            "id",
-            "name",
-            "description",
-            "domain",
-            "custom_id",
-            "latitude",
-            "longitude",
-            "granularity",
-            "directional",
-            "travel_modes",
-            "removed_timestamp",
-            "last_data_timestamp"
-        ])
-        .orderBy("id");
+export function getAllSites(
+  db: DTDatabase,
+  domain?: Domain,
+): Promise<DbSite[]> {
+  let creator = database
+    .selectFrom("cs2_site")
+    .select([
+      "id",
+      "name",
+      "description",
+      "domain",
+      "custom_id",
+      "latitude",
+      "longitude",
+      "granularity",
+      "directional",
+      "travel_modes",
+      "removed_timestamp",
+      "last_data_timestamp",
+    ])
+    .orderBy("id");
 
-    if (domain) creator = creator.where("domain", "=", domain);
+  if (domain) creator = creator.where("domain", "=", domain);
 
-    const compiled = creator.compile();
+  const compiled = creator.compile();
 
-    return db.manyOrNone(compiled.sql, compiled.parameters);
+  return db.manyOrNone(compiled.sql, compiled.parameters);
 }
 
-export async function addSites(db: DTDatabase, domain: Domain, sites: ApiSite[]): Promise<void> {
-    await Promise.all(
-        sites.map((s) => {
-            const compiled = database
-                .insertInto("cs2_site")
-                .values({
-                    id: s.id,
-                    name: s.name,
-                    description: s.description,
-                    domain,
-                    custom_id: s.customId,
-                    latitude: s.location.lat,
-                    longitude: s.location.lon,
-                    granularity: s.granularity,
-                    directional: s.directional,
-                    travel_modes: s.travelModes
-                })
-                .compile();
-
-            return db.none(compiled.sql, compiled.parameters);
+export async function addSites(
+  db: DTDatabase,
+  domain: Domain,
+  sites: ApiSite[],
+): Promise<void> {
+  await Promise.all(
+    sites.map((s) => {
+      const compiled = database
+        .insertInto("cs2_site")
+        .values({
+          id: s.id,
+          name: s.name,
+          description: s.description,
+          domain,
+          custom_id: s.customId,
+          latitude: s.location.lat,
+          longitude: s.location.lon,
+          granularity: s.granularity,
+          directional: s.directional,
+          travel_modes: s.travelModes,
         })
-    );
-}
-
-export async function removeSites(db: DTDatabase, sites: DbSite[]): Promise<void> {
-    await Promise.all(
-        sites.map((s) => {
-            const compiled = database
-                .updateTable("cs2_site")
-                .set("removed_timestamp", sql`current_timestamp`)
-                .where("id", "=", s.id)
-                .compile();
-
-            return db.none(compiled.sql, compiled.parameters);
-        })
-    );
-}
-
-export async function updateSites(db: DTDatabase, sites: ApiSite[]): Promise<void> {
-    await Promise.all(
-        sites.map((s) => {
-            const compiled = database
-                .updateTable("cs2_site")
-                .set("name", s.name)
-                .set("description", s.description)
-                .set("custom_id", s.customId)
-                .set("latitude", s.location.lat)
-                .set("longitude", s.location.lon)
-                .set("granularity", s.granularity ?? null)
-                .set("directional", s.directional)
-                .set("travel_modes", s.travelModes)
-                .set("removed_timestamp", sql`null`)
-                .where("id", "=", s.id)
-                .compile();
-
-            return db.none(compiled.sql, compiled.parameters);
-        })
-    );
-}
-
-export async function updateSiteTimestamp(db: DTDatabase, siteId: number, timestamp: Date): Promise<void> {
-    const compiled = database
-        .updateTable("cs2_site")
-        .set("last_data_timestamp", timestamp)
-        .where("id", "=", siteId)
         .compile();
 
-    await db.none(compiled.sql, compiled.parameters);
+      return db.none(compiled.sql, compiled.parameters);
+    }),
+  );
+}
+
+export async function removeSites(
+  db: DTDatabase,
+  sites: DbSite[],
+): Promise<void> {
+  await Promise.all(
+    sites.map((s) => {
+      const compiled = database
+        .updateTable("cs2_site")
+        .set("removed_timestamp", sql`current_timestamp`)
+        .where("id", "=", s.id)
+        .compile();
+
+      return db.none(compiled.sql, compiled.parameters);
+    }),
+  );
+}
+
+export async function updateSites(
+  db: DTDatabase,
+  sites: ApiSite[],
+): Promise<void> {
+  await Promise.all(
+    sites.map((s) => {
+      const compiled = database
+        .updateTable("cs2_site")
+        .set("name", s.name)
+        .set("description", s.description)
+        .set("custom_id", s.customId)
+        .set("latitude", s.location.lat)
+        .set("longitude", s.location.lon)
+        .set("granularity", s.granularity ?? null)
+        .set("directional", s.directional)
+        .set("travel_modes", s.travelModes)
+        .set("removed_timestamp", sql`null`)
+        .where("id", "=", s.id)
+        .compile();
+
+      return db.none(compiled.sql, compiled.parameters);
+    }),
+  );
+}
+
+export async function updateSiteTimestamp(
+  db: DTDatabase,
+  siteId: number,
+  timestamp: Date,
+): Promise<void> {
+  const compiled = database
+    .updateTable("cs2_site")
+    .set("last_data_timestamp", timestamp)
+    .where("id", "=", siteId)
+    .compile();
+
+  await db.none(compiled.sql, compiled.parameters);
 }

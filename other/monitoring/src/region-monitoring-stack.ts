@@ -15,20 +15,25 @@ import { Route53Monitoring } from "./route53-monitoring.js";
  * TODO: Should we change the id?
  */
 export class RegionMonitoringStack extends Stack {
-    constructor(scope: Construct, id: string, topic: Topic, configuration: MonitoringConfiguration) {
-        super(scope, `${id}Route53`, {
-            env: {
-                account: configuration.env.account,
-                region: "us-east-1"
-            }
-        });
+  constructor(
+    scope: Construct,
+    id: string,
+    topic: Topic,
+    configuration: MonitoringConfiguration,
+  ) {
+    super(scope, `${id}Route53`, {
+      env: {
+        account: configuration.env.account,
+        region: "us-east-1",
+      },
+    });
 
-        if (configuration.cloudfront) {
-            new CloudfrontMonitoring(this, topic, configuration.cloudfront);
-        }
-
-        if (configuration.route53) {
-            new Route53Monitoring(this, topic, configuration.route53);
-        }
+    if (configuration.cloudfront) {
+      new CloudfrontMonitoring(this, topic, configuration.cloudfront);
     }
+
+    if (configuration.route53) {
+      new Route53Monitoring(this, topic, configuration.route53);
+    }
+  }
 }

@@ -1,5 +1,8 @@
 import axios, { type AxiosError } from "axios";
-import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import {
+  logger,
+  type LoggerMethodType,
+} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { add, isBefore, parseJSON } from "date-fns";
 import ky, { HTTPError } from "ky";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
@@ -11,231 +14,256 @@ const MAINTENANCE_ISSUE_PATH = "/digitraffic-maintenance/" as const;
 const SERVICE = "CStateStatuspageApi" as const;
 
 export interface CStateSystem extends Record<string, unknown> {
-    readonly name: string; // "marine/api/ais/v1/locations",
-    readonly description: string; // "Find latest vessel locations by mmsi and optional timestamp interval in milliseconds from Unix epoch.",
-    readonly category: "Road" | "Marine" | "Rail";
-    readonly status: "ok" | "notice" | "disrupted" | "down";
+  readonly name: string; // "marine/api/ais/v1/locations",
+  readonly description: string; // "Find latest vessel locations by mmsi and optional timestamp interval in milliseconds from Unix epoch.",
+  readonly category: "Road" | "Marine" | "Rail";
+  readonly status: "ok" | "notice" | "disrupted" | "down";
 }
 
 export interface CStateStatus extends Record<string, unknown> {
-    readonly baseURL: string;
-    readonly pinnedIssues: PinnedIssue[];
-    readonly systems: CStateSystem[];
+  readonly baseURL: string;
+  readonly pinnedIssues: PinnedIssue[];
+  readonly systems: CStateSystem[];
 }
 
 export interface PinnedIssue {
-    readonly is: string;
-    readonly title: string;
-    readonly createdAt: string;
-    readonly lastMod: string;
-    readonly permalink: string;
-    readonly affected: string[];
-    readonly filename: string;
+  readonly is: string;
+  readonly title: string;
+  readonly createdAt: string;
+  readonly lastMod: string;
+  readonly permalink: string;
+  readonly affected: string[];
+  readonly filename: string;
 }
 
 export interface ActiveMaintenance {
-    readonly issue: PinnedIssue;
-    readonly baseURL: string;
+  readonly issue: PinnedIssue;
+  readonly baseURL: string;
 }
 
 export interface GithubActionPostData {
-    readonly ref: string;
-    readonly inputs: {
-        readonly baseUrl: string;
-        readonly permalink: string;
-    };
+  readonly ref: string;
+  readonly inputs: {
+    readonly baseUrl: string;
+    readonly permalink: string;
+  };
 }
 
 export class CStateStatuspageApi {
-    private readonly cStatePageUrl: string;
-    private gitHubOwner: string;
-    private gitHubRepo: string;
-    private gitHubBranch: string;
-    private gitHubWorkflowFile: string;
-    private secretHolder: SecretHolder<UpdateStatusSecret>;
+  private readonly cStatePageUrl: string;
+  private gitHubOwner: string;
+  private gitHubRepo: string;
+  private gitHubBranch: string;
+  private gitHubWorkflowFile: string;
+  private secretHolder: SecretHolder<UpdateStatusSecret>;
 
-    constructor(
-        cStatePageUrl: string,
-        gitHubOwner: string,
-        gitHubRepo: string,
-        gitHubBranch: string,
-        gitHubWorkflowFile: string,
-        secretHolder: SecretHolder<UpdateStatusSecret>
-    ) {
-        this.cStatePageUrl = cStatePageUrl;
-        this.gitHubOwner = gitHubOwner;
-        this.gitHubRepo = gitHubRepo;
-        this.gitHubBranch = gitHubBranch;
-        this.gitHubWorkflowFile = gitHubWorkflowFile;
-        this.secretHolder = secretHolder;
-    }
+  constructor(
+    cStatePageUrl: string,
+    gitHubOwner: string,
+    gitHubRepo: string,
+    gitHubBranch: string,
+    gitHubWorkflowFile: string,
+    secretHolder: SecretHolder<UpdateStatusSecret>,
+  ) {
+    this.cStatePageUrl = cStatePageUrl;
+    this.gitHubOwner = gitHubOwner;
+    this.gitHubRepo = gitHubRepo;
+    this.gitHubBranch = gitHubBranch;
+    this.gitHubWorkflowFile = gitHubWorkflowFile;
+    this.secretHolder = secretHolder;
+  }
 
-    async getStatus(): Promise<CStateStatus> {
-        const method = `${SERVICE}.getStatus` as const satisfies LoggerMethodType;
-        const start = Date.now();
+  async getStatus(): Promise<CStateStatus> {
+    const method = `${SERVICE}.getStatus` as const satisfies LoggerMethodType;
+    const start = Date.now();
+    logger.info({
+      method,
+      message: "Getting cState status",
+    });
+
+    const statusJsonUrl = `${this.cStatePageUrl}${STATUS_JSON_PATH}`;
+    return await axios
+      .get<CStateStatus>(statusJsonUrl, {
+        validateStatus: (status: number) => {
+          return status === 200;
+        },
+      })
+      .catch((reason: AxiosError) => {
+        throw new Error(
+          `method=${method} Unable to get cState status from ${statusJsonUrl}. Error ${
+            reason.code ? reason.code : ""
+          } ${reason.message}`,
+        );
+      })
+      .then((response) => {
+        return response.data;
+      })
+      .finally(() =>
         logger.info({
-            method,
-            message: "Getting cState status"
-        });
+          method,
+          message: "Getting cState status done",
+          tookMs: Date.now() - start,
+        })
+      );
+  }
 
-        const statusJsonUrl = `${this.cStatePageUrl}${STATUS_JSON_PATH}`;
-        return await axios
-            .get<CStateStatus>(statusJsonUrl, {
-                validateStatus: (status: number) => {
-                    return status === 200;
-                }
-            })
-            .catch((reason: AxiosError) => {
-                throw new Error(
-                    `method=${method} Unable to get cState status from ${statusJsonUrl}. Error ${
-                        reason.code ? reason.code : ""
-                    } ${reason.message}`
-                );
-            })
-            .then((response) => {
-                return response.data;
-            })
-            .finally(() =>
-                logger.info({
-                    method,
-                    message: "Getting cState status done",
-                    tookMs: Date.now() - start
-                })
-            );
-    }
+  async isActiveMaintenances(): Promise<boolean> {
+    const status = await this.getStatus();
+    return this.hasStatusActiveMaintenances(status);
+  }
 
-    async isActiveMaintenances(): Promise<boolean> {
-        const status = await this.getStatus();
-        return this.hasStatusActiveMaintenances(status);
-    }
+  private hasStatusActiveMaintenances(cStatus: CStateStatus): boolean {
+    const method =
+      `${SERVICE}.hasStatusActiveMaintenances` as const satisfies LoggerMethodType;
+    // This is executed ever minute, so in worst case it will turn off one minute late.
+    // Make it turn on max one minute too early :)
+    const now = add(new Date(), { minutes: 1 });
 
-    private hasStatusActiveMaintenances(cStatus: CStateStatus): boolean {
-        const method = `${SERVICE}.hasStatusActiveMaintenances` as const satisfies LoggerMethodType;
-        // This is executed ever minute, so in worst case it will turn off one minute late.
-        // Make it turn on max one minute too early :)
-        const now = add(new Date(), { minutes: 1 });
-
-        for (const issue of cStatus.pinnedIssues) {
-            // CState has "2024-02-20 08:36:51.671186 +0000 UTC" date format in JSONs
-            const starts = parseJSON(issue.createdAt);
-            logger.debug({
-                method,
-                message: `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${isBefore(starts, now)} issue: ${issue.permalink}`
-            });
-            if (issue.permalink.includes(MAINTENANCE_ISSUE_PATH) && isBefore(starts, now)) {
-                logger.info({
-                    method,
-                    message: `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`
-                });
-                return true;
-            }
-        }
-
+    for (const issue of cStatus.pinnedIssues) {
+      // CState has "2024-02-20 08:36:51.671186 +0000 UTC" date format in JSONs
+      const starts = parseJSON(issue.createdAt);
+      logger.debug({
+        method,
+        message:
+          `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${
+            isBefore(starts, now)
+          } issue: ${issue.permalink}`,
+      });
+      if (
+        issue.permalink.includes(MAINTENANCE_ISSUE_PATH) &&
+        isBefore(starts, now)
+      ) {
         logger.info({
-            method,
-            message: "No active maintenance found"
+          method,
+          message:
+            `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`,
         });
-        return false;
+        return true;
+      }
     }
 
-    async findActiveMaintenance(): Promise<ActiveMaintenance | undefined> {
-        const status = await this.getStatus();
-        const issue = this.findActiveMaintenanceFromStatus(status);
-        if (issue) {
-            return {
-                issue,
-                baseURL: status.baseURL
-            };
-        }
-        return undefined;
+    logger.info({
+      method,
+      message: "No active maintenance found",
+    });
+    return false;
+  }
+
+  async findActiveMaintenance(): Promise<ActiveMaintenance | undefined> {
+    const status = await this.getStatus();
+    const issue = this.findActiveMaintenanceFromStatus(status);
+    if (issue) {
+      return {
+        issue,
+        baseURL: status.baseURL,
+      };
     }
+    return undefined;
+  }
 
-    private findActiveMaintenanceFromStatus(cStatus: CStateStatus): PinnedIssue | undefined {
-        const method = `${SERVICE}.findActiveMaintenance` as const satisfies LoggerMethodType;
-        // This is executed ever minute, so in worst case it will turn off one minute late.
-        // Make it turn on max one minute too early :)
-        const now = add(new Date(), { minutes: 1 });
+  private findActiveMaintenanceFromStatus(
+    cStatus: CStateStatus,
+  ): PinnedIssue | undefined {
+    const method =
+      `${SERVICE}.findActiveMaintenance` as const satisfies LoggerMethodType;
+    // This is executed ever minute, so in worst case it will turn off one minute late.
+    // Make it turn on max one minute too early :)
+    const now = add(new Date(), { minutes: 1 });
 
-        for (const issue of cStatus.pinnedIssues) {
-            // CState has "2024-02-20 08:36:51.671186 +0000 UTC" date format in JSONs
-            const starts = parseJSON(issue.createdAt);
-            logger.debug({
-                method,
-                message: `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${isBefore(starts, now)} issue: ${issue.permalink}`
-            });
-            if (issue.permalink.includes(MAINTENANCE_ISSUE_PATH) && isBefore(starts, now)) {
-                logger.info({
-                    method,
-                    message: `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`
-                });
-                return issue;
-            }
-        }
-
+    for (const issue of cStatus.pinnedIssues) {
+      // CState has "2024-02-20 08:36:51.671186 +0000 UTC" date format in JSONs
+      const starts = parseJSON(issue.createdAt);
+      logger.debug({
+        method,
+        message:
+          `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${
+            isBefore(starts, now)
+          } issue: ${issue.permalink}`,
+      });
+      if (
+        issue.permalink.includes(MAINTENANCE_ISSUE_PATH) &&
+        isBefore(starts, now)
+      ) {
         logger.info({
-            method,
-            message: "No active maintenance found"
+          method,
+          message:
+            `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`,
         });
-        return undefined;
+        return issue;
+      }
     }
 
-    async triggerUpdateMaintenanceGithubAction(maintenance: ActiveMaintenance): Promise<void> {
-        const method = `${SERVICE}.triggerUpdateMaintenanceGithubAction` as const satisfies LoggerMethodType;
+    logger.info({
+      method,
+      message: "No active maintenance found",
+    });
+    return undefined;
+  }
 
-        const secret = await this.secretHolder.get();
-        const data = {
-            ref: `refs/heads/${this.gitHubBranch}`,
-            inputs: { baseUrl: maintenance.baseURL, permalink: maintenance.issue.permalink }
-        } satisfies GithubActionPostData;
-        const headers = {
-            Accept: "application/vnd.github+json",
-            "Content-Type": "application/vnd.github+json",
-            Authorization: `token ${secret.gitHubPat}`
-        };
-        const githubApi =
-            `https://api.github.com/repos/${this.gitHubOwner}/${this.gitHubRepo}/actions/workflows/${this.gitHubWorkflowFile}/dispatches` as const;
+  async triggerUpdateMaintenanceGithubAction(
+    maintenance: ActiveMaintenance,
+  ): Promise<void> {
+    const method =
+      `${SERVICE}.triggerUpdateMaintenanceGithubAction` as const satisfies LoggerMethodType;
+
+    const secret = await this.secretHolder.get();
+    const data = {
+      ref: `refs/heads/${this.gitHubBranch}`,
+      inputs: {
+        baseUrl: maintenance.baseURL,
+        permalink: maintenance.issue.permalink,
+      },
+    } satisfies GithubActionPostData;
+    const headers = {
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/vnd.github+json",
+      Authorization: `token ${secret.gitHubPat}`,
+    };
+    const githubApi =
+      `https://api.github.com/repos/${this.gitHubOwner}/${this.gitHubRepo}/actions/workflows/${this.gitHubWorkflowFile}/dispatches` as const;
+    logger.info({
+      method,
+      message: "Trigger GitHub action",
+      customActionUrl: githubApi,
+    });
+    const options = { json: data, headers: headers };
+
+    try {
+      const response = await ky.post(githubApi, options);
+      if (response.ok) {
         logger.info({
-            method,
-            message: "Trigger GitHub action",
-            customActionUrl: githubApi
+          method,
+          message: "Trigger GitHub action response",
+          customActionUrl: githubApi,
+          customResponseCode: response.status,
+          customResponseText: response.statusText,
         });
-        const options = { json: data, headers: headers };
-
-        try {
-            const response = await ky.post(githubApi, options);
-            if (response.ok) {
-                logger.info({
-                    method,
-                    message: "Trigger GitHub action response",
-                    customActionUrl: githubApi,
-                    customResponseCode: response.status,
-                    customResponseText: response.statusText
-                });
-            } else {
-                logger.error({
-                    method,
-                    message: "Trigger GitHub action response failed.",
-                    customActionUrl: githubApi,
-                    customResponseCode: response.status,
-                    customResponseText: response.statusText
-                });
-            }
-        } catch (error) {
-            const message = "Triggering GitHub action throw error.";
-            let errorMessage = JSON.stringify(error);
-            if (error instanceof HTTPError) {
-                const serverMessage = await error.response.text();
-                errorMessage = `${error.response.status} ${error.response.statusText} ${serverMessage}`;
-            } else {
-                errorMessage = `${errorMessage} Not HTTPError.`;
-            }
-            logger.error({
-                method,
-                message,
-                customActionUrl: githubApi,
-                customError: errorMessage
-            });
-            throw new Error(`${method} ${message} ${errorMessage}`);
-        }
+      } else {
+        logger.error({
+          method,
+          message: "Trigger GitHub action response failed.",
+          customActionUrl: githubApi,
+          customResponseCode: response.status,
+          customResponseText: response.statusText,
+        });
+      }
+    } catch (error) {
+      const message = "Triggering GitHub action throw error.";
+      let errorMessage = JSON.stringify(error);
+      if (error instanceof HTTPError) {
+        const serverMessage = await error.response.text();
+        errorMessage =
+          `${error.response.status} ${error.response.statusText} ${serverMessage}`;
+      } else {
+        errorMessage = `${errorMessage} Not HTTPError.`;
+      }
+      logger.error({
+        method,
+        message,
+        customActionUrl: githubApi,
+        customError: errorMessage,
+      });
+      throw new Error(`${method} ${message} ${errorMessage}`);
     }
+  }
 }

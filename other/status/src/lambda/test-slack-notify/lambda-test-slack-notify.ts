@@ -8,7 +8,9 @@ const secretHolder = SecretHolder.create<UpdateStatusSecret>();
  * Sens test message to Slack Webhook to test notifications.
  */
 export const handler = async (): Promise<void> => {
-    const secret = await secretHolder.get();
-    const slackNotifyApi = new SlackApi(secret.reportUrl);
-    await slackNotifyApi.notify(`Test message from status lambda at ${new Date().toUTCString()}`);
+  const secret = await secretHolder.get();
+  const slackNotifyApi = new SlackApi(secret.reportUrl);
+  await slackNotifyApi.notify(
+    `Test message from status lambda at ${new Date().toUTCString()}`,
+  );
 };

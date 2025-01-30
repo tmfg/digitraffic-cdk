@@ -7,21 +7,22 @@ import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stac
 import { Duration } from "aws-cdk-lib";
 
 export class Canaries {
-    constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if (stack.configuration.stackFeatures?.enableCanaries ?? true) {
-            const urlRole = new DigitrafficCanaryRole(stack, "cs-url");
-            const dbRole = new DigitrafficCanaryRole(stack, "cs-db").withDatabaseAccess();
+  constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
+    if (stack.configuration.stackFeatures?.enableCanaries ?? true) {
+      const urlRole = new DigitrafficCanaryRole(stack, "cs-url");
+      const dbRole = new DigitrafficCanaryRole(stack, "cs-db")
+        .withDatabaseAccess();
 
-            DatabaseCanary.createV2(stack, dbRole, "cs");
+      DatabaseCanary.createV2(stack, dbRole, "cs");
 
-            UrlCanary.create(stack, urlRole, publicApi, {
-                name: "cs-public",
-                schedule: Schedule.rate(Duration.minutes(30)),
-                alarm: {
-                    alarmName: "CountingSites-PublicAPI-Alarm",
-                    topicArn: stack.configuration.alarmTopicArn
-                }
-            });
-        }
+      UrlCanary.create(stack, urlRole, publicApi, {
+        name: "cs-public",
+        schedule: Schedule.rate(Duration.minutes(30)),
+        alarm: {
+          alarmName: "CountingSites-PublicAPI-Alarm",
+          topicArn: stack.configuration.alarmTopicArn,
+        },
+      });
     }
+  }
 }

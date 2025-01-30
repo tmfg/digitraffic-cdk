@@ -8,12 +8,12 @@ import type { Camera } from "../../model/camera.js";
 const rdsHolder = RdsHolder.create();
 
 export const handler: () => Promise<LambdaResponse> = () => {
-    return rdsHolder
-        .setCredentials()
-        .then(() => MetadataService.listAllCameras(["Saimaa"]))
-        .then((cameras: Camera[]) => LambdaResponse.okJson(cameras))
-        .catch((e: unknown) => {
-            logException(logger, e as Error);
-            return LambdaResponse.internalError();
-        });
+  return rdsHolder
+    .setCredentials()
+    .then(() => MetadataService.listAllCameras(["Saimaa"]))
+    .then((cameras: Camera[]) => LambdaResponse.okJson(cameras))
+    .catch((e: unknown) => {
+      logException(logger, e as Error);
+      return LambdaResponse.internalError();
+    });
 };

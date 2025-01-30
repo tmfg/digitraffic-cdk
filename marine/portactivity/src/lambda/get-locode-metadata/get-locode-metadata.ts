@@ -7,14 +7,14 @@ import { logException } from "@digitraffic/common/dist/utils/logging";
 const rdsHolder = RdsHolder.create();
 
 export const handler = (): Promise<LambdaResponse> => {
-    return rdsHolder
-        .setCredentials()
-        .then(async () => {
-            const locodes = await MetadataService.getLocodesWithPredictions();
-            return LambdaResponse.okJson(locodes);
-        })
-        .catch((error) => {
-            logException(logger, error);
-            return LambdaResponse.internalError();
-        });
+  return rdsHolder
+    .setCredentials()
+    .then(async () => {
+      const locodes = await MetadataService.getLocodesWithPredictions();
+      return LambdaResponse.okJson(locodes);
+    })
+    .catch((error) => {
+      logException(logger, error);
+      return LambdaResponse.internalError();
+    });
 };

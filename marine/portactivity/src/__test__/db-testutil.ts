@@ -3,7 +3,10 @@ import * as TimestampsDb from "../dao/timestamps.js";
 import type { DbTimestamp } from "../dao/timestamps.js";
 import type { PortAreaDetails, PortCall, Vessel } from "./testdata.js";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import type { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import type {
+  DTDatabase,
+  DTTransaction,
+} from "@digitraffic/common/dist/database/database";
 import { updatePilotages } from "../dao/pilotages.js";
 import type { Countable } from "@digitraffic/common/dist/database/models";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
@@ -11,34 +14,42 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { jest } from "@jest/globals";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
-    return commonDbTestBase(fn, truncate, "portactivity", "portactivity", "localhost:54321/marine");
+  return commonDbTestBase(
+    fn,
+    truncate,
+    "portactivity",
+    "portactivity",
+    "localhost:54321/marine",
+  );
 }
 
 export function inTransaction(
-    db: DTDatabase | DTTransaction,
-    fn: (t: DTTransaction) => void
+  db: DTDatabase | DTTransaction,
+  fn: (t: DTTransaction) => void,
 ): () => Promise<void> {
-    return () => {
-        return db.tx((t) => {
-            fn(t);
-        });
-    };
+  return () => {
+    return db.tx((t) => {
+      fn(t);
+    });
+  };
 }
 
 export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
-    await db.tx(async (t) => {
-        await t.none("DELETE FROM pilotage");
-        await t.none("DELETE FROM port_call_timestamp");
-        await t.none("DELETE FROM public.vessel");
-        await t.none("DELETE FROM public.port_area_details");
-        await t.none("DELETE FROM public.port_call");
-        await t.none("DELETE FROM public.vessel_location");
-    });
+  await db.tx(async (t) => {
+    await t.none("DELETE FROM pilotage");
+    await t.none("DELETE FROM port_call_timestamp");
+    await t.none("DELETE FROM public.vessel");
+    await t.none("DELETE FROM public.port_area_details");
+    await t.none("DELETE FROM public.port_call");
+    await t.none("DELETE FROM public.vessel_location");
+  });
 }
 
-export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> {
-    return db.tx((t) => {
-        return t.manyOrNone(`
+export function findAll(
+  db: DTDatabase | DTTransaction,
+): Promise<DbTimestamp[]> {
+  return db.tx((t) => {
+    return t.manyOrNone(`
         SELECT
             event_type,
             event_time,
@@ -55,20 +66,27 @@ export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> 
             location_from_locode,
             portcall_id
         FROM port_call_timestamp`);
-    });
+  });
 }
 
-export async function getPilotagesCount(db: DTDatabase | DTTransaction): Promise<number> {
-    const ret = await db.tx((t) => t.one<Countable>("SELECT COUNT(*) FROM pilotage"));
-    return ret.count;
+export async function getPilotagesCount(
+  db: DTDatabase | DTTransaction,
+): Promise<number> {
+  const ret = await db.tx((t) =>
+    t.one<Countable>("SELECT COUNT(*) FROM pilotage")
+  );
+  return ret.count;
 }
 
-export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[]): Promise<void> {
-    await db.tx((t) => {
-        return t.batch(
-            timestamps.map((e) => {
-                return t.none(
-                    `
+export async function insert(
+  db: DTDatabase | DTTransaction,
+  timestamps: ApiTimestamp[],
+): Promise<void> {
+  await db.tx((t) => {
+    return t.batch(
+      timestamps.map((e) => {
+        return t.none(
+          `
                 INSERT INTO port_call_timestamp(
                     event_type,
                     event_time,
@@ -103,17 +121,20 @@ export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTime
                     $15
                 )
             `,
-                    TimestampsDb.createUpdateValues(e)
-                );
-            })
+          TimestampsDb.createUpdateValues(e),
         );
-    });
+      }),
+    );
+  });
 }
 
-export async function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel): Promise<void> {
-    await db.tx(async (t) => {
-        await t.none(
-            `
+export async function insertVessel(
+  db: DTDatabase | DTTransaction,
+  vessel: Vessel,
+): Promise<void> {
+  await db.tx(async (t) => {
+    await t.none(
+      `
             INSERT INTO public.vessel(mmsi,
                                       timestamp,
                                       name,
@@ -143,17 +164,17 @@ export async function insertVessel(db: DTDatabase | DTTransaction, vessel: Vesse
                     $(call_sign),
                     $(destination))
         `,
-            vessel
-        );
-    });
+      vessel,
+    );
+  });
 }
 
 export async function insertPortAreaDetails(
-    db: DTTransaction | DTDatabase,
-    p: PortAreaDetails
+  db: DTTransaction | DTDatabase,
+  p: PortAreaDetails,
 ): Promise<void> {
-    await db.none(
-        `
+  await db.none(
+    `
         INSERT INTO public.port_area_details(
             port_area_details_id,
             port_call_id,
@@ -170,13 +191,16 @@ export async function insertPortAreaDetails(
             $(atd)
         )
     `,
-        p
-    );
+    p,
+  );
 }
 
-export async function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall): Promise<void> {
-    await db.none(
-        `
+export async function insertPortCall(
+  db: DTTransaction | DTDatabase,
+  p: PortCall,
+): Promise<void> {
+  await db.none(
+    `
         INSERT INTO public.port_call(
             port_call_id,
             radio_call_sign,
@@ -197,59 +221,59 @@ export async function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall
             $(imo_lloyds)
         )
     `,
-        p
-    );
+    p,
+  );
 }
 
 export function insertPilotage(
-    db: DTDatabase,
-    id: number,
-    state: string,
-    scheduleUpdated: Date,
-    endTime?: Date
+  db: DTDatabase,
+  id: number,
+  state: string,
+  scheduleUpdated: Date,
+  endTime?: Date,
 ): Promise<unknown> {
-    return updatePilotages(db, [
-        {
-            id,
-            vessel: {
-                name: "test",
-                imo: 1,
-                mmsi: 1
-            },
-            vesselEta: new Date().toISOString(),
-            pilotBoardingTime: new Date().toISOString(),
-            endTime: endTime?.toISOString() ?? new Date().toISOString(),
-            scheduleUpdated: scheduleUpdated.toISOString(),
-            scheduleSource: "test",
-            state,
-            route: {
-                start: {
-                    code: "START"
-                },
-                end: {
-                    code: "END"
-                }
-            }
-        }
-    ]);
+  return updatePilotages(db, [
+    {
+      id,
+      vessel: {
+        name: "test",
+        imo: 1,
+        mmsi: 1,
+      },
+      vesselEta: new Date().toISOString(),
+      pilotBoardingTime: new Date().toISOString(),
+      endTime: endTime?.toISOString() ?? new Date().toISOString(),
+      scheduleUpdated: scheduleUpdated.toISOString(),
+      scheduleSource: "test",
+      state,
+      route: {
+        start: {
+          code: "START",
+        },
+        end: {
+          code: "END",
+        },
+      },
+    },
+  ]);
 }
 
 export async function insertVesselLocation(
-    db: DTDatabase,
-    mmsi: number,
-    speed: number = 3,
-    navStatus: number = 0
+  db: DTDatabase,
+  mmsi: number,
+  speed: number = 3,
+  navStatus: number = 0,
 ): Promise<void> {
-    await db.tx(async (t) => {
-        await t.none(
-            "INSERT INTO public.vessel_location(mmsi,timestamp_ext,x,y,sog,cog,nav_stat,rot,pos_acc,raim,timestamp) " +
-                "values ($1, $2, 1, 1, $3, 1, $4, 1, true, true, 1)",
-            [mmsi, Date.now(), speed, navStatus]
-        );
-    });
+  await db.tx(async (t) => {
+    await t.none(
+      "INSERT INTO public.vessel_location(mmsi,timestamp_ext,x,y,sog,cog,nav_stat,rot,pos_acc,raim,timestamp) " +
+        "values ($1, $2, 1, 1, $3, 1, $4, 1, true, true, 1)",
+      [mmsi, Date.now(), speed, navStatus],
+    );
+  });
 }
 
 export function mockSecrets<T>(secret: T): void {
-    jest.spyOn(RdsHolder.prototype, "setCredentials").mockResolvedValue();
-    jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue(secret);
+  jest.spyOn(RdsHolder.prototype, "setCredentials").mockResolvedValue();
+  jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue(secret);
 }

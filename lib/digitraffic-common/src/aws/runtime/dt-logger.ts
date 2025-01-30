@@ -11,18 +11,18 @@ export type LoggerMethodType = `${string}.${string}`;
  * @see {@link DtLogger}
  */
 export interface LoggerConfiguration {
-    /** Name of the lambda */
-    lambdaName?: string;
-    /** The file name where the logging occurs */
-    fileName?: string;
-    /** The lambda runtime environment */
-    runTime?: string;
-    /** Custom end point to write the logs to */
-    writeStream?: Writable;
+  /** Name of the lambda */
+  lambdaName?: string;
+  /** The file name where the logging occurs */
+  fileName?: string;
+  /** The lambda runtime environment */
+  runTime?: string;
+  /** Custom end point to write the logs to */
+  writeStream?: Writable;
 }
 
 interface LoggableTypeInternal extends LoggableType {
-    level: LOG_LEVEL;
+  level: LOG_LEVEL;
 }
 
 /**
@@ -30,21 +30,21 @@ interface LoggableTypeInternal extends LoggableType {
  * object.
  */
 export interface CustomParams {
-    /** do not log your apikey! */
-    customApikey?: never;
-    /** do not log your apikey! */
-    customApiKey?: never;
-    [key: `custom${Capitalize<string>}Count`]: number;
+  /** do not log your apikey! */
+  customApikey?: never;
+  /** do not log your apikey! */
+  customApiKey?: never;
+  [key: `custom${Capitalize<string>}Count`]: number;
 
-    [key: `custom${Capitalize<string>}`]:
-        | string
-        | number
-        | bigint
-        | boolean
-        | Date
-        // eslint-disable-next-line @rushstack/no-new-null
-        | null
-        | undefined;
+  [key: `custom${Capitalize<string>}`]:
+    | string
+    | number
+    | bigint
+    | boolean
+    | Date
+    // eslint-disable-next-line @rushstack/no-new-null
+    | null
+    | undefined;
 }
 
 /**
@@ -57,18 +57,18 @@ export interface CustomParams {
  * @see {@link CustomParams}
  */
 export interface LoggableType extends CustomParams {
-    /** Name of the method logging the message */
-    method: LoggerMethodType;
-    /** Message to log, optional */
-    message?: string;
-    /** Type of message, optional */
-    type?: string;
-    /** Stack trace, optional */
-    stack?: string | undefined;
-    /** Amount of time some operation took in milliseconds, optional */
-    tookMs?: number;
-    /** Pass error object, which will be stringified before logging */
-    error?: unknown;
+  /** Name of the method logging the message */
+  method: LoggerMethodType;
+  /** Message to log, optional */
+  message?: string;
+  /** Type of message, optional */
+  type?: string;
+  /** Stack trace, optional */
+  stack?: string | undefined;
+  /** Amount of time some operation took in milliseconds, optional */
+  tookMs?: number;
+  /** Pass error object, which will be stringified before logging */
+  error?: unknown;
 }
 
 /**
@@ -81,109 +81,112 @@ export interface LoggableType extends CustomParams {
  * * the actual message (as json or as string)
  */
 export class DtLogger {
-    readonly lambdaName?: string;
-    readonly runtime?: string;
+  readonly lambdaName?: string;
+  readonly runtime?: string;
 
-    readonly writeStream: Writable;
+  readonly writeStream: Writable;
 
-    /**
-     * Create a new Logger instance.
-     * @constructor
-     * @param {LoggerConfiguration?} [config] - Accepts configuration options @see {@link LoggerConfiguration}
-     */
-    constructor(config?: LoggerConfiguration) {
-        this.lambdaName =
-            config?.lambdaName ?? getEnvVariableOrElse("AWS_LAMBDA_FUNCTION_NAME", "unknown lambda name");
-        this.runtime = config?.runTime ?? getEnvVariableOrElse("AWS_EXECUTION_ENV", "unknown runtime");
-        this.writeStream = config?.writeStream ?? process.stdout;
-    }
+  /**
+   * Create a new Logger instance.
+   * @constructor
+   * @param {LoggerConfiguration?} [config] - Accepts configuration options @see {@link LoggerConfiguration}
+   */
+  constructor(config?: LoggerConfiguration) {
+    this.lambdaName = config?.lambdaName ??
+      getEnvVariableOrElse("AWS_LAMBDA_FUNCTION_NAME", "unknown lambda name");
+    this.runtime = config?.runTime ??
+      getEnvVariableOrElse("AWS_EXECUTION_ENV", "unknown runtime");
+    this.writeStream = config?.writeStream ?? process.stdout;
+  }
 
-    /**
-     * Log given message with level DEBUG.  This will not be forwarded to centralized logging system!.
-     *
-     * @param message anything
-     * @see {@link LoggableType}
-     * @see {@link DtLogger.log}
-     */
-    debug(message: unknown): void {
-        const logMessage = {
-            message,
-            level: "DEBUG",
-            lambdaName: this.lambdaName,
-            runtime: this.runtime,
-        };
+  /**
+   * Log given message with level DEBUG.  This will not be forwarded to centralized logging system!.
+   *
+   * @param message anything
+   * @see {@link LoggableType}
+   * @see {@link DtLogger.log}
+   */
+  debug(message: unknown): void {
+    const logMessage = {
+      message,
+      level: "DEBUG",
+      lambdaName: this.lambdaName,
+      runtime: this.runtime,
+    };
 
-        this.writeStream.write(JSON.stringify(logMessage) + "\n");
-    }
+    this.writeStream.write(JSON.stringify(logMessage) + "\n");
+  }
 
-    /**
-     * Log given message with level INFO
-     *
-     * @param message Json-object to log
-     * @see {@link LoggableType}
-     * @see {@link DtLogger.log}
-     */
-    info(message: LoggableType): void {
-        this.log({ ...message, level: "INFO" });
-    }
+  /**
+   * Log given message with level INFO
+   *
+   * @param message Json-object to log
+   * @see {@link LoggableType}
+   * @see {@link DtLogger.log}
+   */
+  info(message: LoggableType): void {
+    this.log({ ...message, level: "INFO" });
+  }
 
-    /**
-     * Log given message with level WARN
-     *
-     * @param message Json-object to log
-     * @see {@link LoggableType}
-     * @see {@link DtLogger.log}
-     */
-    warn(message: LoggableType): void {
-        this.log({ ...message, level: "WARN" });
-    }
-    /**
-     * Log given message with level INFO
-     *
-     * @param message Json-object to log
-     * @see {@link LoggableType}
-     * @see {@link DtLogger.log}
-     */
-    error(message: LoggableType): void {
-        this.log({
-            ...message,
-            level: "ERROR",
-        });
-    }
+  /**
+   * Log given message with level WARN
+   *
+   * @param message Json-object to log
+   * @see {@link LoggableType}
+   * @see {@link DtLogger.log}
+   */
+  warn(message: LoggableType): void {
+    this.log({ ...message, level: "WARN" });
+  }
+  /**
+   * Log given message with level INFO
+   *
+   * @param message Json-object to log
+   * @see {@link LoggableType}
+   * @see {@link DtLogger.log}
+   */
+  error(message: LoggableType): void {
+    this.log({
+      ...message,
+      level: "ERROR",
+    });
+  }
 
-    /**
-     * Log message with given log level.
-     *
-     * Some metadata is also added to the message:
-     * * runtime     - can be configured with constructor or inferred from environment
-     * * lambdaName  - can be configured with constructor or inferred from environment
-     *
-     * @param message Json-object to log
-     * @see {@link LoggableType}
-     */
-    private log(message: LoggableTypeInternal): void {
-        const error = message.error
-            ? typeof message.error === "string"
-                ? message.error
-                : JSON.stringify(message.error)
-            : undefined;
+  /**
+   * Log message with given log level.
+   *
+   * Some metadata is also added to the message:
+   * * runtime     - can be configured with constructor or inferred from environment
+   * * lambdaName  - can be configured with constructor or inferred from environment
+   *
+   * @param message Json-object to log
+   * @see {@link LoggableType}
+   */
+  private log(message: LoggableTypeInternal): void {
+    const error = message.error
+      ? typeof message.error === "string"
+        ? message.error
+        : JSON.stringify(message.error)
+      : undefined;
 
-        const logMessage = {
-            ...removePrefix("custom", message),
-            error,
-            lambdaName: this.lambdaName,
-            runtime: this.runtime,
-        };
+    const logMessage = {
+      ...removePrefix("custom", message),
+      error,
+      lambdaName: this.lambdaName,
+      runtime: this.runtime,
+    };
 
-        this.writeStream.write(JSON.stringify(logMessage) + "\n");
-    }
+    this.writeStream.write(JSON.stringify(logMessage) + "\n");
+  }
 }
 
 /**
  * Removes given prefixes from the keys of the object.
  */
 function removePrefix(prefix: string, loggable: LoggableType): LoggableType {
-    return mapKeys(loggable, (_index, key: string) =>
-        key.startsWith(prefix) ? lowerFirst(key.replace(prefix, "")) : key,
-    ) as unknown as LoggableType;
+  return mapKeys(
+    loggable,
+    (_index, key: string) =>
+      key.startsWith(prefix) ? lowerFirst(key.replace(prefix, "")) : key,
+  ) as unknown as LoggableType;
 }

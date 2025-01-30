@@ -16,7 +16,7 @@ export const MYSQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
  * @param end
  */
 export function countDiffMs(start: Date, end: Date): number {
-    return end.getTime() - start.getTime();
+  return end.getTime() - start.getTime();
 }
 
 /**
@@ -25,7 +25,7 @@ export function countDiffMs(start: Date, end: Date): number {
  * @param end
  */
 export function countDiffInSeconds(start: Date, end: Date): number {
-    return countDiffMs(start, end) / 1000;
+  return countDiffMs(start, end) / 1000;
 }
 
 /**
@@ -33,20 +33,22 @@ export function countDiffInSeconds(start: Date, end: Date): number {
  * @param isoString to convert
  */
 export function dateFromIsoString(isoString: string): Date {
-    const parsed = new Date(isoString);
-    if (!isValidDate(parsed)) {
-        throw new Error(`Could not parse iso date-time string: "${isoString}" to date`);
-    }
-    return parsed;
+  const parsed = new Date(isoString);
+  if (!isValidDate(parsed)) {
+    throw new Error(
+      `Could not parse iso date-time string: "${isoString}" to date`,
+    );
+  }
+  return parsed;
 }
 
 function isValidDate(d: unknown): d is Date {
-    return d instanceof Date && !isNaN(d.getTime());
+  return d instanceof Date && !isNaN(d.getTime());
 }
 
 /**
  * Formats a date in UTC in the given format, regardless of system time zone
  */
 export function dateToUTCString(date: Date, formatString: string): string {
-    return format(new TZDate(date, UTC), formatString);
+  return format(new TZDate(date, UTC), formatString);
 }

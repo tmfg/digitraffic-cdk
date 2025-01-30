@@ -1,78 +1,82 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export interface CommandResponse {
-    readonly Communication: {
-        readonly Command: ResponseCommand[];
-    };
+  readonly Communication: {
+    readonly Command: ResponseCommand[];
+  };
 }
 
 interface ResponseCommand {
-    readonly Name: string[];
-    readonly Result: string[];
-    readonly ErrorCode: string[];
-    readonly OutputParams: {
-        Param: ResponseParam[];
-    }[];
-    readonly Items: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
-    readonly Thumbnail?: string[];
+  readonly Name: string[];
+  readonly Result: string[];
+  readonly ErrorCode: string[];
+  readonly OutputParams: {
+    Param: ResponseParam[];
+  }[];
+  readonly Items: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+  readonly Thumbnail?: string[];
 }
 
 interface ResponseParam {
-    $: {
-        Name: string;
-        Value: string;
-    };
+  $: {
+    Name: string;
+    Value: string;
+  };
 }
 
 export type InputParameter =
-    | "Username"
-    | "Password"
-    | "CameraId"
-    | "DestWidth"
-    | "DestHeight"
-    | "ComprLevel"
-    | "Time"
-    | "SignalType"
-    | "MethodType"
-    | "Fps"
-    | "KeyFramesOnly"
-    | "RequestSize"
-    | "StreamType"
-    | "ResizeAvailable"
-    | "Blocking"
-    | "VideoId"
-    | "Speed";
+  | "Username"
+  | "Password"
+  | "CameraId"
+  | "DestWidth"
+  | "DestHeight"
+  | "ComprLevel"
+  | "Time"
+  | "SignalType"
+  | "MethodType"
+  | "Fps"
+  | "KeyFramesOnly"
+  | "RequestSize"
+  | "StreamType"
+  | "ResizeAvailable"
+  | "Blocking"
+  | "VideoId"
+  | "Speed";
 
 export abstract class Command<T> {
-    readonly name: string;
-    readonly inputParameters: Record<string, string>;
+  readonly name: string;
+  readonly inputParameters: Record<string, string>;
 
-    protected constructor(name: string) {
-        this.inputParameters = {};
-        this.name = name;
+  protected constructor(name: string) {
+    this.inputParameters = {};
+    this.name = name;
+  }
+
+  public addInputParameters(name: InputParameter, value: string): this {
+    this.inputParameters[name] = value;
+
+    return this;
+  }
+
+  public createInputParameters(): string {
+    let inputs = "";
+
+    for (const [key, value] of Object.entries(this.inputParameters)) {
+      inputs += `<Param Name="${key}" Value="${value}"/>`;
     }
 
-    public addInputParameters(name: InputParameter, value: string): this {
-        this.inputParameters[name] = value;
+    return `<InputParams>${inputs}</InputParams>`;
+  }
 
-        return this;
-    }
+  public createXml(
+    sequenceId: number,
+    connectionId: string | undefined,
+  ): string {
+    const connection = connectionId === undefined
+      ? "<ConnectionId/>"
+      : `<ConnectionId>${connectionId}</ConnectionId>`;
 
-    public createInputParameters(): string {
-        let inputs = "";
-
-        for (const [key, value] of Object.entries(this.inputParameters)) {
-            inputs += `<Param Name="${key}" Value="${value}"/>`;
-        }
-
-        return `<InputParams>${inputs}</InputParams>`;
-    }
-
-    public createXml(sequenceId: number, connectionId: string | undefined): string {
-        const connection =
-            connectionId === undefined ? "<ConnectionId/>" : `<ConnectionId>${connectionId}</ConnectionId>`;
-
-        return `<?xml version="1.0" encoding="utf-8"?>
+    return `<?xml version="1.0" encoding="utf-8"?>
 <Communication xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         ${connection}
         <Command SequenceId="${sequenceId}">
@@ -83,115 +87,116 @@ export abstract class Command<T> {
         </Command>
 </Communication>
 `;
+  }
+
+  public abstract getResult(result: CommandResponse): T;
+
+  public checkError(result: CommandResponse): void {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const resultCommand = result.Communication.Command[0]!;
+    const commandResult = resultCommand.Result[0];
+    const commandName = resultCommand.Name[0];
+
+    if (commandResult === "Error") {
+      logger.error({
+        method: "Command.checkError",
+        message: "Command failed",
+        customCommand: commandName,
+        customDetails: JSON.stringify(result),
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const errorCode = resultCommand.ErrorCode[0]!;
+
+      throw new Error("Command Failed with error code " + errorCode);
     }
-
-    public abstract getResult(result: CommandResponse): T;
-
-    public checkError(result: CommandResponse): void {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const resultCommand = result.Communication.Command[0]!;
-        const commandResult = resultCommand.Result[0];
-        const commandName = resultCommand.Name[0];
-
-        if (commandResult === "Error") {
-            logger.error({
-                method: "Command.checkError",
-                message: "Command failed",
-                customCommand: commandName,
-                customDetails: JSON.stringify(result)
-            });
-
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const errorCode = resultCommand.ErrorCode[0]!;
-
-            throw new Error("Command Failed with error code " + errorCode);
-        }
-    }
+  }
 }
 
 class DefaultCommand extends Command<void> {
-    public getResult(_result: CommandResponse): void {
-        // do nothing
-    }
+  public getResult(_result: CommandResponse): void {
+    // do nothing
+  }
 }
 
 export class ConnectCommand extends Command<string> {
-    constructor() {
-        super("Connect");
-    }
+  constructor() {
+    super("Connect");
+  }
 
-    public getResult(response: CommandResponse): string {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return response.Communication.Command[0]!.OutputParams[0]!.Param[0]!.$.Value;
-    }
+  public getResult(response: CommandResponse): string {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return response.Communication.Command[0]!.OutputParams[0]!.Param[0]!.$
+      .Value;
+  }
 }
 
 export class LoginCommand extends DefaultCommand {
-    constructor() {
-        super("Login");
-    }
+  constructor() {
+    super("Login");
+  }
 }
 
 function getFirstFromNullable<T>(array?: T[]): T {
-    if (!array) {
-        throw Error("array not set!");
-    }
+  if (!array) {
+    throw Error("array not set!");
+  }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return array[0]!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return array[0]!;
 }
 
 export class GetThumbnailCommand extends Command<string> {
-    constructor() {
-        super("GetThumbnail");
-    }
+  constructor() {
+    super("GetThumbnail");
+  }
 
-    public getResult(response: CommandResponse): string {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return getFirstFromNullable(response.Communication.Command[0]!.Thumbnail);
-    }
+  public getResult(response: CommandResponse): string {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return getFirstFromNullable(response.Communication.Command[0]!.Thumbnail);
+  }
 }
 
 export class GetThumbnailByTimeCommand extends Command<string> {
-    constructor() {
-        super("GetThumbnailByTime");
-    }
+  constructor() {
+    super("GetThumbnailByTime");
+  }
 
-    public getResult(response: CommandResponse): string {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return getFirstFromNullable(response.Communication.Command[0]!.Thumbnail);
-    }
+  public getResult(response: CommandResponse): string {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return getFirstFromNullable(response.Communication.Command[0]!.Thumbnail);
+  }
 }
 
 export class RequestStreamCommand extends Command<string> {
-    constructor() {
-        super("RequestStream");
-    }
+  constructor() {
+    super("RequestStream");
+  }
 
-    public getResult(response: CommandResponse): string {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const output = response.Communication.Command[0]!.OutputParams[0]!.Param;
+  public getResult(response: CommandResponse): string {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const output = response.Communication.Command[0]!.OutputParams[0]!.Param;
 
-        const videoId = output.find((o) => o.$.Name === "VideoId");
+    const videoId = output.find((o) => o.$.Name === "VideoId");
 
-        return videoId?.$.Value ?? "";
-    }
+    return videoId?.$.Value ?? "";
+  }
 }
 
 export class ChangeStreamCommand extends DefaultCommand {
-    constructor() {
-        super("ChangeStream");
-    }
+  constructor() {
+    super("ChangeStream");
+  }
 }
 
 export class CloseStreamCommand extends DefaultCommand {
-    constructor() {
-        super("CloseStream");
-    }
+  constructor() {
+    super("CloseStream");
+  }
 }
 
 export class LogoutCommand extends DefaultCommand {
-    constructor() {
-        super("Disconnect");
-    }
+  constructor() {
+    super("Disconnect");
+  }
 }

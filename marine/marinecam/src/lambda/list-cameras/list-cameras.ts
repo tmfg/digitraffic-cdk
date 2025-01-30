@@ -8,25 +8,27 @@ const rdsHolder = RdsHolder.create();
 const GROUP_SEPARATOR = ",";
 
 export const handler: (event: Record<string, string>) => Promise<Camera[]> = (
-    event: Record<string, string>
+  event: Record<string, string>,
 ) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
-    const usersGroups = getUserGroups(event["groups"]!);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
+  const usersGroups = getUserGroups(event["groups"]!);
 
-    if (usersGroups.length === 0) {
-        return Promise.resolve([] as Camera[]);
-    }
+  if (usersGroups.length === 0) {
+    return Promise.resolve([] as Camera[]);
+  }
 
-    return rdsHolder.setCredentials().then(() => MetadataService.listAllCameras(usersGroups));
+  return rdsHolder.setCredentials().then(() =>
+    MetadataService.listAllCameras(usersGroups)
+  );
 };
 
 // eventGroups is in form [group1, group2...]
 function getUserGroups(eventGroups: string): string[] {
-    if (!eventGroups) {
-        return [];
-    }
+  if (!eventGroups) {
+    return [];
+  }
 
-    const withoutBraces = eventGroups.substring(1, eventGroups.length - 1);
+  const withoutBraces = eventGroups.substring(1, eventGroups.length - 1);
 
-    return withoutBraces.split(GROUP_SEPARATOR).map((s) => s.trim());
+  return withoutBraces.split(GROUP_SEPARATOR).map((s) => s.trim());
 }

@@ -3,13 +3,13 @@ import * as addFormatsOrig from "ajv-formats";
 import { ramiMessageJsonSchema } from "../model/json-schema/rami-message.js";
 
 interface AjvType {
-    // eslint-disable-next-line @typescript-eslint/no-misused-new
-    new (options?: { allErrors: boolean }): AjvType;
+  // eslint-disable-next-line @typescript-eslint/no-misused-new
+  new (options?: { allErrors: boolean }): AjvType;
 
-    addFormat(name: string, format?: string | RegExp): void;
-    addKeyword(name: string, definition?: unknown): void;
-    validate(schema: unknown, data: unknown): boolean;
-    errorsText(): string;
+  addFormat(name: string, format?: string | RegExp): void;
+  addKeyword(name: string, definition?: unknown): void;
+  validate(schema: unknown, data: unknown): boolean;
+  errorsText(): string;
 }
 const Ajv: AjvType = AjvOrig.default as unknown as AjvType;
 
@@ -19,29 +19,31 @@ const addFormats: addFormats = addFormatsOrig.default as unknown as addFormats;
 
 // we can assume id exists if message passes validation
 interface ValidatedRamiMessage {
-    payload: {
-        messageId: string;
-    };
+  payload: {
+    messageId: string;
+  };
 }
 
 interface Invalid {
-    valid: false;
-    errors: string;
+  valid: false;
+  errors: string;
 }
 interface Valid<T> {
-    valid: true;
-    value: T;
+  valid: true;
+  value: T;
 }
 type ValidationResult<T> = Valid<T> | Invalid;
 
-export function validateIncomingRamiMessage(message: unknown): ValidationResult<ValidatedRamiMessage> {
-    const ajv = new Ajv({ allErrors: true });
-    addFormats(ajv);
-    // allow custom field "example" used in the schema
-    ajv.addKeyword("example");
-    // allow custom format "HH:MM" used in the schema
-    ajv.addFormat("HH:MM", /^\d{2}:\d{2}$/);
-    return ajv.validate(ramiMessageJsonSchema, message)
-        ? { valid: true, value: message as ValidatedRamiMessage }
-        : { valid: false, errors: ajv.errorsText() };
+export function validateIncomingRamiMessage(
+  message: unknown,
+): ValidationResult<ValidatedRamiMessage> {
+  const ajv = new Ajv({ allErrors: true });
+  addFormats(ajv);
+  // allow custom field "example" used in the schema
+  ajv.addKeyword("example");
+  // allow custom format "HH:MM" used in the schema
+  ajv.addFormat("HH:MM", /^\d{2}:\d{2}$/);
+  return ajv.validate(ramiMessageJsonSchema, message)
+    ? { valid: true, value: message as ValidatedRamiMessage }
+    : { valid: false, errors: ajv.errorsText() };
 }

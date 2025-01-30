@@ -27,46 +27,51 @@ const fakeSchedules = `
 `.trim();
 
 describe("api-schedules", () => {
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
-    test("getSchedulesTimestamps - in VTS control", async () => {
-        const api = new SchedulesApi(`http:/something/schedules`);
-        jest.spyOn(ky, "get").mockImplementation(() => mockKyResponse(200, fakeSchedules));
-        const resp = await api.getSchedulesTimestamps(SchedulesDirection.EAST, false);
-        verifyXmlResponse(resp);
-    });
+  test("getSchedulesTimestamps - in VTS control", async () => {
+    const api = new SchedulesApi(`http:/something/schedules`);
+    jest.spyOn(ky, "get").mockImplementation(() =>
+      mockKyResponse(200, fakeSchedules)
+    );
+    const resp = await api.getSchedulesTimestamps(
+      SchedulesDirection.EAST,
+      false,
+    );
+    verifyXmlResponse(resp);
+  });
 });
 
 function verifyXmlResponse(resp: SchedulesResponse): void {
-    const s = resp.schedules.schedule[0];
-    assertDefined(s);
-    expect(s.$.UUID).toBe(uuid);
+  const s = resp.schedules.schedule[0];
+  assertDefined(s);
+  expect(s.$.UUID).toBe(uuid);
 
-    expect(s.timetable.length).toBe(1);
-    const tt = s.timetable[0];
-    assertDefined(tt);
+  expect(s.timetable.length).toBe(1);
+  const tt = s.timetable[0];
+  assertDefined(tt);
 
-    expect(tt.eta?.length).toBe(1);
+  expect(tt.eta?.length).toBe(1);
 
-    if (tt.eta === undefined) {
-        fail("missing eta!");
-    }
+  if (tt.eta === undefined) {
+    fail("missing eta!");
+  }
 
-    const eta = tt.eta[0];
-    assertDefined(eta);
-    expect(eta.$.time).toBe(etaEventTime);
-    expect(eta.$.uts).toBe(etaTimestamp);
+  const eta = tt.eta[0];
+  assertDefined(eta);
+  expect(eta.$.time).toBe(etaEventTime);
+  expect(eta.$.uts).toBe(etaTimestamp);
 
-    expect(tt.destination?.length).toBe(1);
-    const dest = tt.destination?.[0];
-    expect(dest?.$.locode).toBe(locode);
+  expect(tt.destination?.length).toBe(1);
+  const dest = tt.destination?.[0];
+  expect(dest?.$.locode).toBe(locode);
 
-    const v = s.vessel[0];
-    assertDefined(v);
-    expect(v.$.vesselName).toBe(vesselName);
-    expect(v.$.callsign).toBe(callsign);
-    expect(v.$.mmsi).toBe(mmsi);
-    expect(v.$.imo).toBe(imo);
+  const v = s.vessel[0];
+  assertDefined(v);
+  expect(v.$.vesselName).toBe(vesselName);
+  expect(v.$.callsign).toBe(callsign);
+  expect(v.$.mmsi).toBe(mmsi);
+  expect(v.$.imo).toBe(imo);
 }

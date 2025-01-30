@@ -4,5 +4,7 @@ import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-hold
 const rdsHolder = RdsHolder.create();
 
 export function handler(): Promise<void> {
-    return rdsHolder.setCredentials().then(() => TimestampsService.deleteOldTimestampsAndPilotages());
+  return rdsHolder.setCredentials().then(() =>
+    TimestampsService.deleteOldTimestampsAndPilotages()
+  );
 }

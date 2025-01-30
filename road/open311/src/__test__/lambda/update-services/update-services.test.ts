@@ -12,36 +12,43 @@ process.env["ENDPOINT_PASS"] = "some_pass";
 // eslint-disable-next-line dot-notation
 process.env["ENDPOINT_URL"] = `http://localhost:${SERVER_PORT}`;
 
-const lambda = await import("../../../lambda/update-services/lambda-update-services.js");
+const lambda = await import(
+  "../../../lambda/update-services/lambda-update-services.js"
+);
 
 describe(
-    "update-services",
-    dbTestBase((db) => {
-        test("update", async () => {
-            jest.spyOn(axios, "get").mockImplementation(
-                (_url: string, _config?: AxiosRequestConfig<unknown>): Promise<unknown> => {
-                    if (_url.match("/services.xml")) {
-                        return Promise.resolve({
-                            status: 200,
-                            data: fakeServices()
-                        });
-                    }
-                    return Promise.resolve({
-                        status: 404
-                    });
-                }
-            );
+  "update-services",
+  dbTestBase((db) => {
+    test("update", async () => {
+      jest.spyOn(axios, "get").mockImplementation(
+        (
+          _url: string,
+          _config?: AxiosRequestConfig<unknown>,
+        ): Promise<unknown> => {
+          if (_url.match("/services.xml")) {
+            return Promise.resolve({
+              status: 200,
+              data: fakeServices(),
+            });
+          }
+          return Promise.resolve({
+            status: 404,
+          });
+        },
+      );
 
-            await lambda.handler();
-            expect(
-                (await ServicesDb.findAllServiceCodes(db)).map((s) => Number(s.service_code))
-            ).toMatchObject([171, 198, 199]);
-        });
-    })
+      await lambda.handler();
+      expect(
+        (await ServicesDb.findAllServiceCodes(db)).map((s) =>
+          Number(s.service_code)
+        ),
+      ).toMatchObject([171, 198, 199]);
+    });
+  }),
 );
 
 function fakeServices(): string {
-    return `
+  return `
 <?xml version="1.0" encoding="UTF-8" ?>
 <services>
     <service>

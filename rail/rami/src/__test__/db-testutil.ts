@@ -6,31 +6,31 @@ export type DbUnitTestFunction = (db: Connection) => void;
 type JestEmptyFunction = () => void;
 
 export enum DatabaseEnvironmentKeys {
-    DB_USER = "DB_USER",
-    DB_PASS = "DB_PASS",
-    DB_URI = "DB_URI",
-    DB_RO_URI = "DB_RO_URI",
-    DB_APPLICATION = "DB_APPLICATION"
+  DB_USER = "DB_USER",
+  DB_PASS = "DB_PASS",
+  DB_URI = "DB_URI",
+  DB_RO_URI = "DB_RO_URI",
+  DB_APPLICATION = "DB_APPLICATION",
 }
 
 async function truncate(db: Connection): Promise<void> {
-    await db.execute("DELETE FROM rami_message");
+  await db.execute("DELETE FROM rami_message");
 }
 
 export function dbTestBase(fn: JestEmptyFunction): JestEmptyFunction {
-    return () => {
-        beforeAll(async () => {
-            await mysql.inTransaction(truncate);
-        });
+  return () => {
+    beforeAll(async () => {
+      await mysql.inTransaction(truncate);
+    });
 
-        afterAll(async () => {
-            await mysql.inTransaction(truncate);
-        });
+    afterAll(async () => {
+      await mysql.inTransaction(truncate);
+    });
 
-        beforeEach(async () => {
-            await mysql.inTransaction(truncate);
-        });
+    beforeEach(async () => {
+      await mysql.inTransaction(truncate);
+    });
 
-        fn();
-    };
+    fn();
+  };
 }

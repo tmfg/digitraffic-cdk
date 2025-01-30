@@ -2,21 +2,21 @@ import { default as pgPromise } from "pg-promise";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export interface DbAreaTraffic {
-    readonly id: number;
-    readonly name: string;
-    readonly brighten_duration_min: number;
-    readonly brighten_sent?: Date;
-    readonly brighten_end?: Date;
+  readonly id: number;
+  readonly name: string;
+  readonly brighten_duration_min: number;
+  readonly brighten_sent?: Date;
+  readonly brighten_end?: Date;
 }
 
 export interface DbAreaTrafficResult extends DbAreaTraffic {
-    readonly ship_mmsi: number;
-    readonly ship_name: string;
+  readonly ship_mmsi: number;
+  readonly ship_name: string;
 }
 
 export enum ShipTypes {
-    FISHING = 30,
-    CARGO = 70
+  FISHING = 30,
+  CARGO = 70,
 }
 
 const SHIP_MOVING_INTERVAL = "2 MINUTE";
@@ -49,19 +49,22 @@ const SQL_UPDATE_AREA_TRAFFIC_SENDTIME = `
 `.trim();
 
 const PS_GET_AREA_TRAFFIC = new pgPromise.PreparedStatement({
-    name: "get-area-traffic",
-    text: SQL_GET_AREA_TRAFFIC
+  name: "get-area-traffic",
+  text: SQL_GET_AREA_TRAFFIC,
 });
 
 const PS_UPDATE_AREA_TRAFFIC_SENDTIME = new pgPromise.PreparedStatement({
-    name: "update-area-traffic-sendtime",
-    text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME
+  name: "update-area-traffic-sendtime",
+  text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME,
 });
 
 export function getAreaTraffic(db: DTDatabase): Promise<DbAreaTrafficResult[]> {
-    return db.manyOrNone(PS_GET_AREA_TRAFFIC);
+  return db.manyOrNone(PS_GET_AREA_TRAFFIC);
 }
 
-export async function updateAreaTrafficSendTime(db: DTDatabase, areaId: number): Promise<void> {
-    await db.none(PS_UPDATE_AREA_TRAFFIC_SENDTIME, [areaId]);
+export async function updateAreaTrafficSendTime(
+  db: DTDatabase,
+  areaId: number,
+): Promise<void> {
+  await db.none(PS_UPDATE_AREA_TRAFFIC_SENDTIME, [areaId]);
 }

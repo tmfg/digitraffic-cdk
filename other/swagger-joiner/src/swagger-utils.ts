@@ -1,14 +1,31 @@
-import { type OpenApiOperation, openapiOperation, type OpenApiSchema } from "./model/openapi-schema.js";
+import {
+  type OpenApiOperation,
+  openapiOperation,
+  type OpenApiSchema,
+} from "./model/openapi-schema.js";
 import _ from "lodash";
-import { logger, type LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import {
+  logger,
+  type LoggerMethodType,
+} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-const HttpMethods = ["get", "head", "post", "put", "delete", "connect", "options", "trace", "patch"] as const;
+const HttpMethods = [
+  "get",
+  "head",
+  "post",
+  "put",
+  "delete",
+  "connect",
+  "options",
+  "trace",
+  "patch",
+] as const;
 export type HttpMethod = (typeof HttpMethods)[number];
 
 const SERVICE = "swagger-utils" as const;
 
 export function constructSwagger(spec: object): string {
-    return `
+  return `
         function showNotSupportedContent() {
             document.querySelector('html').innerHTML = '<div>Query parameters not supported</div>';
         }
@@ -49,56 +66,62 @@ export function constructSwagger(spec: object): string {
 }
 
 export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
-    return allApis.reduce((acc, curr) => _.merge(acc, curr));
+  return allApis.reduce((acc, curr) => _.merge(acc, curr));
 }
 
 function methodIsDeprecated(operation: OpenApiOperation): boolean {
-    const deprecationTextMatcher = /(W|w)ill be removed/;
-    const summaryMatch = operation.summary && deprecationTextMatcher.test(operation.summary);
+  const deprecationTextMatcher = /(W|w)ill be removed/;
+  const summaryMatch = operation.summary &&
+    deprecationTextMatcher.test(operation.summary);
 
-    // I think this witchcraft probably tries to look into operation.response.headers.
-    const headerMatcher = /(headers.*deprecation.*sunset|headers.*sunset.*deprecation)/i;
-    const headerMatch = headerMatcher.test(JSON.stringify(operation));
+  // I think this witchcraft probably tries to look into operation.response.headers.
+  const headerMatcher =
+    /(headers.*deprecation.*sunset|headers.*sunset.*deprecation)/i;
+  const headerMatch = headerMatcher.test(JSON.stringify(operation));
 
-    return summaryMatch || headerMatch;
+  return summaryMatch || headerMatch;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isOperation(value: any): value is OpenApiOperation {
-    // Since all fields are optional, and more can be added, this doesn't discriminate very much.
-    // Just check that types of any defined fields in OpenApiOperation type are correct.
-    const parsed = openapiOperation.safeParse(value);
-    return parsed.success;
+  // Since all fields are optional, and more can be added, this doesn't discriminate very much.
+  // Just check that types of any defined fields in OpenApiOperation type are correct.
+  const parsed = openapiOperation.safeParse(value);
+  return parsed.success;
 }
 
-export function withDeprecations(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
-    const result = _.cloneDeep(paths);
+export function withDeprecations(
+  paths: OpenApiSchema["paths"],
+): OpenApiSchema["paths"] {
+  const result = _.cloneDeep(paths);
 
-    Object.values(result).forEach((pathItem) => {
-        Object.values(pathItem)
-            .filter(isOperation)
-            .forEach((operation) => {
-                if (methodIsDeprecated(operation)) {
-                    operation.deprecated = true;
-                }
-            });
-    });
+  Object.values(result).forEach((pathItem) => {
+    Object.values(pathItem)
+      .filter(isOperation)
+      .forEach((operation) => {
+        if (methodIsDeprecated(operation)) {
+          operation.deprecated = true;
+        }
+      });
+  });
 
-    return result;
+  return result;
 }
 
-export function withoutSecurity(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
-    const result = _.cloneDeep(paths);
+export function withoutSecurity(
+  paths: OpenApiSchema["paths"],
+): OpenApiSchema["paths"] {
+  const result = _.cloneDeep(paths);
 
-    Object.values(result).forEach((pathItem) => {
-        Object.values(pathItem)
-            .filter(isOperation)
-            .forEach((operation) => {
-                delete operation.security;
-            });
-    });
+  Object.values(result).forEach((pathItem) => {
+    Object.values(pathItem)
+      .filter(isOperation)
+      .forEach((operation) => {
+        delete operation.security;
+      });
+  });
 
-    return result;
+  return result;
 }
 
 /**
@@ -107,53 +130,61 @@ export function withoutSecurity(paths: OpenApiSchema["paths"]): OpenApiSchema["p
  * @param keyTest test to perform
  */
 export function withoutMethods(
-    paths: OpenApiSchema["paths"],
-    keyTest: (key: string) => boolean
+  paths: OpenApiSchema["paths"],
+  keyTest: (key: string) => boolean,
 ): OpenApiSchema["paths"] {
-    const result = _.cloneDeep(paths);
+  const result = _.cloneDeep(paths);
 
-    Object.values(result).forEach((pathItem) => {
-        Object.keys(pathItem).forEach((key) => {
-            if (keyTest(key)) {
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access --
+  Object.values(result).forEach((pathItem) => {
+    Object.keys(pathItem).forEach((key) => {
+      if (keyTest(key)) {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access --
                  * Must cast to any to allow indexing object by string.
                  **/
-                delete (pathItem as any)[key];
-            }
-        });
+        delete (pathItem as any)[key];
+      }
     });
+  });
 
-    return result;
+  return result;
 }
 
 /**
  * Removes api paths that doesn't have any http methods defined
  * @param paths Open Api paths to check
  */
-export function withoutApisWithoutHttpMethods(paths: OpenApiSchema["paths"]): OpenApiSchema["paths"] {
-    const result = _.cloneDeep(paths);
-    const method = `${SERVICE}."withoutApisWithoutHttpMethods` as const satisfies LoggerMethodType;
-    try {
-        return _.chain(result)
-            .toPairs()
-            .filter(([path, pathItem]) => {
-                const pathItemKeys = Object.keys(pathItem);
-                // Check that pathItemKeys contains at least one http method, otherwise delete path
-                const containsHttpMethod = pathItemKeys.some((m) => HttpMethods.includes(m as HttpMethod));
-                logger.info({
-                    method,
-                    message: `path: ${path}, pathItemKeys: ${pathItemKeys.join(",")}, containsHttpMethod: ${containsHttpMethod}`
-                });
-                return containsHttpMethod;
-            })
-            .fromPairs()
-            .value();
-    } catch (error) {
-        logger.error({
-            method,
-            message: "Failed to remove apis without any http methods. Fallback to current value.",
-            error
+export function withoutApisWithoutHttpMethods(
+  paths: OpenApiSchema["paths"],
+): OpenApiSchema["paths"] {
+  const result = _.cloneDeep(paths);
+  const method =
+    `${SERVICE}."withoutApisWithoutHttpMethods` as const satisfies LoggerMethodType;
+  try {
+    return _.chain(result)
+      .toPairs()
+      .filter(([path, pathItem]) => {
+        const pathItemKeys = Object.keys(pathItem);
+        // Check that pathItemKeys contains at least one http method, otherwise delete path
+        const containsHttpMethod = pathItemKeys.some((m) =>
+          HttpMethods.includes(m as HttpMethod)
+        );
+        logger.info({
+          method,
+          message: `path: ${path}, pathItemKeys: ${
+            pathItemKeys.join(",")
+          }, containsHttpMethod: ${containsHttpMethod}`,
         });
-    }
-    return result;
+        return containsHttpMethod;
+      })
+      .fromPairs()
+      .value();
+  } catch (error) {
+    logger.error({
+      method,
+      message:
+        "Failed to remove apis without any http methods. Fallback to current value.",
+      error,
+    });
+  }
+  return result;
 }

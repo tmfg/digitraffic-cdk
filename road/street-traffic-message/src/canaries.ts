@@ -7,21 +7,22 @@ import { Schedule } from "aws-cdk-lib/aws-events";
 import { Duration } from "aws-cdk-lib";
 
 export class Canaries {
-    constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if (stack.configuration.stackFeatures?.enableCanaries) {
-            const urlRole = new DigitrafficCanaryRole(stack, "stm-url");
-            const dbRole = new DigitrafficCanaryRole(stack, "stm-db").withDatabaseAccess();
+  constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
+    if (stack.configuration.stackFeatures?.enableCanaries) {
+      const urlRole = new DigitrafficCanaryRole(stack, "stm-url");
+      const dbRole = new DigitrafficCanaryRole(stack, "stm-db")
+        .withDatabaseAccess();
 
-            DatabaseCanary.createV2(stack, dbRole, "stm");
+      DatabaseCanary.createV2(stack, dbRole, "stm");
 
-            UrlCanary.create(stack, urlRole, publicApi, {
-                name: "stm-public",
-                schedule: Schedule.rate(Duration.minutes(30)),
-                alarm: {
-                    alarmName: "STM-PublicAPI-Alarm",
-                    topicArn: stack.configuration.alarmTopicArn
-                }
-            });
-        }
+      UrlCanary.create(stack, urlRole, publicApi, {
+        name: "stm-public",
+        schedule: Schedule.rate(Duration.minutes(30)),
+        alarm: {
+          alarmName: "STM-PublicAPI-Alarm",
+          topicArn: stack.configuration.alarmTopicArn,
+        },
+      });
     }
+  }
 }

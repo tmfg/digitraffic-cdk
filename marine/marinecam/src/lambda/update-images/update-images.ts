@@ -12,27 +12,27 @@ const secretHolder = SecretHolder.create<MarinecamSecret>("mobile_server");
 const bucketName = getEnvVariable(MarinecamEnvKeys.BUCKET_NAME);
 
 export const handler: () => Promise<void> = () => {
-    return rdsHolder
-        .setCredentials()
-        .then(() => secretHolder.get())
-        .then((secret: MarinecamSecret) => {
-            logger.info({
-                method: "UpdateImages.handler",
-                message: "updating images from " + secret.url
-            });
+  return rdsHolder
+    .setCredentials()
+    .then(() => secretHolder.get())
+    .then((secret: MarinecamSecret) => {
+      logger.info({
+        method: "UpdateImages.handler",
+        message: "updating images from " + secret.url,
+      });
 
-            return ImageFetcher.updateAllCameras(
-                secret.url,
-                secret.username,
-                secret.password,
-                bucketName,
-                secret.certificate,
-                secret.ca
-            );
-        })
-        .catch((error: Error) => {
-            logException(logger, error);
+      return ImageFetcher.updateAllCameras(
+        secret.url,
+        secret.username,
+        secret.password,
+        bucketName,
+        secret.certificate,
+        secret.ca,
+      );
+    })
+    .catch((error: Error) => {
+      logException(logger, error);
 
-            return Promise.resolve();
-        });
+      return Promise.resolve();
+    });
 };
