@@ -1,7 +1,7 @@
 *
 
 !.gitignore
-
+!/.git-blame-ignore-revs
 !/.editorconfig
 !/.gitattributes
 !/.node-version
