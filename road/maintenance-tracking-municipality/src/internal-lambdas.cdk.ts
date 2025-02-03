@@ -10,13 +10,13 @@ export class InternalLambdasCdk {
       .createUpdateDataLambdaForAutori(
         stack,
         "autori-oulu",
-        5,
+        0,
       );
     const updateDataForAutoriKuopioLambda = InternalLambdasCdk
       .createUpdateDataLambdaForAutori(
         stack,
         "autori-kuopio",
-        5,
+        0,
       );
     const updateDataForPaikanninKuopioLambda = InternalLambdasCdk
       .createUpdateDataLambdaForPaikannin(
@@ -56,12 +56,14 @@ export class InternalLambdasCdk {
       },
     );
 
-    Scheduler.everyMinutes(
-      stack,
-      `MaintenanceTrackingMunicipalityDataUpdate-${domain}`,
-      runEveryMinutes,
-      lambdaFunction,
-    );
+    if (runEveryMinutes > 0) {
+      Scheduler.everyMinutes(
+        stack,
+        `MaintenanceTrackingMunicipalityDataUpdate-${domain}`,
+        runEveryMinutes,
+        lambdaFunction,
+      );
+    }
     return lambdaFunction;
   }
 
@@ -88,12 +90,14 @@ export class InternalLambdasCdk {
       },
     );
 
-    Scheduler.everyMinutes(
-      stack,
-      `MaintenanceTrackingMunicipalityDataUpdate-${domain}`,
-      runEveryMinutes,
-      lambdaFunction,
-    );
+    if (runEveryMinutes > 0) {
+      Scheduler.everyMinutes(
+        stack,
+        `MaintenanceTrackingMunicipalityDataUpdate-${domain}`,
+        runEveryMinutes,
+        lambdaFunction,
+      );
+    }
     return lambdaFunction;
   }
 }
