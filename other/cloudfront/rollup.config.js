@@ -7,8 +7,6 @@ import { globby } from "globby";
 
 const excludedFiles = [
   "lambda-creator",
-  "lambda-stream-to-elastic",
-  "logging-util",
 ];
 
 const inputs = (await globby([`src/lambda/**/*.ts`])).filter((input) => {
@@ -29,10 +27,7 @@ const excludeTerser = [
   "function-redirect",
   "function-index-html",
   "function-redirect-history",
-  "lambda-stream-to-elastic",
-  "logging-util",
 ];
-//const moduleJs = ["lambda-stream-to-elastic", "logging-util"]
 
 export default inputs.map((input) => {
   const isOutputEsm = false; // moduleJs.some((esm) => input.includes(esm))

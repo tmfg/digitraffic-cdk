@@ -126,17 +126,17 @@ export const handler = async (
 
   const keyFigureQueries = getKeyFigureOsQueries();
 
-  const kibanaResults = await getKibanaResults(
+  const osResults = await getOsResults(
     openSearchApi,
     keyFigureQueries,
     apiPaths,
   );
-  await persistToDatabase(kibanaResults);
+  await persistToDatabase(osResults);
 
   return Promise.resolve(true);
 };
 
-async function getKibanaResult(
+async function getOsResult(
   openSearchApi: OpenSearch,
   keyFigures: KeyFigure[],
   start: Date,
@@ -200,7 +200,7 @@ async function getKibanaResult(
     } else {
       logger.error({
         message: `Unknown type: ${keyFigure.type}`,
-        method: "collect-os-key-figures.getKibanaResult",
+        method: "collect-os-key-figures.getOsResult",
       });
     }
 
@@ -210,17 +210,17 @@ async function getKibanaResult(
   return output;
 }
 
-export async function getKibanaResults(
+export async function getOsResults(
   openSearchApi: OpenSearch,
   keyFigures: KeyFigure[],
   apiPaths: { transportType: TransportType; paths: Set<string> }[],
 ): Promise<KeyFigureResult[]> {
-  const kibanaResults = [];
+  const osResults = [];
 
   for (const apiPath of apiPaths) {
     logger.info({
       message: `Running: ${apiPath.transportType}`,
-      method: "collect-os-key-figures.getKibanaResults",
+      method: "collect-os-key-figures.getOsResults",
     });
     try {
       const osFilter = getAccountNameOsFilterFromTransportTypeName(
@@ -229,8 +229,8 @@ export async function getKibanaResults(
       if (!osFilter) {
         throw new Error("Could not parse OS search filter from transport type");
       }
-      kibanaResults.push(
-        getKibanaResult(openSearchApi, keyFigures, startDate, endDate, {
+      osResults.push(
+        getOsResult(openSearchApi, keyFigures, startDate, endDate, {
           osFilter: osFilter,
           dbFilter: `@transport_type:${apiPath.transportType}`,
         }),
@@ -239,7 +239,7 @@ export async function getKibanaResults(
       logger.error({
         message: "Error getting OS query results: " +
           (error instanceof Error && error.message),
-        method: "collect-os-key-figures.getKibanaResults",
+        method: "collect-os-key-figures.getOsResults",
       });
       throw error;
     }
@@ -249,10 +249,10 @@ export async function getKibanaResults(
     for (const path of apiPath.paths) {
       logger.info({
         message: `Running path: ${path}`,
-        method: "collect-os-key-figures.getKibanaResults",
+        method: "collect-os-key-figures.getOsResults",
       });
-      kibanaResults.push(
-        getKibanaResult(openSearchApi, keyFigures, startDate, endDate, {
+      osResults.push(
+        getOsResult(openSearchApi, keyFigures, startDate, endDate, {
           osFilter: `${
             getAccountNameOsFilterFromTransportTypeName(apiPath.transportType)
           } AND ${getUriFiltersFromPath(path).osFilter}` as OsFilter,
@@ -264,7 +264,7 @@ export async function getKibanaResults(
     }
   }
 
-  const results = await Promise.all(kibanaResults);
+  const results = await Promise.all(osResults);
   return results.flat();
 }
 
@@ -295,10 +295,10 @@ async function getRowAmountWithDateNameFilter(
 }
 
 async function insertFigures(
-  kibanaResults: KeyFigureResult[],
+  osResults: KeyFigureResult[],
   tableName: string,
 ) {
-  for (const result of kibanaResults) {
+  for (const result of osResults) {
     /**
          * Even though the actual filters used in the OS queries is by accountName.keyword:[name] and request:[uri],
            they are converted to @transport_type:[rail|road|marine|*] and @fields.request_uri:[uri] for the database entry.
@@ -320,16 +320,16 @@ async function insertFigures(
   }
 }
 
-async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
+async function persistToDatabase(osResults: KeyFigureResult[]) {
   const CREATE_KEY_FIGURES_TABLE =
     "CREATE TABLE ?? ( `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `from` DATE NOT NULL, `to` DATE NOT NULL, `name` VARCHAR(100) NOT NULL,`filter` VARCHAR(1000) NOT NULL, `query` VARCHAR(1000) NOT NULL, `value` JSON NOT NULL, PRIMARY KEY (`id`))";
   const CREATE_KEY_FIGURES_INDEX =
     "CREATE INDEX filter_name_date ON ?? (`filter`, `name`, `from`, `to`);";
 
-  const kibanaResult = kibanaResults[0];
+  const osResult = osResults[0];
 
-  if (!kibanaResult) {
-    throw new Error("No kibana results available");
+  if (!osResult) {
+    throw new Error("No OS results available");
   }
 
   try {
@@ -343,22 +343,22 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
     const startIsoDate = startDate.toISOString().substring(0, 10);
     const existingRows = await getRowAmountWithDateNameFilter(
       startIsoDate,
-      kibanaResult.name,
-      kibanaResult.filter.dbFilter,
+      osResult.name,
+      osResult.filter.dbFilter,
     );
 
     // save duplicate rows to a separate table if current set of results already exists in database
     if (existingRows > 0) {
       logger.info({
         message:
-          `Found existing result '${kibanaResult.name}' where 'from' is '${startIsoDate}' and filter is '${kibanaResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`,
+          `Found existing result '${osResult.name}' where 'from' is '${startIsoDate}' and filter is '${osResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`,
         method: "collect-os-key-figures.persistToDatabase",
       });
       await query("DROP TABLE IF EXISTS ??", [DUPLICATES_TABLE_NAME]);
       await query(CREATE_KEY_FIGURES_TABLE, [DUPLICATES_TABLE_NAME]);
-      await insertFigures(kibanaResults, DUPLICATES_TABLE_NAME);
+      await insertFigures(osResults, DUPLICATES_TABLE_NAME);
     } else {
-      await insertFigures(kibanaResults, KEY_FIGURES_TABLE_NAME);
+      await insertFigures(osResults, KEY_FIGURES_TABLE_NAME);
     }
   } catch (error) {
     logger.error({

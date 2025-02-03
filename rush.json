@@ -150,11 +150,6 @@
       "tags": ["cdk", "other"]
     },
     {
-      "packageName": "elasticsearch",
-      "projectFolder": "other/elasticsearch",
-      "tags": ["cdk", "other"]
-    },
-    {
       "packageName": "os-key-figures",
       "projectFolder": "other/os-key-figures",
       "decoupledLocalDependencies": ["@digitraffic/common"],
