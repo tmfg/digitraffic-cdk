@@ -1,0 +1,34 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { logException } from "@digitraffic/common/dist/utils/logging";
+import { updateVisits } from "../../service/visit-service.js";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { PortCallSecret } from "../../model/secret.js";
+
+const proxyHolder = ProxyHolder.create();
+const secretHolder = SecretHolder.create<PortCallSecret>("cs");
+
+export const handler = async (): Promise<void> => {
+    const start = Date.now();
+
+    try {
+        await proxyHolder.setCredentials();
+        const secret = await secretHolder.get();
+
+        const updated = await updateVisits(secret.url, secret.ca, secret.privateKey, secret.certificate);
+
+        logger.info({
+            method: "UpdateVisits.handler",
+            customUpdatedCount: updated.updated,
+            customInsertedCount: updated.inserted
+        });
+
+    } catch (error) {
+        logException(logger, error, true);
+    } finally {
+        logger.info({
+            method: "UpdateVisits.handler",
+            tookMs: Date.now() - start
+        });
+    }
+};
