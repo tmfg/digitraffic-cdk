@@ -31,6 +31,11 @@ Currently the following is monitored:
 - max heap usage
 - max network out
 
+## Build
+
+    rush update
+    rushx build
+
 ## Installation
 
 Cdk bootstrap needst to be done for both regions `eu-west-1` and `us-east-1`
@@ -44,7 +49,11 @@ npx cdk@latest bootstrap aws://<accountnum>/us-east-1
 And diff / deploy
 
 ```
-../../scripts/cdk-diff-and-deploy.sh <project>-<test|pro> <diff|deploy>
+../../scripts/cdk-diff-and-deploy.sh <project>-<test|pro> <diff|deploy> <StackName>
+
+i.e.
+../../scripts/cdk-diff-and-deploy.sh afir-test diff MonitoringAfirTest
+../../scripts/cdk-diff-and-deploy.sh afir-test deploy MonitoringAfirTest
 ```
 
 Topics created by the stack can be found from AWS console at Amazon SNS Topics
