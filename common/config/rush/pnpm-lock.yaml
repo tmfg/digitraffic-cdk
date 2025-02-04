@@ -821,9 +821,9 @@ importers:
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
-      ky:
-        specifier: ^1.7.4
-        version: 1.7.4
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -833,6 +833,12 @@ importers:
       pg-promise:
         specifier: ^11.10.2
         version: 11.10.2(pg-native@3.2.0)(pg-query-stream@4.7.1(pg@8.13.1(pg-native@3.2.0)))
+      undici:
+        specifier: ^7.3.0
+        version: 7.3.0
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -8105,6 +8111,10 @@ packages:
 
   undici@7.13.0:
     resolution: {integrity: sha512-l+zSMssRqrzDcb3fjMkjjLGmuiiK2pMIcV++mJaAc9vhjSGpvM7h43QgP+OAMb1GImHmbPyG2tBXeuyG5iY4gA==}
+    engines: {node: '>=20.18.1'}
+
+  undici@7.3.0:
+    resolution: {integrity: sha512-Qy96NND4Dou5jKoSJ2gm8ax8AJM/Ey9o9mz7KN1bb9GP+G0l20Zw8afxTnY2f4b7hmhn/z8aC2kfArVQlAhFBw==}
     engines: {node: '>=20.18.1'}
 
   unfetch@4.2.0:
@@ -16784,6 +16794,8 @@ snapshots:
   undici-types@6.21.0: {}
 
   undici@7.13.0: {}
+
+  undici@7.3.0: {}
 
   unfetch@4.2.0: {}
 

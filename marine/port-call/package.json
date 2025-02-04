@@ -26,10 +26,12 @@
     "@digitraffic/common": "2025.1.17-1",
     "aws-cdk-lib": "^2.173.4",
     "constructs": "~10.4.2",
-    "ky": "^1.7.4",
+    "date-fns": "^4.1.0",
     "lodash": "^4.17.21",
     "pg-native": "^3.2.0",
-    "pg-promise": "^11.10.2"
+    "pg-promise": "^11.10.2",
+    "undici": "^7.3.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
