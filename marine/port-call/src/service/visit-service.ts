@@ -2,20 +2,24 @@ import { inDatabase, inDatabaseReadonly, type DTDatabase } from "@digitraffic/co
 import { NemoApi } from "../api/nemo-api.js";
 import type { DbVisit } from "../model/db-schema.js";
 import * as VisitDAO from "../db/visits.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import { addDays, subDays } from "date-fns";
+import type { GetVisitsParameters } from "../lambda/get-visits/get-visits.js";
 
 const DATATYPE = "PC2_VISITS" as const;
 
 // what format? json or geojson?
-export async function findAllVisits(): Promise<[DbVisit[], Date]> {
+export async function findAllVisits(getVisitsEvent: GetVisitsParameters): Promise<[DbVisit[], Date]> {
     const visits = await inDatabaseReadonly((db: DTDatabase) => {
         return VisitDAO.findAllVisits(db);
     });
 
     // get from visits
     return [visits, new Date()];
+}
+
+export async function getVisit(visitId: string): Promise<[DbVisit | null, Date]> {
+    return Promise.resolve([null, new Date()]);
 }
 
 /// get "from" timestamp from database, or if not yet present use now-30 days
