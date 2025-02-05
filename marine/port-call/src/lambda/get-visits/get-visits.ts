@@ -7,9 +7,19 @@ import { findAllVisits } from "../../service/visit-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
-const getVisitsSchema = z.object({
-    // not yet
-}).strict();
+const EmptyStringUndefined = z.literal("").transform(() => undefined);
+const OptionalDateString = z.coerce.date().optional().or(EmptyStringUndefined);
+
+const getVisitsSchema = 
+    z.object({
+        from: OptionalDateString,
+        to: OptionalDateString,
+        // not yet
+    })
+    .strict()
+    .readonly();
+
+export type GetVisitsParameters = z.infer<typeof getVisitsSchema>;
 
 export const handler = async (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
@@ -19,7 +29,7 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
 
         return proxyHolder
             .setCredentials()
-            .then(() => findAllVisits())
+            .then(() => findAllVisits(getVisitsEvent))
             .then(([visits, lastUpdated]) => {
                 return lastUpdated
                     ? LambdaResponse.okJson(visits).withTimestamp(lastUpdated)
