@@ -21,4 +21,5 @@
 !/src/website/**/*.json
 !/src/website/**/*.js
 !/src/website/**/*.css
+!/src/web/*
 /src/bin

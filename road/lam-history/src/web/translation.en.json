@@ -1,0 +1,124 @@
+{
+    "language": "en",
+    "title": "TMS-statistics",
+    "scripts_js": "scripts_en.js",
+    "datepicker_js_url": "https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.en.min.js",
+    "aineisto": {
+        "label": "Data type",
+        "title": "Select data type: amount of vehicles or avarage speed",
+        "select": "Select data type",
+        "select_feedback": "Selection is mandatory"
+    },
+    "report": {
+        "label": "Report",
+        "select": "Select report resolution",
+        "select_feedback": "Selection is mandatory"
+    },
+    "aika": {
+        "label": "Time period",
+        "alkuaika": {
+            "label": "Starttime",
+            "placeholder": "Select starttime",
+            "feedback": "Selection is mandatory"
+        },
+        "loppuaika": {
+            "label": "Endtime",
+            "placeholder": "Select endtime (optional)"
+        }
+    },
+    "stations": {
+        "label": "TMS-stations",
+        "title": "Select: a single TMS-station or a predefined group of stations",
+        "type1": "Single station",
+        "type1_placeholder": "TMS-stations",
+        "type1_feedback": "At least one must be selected",
+        "type2": "Group of stations",
+        "type2_placeholder": "Group of stations",
+        "type2_feedback": "At least one must be selected"
+    },
+    "ajoneuvoluokat": {
+        "label": "Vehicle classes",
+        "select": "Select vehicle class (you can select multiple classes)",
+        "select_feedback": "At least one must be selected"
+    },
+    "directions": {
+        "label": "Directions",
+        "option0": "All (sum both directions)",
+        "option1": "Direction 1",
+        "option2": "Direction 2"
+    },
+    "lanes": {
+        "label": "Lanes",
+        "option0": "No - sum over lanes",
+        "option1": "Yes - lanes separated"
+    },
+    "buttons": {
+        "clear": "Empty form",
+        "download": "Download (.CSV)",
+        "select": "Select"
+    },
+    "dialogs": {
+        "lam": {
+            "title": "TMS-stations",
+            "tab1": "Single station",
+            "tab2": "Group of stations",
+            "placeholder": "Search stations",
+            "count": "Selection count",
+            "table1": {
+                "col1": "Id",
+                "col2": "Name",
+                "col3": "Road/Section/Distance",
+                "col4": "Municipality",
+                "col5": "Province",
+                "no_results": "No results"
+            },
+            "table2": {
+                "col1": "Group Type",
+                "col2": "Group id",
+                "col3": "Name"
+            },
+            "buttons": {
+                "clear": "Clear",
+                "close": "Close"
+            }
+        }
+    },
+    "aineistot": {
+        "liikennemaara": "Traffic volume (quality controlled)",
+        "raakaliikennemaara": "Raw traffic volume data",
+        "keskinopeus": "Avarage speed"
+    },
+    "liikennetasot": {
+        "raaka_h": "Hourly traffic volume",
+        "liikenne_h": "Hourly traffic volume",
+        "liikenne_vrk": "Daily traffic volume",
+        "liikenne_vk": "Weekly traffic volume",
+        "liikenne_kk": "Monthly traffic volume",
+        "liikenne_v": "Yearly traffic volume",
+        "liikenne_kvl1": "Average daily traffic volume (free time period)",
+        "liikenne_kvl2": "Average daily traffic volume for a year",
+        "liikenne_kavl1": "Average weekday traffic volume (free time period)",
+        "liikenne_kavl2": "Average weekday daily traffic volume for a year"
+    },
+    "nopeustasot": {
+        "h": "Hourly average speed",
+        "vrk": "Daily average speed",
+        "vk": "Weekly average speed",
+        "kk": "Monthly average speed",
+        "v": "Yearly average speed"
+    },
+    "vehicles": {
+        "kaikki": "All (sum)",
+        "kevyet": "Light vehicles (classes 1,6,7,8)",
+        "raskaat": "Heavy vehicles (classes 2,3,4,5,9)",
+        "luokka1": "1 Passenger car or van",
+        "luokka2": "2 Truck without trailer",
+        "luokka3": "3 Bus",
+        "luokka4": "4 Truck and semi-trailer",
+        "luokka5": "5 Truck and full trailer",
+        "luokka6": "6 Passenger car and trailer",
+        "luokka7": "7 Passenger car and caravan",
+        "luokka8": "8 Motorcycles and mopeds",
+        "luokka9": "9 High Capacity Truck"
+    }
+}

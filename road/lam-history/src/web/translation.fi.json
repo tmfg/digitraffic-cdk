@@ -1,0 +1,124 @@
+{
+    "language": "fi",
+    "title": "LAM-tilastohaku",
+    "scripts_js": "scripts.js",
+    "datepicker_js_url": "https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.fi.min.js",
+    "aineisto": {
+        "label": "Aineisto",
+        "title": "Valitse haluamasi aineisto: ajoneuvojen määrä tai niiden keskinopeudet",
+        "select": "Valitse aineisto",
+        "select_feedback": "Aineiston valinta on pakollinen"
+    },
+    "report": {
+        "label": "Raportti",
+        "select": "Valitse raportin tarkkuus",
+        "select_feedback": "Raportin tarkkuuden valinta on pakollinen"
+    },
+    "aika": {
+        "label": "Aika",
+        "alkuaika": {
+            "label": "Alkuaika",
+            "placeholder": "Valitse aikavälin alku",
+            "feedback": "Aloitusaika on pakollinen"
+        },
+        "loppuaika": {
+            "label": "Loppuaika",
+            "placeholder": "Valitse aikavälin loppu (valinnainen)"
+        }
+    },
+    "stations": {
+        "label": "LAM-pisteet",
+        "title": "Valitse haluamasi ryhmä: yksittäiset pisteet tai pistejoukot.",
+        "type1": "Yksittäisten pisteiden valinta",
+        "type1_placeholder": "LAM-pisteet",
+        "type1_feedback": "Vähintään yksi piste on annettava",
+        "type2": "Pistejoukkojen valinta",
+        "type2_placeholder": "LAM-pistejoukot",
+        "type2_feedback": "Vähintään yksi pistejoukko on annettava"
+    },
+    "ajoneuvoluokat": {
+        "label": "Ajoneuvoluokat",
+        "select": "Valitse ajoneuvoluokka (voit valita useampia)",
+        "select_feedback": "Vähintään yksi ryhmä on valittava"
+    },
+    "directions": {
+        "label": "Suunnat",
+        "option0": "Kaikki (suunnat summattuna)",
+        "option1": "Suunta 1",
+        "option2": "Suunta 2"
+    },
+    "lanes": {
+        "label": "Kaistat",
+        "option0": "Ei - kaistat summattuna",
+        "option1": "Kyllä - kaistat eriteltynä"
+    },
+    "buttons": {
+        "clear": "Tyhjennä lomake",
+        "download": "Lataa tiedot (.CSV)",
+        "select": "Listaus"
+    },
+    "dialogs": {
+        "lam": {
+            "title": "LAM-asemat",
+            "tab1": "Yksittäiset mittauspisteet",
+            "tab2": "Pistejoukot",
+            "placeholder": "Hae pisteitä",
+            "count": "Valittuja pisteitä",
+            "table1": {
+                "col1": "Piste",
+                "col2": "Nimi",
+                "col3": "Tie/Osa/Etäisyys",
+                "col4": "Kunta",
+                "col5": "Maakunta",
+                "no_results": "Ei hakutuloksia"
+            },
+            "table2": {
+                "col1": "Ryhmä",
+                "col2": "Joukko",
+                "col3": "Nimi"
+            },
+            "buttons": {
+                "clear": "Poista valinnat",
+                "close": "Sulje"
+            }
+        }
+    },
+    "aineistot": {
+        "liikennemaara": "Liikennemäärät",
+        "raakaliikennemaara": "Raakadatahavainnot",
+        "keskinopeus": "Keskinopeus"
+    },
+    "liikennetasot": {
+        "raaka_h": "Tuntiliikenneraportti",
+        "liikenne_h": "Tuntiliikenneraportti",
+        "liikenne_vrk": "Vuorokausiliikenneraportti",
+        "liikenne_vk": "Viikkosummaraportti",
+        "liikenne_kk": "Kuukausisummaraportti",
+        "liikenne_v": "Vuosisummaraportti",
+        "liikenne_kvl1": "Keskimääräinen vuorokausiliikenne (vapaa aikaväli)",
+        "liikenne_kvl2": "Vuoden keskimääräinen vuorokausiliikenne",
+        "liikenne_kavl1": "Keskimääräinen arkivuorokausiliikenne (vapaa aikaväli)",
+        "liikenne_kavl2": "Vuoden Keskimääräinen arkivuorokausiliikenne"
+    },
+    "nopeustasot": {
+        "h": "Tunnin keskinopeus",
+        "vrk": "Vuorokauden keskinopeus",
+        "vk": "Viikon keskinopeus",
+        "kk": "Kuukauden keskinopeus",
+        "v": "Vuoden keskinopeus"
+    },
+   "vehicles": {
+        "kaikki": "Kaikki (yhteensä)",
+        "kevyet": "Kevyet ajoneuvot (1,6,7,8)",
+        "raskaat": "Raskaat ajoneuvot (2,3,4,5,9)",
+        "luokka1": "1 Henkilö- tai pakettiauto",
+        "luokka2": "2 Kuorma-auto ilman perävaunua",
+        "luokka3": "3 Linja-autot",
+        "luokka4": "4 Kuorma-auto ja puoliperävaunu",
+        "luokka5": "5 Kuorma-auto ja täysperävaunu",
+        "luokka6": "6 Henkilöauto ja peräkärry",
+        "luokka7": "7 Henkilöauto ja asuntovaunu",
+        "luokka8": "8 Moottoripyörät ja mopot",
+        "luokka9": "9 High Capacity Truck"
+    }
+}
