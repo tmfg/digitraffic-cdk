@@ -37,10 +37,11 @@ describe(
         });
 
         test("update visits - new visit then update but no change", async () => {
-            await updateAndExpect([createTestVisit("ID", "P1")], 1, 0);
+            const testVisit = createTestVisit("ID", "P1");
+            await updateAndExpect([testVisit], 1, 0);
             await assertVisitCount(db, 1);
 
-            await updateAndExpect([createTestVisit("ID", "P1")], 0, 0);
+            await updateAndExpect([testVisit], 0, 0);
             await assertVisitCount(db, 1);
         });
 

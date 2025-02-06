@@ -26,12 +26,12 @@ export const nemoVisitSchema =
                 .max(5)
                 .describe("Käyntisatama, koodattu"),
               estimatedArrivalDateTime: z
-                .string()
+                .coerce.date()
                 .describe("Saapumispäivä ja -aika – arvioitu"),
               estimatedDepartureDateTime: z
                 .union([
                   z.null().describe("Lähtöpäivä ja -aika – arvioitu"),
-                  z.string().describe("Lähtöpäivä ja -aika – arvioitu")
+                  z.coerce.date().describe("Lähtöpäivä ja -aika – arvioitu")
                 ])
                 .describe("Lähtöpäivä ja -aika – arvioitu")
             })
@@ -41,7 +41,7 @@ export const nemoVisitSchema =
               actualArrivalDateTime: z
                 .union([
                   z.null().describe("Saapumispäivä ja -aika – toteutunut"),
-                  z.string().describe("Saapumispäivä ja -aika – toteutunut")
+                  z.coerce.date().describe("Saapumispäivä ja -aika – toteutunut")
                 ])
                 .describe("Saapumispäivä ja -aika – toteutunut")
             })
@@ -51,7 +51,7 @@ export const nemoVisitSchema =
               actualDepartureDateTime: z
                 .union([
                   z.null().describe("Lähtöpäivä ja -aika – toteutunut"),
-                  z.string().describe("Lähtöpäivä ja -aika – toteutunut")
+                  z.coerce.date().describe("Lähtöpäivä ja -aika – toteutunut")
                 ])
                 .describe("Lähtöpäivä ja -aika – toteutunut")
             })
@@ -70,7 +70,7 @@ export const nemoVisitSchema =
             .strict()
         })
         .strict(),
-      latestUpdateTime: z.string()
+      latestUpdateTime: z.coerce.date()
     })
     .strict()
     .describe("Päivämäärät muodossa: YYYY-MM-DDTHH:MM:SS.SS+HH:MM");
