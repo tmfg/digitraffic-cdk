@@ -1,11 +1,9 @@
 import type { NemoVisit } from "../model/nemo.js";
-import { roundToNearestMinutes } from "date-fns";
 
-/// creates NemoVisit for testing.  Times are rounded to nearest minute to make verifying easier, database rounds milliseconds off
 export function createTestVisit(visitId: string = "VISIT_ID", portIdentification: string = "PORT1"): NemoVisit {
     return {
         visitId,
-        latestUpdateTime: roundToNearestMinutes(new Date()).toISOString(),
+        latestUpdateTime: new Date(),
         portCall: {
             vesselInformation: {
                 identification: "TESTI",
@@ -13,8 +11,8 @@ export function createTestVisit(visitId: string = "VISIT_ID", portIdentification
             },
             voyageInformation: {
                 portIdentification,
-                estimatedArrivalDateTime: roundToNearestMinutes(new Date()).toISOString(),
-                estimatedDepartureDateTime: roundToNearestMinutes(new Date()).toISOString()
+                estimatedArrivalDateTime: new Date(),
+                estimatedDepartureDateTime: new Date()
             },
             arrivalNotification: {
                 actualArrivalDateTime: null,
