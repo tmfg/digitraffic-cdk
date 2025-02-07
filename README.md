@@ -17,6 +17,10 @@ Projects are categorized as:
 
 Digitraffic is operated by [Fintraffic](https://www.fintraffic.fi)
 
+## Format
+
+    rush run:format
+
 ## ESLint
 
 ESLint-configuration can be found in _.eslintrc.json_. A Dockerfile is added to

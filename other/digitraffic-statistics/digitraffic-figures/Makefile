@@ -1,6 +1,12 @@
 include .env
+export
 
-python := python3.11
+python := python3
+
+DOCKER_COMPOSE := $(shell command -v docker-compose 2> /dev/null)
+ifndef DOCKER_COMPOSE
+  DOCKER_COMPOSE := docker compose
+endif
 
 create_venv:
 	$(python) -m venv venv
@@ -22,11 +28,14 @@ update_outdated:
 freeze_venv:
 	venv/bin/pip freeze > requirements.txt
 
+build_docker:
+	${DOCKER_COMPOSE} --file dbfigures/docker-compose.yml build
+
 clean_docker:
-	${docker_compose} kill && ${docker_compose} rm -f
+	${DOCKER_COMPOSE} --file dbfigures/docker-compose.yml kill  && ${DOCKER_COMPOSE} --file dbfigures/docker-compose.yml rm
 
 start_db:
-	${docker_compose} up -d db
+	${DOCKER_COMPOSE} --file dbfigures/docker-compose.yml up -d db
 
 dev: export FLASK_APP=digitraffic_figures
 dev: export DEV=true
