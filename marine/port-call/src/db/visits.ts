@@ -100,3 +100,12 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
 export function findAllVisits(db: DTDatabase): Promise<DbVisit[]> {
     return db.manyOrNone(FIND_ALL_VISITS_PS);
 }
+
+const GET_VISIT_PS = new pgPromise.PreparedStatement({
+    name: "get-visit",
+    text: "select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time from pc2_visit where visit_id = $1",
+});
+
+export async function getVisit(db: DTDatabase, visitId: string): Promise<DbVisit | undefined> {
+    return await db.oneOrNone(GET_VISIT_PS, [visitId]) ?? undefined;
+}

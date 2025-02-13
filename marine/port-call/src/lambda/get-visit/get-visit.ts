@@ -5,7 +5,6 @@ import { logException } from "@digitraffic/common/dist/utils/logging";
 import { getVisit } from "../../service/visit-service.js";
 
 const proxyHolder = ProxyHolder.create();
-
 interface GetVisitEvent {
     readonly visitId: string
 }
