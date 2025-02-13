@@ -18,8 +18,12 @@ export async function findAllVisits(getVisitsEvent: GetVisitsParameters): Promis
     return [visits, new Date()];
 }
 
-export async function getVisit(visitId: string): Promise<[DbVisit | null, Date]> {
-    return Promise.resolve([null, new Date()]);
+export async function getVisit(visitId: string): Promise<[DbVisit | undefined, Date]> {
+    const visit = await inDatabaseReadonly((db: DTDatabase) => {
+        return VisitDAO.getVisit(db, visitId);
+    });
+
+    return Promise.resolve([visit, new Date()]);
 }
 
 /// get "from" timestamp from database, or if not yet present use now-30 days
