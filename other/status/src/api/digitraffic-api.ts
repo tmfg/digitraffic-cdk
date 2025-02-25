@@ -9,8 +9,30 @@ import _ from "lodash";
 
 const BETA = "/beta/" as const;
 
-interface EndpointResponse {
-  readonly paths: string[];
+export interface PathOperation {
+  readonly parameters?: [{
+    readonly name: string;
+    readonly in: "query" | "header" | "path" | "cookie";
+    readonly required: boolean;
+    readonly schema: {
+      default?: string[] | string;
+    };
+  }];
+}
+
+export interface PathItem {
+  get?: PathOperation;
+  post?: PathOperation;
+  put?: PathOperation;
+  patch?: PathOperation;
+  delete?: PathOperation;
+  head?: PathOperation;
+  options?: PathOperation;
+  trace?: PathOperation;
+}
+
+export interface OpenApiResponse {
+  readonly paths: Record<string, PathItem>;
 }
 
 /**
@@ -29,7 +51,7 @@ export class DigitrafficApi {
     });
     // Swagger url
     return axios
-      .get<EndpointResponse>(app.url, {
+      .get<OpenApiResponse>(app.url, {
         headers: {
           "accept-encoding": "gzip",
         },
@@ -61,25 +83,28 @@ export class DigitrafficApi {
 
   private createAppWithEndpointsResponse(
     app: MonitoredApp,
-    resp: EndpointResponse,
+    resp: OpenApiResponse,
   ): AppWithEndpoints {
     const method =
       "DigitrafficApi.createEndpointResponse" as const satisfies LoggerMethodType;
 
-    const all = _.keys(resp.paths).filter(
-      // Filter all api paths that needs path-parameter
-      (p) => !p.includes("{"),
-    );
-    const notBeta = all.filter((e) => !e.includes(BETA));
-    const beta = all.filter((e) => e.includes(BETA));
+    const apisToTest = Object.entries(resp.paths).map(
+      ([path, item]) =>
+        checkApiCanBeTestedAndAppendQueryStringToPath(path, item),
+    ).filter((api) => api.canBeCalled)
+      .map((api) => api.pathWithMaybeQueryString);
+
+    const notBeta = apisToTest.filter((e) => !e.includes(BETA));
+    const beta = apisToTest.filter((e) => e.includes(BETA));
     notBeta.sort();
     beta.sort();
 
     logger.info({
       method,
-      message: `Found ${all.length}/${
+      customApiApp: app.name,
+      message: `Found ${apisToTest.length}/${
         _.keys(resp.paths).length
-      } Digitraffic endpoints without path parameters for ${app.name}`,
+      } Digitraffic endpoints to test`,
     });
 
     return {
@@ -91,5 +116,114 @@ export class DigitrafficApi {
         .filter((e) => !app.excluded.includes(e)),
       extraEndpoints: app.endpoints,
     } as const satisfies AppWithEndpoints;
+  }
+}
+
+function checkApiCanBeTestedAndAppendQueryStringToPath(
+  path: string,
+  pathItem: PathItem,
+): {
+  readonly canBeCalled: boolean;
+  readonly pathWithMaybeQueryString: string;
+} {
+  try {
+    if (!pathItem.get) { // For now support only GET method
+      logger.info({
+        method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+        customPath: path,
+        message: `Api can't be tested without GET method`,
+      });
+      return { canBeCalled: false, pathWithMaybeQueryString: path };
+    }
+
+    if (path.includes("{")) {
+      logger.info({
+        method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+        customPath: path,
+        message: `Api can't be tested when there is path parameters`,
+      });
+      return { canBeCalled: false, pathWithMaybeQueryString: path };
+    }
+
+    if (path.includes("beta")) {
+      logger.info({
+        method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+        customPath: path,
+        message: `Api can't be tested when its BETA`,
+      });
+      return { canBeCalled: false, pathWithMaybeQueryString: path };
+    }
+
+    const operation = pathItem.get;
+    // No parameters or all are not required parameters -> ok to call
+    if (
+      !operation.parameters || !operation.parameters.find((p) => p.required)
+    ) {
+      logger.info({
+        method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+        customPath: path,
+        message: "Api can be tested without required parameters",
+      });
+      return { canBeCalled: true, pathWithMaybeQueryString: path };
+    }
+
+    // Can't call api with required parameters that doesn't have default value(s) defined
+    if (
+      operation.parameters.find((p) => p.required && !p.schema.default?.length)
+    ) {
+      logger.info({
+        method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+        customPath: path,
+        message:
+          "Api can't be tested with required parameters without default parameters",
+      });
+      return { canBeCalled: false, pathWithMaybeQueryString: path };
+    }
+
+    // Now we have some required parameters with default values, lets parse them to query string
+    // join result: param1=param1value1&param1=param1value2&param2=param2value1...
+    logger.info({
+      method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+      customPath: path,
+      customOperationParameters: JSON.stringify(operation.parameters),
+      message:
+        "Api has some required parameters with default values, parsing queryString",
+    });
+
+    const queryString = operation.parameters
+      .filter((p) => p.required && p.schema.default?.length)
+      .map((p) => {
+        if (Array.isArray(p.schema.default)) {
+          return p.schema.default.map((paramValue) => `${p.name}=${paramValue}`)
+            .join("&");
+        } else {
+          return `${p.name}=${p.schema.default}`;
+        }
+      })
+      .join("&");
+
+    logger.info({
+      method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+      customPath: path,
+      customQueryString: queryString,
+      message: "Api can be tested with required parameters with default values",
+    });
+    return {
+      canBeCalled: true,
+      pathWithMaybeQueryString: `${path}${
+        queryString ? "?" : ""
+      }${queryString}`,
+    };
+  } catch (e) {
+    logger.error({
+      method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
+      message: "Failed to check api defaulting to canBeCalled: false",
+      customPathItem: JSON.stringify(pathItem),
+      error: e,
+    });
+    return {
+      canBeCalled: false,
+      pathWithMaybeQueryString: path,
+    };
   }
 }

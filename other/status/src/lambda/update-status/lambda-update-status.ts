@@ -23,7 +23,7 @@ const gitHubBranch = getEnvVariable(StatusEnvKeys.GITHUB_BRANCH);
 const gitHubWorkflowFile = getEnvVariable(StatusEnvKeys.GITHUB_WORKFLOW_FILE);
 
 /**
- * Updates StatusPage components and NodePing checks
+ * Updates StatusPage components and NodePing checks to correspond OpenAPI Specifications
  */
 export const handler = async (): Promise<void> => {
   const digitrafficApi = new DigitrafficApi();

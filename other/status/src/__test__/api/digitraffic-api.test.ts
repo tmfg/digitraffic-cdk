@@ -4,7 +4,7 @@ import {
   type MonitoredApp,
   type MonitoredEndpoint,
 } from "../../app-props.js";
-import { DigitrafficApi } from "../../api/digitraffic-api.js";
+import { DigitrafficApi, type PathItem } from "../../api/digitraffic-api.js";
 import type { AppWithEndpoints } from "../../model/app-with-endpoints.js";
 import axios, { type AxiosRequestConfig } from "axios";
 import { jest } from "@jest/globals";
@@ -14,7 +14,10 @@ const digitrafficApi = new DigitrafficApi();
 
 const API_1 = "/api/maintenance/v1/tracking/domains" as const;
 const API_2 = "/api/maintenance/v1/tracking/routes" as const;
-const API_WITH_PARAMS = "/api/maintenance/v1/tracking/routes/{id}" as const;
+const API_3 = "/api/maintenance/v1/tracking/latest" as const;
+const API_4 = "/api/maintenance/v1/tracking/foo" as const;
+const API_WITH_PATH_PARAMS =
+  "/api/maintenance/v1/tracking/routes/{id}" as const;
 
 describe("DigitrafficApiTest", () => {
   afterEach(() => {
@@ -26,20 +29,93 @@ describe("DigitrafficApiTest", () => {
   });
 
   test("getAppEndpoints - api with parameters excluded", async () => {
-    await getAppEndpointsAndExpect([API_1], [API_1, API_WITH_PARAMS]);
+    await getAppEndpointsAndExpect(
+      [API_1],
+      convertToPathRecords([API_1, API_WITH_PATH_PARAMS]),
+    );
   });
 
   test("getAppEndpoints - with exclude", async () => {
-    await getAppEndpointsAndExpect([API_1], [API_1, API_2], [API_2]);
+    await getAppEndpointsAndExpect(
+      [API_1],
+      convertToPathRecords([API_1, API_2]),
+      [API_2],
+    );
   });
 
   test("getAppEndpoints - with extra", async () => {
-    await getAppEndpointsAndExpect([API_1], [API_1], [], [API_2]);
+    await getAppEndpointsAndExpect([API_1], convertToPathRecords([API_1]), [], [
+      API_2,
+    ]);
+  });
+
+  test("getAppEndpoints - with required parameters", async () => {
+    const paths: Record<string, PathItem> = {};
+    // Api 1 has required param so that will be filtered out
+    paths[API_1] = {
+      get: {
+        parameters: [{
+          name: "param1",
+          required: true,
+          in: "query",
+          schema: {
+            //default: []
+          },
+        }],
+      },
+    };
+    // Api 2 has array default values for required parameters, so it should be tested with query string
+    paths[API_2] = {
+      get: {
+        parameters: [{
+          name: "api2param1",
+          required: true,
+          in: "query",
+          schema: {
+            default: ["value1", "value2"],
+          },
+        }],
+      },
+    };
+
+    // Api 3 has optional parameters, so it should be tested
+    paths[API_3] = {
+      get: {
+        parameters: [{
+          name: "api3param1",
+          required: false,
+          in: "query",
+          schema: {},
+        }],
+      },
+    };
+
+    // Api 4 has default value for required parameter, so it should be tested with query string
+    paths[API_4] = {
+      get: {
+        parameters: [{
+          name: "api4param1",
+          required: true,
+          in: "query",
+          schema: {
+            default: "value1",
+          },
+        }],
+      },
+    };
+
+    const expectApi2WithParams = `${API_2}?api2param1=value1&api2param1=value2`;
+    const expectApi4WithParams = `${API_4}?api4param1=value1`;
+    await getAppEndpointsAndExpect([
+      expectApi2WithParams,
+      API_3,
+      expectApi4WithParams,
+    ], paths);
   });
 
   async function getAppEndpointsAndExpect(
     expectedApis: string[],
-    apis: string[] = expectedApis,
+    apis: Record<string, PathItem> = convertToPathRecords(expectedApis),
     excluded: string[] = [],
     extraEndpoints: string[] = [],
   ): Promise<void> {
@@ -91,11 +167,20 @@ describe("DigitrafficApiTest", () => {
     expect(spy).toHaveBeenCalledTimes(1);
   }
 
-  function getOpenApiJson(apis: string[]): object {
+  function getOpenApiJson(apis: Record<string, PathItem>): object {
     const paths: Record<string, object> = {};
-    for (const api of apis) {
+
+    console.debug(`apis: ${JSON.stringify(apis)}`);
+
+    for (const api of Object.keys(apis)) {
+      // @ts-ignore
+      const pathItem: PathItem = apis[api] satisfies PathItem;
+      console.debug(
+        `pathItem: ${JSON.stringify(pathItem)}`,
+      );
       paths[api] = {
         get: {
+          ...pathItem.get,
           tags: ["Api tag"],
           responses: {
             "200": {
@@ -114,6 +199,7 @@ describe("DigitrafficApiTest", () => {
       };
     }
 
+    console.debug(`paths: ${JSON.stringify(paths)}`);
     return {
       openapi: "3.0.1",
       paths,
@@ -123,5 +209,21 @@ describe("DigitrafficApiTest", () => {
   function expectBothContainsAll(arr1: string[], arr2: string[]): void {
     expect(arr1.every((c) => arr2.includes(c))).toBe(true);
     expect(arr2.every((c) => arr1.includes(c))).toBe(true);
+  }
+
+  function convertToPathItem(api: string): PathItem {
+    return {
+      [api]: {
+        get: {},
+      },
+    };
+  }
+
+  function convertToPathRecords(apis: string[]): Record<string, PathItem> {
+    const result: Record<string, PathItem> = {};
+    apis.forEach((a) => {
+      result[a] = convertToPathItem(a);
+    });
+    return result;
   }
 });

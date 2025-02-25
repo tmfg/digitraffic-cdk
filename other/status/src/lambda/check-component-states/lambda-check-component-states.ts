@@ -30,7 +30,7 @@ let nodePingApi: NodePingApi;
 let slackApi: SlackApi;
 let cStateApi: CStateStatuspageApi;
 /**
- * Checks current status of StatusPage and NodePing and sends report to Slack
+ * Checks current status of StatusPage and NodePing and sends report of differences to Slack
  */
 export const handler = async (): Promise<void> => {
   const method =
