@@ -22,6 +22,7 @@
   "dependencies": {
     "@rushstack/eslint-config": "^3.7.1",
     "@typescript-eslint/eslint-plugin": "~7.14.1",
+    "@typescript-eslint/parser": "^7.0.0",
     "eslint-plugin-deprecation": "~3.0.0",
     "madge": "^8.0.0"
   },
@@ -29,18 +30,18 @@
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/common": "2025.1.17-1",
+    "@digitraffic/common": "2025.2.28-2",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.11",
-    "@rushstack/heft-jest-plugin": "^0.14.1",
+    "@rushstack/heft": "^0.69.1",
+    "@rushstack/heft-jest-plugin": "^0.14.11",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
     "@types/madge": "5.0.3",
-    "@types/node": "20.17.6",
-    "esbuild": "0.24.2",
+    "@types/node": "22.13.5",
+    "esbuild": "0.25.0",
     "eslint": "^8.57.0",
-    "rollup": "~4.29.1",
+    "rollup": "~4.34.8",
     "typescript": "~5.6.3"
   }
 }

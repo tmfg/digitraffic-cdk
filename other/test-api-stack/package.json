@@ -25,10 +25,10 @@
     "test_errors": "rushx test 2>&1 | grep 'FAIL'"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.1.17-1",
-    "aws-cdk-lib": "^2.173.4",
+    "@digitraffic/common": "2025.2.28-2",
+    "aws-cdk-lib": "^2.181.1",
     "constructs": "~10.4.2",
-    "zod": "~3.24.1"
+    "zod": "~3.24.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -37,13 +37,13 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.68.11",
-    "@rushstack/heft-jest-plugin": "^0.14.1",
+    "@rushstack/heft": "^0.69.1",
+    "@rushstack/heft-jest-plugin": "^0.14.11",
     "@types/aws-lambda": "8.10.147",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
-    "@types/node": "20.17.6",
-    "esbuild": "0.24.2",
+    "@types/node": "22.13.5",
+    "esbuild": "0.25.0",
     "eslint": "^8.57.0",
     "parallelshell": "3.0.2",
     "typescript": "~5.6.3"
