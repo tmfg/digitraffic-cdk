@@ -129,7 +129,7 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       lodash-es:
-        specifier: ~4.17.21
+        specifier: ^4.17.21
         version: 4.17.21
       madge:
         specifier: ^8.0.0
@@ -159,7 +159,7 @@ importers:
         specifier: ^2.0.6
         version: 2.0.6
       zod:
-        specifier: ~3.24.2
+        specifier: ^3.24.2
         version: 3.24.2
 
 packages:
