@@ -30,7 +30,7 @@
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/common": "2025.2.28-2",
+    "@digitraffic/common": "2025.2.28-3",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
     "@rushstack/heft": "^0.69.1",

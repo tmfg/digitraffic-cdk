@@ -25,7 +25,7 @@
     "@aws-sdk/client-sns": "^3.758.0",
     "@aws-sdk/client-sqs": "^3.758.0",
     "@aws-sdk/client-s3": "^3.758.0",
-    "@digitraffic/common": "2025.2.28-2",
+    "@digitraffic/common": "2025.2.28-3",
     "@turf/turf": "7.0.0-alpha.111",
     "aws-cdk-lib": "^2.181.1",
     "aws-sdk": "^2.1692.0",

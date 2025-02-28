@@ -15,7 +15,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.2.28-2",
+    "@digitraffic/common": "2025.2.28-3",
     "@aws-sdk/lib-storage": "^3.758.0",
     "@aws-sdk/client-s3": "^3.758.0",
     "aws-cdk-lib": "^2.181.1",
