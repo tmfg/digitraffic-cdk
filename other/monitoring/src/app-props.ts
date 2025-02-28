@@ -1,9 +1,11 @@
 import type { Environment } from "aws-cdk-lib";
+import type { IClusterEngine } from "aws-cdk-lib/aws-rds";
 
 export interface MonitoringConfiguration {
   readonly warningTopicEmail: string;
   readonly alarmTopicEmail: string;
 
+  readonly ecs?: EcsConfiguration;
   readonly db?: DBConfiguration;
   readonly route53?: Route53Configuration;
   readonly cloudfront?: CloudfrontConfiguration;
@@ -11,8 +13,20 @@ export interface MonitoringConfiguration {
   readonly env: Environment;
 }
 
+export interface EcsConfiguration {
+  readonly services: EcsService[];
+}
+
+export interface EcsService {
+    readonly clusterName: string;
+    readonly serviceName: string;
+    readonly cpu?: number | "DISABLED";
+    readonly memory?: number | "DISABLED";
+}
+
 export interface DBConfiguration {
   readonly dbClusterIdentifier: string;
+  readonly engine?: IClusterEngine;
   readonly cpuLimit: number;
   readonly writeIOPSLimit: number;
   readonly readIOPSLimit: number;

@@ -12,6 +12,7 @@ import {
   SSM_KEY_WARNING_TOPIC,
 } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { RegionMonitoringStack } from "./region-monitoring-stack.js";
+import { EcsMonitoring } from "./ecs-monitoring.js";
 
 export class MonitoringStack extends Stack {
   constructor(
@@ -61,6 +62,10 @@ export class MonitoringStack extends Stack {
   ): void {
     if (configuration.db) {
       new RdsMonitoring(this, alarmsTopic, configuration.db);
+    }
+
+    if(configuration.ecs) {
+      new EcsMonitoring(this, alarmsTopic, configuration.ecs);
     }
   }
 
