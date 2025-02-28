@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "include": [],
-  "typeRoots": ["./node_modules/@types", "./src"]
-}

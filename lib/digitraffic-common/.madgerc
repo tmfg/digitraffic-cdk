@@ -1,9 +1,0 @@
-{
-    "fontSize": "10px",
-    "fileExtensions": ["mjs"],
-    "detectiveOptions": {
-         "js": {
-            "skipTypeImports": true
-        }        
-	}
-}
