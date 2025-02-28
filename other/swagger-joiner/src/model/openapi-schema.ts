@@ -77,7 +77,7 @@ export const openapiPathItem = z
 
 export const openapiSchema = z
   .object({
-    openapi: z.string().regex(new RegExp("^3\\.0\\.\\d(-.+)?$")),
+    openapi: z.string().regex(new RegExp("^3\\.\\d\\.\\d(-.+)?$")),
     info: z
       .object({
         title: z.string(),
@@ -156,7 +156,7 @@ export const openapiSchema = z
       .optional(),
   })
   .describe(
-    "The description of OpenAPI v3.0.x documents, as defined by https://spec.openapis.org/oas/v3.0.3",
+    "OpenAPI v3 https://spec.openapis.org/oas/v3.1.0",
   );
 
 export type OpenApiOperation = z.infer<typeof openapiOperation>;
