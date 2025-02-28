@@ -22,7 +22,7 @@ jobs:
           email: digitraffic@solita.fi
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Cache pnpm store cache
         uses: actions/cache@v4

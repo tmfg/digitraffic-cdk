@@ -71,7 +71,7 @@ function createProcessDLQLambda(
       reservedConcurrentExecutions: 5,
       timeout: 10,
       memorySize: 256,
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_22_X,
     },
   );
 

@@ -15,9 +15,9 @@
    * path segment in the "$schema" field for all your Rush config files.  This will ensure
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
-  "nodeSupportedVersionRange": ">=20.10.0 <21.0.0",
-  "rushVersion": "5.145.0",
-  "pnpmVersion": "9.15.4",
+  "nodeSupportedVersionRange": ">=22.0.0 <23.0.0",
+  "rushVersion": "5.150.0",
+  "pnpmVersion": "10.5.2",
   "ensureConsistentVersions": false,
   "repository": {
     "url": "https://github.com/fintraffic-vts/mcp-cdk",

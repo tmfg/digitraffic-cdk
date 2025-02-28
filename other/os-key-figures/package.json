@@ -6,9 +6,9 @@
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "build": "heft build --clean && npm run postbuild",
-    "postbuild": "esbuild src/lambda/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node20",
+    "postbuild": "esbuild src/lambda/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
     "build:watch": "heft build-watch --clean",
-    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node20",
+    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node22",
     "cdk": "cdk",
     "ci:eslint-report": "echo 'No eslint report available'",
     "synth-sam": "cdk synth --no-staging > template.yaml",

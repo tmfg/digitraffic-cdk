@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "heft build --clean && npm run postbuild",
-    "postbuild": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node20",
+    "postbuild": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "cdk": "npx cdk@latest",
