@@ -1,0 +1,13 @@
+# EXAMPLE USAGE:
+#
+#   Refer for explanation to following link:
+#   https://lefthook.dev/configuration/
+#
+pre-commit:
+  parallel: false
+  commands:
+    deno-fmt:
+      #glob: "*.{ts,yml,yaml,md,json,html}"
+      run: | # Runs even when deno fmt fails with: No target files found.
+        pnpm deno fmt {staged_files} || true;
+        git add {staged_files} || true;
