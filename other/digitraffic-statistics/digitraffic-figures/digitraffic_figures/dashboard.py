@@ -140,7 +140,7 @@ def create_top_10_users_date_options(df):
     options = [dict(label=i.strftime("%Y-%m-%d"), value=i) for i in dates]
     options.reverse()
 
-    default_value = max(dates)
+    default_value = max(dates) if dates else None
 
     return options, default_value
 
