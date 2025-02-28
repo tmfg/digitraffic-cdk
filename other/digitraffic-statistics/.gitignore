@@ -8,6 +8,7 @@
 !/.gitignore
 !/cdk.json
 !/jest.config.js
+!/README.md
 
 !/config/
 !/config/*.json
@@ -15,8 +16,6 @@
 !/src/**/
 !/src/**/*.ts
 /src/bin
-
-
 
 !/digitraffic-figures/
 !/digitraffic-figures/**/
@@ -31,3 +30,4 @@
 !/digitraffic-figures/Makefile
 !/digitraffic-figures/requirements.txt
 !/digitraffic-figures/update_requirements.sh
+!/digitraffic-figures/dbfigures/data/test/test_data.csv

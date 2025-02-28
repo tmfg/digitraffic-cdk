@@ -47,18 +47,20 @@ class Figures:
         )
         dates = pivot.tail(n=6).reset_index()["from"].to_list()
 
-        p1_from = dates[0].strftime("%d.%m.")
-        p1_to = dates[2].strftime("%d.%m.")
-        p2_from = dates[3].strftime("%d.%m.")
-        p2_to = dates[5].strftime("%d.%m.")
+        if len(dates) > 5:
 
-        self.logger.info(
-            f"method=Figures.change_in_period_time_frame took={time.time()-start}"
-        )
+            p1_from = dates[0].strftime("%d.%m.")
+            p1_to = dates[2].strftime("%d.%m.")
+            p2_from = dates[3].strftime("%d.%m.")
+            p2_to = dates[5].strftime("%d.%m.")
 
-        return (
-            f"Verrataan keskenään ajanjaksoja {p1_from}–{p1_to} ja {p2_from}–{p2_to}."
-        )
+            self.logger.info(
+                f"method=Figures.change_in_period_time_frame took={time.time()-start}"
+            )
+            return f"Verrataan keskenään ajanjaksoja {p1_from}–{p1_to} ja {p2_from}–{p2_to}."
+
+        else:
+            return f"No data available"
 
     def change_in_period(self):
         df = self.df
@@ -78,24 +80,25 @@ class Figures:
         latest_values = resample.tail(n=1).stack()
         latest_change = change.tail(n=1).stack()
 
-        latest_values["Kyselyt (Milj.)"] = latest_values["Http req"].apply(
-            lambda x: round(x / MILJ, 2)
-        )
-        latest_values["Kyselyt (muutos-%)"] = latest_change["Http req"].apply(
-            lambda x: round(x * 100, 2)
-        )
-        latest_values["Data (Tt)"] = latest_values["Bytes out"].apply(
-            lambda x: round(x / TERA, 2)
-        )
-        latest_values["Data (muutos-%)"] = latest_change["Bytes out"].apply(
-            lambda x: round(x * 100, 2)
-        )
+        if len(latest_values > 0):
+            latest_values["Kyselyt (Milj.)"] = latest_values["Http req"].apply(
+                lambda x: round(x / MILJ, 2)
+            )
+            latest_values["Kyselyt (muutos-%)"] = latest_change["Http req"].apply(
+                lambda x: round(x * 100, 2)
+            )
+            latest_values["Data (Tt)"] = latest_values["Bytes out"].apply(
+                lambda x: round(x / TERA, 2)
+            )
+            latest_values["Data (muutos-%)"] = latest_change["Bytes out"].apply(
+                lambda x: round(x * 100, 2)
+            )
 
-        result = (
-            latest_values.reset_index()
-            .drop(columns=["from", "Bytes out", "Http req"])
-            .rename(columns=dict(liikennemuoto="Liikennemuoto"))
-        )
+            result = (
+                latest_values.reset_index()
+                .drop(columns=["from", "Bytes out", "Http req"])
+                .rename(columns=dict(liikennemuoto="Liikennemuoto"))
+            )
 
         table = dict(
             columns=[dict(name=i, id=i) for i in result.columns],
@@ -116,7 +119,6 @@ class Figures:
         liikennemuoto=None,
     ):
         df = self.df
-
         if date is None:
             date = df["from"].unique().max()
 
@@ -155,6 +157,7 @@ class Figures:
         if isinstance(data, str):
             data = json.loads(data)
             if "" in data:
+                data["__missing__"] = data.get("__missing__", 0)
                 data["__missing__"] += data[""]
                 del data[""]
 

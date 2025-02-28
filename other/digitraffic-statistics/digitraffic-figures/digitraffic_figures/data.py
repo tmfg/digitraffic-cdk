@@ -43,7 +43,7 @@ def extract_request_uri(x):
     return ""
 
 
-def make_adjustments(df):
+def make_adjustments(df: pd.DataFrame):
     missing_figures = {
         "Bytes out": {
             "2020-09-01": 20.26 * TEBI,
@@ -67,27 +67,39 @@ def make_adjustments(df):
         },
     }
 
-    for name, data_points in missing_figures.items():
-        for timestamp, new_road_value in data_points.items():
-            filter = (
-                (df["aikaleima"] == timestamp)
-                & (df["request_uri"] == "")
-                & (df["name"] == name)
-            )
-            old_road_value = df.loc[filter & (df["liikennemuoto"] == "tie")][
-                "value"
-            ].item()
-            traffic_combined_value = df.loc[filter & (df["liikennemuoto"] == "kaikki")][
-                "value"
-            ].item()
+    if not df.empty:
+        for name, data_points in missing_figures.items():
+            for timestamp, new_road_value in data_points.items():
+                filter = (
+                    (df["aikaleima"] == timestamp)
+                    & (df["request_uri"] == "")
+                    & (df["name"] == name)
+                )
 
-            # korjaa yksittäiset
-            df.loc[filter & (df["liikennemuoto"] == "tie"), ["value"]] = new_road_value
+                road_values = df.loc[filter & (df["liikennemuoto"] == "tie")]["value"]
 
-            # korjaa yhteensä arvo
-            df.loc[filter & (df["liikennemuoto"] == "kaikki"), ["value"]] = (
-                traffic_combined_value - old_road_value + new_road_value
-            )
+                if len(road_values) == 1:
+                    old_road_value = road_values.item()
+                else:
+                    print(f"{len(road_values)} values found for date: {timestamp}")
+                    continue
+
+                old_road_value = df.loc[filter & (df["liikennemuoto"] == "tie")][
+                    "value"
+                ].item()
+                traffic_combined_value = df.loc[
+                    filter & (df["liikennemuoto"] == "kaikki")
+                ]["value"].item()
+
+                # korjaa yksittäiset
+                df.loc[filter & (df["liikennemuoto"] == "tie"), ["value"]] = (
+                    new_road_value
+                )
+
+                # korjaa yhteensä arvo
+                df.loc[filter & (df["liikennemuoto"] == "kaikki"), ["value"]] = (
+                    traffic_combined_value - old_road_value + new_road_value
+                )
 
     return df
 
@@ -108,7 +120,7 @@ def fetch_data_from_database(logger):
 
     secret["database"] = os.getenv("DB_DATABASE")
 
-    url = "mysql+pymysql://{username}:{password}@{endpoint}:3306/{database}".format(
+    url = "mysql+pymysql://{username}:{password}@{host}:{port}/{database}".format(
         **secret
     )
     engine = create_engine(url)
