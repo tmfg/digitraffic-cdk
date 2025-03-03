@@ -1,5 +1,6 @@
 *
 
+!/deno.json
 !.husky/
 !.husky/pre-commit
 !/.editorconfig
@@ -7,12 +8,12 @@
 !/.eslintrc.cjs
 !/.gitattributes
 !/.gitignore
+!/.git-blame-ignore-revs
 !/.npmignore
 !/.npmrc
-!/.prettierignore
-!/.prettierrc.json
 !/.madgerc
 !/jest.config.mjs
+!/lefthook.yml
 !/LICENSE
 !/package.json
 !/pnpm-lock.yaml

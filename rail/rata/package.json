@@ -11,15 +11,15 @@
     "build": "heft build --clean",
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
-    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node20",
+    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node22",
     "cdk": "npx cdk@latest",
     "ci:eslint-report": "eslint . --format html -o report.html || true"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.173.4",
+    "aws-cdk-lib": "^2.181.1",
     "aws-sdk": "^2.1692.0",
     "constructs": "~10.4.2",
-    "@digitraffic/common": "2025.1.17-1"
+    "@digitraffic/common": "2025.2.28-3"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -27,14 +27,14 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
     "@types/aws-lambda": "8.10.147",
-    "@types/node": "20.17.6",
-    "@rushstack/heft-jest-plugin": "^0.14.1",
+    "@types/node": "22.13.5",
+    "@rushstack/heft-jest-plugin": "^0.14.11",
     "@types/heft-jest": "1.0.6",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "typescript": "~5.6.3",
-    "@rushstack/heft": "^0.68.11",
-    "esbuild": "0.24.2"
+    "@rushstack/heft": "^0.69.1",
+    "esbuild": "0.25.0"
   },
   "externals": [
     "aws-sdk"

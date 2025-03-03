@@ -20,14 +20,24 @@ export function dbTestBase(
   dbUser: string,
   dbPass: string,
   dbUri: string,
+  convertNullsToUndefined: boolean = false,
 ): () => void {
   const theDbUri = getEnvVariableOrElse("DB_URI", dbUri);
-  console.log(`Test database URI: ${theDbUri}`);
+  console.log(
+    `Test database URI: ${theDbUri}, convertNullsToUndefined: ${convertNullsToUndefined}`,
+  );
 
   return () => {
-    const db: DTDatabase = initDbConnection(dbUser, dbPass, "test", theDbUri, {
-      noWarnings: true, // ignore duplicate connection warning for tests
-    });
+    const db: DTDatabase = initDbConnection(
+      dbUser,
+      dbPass,
+      "test",
+      theDbUri,
+      convertNullsToUndefined,
+      {
+        noWarnings: true, // ignore duplicate connection warning for tests
+      },
+    );
 
     beforeAll(async () => {
       process.env[DatabaseEnvironmentKeys.DB_USER] = dbUser;

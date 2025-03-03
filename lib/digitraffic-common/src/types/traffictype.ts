@@ -3,6 +3,7 @@ export enum TrafficType {
   MARINE = "Marine",
   RAIL = "Rail",
   AVIATION = "Aviation",
+  AFIR = "Afir",
   MCP = "MCP",
   OTHER = "Other",
 }

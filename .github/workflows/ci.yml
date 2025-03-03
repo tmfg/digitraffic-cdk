@@ -16,7 +16,7 @@ jobs:
           email: digitraffic@solita.fi
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       #- name: Check rush.json and dependabot.yml
       #  run: python scripts/check-dependabot-projects.py
       - name: Cache pnpm store cache

@@ -5,5 +5,5 @@ insert_final_newline=true
 indent_style=space
 indent_size=4
 
-[{*.json,*.yml,*.yaml}]
-indent_size=2
+[{*.json,*.yml,*.yaml,*.ts,*.js, *.ddl,*.sql}]
+indent_size = 2

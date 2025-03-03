@@ -50,6 +50,7 @@ export interface ClusterConfiguration {
   readonly securityGroupId: string;
   readonly snapshotIdentifier?: string;
   readonly dbVersion: AuroraPostgresEngineVersion;
+  readonly storageEncrypted?: boolean; // default true
 
   readonly writer: ClusterDbInstanceConfiguration;
   readonly readers: ClusterDbInstanceConfiguration[];
@@ -58,11 +59,36 @@ export interface ClusterConfiguration {
 export interface ClusterImportConfiguration {
   readonly clusterReadEndpoint: string;
   readonly clusterWriteEndpoint: string;
-  /** Override clusterIdentifier if clusterWriteEndpoint name doesn't contain
-   * clusterIdentifier before '.cluster' substring.
-   * clusterWriteEndpoint name that is normally formed stackenv-stackenvxxx-xxx.cluster-xxx.region.rds.amazonaws.com
-   * and we can parse clusterIdentifier from it. */
-  readonly clusterIdentifier?: string;
+}
+
+/**
+ * Parse cluster identifier from cluster writer endpoint.
+ * i.e. <i>stackenv-stackenvxxx-xxx.cluster-xxx.region.rds.amazonaws.com</i>
+ * -> <i>stackenv-stackenvxxx-xxx</i>
+ * @param clusterImport ClusterImportConfiguration to resolve cluster identifier
+ * @param fallbackValue If parse fails return fallback value. If not given will throw error.
+ * @throws Error If not cluster is found and no fallbackValue is given.
+ */
+export function parseClusterIdentifier(
+  clusterImport?: ClusterImportConfiguration,
+  fallbackValue?: string,
+): string {
+  if (
+    clusterImport &&
+    clusterImport.clusterWriteEndpoint.includes(".cluster") &&
+    clusterImport.clusterWriteEndpoint.split(".cluster")[0]
+  ) {
+    // @ts-ignore this is checked above
+    return clusterImport.clusterWriteEndpoint.split(".cluster")[0];
+  }
+  if (fallbackValue) {
+    return fallbackValue;
+  }
+  throw new Error(
+    [`Could not resolve 'clusterIdentifier' from 'configuration.clusterImport': ${clusterImport?.clusterWriteEndpoint}.,
+     'configuration.clusterImport.clusterWriteEndpoint' didn't contain '.cluster'`]
+      .join(" "),
+  );
 }
 
 /**
@@ -150,6 +176,10 @@ export class DbStack extends Stack {
     }
 
     if (configuration.clusterImport) {
+      this.clusterIdentifier = parseClusterIdentifier(
+        configuration.clusterImport,
+      );
+
       createParameter(
         this,
         "cluster.reader",
@@ -160,32 +190,7 @@ export class DbStack extends Stack {
         "cluster.writer",
         configuration.clusterImport.clusterWriteEndpoint,
       );
-
-      // If clusterIdentifier is provided we use it and otherwise we try to parse it from
-      // from clusterWriteEndpoint name that is normally formed stackenv-stackenvxxx-xxx.cluster-xxx.region.rds.amazonaws.com
-      // and part before .cluster is clusterIdentifier.
-      if (configuration.clusterImport.clusterIdentifier) {
-        this.clusterIdentifier = configuration.clusterImport.clusterIdentifier;
-      } else if (
-        configuration.clusterImport.clusterWriteEndpoint !== undefined &&
-        configuration.clusterImport.clusterWriteEndpoint.split(
-            ".cluster",
-          )[0] !== undefined &&
-        configuration.clusterImport.clusterWriteEndpoint.split(
-            ".cluster",
-          )[0] !== configuration.clusterImport.clusterWriteEndpoint
-      ) {
-        // @ts-ignore We check that this is defined
-        this.clusterIdentifier =
-          configuration.clusterImport.clusterWriteEndpoint.split(".cluster")[0];
-      } else {
-        throw new Error(
-          "Could not resolve 'clusterIdentifier' from 'configuration.clusterImport': " +
-            configuration.clusterImport.clusterWriteEndpoint +
-            " Either 'configuration.clusterImport.clusterReadEndpoint' didn't contain '.cluster' or " +
-            "configuration.clusterImport.clusterIdentifier was not defined to override default value.",
-        );
-      }
+      createParameter(this, "cluster.identifier", this.clusterIdentifier);
     }
   }
 
@@ -281,6 +286,7 @@ export class DbStack extends Stack {
       ),
       parameterGroup,
       monitoringInterval: Duration.seconds(30),
+      storageEncrypted: clusterConfiguration.storageEncrypted ?? true,
     };
   }
 

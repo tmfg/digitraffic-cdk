@@ -11,6 +11,11 @@ Use `pnpm` to build the code i.e.
     pnpm build
     pnpm test
 
+Format code
+
+    pnpm run:format-changed # Formats stagged files
+    pnpm run:format # Format all files
+
 ## How to use
 
 In package.json dependencies:

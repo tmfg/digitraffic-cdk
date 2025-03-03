@@ -290,7 +290,7 @@ function createProcessDLQLambda(
 
   const functionName = "PortActivity-ProcessTimestampsDLQ";
   const processDLQLambda = MonitoredFunction.create(stack, functionName, {
-    runtime: Runtime.NODEJS_20_X,
+    runtime: Runtime.NODEJS_22_X,
     logRetention: RetentionDays.ONE_YEAR,
     functionName: functionName,
     code: new AssetCode("dist/lambda/process-dlq"),
