@@ -6,7 +6,7 @@ certifi==2024.8.30
 cffi==1.17.1
 charset-normalizer==3.3.2
 click==8.1.7
-cryptography==43.0.1
+cryptography==44.0.1
 dash==2.18.1
 dash-bootstrap-components==1.6.0
 dash-core-components==2.0.0
