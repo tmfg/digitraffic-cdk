@@ -3,6 +3,7 @@ import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 import { App, Stack } from "aws-cdk-lib";
 import { MediaType } from "../../../aws/types/mediatypes.js";
 import velocity from "velocityjs";
+import { decodeBase64ToAscii } from "../../../utils/base64.js";
 
 describe("integration tests", () => {
   function createTemplate(i: DigitrafficIntegration<string>): unknown {
@@ -30,6 +31,7 @@ describe("integration tests", () => {
         },
       },
       input: {
+        body: "{ body: \"'moi\" }",
         params: () => ({
           header: {
             h1: "header1",
@@ -44,7 +46,8 @@ describe("integration tests", () => {
         }),
       },
       util: {
-        base64Decode: (data: string) => Buffer.from(data, "base64").toString(),
+        base64Encode: (data: string) => Buffer.from(data).toString("base64"),
+        base64Decode: decodeBase64ToAscii,
         escapeJavaScript: (data: string) => encodeURIComponent(data),
         parseJson: (data: unknown) => JSON.stringify(data),
       },
@@ -183,4 +186,16 @@ describe("integration tests", () => {
       q2: "querystring2",
     });
   });
+
+  test("path body", () => {
+    const i = createIntegration()
+      .passBody();
+
+    const t = createTemplate(i);
+    // body base64-encoded
+    expect(t).toEqual({
+      payload: "eyBib2R5OiAiJ21vaSIgfQ==",
+    });
+  });
+
 });

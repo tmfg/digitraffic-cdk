@@ -24,7 +24,7 @@ const VELOCITY_ALL_PARAMS = `#foreach($paramName in $params.keySet())
 #end`;
 
 const VELOCITY_PASS_BODY =
-  `#set($tmp = $paramMap.put('body', $util.escapeJavaScript($input.json('$'))))`;
+  `#set($tmp = $paramMap.put('payload', $util.base64Encode($input.body)))`;
 
 export class DigitrafficIntegration<T extends string> {
   readonly lambda: IFunction;
@@ -58,8 +58,10 @@ export class DigitrafficIntegration<T extends string> {
   }
 
   /**
-   * Body is passed as an escaped string, so broken input won't break anything.  You should
-   * parse and validate the input in the lambda.
+   * Body is passed as an base64-encoded string, so broken input should't break anything.  You should
+   * decode, parse and validate the input in the lambda.
+   * 
+   * The encoded body will be passed to handler with name payload!!
    */
   passBody(): this {
     this._passBody = true;
