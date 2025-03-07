@@ -18,10 +18,10 @@ export interface EcsConfiguration {
 }
 
 export interface EcsService {
-    readonly clusterName: string;
-    readonly serviceName: string;
-    readonly cpu?: number | "DISABLED";
-    readonly memory?: number | "DISABLED";
+  readonly clusterName: string;
+  readonly serviceName: string;
+  readonly cpu?: number | "DISABLED";
+  readonly memory?: number | "DISABLED";
 }
 
 export interface DBConfiguration {

@@ -6,10 +6,7 @@ import {
   DatabaseClusterEngine,
 } from "aws-cdk-lib/aws-rds";
 import type { Topic } from "aws-cdk-lib/aws-sns";
-import {
-  ComparisonOperator,
-  type Metric,
-} from "aws-cdk-lib/aws-cloudwatch";
+import { ComparisonOperator, type Metric } from "aws-cdk-lib/aws-cloudwatch";
 import { createAlarm } from "./alarms.js";
 
 export class RdsMonitoring {
@@ -29,7 +26,8 @@ export class RdsMonitoring {
       "DbCluster",
       {
         clusterIdentifier: dbConfiguration.dbClusterIdentifier,
-        engine: dbConfiguration.engine ?? DatabaseClusterEngine.AURORA_POSTGRESQL,
+        engine: dbConfiguration.engine ??
+          DatabaseClusterEngine.AURORA_POSTGRESQL,
       },
     );
 
@@ -99,6 +97,13 @@ export class RdsMonitoring {
   ): void {
     const alarmName = `DB-${this.stack.stackName}-${name}`;
 
-    createAlarm(this.stack, this.alarmsTopic, alarmName, metric, threshold, comparisonOperator);
+    createAlarm(
+      this.stack,
+      this.alarmsTopic,
+      alarmName,
+      metric,
+      threshold,
+      comparisonOperator,
+    );
   }
 }

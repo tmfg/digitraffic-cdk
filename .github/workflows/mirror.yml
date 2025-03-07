@@ -6,7 +6,7 @@ on:
 jobs:
   Mirror-action:
     if: github.repository != 'tmfg/digitraffic-cdk'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Mirror
         uses: tmfg/digitraffic-actions@mirror/v2

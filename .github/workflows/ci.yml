@@ -4,7 +4,7 @@ on: [push]
 jobs:
   build:
     if: github.repository != 'tmfg/digitraffic-cdk'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:

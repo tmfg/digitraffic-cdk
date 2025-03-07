@@ -64,7 +64,7 @@ export class MonitoringStack extends Stack {
       new RdsMonitoring(this, alarmsTopic, configuration.db);
     }
 
-    if(configuration.ecs) {
+    if (configuration.ecs) {
       new EcsMonitoring(this, alarmsTopic, configuration.ecs);
     }
   }

@@ -31,7 +31,7 @@ describe("integration tests", () => {
         },
       },
       input: {
-        body: "{ body: \"'moi\" }",
+        body: '{ body: "\'moi" }',
         params: () => ({
           header: {
             h1: "header1",
@@ -197,5 +197,4 @@ describe("integration tests", () => {
       payload: "eyBib2R5OiAiJ21vaSIgfQ==",
     });
   });
-
 });
