@@ -51,7 +51,10 @@ echo
 # Get stack name (take first match ie. grep -i 'new ' <the-file> | grep -i marineprod |  cut -d "'" -f2 | head -1
 # sed replaces single quotes (old way) with double quotes (new way)
 if [[ "${STACK_NAME}" == "NONE" ]]; then
-    STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${DT_PROJECT}${DT_PROJECT_ENV}"  | gsed  "s/'/\"/g" |  cut -d '"' -f2 | head -1)
+    REGEX="\"[A-Za-z0-9-]*${DT_PROJECT}[A-Za-z0-9-]*${DT_PROJECT_ENV}[A-Za-z0-9-]*\"";
+    echo "REGEX=${REGEX}"
+    # Take first line of grep match and strip off double quotes
+    STACK=$(grep -Ei ${REGEX} ${APP_TS} |  cut -d '"' -f2 | head -1)
 else
     STACK=${STACK_NAME}
 fi
