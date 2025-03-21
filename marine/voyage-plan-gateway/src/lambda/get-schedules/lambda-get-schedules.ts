@@ -1,10 +1,10 @@
-import ky from "ky";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type {
   ProxyLambdaRequest,
   ProxyLambdaResponse,
 } from "@digitraffic/common/dist/aws/types/proxytypes";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import ky from "ky";
 
 interface VoyagePlanSecret extends GenericSecret {
   readonly "vpgw.schedulesAccessToken": string;

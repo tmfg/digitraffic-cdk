@@ -14,20 +14,6 @@ export class VoyagePlanGatewayStack extends DigitrafficStack {
       appProps.secretId,
     );
 
-    /**
-     * The VIS API is no longer in operation so there are no more voyage plans to handle.
-
-    const notifyTopicName = "VPGW-NotifyTopic";
-    const notifyTopic = new Topic(this, notifyTopicName, {
-      topicName: notifyTopicName,
-      displayName: notifyTopicName,
-    });
-
-    IntegrationApi.create(secret, notifyTopic, appProps, this);
-    InternalLambdas.create(secret, notifyTopic, appProps, this);
-     */
-
-    // The schedules public API is still needed
     PublicApi.create(secret, appProps, this);
   }
 }

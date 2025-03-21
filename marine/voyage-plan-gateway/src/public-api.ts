@@ -66,7 +66,7 @@ function createVtsProxyHandler(
     functionName,
     defaultLambdaConfiguration({
       functionName,
-      code: new AssetCode("dist/lambda/get-schedules"),
+      code: new AssetCode("dist/lambda"),
       handler: "lambda-get-schedules.handler",
       environment: env,
       vpc: stack.vpc,
