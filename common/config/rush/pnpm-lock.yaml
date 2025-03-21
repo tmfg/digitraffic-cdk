@@ -1120,48 +1120,18 @@ importers:
 
   ../../marine/voyage-plan-gateway:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.758.0
-        version: 3.758.0
-      '@aws-sdk/client-sns':
-        specifier: ^3.758.0
-        version: 3.758.0
-      '@aws-sdk/client-sqs':
-        specifier: ^3.758.0
-        version: 3.758.0
-      '@date-fns/tz':
-        specifier: 1.2.0
-        version: 1.2.0
       '@digitraffic/common':
         specifier: 2025.2.28-3
         version: 2025.2.28-3(@aws-sdk/client-api-gateway@3.758.0)(@aws-sdk/client-s3@3.758.0)(@aws-sdk/client-secrets-manager@3.758.0)(@aws-sdk/client-sns@3.758.0)(@aws-sdk/lib-storage@3.758.0(@aws-sdk/client-s3@3.758.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@5.0.1)(aws-cdk-lib@2.181.1(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.7.5)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.2.2)(pg-promise@11.10.2(pg-native@3.2.2)(pg-query-stream@4.7.1(pg@8.13.1(pg-native@3.2.2))))(pg-query-stream@4.7.1(pg@8.13.1(pg-native@3.2.2)))(zod@3.24.2)
-      '@turf/turf':
-        specifier: 7.0.0-alpha.111
-        version: 7.0.0-alpha.111
       aws-cdk-lib:
         specifier: ^2.181.1
         version: 2.181.1(constructs@10.4.2)
-      aws-sdk:
-        specifier: ^2.1692.0
-        version: 2.1692.0
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
-      date-fns:
-        specifier: ~4.1.0
-        version: 4.1.0
       ky:
         specifier: ^1.7.5
         version: 1.7.5
-      source-map-support:
-        specifier: ^0.5.21
-        version: 0.5.21
-      uuid:
-        specifier: ^11.1.0
-        version: 11.1.0
-      xml2js:
-        specifier: ^0.6.2
-        version: 0.6.2
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -1199,15 +1169,6 @@ importers:
       '@types/node':
         specifier: 22.13.5
         version: 22.13.5
-      '@types/openlayers':
-        specifier: 4.6.23
-        version: 4.6.23
-      '@types/uuid':
-        specifier: 10.0.0
-        version: 10.0.0
-      '@types/xml2js':
-        specifier: 0.4.14
-        version: 0.4.14
       aws-lambda:
         specifier: ^1.0.7
         version: 1.0.7
@@ -4994,9 +4955,6 @@ packages:
   '@turf/truncate@7.2.0':
     resolution: {integrity: sha512-jyFzxYbPugK4XjV5V/k6Xr3taBjjvo210IbPHJXw0Zh7Y6sF+hGxeRVtSuZ9VP/6oRyqAOHKUrze+OOkPqBgUg==}
 
-  '@turf/turf@7.0.0-alpha.111':
-    resolution: {integrity: sha512-ZiL8UTa1/LdxSYqjvYhROQbJBdTDxOe1lIEHiUnJ42h0keGcm6l35BVJPjv7MXkbJxV4DhlqgVfEG7yNgVw8sw==}
-
   '@turf/turf@7.0.0-alpha.116':
     resolution: {integrity: sha512-RzqsS3KsoidNg19wjU7vxxsTouvrZtUt78YxwKFT6EfRNieBm1BNr2jf+Y0JVQr6XiEXO7iM+jDzOraIPu3XFA==}
 
@@ -5089,9 +5047,6 @@ packages:
 
   '@types/node@22.13.5':
     resolution: {integrity: sha512-+lTU0PxZXn0Dr1NBtC7Y8cR21AJr87dLLU953CWA6pMxxv/UDc7jYAY90upcrie1nRcD6XNG5HOYEDtgW5TxAg==}
-
-  '@types/openlayers@4.6.23':
-    resolution: {integrity: sha512-7jCPIa4D4LV03Rttae1AEqvkIN0+nc6Snz4IgA/IjsJD5O3ONxpscqIOdp1qAGuAsikR/ZC9vrPF9np8JRc6ig==}
 
   '@types/prettier@2.7.3':
     resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}
@@ -12016,122 +11971,6 @@ snapshots:
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 
-  '@turf/turf@7.0.0-alpha.111':
-    dependencies:
-      '@turf/along': 7.2.0
-      '@turf/angle': 7.2.0
-      '@turf/area': 7.2.0
-      '@turf/bbox': 7.2.0
-      '@turf/bbox-clip': 7.2.0
-      '@turf/bbox-polygon': 7.2.0
-      '@turf/bearing': 7.2.0
-      '@turf/bezier-spline': 7.2.0
-      '@turf/boolean-clockwise': 7.2.0
-      '@turf/boolean-concave': 7.2.0
-      '@turf/boolean-contains': 7.2.0
-      '@turf/boolean-crosses': 7.2.0
-      '@turf/boolean-disjoint': 7.2.0
-      '@turf/boolean-equal': 7.2.0
-      '@turf/boolean-intersects': 7.2.0
-      '@turf/boolean-overlap': 7.2.0
-      '@turf/boolean-parallel': 7.2.0
-      '@turf/boolean-point-in-polygon': 7.2.0
-      '@turf/boolean-point-on-line': 7.2.0
-      '@turf/boolean-touches': 7.2.0
-      '@turf/boolean-valid': 7.2.0
-      '@turf/boolean-within': 7.2.0
-      '@turf/buffer': 7.2.0
-      '@turf/center': 7.2.0
-      '@turf/center-mean': 7.2.0
-      '@turf/center-median': 7.2.0
-      '@turf/center-of-mass': 7.2.0
-      '@turf/centroid': 7.2.0
-      '@turf/circle': 7.2.0
-      '@turf/clean-coords': 7.2.0
-      '@turf/clone': 7.2.0
-      '@turf/clusters': 7.2.0
-      '@turf/clusters-dbscan': 7.2.0
-      '@turf/clusters-kmeans': 7.2.0
-      '@turf/collect': 7.2.0
-      '@turf/combine': 7.2.0
-      '@turf/concave': 7.2.0
-      '@turf/convex': 7.2.0
-      '@turf/destination': 7.2.0
-      '@turf/difference': 7.2.0
-      '@turf/dissolve': 7.2.0
-      '@turf/distance': 7.2.0
-      '@turf/distance-weight': 7.2.0
-      '@turf/ellipse': 7.2.0
-      '@turf/envelope': 7.2.0
-      '@turf/explode': 7.2.0
-      '@turf/flatten': 7.2.0
-      '@turf/flip': 7.2.0
-      '@turf/geojson-rbush': 7.2.0
-      '@turf/great-circle': 7.2.0
-      '@turf/helpers': 7.2.0
-      '@turf/hex-grid': 7.2.0
-      '@turf/interpolate': 7.2.0
-      '@turf/intersect': 7.2.0
-      '@turf/invariant': 7.2.0
-      '@turf/isobands': 7.2.0
-      '@turf/isolines': 7.2.0
-      '@turf/kinks': 7.2.0
-      '@turf/length': 7.2.0
-      '@turf/line-arc': 7.2.0
-      '@turf/line-chunk': 7.2.0
-      '@turf/line-intersect': 7.2.0
-      '@turf/line-offset': 7.2.0
-      '@turf/line-overlap': 7.2.0
-      '@turf/line-segment': 7.2.0
-      '@turf/line-slice': 7.2.0
-      '@turf/line-slice-along': 7.2.0
-      '@turf/line-split': 7.2.0
-      '@turf/line-to-polygon': 7.2.0
-      '@turf/mask': 7.2.0
-      '@turf/meta': 7.2.0
-      '@turf/midpoint': 7.2.0
-      '@turf/moran-index': 7.2.0
-      '@turf/nearest-neighbor-analysis': 7.2.0
-      '@turf/nearest-point': 7.2.0
-      '@turf/nearest-point-on-line': 7.2.0
-      '@turf/nearest-point-to-line': 7.2.0
-      '@turf/planepoint': 7.2.0
-      '@turf/point-grid': 7.2.0
-      '@turf/point-on-feature': 7.2.0
-      '@turf/point-to-line-distance': 7.2.0
-      '@turf/points-within-polygon': 7.2.0
-      '@turf/polygon-smooth': 7.2.0
-      '@turf/polygon-tangents': 7.2.0
-      '@turf/polygon-to-line': 7.2.0
-      '@turf/polygonize': 7.2.0
-      '@turf/projection': 7.2.0
-      '@turf/quadrat-analysis': 7.2.0
-      '@turf/random': 7.2.0
-      '@turf/rectangle-grid': 7.2.0
-      '@turf/rewind': 7.2.0
-      '@turf/rhumb-bearing': 7.2.0
-      '@turf/rhumb-destination': 7.2.0
-      '@turf/rhumb-distance': 7.2.0
-      '@turf/sample': 7.2.0
-      '@turf/sector': 7.2.0
-      '@turf/shortest-path': 7.2.0
-      '@turf/simplify': 7.2.0
-      '@turf/square': 7.2.0
-      '@turf/square-grid': 7.2.0
-      '@turf/standard-deviational-ellipse': 7.2.0
-      '@turf/tag': 7.2.0
-      '@turf/tesselate': 7.2.0
-      '@turf/tin': 7.2.0
-      '@turf/transform-rotate': 7.2.0
-      '@turf/transform-scale': 7.2.0
-      '@turf/transform-translate': 7.2.0
-      '@turf/triangle-grid': 7.2.0
-      '@turf/truncate': 7.2.0
-      '@turf/union': 7.2.0
-      '@turf/unkink-polygon': 7.2.0
-      '@turf/voronoi': 7.2.0
-      tslib: 2.8.1
-
   '@turf/turf@7.0.0-alpha.116':
     dependencies:
       '@turf/along': 7.2.0
@@ -12370,8 +12209,6 @@ snapshots:
   '@types/node@22.13.5':
     dependencies:
       undici-types: 6.20.0
-
-  '@types/openlayers@4.6.23': {}
 
   '@types/prettier@2.7.3': {}
 
