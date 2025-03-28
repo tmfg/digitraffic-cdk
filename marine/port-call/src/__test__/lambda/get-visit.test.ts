@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertVisitCount, dbTestBase } from "../db-testutil.js";
-import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
+import { assertVisitCount, dbTestBase, mockProxyAndSecretHolder } from "../db-testutil.js";
+import { ExpectResponse } from "@digitraffic-cdk/testing";
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { updateAndExpect } from "../service/visits-service.test.js";
 import { createTestVisit } from "../testdata.js";
@@ -8,7 +8,7 @@ import { createTestVisit } from "../testdata.js";
 // eslint-disable-next-line dot-notation
 process.env["SECRET_ID"] = "";
 
-mockProxyHolder();
+mockProxyAndSecretHolder();
 
 async function getResponseFromLambda(visitId: string): Promise<LambdaResponse> {
     const { handler } = await import("../../lambda/get-visit/get-visit.js");

@@ -11,7 +11,7 @@ const DATATYPE = "PC2_VISITS" as const;
 // what format? json or geojson?
 export async function findAllVisits(getVisitsEvent: GetVisitsParameters): Promise<[DbVisit[], Date]> {
     const visits = await inDatabaseReadonly((db: DTDatabase) => {
-        return VisitDAO.findAllVisits(db);
+        return VisitDAO.findAllVisits(db, getVisitsEvent.from, getVisitsEvent.to);
     });
 
     // get from visits
@@ -44,8 +44,8 @@ function getTo(from: Date): Date {
     return now;
 }
 
-export async function updateVisits(url: string, ca: string, privateKey: string, certificate: string): Promise<VisitDAO.DbInsertedUpdated> {
-    const api = new NemoApi(url, ca, privateKey, certificate);
+export async function updateVisits(url: string, privateKey: string, certificate: string): Promise<VisitDAO.DbInsertedUpdated> {
+    const api = new NemoApi(url, privateKey, certificate);
 
     const from = await getLastUpdated();
     const to = getTo(from);

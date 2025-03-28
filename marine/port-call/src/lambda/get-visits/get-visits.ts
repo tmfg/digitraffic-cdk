@@ -13,8 +13,7 @@ const OptionalDateString = z.coerce.date().optional().or(EmptyStringUndefined);
 const getVisitsSchema = 
     z.object({
         from: OptionalDateString,
-        to: OptionalDateString,
-        // not yet
+        to: OptionalDateString
     })
     .strict()
     .readonly();
