@@ -9,11 +9,13 @@ import type { NemoResponse } from "../../model/nemo.js";
 export async function updateAndExpect(response: NemoResponse, expectInserted: number = 0, expectUpdated: number = 0): Promise<void> {
     jest.spyOn(NemoApi.prototype, "getVisits").mockResolvedValue(response);
 
-    const updated = await updateVisits("", "", "", "");
+    const updated = await updateVisits("", "", "");
 
     expect(updated.inserted).toBe(expectInserted);
     expect(updated.updated).toBe(expectUpdated);
 }
+
+const TEST_RESPONSE = [{"visitId":"32ab881cf91a46428e8bc916bdf753f2","portCall":{"vesselInformation":{"identification":"9878319","name":"AURORA BOTNIA"},"voyageInformation":{"portIdentification":"FIVAA","estimatedArrivalDateTime":"2025-03-19T13:00:00.00+02:00","estimatedDepartureDateTime":"2025-03-19T14:00:00.00+02:00"},"arrivalNotification":{"actualArrivalDateTime":null},"departureNotification":{"actualDepartureDateTime":null},"portCallStatus":{"status":"Expected to Arrive"}},"latestUpdateTime":"2025-03-19T12:42:49.852078+02:00"},{"visitId":"667c3398d7794c2eb4b84aac130b422b","portCall":{"vesselInformation":{"identification":"9878319","name":"AURORA BOTNIA"},"voyageInformation":{"portIdentification":"FIVAA","estimatedArrivalDateTime":"2025-03-19T15:00:00.00+02:00","estimatedDepartureDateTime":"2025-03-19T16:00:00.00+02:00"},"arrivalNotification":{"actualArrivalDateTime":"2025-03-19T14:50:00.00+02:00"},"departureNotification":{"actualDepartureDateTime":null},"portCallStatus":{"status":"Arrived"}},"latestUpdateTime":"2025-03-19T14:49:55.638824+02:00"}] as unknown as NemoResponse;
 
 describe(
     "visit-service-tests",
@@ -43,6 +45,14 @@ describe(
 
             await updateAndExpect([testVisit], 0, 0);
             await assertVisitCount(db, 1);
+        });
+
+        test("update visits - from test response", async () => {
+            await updateAndExpect(TEST_RESPONSE, 2, 0);
+            await assertVisitCount(db, 2);
+
+            await updateAndExpect(TEST_RESPONSE, 0, 0);
+            await assertVisitCount(db, 2);
         });
 
     })

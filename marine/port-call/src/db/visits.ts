@@ -94,11 +94,14 @@ export async function upsertVisit(
 
 const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
     name: "find-all-visits",
-    text: "select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time from pc2_visit",
+    text: `select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time 
+    from pc2_visit
+    where ($1::timestamptz is null or update_time >= $1::timestamptz)
+    and ($2::timestamptz is null or update_time < $2::timestamptz)`,
 });
 
-export function findAllVisits(db: DTDatabase): Promise<DbVisit[]> {
-    return db.manyOrNone(FIND_ALL_VISITS_PS);
+export function findAllVisits(db: DTDatabase, from: Date | undefined, to: Date | undefined): Promise<DbVisit[]> {
+    return db.manyOrNone(FIND_ALL_VISITS_PS, [from, to]);
 }
 
 const GET_VISIT_PS = new pgPromise.PreparedStatement({
