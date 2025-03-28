@@ -15,7 +15,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.181.1",
+    "aws-cdk-lib": "^2.186.0",
     "constructs": "~10.4.2"
   },
   "devDependencies": {
@@ -23,13 +23,13 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.69.1",
-    "@rushstack/heft-jest-plugin": "^0.14.11",
+    "@rushstack/heft": "^0.71.1",
+    "@rushstack/heft-jest-plugin": "^0.15.3",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "22.13.5",
+    "@types/node": "22.13.14",
     "eslint": "^8.57.0",
     "ts-node": "^10.9.2",
-    "typescript": "~5.6.3"
+    "typescript": "~5.8.2"
   },
   "externals": [
     "aws-sdk"

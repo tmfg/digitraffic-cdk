@@ -33,15 +33,15 @@
     "@digitraffic/common": "2025.2.28-3",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.69.1",
-    "@rushstack/heft-jest-plugin": "^0.14.11",
+    "@rushstack/heft": "^0.71.1",
+    "@rushstack/heft-jest-plugin": "^0.15.3",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
     "@types/madge": "5.0.3",
-    "@types/node": "22.13.5",
-    "esbuild": "0.25.0",
+    "@types/node": "22.13.14",
+    "esbuild": "0.25.1",
     "eslint": "^8.57.0",
-    "rollup": "~4.34.8",
-    "typescript": "~5.6.3"
+    "rollup": "~4.37.0",
+    "typescript": "~5.8.2"
   }
 }

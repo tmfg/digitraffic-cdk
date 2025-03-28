@@ -26,33 +26,33 @@
   "dependencies": {
     "@digitraffic/common": "2025.2.28-3",
     "@rgrove/parse-xml": "4.2.0",
-    "aws-cdk-lib": "^2.181.1",
+    "aws-cdk-lib": "^2.186.0",
     "constructs": "~10.4.2",
-    "pg-native": "^3.2.2",
-    "pg-promise": "^11.10.2"
+    "pg-native": "^3.3.0",
+    "pg-promise": "^11.13.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-api-gateway": "^3.758.0",
+    "@aws-sdk/client-api-gateway": "^3.777.0",
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.69.1",
-    "@rushstack/heft-jest-plugin": "^0.14.11",
-    "@types/aws-lambda": "8.10.147",
+    "@rushstack/heft": "^0.71.1",
+    "@rushstack/heft-jest-plugin": "^0.15.3",
+    "@types/aws-lambda": "8.10.148",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
-    "@types/node": "22.13.5",
+    "@types/node": "22.13.14",
     "@types/xml2js": "0.4.14",
-    "esbuild": "0.25.0",
+    "esbuild": "0.25.1",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
     "parallelshell": "^3.0.2",
-    "spex": "^3.4.0",
-    "ts-jest": "^29.2.6",
-    "typescript": "~5.6.3"
+    "spex": "^3.4.1",
+    "ts-jest": "^29.3.0",
+    "typescript": "~5.8.2"
   }
 }

@@ -22,14 +22,14 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.2.28-3",
-    "aws-cdk-lib": "^2.181.1",
-    "axios": "^1.8.1",
+    "aws-cdk-lib": "^2.186.0",
+    "axios": "^1.8.4",
     "constructs": "~10.4.2",
     "date-fns": "~4.1.0",
     "geojson": "^0.5.0",
-    "pg-native": "^3.2.2",
-    "pg-promise": "^11.10.2",
-    "spex": "^3.4.0"
+    "pg-native": "^3.3.0",
+    "pg-promise": "^11.13.0",
+    "spex": "^3.4.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -38,17 +38,17 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.69.1",
-    "@rushstack/heft-jest-plugin": "^0.14.11",
-    "@types/aws-lambda": "8.10.147",
+    "@rushstack/heft": "^0.71.1",
+    "@rushstack/heft-jest-plugin": "^0.15.3",
+    "@types/aws-lambda": "8.10.148",
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
-    "@types/lodash": "4.17.15",
-    "@types/node": "22.13.5",
-    "esbuild": "0.25.0",
+    "@types/lodash": "4.17.16",
+    "@types/node": "22.13.14",
+    "esbuild": "0.25.1",
     "eslint": "^8.57.0",
     "lodash": "^4.17.21",
-    "typescript": "~5.6.3"
+    "typescript": "~5.8.2"
   }
 }
