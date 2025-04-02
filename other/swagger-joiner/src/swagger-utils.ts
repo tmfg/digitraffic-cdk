@@ -2,7 +2,7 @@ import {
   type OpenApiOperation,
   openapiOperation,
   type OpenApiSchema,
-} from "./model/openapi-schema.js";
+} from "@digitraffic/common/dist/types/openapi-schema";
 import _ from "lodash";
 import {
   logger,
