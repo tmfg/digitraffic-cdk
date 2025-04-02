@@ -23,7 +23,7 @@ import {
 import {
   type OpenApiSchema,
   openapiSchema,
-} from "../../model/openapi-schema.js";
+} from "@digitraffic/common/dist/types/openapi-schema";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { UPDATE_SWAGGER_KEYS } from "../../model/keys.js";
 

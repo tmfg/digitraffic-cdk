@@ -12,7 +12,7 @@ import {
   getPathWithSecurity,
   getSupportedPath,
 } from "./testdata.js";
-import { openapiSchema } from "../model/openapi-schema.js";
+import { openapiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import { TEST } from "./resources/digitraffic-road-test.js";
 
 describe("swagger-utils", () => {
