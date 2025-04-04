@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.2.28-3",
-    "aws-cdk-lib": "^2.186.0",
+    "aws-cdk-lib": "^2.188.0",
     "constructs": "~10.4.2",
     "ky": "^1.7.5"
   },

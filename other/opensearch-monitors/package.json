@@ -28,7 +28,7 @@
     "@smithy/node-http-handler": "~4.0.4",
     "@smithy/protocol-http": "~5.1.0",
     "@smithy/signature-v4": "~5.0.2",
-    "aws-cdk-lib": "^2.186.0",
+    "aws-cdk-lib": "^2.188.0",
     "constructs": "~10.4.2"
   },
   "devDependencies": {
