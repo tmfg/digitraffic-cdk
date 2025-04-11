@@ -30,7 +30,7 @@
     "@middy/core": "^6.1.6",
     "@middy/sqs-partial-batch-failure": "^6.1.6",
     "amqplib": "^0.10.5",
-    "aws-cdk-lib": "^2.188.0",
+    "aws-cdk-lib": "^2.189.0",
     "constructs": "~10.4.2",
     "date-fns": "~4.1.0",
     "@date-fns/tz": "1.2.0",

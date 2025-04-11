@@ -53,9 +53,9 @@ After adding a dependency, remember to commit the changes made to pnpm.lock.
 
 ## Updating all dependencies
 
-Run the script update-deps.sh. This script updates all dependencies to their
-latest patch version and compiles projects. Any compilation errors should be
-fixed before committing dependency changes.
+Run the script [update-deps.sh](update-deps.sh). This script updates all
+dependencies to their latest patch version and compiles projects. Any
+compilation errors should be fixed before committing dependency changes.
 
 ## Running tests
 

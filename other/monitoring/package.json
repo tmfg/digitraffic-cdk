@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.2.28-3",
-    "aws-cdk-lib": "^2.188.0",
+    "aws-cdk-lib": "^2.189.0",
     "constructs": "~10.4.2"
   },
   "devDependencies": {
