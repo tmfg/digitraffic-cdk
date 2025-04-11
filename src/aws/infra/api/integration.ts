@@ -60,7 +60,7 @@ export class DigitrafficIntegration<T extends string> {
   /**
    * Body is passed as an base64-encoded string, so broken input should't break anything.  You should
    * decode, parse and validate the input in the lambda.
-   * 
+   *
    * The encoded body will be passed to handler with name payload!!
    */
   passBody(): this {

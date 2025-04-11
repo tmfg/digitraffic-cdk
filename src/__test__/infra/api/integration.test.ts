@@ -31,7 +31,7 @@ describe("integration tests", () => {
         },
       },
       input: {
-        body: "{ body: \"'moi\" }",
+        body: '{ body: "\'moi" }',
         params: () => ({
           header: {
             h1: "header1",
@@ -65,7 +65,7 @@ describe("integration tests", () => {
     const stack = new Stack(app);
 
     const f = new Function(stack, "id", {
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_22_X,
       code: Code.fromInline("placeholder"),
       handler: "handler",
     });
@@ -197,5 +197,4 @@ describe("integration tests", () => {
       payload: "eyBib2R5OiAiJ21vaSIgfQ==",
     });
   });
-
 });

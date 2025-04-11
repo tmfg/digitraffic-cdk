@@ -76,7 +76,7 @@ describe("dt-logger", () => {
     assertLogError(STRING_ERROR, {
       type: "Error",
       method: TEST_METHODNAME,
-      message: STRING_ERROR,
+      message: `${TEST_METHODNAME} ${STRING_ERROR}`,
       level: "ERROR",
     });
   });
@@ -87,7 +87,7 @@ describe("dt-logger", () => {
     assertLogError(ERROR, {
       type: "Error",
       method: TEST_METHODNAME,
-      message: ERROR.message,
+      message: `${TEST_METHODNAME} ${ERROR.message}`,
       level: "ERROR",
     });
   });
@@ -100,7 +100,7 @@ describe("dt-logger", () => {
       {
         type: "Error",
         method: TEST_METHODNAME,
-        message: ERROR.message,
+        message: `${TEST_METHODNAME} ${ERROR.message}`,
         level: "ERROR",
         stack: true,
       },
@@ -115,7 +115,7 @@ describe("dt-logger", () => {
     assertAxiosError(ERROR, {
       type: "Error",
       method: TEST_METHODNAME,
-      message: ERROR.message,
+      message: `${TEST_METHODNAME} ${ERROR.message}`,
       level: "ERROR",
       code: ERROR.code,
     });
