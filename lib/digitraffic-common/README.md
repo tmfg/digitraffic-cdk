@@ -10,6 +10,7 @@ Use `pnpm` to build the code i.e.
     pnpm install
     pnpm build
     pnpm test
+    pnpm test --test-path-pattern 'dt-logger.test'
 
 Format code
 

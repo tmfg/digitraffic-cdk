@@ -77,7 +77,7 @@ export const openapiPathItem = z
 
 export const openapiSchema = z
   .object({
-    openapi: z.string().regex(new RegExp("^3\\.0\\.\\d(-.+)?$")),
+    openapi: z.string().regex(new RegExp("^3\\.\\d\\.\\d(-.+)?$")),
     info: z
       .object({
         title: z.string(),
