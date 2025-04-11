@@ -74,3 +74,9 @@ compilation errors should be fixed before committing dependency changes.
 6. Create a breakpoint in a TypeScript file
 7. Select a Lambda
 8. Wait for execution to reach breakpoint
+
+## Subtree commands
+
+    rush common-subtree -h
+    rush common-subtree -c pull -r master
+    rush common-subtree -c push -r master
