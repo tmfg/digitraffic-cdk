@@ -279,7 +279,7 @@ describe("NodePing API test", () => {
     const repo = "bar";
     const branch = "master";
     const workflowFile = "workflowFile.yaml";
-    const gitHubPat = "gh_pat_adfas";
+    const gitHubPat = "SampleToken";
     const nodepingContactName = "gh-contact";
 
     const spy = jest
