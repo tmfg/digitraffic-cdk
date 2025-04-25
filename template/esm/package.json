@@ -31,9 +31,9 @@
     "@rushstack/heft-jest-plugin": "^0.15.3",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
-    "@types/node": "22.13.14",
-    "esbuild": "0.25.1",
+    "@types/node": "22.15.2",
+    "esbuild": "0.25.3",
     "eslint": "^8.57.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.3"
   }
 }
