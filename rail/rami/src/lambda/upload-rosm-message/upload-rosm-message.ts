@@ -3,40 +3,42 @@ import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-respon
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";
 import { sendDlq, sendRosmMessage } from "../../service/sqs-service.js";
 
-export const handler = async (messageBody: object | undefined): Promise<LambdaResponse> => {
-    if(!messageBody) {
-        return LambdaResponse.badRequest("Empty message body");
-    }
+export const handler = async (
+  messageBody: object | undefined,
+): Promise<LambdaResponse> => {
+  if (!messageBody) {
+    return LambdaResponse.badRequest("Empty message body");
+  }
 
-    const validationResult = validateIncomingRosmMessage(messageBody);
-    
-    if (validationResult.valid) {            
-        const body = JSON.stringify(messageBody);
+  const validationResult = validateIncomingRosmMessage(messageBody);
 
-        logger.info({
-            method: "UploadRosmMessage.handler",
-            message: "Received valid ROSM message",
-            customSizeBytes: body.length
-        });
+  if (validationResult.valid) {
+    const body = JSON.stringify(messageBody);
 
-        logger.debug(body);
+    logger.info({
+      method: "UploadRosmMessage.handler",
+      message: "Received valid ROSM message",
+      customSizeBytes: body.length,
+    });
 
-        await sendRosmMessage(validationResult);
-    } else {
-        logger.error({
-            method: "UploadRosmMessage.handler",
-            message: "Received invalid ROSM message",
-            customInvalidRosmMessage: JSON.stringify(messageBody),
-            customValidationErrors: validationResult.errors
-        });
-        
-        // send invalid message and error report to dlq
-        await sendDlq({
-            messageType: "ROSM",
-            errors: validationResult.errors,
-            message: messageBody
-        });     
-    }
+    logger.debug(body);
 
-    return LambdaResponse.ok("OK");
+    await sendRosmMessage(validationResult);
+  } else {
+    logger.error({
+      method: "UploadRosmMessage.handler",
+      message: "Received invalid ROSM message",
+      customInvalidRosmMessage: JSON.stringify(messageBody),
+      customValidationErrors: validationResult.errors,
+    });
+
+    // send invalid message and error report to dlq
+    await sendDlq({
+      messageType: "ROSM",
+      errors: validationResult.errors,
+      message: messageBody,
+    });
+  }
+
+  return LambdaResponse.ok("OK");
 };

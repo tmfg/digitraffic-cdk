@@ -30,34 +30,36 @@ and attap_id = :attapId;
 `;
 
 export interface UdotUpsertValues {
-    readonly trainNumber: number
-    readonly trainDepartureDate: string
-    readonly attapId: number
-    readonly messageId: string
+  readonly trainNumber: number;
+  readonly trainDepartureDate: string;
+  readonly attapId: number;
+  readonly messageId: string;
 
-    readonly ut: boolean
-    readonly ud: boolean
+  readonly ut: boolean;
+  readonly ud: boolean;
 }
 
-export async function insertOrUpdate(conn: Connection, value: UdotUpsertValues): Promise<void> {    
-    try {
-        if(value.ud === false && value.ut === false) {                
-            await conn.execute(SQL_UPDATE_FALSE_VALUES, value);
-        } else {
-            await conn.execute(SQL_UPSERT_UDOT_VALUES, value) 
-        };
-
-        await conn.execute(SQL_MERGE_HISTORY, value);
-    } catch(error) {
-        logger.error({
-            method: "UdotDao.insertOrUpdate",
-            error
-        });        
+export async function insertOrUpdate(
+  conn: Connection,
+  value: UdotUpsertValues,
+): Promise<void> {
+  try {
+    if (value.ud === false && value.ut === false) {
+      await conn.execute(SQL_UPDATE_FALSE_VALUES, value);
+    } else {
+      await conn.execute(SQL_UPSERT_UDOT_VALUES, value);
     }
 
+    await conn.execute(SQL_MERGE_HISTORY, value);
+  } catch (error) {
+    logger.error({
+      method: "UdotDao.insertOrUpdate",
+      error,
+    });
+  }
 }
 
 export async function deleteOldValues(conn: Connection): Promise<void> {
-    await conn.execute(SQL_DELETE_OLD_UDOT_VALUES);
-    await conn.execute(SQL_DELETE_OLD_UDOT_HISTORY_VALUES);
+  await conn.execute(SQL_DELETE_OLD_UDOT_VALUES);
+  await conn.execute(SQL_DELETE_OLD_UDOT_HISTORY_VALUES);
 }

@@ -16,20 +16,22 @@ export enum DatabaseEnvironmentKeys {
 }
 
 async function truncate(db: Connection): Promise<void> {
-    await db.execute("DELETE FROM rami_message");
-    await db.execute("DELETE FROM rami_stop_monitoring_message");
-    await db.execute("DELETE FROM rami_udot");
-    await db.execute("DELETE FROM rami_udot_history");
+  await db.execute("DELETE FROM rami_message");
+  await db.execute("DELETE FROM rami_stop_monitoring_message");
+  await db.execute("DELETE FROM rami_udot");
+  await db.execute("DELETE FROM rami_udot_history");
 }
 
-export async function expectRowCount(expectedCount: number, sql: string): Promise<void> {
-    await inTransaction(async conn => {
-        const [rows] = await conn.query(sql);
+export async function expectRowCount(
+  expectedCount: number,
+  sql: string,
+): Promise<void> {
+  await inTransaction(async (conn) => {
+    const [rows] = await conn.query(sql);
 
-        expect(rows).toHaveLength(1);
-        expect(_.get(rows, ["0", "count(*)"])).toEqual(expectedCount);
-    });
-
+    expect(rows).toHaveLength(1);
+    expect(_.get(rows, ["0", "count(*)"])).toEqual(expectedCount);
+  });
 }
 
 export function dbTestBase(fn: JestEmptyFunction): JestEmptyFunction {

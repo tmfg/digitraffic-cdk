@@ -30,12 +30,12 @@ export async function uploadToS3(
 }
 
 function doUpload(
-    s3: S3,
-    Bucket: string,
-    Body: string,
-    Key: string
+  s3: S3,
+  Bucket: string,
+  Body: string,
+  Key: string,
 ): Promise<PutObjectCommandOutput> {
-    const command = new PutObjectCommand({Bucket, Key, Body});
-    
-    return s3.send(command);
+  const command = new PutObjectCommand({ Bucket, Key, Body });
+
+  return s3.send(command);
 }

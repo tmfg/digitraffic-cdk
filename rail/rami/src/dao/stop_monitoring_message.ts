@@ -10,11 +10,20 @@ WHERE created_db < current_timestamp() - INTERVAL 1 DAY
 LIMIT 50000`;
 
 export async function deleteOldMessages(conn: Connection): Promise<void> {
-    await conn.execute(SQL_DELETE_OLD_MESSAGES);
+  await conn.execute(SQL_DELETE_OLD_MESSAGES);
 }
 
-export async function insertMessage(conn: Connection, id: string, trainNumber: number, trainDepartureDate: string, message: string): Promise<void> {
-    await conn.execute(SQL_INSERT_MESSAGE, {
-        id, trainNumber, trainDepartureDate, message
-    });
+export async function insertMessage(
+  conn: Connection,
+  id: string,
+  trainNumber: number,
+  trainDepartureDate: string,
+  message: string,
+): Promise<void> {
+  await conn.execute(SQL_INSERT_MESSAGE, {
+    id,
+    trainNumber,
+    trainDepartureDate,
+    message,
+  });
 }

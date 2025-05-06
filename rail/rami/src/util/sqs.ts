@@ -1,18 +1,18 @@
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 
 const sqsClient = new SQSClient({
-    maxAttempts: 3,
-    retryMode: "STANDARD"
+  maxAttempts: 3,
+  retryMode: "STANDARD",
 });
 
 export async function sendToSqs(
-    queueUrl: string,
-    messageBody: string
+  queueUrl: string,
+  messageBody: string,
 ): Promise<void> {
-    const message = new SendMessageCommand({        
-        QueueUrl: queueUrl,
-        MessageBody: messageBody
-    });
+  const message = new SendMessageCommand({
+    QueueUrl: queueUrl,
+    MessageBody: messageBody,
+  });
 
-    await sqsClient.send(message);
+  await sqsClient.send(message);
 }

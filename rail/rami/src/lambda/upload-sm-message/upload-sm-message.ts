@@ -3,25 +3,27 @@ import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-respon
 import { validateIncomingSmMessage } from "../../service/validate-message.js";
 import { sendDlq, sendSmMessage } from "../../service/sqs-service.js";
 
-export const handler = async (messageBody: object | undefined): Promise<LambdaResponse> => {
-    if (!messageBody) {
-        return LambdaResponse.badRequest("Empty message body");
-    }
+export const handler = async (
+  messageBody: object | undefined,
+): Promise<LambdaResponse> => {
+  if (!messageBody) {
+    return LambdaResponse.badRequest("Empty message body");
+  }
 
-    const body = JSON.stringify(messageBody);
+  const body = JSON.stringify(messageBody);
 
-    logger.info({
-        method: "UploadSmMessage.handler",
-        message: "Received valid SM message",
-        customSizeBytes: body.length
-    });
+  logger.info({
+    method: "UploadSmMessage.handler",
+    message: "Received valid SM message",
+    customSizeBytes: body.length,
+  });
 
-    logger.debug(body);
+  logger.debug(body);
 
-    await sendSmMessage(messageBody);
+  await sendSmMessage(messageBody);
 
-//    const validationResult = validateIncomingSmMessage(messageBody);
-/*
+  //    const validationResult = validateIncomingSmMessage(messageBody);
+  /*
     if(validationResult.valid) {
         const body = JSON.stringify(messageBody);
 
@@ -45,11 +47,10 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
         // send invalid message and error report to dlq
         await sendDlq({
             messageType: "SM",
-            errors: validationResult.errors, 
+            errors: validationResult.errors,
             message: messageBody
-        });     
+        });
     }*/
 
-    return LambdaResponse.ok("OK");
-
+  return LambdaResponse.ok("OK");
 };

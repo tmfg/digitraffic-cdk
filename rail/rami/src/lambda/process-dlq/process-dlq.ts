@@ -14,30 +14,34 @@ interface DlqEvent {
 }
 
 export const handler = async (event: DlqEvent): Promise<void> => {
-    const millis = new Date().getTime();
-    logger.info({
-        method: "RAMI-ProcessDLQ.handler",
-        customRamiDLQMessagesReceived: event.Records.length
-    });
+  const millis = new Date().getTime();
+  logger.info({
+    method: "RAMI-ProcessDLQ.handler",
+    customRamiDLQMessagesReceived: event.Records.length,
+  });
 
-    const uploads = event.Records.map((e, idx: number) => {
-        logger.debug("event " + JSON.stringify(e));
+  const uploads = event.Records.map((e, idx: number) => {
+    logger.debug("event " + JSON.stringify(e));
 
-        try {
-            const dlqMessage = JSON.parse(e.body) as DlqMessage;
-            const body = `[{"errors":"${dlqMessage.errors}"}, ${JSON.stringify(dlqMessage.message)}]`
-            const folder = `${dlqMessage.messageType}/${new Date().toISOString().substring(0, 10)}`;
-            const fileName = `${folder}/message-${millis}-${idx}.json`;
+    try {
+      const dlqMessage = JSON.parse(e.body) as DlqMessage;
+      const body = `[{"errors":"${dlqMessage.errors}"}, ${
+        JSON.stringify(dlqMessage.message)
+      }]`;
+      const folder = `${dlqMessage.messageType}/${
+        new Date().toISOString().substring(0, 10)
+      }`;
+      const fileName = `${folder}/message-${millis}-${idx}.json`;
 
-            logger.debug("Uploading to " + fileName);
+      logger.debug("Uploading to " + fileName);
 
-            return uploadToS3(bucketName, body, fileName)
-        } catch(error) {
-            logException(logger, error);
+      return uploadToS3(bucketName, body, fileName);
+    } catch (error) {
+      logException(logger, error);
 
-            return Promise.resolve();
-        }
-     });
+      return Promise.resolve();
+    }
+  });
 
-    await Promise.allSettled(uploads);
+  await Promise.allSettled(uploads);
 };

@@ -14,34 +14,43 @@ import { IntegrationApi } from "./integration-api.js";
 export interface RamiConfiguration extends StackConfiguration {
   readonly dlqBucketName: string;
   readonly dlqNotificationDuration?: Duration;
-  readonly enablePublicApi: boolean;
 }
 export class RamiStack extends DigitrafficStack {
-    constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
-        super(scope, id, configuration);
-        const dlq = this.createDLQ(this);
+  constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
+    super(scope, id, configuration);
+    const dlq = this.createDLQ(this);
 
-        const rosmSqs = this.createSqs(this, "RosmSqs", dlq);
-        const smSqs = this.createSqs(this, "SmSqs", dlq);
-        const udotSqs = this.createSqs(this, "UdotSqs", dlq);
+    const rosmSqs = this.createSqs(this, "RosmSqs", dlq);
+    const smSqs = this.createSqs(this, "SmSqs", dlq);
+    const udotSqs = this.createSqs(this, "UdotSqs", dlq);
 
-        new IntegrationApi(this, rosmSqs, smSqs, dlq);
+    new IntegrationApi(this, rosmSqs, smSqs, dlq);
 
-        InternalLambdas.create(this, rosmSqs, smSqs, udotSqs, dlq, configuration.dlqBucketName);
+    InternalLambdas.create(
+      this,
+      rosmSqs,
+      smSqs,
+      udotSqs,
+      dlq,
+      configuration.dlqBucketName,
+    );
 
-        const publicApi = new PublicApi(this);
-        if (!this.secret) throw new Error("secret not found");
-        Canaries.create(this, dlq, publicApi, this.secret);
-    }
+    const publicApi = new PublicApi(this);
+    if (!this.secret) throw new Error("secret not found");
+    Canaries.create(this, dlq, publicApi, this.secret);
   }
 
-    createSqs(stack: DigitrafficStack, name: string, dlq: Queue): DigitrafficSqsQueue {
-        return DigitrafficSqsQueue.create(stack, name, {
-            receiveMessageWaitTime: Duration.seconds(2),
-            visibilityTimeout: Duration.seconds(15),
-            deadLetterQueue: { queue: dlq, maxReceiveCount: 2 }
-        });
-    }
+  createSqs(
+    stack: DigitrafficStack,
+    name: string,
+    dlq: Queue,
+  ): DigitrafficSqsQueue {
+    return DigitrafficSqsQueue.create(stack, name, {
+      receiveMessageWaitTime: Duration.seconds(2),
+      visibilityTimeout: Duration.seconds(15),
+      deadLetterQueue: { queue: dlq, maxReceiveCount: 2 },
+    });
+  }
 
   createDLQ(stack: DigitrafficStack): Queue {
     const dlqName = "RAMI-DLQ";
