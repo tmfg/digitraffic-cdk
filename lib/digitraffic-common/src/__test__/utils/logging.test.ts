@@ -17,7 +17,7 @@ interface LikeAxiosError extends Error {
   code?: string;
 }
 
-describe("dt-logger", () => {
+describe("logging-test", () => {
   function assertLogError(
     error: Error | string,
     expected: ErrorLogLine,
@@ -76,7 +76,7 @@ describe("dt-logger", () => {
     assertLogError(STRING_ERROR, {
       type: "Error",
       method: TEST_METHODNAME,
-      message: `${TEST_METHODNAME} ${STRING_ERROR}`,
+      message: `${TEST_METHODNAME} error=${STRING_ERROR} type=Error`,
       level: "ERROR",
     });
   });
@@ -87,7 +87,7 @@ describe("dt-logger", () => {
     assertLogError(ERROR, {
       type: "Error",
       method: TEST_METHODNAME,
-      message: `${TEST_METHODNAME} ${ERROR.message}`,
+      message: `${TEST_METHODNAME} error=${ERROR.message} type=Error`,
       level: "ERROR",
     });
   });
@@ -100,7 +100,7 @@ describe("dt-logger", () => {
       {
         type: "Error",
         method: TEST_METHODNAME,
-        message: `${TEST_METHODNAME} ${ERROR.message}`,
+        message: `${TEST_METHODNAME} error=${ERROR.message} type=Error`,
         level: "ERROR",
         stack: true,
       },
@@ -115,7 +115,7 @@ describe("dt-logger", () => {
     assertAxiosError(ERROR, {
       type: "Error",
       method: TEST_METHODNAME,
-      message: `${TEST_METHODNAME} ${ERROR.message}`,
+      message: `${TEST_METHODNAME} error=${ERROR.message} type=Error code=12`,
       level: "ERROR",
       code: ERROR.code,
     });

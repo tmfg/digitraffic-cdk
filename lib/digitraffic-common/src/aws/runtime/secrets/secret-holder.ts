@@ -3,10 +3,7 @@ import { checkExpectedSecretKeys } from "./dbsecret.js";
 import { getEnvVariable } from "../../../utils/utils.js";
 import { logger } from "../dt-logger-default.js";
 
-import NodeTtl from "node-ttl";
-
 const DEFAULT_PREFIX = "";
-const DEFAULT_SECRET_KEY = "SECRET";
 const DEFAULT_CONFIGURATION = {
   ttl: 5 * 60, // timeout secrets in 5 minutes
 } as const;
@@ -27,7 +24,9 @@ export class SecretHolder<Secret extends GenericSecret> {
   private readonly prefix: string;
   private readonly expectedKeys: string[];
 
-  private readonly secretCache: NodeTtl;
+  private cachedSecret?: Secret;
+  private expirationTime: Date;
+  private readonly ttl: number; // seconds
 
   constructor(
     secretId: string,
@@ -38,8 +37,8 @@ export class SecretHolder<Secret extends GenericSecret> {
     this.secretId = secretId;
     this.prefix = prefix;
     this.expectedKeys = expectedKeys;
-
-    this.secretCache = new NodeTtl(configuration);
+    this.expirationTime = new Date(0);
+    this.ttl = configuration.ttl;
   }
 
   private async initSecret(): Promise<void> {
@@ -50,7 +49,8 @@ export class SecretHolder<Secret extends GenericSecret> {
       message: "Refreshing secret " + this.secretId,
     });
 
-    this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
+    this.cachedSecret = secretValue;
+    this.expirationTime = new Date(Date.now() + this.ttl * 1000);
   }
 
   public static create<S extends GenericSecret>(
@@ -65,7 +65,7 @@ export class SecretHolder<Secret extends GenericSecret> {
   }
 
   public async get(): Promise<Secret> {
-    const secret = await this.getSecret<Secret>();
+    const secret = await this.getSecret();
     const parsedSecret = this.prefix === DEFAULT_PREFIX
       ? secret
       : this.parseSecret(secret, `${this.prefix}.`);
@@ -95,13 +95,15 @@ export class SecretHolder<Secret extends GenericSecret> {
     return parsed as unknown as Secret;
   }
 
-  private async getSecret<S>(): Promise<S> {
-    const secret: S | undefined = this.secretCache.get(DEFAULT_SECRET_KEY);
-
-    if (!secret) {
+  private async getSecret(): Promise<Secret> {
+    if(this.expirationTime.getTime() < Date.now()) {
       await this.initSecret();
     }
 
-    return secret ?? this.secretCache.get(DEFAULT_SECRET_KEY);
+    if(this.cachedSecret === undefined) {
+      throw new Error("SecretHolder in illegal state");
+    }
+    
+    return this.cachedSecret;
   }
 }

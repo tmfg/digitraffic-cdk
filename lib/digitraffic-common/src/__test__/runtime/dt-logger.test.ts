@@ -1,9 +1,9 @@
 import { Writable } from "stream";
+import type { LoggableType } from "../../aws/runtime/dt-logger.js";
 import {
   DtLogger,
   type LoggerConfiguration,
 } from "../../aws/runtime/dt-logger.js";
-import type { LoggableType } from "../../aws/runtime/dt-logger.js";
 
 const LOG_LINE: LoggableType = {
   method: "dt-logger.test",
@@ -102,17 +102,24 @@ describe("dt-logger", () => {
     expect(loggedLine).toMatchObject(expected);
   }
 
-  test("custom values", () => {
+  test("custom date, number, text and '=' values", () => {
     const date = new Date();
     assertLog(
       {},
       {
         ...LOG_LINE,
         customDate: date,
+        customNumber: 123,
+        customText: "abc",
+        customEqualsText: "foo=bar",
       },
       {
-        ...EXPECTED_LOG_LINE,
+        method: EXPECTED_LOG_LINE.method,
+        message:
+          `${EXPECTED_LOG_LINE.message} date=${date.toISOString()} number=123 text=abc equalsText=\"foo=bar\"`,
         date: date.toISOString(),
+        number: 123,
+        text: "abc",
       },
     );
   });
@@ -125,7 +132,8 @@ describe("dt-logger", () => {
         customFooCount: 123,
       },
       {
-        ...EXPECTED_LOG_LINE,
+        method: EXPECTED_LOG_LINE.method,
+        message: `${EXPECTED_LOG_LINE.message} fooCount=123`,
         fooCount: 123,
       },
     );

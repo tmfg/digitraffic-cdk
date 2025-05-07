@@ -19,9 +19,7 @@ const getSecretValueMock = jest.fn<
 >();
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(
-  getSecretValueMock,
-);
+jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(getSecretValueMock);
 
 const { SecretHolder } = await import(
   "../../aws/runtime/secrets/secret-holder.js"

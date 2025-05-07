@@ -1,5 +1,5 @@
-import type { Writable } from "stream";
 import { lowerFirst, mapKeys } from "lodash-es";
+import type { Writable } from "stream";
 import { getEnvVariableOrElse } from "../../utils/utils.js";
 
 /** Logging level */
@@ -184,14 +184,35 @@ export class DtLogger {
       : message.error
       ? (message.error instanceof Error) ? message.error.stack : undefined
       : undefined;
+
+    const messageFields = removePrefix("custom", message);
+    messageFields.message = this.appendMessageFieldsToMessage(messageFields);
     const logMessage = {
-      ...removePrefix("custom", message),
+      ...messageFields,
       error,
       stack,
       lambdaName: this.lambdaName,
       runtime: this.runtime,
     };
+
     this.writeStream.write(JSON.stringify(logMessage) + "\n");
+  }
+
+  private appendMessageFieldsToMessage(message: LoggableType): string {
+    // The order is not guaranteed to be alphabetical etc.
+    const fielValuePairs = Object.entries(message)
+      // Remove fields not logged in message field
+      .filter(([key]) => {
+        return !["message", "level", "method", "stack", "error"].includes(
+          key,
+        ) && !(message.message ?? "").includes(`${key}=`);
+      })
+      // Map value to string
+      .map(([key, value]) => `${key}=${valueToString(value)}`)
+      .join(" ");
+    return `${message.message ?? ""}${
+      fielValuePairs ? " " + fielValuePairs : ""
+    }`;
   }
 }
 
@@ -204,4 +225,19 @@ function removePrefix(prefix: string, loggable: LoggableType): LoggableType {
     (_index, key: string) =>
       key.startsWith(prefix) ? lowerFirst(key.replace(prefix, "")) : key,
   ) as unknown as LoggableType;
+}
+
+function valueToString(value: unknown): string {
+  if (value === undefined) {
+    return "undefined";
+  } else if (value === null) {
+    return "null";
+  } else if (value instanceof Date) {
+    return value.toISOString();
+  } else if (typeof value !== "string") {
+    return JSON.stringify(value);
+  } else if (value.includes("=")) {
+    return JSON.stringify(value);
+  }
+  return value;
 }
