@@ -821,8 +821,8 @@ importers:
         specifier: 1.2.0
         version: 1.2.0
       '@digitraffic/common':
-        specifier: 2025.2.28-3
-        version: 2025.2.28-3(@aws-sdk/client-api-gateway@3.804.0)(@aws-sdk/client-s3@3.796.0)(@aws-sdk/client-secrets-manager@3.804.0)(@aws-sdk/client-sns@3.796.0)(@aws-sdk/lib-storage@3.804.0(@aws-sdk/client-s3@3.796.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@5.0.2)(aws-cdk-lib@2.192.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.8.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.4.5)(pg-promise@11.13.0(pg-native@3.4.5))(zod@3.24.3)
+        specifier: 2025.5.5-1
+        version: 2025.5.5-1(@aws-sdk/client-api-gateway@3.804.0)(@aws-sdk/client-s3@3.796.0)(@aws-sdk/client-secrets-manager@3.804.0)(@aws-sdk/client-sns@3.796.0)(@aws-sdk/lib-storage@3.804.0(@aws-sdk/client-s3@3.796.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@5.0.2)(aws-cdk-lib@2.192.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.8.1)(lodash-es@4.17.21)(pg-native@3.4.5)(pg-promise@11.13.0(pg-native@3.4.5)(pg-query-stream@4.8.1(pg@8.14.1(pg-native@3.4.5))))(zod@3.24.3)
       '@middy/core':
         specifier: ^6.1.6
         version: 6.1.6
@@ -3487,6 +3487,29 @@ packages:
       pg-promise: ^11.13.0
       pg-query-stream: 4.8.1
       zod: ^3.24.2
+
+  '@digitraffic/common@2025.5.5-1':
+    resolution: {integrity: sha512-yLKsb3ErY46Ge94PO31rIfGalvquzSWrEi0Vr6C5tR6/T9jLGJiABVuEDIX82i5H9qtqNy7M4UYD9j6MgVnfIg==}
+    engines: {node: '>=22 <23'}
+    peerDependencies:
+      '@aws-sdk/client-api-gateway': ^3.799.0
+      '@aws-sdk/client-s3': ^3.799.0
+      '@aws-sdk/client-secrets-manager': ^3.799.0
+      '@aws-sdk/client-sns': ^3.799.0
+      '@aws-sdk/lib-storage': ^3.799.0
+      '@date-fns/tz': 1.2.0
+      '@smithy/fetch-http-handler': 5.0.2
+      aws-cdk-lib: ^2.194.0
+      change-case: ^5.4.4
+      constructs: ~10.4.2
+      date-fns: ~4.1.0
+      etag: ^1.8.1
+      geojson-validation: ^1.0.2
+      ky: ^1.7.5
+      lodash-es: ^4.17.21
+      pg-native: ^3.4.5
+      pg-promise: ^11.13.0
+      zod: ^3.24.3
 
   '@digitraffic/eslint-config@3.1.1':
     resolution: {integrity: sha512-TdaIgPTzCEnhv70Lzib6oajpdzpGDqvCfql3ILkDH/Yu1vTeAqv+wfSdBYXpOkPllVhpPKLUOrksVuqvJy+U6A==}
@@ -9741,28 +9764,6 @@ snapshots:
       pg-query-stream: 4.8.1(pg@8.14.1(pg-native@3.4.5))
       zod: 3.24.3
 
-  '@digitraffic/common@2025.2.28-3(@aws-sdk/client-api-gateway@3.804.0)(@aws-sdk/client-s3@3.796.0)(@aws-sdk/client-secrets-manager@3.804.0)(@aws-sdk/client-sns@3.796.0)(@aws-sdk/lib-storage@3.804.0(@aws-sdk/client-s3@3.796.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@5.0.2)(aws-cdk-lib@2.192.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.8.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.4.5)(pg-promise@11.13.0(pg-native@3.4.5))(zod@3.24.3)':
-    dependencies:
-      '@aws-sdk/client-api-gateway': 3.804.0
-      '@aws-sdk/client-s3': 3.796.0
-      '@aws-sdk/client-secrets-manager': 3.804.0
-      '@aws-sdk/client-sns': 3.796.0
-      '@aws-sdk/lib-storage': 3.804.0(@aws-sdk/client-s3@3.796.0)
-      '@date-fns/tz': 1.2.0
-      '@smithy/fetch-http-handler': 5.0.2
-      aws-cdk-lib: 2.192.0(constructs@10.4.2)
-      change-case: 5.4.4
-      constructs: 10.4.2
-      date-fns: 4.1.0
-      etag: 1.8.1
-      geojson-validation: 1.0.2
-      ky: 1.8.1
-      lodash-es: 4.17.21
-      node-ttl: 0.2.0
-      pg-native: 3.4.5
-      pg-promise: 11.13.0(pg-native@3.4.5)(pg-query-stream@4.8.1(pg@8.14.1(pg-native@3.4.5)))
-      zod: 3.24.3
-
   '@digitraffic/common@2025.2.28-3(@aws-sdk/client-api-gateway@3.804.0)(@aws-sdk/client-s3@3.796.0)(@aws-sdk/client-secrets-manager@3.804.0)(@aws-sdk/client-sns@3.804.0)(@aws-sdk/lib-storage@3.796.0(@aws-sdk/client-s3@3.796.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@5.0.2)(aws-cdk-lib@2.192.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.8.1)(lodash-es@4.17.21)(node-ttl@0.2.0)(pg-native@3.4.5)(pg-promise@11.13.0(pg-native@3.4.5)(pg-query-stream@4.8.1(pg@8.14.1(pg-native@3.4.5))))(pg-query-stream@4.8.1(pg@8.14.1(pg-native@3.4.5)))(zod@3.24.3)':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.804.0
@@ -9921,6 +9922,27 @@ snapshots:
       pg-native: 3.4.5
       pg-promise: 11.13.0(pg-native@3.4.5)(pg-query-stream@4.8.1(pg@8.14.1(pg-native@3.4.5)))
       pg-query-stream: 4.8.1(pg@8.14.1(pg-native@3.4.5))
+      zod: 3.24.3
+
+  '@digitraffic/common@2025.5.5-1(@aws-sdk/client-api-gateway@3.804.0)(@aws-sdk/client-s3@3.796.0)(@aws-sdk/client-secrets-manager@3.804.0)(@aws-sdk/client-sns@3.796.0)(@aws-sdk/lib-storage@3.804.0(@aws-sdk/client-s3@3.796.0))(@date-fns/tz@1.2.0)(@smithy/fetch-http-handler@5.0.2)(aws-cdk-lib@2.192.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(etag@1.8.1)(geojson-validation@1.0.2)(ky@1.8.1)(lodash-es@4.17.21)(pg-native@3.4.5)(pg-promise@11.13.0(pg-native@3.4.5)(pg-query-stream@4.8.1(pg@8.14.1(pg-native@3.4.5))))(zod@3.24.3)':
+    dependencies:
+      '@aws-sdk/client-api-gateway': 3.804.0
+      '@aws-sdk/client-s3': 3.796.0
+      '@aws-sdk/client-secrets-manager': 3.804.0
+      '@aws-sdk/client-sns': 3.796.0
+      '@aws-sdk/lib-storage': 3.804.0(@aws-sdk/client-s3@3.796.0)
+      '@date-fns/tz': 1.2.0
+      '@smithy/fetch-http-handler': 5.0.2
+      aws-cdk-lib: 2.192.0(constructs@10.4.2)
+      change-case: 5.4.4
+      constructs: 10.4.2
+      date-fns: 4.1.0
+      etag: 1.8.1
+      geojson-validation: 1.0.2
+      ky: 1.8.1
+      lodash-es: 4.17.21
+      pg-native: 3.4.5
+      pg-promise: 11.13.0(pg-native@3.4.5)(pg-query-stream@4.8.1(pg@8.14.1(pg-native@3.4.5)))
       zod: 3.24.3
 
   '@digitraffic/eslint-config@3.1.1(@rushstack/eslint-config@3.7.1(eslint@8.57.1)(typescript@5.8.3))(@typescript-eslint/eslint-plugin@7.14.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3))(eslint-plugin-deprecation@3.0.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)':
