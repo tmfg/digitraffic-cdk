@@ -2,88 +2,59 @@ name: ESLint
 
 on: [push]
 
-env:
-  CI_DIR: "common/scripts/ci"
 permissions:
   contents: read
   pages: write
   id-token: write
 
 jobs:
-  generate-reports:
-    if: github.repository != 'tmfg/digitraffic-cdk'
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Git config user
-        uses: snow-actions/git-config-user@v1.0.0
-        with:
-          name: Digitraffic CI
-          email: digitraffic@solita.fi
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Cache pnpm store cache
-        uses: actions/cache@v4
-        with:
-          key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
-          path: |
-            common/temp/pnpm-store
-
-      - name: Cache rush build
-        uses: actions/cache@v4
-        with:
-          key: ${{ runner.os }}-rush-build-${{ hashFiles('common/config/rush/repo-state.json') }}-${{ github.ref_name }}
-          path: |
-            common/temp/build-cache
-
-      - name: Rush install
-        run: node common/scripts/install-run-rush.js install
-
-      - name: Create eslint reports
-        run: node common/scripts/install-run-rush.js ci:eslint-report
-
-      - name: Find report files
-        id: reports
-        shell: sh
-        run: python ${{ env.CI_DIR }}/find-reports.py
-
-      - name: Archive reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: reports
-          path: ${{ github.ref_name }}/
-
-  publish:
-    needs: generate-reports
+  lint:
+    if: github.repository != 'tmfg/digitraffic-common'
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Download reports
-        uses: actions/download-artifact@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          name: reports
-          path: reports/${{ github.ref_name }}/
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install packages
+        run: pnpm install
+
+      - name: Create ESLint report
+        id: report
+        run: |
+          mkdir -p eslint/${{ github.ref_name }}
+          pnpm eslint-report -o eslint/${{ github.ref_name }}/index.html
+        continue-on-error: true
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: reports/
+          path: eslint/
 
-      - name: Deploy to Github Pages
+      - name: Publish report
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Create summary
-        shell: sh
-        env:
-          GITHUB_PAGES: ${{ steps.deployment.outputs.page_url }}
-        run: python ${{ env.CI_DIR }}/create-summary.py
+      - name: Step summary
+        run: |
+          echo "# ESLint" >> $GITHUB_STEP_SUMMARY
+          echo "[ESLint report](${{ steps.deployment.outputs.page_url }}${{ github.ref_name }}/index.html)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail on ESLint errors
+        run: |
+          if [[ "${{ steps.report.outcome }}" == "failure" || "${{ steps.report-affected.outcome }}" == "failure" ]]; then exit 1; else exit 0; fi

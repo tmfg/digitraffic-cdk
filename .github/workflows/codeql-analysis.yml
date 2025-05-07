@@ -1,6 +1,7 @@
 name: "CodeQL"
 
 on:
+  workflow_dispatch:
   push:
     branches: [master]
   pull_request:
@@ -10,7 +11,7 @@ on:
 
 jobs:
   analyze:
-    if: github.repository == 'tmfg/digitraffic-cdk'
+    if: github.repository == 'tmfg/digitraffic-common'
     name: Analyze
     runs-on: ubuntu-24.04
 
@@ -20,27 +21,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "python"]
+        language: ["javascript"]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          # Digitraffic-common has its own repo.
-          # Common/scripts and swagger-joiner/resources are 3rd party code.
-          config: |
-            paths-ignore:
-              - lib/digitraffic-common
-              - common/scripts
-              - other/swagger-joiner/resources
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

@@ -1,6 +1,0 @@
-{
-  "app": "node lib/bin/os-key-figures-app.js",
-  "context": {
-    "@aws-cdk/aws-rds:lowercaseDbIdentifier": false
-  }
-}

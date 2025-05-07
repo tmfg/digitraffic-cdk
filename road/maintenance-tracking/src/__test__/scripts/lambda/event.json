@@ -1,7 +1,0 @@
-{
-  "Records": [
-    {
-      "body": "{\n    \"otsikko\": {\n        \"lahettaja\": {\n            \"jarjestelma\": \"Urakoitsijan järjestelmä\",\n            \"organisaatio\": {\n                \"nimi\": \"Urakoitsija viivageometrialla\",\n                \"ytunnus\": \"6547365-0\"\n            }\n        },\n        \"viestintunniste\": {\n            \"id\": 123\n        },\n        \"lahetysaika\": \"2019-01-30T12:00:00+02:00\"\n    },\n    \"havainnot\": [\n        {\n            \"havainto\": {\n                \"tyokone\": {\n                    \"id\": 1111111111,\n                    \"tyokonetyyppi\": \"aura-auto\"\n                },\n                \"sijainti\": {\n                    \"viivageometria\": {\n                        \"type\": \"LineString\",\n                        \"coordinates\": [\n                            [293359, 6889071],\n                            [293358, 6889073],\n                            [293358, 6889075],\n                            [293359, 6889072],\n                            [293356, 6889078]\n                        ]\n                    }\n                },\n                \"suunta\": 45,\n                \"havaintoaika\": \"2019-01-30T12:00:00+02:00\",\n                \"urakkaid\": 999999,\n                \"suoritettavatTehtavat\": [\n                    \"auraus ja sohjonpoisto\",\n                    \"suolaus\"\n                ]\n            }\n        }\n    ]\n}"
-    }
-  ]
-}
