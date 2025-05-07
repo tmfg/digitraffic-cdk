@@ -17,6 +17,10 @@ Format code
     pnpm run:format-changed # Formats stagged files
     pnpm run:format # Format all files
 
+## Reinstall lefthook git hooks
+
+    pnpm prepare
+
 ## How to use
 
 In package.json dependencies:

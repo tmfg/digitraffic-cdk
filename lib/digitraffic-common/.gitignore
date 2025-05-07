@@ -1,8 +1,6 @@
 *
 
 !/deno.json
-!.husky/
-!.husky/pre-commit
 !/.editorconfig
 !/.eslintignore
 !/.eslintrc.cjs
