@@ -13,7 +13,9 @@ export class DependencyTester {
 
   assertNoCircularDependencies(whitelist: string[] = []): void {
     const circulars = this._instance.circular().map((c) => JSON.stringify(c));
-    const errors = circulars.filter((circular) => whitelist.includes(circular));
+    const errors = circulars.filter((circular) =>
+      !whitelist.includes(circular)
+    );
 
     if (errors.length !== 0) {
       throw new Error("Circular dependencies found!");
@@ -29,7 +31,7 @@ export class DependencyTester {
 
   assertNoOrphans(whitelist: string[] = []): void {
     const orphans = this._instance.circular().map((c) => JSON.stringify(c));
-    const errors = orphans.filter((circular) => whitelist.includes(circular));
+    const errors = orphans.filter((circular) => !whitelist.includes(circular));
 
     if (errors.length !== 0) {
       throw new Error("Orphans found!");

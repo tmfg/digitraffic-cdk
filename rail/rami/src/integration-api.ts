@@ -46,7 +46,7 @@ export class IntegrationApi {
       .addResource("incoming");
 
     this.createUploadRosmMessageResource(stack, resource, rosmSqs, dlq);
-    this.createNewUploadSmMessageResource(stack, resource, smSqs);
+    this.createUploadSmMessageResource(stack, resource, smSqs);
   }
 
   createUploadRosmMessageResource(
@@ -89,7 +89,7 @@ export class IntegrationApi {
     return uploadLambda;
   }
 
-  createNewUploadSmMessageResource(
+  createUploadSmMessageResource(
     stack: DigitrafficStack,
     resource: Resource,
     dlq: Queue,
@@ -111,45 +111,5 @@ export class IntegrationApi {
       "StopMonitoring",
       true,
     );
-  }
-
-  createUploadSmMessageResource(
-    stack: DigitrafficStack,
-    resource: Resource,
-    smSqs: Queue,
-    dlq: Queue,
-  ): MonitoredDBFunction {
-    const activeResource = resource.addResource("sm");
-    const functionName = "RAMI-UploadRamiSmMessage";
-    const uploadLambda = MonitoredFunction.create(stack, functionName, {
-      functionName,
-      timeout: Duration.seconds(15),
-      memorySize: 512,
-      code: new AssetCode("dist/lambda/upload-sm-message"),
-      handler: "upload-sm-message.handler",
-      runtime: Runtime.NODEJS_20_X,
-      reservedConcurrentExecutions: 24,
-      environment: {
-        [RamiEnvKeys.SM_SQS_URL]: smSqs.queueUrl,
-        [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
-      },
-    });
-
-    smSqs.grantSendMessages(uploadLambda);
-    dlq.grantSendMessages(uploadLambda);
-
-    const uploadRamiMessageIntegration = new DigitrafficIntegration(
-      uploadLambda,
-    ).build();
-
-    activeResource.addMethod("POST", uploadRamiMessageIntegration, {
-      apiKeyRequired: true,
-      methodResponses: [
-        DigitrafficMethodResponse.response200(Model.EMPTY_MODEL),
-        DigitrafficMethodResponse.response400(),
-      ],
-    });
-
-    return uploadLambda;
   }
 }

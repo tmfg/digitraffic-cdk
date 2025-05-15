@@ -1,4 +1,4 @@
-import type { Connection } from "mysql2/promise";
+import type { Connection, ResultSetHeader } from "mysql2/promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const SQL_DELETE_OLD_UDOT_VALUES = `
@@ -12,21 +12,25 @@ WHERE created_db < current_timestamp() - INTERVAL 1 DAY`;
 const SQL_UPDATE_FALSE_VALUES = `
 UPDATE rami_udot
 SET unknown_delay = false, unknown_track = false
-WHERE train_number = :trainNumber AND train_departure_date = :trainDepartureDate AND attap_id = :attapId`;
+WHERE train_number = :trainNumber AND train_departure_date = :trainDepartureDate 
+AND attap_id = :attapId
+AND NOT (unknown_delay = false AND unknown_track = false)`;
 
 const SQL_UPSERT_UDOT_VALUES = `
 INSERT INTO rami_udot(train_number, train_departure_date, attap_id, unknown_delay, unknown_track)
 VALUES (:trainNumber, :trainDepartureDate, :attapId, :ud, :ut)
 ON DUPLICATE KEY UPDATE
-    unknown_delay = :ud,
-    unknown_track = :ut`;
+    unknown_delay = VALUES(unknown_delay),
+    unknown_track = VALUES(unknown_track)`;
 
 const SQL_MERGE_HISTORY = `
 insert into rami_udot_history(rami_message_id, train_number, train_departure_date, attap_id, unknown_track, unknown_delay)
 select :messageId, train_number, train_departure_date, attap_id, :ut, :ud
 from rami_udot
-where train_number = :trainNumber and train_departure_date = :trainDepartureDate
-and attap_id = :attapId;
+where train_number = :trainNumber 
+and train_departure_date = :trainDepartureDate
+and attap_id = :attapId
+and model_updated_time is null
 `;
 
 export interface UdotUpsertValues {
@@ -41,21 +45,29 @@ export interface UdotUpsertValues {
 
 export async function insertOrUpdate(
   conn: Connection,
-  value: UdotUpsertValues,
+  values: UdotUpsertValues,
 ): Promise<void> {
-  try {
-    if (value.ud === false && value.ut === false) {
-      await conn.execute(SQL_UPDATE_FALSE_VALUES, value);
-    } else {
-      await conn.execute(SQL_UPSERT_UDOT_VALUES, value);
-    }
+  const method = "UdotDao.insertOrUpdate" as const;
 
-    await conn.execute(SQL_MERGE_HISTORY, value);
+  try {
+    // if both values are false, there is no point inserting it, you can just update existing values if any
+    const updateSql = values.ud === false && values.ut === false
+      ? SQL_UPDATE_FALSE_VALUES
+      : SQL_UPSERT_UDOT_VALUES;
+    const [result] = await conn.execute<ResultSetHeader>(updateSql, values);
+
+    if (result.affectedRows > 0) {
+      logger.info({
+        method: "UdotDao.insertOrUpdate",
+        customAffectedRows: result.affectedRows,
+        customTrainNumber: values.trainNumber,
+      });
+
+      // insert history only if something was updated
+      await conn.execute(SQL_MERGE_HISTORY, values);
+    }
   } catch (error) {
-    logger.error({
-      method: "UdotDao.insertOrUpdate",
-      error,
-    });
+    logger.error({ method, error });
   }
 }
 

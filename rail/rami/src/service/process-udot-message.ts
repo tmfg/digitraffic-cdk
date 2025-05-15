@@ -1,7 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
 import type { Connection } from "mysql2/promise";
-import { inDatabase } from "../util/database.js";
+import { inTransaction } from "../util/database.js";
 import type {
   UnknownDelayOrTrack,
   UnknownDelayOrTrackMessage,
@@ -23,7 +23,7 @@ export async function processUdotMessage(
 
     if (rows.length === 0) {
       logger.info({
-        method: "ProcessSmMessageService.processUdotMessage",
+        method: "ProcessUdotMessageService.processUdotMessage",
         message:
           `Could not find rows for ${message.trainNumber} ${message.departureDate}`,
       });
@@ -40,15 +40,20 @@ export async function processUdotMessage(
       if (attapId) {
         foundCount++;
 
-        // each update in own connection, to prevent locking!
-        await inDatabase(async (conn: Connection): Promise<void> => {
+        // each update in own transaction, to prevent locking!
+        await inTransaction(async (conn: Connection): Promise<void> => {
+          logger.info({
+            method: "ProcessUdotMessageService.processUdotMessage",
+            message: `About to insert ${message.trainNumber}`,
+          });
+
           return await insertOrUpdate(conn, {
             trainNumber: message.trainNumber,
             trainDepartureDate: message.departureDate,
             attapId,
+            messageId: message.messageId,
             ut: datarow.unknownTrack,
             ud: datarow.unknownDelay,
-            messageId: message.messageId,
           });
         });
       } else {
