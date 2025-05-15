@@ -1,10 +1,10 @@
-import type { RamiMessageOperation, RamiMessageType } from "./rami-message.js";
+import type { RosmMessageOperation, RosmMessageType } from "./rosm-message.js";
 
-export interface DtRamiMessage {
+export interface DtRosmMessage {
   readonly id: string;
   readonly version: number;
-  readonly messageType: RamiMessageType;
-  readonly operation: RamiMessageOperation;
+  readonly messageType: RosmMessageType;
+  readonly operation: RosmMessageOperation;
   readonly created: Date;
   readonly startValidity: Date;
   readonly endValidity: Date;

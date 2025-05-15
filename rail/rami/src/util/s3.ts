@@ -31,14 +31,11 @@ export async function uploadToS3(
 
 function doUpload(
   s3: S3,
-  bucketName: string,
-  body: string,
-  fileName: string,
+  Bucket: string,
+  Body: string,
+  Key: string,
 ): Promise<PutObjectCommandOutput> {
-  const command = new PutObjectCommand({
-    Bucket: bucketName,
-    Key: fileName,
-    Body: body,
-  });
+  const command = new PutObjectCommand({ Bucket, Key, Body });
+
   return s3.send(command);
 }

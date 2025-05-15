@@ -1,12 +1,11 @@
 import { addHours } from "date-fns";
-import type { DtRamiMessage } from "../model/dt-rami-message.js";
-import type { RamiMessageOperation } from "../model/rami-message.js";
-import {
-  validRamiMonitoredJourneyScheduledMessage,
-  validRamiScheduledMessage,
-} from "./testdata.js";
+import type { DtRosmMessage } from "../model/dt-rami-message.js";
+import type { RosmMessageOperation } from "../model/rosm-message.js";
+import { validRamiMonitoredJourneyScheduledMessage } from "./testdata-rosm.js";
+import { validMessageUnknownTrackAndDelay } from "./testdata-sm.js";
+import _ from "lodash";
 
-export function createDtRamiMessage(properties: {
+export function createDtRosmMessage(properties: {
   created?: Date;
   start?: Date;
   end?: Date;
@@ -14,7 +13,7 @@ export function createDtRamiMessage(properties: {
   trainDepartureLocalDate?: string;
   stations?: string[];
   id?: string;
-}): DtRamiMessage {
+}): DtRosmMessage {
   return {
     id: properties.id ?? "abc",
     version: 1,
@@ -40,7 +39,7 @@ export function createDtRamiMessage(properties: {
 }
 
 export function createMonitoredJourneyScheduledMessage(properties: {
-  operation?: RamiMessageOperation;
+  operation?: RosmMessageOperation;
   start?: Date;
   end?: Date;
   trainNumber?: number;
@@ -81,7 +80,7 @@ export function createMonitoredJourneyScheduledMessage(properties: {
 }
 
 export function createScheduledMessage(properties: {
-  operation?: RamiMessageOperation;
+  operation?: RosmMessageOperation;
   start?: Date;
   end?: Date;
   trainNumber?: number;
@@ -90,11 +89,11 @@ export function createScheduledMessage(properties: {
   messageId?: string;
 }): unknown {
   return {
-    ...validRamiScheduledMessage,
+    ...validRamiMonitoredJourneyScheduledMessage,
     payload: {
-      ...validRamiScheduledMessage.payload,
+      ...validRamiMonitoredJourneyScheduledMessage.payload,
       operation: properties.operation ??
-        validRamiScheduledMessage.payload.operation,
+        validRamiMonitoredJourneyScheduledMessage.payload.operation,
       startValidity: properties.start
         ? properties.start.toISOString()
         : new Date().toISOString(),
@@ -103,4 +102,49 @@ export function createScheduledMessage(properties: {
         : addHours(new Date(), 1).toISOString(),
     },
   };
+}
+
+export function createSmMessage(properties: {
+  arrivalTime?: string;
+  arrivalQuay?: string;
+  departureTime?: string;
+  departureQuay?: string;
+}): unknown {
+  return _.chain(validMessageUnknownTrackAndDelay)
+    .clone()
+    .set([
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "expectedArrivalTime",
+    ], properties.arrivalTime)
+    .set([
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "expectedDepartureTime",
+    ], properties.departureTime)
+    .set([
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "arrivalStopAssignment",
+      "expectedQuayName",
+    ], properties.arrivalQuay)
+    .set([
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "departureStopAssignment",
+      "expectedQuayName",
+    ], properties.departureQuay)
+    .value();
 }

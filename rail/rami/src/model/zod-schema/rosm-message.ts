@@ -54,7 +54,8 @@ export const payload = z
     "Object containing the information of a scheduled message inserted by an operator",
   );
 
-export const ramiMessageSchema = z
+// RamiOperatorScheduledMessage
+export const ramiRosmMessageSchema = z
   .object({
     headers,
     payload,

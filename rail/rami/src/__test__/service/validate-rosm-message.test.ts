@@ -1,24 +1,24 @@
 import _ from "lodash";
-import { validateIncomingRamiMessage } from "../../service/validate-message.js";
-import {
-  validRamiMonitoredJourneyScheduledMessage,
-  validRamiScheduledMessage,
-} from "../testdata.js";
+import { validateIncomingRosmMessage } from "../../service/validate-message.js";
+import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";
+import { cloneAndUndefine, undefine } from "../message-util.js";
 
-describe("validate incoming rami message", () => {
+describe("validate incoming rosm message", () => {
   test("validateIncomingRamiMessage - invalid scheduledMessage", () => {
-    const invalidMessage = _.set(
-      _.cloneDeep(validRamiScheduledMessage),
-      ["payload", "messageId"],
-      undefined,
+    const invalidMessage = cloneAndUndefine(
+      validRamiMonitoredJourneyScheduledMessage,
+      "payload",
+      "messageId",
     );
-    _.set(
+    undefine(
       invalidMessage,
-      ["payload", "scheduledMessage", "onGroundRecipient", "deliveryPoints"],
-      undefined,
+      "payload",
+      "scheduledMessage",
+      "onGroundRecipient",
+      "deliveryPoints",
     );
 
-    const result = validateIncomingRamiMessage(invalidMessage);
+    const result = validateIncomingRosmMessage(invalidMessage);
     expect(result.valid).toBe(false);
     if (!result.valid) {
       expect(result.errors).toMatch(
@@ -30,12 +30,12 @@ describe("validate incoming rami message", () => {
     }
   });
   test("validateIncomingRamiMessage - invalid monitoredJourneyScheduledMessage", () => {
-    const invalidMessage = _.set(
-      _.cloneDeep(validRamiMonitoredJourneyScheduledMessage),
-      ["payload", "messageId"],
-      undefined,
+    const invalidMessage = cloneAndUndefine(
+      validRamiMonitoredJourneyScheduledMessage,
+      "payload",
+      "messageId",
     );
-    _.set(invalidMessage, ["payload", "messageVersion"], undefined);
+    undefine(invalidMessage, "payload", "messageVersion");
     _.set(invalidMessage, [
       "payload",
       "monitoredJourneyScheduledMessage",
@@ -46,7 +46,7 @@ describe("validate incoming rami message", () => {
       nameLong: "abc",
     });
 
-    const result = validateIncomingRamiMessage(invalidMessage);
+    const result = validateIncomingRosmMessage(invalidMessage);
     expect(result.valid).toBe(false);
     if (!result.valid) {
       expect(result.errors).toMatch(
@@ -62,13 +62,17 @@ describe("validate incoming rami message", () => {
   });
 
   test("validateIncomingRamiMessage - valid scheduledMessage", () => {
-    const result = validateIncomingRamiMessage(validRamiScheduledMessage);
+    const result = validateIncomingRosmMessage(
+      validRamiMonitoredJourneyScheduledMessage,
+    );
     expect(result.valid).toBe(true);
-    if (result.valid) expect(result.value).toEqual(validRamiScheduledMessage);
+    if (result.valid) {
+      expect(result.value).toEqual(validRamiMonitoredJourneyScheduledMessage);
+    }
   });
 
   test("validateIncomingRamiMessage - valid monitoredJourneyScheduledMessage", () => {
-    const result = validateIncomingRamiMessage(
+    const result = validateIncomingRosmMessage(
       validRamiMonitoredJourneyScheduledMessage,
     );
     expect(result.valid).toBe(true);

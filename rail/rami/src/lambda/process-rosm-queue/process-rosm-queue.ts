@@ -2,43 +2,44 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
-import { parseMessage, processMessage } from "../../service/process-message.js";
+import {
+  parseRosmMessage,
+  processRosmMessage,
+} from "../../service/process-rosm-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { sendToSqs } from "../../util/sqs.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-
-const DLQ_URL = getEnvVariable("DLQ_URL");
+import { sendDlq } from "../../service/sqs-service.js";
 
 export function handlerFn(): (
   event: SQSEvent,
 ) => Promise<PromiseSettledResult<void>[]> {
-  return (event: SQSEvent) => {
-    return Promise.allSettled(
+  return async (event: SQSEvent) => {
+    return await Promise.allSettled(
       event.Records.map(async (r) => {
         const start = Date.now();
         const recordBody = r.body;
-        const parsedRamiMessage = parseMessage(JSON.parse(recordBody));
+        const parsedRamiMessage = parseRosmMessage(JSON.parse(recordBody));
         logger.debug({
-          method: "RAMI-ProcessQueue.handler",
+          method: "RAMI-ProcessRosmQueue.handler",
           customParsedRamiMessage: JSON.stringify(parsedRamiMessage),
         });
         if (parsedRamiMessage) {
           try {
-            await processMessage(parsedRamiMessage);
+            await processRosmMessage(parsedRamiMessage);
           } catch (error) {
             logException(logger, error);
             // send original message to dlq on error
-            await sendToSqs(
-              DLQ_URL,
-              2,
-              `[{"errors":"${JSON.stringify(error)}"}, ${recordBody}}]`,
-              parsedRamiMessage.id,
-            );
+
+            await sendDlq({
+              messageType: "ROSM",
+              errors: JSON.stringify(error),
+              message: recordBody,
+            });
+
             return Promise.reject(error);
           }
         }
         logger.info({
-          method: "RAMI-ProcessQueue.handler",
+          method: "RAMI-ProcessRosmQueue.handler",
           tookMs: Date.now() - start,
         });
         return Promise.resolve();

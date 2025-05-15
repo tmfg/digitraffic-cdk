@@ -1,5 +1,6 @@
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { attachQueueToApiGatewayResource } from "@digitraffic/common/dist/aws/infra/sqs-integration";
 import {
   MonitoredDBFunction,
   MonitoredFunction,
@@ -11,12 +12,19 @@ import { Duration } from "aws-cdk-lib";
 import { EndpointType, Model, type Resource } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
+import { RamiEnvKeys } from "./keys.js";
+import { RequestValidator } from "aws-cdk-lib/aws-apigateway";
 
 export class IntegrationApi {
   readonly integrationApi: DigitrafficRestApi;
   readonly apiKeyId: string;
 
-  constructor(stack: DigitrafficStack, sqs: Queue, dlq: Queue) {
+  constructor(
+    stack: DigitrafficStack,
+    rosmSqs: Queue,
+    smSqs: Queue,
+    dlq: Queue,
+  ) {
     const apiName = "RAMI integration API";
     this.integrationApi = new DigitrafficRestApi(
       stack,
@@ -37,37 +45,37 @@ export class IntegrationApi {
       .addResource("rami")
       .addResource("incoming");
 
-    this.createUploadMessageResource(stack, resource, sqs, dlq);
+    this.createUploadRosmMessageResource(stack, resource, rosmSqs, dlq);
+    this.createUploadSmMessageResource(stack, resource, smSqs);
   }
 
-  createUploadMessageResource(
+  createUploadRosmMessageResource(
     stack: DigitrafficStack,
     resource: Resource,
     sqs: Queue,
     dlq: Queue,
   ): MonitoredDBFunction {
     const activeResource = resource.addResource("message");
-    const functionName = "RAMI-UploadRamiMessage";
-    const uploadRamiMessageLambda = MonitoredFunction.create(
-      stack,
+    const functionName = "RAMI-UploadRamiRosmMessage";
+    const uploadLambda = MonitoredFunction.create(stack, functionName, {
       functionName,
-      {
-        functionName,
-        timeout: Duration.seconds(15),
-        memorySize: 256,
-        code: new AssetCode("dist/lambda/upload-rami-message"),
-        handler: "upload-rami-message.handler",
-        runtime: Runtime.NODEJS_22_X,
-        reservedConcurrentExecutions: 20,
-        environment: { SQS_URL: sqs.queueUrl, DLQ_URL: dlq.queueUrl },
+      timeout: Duration.seconds(15),
+      memorySize: 256,
+      code: new AssetCode("dist/lambda/upload-rosm-message"),
+      handler: "upload-rosm-message.handler",
+      runtime: Runtime.NODEJS_20_X,
+      reservedConcurrentExecutions: 20,
+      environment: {
+        [RamiEnvKeys.ROSM_SQS_URL]: sqs.queueUrl,
+        [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
       },
-    );
+    });
 
-    sqs.grantSendMessages(uploadRamiMessageLambda);
-    dlq.grantSendMessages(uploadRamiMessageLambda);
+    sqs.grantSendMessages(uploadLambda);
+    dlq.grantSendMessages(uploadLambda);
 
     const uploadRamiMessageIntegration = new DigitrafficIntegration(
-      uploadRamiMessageLambda,
+      uploadLambda,
     ).build();
 
     activeResource.addMethod("POST", uploadRamiMessageIntegration, {
@@ -78,6 +86,30 @@ export class IntegrationApi {
       ],
     });
 
-    return uploadRamiMessageLambda;
+    return uploadLambda;
+  }
+
+  createUploadSmMessageResource(
+    stack: DigitrafficStack,
+    resource: Resource,
+    dlq: Queue,
+  ): void {
+    const activeResource = resource.addResource("sm");
+
+    const requestValidator = new RequestValidator(stack, "RequestValidator", {
+      validateRequestBody: false,
+      validateRequestParameters: false,
+      requestValidatorName: "StopMonitoringIntegrationRequestValidator",
+      restApi: this.integrationApi,
+    });
+
+    attachQueueToApiGatewayResource(
+      stack,
+      dlq,
+      activeResource,
+      requestValidator,
+      "StopMonitoring",
+      true,
+    );
   }
 }
