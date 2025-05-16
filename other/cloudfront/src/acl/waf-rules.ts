@@ -47,13 +47,14 @@ export class WafRules {
     perIpAndQueryWithHeader?: number,
     perIpAndQueryWithoutHeader?: number,
   ): void {
+    const minimumLimit = 50;
     if (
-      perIpWithHeader < 100 ||
-      perIpWithoutHeader < 100 ||
-      (perIpAndQueryWithHeader ?? 100) < 100 ||
-      (perIpAndQueryWithoutHeader ?? 100) < 100
+      perIpWithHeader < minimumLimit ||
+      perIpWithoutHeader < minimumLimit ||
+      (perIpAndQueryWithHeader ?? minimumLimit) < minimumLimit ||
+      (perIpAndQueryWithoutHeader ?? minimumLimit) < minimumLimit
     ) {
-      throw new Error("Minimum limit is 100");
+      throw new Error("Minimum limit is 50");
     }
   }
 
