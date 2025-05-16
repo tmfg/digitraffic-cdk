@@ -1,6 +1,6 @@
 .swagger-ui {
   color: #3b4151;
-  font-family: sans-serif; /*! normalize.css v7.0.0 | MIT License | github.com/necolas/normalize.css */
+  font-family: sans-serif;
 }
 .swagger-ui html {
   line-height: 1.15;
@@ -22,9 +22,7 @@
   font-size: 2em;
   margin: 0.67em 0;
 }
-.swagger-ui figcaption,
-.swagger-ui figure,
-.swagger-ui main {
+.swagger-ui figcaption, .swagger-ui figure, .swagger-ui main {
   display: block;
 }
 .swagger-ui figure {
@@ -49,14 +47,11 @@
   -webkit-text-decoration: underline dotted;
   text-decoration: underline dotted;
 }
-.swagger-ui b,
-.swagger-ui strong {
+.swagger-ui b, .swagger-ui strong {
   font-weight: inherit;
   font-weight: bolder;
 }
-.swagger-ui code,
-.swagger-ui kbd,
-.swagger-ui samp {
+.swagger-ui code, .swagger-ui kbd, .swagger-ui samp {
   font-family: monospace, monospace;
   font-size: 1em;
 }
@@ -70,8 +65,7 @@
 .swagger-ui small {
   font-size: 80%;
 }
-.swagger-ui sub,
-.swagger-ui sup {
+.swagger-ui sub, .swagger-ui sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
@@ -83,8 +77,7 @@
 .swagger-ui sup {
   top: -0.5em;
 }
-.swagger-ui audio,
-.swagger-ui video {
+.swagger-ui audio, .swagger-ui video {
   display: inline-block;
 }
 .swagger-ui audio:not([controls]) {
@@ -107,12 +100,10 @@
   line-height: 1.15;
   margin: 0;
 }
-.swagger-ui button,
-.swagger-ui input {
+.swagger-ui button, .swagger-ui input {
   overflow: visible;
 }
-.swagger-ui button,
-.swagger-ui select {
+.swagger-ui button, .swagger-ui select {
   text-transform: none;
 }
 .swagger-ui [type="reset"],
@@ -152,8 +143,7 @@
 .swagger-ui textarea {
   overflow: auto;
 }
-.swagger-ui [type="checkbox"],
-.swagger-ui [type="radio"] {
+.swagger-ui [type="checkbox"], .swagger-ui [type="radio"] {
   box-sizing: border-box;
   padding: 0;
 }
@@ -173,8 +163,7 @@
   -webkit-appearance: button;
   font: inherit;
 }
-.swagger-ui details,
-.swagger-ui menu {
+.swagger-ui details, .swagger-ui menu {
   display: block;
 }
 .swagger-ui summary {
@@ -183,8 +172,7 @@
 .swagger-ui canvas {
   display: inline-block;
 }
-.swagger-ui [hidden],
-.swagger-ui template {
+.swagger-ui [hidden], .swagger-ui template {
   display: none;
 }
 .swagger-ui .debug * {
@@ -1575,8 +1563,7 @@
     top: 0;
   }
 }
-.swagger-ui .cf:after,
-.swagger-ui .cf:before {
+.swagger-ui .cf:after, .swagger-ui .cf:before {
   content: " ";
   display: table;
 }
@@ -2434,8 +2421,7 @@
 .swagger-ui .system-serif {
   font-family: serif;
 }
-.swagger-ui .code,
-.swagger-ui code {
+.swagger-ui .code, .swagger-ui code {
   font-family: Consolas, monaco, monospace;
 }
 .swagger-ui .courier {
@@ -4037,424 +4023,324 @@
 .swagger-ui .bg-inherit {
   background-color: inherit;
 }
-.swagger-ui .hover-black:focus,
-.swagger-ui .hover-black:hover {
+.swagger-ui .hover-black:focus, .swagger-ui .hover-black:hover {
   color: #000;
 }
-.swagger-ui .hover-near-black:focus,
-.swagger-ui .hover-near-black:hover {
+.swagger-ui .hover-near-black:focus, .swagger-ui .hover-near-black:hover {
   color: #111;
 }
-.swagger-ui .hover-dark-gray:focus,
-.swagger-ui .hover-dark-gray:hover {
+.swagger-ui .hover-dark-gray:focus, .swagger-ui .hover-dark-gray:hover {
   color: #333;
 }
-.swagger-ui .hover-mid-gray:focus,
-.swagger-ui .hover-mid-gray:hover {
+.swagger-ui .hover-mid-gray:focus, .swagger-ui .hover-mid-gray:hover {
   color: #555;
 }
-.swagger-ui .hover-gray:focus,
-.swagger-ui .hover-gray:hover {
+.swagger-ui .hover-gray:focus, .swagger-ui .hover-gray:hover {
   color: #777;
 }
-.swagger-ui .hover-silver:focus,
-.swagger-ui .hover-silver:hover {
+.swagger-ui .hover-silver:focus, .swagger-ui .hover-silver:hover {
   color: #999;
 }
-.swagger-ui .hover-light-silver:focus,
-.swagger-ui .hover-light-silver:hover {
+.swagger-ui .hover-light-silver:focus, .swagger-ui .hover-light-silver:hover {
   color: #aaa;
 }
-.swagger-ui .hover-moon-gray:focus,
-.swagger-ui .hover-moon-gray:hover {
+.swagger-ui .hover-moon-gray:focus, .swagger-ui .hover-moon-gray:hover {
   color: #ccc;
 }
-.swagger-ui .hover-light-gray:focus,
-.swagger-ui .hover-light-gray:hover {
+.swagger-ui .hover-light-gray:focus, .swagger-ui .hover-light-gray:hover {
   color: #eee;
 }
-.swagger-ui .hover-near-white:focus,
-.swagger-ui .hover-near-white:hover {
+.swagger-ui .hover-near-white:focus, .swagger-ui .hover-near-white:hover {
   color: #f4f4f4;
 }
-.swagger-ui .hover-white:focus,
-.swagger-ui .hover-white:hover {
+.swagger-ui .hover-white:focus, .swagger-ui .hover-white:hover {
   color: #fff;
 }
-.swagger-ui .hover-black-90:focus,
-.swagger-ui .hover-black-90:hover {
+.swagger-ui .hover-black-90:focus, .swagger-ui .hover-black-90:hover {
   color: rgba(0, 0, 0, 0.9);
 }
-.swagger-ui .hover-black-80:focus,
-.swagger-ui .hover-black-80:hover {
+.swagger-ui .hover-black-80:focus, .swagger-ui .hover-black-80:hover {
   color: rgba(0, 0, 0, 0.8);
 }
-.swagger-ui .hover-black-70:focus,
-.swagger-ui .hover-black-70:hover {
+.swagger-ui .hover-black-70:focus, .swagger-ui .hover-black-70:hover {
   color: rgba(0, 0, 0, 0.7);
 }
-.swagger-ui .hover-black-60:focus,
-.swagger-ui .hover-black-60:hover {
+.swagger-ui .hover-black-60:focus, .swagger-ui .hover-black-60:hover {
   color: rgba(0, 0, 0, 0.6);
 }
-.swagger-ui .hover-black-50:focus,
-.swagger-ui .hover-black-50:hover {
+.swagger-ui .hover-black-50:focus, .swagger-ui .hover-black-50:hover {
   color: rgba(0, 0, 0, 0.5);
 }
-.swagger-ui .hover-black-40:focus,
-.swagger-ui .hover-black-40:hover {
+.swagger-ui .hover-black-40:focus, .swagger-ui .hover-black-40:hover {
   color: rgba(0, 0, 0, 0.4);
 }
-.swagger-ui .hover-black-30:focus,
-.swagger-ui .hover-black-30:hover {
+.swagger-ui .hover-black-30:focus, .swagger-ui .hover-black-30:hover {
   color: rgba(0, 0, 0, 0.3);
 }
-.swagger-ui .hover-black-20:focus,
-.swagger-ui .hover-black-20:hover {
+.swagger-ui .hover-black-20:focus, .swagger-ui .hover-black-20:hover {
   color: rgba(0, 0, 0, 0.2);
 }
-.swagger-ui .hover-black-10:focus,
-.swagger-ui .hover-black-10:hover {
+.swagger-ui .hover-black-10:focus, .swagger-ui .hover-black-10:hover {
   color: rgba(0, 0, 0, 0.1);
 }
-.swagger-ui .hover-white-90:focus,
-.swagger-ui .hover-white-90:hover {
+.swagger-ui .hover-white-90:focus, .swagger-ui .hover-white-90:hover {
   color: hsla(0, 0%, 100%, 0.9);
 }
-.swagger-ui .hover-white-80:focus,
-.swagger-ui .hover-white-80:hover {
+.swagger-ui .hover-white-80:focus, .swagger-ui .hover-white-80:hover {
   color: hsla(0, 0%, 100%, 0.8);
 }
-.swagger-ui .hover-white-70:focus,
-.swagger-ui .hover-white-70:hover {
+.swagger-ui .hover-white-70:focus, .swagger-ui .hover-white-70:hover {
   color: hsla(0, 0%, 100%, 0.7);
 }
-.swagger-ui .hover-white-60:focus,
-.swagger-ui .hover-white-60:hover {
+.swagger-ui .hover-white-60:focus, .swagger-ui .hover-white-60:hover {
   color: hsla(0, 0%, 100%, 0.6);
 }
-.swagger-ui .hover-white-50:focus,
-.swagger-ui .hover-white-50:hover {
+.swagger-ui .hover-white-50:focus, .swagger-ui .hover-white-50:hover {
   color: hsla(0, 0%, 100%, 0.5);
 }
-.swagger-ui .hover-white-40:focus,
-.swagger-ui .hover-white-40:hover {
+.swagger-ui .hover-white-40:focus, .swagger-ui .hover-white-40:hover {
   color: hsla(0, 0%, 100%, 0.4);
 }
-.swagger-ui .hover-white-30:focus,
-.swagger-ui .hover-white-30:hover {
+.swagger-ui .hover-white-30:focus, .swagger-ui .hover-white-30:hover {
   color: hsla(0, 0%, 100%, 0.3);
 }
-.swagger-ui .hover-white-20:focus,
-.swagger-ui .hover-white-20:hover {
+.swagger-ui .hover-white-20:focus, .swagger-ui .hover-white-20:hover {
   color: hsla(0, 0%, 100%, 0.2);
 }
-.swagger-ui .hover-white-10:focus,
-.swagger-ui .hover-white-10:hover {
+.swagger-ui .hover-white-10:focus, .swagger-ui .hover-white-10:hover {
   color: hsla(0, 0%, 100%, 0.1);
 }
-.swagger-ui .hover-inherit:focus,
-.swagger-ui .hover-inherit:hover {
+.swagger-ui .hover-inherit:focus, .swagger-ui .hover-inherit:hover {
   color: inherit;
 }
-.swagger-ui .hover-bg-black:focus,
-.swagger-ui .hover-bg-black:hover {
+.swagger-ui .hover-bg-black:focus, .swagger-ui .hover-bg-black:hover {
   background-color: #000;
 }
-.swagger-ui .hover-bg-near-black:focus,
-.swagger-ui .hover-bg-near-black:hover {
+.swagger-ui .hover-bg-near-black:focus, .swagger-ui .hover-bg-near-black:hover {
   background-color: #111;
 }
-.swagger-ui .hover-bg-dark-gray:focus,
-.swagger-ui .hover-bg-dark-gray:hover {
+.swagger-ui .hover-bg-dark-gray:focus, .swagger-ui .hover-bg-dark-gray:hover {
   background-color: #333;
 }
-.swagger-ui .hover-bg-mid-gray:focus,
-.swagger-ui .hover-bg-mid-gray:hover {
+.swagger-ui .hover-bg-mid-gray:focus, .swagger-ui .hover-bg-mid-gray:hover {
   background-color: #555;
 }
-.swagger-ui .hover-bg-gray:focus,
-.swagger-ui .hover-bg-gray:hover {
+.swagger-ui .hover-bg-gray:focus, .swagger-ui .hover-bg-gray:hover {
   background-color: #777;
 }
-.swagger-ui .hover-bg-silver:focus,
-.swagger-ui .hover-bg-silver:hover {
+.swagger-ui .hover-bg-silver:focus, .swagger-ui .hover-bg-silver:hover {
   background-color: #999;
 }
 .swagger-ui .hover-bg-light-silver:focus,
 .swagger-ui .hover-bg-light-silver:hover {
   background-color: #aaa;
 }
-.swagger-ui .hover-bg-moon-gray:focus,
-.swagger-ui .hover-bg-moon-gray:hover {
+.swagger-ui .hover-bg-moon-gray:focus, .swagger-ui .hover-bg-moon-gray:hover {
   background-color: #ccc;
 }
-.swagger-ui .hover-bg-light-gray:focus,
-.swagger-ui .hover-bg-light-gray:hover {
+.swagger-ui .hover-bg-light-gray:focus, .swagger-ui .hover-bg-light-gray:hover {
   background-color: #eee;
 }
-.swagger-ui .hover-bg-near-white:focus,
-.swagger-ui .hover-bg-near-white:hover {
+.swagger-ui .hover-bg-near-white:focus, .swagger-ui .hover-bg-near-white:hover {
   background-color: #f4f4f4;
 }
-.swagger-ui .hover-bg-white:focus,
-.swagger-ui .hover-bg-white:hover {
+.swagger-ui .hover-bg-white:focus, .swagger-ui .hover-bg-white:hover {
   background-color: #fff;
 }
 .swagger-ui .hover-bg-transparent:focus,
 .swagger-ui .hover-bg-transparent:hover {
   background-color: transparent;
 }
-.swagger-ui .hover-bg-black-90:focus,
-.swagger-ui .hover-bg-black-90:hover {
+.swagger-ui .hover-bg-black-90:focus, .swagger-ui .hover-bg-black-90:hover {
   background-color: rgba(0, 0, 0, 0.9);
 }
-.swagger-ui .hover-bg-black-80:focus,
-.swagger-ui .hover-bg-black-80:hover {
+.swagger-ui .hover-bg-black-80:focus, .swagger-ui .hover-bg-black-80:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
-.swagger-ui .hover-bg-black-70:focus,
-.swagger-ui .hover-bg-black-70:hover {
+.swagger-ui .hover-bg-black-70:focus, .swagger-ui .hover-bg-black-70:hover {
   background-color: rgba(0, 0, 0, 0.7);
 }
-.swagger-ui .hover-bg-black-60:focus,
-.swagger-ui .hover-bg-black-60:hover {
+.swagger-ui .hover-bg-black-60:focus, .swagger-ui .hover-bg-black-60:hover {
   background-color: rgba(0, 0, 0, 0.6);
 }
-.swagger-ui .hover-bg-black-50:focus,
-.swagger-ui .hover-bg-black-50:hover {
+.swagger-ui .hover-bg-black-50:focus, .swagger-ui .hover-bg-black-50:hover {
   background-color: rgba(0, 0, 0, 0.5);
 }
-.swagger-ui .hover-bg-black-40:focus,
-.swagger-ui .hover-bg-black-40:hover {
+.swagger-ui .hover-bg-black-40:focus, .swagger-ui .hover-bg-black-40:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
-.swagger-ui .hover-bg-black-30:focus,
-.swagger-ui .hover-bg-black-30:hover {
+.swagger-ui .hover-bg-black-30:focus, .swagger-ui .hover-bg-black-30:hover {
   background-color: rgba(0, 0, 0, 0.3);
 }
-.swagger-ui .hover-bg-black-20:focus,
-.swagger-ui .hover-bg-black-20:hover {
+.swagger-ui .hover-bg-black-20:focus, .swagger-ui .hover-bg-black-20:hover {
   background-color: rgba(0, 0, 0, 0.2);
 }
-.swagger-ui .hover-bg-black-10:focus,
-.swagger-ui .hover-bg-black-10:hover {
+.swagger-ui .hover-bg-black-10:focus, .swagger-ui .hover-bg-black-10:hover {
   background-color: rgba(0, 0, 0, 0.1);
 }
-.swagger-ui .hover-bg-white-90:focus,
-.swagger-ui .hover-bg-white-90:hover {
+.swagger-ui .hover-bg-white-90:focus, .swagger-ui .hover-bg-white-90:hover {
   background-color: hsla(0, 0%, 100%, 0.9);
 }
-.swagger-ui .hover-bg-white-80:focus,
-.swagger-ui .hover-bg-white-80:hover {
+.swagger-ui .hover-bg-white-80:focus, .swagger-ui .hover-bg-white-80:hover {
   background-color: hsla(0, 0%, 100%, 0.8);
 }
-.swagger-ui .hover-bg-white-70:focus,
-.swagger-ui .hover-bg-white-70:hover {
+.swagger-ui .hover-bg-white-70:focus, .swagger-ui .hover-bg-white-70:hover {
   background-color: hsla(0, 0%, 100%, 0.7);
 }
-.swagger-ui .hover-bg-white-60:focus,
-.swagger-ui .hover-bg-white-60:hover {
+.swagger-ui .hover-bg-white-60:focus, .swagger-ui .hover-bg-white-60:hover {
   background-color: hsla(0, 0%, 100%, 0.6);
 }
-.swagger-ui .hover-bg-white-50:focus,
-.swagger-ui .hover-bg-white-50:hover {
+.swagger-ui .hover-bg-white-50:focus, .swagger-ui .hover-bg-white-50:hover {
   background-color: hsla(0, 0%, 100%, 0.5);
 }
-.swagger-ui .hover-bg-white-40:focus,
-.swagger-ui .hover-bg-white-40:hover {
+.swagger-ui .hover-bg-white-40:focus, .swagger-ui .hover-bg-white-40:hover {
   background-color: hsla(0, 0%, 100%, 0.4);
 }
-.swagger-ui .hover-bg-white-30:focus,
-.swagger-ui .hover-bg-white-30:hover {
+.swagger-ui .hover-bg-white-30:focus, .swagger-ui .hover-bg-white-30:hover {
   background-color: hsla(0, 0%, 100%, 0.3);
 }
-.swagger-ui .hover-bg-white-20:focus,
-.swagger-ui .hover-bg-white-20:hover {
+.swagger-ui .hover-bg-white-20:focus, .swagger-ui .hover-bg-white-20:hover {
   background-color: hsla(0, 0%, 100%, 0.2);
 }
-.swagger-ui .hover-bg-white-10:focus,
-.swagger-ui .hover-bg-white-10:hover {
+.swagger-ui .hover-bg-white-10:focus, .swagger-ui .hover-bg-white-10:hover {
   background-color: hsla(0, 0%, 100%, 0.1);
 }
-.swagger-ui .hover-dark-red:focus,
-.swagger-ui .hover-dark-red:hover {
+.swagger-ui .hover-dark-red:focus, .swagger-ui .hover-dark-red:hover {
   color: #e7040f;
 }
-.swagger-ui .hover-red:focus,
-.swagger-ui .hover-red:hover {
+.swagger-ui .hover-red:focus, .swagger-ui .hover-red:hover {
   color: #ff4136;
 }
-.swagger-ui .hover-light-red:focus,
-.swagger-ui .hover-light-red:hover {
+.swagger-ui .hover-light-red:focus, .swagger-ui .hover-light-red:hover {
   color: #ff725c;
 }
-.swagger-ui .hover-orange:focus,
-.swagger-ui .hover-orange:hover {
+.swagger-ui .hover-orange:focus, .swagger-ui .hover-orange:hover {
   color: #ff6300;
 }
-.swagger-ui .hover-gold:focus,
-.swagger-ui .hover-gold:hover {
+.swagger-ui .hover-gold:focus, .swagger-ui .hover-gold:hover {
   color: #ffb700;
 }
-.swagger-ui .hover-yellow:focus,
-.swagger-ui .hover-yellow:hover {
+.swagger-ui .hover-yellow:focus, .swagger-ui .hover-yellow:hover {
   color: gold;
 }
-.swagger-ui .hover-light-yellow:focus,
-.swagger-ui .hover-light-yellow:hover {
+.swagger-ui .hover-light-yellow:focus, .swagger-ui .hover-light-yellow:hover {
   color: #fbf1a9;
 }
-.swagger-ui .hover-purple:focus,
-.swagger-ui .hover-purple:hover {
+.swagger-ui .hover-purple:focus, .swagger-ui .hover-purple:hover {
   color: #5e2ca5;
 }
-.swagger-ui .hover-light-purple:focus,
-.swagger-ui .hover-light-purple:hover {
+.swagger-ui .hover-light-purple:focus, .swagger-ui .hover-light-purple:hover {
   color: #a463f2;
 }
-.swagger-ui .hover-dark-pink:focus,
-.swagger-ui .hover-dark-pink:hover {
+.swagger-ui .hover-dark-pink:focus, .swagger-ui .hover-dark-pink:hover {
   color: #d5008f;
 }
-.swagger-ui .hover-hot-pink:focus,
-.swagger-ui .hover-hot-pink:hover {
+.swagger-ui .hover-hot-pink:focus, .swagger-ui .hover-hot-pink:hover {
   color: #ff41b4;
 }
-.swagger-ui .hover-pink:focus,
-.swagger-ui .hover-pink:hover {
+.swagger-ui .hover-pink:focus, .swagger-ui .hover-pink:hover {
   color: #ff80cc;
 }
-.swagger-ui .hover-light-pink:focus,
-.swagger-ui .hover-light-pink:hover {
+.swagger-ui .hover-light-pink:focus, .swagger-ui .hover-light-pink:hover {
   color: #ffa3d7;
 }
-.swagger-ui .hover-dark-green:focus,
-.swagger-ui .hover-dark-green:hover {
+.swagger-ui .hover-dark-green:focus, .swagger-ui .hover-dark-green:hover {
   color: #137752;
 }
-.swagger-ui .hover-green:focus,
-.swagger-ui .hover-green:hover {
+.swagger-ui .hover-green:focus, .swagger-ui .hover-green:hover {
   color: #19a974;
 }
-.swagger-ui .hover-light-green:focus,
-.swagger-ui .hover-light-green:hover {
+.swagger-ui .hover-light-green:focus, .swagger-ui .hover-light-green:hover {
   color: #9eebcf;
 }
-.swagger-ui .hover-navy:focus,
-.swagger-ui .hover-navy:hover {
+.swagger-ui .hover-navy:focus, .swagger-ui .hover-navy:hover {
   color: #001b44;
 }
-.swagger-ui .hover-dark-blue:focus,
-.swagger-ui .hover-dark-blue:hover {
+.swagger-ui .hover-dark-blue:focus, .swagger-ui .hover-dark-blue:hover {
   color: #00449e;
 }
-.swagger-ui .hover-blue:focus,
-.swagger-ui .hover-blue:hover {
+.swagger-ui .hover-blue:focus, .swagger-ui .hover-blue:hover {
   color: #357edd;
 }
-.swagger-ui .hover-light-blue:focus,
-.swagger-ui .hover-light-blue:hover {
+.swagger-ui .hover-light-blue:focus, .swagger-ui .hover-light-blue:hover {
   color: #96ccff;
 }
-.swagger-ui .hover-lightest-blue:focus,
-.swagger-ui .hover-lightest-blue:hover {
+.swagger-ui .hover-lightest-blue:focus, .swagger-ui .hover-lightest-blue:hover {
   color: #cdecff;
 }
-.swagger-ui .hover-washed-blue:focus,
-.swagger-ui .hover-washed-blue:hover {
+.swagger-ui .hover-washed-blue:focus, .swagger-ui .hover-washed-blue:hover {
   color: #f6fffe;
 }
-.swagger-ui .hover-washed-green:focus,
-.swagger-ui .hover-washed-green:hover {
+.swagger-ui .hover-washed-green:focus, .swagger-ui .hover-washed-green:hover {
   color: #e8fdf5;
 }
-.swagger-ui .hover-washed-yellow:focus,
-.swagger-ui .hover-washed-yellow:hover {
+.swagger-ui .hover-washed-yellow:focus, .swagger-ui .hover-washed-yellow:hover {
   color: #fffceb;
 }
-.swagger-ui .hover-washed-red:focus,
-.swagger-ui .hover-washed-red:hover {
+.swagger-ui .hover-washed-red:focus, .swagger-ui .hover-washed-red:hover {
   color: #ffdfdf;
 }
-.swagger-ui .hover-bg-dark-red:focus,
-.swagger-ui .hover-bg-dark-red:hover {
+.swagger-ui .hover-bg-dark-red:focus, .swagger-ui .hover-bg-dark-red:hover {
   background-color: #e7040f;
 }
-.swagger-ui .hover-bg-red:focus,
-.swagger-ui .hover-bg-red:hover {
+.swagger-ui .hover-bg-red:focus, .swagger-ui .hover-bg-red:hover {
   background-color: #ff4136;
 }
-.swagger-ui .hover-bg-light-red:focus,
-.swagger-ui .hover-bg-light-red:hover {
+.swagger-ui .hover-bg-light-red:focus, .swagger-ui .hover-bg-light-red:hover {
   background-color: #ff725c;
 }
-.swagger-ui .hover-bg-orange:focus,
-.swagger-ui .hover-bg-orange:hover {
+.swagger-ui .hover-bg-orange:focus, .swagger-ui .hover-bg-orange:hover {
   background-color: #ff6300;
 }
-.swagger-ui .hover-bg-gold:focus,
-.swagger-ui .hover-bg-gold:hover {
+.swagger-ui .hover-bg-gold:focus, .swagger-ui .hover-bg-gold:hover {
   background-color: #ffb700;
 }
-.swagger-ui .hover-bg-yellow:focus,
-.swagger-ui .hover-bg-yellow:hover {
+.swagger-ui .hover-bg-yellow:focus, .swagger-ui .hover-bg-yellow:hover {
   background-color: gold;
 }
 .swagger-ui .hover-bg-light-yellow:focus,
 .swagger-ui .hover-bg-light-yellow:hover {
   background-color: #fbf1a9;
 }
-.swagger-ui .hover-bg-purple:focus,
-.swagger-ui .hover-bg-purple:hover {
+.swagger-ui .hover-bg-purple:focus, .swagger-ui .hover-bg-purple:hover {
   background-color: #5e2ca5;
 }
 .swagger-ui .hover-bg-light-purple:focus,
 .swagger-ui .hover-bg-light-purple:hover {
   background-color: #a463f2;
 }
-.swagger-ui .hover-bg-dark-pink:focus,
-.swagger-ui .hover-bg-dark-pink:hover {
+.swagger-ui .hover-bg-dark-pink:focus, .swagger-ui .hover-bg-dark-pink:hover {
   background-color: #d5008f;
 }
-.swagger-ui .hover-bg-hot-pink:focus,
-.swagger-ui .hover-bg-hot-pink:hover {
+.swagger-ui .hover-bg-hot-pink:focus, .swagger-ui .hover-bg-hot-pink:hover {
   background-color: #ff41b4;
 }
-.swagger-ui .hover-bg-pink:focus,
-.swagger-ui .hover-bg-pink:hover {
+.swagger-ui .hover-bg-pink:focus, .swagger-ui .hover-bg-pink:hover {
   background-color: #ff80cc;
 }
-.swagger-ui .hover-bg-light-pink:focus,
-.swagger-ui .hover-bg-light-pink:hover {
+.swagger-ui .hover-bg-light-pink:focus, .swagger-ui .hover-bg-light-pink:hover {
   background-color: #ffa3d7;
 }
-.swagger-ui .hover-bg-dark-green:focus,
-.swagger-ui .hover-bg-dark-green:hover {
+.swagger-ui .hover-bg-dark-green:focus, .swagger-ui .hover-bg-dark-green:hover {
   background-color: #137752;
 }
-.swagger-ui .hover-bg-green:focus,
-.swagger-ui .hover-bg-green:hover {
+.swagger-ui .hover-bg-green:focus, .swagger-ui .hover-bg-green:hover {
   background-color: #19a974;
 }
 .swagger-ui .hover-bg-light-green:focus,
 .swagger-ui .hover-bg-light-green:hover {
   background-color: #9eebcf;
 }
-.swagger-ui .hover-bg-navy:focus,
-.swagger-ui .hover-bg-navy:hover {
+.swagger-ui .hover-bg-navy:focus, .swagger-ui .hover-bg-navy:hover {
   background-color: #001b44;
 }
-.swagger-ui .hover-bg-dark-blue:focus,
-.swagger-ui .hover-bg-dark-blue:hover {
+.swagger-ui .hover-bg-dark-blue:focus, .swagger-ui .hover-bg-dark-blue:hover {
   background-color: #00449e;
 }
-.swagger-ui .hover-bg-blue:focus,
-.swagger-ui .hover-bg-blue:hover {
+.swagger-ui .hover-bg-blue:focus, .swagger-ui .hover-bg-blue:hover {
   background-color: #357edd;
 }
-.swagger-ui .hover-bg-light-blue:focus,
-.swagger-ui .hover-bg-light-blue:hover {
+.swagger-ui .hover-bg-light-blue:focus, .swagger-ui .hover-bg-light-blue:hover {
   background-color: #96ccff;
 }
 .swagger-ui .hover-bg-lightest-blue:focus,
@@ -4473,12 +4359,10 @@
 .swagger-ui .hover-bg-washed-yellow:hover {
   background-color: #fffceb;
 }
-.swagger-ui .hover-bg-washed-red:focus,
-.swagger-ui .hover-bg-washed-red:hover {
+.swagger-ui .hover-bg-washed-red:focus, .swagger-ui .hover-bg-washed-red:hover {
   background-color: #ffdfdf;
 }
-.swagger-ui .hover-bg-inherit:focus,
-.swagger-ui .hover-bg-inherit:hover {
+.swagger-ui .hover-bg-inherit:focus, .swagger-ui .hover-bg-inherit:hover {
   background-color: inherit;
 }
 .swagger-ui .pa0 {
@@ -6569,12 +6453,10 @@
     text-transform: none;
   }
 }
-.swagger-ui .f-6,
-.swagger-ui .f-headline {
+.swagger-ui .f-6, .swagger-ui .f-headline {
   font-size: 6rem;
 }
-.swagger-ui .f-5,
-.swagger-ui .f-subheadline {
+.swagger-ui .f-5, .swagger-ui .f-subheadline {
   font-size: 5rem;
 }
 .swagger-ui .f1 {
@@ -6599,12 +6481,10 @@
   font-size: 0.75rem;
 }
 @media screen and (min-width: 30em) {
-  .swagger-ui .f-6-ns,
-  .swagger-ui .f-headline-ns {
+  .swagger-ui .f-6-ns, .swagger-ui .f-headline-ns {
     font-size: 6rem;
   }
-  .swagger-ui .f-5-ns,
-  .swagger-ui .f-subheadline-ns {
+  .swagger-ui .f-5-ns, .swagger-ui .f-subheadline-ns {
     font-size: 5rem;
   }
   .swagger-ui .f1-ns {
@@ -6630,12 +6510,10 @@
   }
 }
 @media screen and (min-width: 30em) and (max-width: 60em) {
-  .swagger-ui .f-6-m,
-  .swagger-ui .f-headline-m {
+  .swagger-ui .f-6-m, .swagger-ui .f-headline-m {
     font-size: 6rem;
   }
-  .swagger-ui .f-5-m,
-  .swagger-ui .f-subheadline-m {
+  .swagger-ui .f-5-m, .swagger-ui .f-subheadline-m {
     font-size: 5rem;
   }
   .swagger-ui .f1-m {
@@ -6661,12 +6539,10 @@
   }
 }
 @media screen and (min-width: 60em) {
-  .swagger-ui .f-6-l,
-  .swagger-ui .f-headline-l {
+  .swagger-ui .f-6-l, .swagger-ui .f-headline-l {
     font-size: 6rem;
   }
-  .swagger-ui .f-5-l,
-  .swagger-ui .f-subheadline-l {
+  .swagger-ui .f-5-l, .swagger-ui .f-subheadline-l {
     font-size: 5rem;
   }
   .swagger-ui .f1-l {
@@ -6968,8 +6844,7 @@
   opacity: 1;
   transition: opacity 0.15s ease-in;
 }
-.swagger-ui .dim:focus,
-.swagger-ui .dim:hover {
+.swagger-ui .dim:focus, .swagger-ui .dim:hover {
   opacity: 0.5;
   transition: opacity 0.15s ease-in;
 }
@@ -6980,8 +6855,7 @@
 .swagger-ui .glow {
   transition: opacity 0.15s ease-in;
 }
-.swagger-ui .glow:focus,
-.swagger-ui .glow:hover {
+.swagger-ui .glow:focus, .swagger-ui .glow:hover {
   opacity: 1;
   transition: opacity 0.15s ease-in;
 }
@@ -6995,8 +6869,7 @@
   opacity: 1;
   transition: opacity 0.15s ease-in;
 }
-.swagger-ui .underline-hover:focus,
-.swagger-ui .underline-hover:hover {
+.swagger-ui .underline-hover:focus, .swagger-ui .underline-hover:hover {
   -webkit-text-decoration: underline;
   text-decoration: underline;
 }
@@ -7006,8 +6879,7 @@
   transform: translateZ(0);
   transition: transform 0.25s ease-out;
 }
-.swagger-ui .grow:focus,
-.swagger-ui .grow:hover {
+.swagger-ui .grow:focus, .swagger-ui .grow:hover {
   transform: scale(1.05);
 }
 .swagger-ui .grow:active {
@@ -7019,8 +6891,7 @@
   transform: translateZ(0);
   transition: transform 0.25s ease-in-out;
 }
-.swagger-ui .grow-large:focus,
-.swagger-ui .grow-large:hover {
+.swagger-ui .grow-large:focus, .swagger-ui .grow-large:hover {
   transform: scale(1.2);
 }
 .swagger-ui .grow-large:active {
@@ -7047,8 +6918,7 @@
   width: 100%;
   z-index: -1;
 }
-.swagger-ui .shadow-hover:focus:after,
-.swagger-ui .shadow-hover:hover:after {
+.swagger-ui .shadow-hover:focus:after, .swagger-ui .shadow-hover:hover:after {
   opacity: 1;
 }
 .swagger-ui .bg-animate,
@@ -7086,8 +6956,7 @@
 .swagger-ui .z-inherit {
   z-index: inherit;
 }
-.swagger-ui .z-initial,
-.swagger-ui .z-unset {
+.swagger-ui .z-initial, .swagger-ui .z-unset {
   z-index: auto;
 }
 .swagger-ui .nested-copy-line-height ol,
@@ -7103,8 +6972,7 @@
 .swagger-ui .nested-headline-line-height h6 {
   line-height: 1.25;
 }
-.swagger-ui .nested-list-reset ol,
-.swagger-ui .nested-list-reset ul {
+.swagger-ui .nested-list-reset ol, .swagger-ui .nested-list-reset ul {
   list-style-type: none;
   margin-left: 0;
   padding-left: 0;
@@ -7126,8 +6994,7 @@
   color: #357edd;
   transition: color 0.15s ease-in;
 }
-.swagger-ui .nested-links a:focus,
-.swagger-ui .nested-links a:hover {
+.swagger-ui .nested-links a:focus, .swagger-ui .nested-links a:hover {
   color: #96ccff;
   transition: color 0.15s ease-in;
 }
@@ -7189,8 +7056,7 @@
   white-space: nowrap;
 }
 @media (max-width: 640px) {
-  .swagger-ui .opblock-tag small,
-  .swagger-ui .opblock-tag > div {
+  .swagger-ui .opblock-tag small, .swagger-ui .opblock-tag > div {
     flex: 1;
   }
 }
@@ -7369,10 +7235,10 @@
   align-items: center;
   display: flex;
   flex-direction: row;
+  flex-grow: 1;
   flex-wrap: wrap;
   gap: 0 10px;
   padding: 0 10px;
-  width: 100%;
 }
 @media (max-width: 550px) {
   .swagger-ui .opblock .opblock-summary-path-description-wrapper {
@@ -7528,16 +7394,24 @@
   padding: 10px;
   width: 100%;
 }
-.swagger-ui .download-url-wrapper .failed,
-.swagger-ui .filter .failed {
+.swagger-ui .download-url-wrapper .failed, .swagger-ui .filter .failed {
   color: red;
 }
-.swagger-ui .download-url-wrapper .loading,
-.swagger-ui .filter .loading {
+.swagger-ui .download-url-wrapper .loading, .swagger-ui .filter .loading {
   color: #aaa;
 }
 .swagger-ui .model-example {
   margin-top: 1em;
+}
+.swagger-ui .model-example .model-container {
+  overflow-x: auto;
+  width: 100%;
+}
+.swagger-ui
+  .model-example
+  .model-container
+  .model-hint:not(.model-hint--embedded) {
+  top: -1.15em;
 }
 .swagger-ui .tab {
   display: flex;
@@ -7629,8 +7503,7 @@
 .swagger-ui .responses-inner {
   padding: 20px;
 }
-.swagger-ui .responses-inner h4,
-.swagger-ui .responses-inner h5 {
+.swagger-ui .responses-inner h4, .swagger-ui .responses-inner h5 {
   color: #3b4151;
   font-family: sans-serif;
   font-size: 12px;
@@ -7869,8 +7742,7 @@
 .swagger-ui a.nostyle {
   display: inline;
 }
-.swagger-ui a.nostyle,
-.swagger-ui a.nostyle:visited {
+.swagger-ui a.nostyle, .swagger-ui a.nostyle:visited {
   color: inherit;
   cursor: pointer;
   text-decoration: inherit;
@@ -8000,13 +7872,11 @@
 .swagger-ui .opblock-summary-control:focus {
   outline: auto;
 }
-.swagger-ui .expand-methods,
-.swagger-ui .expand-operation {
+.swagger-ui .expand-methods, .swagger-ui .expand-operation {
   background: none;
   border: none;
 }
-.swagger-ui .expand-methods svg,
-.swagger-ui .expand-operation svg {
+.swagger-ui .expand-methods svg, .swagger-ui .expand-operation svg {
   height: 20px;
   width: 20px;
 }
@@ -8042,7 +7912,7 @@
   width: 30px;
 }
 .swagger-ui .copy-to-clipboard button {
-  background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" aria-hidden="true"><path fill="%23fff" fill-rule="evenodd" d="M4 12h4v1H4zm5-6H4v1h5zm2 3V7l-3 3 3 3v-2h5V9zM6.5 8H4v1h2.5zM4 11h2.5v-1H4zm9 1h1v2c-.02.28-.11.52-.3.7s-.42.28-.7.3H3c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3c0-1.11.89-2 2-2s2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V5H3v9h10zM4 4h8c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H5c-.55 0-1 .45-1 1"/></svg>')
+  background: url("data:image/svg+xml;charset=utf-8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"15\" aria-hidden=\"true\"><path fill=\"%23fff\" fill-rule=\"evenodd\" d=\"M4 12h4v1H4zm5-6H4v1h5zm2 3V7l-3 3 3 3v-2h5V9zM6.5 8H4v1h2.5zM4 11h2.5v-1H4zm9 1h1v2c-.02.28-.11.52-.3.7s-.42.28-.7.3H3c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h3c0-1.11.89-2 2-2s2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V5H3v9h10zM4 4h8c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H5c-.55 0-1 .45-1 1\"/></svg>")
     50% no-repeat;
   border: none;
   flex-grow: 1;
@@ -8075,7 +7945,7 @@
   -moz-appearance: none;
   appearance: none;
   background: #f7f7f7
-    url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13.418 7.859a.695.695 0 0 1 .978 0 .68.68 0 0 1 0 .969l-3.908 3.83a.697.697 0 0 1-.979 0l-3.908-3.83a.68.68 0 0 1 0-.969.695.695 0 0 1 .978 0L10 11z"/></svg>')
+    url("data:image/svg+xml;charset=utf-8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\"><path d=\"M13.418 7.859a.695.695 0 0 1 .978 0 .68.68 0 0 1 0 .969l-3.908 3.83a.697.697 0 0 1-.979 0l-3.908-3.83a.68.68 0 0 1 0-.969.695.695 0 0 1 .978 0L10 11z\"/></svg>")
     right 10px center no-repeat;
   background-size: 20px;
   border: 2px solid #41444e;
@@ -8172,21 +8042,16 @@
   color: #fff;
 }
 @keyframes shake {
-  10%,
-  90% {
+  10%, 90% {
     transform: translate3d(-1px, 0, 0);
   }
-  20%,
-  80% {
+  20%, 80% {
     transform: translate3d(2px, 0, 0);
   }
-  30%,
-  50%,
-  70% {
+  30%, 50%, 70% {
     transform: translate3d(-4px, 0, 0);
   }
-  40%,
-  60% {
+  40%, 60% {
     transform: translate3d(4px, 0, 0);
   }
 }
@@ -8256,7 +8121,7 @@
 }
 .swagger-ui .checkbox input[type="checkbox"]:checked + label > .item {
   background: #e8e8e8
-    url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="8" viewBox="3 7 10 8"><path fill="%2341474E" fill-rule="evenodd" d="M6.333 15 3 11.667l1.333-1.334 2 2L11.667 7 13 8.333z"/></svg>')
+    url("data:image/svg+xml;charset=utf-8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"10\" height=\"8\" viewBox=\"3 7 10 8\"><path fill=\"%2341474E\" fill-rule=\"evenodd\" d=\"M6.333 15 3 11.667l1.333-1.334 2 2L11.667 7 13 8.333z\"/></svg>")
     50% no-repeat;
 }
 .swagger-ui .dialog-ux {
@@ -8338,8 +8203,7 @@
   font-weight: 300;
   font-weight: 600;
 }
-.swagger-ui .model .deprecated span,
-.swagger-ui .model .deprecated td {
+.swagger-ui .model .deprecated span, .swagger-ui .model .deprecated td {
   color: #a0a0a0 !important;
 }
 .swagger-ui .model .deprecated > td:first-of-type {
@@ -8361,7 +8225,7 @@
   transform: rotate(0deg);
 }
 .swagger-ui .model-toggle:after {
-  background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>')
+  background: url("data:image/svg+xml;charset=utf-8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path d=\"M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z\"/></svg>")
     50% no-repeat;
   background-size: 100%;
   content: "";
@@ -8382,16 +8246,16 @@
   position: relative;
 }
 .swagger-ui .model-title:hover .model-hint {
-  visibility: visible;
+  display: block;
 }
 .swagger-ui .model-hint {
   background: rgba(0, 0, 0, 0.7);
   border-radius: 4px;
   color: #ebebeb;
+  display: none;
   padding: 0.1em 0.5em;
   position: absolute;
   top: -1.8em;
-  visibility: hidden;
   white-space: nowrap;
 }
 .swagger-ui .model p {
@@ -8404,8 +8268,18 @@
 .swagger-ui .model .property.primitive {
   color: #6b6b6b;
 }
-.swagger-ui .model .external-docs,
-.swagger-ui table.model tr.description {
+.swagger-ui .model .property.primitive.extension {
+  display: block;
+}
+.swagger-ui .model .property.primitive.extension > td:first-child {
+  padding-left: 0;
+  padding-right: 0;
+  width: auto;
+}
+.swagger-ui .model .property.primitive.extension > td:first-child:after {
+  content: ": ";
+}
+.swagger-ui .model .external-docs, .swagger-ui table.model tr.description {
   color: #666;
   font-weight: 400;
 }
@@ -8503,6 +8377,10 @@
 }
 .swagger-ui section.models .model-box {
   background: none;
+}
+.swagger-ui section.models .model-box:has(.model-box) {
+  overflow-x: auto;
+  width: 100%;
 }
 .swagger-ui .model-box {
   background: rgba(0, 0, 0, 0.1);
@@ -8630,8 +8508,10 @@
   min-width: 6em;
   padding: 10px 0;
 }
-.swagger-ui table thead tr td,
-.swagger-ui table thead tr th {
+.swagger-ui table tbody tr td:has(.model-box) {
+  max-width: 1px;
+}
+.swagger-ui table thead tr td, .swagger-ui table thead tr th {
   border-bottom: 1px solid rgba(59, 65, 81, 0.2);
   color: #3b4151;
   font-family: sans-serif;
@@ -8676,8 +8556,7 @@
   position: relative;
   top: -6px;
 }
-.swagger-ui .parameter__extension,
-.swagger-ui .parameter__in {
+.swagger-ui .parameter__extension, .swagger-ui .parameter__in {
   color: grey;
   font-family: monospace;
   font-size: 12px;
@@ -8820,21 +8699,20 @@
 .swagger-ui .info hgroup.main a {
   font-size: 12px;
 }
-.swagger-ui .info pre {
-  font-size: 14px;
-}
 .swagger-ui .info li,
 .swagger-ui .info p,
+.swagger-ui .info pre,
 .swagger-ui .info table {
-  color: #3b4151;
-  font-family: sans-serif;
   font-size: 14px;
 }
 .swagger-ui .info h1,
 .swagger-ui .info h2,
 .swagger-ui .info h3,
 .swagger-ui .info h4,
-.swagger-ui .info h5 {
+.swagger-ui .info h5,
+.swagger-ui .info li,
+.swagger-ui .info p,
+.swagger-ui .info table {
   color: #3b4151;
   font-family: sans-serif;
 }
@@ -9018,16 +8896,14 @@
   word-break: break-all;
   word-break: break-word;
 }
-.swagger-ui .markdown pre,
-.swagger-ui .renderedMarkdown pre {
+.swagger-ui .markdown pre, .swagger-ui .renderedMarkdown pre {
   background: none;
   color: #000;
   font-weight: 400;
   padding: 0;
   white-space: pre-wrap;
 }
-.swagger-ui .markdown code,
-.swagger-ui .renderedMarkdown code {
+.swagger-ui .markdown code, .swagger-ui .renderedMarkdown code {
   background: rgba(0, 0, 0, 0.05);
   border-radius: 4px;
   color: #9012fe;
@@ -9036,9 +8912,289 @@
   font-weight: 600;
   padding: 5px 7px;
 }
-.swagger-ui .markdown pre > code,
-.swagger-ui .renderedMarkdown pre > code {
+.swagger-ui .markdown pre > code, .swagger-ui .renderedMarkdown pre > code {
   display: block;
+}
+.swagger-ui .json-schema-2020-12-keyword--\$vocabulary ul {
+  border-left: 1px dashed rgba(0, 0, 0, 0.1);
+  margin: 0 0 0 20px;
+}
+.swagger-ui .json-schema-2020-12-\$vocabulary-uri {
+  margin-left: 35px;
+}
+.swagger-ui .json-schema-2020-12-\$vocabulary-uri--disabled {
+  -webkit-text-decoration: line-through;
+  text-decoration: line-through;
+}
+.swagger-ui
+  .json-schema-2020-12-keyword--const
+  .json-schema-2020-12-json-viewer__name,
+.swagger-ui
+  .json-schema-2020-12-keyword--const
+  .json-schema-2020-12-json-viewer__value {
+  color: #3b4151;
+  font-style: normal;
+}
+.swagger-ui .json-schema-2020-12__constraint {
+  background-color: #805ad5;
+  border-radius: 4px;
+  color: #3b4151;
+  color: #fff;
+  font-family: monospace;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-left: 10px;
+  padding: 1px 3px;
+}
+.swagger-ui .json-schema-2020-12__constraint--string {
+  background-color: #d69e2e;
+  color: #fff;
+}
+.swagger-ui
+  .json-schema-2020-12-keyword--default
+  .json-schema-2020-12-json-viewer__name,
+.swagger-ui
+  .json-schema-2020-12-keyword--default
+  .json-schema-2020-12-json-viewer__value {
+  color: #3b4151;
+  font-style: normal;
+}
+.swagger-ui .json-schema-2020-12-keyword--dependentRequired > ul {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+.swagger-ui .json-schema-2020-12-keyword--dependentRequired > ul li {
+  display: inline;
+  list-style-type: none;
+}
+.swagger-ui .json-schema-2020-12-keyword--description {
+  color: #6b6b6b;
+  font-size: 12px;
+  margin-left: 20px;
+}
+.swagger-ui .json-schema-2020-12-keyword--description p {
+  margin: 0;
+}
+.swagger-ui
+  .json-schema-2020-12-keyword--enum
+  .json-schema-2020-12-json-viewer__name,
+.swagger-ui
+  .json-schema-2020-12-keyword--enum
+  .json-schema-2020-12-json-viewer__value,
+.swagger-ui
+  .json-schema-2020-12-keyword--examples
+  .json-schema-2020-12-json-viewer__name,
+.swagger-ui
+  .json-schema-2020-12-keyword--examples
+  .json-schema-2020-12-json-viewer__value {
+  color: #3b4151;
+  font-style: normal;
+}
+.swagger-ui
+  .json-schema-2020-12-json-viewer-extension-keyword
+  .json-schema-2020-12-json-viewer__name,
+.swagger-ui
+  .json-schema-2020-12-json-viewer-extension-keyword
+  .json-schema-2020-12-json-viewer__value {
+  color: #929292;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-keyword--patternProperties ul {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.swagger-ui
+  .json-schema-2020-12-keyword--patternProperties
+  .json-schema-2020-12__title:first-of-type:after,
+.swagger-ui
+  .json-schema-2020-12-keyword--patternProperties
+  .json-schema-2020-12__title:first-of-type:before {
+  color: #55a;
+  content: "/";
+}
+.swagger-ui .json-schema-2020-12-keyword--properties > ul {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.swagger-ui .json-schema-2020-12-property {
+  list-style-type: none;
+}
+.swagger-ui
+  .json-schema-2020-12-property--required
+  > .json-schema-2020-12:first-of-type
+  > .json-schema-2020-12-head
+  .json-schema-2020-12__title:after {
+  color: red;
+  content: "*";
+  font-weight: 700;
+}
+.swagger-ui .json-schema-2020-12__title {
+  color: #505050;
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: normal;
+}
+.swagger-ui .json-schema-2020-12__title .json-schema-2020-12-keyword__name {
+  margin: 0;
+}
+.swagger-ui .json-schema-2020-12-property {
+  margin: 7px 0;
+}
+.swagger-ui .json-schema-2020-12-property .json-schema-2020-12__title {
+  color: #3b4151;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.swagger-ui .json-schema-2020-12-keyword {
+  margin: 5px 0;
+}
+.swagger-ui .json-schema-2020-12-keyword__children {
+  border-left: 1px dashed rgba(0, 0, 0, 0.1);
+  margin: 0 0 0 20px;
+  padding: 0;
+}
+.swagger-ui .json-schema-2020-12-keyword__children--collapsed {
+  display: none;
+}
+.swagger-ui .json-schema-2020-12-keyword__name {
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 20px;
+}
+.swagger-ui .json-schema-2020-12-keyword__name--primary {
+  color: #3b4151;
+  font-style: normal;
+}
+.swagger-ui .json-schema-2020-12-keyword__name--secondary {
+  color: #6b6b6b;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-keyword__name--extension {
+  color: #929292;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-keyword__value {
+  color: #6b6b6b;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+}
+.swagger-ui .json-schema-2020-12-keyword__value--primary {
+  color: #3b4151;
+  font-style: normal;
+}
+.swagger-ui .json-schema-2020-12-keyword__value--secondary {
+  color: #6b6b6b;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-keyword__value--extension {
+  color: #929292;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-keyword__value--warning {
+  border: 1px dashed red;
+  border-radius: 4px;
+  color: #3b4151;
+  color: red;
+  display: inline-block;
+  font-family: monospace;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-left: 10px;
+  padding: 1px 4px;
+}
+.swagger-ui
+  .json-schema-2020-12-keyword__name--secondary
+  + .json-schema-2020-12-keyword__value--secondary:before {
+  content: "=";
+}
+.swagger-ui .json-schema-2020-12__attribute {
+  color: #3b4151;
+  font-family: monospace;
+  font-size: 12px;
+  padding-left: 10px;
+  text-transform: lowercase;
+}
+.swagger-ui .json-schema-2020-12__attribute--primary {
+  color: #55a;
+}
+.swagger-ui .json-schema-2020-12__attribute--muted {
+  color: gray;
+}
+.swagger-ui .json-schema-2020-12__attribute--warning {
+  color: red;
+}
+.swagger-ui .json-schema-2020-12-json-viewer {
+  margin: 5px 0;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__children {
+  border-left: 1px dashed rgba(0, 0, 0, 0.1);
+  margin: 0 0 0 20px;
+  padding: 0;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__children--collapsed {
+  display: none;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__name {
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 20px;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__name--primary {
+  color: #3b4151;
+  font-style: normal;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__name--secondary {
+  color: #6b6b6b;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__name--extension {
+  color: #929292;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__value {
+  color: #6b6b6b;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__value--primary {
+  color: #3b4151;
+  font-style: normal;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__value--secondary {
+  color: #6b6b6b;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__value--extension {
+  color: #929292;
+  font-style: italic;
+}
+.swagger-ui .json-schema-2020-12-json-viewer__value--warning {
+  border: 1px dashed red;
+  border-radius: 4px;
+  color: #3b4151;
+  color: red;
+  display: inline-block;
+  font-family: monospace;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-left: 10px;
+  padding: 1px 4px;
+}
+.swagger-ui
+  .json-schema-2020-12-json-viewer__name--secondary
+  + .json-schema-2020-12-json-viewer__value--secondary:before {
+  content: "=";
 }
 .swagger-ui .json-schema-2020-12 {
   background-color: rgba(0, 0, 0, 0.05);
@@ -9102,187 +9258,6 @@
   font-size: 12px;
   padding-right: 0;
 }
-.swagger-ui .json-schema-2020-12-keyword {
-  margin: 5px 0;
-}
-.swagger-ui .json-schema-2020-12-keyword__children {
-  border-left: 1px dashed rgba(0, 0, 0, 0.1);
-  margin: 0 0 0 20px;
-  padding: 0;
-}
-.swagger-ui .json-schema-2020-12-keyword__children--collapsed {
-  display: none;
-}
-.swagger-ui .json-schema-2020-12-keyword__name {
-  font-size: 12px;
-  font-weight: 700;
-  margin-left: 20px;
-}
-.swagger-ui .json-schema-2020-12-keyword__name--primary {
-  color: #3b4151;
-  font-style: normal;
-}
-.swagger-ui .json-schema-2020-12-keyword__name--secondary {
-  color: #6b6b6b;
-  font-style: italic;
-}
-.swagger-ui .json-schema-2020-12-keyword__value {
-  color: #6b6b6b;
-  font-size: 12px;
-  font-style: italic;
-  font-weight: 400;
-}
-.swagger-ui .json-schema-2020-12-keyword__value--primary {
-  color: #3b4151;
-  font-style: normal;
-}
-.swagger-ui .json-schema-2020-12-keyword__value--secondary {
-  color: #6b6b6b;
-  font-style: italic;
-}
-.swagger-ui .json-schema-2020-12-keyword__value--const,
-.swagger-ui .json-schema-2020-12-keyword__value--warning {
-  border: 1px dashed #6b6b6b;
-  border-radius: 4px;
-  color: #3b4151;
-  color: #6b6b6b;
-  display: inline-block;
-  font-family: monospace;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 1.5;
-  margin-left: 10px;
-  padding: 1px 4px;
-}
-.swagger-ui .json-schema-2020-12-keyword__value--warning {
-  border: 1px dashed red;
-  color: red;
-}
-.swagger-ui
-  .json-schema-2020-12-keyword__name--secondary
-  + .json-schema-2020-12-keyword__value--secondary:before {
-  content: "=";
-}
-.swagger-ui .json-schema-2020-12__attribute {
-  color: #3b4151;
-  font-family: monospace;
-  font-size: 12px;
-  padding-left: 10px;
-  text-transform: lowercase;
-}
-.swagger-ui .json-schema-2020-12__attribute--primary {
-  color: #55a;
-}
-.swagger-ui .json-schema-2020-12__attribute--muted {
-  color: gray;
-}
-.swagger-ui .json-schema-2020-12__attribute--warning {
-  color: red;
-}
-.swagger-ui .json-schema-2020-12-keyword--\$vocabulary ul {
-  border-left: 1px dashed rgba(0, 0, 0, 0.1);
-  margin: 0 0 0 20px;
-}
-.swagger-ui .json-schema-2020-12-\$vocabulary-uri {
-  margin-left: 35px;
-}
-.swagger-ui .json-schema-2020-12-\$vocabulary-uri--disabled {
-  -webkit-text-decoration: line-through;
-  text-decoration: line-through;
-}
-.swagger-ui .json-schema-2020-12-keyword--description {
-  color: #6b6b6b;
-  font-size: 12px;
-  margin-left: 20px;
-}
-.swagger-ui .json-schema-2020-12-keyword--description p {
-  margin: 0;
-}
-.swagger-ui .json-schema-2020-12__title {
-  color: #505050;
-  display: inline-block;
-  font-family: sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: normal;
-}
-.swagger-ui .json-schema-2020-12__title .json-schema-2020-12-keyword__name {
-  margin: 0;
-}
-.swagger-ui .json-schema-2020-12-property {
-  margin: 7px 0;
-}
-.swagger-ui .json-schema-2020-12-property .json-schema-2020-12__title {
-  color: #3b4151;
-  font-family: monospace;
-  font-size: 12px;
-  font-weight: 600;
-  vertical-align: middle;
-}
-.swagger-ui .json-schema-2020-12-keyword--properties > ul {
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-.swagger-ui .json-schema-2020-12-property {
-  list-style-type: none;
-}
-.swagger-ui
-  .json-schema-2020-12-property--required
-  > .json-schema-2020-12:first-of-type
-  > .json-schema-2020-12-head
-  .json-schema-2020-12__title:after {
-  color: red;
-  content: "*";
-  font-weight: 700;
-}
-.swagger-ui .json-schema-2020-12-keyword--patternProperties ul {
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-.swagger-ui
-  .json-schema-2020-12-keyword--patternProperties
-  .json-schema-2020-12__title:first-of-type:after,
-.swagger-ui
-  .json-schema-2020-12-keyword--patternProperties
-  .json-schema-2020-12__title:first-of-type:before {
-  color: #55a;
-  content: "/";
-}
-.swagger-ui .json-schema-2020-12-keyword--enum > ul {
-  display: inline-block;
-  margin: 0;
-  padding: 0;
-}
-.swagger-ui .json-schema-2020-12-keyword--enum > ul li {
-  display: inline;
-  list-style-type: none;
-}
-.swagger-ui .json-schema-2020-12__constraint {
-  background-color: #805ad5;
-  border-radius: 4px;
-  color: #3b4151;
-  color: #fff;
-  font-family: monospace;
-  font-weight: 600;
-  line-height: 1.5;
-  margin-left: 10px;
-  padding: 1px 3px;
-}
-.swagger-ui .json-schema-2020-12__constraint--string {
-  background-color: #d69e2e;
-  color: #fff;
-}
-.swagger-ui .json-schema-2020-12-keyword--dependentRequired > ul {
-  display: inline-block;
-  margin: 0;
-  padding: 0;
-}
-.swagger-ui .json-schema-2020-12-keyword--dependentRequired > ul li {
-  display: inline;
-  list-style-type: none;
-}
 .swagger-ui
   .model-box
   .json-schema-2020-12:not(.json-schema-2020-12--embedded)
@@ -9307,6 +9282,10 @@
   > .json-schema-2020-12-head
   .json-schema-2020-12__title:first-of-type {
   font-size: 16px;
+}
+.swagger-ui .models .json-schema-2020-12:not(.json-schema-2020-12--embedded) {
+  overflow-x: auto;
+  width: calc(100% - 40px);
 }
 
 /*# sourceMappingURL=swagger-ui.css.map*/
