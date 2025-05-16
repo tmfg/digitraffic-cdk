@@ -24,14 +24,24 @@ export interface EcsService {
   readonly memory?: number | "DISABLED";
 }
 
-export interface DBConfiguration {
-  readonly dbClusterIdentifier: string;
-  readonly engine?: IClusterEngine;
+export interface DBLimits {
   readonly cpuLimit: number;
   readonly writeIOPSLimit: number;
   readonly readIOPSLimit: number;
   readonly volumeWriteIOPSLimit: number;
   readonly volumeReadIOPSLimit: number;
+}
+export interface DBConfiguration {
+  readonly clusters?: {
+    readonly dbClusterIdentifier: string;
+    readonly engine?: IClusterEngine;
+
+    readonly limits?: DBLimits;
+  }[];
+
+  readonly instances?: {
+    readonly instanceIdentifier: string;
+  }[];
 }
 
 export interface Route53Configuration {

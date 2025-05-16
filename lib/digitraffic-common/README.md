@@ -10,11 +10,16 @@ Use `pnpm` to build the code i.e.
     pnpm install
     pnpm build
     pnpm test
+    pnpm test --test-path-pattern 'dt-logger.test'
 
 Format code
 
     pnpm run:format-changed # Formats stagged files
     pnpm run:format # Format all files
+
+## Reinstall lefthook git hooks
+
+    pnpm prepare
 
 ## How to use
 

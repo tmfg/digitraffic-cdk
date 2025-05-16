@@ -3,6 +3,7 @@ import { RamiEnvKeys } from "../../keys.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { uploadToS3 } from "../../util/s3.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import type { DlqMessage } from "../../model/dlq-message.js";
 
 const bucketName = getEnvVariable(RamiEnvKeys.SQS_DLQ_BUCKET_NAME);
 
@@ -18,10 +19,29 @@ export const handler = async (event: DlqEvent): Promise<void> => {
     method: "RAMI-ProcessDLQ.handler",
     customRamiDLQMessagesReceived: event.Records.length,
   });
-  const uploads = event.Records.map((e, idx: number) =>
-    uploadToS3(bucketName, e.body, `message-${millis}-${idx}.json`)
-  );
-  await Promise.allSettled(uploads).catch((error): void => {
-    logException(logger, error);
+
+  const uploads = event.Records.map((e, idx: number) => {
+    logger.debug("event " + JSON.stringify(e));
+
+    try {
+      const dlqMessage = JSON.parse(e.body) as DlqMessage;
+      const body = `[{"errors":"${dlqMessage.errors}"}, ${
+        JSON.stringify(dlqMessage.message)
+      }]`;
+      const folder = `${dlqMessage.messageType}/${
+        new Date().toISOString().substring(0, 10)
+      }`;
+      const fileName = `${folder}/message-${millis}-${idx}.json`;
+
+      logger.debug("Uploading to " + fileName);
+
+      return uploadToS3(bucketName, body, fileName);
+    } catch (error) {
+      logException(logger, error);
+
+      return Promise.resolve();
+    }
   });
+
+  await Promise.allSettled(uploads);
 };

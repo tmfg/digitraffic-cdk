@@ -6,3 +6,7 @@ test("circular dependencies", async () => {
   tester.assertNoCircularDependencies();
   tester.assertNoOrphans();
 });
+
+test("lambda aws-lib dependency", async () => {
+  await DependencyTester.assertNoCdkLibDependenciesInLambdas("lib");
+});

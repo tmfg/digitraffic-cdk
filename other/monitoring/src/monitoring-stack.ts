@@ -82,11 +82,14 @@ export class MonitoringStack extends Stack {
         principals: [
           new ServicePrincipal("cloudwatch.amazonaws.com"),
           new ServicePrincipal("events.amazonaws.com"),
+          new ServicePrincipal("events.rds.amazonaws.com"),
         ],
         conditions: {
           ArnLike: {
-            "aws:SourceArn":
+            "aws:SourceArn": [
               `arn:aws:cloudwatch:${this.region}:${this.account}:alarm:*`,
+              `arn:aws:rds:${this.region}:${this.account}:*:*`,
+            ],
           },
           StringEquals: {
             "aws:SourceAccount": this.account,

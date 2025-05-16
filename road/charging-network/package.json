@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.2.28-3",
-    "aws-cdk-lib": "^2.166.0",
+    "aws-cdk-lib": "^2.189.0",
     "axios": "^1.7.7",
     "compare-versions": "^6.1.1",
     "constructs": "~10.4.2",

@@ -1,13 +1,18 @@
 import { Writable } from "stream";
+import type { LoggableType } from "../../aws/runtime/dt-logger.js";
 import {
   DtLogger,
   type LoggerConfiguration,
 } from "../../aws/runtime/dt-logger.js";
-import type { LoggableType } from "../../aws/runtime/dt-logger.js";
 
 const LOG_LINE: LoggableType = {
   method: "dt-logger.test",
   message: "FOO",
+};
+
+const EXPECTED_LOG_LINE: LoggableType = {
+  method: "dt-logger.test",
+  message: "dt-logger.test FOO",
 };
 
 describe("dt-logger", () => {
@@ -34,6 +39,20 @@ describe("dt-logger", () => {
       config,
       (logger: DtLogger) => {
         logger.debug(message);
+      },
+      expected,
+    );
+  }
+
+  function assertError<T>(
+    config: LoggerConfiguration,
+    message: LoggableType,
+    expected: NonNullable<T>,
+  ): void {
+    assertWrite(
+      config,
+      (logger: DtLogger) => {
+        logger.error(message);
       },
       expected,
     );
@@ -66,27 +85,41 @@ describe("dt-logger", () => {
     if (typeof expected === "object" && "stack" in expected && expected.stack) {
       // eslint-disable-next-line dot-notation
       const stack = loggedLine["stack"];
+
+      expect(stack).toBeDefined();
+      // @ts-ignore // stack should be multiline string
+      const stackLines: string[] = (stack as string).split("\n");
+      expect(stackLines.length).toBeGreaterThanOrEqual(2);
+      expect(stackLines[0]).toEqual(expected.stack);
+      // @ts-ignore
+      expect(stackLines[1].trim().startsWith("at ")).toBe(true);
+
       // eslint-disable-next-line dot-notation
       delete loggedLine["stack"];
       delete expected.stack;
-
-      expect(stack).toBeDefined();
     }
 
     expect(loggedLine).toMatchObject(expected);
   }
 
-  test("custom values", () => {
+  test("custom date, number, text and '=' values", () => {
     const date = new Date();
     assertLog(
       {},
       {
         ...LOG_LINE,
         customDate: date,
+        customNumber: 123,
+        customText: "abc",
+        customEqualsText: "foo=bar",
       },
       {
-        ...LOG_LINE,
+        method: EXPECTED_LOG_LINE.method,
+        message:
+          `${EXPECTED_LOG_LINE.message} date=${date.toISOString()} number=123 text=abc equalsText=\"foo=bar\"`,
         date: date.toISOString(),
+        number: 123,
+        text: "abc",
       },
     );
   });
@@ -99,7 +132,8 @@ describe("dt-logger", () => {
         customFooCount: 123,
       },
       {
-        ...LOG_LINE,
+        method: EXPECTED_LOG_LINE.method,
+        message: `${EXPECTED_LOG_LINE.message} fooCount=123`,
         fooCount: 123,
       },
     );
@@ -107,8 +141,16 @@ describe("dt-logger", () => {
 
   test("default values", () => {
     assertLog({}, LOG_LINE, {
-      method: LOG_LINE.method,
-      message: LOG_LINE.message,
+      method: EXPECTED_LOG_LINE.method,
+      message: EXPECTED_LOG_LINE.message,
+      level: "INFO",
+    });
+  });
+
+  test("method not duplicated", () => {
+    assertLog({}, EXPECTED_LOG_LINE, {
+      method: EXPECTED_LOG_LINE.method,
+      message: EXPECTED_LOG_LINE.message,
       level: "INFO",
     });
   });
@@ -118,8 +160,8 @@ describe("dt-logger", () => {
 
     assertLog({ lambdaName: LAMBDA_NAME }, LOG_LINE, {
       lambdaName: LAMBDA_NAME,
-      method: LOG_LINE.method,
-      message: LOG_LINE.message,
+      method: EXPECTED_LOG_LINE.method,
+      message: EXPECTED_LOG_LINE.message,
       level: "INFO",
     });
   });
@@ -128,8 +170,8 @@ describe("dt-logger", () => {
     const RUNTIME = "test_runtime";
 
     assertLog({ runTime: RUNTIME }, LOG_LINE, {
-      message: LOG_LINE.message,
-      method: LOG_LINE.method,
+      message: EXPECTED_LOG_LINE.message,
+      method: EXPECTED_LOG_LINE.method,
       level: "INFO",
       runtime: RUNTIME,
     });
@@ -157,5 +199,86 @@ describe("dt-logger", () => {
       },
       level: "DEBUG",
     });
+  });
+
+  test("error - Error string", () => {
+    const error = "FAIL!";
+    assertError(
+      {},
+      {
+        ...LOG_LINE,
+        error,
+      },
+      {
+        ...EXPECTED_LOG_LINE,
+        error: "FAIL!",
+        level: "ERROR",
+      },
+    );
+  });
+
+  test("error - Error object", () => {
+    const error = {
+      errorMessage: "FAIL!",
+      errorCode: 123,
+    };
+    assertError(
+      {},
+      {
+        ...LOG_LINE,
+        error,
+      },
+      {
+        ...EXPECTED_LOG_LINE,
+        error: '{"errorMessage":"FAIL!","errorCode":123}',
+        level: "ERROR",
+      },
+    );
+  });
+
+  test("error - Error", () => {
+    const error = new Error("FAIL!");
+    assertError(
+      {},
+      {
+        ...LOG_LINE,
+        error,
+      },
+      {
+        ...EXPECTED_LOG_LINE,
+        error: "Error: FAIL!",
+        level: "ERROR",
+      },
+    );
+  });
+
+  test("error - Error with stack", () => {
+    let error;
+
+    try {
+      // @ts-ignore
+      console.log(`Result: ${undefined.length}`);
+    } catch (e) {
+      // @ts-ignore
+      console.debug(`Failed message: ${e.message}`);
+      console.debug(`Failed stack: ${(e as Error).stack}`);
+      error = e;
+    }
+
+    assertError(
+      {},
+      {
+        ...LOG_LINE,
+        error,
+      },
+      {
+        ...EXPECTED_LOG_LINE,
+        error:
+          "TypeError: Cannot read properties of undefined (reading 'length')",
+        level: "ERROR",
+        stack:
+          "TypeError: Cannot read properties of undefined (reading 'length')",
+      },
+    );
   });
 });

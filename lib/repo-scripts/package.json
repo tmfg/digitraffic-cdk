@@ -19,7 +19,7 @@
     "fs-extra": "~11.3.0",
     "globby": "~14.1.0",
     "lodash": "^4.17.21",
-    "zx": "~8.4.1"
+    "zx": "~8.5.3"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -36,10 +36,10 @@
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
     "@types/lodash": "4.17.16",
-    "@types/node": "22.13.14",
+    "@types/node": "22.15.2",
     "eslint": "^8.57.0",
-    "rollup": "~4.37.0",
-    "typescript": "~5.8.2",
+    "rollup": "~4.40.0",
+    "typescript": "~5.8.3",
     "@rollup/plugin-typescript": "~12.1.2",
     "lodash": "^4.17.21",
     "@types/async": "~3.2.24",

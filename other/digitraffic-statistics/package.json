@@ -16,11 +16,11 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.2.28-3",
-    "aws-cdk-lib": "^2.186.0",
+    "aws-cdk-lib": "^2.192.0",
     "constructs": "~10.4.2"
   },
   "devDependencies": {
-    "@types/aws-lambda": "8.10.148",
+    "@types/aws-lambda": "8.10.149",
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
@@ -30,10 +30,10 @@
     "@rushstack/heft-jest-plugin": "^0.15.3",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "29.5.14",
-    "@types/node": "22.13.14",
-    "esbuild": "0.25.1",
+    "@types/node": "22.15.2",
+    "esbuild": "0.25.3",
     "eslint": "^8.57.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.3"
   },
   "externals": [
     "aws-sdk"

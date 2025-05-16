@@ -1,6 +1,7 @@
 import * as AjvOrig from "ajv";
 import * as addFormatsOrig from "ajv-formats";
-import { ramiMessageJsonSchema } from "../model/json-schema/rami-message.js";
+import { ramiRosmMessageJsonSchema } from "../model/json-schema/rosm-message.js";
+import { ramiSmMessageJsonSchema } from "../model/json-schema/sm-message.js";
 
 interface AjvType {
   // eslint-disable-next-line @typescript-eslint/no-misused-new
@@ -17,33 +18,39 @@ type addFormats = (ajv: typeof Ajv) => void;
 
 const addFormats: addFormats = addFormatsOrig.default as unknown as addFormats;
 
-// we can assume id exists if message passes validation
-interface ValidatedRamiMessage {
-  payload: {
-    messageId: string;
-  };
-}
-
-interface Invalid {
+export interface Invalid {
   valid: false;
   errors: string;
 }
-interface Valid<T> {
+export interface Valid<T> {
   valid: true;
   value: T;
 }
-type ValidationResult<T> = Valid<T> | Invalid;
+export type ValidationResult<T> = Valid<T> | Invalid;
 
-export function validateIncomingRamiMessage(
+export function validateIncomingRosmMessage<T>(
   message: unknown,
-): ValidationResult<ValidatedRamiMessage> {
+): ValidationResult<T> {
+  return validateWithSchema(ramiRosmMessageJsonSchema, message);
+}
+
+export function validateIncomingSmMessage<T>(
+  message: unknown,
+): ValidationResult<T> {
+  return validateWithSchema(ramiSmMessageJsonSchema, message);
+}
+
+function validateWithSchema<T>(
+  schema: unknown,
+  message: unknown,
+): ValidationResult<T> {
   const ajv = new Ajv({ allErrors: true });
   addFormats(ajv);
   // allow custom field "example" used in the schema
   ajv.addKeyword("example");
   // allow custom format "HH:MM" used in the schema
   ajv.addFormat("HH:MM", /^\d{2}:\d{2}$/);
-  return ajv.validate(ramiMessageJsonSchema, message)
-    ? { valid: true, value: message as ValidatedRamiMessage }
+  return ajv.validate(schema, message)
+    ? { valid: true, value: message as T }
     : { valid: false, errors: ajv.errorsText() };
 }

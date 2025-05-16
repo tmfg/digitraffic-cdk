@@ -65,7 +65,7 @@ describe("integration tests", () => {
     const stack = new Stack(app);
 
     const f = new Function(stack, "id", {
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_22_X,
       code: Code.fromInline("placeholder"),
       handler: "handler",
     });

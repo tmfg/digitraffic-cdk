@@ -1,4 +1,6 @@
-import { type OpenApiSchema } from "../model/openapi-schema.js";
+import {
+  type OpenApiSchema,
+} from "@digitraffic/common/dist/types/openapi-schema";
 import type { HttpMethod } from "../swagger-utils.js";
 import _ from "lodash";
 
