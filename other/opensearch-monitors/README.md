@@ -1,5 +1,15 @@
 Installation
 
+TL;DR
+
+```bash
+rushx cdk-diff-status-prod
+```
+
+```bash
+rushx cdk-deploy-status-prod
+```
+
 Build
 
 ```bash
