@@ -89,10 +89,11 @@ export const handler = async (): Promise<void> => {
     const body: Uint8Array = resp.body;
     const schema = Buffer.from(body.buffer).toString();
 
+    /*
     logger.info({
       method: "UpdateSwagger.handler",
       customSchema: schema,
-    });
+    });*/
 
     return openapiSchema.parse(JSON.parse(schema));
   });

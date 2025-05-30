@@ -62,7 +62,7 @@ export class DependencyTester {
 
         if (deps.length > 0 && !whiteList.includes(field)) {
           errors.push(
-            `${field} has aws-lib dependency: ${JSON.stringify(deps)}`,
+            `${field} has aws-cdk-lib dependency: ${JSON.stringify(deps)}`,
           );
         }
 
@@ -72,7 +72,7 @@ export class DependencyTester {
 
     if (errors.length > 0) {
       throw new Error(
-        "Lambdas have cdk-lib dependencies: " + errors.join("\n"),
+        "Lambdas have aws-cdk-lib dependencies: " + errors.join("\n"),
       );
     }
 

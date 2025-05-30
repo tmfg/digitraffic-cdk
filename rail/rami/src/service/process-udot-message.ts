@@ -42,11 +42,6 @@ export async function processUdotMessage(
 
         // each update in own transaction, to prevent locking!
         await inTransaction(async (conn: Connection): Promise<void> => {
-          logger.info({
-            method: "ProcessUdotMessageService.processUdotMessage",
-            message: `About to insert ${message.trainNumber}`,
-          });
-
           return await insertOrUpdate(conn, {
             trainNumber: message.trainNumber,
             trainDepartureDate: message.departureDate,
@@ -59,7 +54,7 @@ export async function processUdotMessage(
       } else {
         notFoundCount++;
 
-        logRowNotFound(message, datarow, rows);
+        //        logRowNotFound(message, datarow, rows);
       }
     }
   } finally {
