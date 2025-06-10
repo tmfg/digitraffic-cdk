@@ -1,0 +1,29 @@
+{
+  "formatter": {
+    "enabled": false,
+    "indentStyle": "space",
+    "ignore": [
+      "tools/rig/**/*.json",
+      "**/cdk.out/**",
+      "**/dist/**",
+      "/*/**/lib/**",
+      "/*/*/config/**",
+      "**/pnpm-lock.yaml",
+      "lib/digitraffic-common/**"
+    ]
+  },
+  "linter": {
+    "enabled": true,
+    "include": [
+      "**/*.ts",
+      "**/*.tsx"
+    ],
+    "ignore": [
+      "**/dist/**",
+      "/*/**/lib/**",
+    ],
+    "rules": {
+      "recommended": true
+    }
+  }
+}

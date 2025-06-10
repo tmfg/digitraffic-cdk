@@ -12,6 +12,7 @@
 !/*.py
 !/Dockerfile
 !/LICENCE
+!/biome.jsonc
 !/rush.json
 
 # for creating empty directories
