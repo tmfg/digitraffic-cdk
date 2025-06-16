@@ -39,7 +39,7 @@ const OS_MONITORS_URL_PATH = "/_plugins/_alerting/monitors/";
 const OS_SEARCH_MONITORS_PATH = `${OS_MONITORS_URL_PATH}_search`;
 
 const OS_MONITORS_SEACH = JSON.stringify({
-  size: 100,
+  size: 200,
   query: {
     exists: {
       field: "monitor",
@@ -95,9 +95,12 @@ export class OpenSearch {
 
     // 200 from delete, 201 from create
     if (response.statusCode > 201) {
+      logger.debug(JSON.stringify(response));
+
       logger.error({
         method: "OpenSearch.send",
-        customMethod: method,
+        customUrl: path,
+        customHttpMethod: method,
         customStatusCode: response.statusCode,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         customStatusMessage: response.body.statusMessage,
@@ -145,6 +148,8 @@ export class OpenSearch {
   }
 
   addMonitor(monitor: OSMonitor): Promise<OSMonitorsResponse | undefined> {
+    logger.debug("Sending " + monitor.name);
+
     return this.send(
       "POST",
       OS_MONITORS_URL_PATH,

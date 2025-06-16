@@ -1,4 +1,3 @@
-import { Bytes } from "./fields.js";
 import { sendSlackMessage, SlackEmoji, type SlackMessage } from "./slack.js";
 
 export interface OSAction {
