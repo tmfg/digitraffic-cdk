@@ -1,4 +1,4 @@
-import type { Query, Sort } from "./queries.js";
+import type { Query, ScriptedMetric, Sort } from "./queries.js";
 import type { OSTrigger } from "./triggers.js";
 
 interface OSQueryData {
@@ -13,6 +13,7 @@ export interface OSMonitor {
   readonly cron: string;
   readonly indices: string[];
   readonly query: OSQueryData;
+  readonly aggregations?: ScriptedMetric;
   readonly triggers: OSTrigger[];
 }
 
@@ -38,7 +39,11 @@ export function opensearchMonitor(osMonitor: OSMonitor): unknown {
       {
         search: {
           indices: osMonitor.indices,
-          query: { ...osMonitor.query, track_total_hits: true }, // track all hits, not just 10000
+          query: {
+            ...osMonitor.query,
+            aggs: osMonitor.aggregations,
+            track_total_hits: true,
+          }, // track all hits, not just 10000
         },
       },
     ],

@@ -4,7 +4,7 @@ import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { MobileServerProps } from "./app-props.js";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
-import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
+import { type Function as AWSFunction, Runtime } from "aws-cdk-lib/aws-lambda";
 
 export function create(stack: DigitrafficStack, bucket: Bucket): void {
   const updateLambda = createUpdateImagesLambda(stack, bucket);
@@ -27,6 +27,7 @@ function createUpdateImagesLambda(
 
   return MonitoredDBFunction.create(stack, "update-images", environment, {
     memorySize: 256,
+    runtime: Runtime.NODEJS_20_X, // this needs to be node20!
     errorAlarmProps: {
       create: true,
       threshold: 10,

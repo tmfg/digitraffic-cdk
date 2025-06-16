@@ -23,6 +23,17 @@ export interface BoolQuery {
   };
 }
 
+export interface ScriptedMetric {
+  [field: string]: {
+    scripted_metric: {
+      init_script: string;
+      map_script: string;
+      combine_script: string;
+      reduce_script: string;
+    };
+  };
+}
+
 export interface MatchPhraseQuery {
   match_phrase: {
     [field: string]: { query: string };

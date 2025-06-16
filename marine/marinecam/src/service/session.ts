@@ -58,7 +58,6 @@ export class Session {
     try {
       return await request(url, {
         method: "POST",
-        throwOnError: false,
         body: xml,
         headers: {
           host: "VideoOSLogServer",

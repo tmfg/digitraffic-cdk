@@ -8,6 +8,7 @@ import type {
   Query,
   QueryStringQuery,
   RangeQuery,
+  ScriptedMetric,
   ScriptQuery,
   Sort,
 } from "./queries.js";
@@ -15,6 +16,7 @@ import {
   type OSTrigger,
   triggerWhenLineCountOutside,
   triggerWhenLinesFound,
+  triggerWhenSumOutside,
 } from "./triggers.js";
 
 export interface MonitorConfig {
@@ -92,6 +94,7 @@ export class OsMonitorBuilder {
   readonly index: string;
   readonly phrases: Query[];
   readonly notPhrases: Query[];
+  readonly aggs: ScriptedMetric;
 
   messageSubject: string;
   messageLink?: string;
@@ -107,6 +110,7 @@ export class OsMonitorBuilder {
     this.rangeInMinutes = config.rangeInMinutes;
     this.phrases = ([] as Query[]).concat(config.phrases);
     this.notPhrases = [];
+    this.aggs = {};
     this.trigger = triggerWhenLinesFound(
       this.name,
       this.config.slackDestinations,
@@ -203,6 +207,30 @@ export class OsMonitorBuilder {
     return this;
   }
 
+  sum(field: string, betweenLower: number, betweenUpper: number): this {
+    this.aggs[`sum_${field}`] = {
+      "scripted_metric": {
+        "init_script": "state.responses = ['total': 0L]",
+        "map_script": "state.responses.total+= doc['bytes'].value",
+        "combine_script": "state.responses",
+        "reduce_script":
+          "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));",
+      },
+    };
+
+    this.trigger = triggerWhenSumOutside(
+      this.name,
+      field,
+      this.config.slackDestinations,
+      getThrottle(this.config),
+      betweenLower,
+      betweenUpper,
+      this.messageSubject,
+    );
+
+    return this;
+  }
+
   build(): OSMonitor {
     return {
       name: this.name,
@@ -221,6 +249,7 @@ export class OsMonitorBuilder {
         sort: [sort("@timestamp", "desc")],
       },
 
+      aggregations: this.aggs,
       triggers: [this.trigger],
     };
   }

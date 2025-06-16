@@ -1,3 +1,4 @@
+import { Bytes } from "./fields.js";
 import { sendSlackMessage, SlackEmoji, type SlackMessage } from "./slack.js";
 
 export interface OSAction {
@@ -27,6 +28,13 @@ function notBetween(lower: number, upper: number): string {
   return `!(ctx.results[0].hits.total.value >= ${lower} && ctx.results[0].hits.total.value <= ${upper})`;
 }
 
+/**
+ * Result aggregation sum not in inclusive range
+ */
+function sumNotBetween(name: string, lower: number, upper: number): string {
+  return `!(ctx.results[0].aggregations.sum_${name}.value >= ${lower} && ctx.results[0].aggregations.sum_${name}.value <= ${upper})`;
+}
+
 export enum OSMessageSubjects {
   LAMBDA_ERRORS =
     "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}}",
@@ -45,6 +53,28 @@ function sendAlerts(
   return destinations.map((destination) =>
     sendSlackMessage(message, destination, throttleMinutes)
   );
+}
+
+export function triggerWhenSumOutside(
+  name: string,
+  field: string,
+  destinations: string[],
+  throttleMinutes: number,
+  betweenLower: number,
+  betweenUpper: number,
+  message: string,
+): OSTrigger {
+  const msg: SlackMessage = {
+    emoji: SlackEmoji.RED_CIRCLE,
+    subject:
+      `${name} should be between ${betweenLower} MB and ${betweenUpper} MB, was {{ctx.results.0.aggregations.sum_${field}.value}} MB`,
+    message,
+  };
+  return {
+    name: name,
+    condition: sumNotBetween(field, betweenLower, betweenUpper),
+    actions: sendAlerts(destinations, msg, throttleMinutes),
+  };
 }
 
 export function triggerWhenLinesFound(

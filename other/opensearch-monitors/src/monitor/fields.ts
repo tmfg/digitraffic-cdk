@@ -50,3 +50,9 @@ export type OSLogField =
   | NginxField
   | CloudfrontField
   | HttpUserAgentField;
+
+export enum Bytes {
+  KILO = 1000 * 1000,
+  MEGA = KILO * 1000,
+  GIGA = MEGA * 1000,
+}
