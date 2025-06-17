@@ -13,7 +13,7 @@ import {
   LogoutCommand,
   RequestStreamCommand,
 } from "./command.js";
-import { Agent, type Dispatcher, request } from "undici";
+import { Agent, type Dispatcher, interceptors, request } from "undici";
 
 const COMPR_LEVEL = "70" as const;
 const DEST_WIDTH = "1280" as const;
@@ -29,7 +29,7 @@ const parse = util.promisify(parseString);
 export class Session {
   readonly communicationUrl: string;
   readonly videoUrl: string;
-  readonly agent: Agent;
+  readonly dispatcher: Dispatcher;
 
   // this increases for every command
   sequenceId: number;
@@ -41,13 +41,22 @@ export class Session {
     this.videoUrl = url + VIDEO_URL_PART;
     this.sequenceId = 1;
 
-    this.agent = new Agent({
+    const agent = new Agent({
       connect: {
         cert: Buffer.from(certificate, "base64").toString(),
         ca: Buffer.from(ca, "base64").toString(),
       },
       pipelining: 6,
     });
+
+    this.dispatcher = agent.compose(interceptors.retry({
+      methods: ["POST"],
+      maxRetries: 3,
+      minTimeout: 1000,
+      maxTimeout: 10000,
+      timeoutFactor: 2,
+      retryAfter: true,
+    }));
   }
 
   async post(
@@ -63,7 +72,7 @@ export class Session {
           host: "VideoOSLogServer",
           "accept": "application/json",
         },
-        dispatcher: this.agent,
+        dispatcher: this.dispatcher,
         bodyTimeout: AXIOS_TIMEOUT_MILLIS,
         ...configuration,
       });
