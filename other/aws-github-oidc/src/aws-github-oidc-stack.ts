@@ -17,6 +17,7 @@ export interface AwsGithubProps {
     readonly repo: string;
     readonly environment: string;
     readonly allowedActions: string[];
+    readonly additionalPolicies?: PolicyStatement[];
   }[];
 }
 
@@ -66,6 +67,11 @@ export class AwsGithubOidcStack extends Stack {
             resources: ["*"],
           }),
         );
+      }
+      if (role.additionalPolicies) {
+        role.additionalPolicies.forEach((policy) => {
+          createdRole.addToPrincipalPolicy(policy);
+        });
       }
       if (role.updateSwaggerForTrafficType) {
         const updateApiDocsFunctionName =
