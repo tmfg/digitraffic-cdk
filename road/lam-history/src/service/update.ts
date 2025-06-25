@@ -3,8 +3,8 @@ import {
   type PutObjectCommandOutput,
   S3,
 } from "@aws-sdk/client-s3";
-import axios, { AxiosError } from "axios";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import ky, { HTTPError } from "ky";
 
 const SERVICE = "UpdateService";
 export async function handleMetadataUpdate(
@@ -66,53 +66,49 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
   const start = Date.now();
 
   try {
-    const result = await axios.get<ServerResponse>(url, {
+    const result = await ky.get<ServerResponse>(url, {
       headers: {
         Accept: "application/json",
         "x-api-key": apikey,
       },
-      validateStatus: function (status: number) {
-        return status === 200;
-      },
     });
-
-    return JSON.stringify(result.data);
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        // error response
-        const response = error.response;
-        logger.error({
-          method: `${SERVICE}.getFromServer`,
-          message:
-            `url=${url} failed with return code ${response.status} and data ${
-              JSON.stringify(
-                response.data,
-              )
-            }`,
-          error,
-        });
-      } else if (error.request) {
-        // no response from server
-        logger.error({
-          method: `${SERVICE}.getFromServer`,
-          message: `url=${url} failed with no response ${
-            JSON.stringify(error.request)
-          }`,
-          error,
-        });
-      } else {
-        // set up failed
-        logger.error({
-          method: `${SERVICE}.getFromServer`,
-          message: `url=${url} failed in setup ${error.message}`,
-          error,
-        });
-      }
-    } else {
+    if (result.status !== 200) {
       logger.error({
         method: `${SERVICE}.getFromServer`,
-        message: `update failed`,
+        message:
+          `url=${url} failed with return code ${result.status} and data ${
+            JSON.stringify(
+              await result.json(),
+            )
+          }`,
+      });
+      return Promise.reject();
+    }
+    return JSON.stringify(await result.json());
+  } catch (error) {
+    if (error instanceof HTTPError) {
+      const response = error.response;
+      let errorBody: unknown;
+      try {
+        errorBody = await response.json();
+      } catch {
+        errorBody = await response.text();
+      }
+      logger.error({
+        method: `${SERVICE}.getFromServer`,
+        message:
+          `url=${url} failed with return code ${response.status} and data ${
+            JSON.stringify(errorBody)
+          }`,
+        error,
+      });
+    } else {
+      // set up failed
+      logger.error({
+        method: `${SERVICE}.getFromServer`,
+        message: `url=${url} failed with error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
         error,
       });
     }
