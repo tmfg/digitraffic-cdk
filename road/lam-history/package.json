@@ -40,7 +40,7 @@
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "^30.0.2",
+    "@jest/globals": "^30.0.3",
     "@rushstack/eslint-config": "^3.7.1",
     "@rushstack/heft": "^0.74.0",
     "@rushstack/heft-jest-plugin": "^0.16.9",

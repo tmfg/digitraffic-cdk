@@ -22,13 +22,13 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "~5.2.0",
-    "@aws-sdk/client-sts": "^3.796.0",
-    "@aws-sdk/types": "^3.775.0",
+    "@aws-sdk/client-sts": "^3.835.0",
+    "@aws-sdk/types": "^3.821.0",
     "@digitraffic/common": "2025.2.28-3",
-    "@smithy/node-http-handler": "~4.0.4",
-    "@smithy/protocol-http": "~5.1.0",
-    "@smithy/signature-v4": "~5.1.0",
-    "aws-cdk-lib": "^2.192.0",
+    "@smithy/node-http-handler": "~4.0.6",
+    "@smithy/protocol-http": "~5.1.2",
+    "@smithy/signature-v4": "~5.1.2",
+    "aws-cdk-lib": "^2.202.0",
     "constructs": "~10.4.2"
   },
   "devDependencies": {
@@ -36,11 +36,11 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.71.1",
-    "@rushstack/heft-jest-plugin": "^0.15.3",
+    "@rushstack/heft": "^0.74.0",
+    "@rushstack/heft-jest-plugin": "^0.16.9",
     "@types/heft-jest": "1.0.6",
     "@types/node": "22.15.2",
-    "esbuild": "0.25.3",
+    "esbuild": "0.25.5",
     "typescript": "~5.8.3"
   }
 }

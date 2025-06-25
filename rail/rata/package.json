@@ -16,7 +16,7 @@
     "ci:eslint-report": "eslint . --format html -o report.html || true"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.192.0",
+    "aws-cdk-lib": "^2.202.0",
     "aws-sdk": "^2.1692.0",
     "constructs": "~10.4.2",
     "@digitraffic/common": "2025.2.28-3"
@@ -26,15 +26,15 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@types/aws-lambda": "8.10.149",
+    "@types/aws-lambda": "8.10.150",
     "@types/node": "22.15.2",
-    "@rushstack/heft-jest-plugin": "^0.15.3",
+    "@rushstack/heft-jest-plugin": "^0.16.9",
     "@types/heft-jest": "1.0.6",
     "eslint": "^8.57.0",
-    "jest": "^29.7.0",
+    "jest": "^30.0.3",
     "typescript": "~5.8.3",
-    "@rushstack/heft": "^0.71.1",
-    "esbuild": "0.25.3"
+    "@rushstack/heft": "^0.74.0",
+    "esbuild": "0.25.5"
   },
   "externals": [
     "aws-sdk"

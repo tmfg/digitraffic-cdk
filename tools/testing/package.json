@@ -31,17 +31,17 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/common": "2025.6.16-1",
-    "@jest/globals": "^29.7.0",
+    "@jest/globals": "^30.0.3",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.73.6",
-    "@rushstack/heft-jest-plugin": "^0.16.8",
+    "@rushstack/heft": "^0.74.0",
+    "@rushstack/heft-jest-plugin": "^0.16.9",
     "@types/heft-jest": "1.0.6",
-    "@types/jest": "29.5.14",
+    "@types/jest": "30.0.0",
     "@types/madge": "5.0.3",
     "@types/node": "22.15.32",
-    "esbuild": "^0.25.5",
+    "esbuild": "0.25.5",
     "eslint": "^8.57.1",
-    "rollup": "^4.43.0",
+    "rollup": "~4.44.0",
     "typescript": "^5.8.3"
   }
 }

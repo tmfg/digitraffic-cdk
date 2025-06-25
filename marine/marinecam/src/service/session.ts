@@ -19,7 +19,7 @@ const COMPR_LEVEL = "70" as const;
 const DEST_WIDTH = "1280" as const;
 const DEST_HEIGHT = "720" as const;
 
-const AXIOS_TIMEOUT_MILLIS = 2000 as const;
+const REQUEST_TIMEOUT_MILLIS = 2000 as const;
 
 const COMMUNICATION_URL_PART = "/Communication";
 const VIDEO_URL_PART = "/Video/";
@@ -73,7 +73,7 @@ export class Session {
           "accept": "application/json",
         },
         dispatcher: this.dispatcher,
-        bodyTimeout: AXIOS_TIMEOUT_MILLIS,
+        bodyTimeout: REQUEST_TIMEOUT_MILLIS,
         ...configuration,
       });
     } catch (e) {
