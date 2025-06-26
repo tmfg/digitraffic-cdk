@@ -28,6 +28,7 @@ export class EcoCounterApi {
 
     try {
       const resp = await ky.get(serverUrl, {
+        timeout: 20000,
         headers: {
           accept: MediaType.APPLICATION_JSON,
           "Accept-Encoding": "gzip, deflate, br",
