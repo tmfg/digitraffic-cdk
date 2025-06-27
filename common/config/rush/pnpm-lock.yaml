@@ -2479,12 +2479,12 @@ importers:
       aws-sdk:
         specifier: ^2.1692.0
         version: 2.1692.0
-      axios:
-        specifier: ^1.10.0
-        version: 1.10.0
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
+      ky:
+        specifier: ^1.8.1
+        version: 1.8.1
       pg-native:
         specifier: ^3.5.1
         version: 3.5.1

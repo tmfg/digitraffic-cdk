@@ -2,7 +2,7 @@ import { dbTestBase } from "../../db-testutil.js";
 import * as SubjectsDb from "../../../db/subjects.js";
 import { Locale } from "../../../model/locale.js";
 import { jest } from "@jest/globals";
-import axios, { type AxiosRequestConfig } from "axios";
+import ky, { type Input, type Options, type ResponsePromise } from "ky";
 
 const SERVER_PORT = 8090;
 
@@ -21,22 +21,22 @@ describe(
   "update-subjects",
   dbTestBase((db) => {
     test("update", async () => {
-      jest.spyOn(axios, "get").mockImplementation(
+      jest.spyOn(ky, "get").mockImplementation(
         (
-          _url: string,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
-          if (_url.match("/subjects")) {
+          _url: Input,
+          _options: Options | undefined,
+        ): ResponsePromise => {
+          if (_url.toString().match("/subjects")) {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-            const locale = _url!.match(/\/.+=(.+)/)![1];
+            const locale = _url!.toString().match(/\/.+=(.+)/)![1];
             return Promise.resolve({
               status: 200,
-              data: fakeSubjects(locale),
-            });
+              text: () => Promise.resolve(fakeSubjects(locale)),
+            }) as ResponsePromise;
           }
           return Promise.resolve({
             status: 404,
-          });
+          }) as ResponsePromise;
         },
       );
 

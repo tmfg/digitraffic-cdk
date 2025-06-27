@@ -222,22 +222,7 @@ describe("NodePing API test", () => {
 
     expect(api.checkNeedsUpdate(check, undefined, [randomString()])).toBe(true);
   });
-  /*
 
-        .mockImplementation(
-          (
-            _url: Input,
-            _options: Options | undefined,
-          ): ResponsePromise => {
-            expect(_url).toEqual(monitoredApp.url);
-            return Promise.resolve({
-              status: 200,
-              json: () => Promise.resolve(getOpenApiJson(apis)),
-            }) as ResponsePromise;
-          },
-        );
-
-  */
   test("getNodePingChecks", async () => {
     const secret = await secretHolder.get();
     const spy = jest

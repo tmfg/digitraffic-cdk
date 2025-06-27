@@ -3,7 +3,7 @@ import * as SubSubjectsDb from "../../../db/subsubjects.js";
 import { Locale } from "../../../model/locale.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { jest } from "@jest/globals";
-import axios, { type AxiosRequestConfig } from "axios";
+import ky, { type Input, type Options, type ResponsePromise } from "ky";
 
 const SERVER_PORT = 8091;
 
@@ -22,22 +22,22 @@ describe(
   "update-subsubjects",
   dbTestBase((db: DTDatabase) => {
     test("update", async () => {
-      jest.spyOn(axios, "get").mockImplementation(
+      jest.spyOn(ky, "get").mockImplementation(
         (
-          _url: string,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
-          if (_url.match("/subsubjects")) {
+          _url: Input,
+          _options: Options | undefined,
+        ): ResponsePromise => {
+          if (_url.toString().match("/subsubjects")) {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-            const locale = _url!.match(/\/.+=(.+)/)![1];
+            const locale = _url!.toString().match(/\/.+=(.+)/)![1];
             return Promise.resolve({
               status: 200,
-              data: fakeSubSubjects(locale),
-            });
+              text: () => Promise.resolve(fakeSubSubjects(locale)),
+            }) as ResponsePromise;
           }
           return Promise.resolve({
             status: 404,
-          });
+          }) as ResponsePromise;
         },
       );
       const expectedId = 305;
