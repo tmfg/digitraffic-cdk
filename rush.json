@@ -235,12 +235,6 @@
       "tags": ["cdk", "road"]
     },
     {
-      "packageName": "street-traffic-messages",
-      "projectFolder": "road/street-traffic-message",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "road"]
-    },
-    {
       "packageName": "variable-signs",
       "projectFolder": "road/variable-signs",
       "decoupledLocalDependencies": ["@digitraffic/common"],
