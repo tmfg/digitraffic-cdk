@@ -23,6 +23,7 @@ export class InternalLambdas {
     environment[CountingSitesEnvKeys.DOMAIN_NAME] = "Fintraffic";
 
     return MonitoredFunction.createV2(stack, "update-metadata", environment, {
+      memorySize: 256,
       functionName: stack.configuration.shortName +
         "-UpdateMetadata-Fintraffic",
     });
