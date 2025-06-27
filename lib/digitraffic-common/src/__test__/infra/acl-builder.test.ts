@@ -85,7 +85,7 @@ describe("acl-builder tests", () => {
         createBuilder().withThrottleAnonymousUserIpAndUriPath(undefined),
       ]
     ) {
-      expect(() => aclBuilder.build()).toThrowError("No rules");
+      expect(() => aclBuilder.build()).toThrow("No rules");
     }
   });
 });
