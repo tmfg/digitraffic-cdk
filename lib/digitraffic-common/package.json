@@ -127,6 +127,7 @@
     "@aws-sdk/lib-storage": "^3.835.0",
     "@date-fns/tz": "^1.2.0",
     "@smithy/node-http-handler": "^4.0.6",
+    "@smithy/fetch-http-handler": "^5.0.1",
     "aws-cdk-lib": "^2.202.0",
     "change-case": "^5.4.4",
     "constructs": "^10.4.2",
@@ -137,7 +138,7 @@
     "pg-native": "^3.5.1",
     "pg-promise": "^11.14.0",
     "pg-query-stream": "4.8.1",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
   },
   "devDependencies": {
     "@aws-sdk/client-api-gateway": "^3.835.0",
