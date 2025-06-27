@@ -84,7 +84,7 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
       });
       return Promise.reject();
     }
-    return JSON.stringify(await result.json());
+    return await result.text();
   } catch (error) {
     if (error instanceof HTTPError) {
       const response = error.response;

@@ -1,4 +1,3 @@
-import axios, { type AxiosError } from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { parseISO } from "date-fns";
 import {
@@ -6,6 +5,7 @@ import {
   type ApiWorkeventDevice,
 } from "../model/paikannin-api-data.js";
 import logger from "../service/maintenance-logger.js";
+import ky, { HTTPError } from "ky";
 
 const URL_DEVICES = "/public/api/devices/all";
 const URL_WORKEVENTS = "/public/api/devices/workevents/alldevices";
@@ -44,36 +44,32 @@ export class PaikanninApi {
       message: `${callerMethod} Sending to url ${serverUrl}`,
     });
 
-    return axios
+    return ky
       .get<T>(serverUrl, {
         headers: {
           accept: MediaType.APPLICATION_JSON,
           API_KEY: this.apikey,
         },
-        validateStatus: function (status: number) {
-          return status === 200; // Resolve only if the status code is 200
-        },
       })
       .then((value) => {
-        return value.data;
+        return value.json();
       })
-      .catch((error: Error | AxiosError) => {
-        const isAxiosError = axios.isAxiosError(error);
+      .catch(async (error: Error | HTTPError) => {
+        const isHTTPError = error instanceof HTTPError;
         const message = `method=${method} message=${callerMethod} ` +
-          (isAxiosError
+          (isHTTPError
             ? `GET failed with message: ${error.message}`
-            : `GET failed outside axios with message ${error.message}`);
+            : `GET failed outside ky with message ${error.message}`);
         logger.error({
           method,
           message,
           customCallerMethod: callerMethod,
           customUrl: serverUrl,
-          customStatus: isAxiosError ? error.status : undefined,
-          customCode: isAxiosError ? error.code : undefined,
-          customResponseData: isAxiosError
-            ? JSON.stringify(error.response?.data)
+          customStatus: isHTTPError ? error.response.status : undefined,
+          customResponseData: isHTTPError
+            ? await error.response.text()
             : undefined,
-          customResponseStatus: isAxiosError
+          customResponseStatus: isHTTPError
             ? error.response?.status
             : undefined,
           stack: error.stack,

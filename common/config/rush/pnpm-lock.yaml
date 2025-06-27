@@ -2391,9 +2391,6 @@ importers:
       aws-cdk-lib:
         specifier: ^2.202.0
         version: 2.202.0(constructs@10.4.2)
-      axios:
-        specifier: ^1.10.0
-        version: 1.10.0
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
@@ -2403,6 +2400,9 @@ importers:
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
+      ky:
+        specifier: ^1.8.1
+        version: 1.8.1
       pg-native:
         specifier: ^3.5.1
         version: 3.5.1
