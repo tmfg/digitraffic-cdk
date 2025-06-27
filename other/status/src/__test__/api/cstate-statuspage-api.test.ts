@@ -11,7 +11,6 @@ import {
   mockSecretHolder,
   setTestEnv,
 } from "../testutils.js";
-import axios, { type AxiosRequestConfig } from "axios";
 import { expect, jest } from "@jest/globals";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { UpdateStatusSecret } from "../../secret.js";
@@ -126,19 +125,19 @@ describe("CStateApiTest", () => {
     expectMaintenance: boolean,
   ): Promise<void> {
     const spy = jest
-      .spyOn(axios, "get")
+      .spyOn(ky, "get")
       .mockImplementation(
         (
-          _url: string,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
+          _url: Input,
+          _options: Options | undefined,
+        ): ResponsePromise => {
           expect(_url).toEqual(
             `${getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL)}/index.json`,
           );
           return Promise.resolve({
             status: 200,
-            data: getCstateIndexJson(maintenances),
-          });
+            json: () => Promise.resolve(getCstateIndexJson(maintenances)),
+          }) as ResponsePromise;
         },
       );
     const result = await cStateApi.isActiveMaintenances();
@@ -152,19 +151,19 @@ describe("CStateApiTest", () => {
   ): Promise<void> {
     const indexJson = getCstateIndexJson(maintenances);
     const spy = jest
-      .spyOn(axios, "get")
+      .spyOn(ky, "get")
       .mockImplementation(
         (
-          _url: string,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
+          _url: Input,
+          _options: Options | undefined,
+        ): ResponsePromise => {
           expect(_url).toEqual(
             `${getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL)}/index.json`,
           );
           return Promise.resolve({
             status: 200,
-            data: indexJson,
-          });
+            json: () => Promise.resolve(indexJson),
+          }) as ResponsePromise;
         },
       );
     const result = await cStateApi.findActiveMaintenance();

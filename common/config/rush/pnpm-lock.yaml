@@ -1753,9 +1753,6 @@ importers:
       aws-cdk-lib:
         specifier: ^2.202.0
         version: 2.202.0(constructs@10.4.2)
-      axios:
-        specifier: ^1.10.0
-        version: 1.10.0
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
