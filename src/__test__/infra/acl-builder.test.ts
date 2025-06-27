@@ -30,8 +30,15 @@ describe("acl-builder tests", () => {
     expect(acl.rules).toHaveLength(2);
   });
 
-  test("ip restriction", () => {
-    const acl = createBuilder().withIpRestrictionRule(["1.2.3.4", "1.2.6.6"])
+  test("ip blacklist", () => {
+    const acl = createBuilder().withIpBlacklistRule(["1.2.3.4", "1.2.6.6"])
+      .build();
+
+    expect(acl.rules).toHaveLength(1);
+  });
+
+  test("ip whitelist", () => {
+    const acl = createBuilder().withIpWhitelistRule(["1.2.3.4", "1.2.6.6"])
       .build();
 
     expect(acl.rules).toHaveLength(1);
