@@ -28,7 +28,7 @@
     "test_": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.835.0",
+    "@aws-sdk/client-s3": "^3.837.0",
     "@aws-sdk/client-secrets-manager": "^3.835.0",
     "@digitraffic/common": "2025.2.28-3",
     "aws-cdk-lib": "^2.202.0",

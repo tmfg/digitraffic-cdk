@@ -21,7 +21,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.835.0",
+    "@aws-sdk/client-s3": "^3.837.0",
     "@digitraffic/common": "2025.5.28-1",
     "amazon-cognito-identity-js": "6.3.15",
     "aws-cdk-lib": "^2.202.0",
