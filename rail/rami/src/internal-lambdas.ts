@@ -119,8 +119,8 @@ function createProcessUdotQueueLambda(
     "process-udot-queue",
     lambdaEnv,
     {
-      memorySize: 512,
-      reservedConcurrentExecutions: 2,
+      memorySize: 256,
+      reservedConcurrentExecutions: 3,
       timeout: 15,
     },
   );
@@ -129,7 +129,7 @@ function createProcessUdotQueueLambda(
       reportBatchItemFailures: true,
       batchSize: 25,
       maxBatchingWindow: Duration.seconds(5),
-      maxConcurrency: 2,
+      maxConcurrency: 3,
     }),
   );
   dlq.grantSendMessages(processQueueLambda);
