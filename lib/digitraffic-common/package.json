@@ -138,7 +138,7 @@
     "pg-native": "^3.5.1",
     "pg-promise": "^11.14.0",
     "pg-query-stream": "4.8.1",
-    "zod": "^3.25.67",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@aws-sdk/client-api-gateway": "^3.835.0",
