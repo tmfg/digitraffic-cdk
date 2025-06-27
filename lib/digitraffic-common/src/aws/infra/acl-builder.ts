@@ -28,7 +28,7 @@ export type CfnWebAclRuleProperty = {
  *
  * Currently supports:
  * * Some AWS managed WAF rules
- * * IP blacklisting
+ * * IP blacklisting/whitelisting
  */
 export class AclBuilder {
   readonly _construct: Construct;
@@ -55,7 +55,7 @@ export class AclBuilder {
   withAWSManagedRules(
     rules: AWSManagedWafRule[] | "all" = "all",
     excludedRules: ExcludedAWSRules = {},
-  ): AclBuilder {
+  ): this {
     if (this.isRuleDefined(rules, "CommonRuleSet")) {
       this._blockRules.push(
         createAWSCommonRuleSet(excludedRules?.CommonRuleSet),
@@ -83,7 +83,10 @@ export class AclBuilder {
     return this;
   }
 
-  withIpRestrictionRule(addresses: string[]): AclBuilder {
+  /**
+   * Block access from given addresses
+   */
+  withIpBlacklistRule(addresses: string[]): this {
     const blocklistIpSet = new CfnIPSet(this._construct, "BlocklistIpSet", {
       ipAddressVersion: "IPV4",
       scope: this._scope,
@@ -108,13 +111,45 @@ export class AclBuilder {
     return this;
   }
 
+  /**
+   * Allow access only from the given addresses
+   */
+  withIpWhitelistRule(addresses: string[]): this {
+    const blocklistIpSet = new CfnIPSet(this._construct, "AllowlistIpSet", {
+      ipAddressVersion: "IPV4",
+      scope: this._scope,
+      addresses,
+    });
+
+    this._blockRules.push({
+      name: "IpAllowlist",
+      action: { block: {} },
+      statement: {
+        notStatement: {
+          statement: {
+            ipSetReferenceStatement: {
+              arn: blocklistIpSet.attrArn,
+            },
+          },
+        },
+      },
+      visibilityConfig: {
+        sampledRequestsEnabled: false,
+        cloudWatchMetricsEnabled: true,
+        metricName: "IpAllowlist",
+      },
+    });
+
+    return this;
+  }
+
   withThrottleRule(
     name: string,
     limit: number,
     isHeaderRequired: boolean,
     isBasedOnIpAndUriPath: boolean,
     customResponseBodyKey?: string,
-  ): AclBuilder {
+  ): this {
     const isBlockRule = !!customResponseBodyKey;
     const rules = isBlockRule ? this._blockRules : this._countRules;
     const action = isBlockRule
@@ -150,7 +185,7 @@ export class AclBuilder {
   withCustomResponseBody(
     key: string,
     customResponseBody: CfnWebACL.CustomResponseBodyProperty,
-  ): AclBuilder {
+  ): this {
     if (key in this._customResponseBodies) {
       logger.warn({
         method: "acl-builder.withCustomResponseBody",
@@ -162,7 +197,7 @@ export class AclBuilder {
     return this;
   }
 
-  withThrottleDigitrafficUserIp(limit: number | undefined): AclBuilder {
+  withThrottleDigitrafficUserIp(limit: number | undefined): this {
     if (limit === undefined) {
       return this;
     }
@@ -179,7 +214,7 @@ export class AclBuilder {
 
   withThrottleDigitrafficUserIpAndUriPath(
     limit: number | undefined,
-  ): AclBuilder {
+  ): this {
     if (limit === undefined) {
       return this;
     }
@@ -209,7 +244,7 @@ export class AclBuilder {
     );
   }
 
-  withThrottleAnonymousUserIpAndUriPath(limit: number | undefined): AclBuilder {
+  withThrottleAnonymousUserIpAndUriPath(limit: number | undefined): this {
     if (limit === undefined) {
       return this;
     }
@@ -224,7 +259,7 @@ export class AclBuilder {
     );
   }
 
-  withCountDigitrafficUserIp(limit: number | undefined): AclBuilder {
+  withCountDigitrafficUserIp(limit: number | undefined): this {
     if (limit === undefined) {
       return this;
     }
@@ -236,7 +271,7 @@ export class AclBuilder {
     );
   }
 
-  withCountDigitrafficUserIpAndUriPath(limit: number | undefined): AclBuilder {
+  withCountDigitrafficUserIpAndUriPath(limit: number | undefined): this {
     if (limit === undefined) {
       return this;
     }
@@ -248,7 +283,7 @@ export class AclBuilder {
     );
   }
 
-  withCountAnonymousUserIp(limit: number | undefined): AclBuilder {
+  withCountAnonymousUserIp(limit: number | undefined): this {
     if (limit === undefined) {
       return this;
     }
@@ -260,7 +295,7 @@ export class AclBuilder {
     );
   }
 
-  withCountAnonymousUserIpAndUriPath(limit: number | undefined): AclBuilder {
+  withCountAnonymousUserIpAndUriPath(limit: number | undefined): this {
     if (limit === undefined) {
       return this;
     }
