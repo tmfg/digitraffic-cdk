@@ -24,7 +24,7 @@
     "@aws-crypto/sha256-browser": "~5.2.0",
     "@aws-sdk/client-sts": "^3.835.0",
     "@aws-sdk/types": "^3.821.0",
-    "@digitraffic/common": "2025.2.28-3",
+    "@digitraffic/common": "2025.6.27-2",
     "@smithy/node-http-handler": "~4.0.6",
     "@smithy/protocol-http": "~5.1.2",
     "@smithy/signature-v4": "~5.1.2",

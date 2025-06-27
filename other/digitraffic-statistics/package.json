@@ -15,7 +15,7 @@
     "test": "echo 'No tests implemented'"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.2.28-3",
+    "@digitraffic/common": "2025.6.27-2",
     "aws-cdk-lib": "^2.202.0",
     "constructs": "~10.4.2"
   },

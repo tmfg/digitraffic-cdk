@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.837.0",
-    "@digitraffic/common": "2025.5.28-1",
+    "@digitraffic/common": "2025.6.27-2",
     "amazon-cognito-identity-js": "6.3.15",
     "aws-cdk-lib": "^2.202.0",
     "constructs": "~10.4.2",

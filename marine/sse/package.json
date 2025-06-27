@@ -23,7 +23,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.2.28-3",
+    "@digitraffic/common": "2025.6.27-2",
     "aws-cdk-lib": "^2.202.0",
     "constructs": "~10.4.2",
     "pg-native": "^3.5.1",
