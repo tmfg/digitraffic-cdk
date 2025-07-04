@@ -1,5 +1,5 @@
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import ky from "ky";
+import ky, { type KyResponse } from "ky";
 import type { Feature, Geometry } from "geojson";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -8,7 +8,7 @@ export async function getDisruptions(
 ): Promise<DisruptionFeature[]> {
   const start = Date.now();
 
-  const response = await ky.get(endpointUrl, {
+  const response: KyResponse = await ky.get(endpointUrl, {
     headers: {
       Accept: MediaType.APPLICATION_JSON,
     },

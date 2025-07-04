@@ -1,4 +1,3 @@
-import axios, { type AxiosError } from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   type ApiContractData,
@@ -9,6 +8,7 @@ import { type DbDomainContract } from "../model/db-data.js";
 import { type MaintenanceTrackingAutoriSecret } from "../model/maintenance-tracking-municipality-secret.js";
 import { URLSearchParams } from "url";
 import logger from "../service/maintenance-logger.js";
+import ky, { HTTPError } from "ky";
 
 export const PATH_SUFFIX_CONTRACTS = "contracts";
 export const PATH_SUFFIX_ROUTE = "route";
@@ -111,37 +111,33 @@ export class AutoriApi {
 
     const token: OAuthTokenResponse = await this.getOAuthToken();
 
-    return axios
+    return ky
       .get<T>(serverUrl, {
         // OAuth 2.0 Authorization headers
         headers: {
           accept: MediaType.APPLICATION_JSON,
           Authorization: `Bearer ${token.access_token}`,
         },
-        validateStatus: function (status: number) {
-          return status === 200; // Resolve only if the status code is 200
-        },
       })
       .then((value) => {
-        return value.data;
+        return value.json();
       })
-      .catch((error: Error | AxiosError) => {
-        const isAxiosError = axios.isAxiosError(error);
+      .catch(async (error: Error | HTTPError) => {
+        const isHTTPError = error instanceof HTTPError;
         const message = `method=${method} message=${callerMethod} ` +
-          (isAxiosError
+          (isHTTPError
             ? `GET failed with message: ${error.message}`
-            : `GET failed outside axios with message ${error.message}`);
+            : `GET failed outside ky with message ${error.message}`);
         logger.error({
           method,
           message,
           customCallerMethod: callerMethod,
           customUrl: serverUrl,
-          customStatus: isAxiosError ? error.status : undefined,
-          customCode: isAxiosError ? error.code : undefined,
-          customResponseData: isAxiosError
-            ? JSON.stringify(error.response?.data)
+          customStatus: isHTTPError ? error.response.status : undefined,
+          customResponseData: isHTTPError
+            ? await error.response.text()
             : undefined,
-          customResponseStatus: isAxiosError
+          customResponseStatus: isHTTPError
             ? error.response?.status
             : undefined,
           stack: error.stack,
@@ -274,22 +270,19 @@ export class AutoriApi {
     };
 
     const url = this.secret.oAuthTokenEndpoint;
-    return axios
+    return ky
       .post<Partial<OAuthTokenResponse>>(
         url,
-        new URLSearchParams(postData).toString(),
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          validateStatus: function (status: number) {
-            return status === 200; // Resolve only if the status code is 200
-          },
+          body: new URLSearchParams(postData).toString(),
         },
       )
-      .then((response) => {
+      .then(async (response) => {
         this.oAuthResponse = OAuthTokenResponse.createFromAuthResponse(
-          response.data,
+          await response.json(),
         );
         if (this.oAuthResponse === undefined) {
           throw new Error("Invalid OAuth token");
@@ -301,21 +294,20 @@ export class AutoriApi {
         });
         return this.oAuthResponse;
       })
-      .catch((error: Error | AxiosError) => {
-        const isAxiosError = axios.isAxiosError(error);
-        const message = isAxiosError
+      .catch(async (error: Error | HTTPError) => {
+        const isHTTPError = error instanceof HTTPError;
+        const message = isHTTPError
           ? `POST failed with message: ${error.message}`
-          : `POST failed outside axios with message ${error.message}`;
+          : `POST failed outside ky with message ${error.message}`;
         logger.error({
           method,
           message,
           customUrl: url,
-          customStatus: isAxiosError ? error.status : undefined,
-          customCode: isAxiosError ? error.code : undefined,
-          customResponseData: isAxiosError
-            ? JSON.stringify(error.response?.data)
+          customStatus: isHTTPError ? error.response.status : undefined,
+          customResponseData: isHTTPError
+            ? await error.response.text()
             : undefined,
-          customResponseStatus: isAxiosError
+          customResponseStatus: isHTTPError
             ? error.response?.status
             : undefined,
           stack: error.stack,

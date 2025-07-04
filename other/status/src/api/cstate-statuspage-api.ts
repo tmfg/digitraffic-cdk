@@ -1,4 +1,3 @@
-import axios, { type AxiosError } from "axios";
 import {
   logger,
   type LoggerMethodType,
@@ -82,22 +81,16 @@ export class CStateStatuspageApi {
     });
 
     const statusJsonUrl = `${this.cStatePageUrl}${STATUS_JSON_PATH}`;
-    return await axios
-      .get<CStateStatus>(statusJsonUrl, {
-        validateStatus: (status: number) => {
-          return status === 200;
-        },
-      })
-      .catch((reason: AxiosError) => {
+    return await ky
+      .get<CStateStatus>(statusJsonUrl)
+      .catch((error: HTTPError) => {
         throw new Error(
           `method=${method} Unable to get cState status from ${statusJsonUrl}. Error ${
-            reason.code ? reason.code : ""
-          } ${reason.message}`,
+            error.response.status ? error.response.status : ""
+          } ${error.message}`,
         );
       })
-      .then((response) => {
-        return response.data;
-      })
+      .then((response) => response.json())
       .finally(() =>
         logger.info({
           method,

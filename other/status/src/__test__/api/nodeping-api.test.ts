@@ -17,8 +17,8 @@ import {
 import { mockSecretHolder, NODEPING_API, setTestEnv } from "../testutils.js";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { UpdateStatusSecret } from "../../secret.js";
-import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 import { jest } from "@jest/globals";
+import ky, { type Input, type Options, type ResponsePromise } from "ky";
 
 let secretHolder: SecretHolder<UpdateStatusSecret>;
 let nodepingApi: NodePingApi;
@@ -226,19 +226,19 @@ describe("NodePing API test", () => {
   test("getNodePingChecks", async () => {
     const secret = await secretHolder.get();
     const spy = jest
-      .spyOn(axios, "get")
+      .spyOn(ky, "get")
       .mockImplementation(
         (
-          _url: string,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
+          _url: Input,
+          _options: Options | undefined,
+        ): ResponsePromise => {
           expect(_url).toEqual(
             `${NODEPING_API}/checks?customerid=${secret.nodePingSubAccountId}`,
           );
           return Promise.resolve({
             status: 200,
-            data: getNodepinChecksJson(),
-          });
+            json: () => Promise.resolve(getNodepinChecksJson()),
+          }) as ResponsePromise;
         },
       );
     const checks = await nodepingApi.getNodePingChecks();
@@ -249,19 +249,19 @@ describe("NodePing API test", () => {
   test("getNodepingContacts", async () => {
     const secret = await secretHolder.get();
     const spy = jest
-      .spyOn(axios, "get")
+      .spyOn(ky, "get")
       .mockImplementation(
         (
-          _url: string,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
+          _url: Input,
+          _options: Options | undefined,
+        ): ResponsePromise => {
           expect(_url).toEqual(
             `${NODEPING_API}/contacts?customerid=${secret.nodePingSubAccountId}`,
           );
           return Promise.resolve({
             status: 200,
-            data: getNodepinContactsJson(),
-          });
+            json: () => Promise.resolve(getNodepinContactsJson()),
+          }) as ResponsePromise;
         },
       );
 
@@ -283,17 +283,13 @@ describe("NodePing API test", () => {
     const nodepingContactName = "gh-contact";
 
     const spy = jest
-      .spyOn(axios, "post")
+      .spyOn(ky, "post")
       .mockImplementation(
-        (
-          _url: string,
-          data?: unknown,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
+        (_url: Input, _options?: Options | undefined): ResponsePromise => {
           expect(_url).toEqual(`${NODEPING_API}/contacts`);
 
-          const body: NodePingContactPostPutData =
-            data as NodePingContactPostPutData satisfies NodePingContactPostPutData;
+          const body: NodePingContactPostPutData = _options
+            ?.json as NodePingContactPostPutData satisfies NodePingContactPostPutData;
 
           expect(body.name).toEqual(nodepingContactName);
           expect(body.custrole).toEqual("notify");
@@ -331,8 +327,8 @@ describe("NodePing API test", () => {
 
           return Promise.resolve({
             status: 200,
-            data: {},
-          });
+            json: () => Promise.resolve({}),
+          }) as ResponsePromise;
         },
       );
 
@@ -394,29 +390,30 @@ async function testNodePingChecksDisableall(
   const url = `${NODEPING_API}/checks?disableall=${JSON.stringify(disableall)}`;
 
   const spy = jest
-    .spyOn(axios, "put")
+    .spyOn(ky, "put")
     .mockImplementation(
-      async (
-        _url: string,
-        data?: unknown,
-        _config?: AxiosRequestConfig<unknown>,
-      ): Promise<unknown> => {
+      (async (_url: Input, _options?: Options | undefined) => {
         expect(_url).toEqual(url);
         if (fail) {
-          throw new AxiosError("Put failed!");
+          throw new Error("Put failed!");
         }
 
-        await expectTokenAndCustomeridInData(data);
+        await expectTokenAndCustomeridInData(_options?.json);
 
-        return Promise.resolve({
+        return {
           status: 200,
-          data: {
-            disableall: disableall ? 3 : 0,
-            disabled: 0,
-            enabled: disableall ? 0 : 3,
-          },
-        });
-      },
+          json: () =>
+            Promise.resolve({
+              disableall: disableall ? 3 : 0,
+              disabled: 0,
+              enabled: disableall ? 0 : 3,
+            }),
+          text: () => Promise.resolve(""),
+          blob: () => Promise.resolve(new Blob([])),
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+          formData: () => Promise.resolve(new FormData()),
+        };
+      }) as unknown as (_url: Input, _options?: Options) => ResponsePromise,
     );
   const spyDoPut = jest.spyOn(nodepingApi, "doPut");
 
@@ -453,16 +450,12 @@ async function testCreateNodepingCheck(
   });
 
   const spy = jest
-    .spyOn(axios, "post")
+    .spyOn(ky, "post")
     .mockImplementation(
-      async (
-        _url: string,
-        data?: unknown,
-        _config?: AxiosRequestConfig<unknown>,
-      ): Promise<unknown> => {
+      (async (_url: Input, _options?: Options | undefined) => {
         expect(_url).toEqual(`${NODEPING_API}/checks`);
 
-        const postData = data as NodePingCheckPostPutData;
+        const postData = _options?.json as NodePingCheckPostPutData;
 
         console.debug(JSON.stringify(postData));
 
@@ -504,11 +497,15 @@ async function testCreateNodepingCheck(
         expect(postData.sendheaders).toEqual(NODEPING_SENT_HEADERS);
         expect(postData.notifications).toEqual(expectedNotifications);
 
-        return Promise.resolve({
+        return {
           status: 200,
-          data: {},
-        });
-      },
+          json: () => Promise.resolve({}),
+          text: () => Promise.resolve(""),
+          blob: () => Promise.resolve(new Blob([])),
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+          formData: () => Promise.resolve(new FormData()),
+        };
+      }) as unknown as (_url: Input, _options?: Options) => ResponsePromise,
     );
 
   await nodepingApi.createNodepingCheck(

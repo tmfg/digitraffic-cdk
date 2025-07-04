@@ -1,4 +1,3 @@
-import axios, { type AxiosRequestConfig } from "axios";
 import {
   EndpointHttpMethod,
   EndpointProtocol,
@@ -11,8 +10,9 @@ import {
 } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { UpdateStatusSecret } from "../secret.js";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { converToError, type ErrorOrAxiosError } from "./api-tools.js";
+import { convertToError, type ErrorOrHTTPError } from "./api-tools.js";
 import _ from "lodash";
+import ky from "ky";
 
 const SERVICE = "NodePingApi" as const;
 
@@ -134,18 +134,17 @@ export class NodePingApi {
 
   private async doGet<T>(url: string): Promise<T> {
     const secret = await this.secretHolder.get();
-    return axios
+    return ky
       .get<T>(`${url}?customerid=${secret.nodePingSubAccountId}`, {
         timeout: this.requestTimeoutMs,
-        validateStatus: this.getValidateStatusFn(),
         headers: {
           Authorization: `Basic ${this.toBase64(secret.nodePingToken)}`,
         },
       })
-      .catch((error: ErrorOrAxiosError) => {
-        throw converToError(error);
+      .catch(async (error: ErrorOrHTTPError) => {
+        throw await convertToError(error);
       })
-      .then((response) => response.data);
+      .then((response) => response.json());
   }
 
   // create
@@ -154,25 +153,24 @@ export class NodePingApi {
     const config = {
       headers: { "Content-type": MediaType.APPLICATION_JSON },
       timeout: this.requestTimeoutMs,
-      validateStatus: this.getValidateStatusFn(),
-    } satisfies AxiosRequestConfig;
+    };
 
-    return axios
-      .post<void>(
+    return ky
+      .post(
         url,
         {
-          ...data,
-          ...{
+          json: {
+            ...data,
             token: secret.nodePingToken,
             customerid: secret.nodePingSubAccountId,
-          },
-        } satisfies NodePingCheckPostPutAuthData & DATA,
-        config,
+          } satisfies NodePingCheckPostPutAuthData & DATA,
+          ...config,
+        },
       )
-      .catch((error: ErrorOrAxiosError) => {
-        throw converToError(error);
+      .catch(async (error: ErrorOrHTTPError) => {
+        throw await convertToError(error);
       })
-      .then((response) => response.data);
+      .then((response) => response.json());
   }
 
   // update
@@ -181,25 +179,23 @@ export class NodePingApi {
     const config = {
       headers: { "Content-type": MediaType.APPLICATION_JSON },
       timeout: this.requestTimeoutMs,
-      validateStatus: this.getValidateStatusFn(),
-    } satisfies AxiosRequestConfig;
-
-    return axios
+    };
+    return ky
       .put<void>(
         url,
         {
-          ...data,
-          ...{
+          json: {
+            ...data,
             token: secret.nodePingToken,
             customerid: secret.nodePingSubAccountId,
-          },
-        } satisfies NodePingCheckPostPutAuthData & DATA,
-        config,
+          } satisfies NodePingCheckPostPutAuthData & DATA,
+          ...config,
+        },
       )
-      .catch((error: ErrorOrAxiosError) => {
-        throw converToError(error);
+      .catch(async (error: ErrorOrHTTPError) => {
+        throw await convertToError(error);
       })
-      .then((response) => response.data);
+      .then((response) => response.json());
   }
 
   async getNodepingContacts(): Promise<NodePingContact[]> {

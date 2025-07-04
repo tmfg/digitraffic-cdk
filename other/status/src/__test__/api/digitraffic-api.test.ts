@@ -6,8 +6,8 @@ import {
 } from "../../app-props.js";
 import { DigitrafficApi, type PathItem } from "../../api/digitraffic-api.js";
 import type { AppWithEndpoints } from "../../model/app-with-endpoints.js";
-import axios, { type AxiosRequestConfig } from "axios";
 import { jest } from "@jest/globals";
+import ky, { type Input, type Options, type ResponsePromise } from "ky";
 
 const SERVER_PORT = 8090;
 const digitrafficApi = new DigitrafficApi();
@@ -139,17 +139,17 @@ describe("DigitrafficApiTest", () => {
     } satisfies MonitoredApp;
 
     const spy = jest
-      .spyOn(axios, "get")
+      .spyOn(ky, "get")
       .mockImplementation(
         (
-          _url: string,
-          _config?: AxiosRequestConfig<unknown>,
-        ): Promise<unknown> => {
+          _url: Input,
+          _options: Options | undefined,
+        ): ResponsePromise => {
           expect(_url).toEqual(monitoredApp.url);
           return Promise.resolve({
             status: 200,
-            data: getOpenApiJson(apis),
-          });
+            json: () => Promise.resolve(getOpenApiJson(apis)),
+          }) as ResponsePromise;
         },
       );
 

@@ -1,11 +1,11 @@
 import type { MonitoredApp } from "../app-props.js";
-import axios from "axios";
 import type { AppWithEndpoints } from "../model/app-with-endpoints.js";
 import {
   logger,
   type LoggerMethodType,
 } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import _ from "lodash";
+import ky from "ky";
 
 const BETA = "/beta/" as const;
 
@@ -50,18 +50,15 @@ export class DigitrafficApi {
       message,
     });
     // Swagger url
-    return axios
+    return ky
       .get<OpenApiResponse>(app.url, {
         headers: {
           "accept-encoding": "gzip",
         },
-        validateStatus: (status: number) => {
-          return status === 200;
-        },
       })
-      .catch((reason) => {
+      .catch((error: Error) => {
         const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(reason)
+          JSON.stringify(error.message)
         }`;
         logger.error({
           method,
@@ -69,8 +66,8 @@ export class DigitrafficApi {
         });
         throw new Error(`${method} ${message}`);
       })
-      .then((resp) => {
-        return this.createAppWithEndpointsResponse(app, resp.data);
+      .then(async (resp) => {
+        return this.createAppWithEndpointsResponse(app, await resp.json());
       })
       .finally(() =>
         logger.info({

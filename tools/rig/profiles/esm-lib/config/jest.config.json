@@ -24,8 +24,5 @@
       "lines": 50,
       "statements": 50
     }
-  },
-  "moduleNameMapper": {
-    "^axios$": "<rootDir>/node_modules/axios/dist/esm/axios.js"
   }
 }

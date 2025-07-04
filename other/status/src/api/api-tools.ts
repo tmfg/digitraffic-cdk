@@ -1,16 +1,16 @@
-import axios, { type AxiosError } from "axios";
+import { HTTPError } from "ky";
 
-export type ErrorOrAxiosError = Error | AxiosError;
+export type ErrorOrHTTPError = Error | HTTPError;
 
-export function converToError(error: ErrorOrAxiosError): Error {
-  if (axios.isAxiosError(error)) {
+export async function convertToError(error: ErrorOrHTTPError): Promise<Error> {
+  if (error instanceof HTTPError) {
     return new Error(
-      `{ "name": "${error.name}", "message: "${error.message}", "code": "${
-        error.code ?? "-"
-      }", "status": "${error.status ?? "-"}", "url": "${
-        error.config?.url ?? "-"
-      }", "method": "${error.config?.method ?? "-"}", "response": "${
-        error.response ? JSON.stringify(error.response) : "-"
+      `{ "name": "${error.name}", "message: "${error.message}", "status": "${
+        error.response.status ?? "-"
+      }", "url": "${error.request.url ?? "-"}", "method": "${
+        error.request.method ?? "-"
+      }", "response": "${
+        error.response ? await error.response.text() : "-"
       }" }`,
     );
   } else {

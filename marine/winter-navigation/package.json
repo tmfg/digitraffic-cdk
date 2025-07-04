@@ -17,29 +17,29 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.2.28-3",
-    "aws-cdk-lib": "^2.192.0",
+    "@digitraffic/common": "2025.6.27-2",
+    "aws-cdk-lib": "^2.202.0",
     "constructs": "~10.4.2",
     "ky": "^1.8.1",
     "lodash-es": "4.17.21",
-    "pg-native": "^3.4.5",
-    "pg-promise": "^11.13.0",
-    "zod": "~3.24.3"
+    "pg-native": "^3.5.1",
+    "pg-promise": "^11.14.0",
+    "zod": "~3.25.67"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "^29.7.0",
+    "@jest/globals": "^30.0.3",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.71.1",
-    "@rushstack/heft-jest-plugin": "^0.15.3",
+    "@rushstack/heft": "^0.74.0",
+    "@rushstack/heft-jest-plugin": "^0.16.9",
     "@types/heft-jest": "1.0.6",
-    "@types/jest": "29.5.14",
+    "@types/jest": "30.0.0",
     "@types/lodash-es": "4.17.12",
     "@types/node": "22.15.2",
-    "esbuild": "0.25.3",
+    "esbuild": "0.25.5",
     "eslint": "^8.57.0",
     "typescript": "~5.8.3"
   }

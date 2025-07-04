@@ -15,7 +15,7 @@ export async function postDocument(
     customUrl: url,
   });
 
-  // try-catch so axios won't log keys/certs
+  // try-catch so ky won't log keys/certs
   try {
     const resp = await request(url, {
       method: "POST",
