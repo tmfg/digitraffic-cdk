@@ -1,11 +1,11 @@
-import _ from "lodash";
+import { cloneDeep, set } from "lodash-es";
 
 /**
  * Returns new copy of given object, with given path undefined
  */
 export function cloneAndUndefine(message: object, ...path: string[]): object {
-  return _.set(
-    _.cloneDeep(message),
+  return set(
+    cloneDeep(message),
     path,
     undefined,
   );
@@ -15,7 +15,7 @@ export function cloneAndUndefine(message: object, ...path: string[]): object {
  * Undefines a given path from the given object
  */
 export function undefine(message: object, ...path: string[]): void {
-  _.set(
+  set(
     message,
     path,
     undefined,

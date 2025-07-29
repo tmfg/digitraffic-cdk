@@ -9,10 +9,10 @@ import {
   ramiSmMessageSchema,
 } from "../model/zod-schema/sm-message.js";
 import type { z } from "zod";
-import _ from "lodash";
 import { insertMessage } from "../dao/stop_monitoring_message.js";
 import type { Connection } from "mysql2/promise";
 import { inTransaction } from "../util/database.js";
+import { compact } from "lodash-es";
 
 export function parseUDOTMessage(
   message: unknown,
@@ -84,7 +84,7 @@ function parseMonitoredCall(
       }
       : undefined;
 
-  return _.compact([arrival, departure]);
+  return compact([arrival, departure]);
 }
 
 function includeCall(mc: z.infer<typeof monitoredCall>): boolean {

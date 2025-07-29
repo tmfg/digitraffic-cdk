@@ -119,7 +119,7 @@ function createProcessUdotQueueLambda(
     "process-udot-queue",
     lambdaEnv,
     {
-      memorySize: 256,
+      memorySize: 512,
       reservedConcurrentExecutions: 3,
       timeout: 15,
     },

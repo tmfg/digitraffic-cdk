@@ -1,7 +1,7 @@
 import type { Connection } from "mysql2/promise";
 import * as mysql from "../util/database.js";
 import { inTransaction } from "../util/database.js";
-import _ from "lodash";
+import { get } from "lodash-es";
 
 export type DbUnitTestFunction = (db: Connection) => void;
 
@@ -30,7 +30,7 @@ export async function expectRowCount(
     const [rows] = await conn.query(sql);
 
     expect(rows).toHaveLength(1);
-    expect(_.get(rows, ["0", "count(*)"])).toEqual(expectedCount);
+    expect(get(rows, ["0", "count(*)"])).toEqual(expectedCount);
   });
 }
 

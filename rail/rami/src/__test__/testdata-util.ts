@@ -3,7 +3,7 @@ import type { DtRosmMessage } from "../model/dt-rami-message.js";
 import type { RosmMessageOperation } from "../model/rosm-message.js";
 import { validRamiMonitoredJourneyScheduledMessage } from "./testdata-rosm.js";
 import { validMessageUnknownTrackAndDelay } from "./testdata-sm.js";
-import _ from "lodash";
+import { chain } from "lodash-es";
 
 export function createDtRosmMessage(properties: {
   created?: Date;
@@ -110,7 +110,7 @@ export function createSmMessage(properties: {
   departureTime?: string;
   departureQuay?: string;
 }): unknown {
-  return _.chain(validMessageUnknownTrackAndDelay)
+  return chain(validMessageUnknownTrackAndDelay)
     .clone()
     .set([
       "payload",

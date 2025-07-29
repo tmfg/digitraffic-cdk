@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { set } from "lodash-es";
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";
 import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";
 import { cloneAndUndefine, undefine } from "../message-util.js";
@@ -36,7 +36,7 @@ describe("validate incoming rosm message", () => {
       "messageId",
     );
     undefine(invalidMessage, "payload", "messageVersion");
-    _.set(invalidMessage, [
+    set(invalidMessage, [
       "payload",
       "monitoredJourneyScheduledMessage",
       "deliveryPoints",

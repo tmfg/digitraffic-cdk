@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { cloneDeep, set } from "lodash-es";
 import { RosmMessageOperations } from "../../model/rosm-message.js";
 import { getActiveMessages } from "../../service/get-message.js";
 import {
@@ -32,8 +32,8 @@ describe("parse rosm message", () => {
   });
 
   test("parseMessage - invalid message is correctly parsed", () => {
-    const invalidMessage = _.set(
-      _.cloneDeep(validRamiMonitoredJourneyScheduledMessage),
+    const invalidMessage = set(
+      cloneDeep(validRamiMonitoredJourneyScheduledMessage),
       ["payload", "messageId"],
       undefined,
     );
