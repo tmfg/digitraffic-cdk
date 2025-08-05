@@ -42,6 +42,11 @@ export type CloudfrontField =
 
 export type HttpUserAgentField = "@fields.http_user_agent";
 
+// prettier-ignore
+export type AlertField =
+  | "alert.id"
+  | "alert.correlation_id.keyword";
+
 export type OSLogField =
   | DefaultField
   | DefaultJavaField
@@ -49,7 +54,8 @@ export type OSLogField =
   | AppField
   | NginxField
   | CloudfrontField
-  | HttpUserAgentField;
+  | HttpUserAgentField
+  | AlertField;
 
 export enum Bytes {
   KILO = 1000 * 1000,

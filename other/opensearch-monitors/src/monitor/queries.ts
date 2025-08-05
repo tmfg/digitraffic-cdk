@@ -40,6 +40,18 @@ export interface MatchPhraseQuery {
   };
 }
 
+export interface WildcardQuery {
+  wildcard: {
+    [field: string]: { value: string };
+  };
+}
+
+export interface RegExpQuery {
+  regexp: {
+    [field: string]: { value: string };
+  };
+}
+
 export interface RangeQuery {
   range: {
     [field: string]: {
@@ -68,6 +80,8 @@ export interface QueryStringQuery {
 export type Query =
   | BoolQuery
   | MatchPhraseQuery
+  | WildcardQuery
+  | RegExpQuery
   | RangeQuery
   | ExistsQuery
   | ScriptQuery
