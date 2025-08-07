@@ -1,6 +1,7 @@
 import type { OSLogField } from "./fields.js";
 import type { OSMonitor } from "./monitor.js";
 import type {
+  BoolOrQuery,
   BoolQuery,
   ExistsQuery,
   MatchPhraseQuery,
@@ -16,6 +17,7 @@ import type {
 } from "./queries.js";
 import {
   type OSTrigger,
+  triggerWhenAggregationBucketsFound,
   triggerWhenLineCountOutside,
   triggerWhenLinesFound,
   triggerWhenSumOutside,
@@ -102,6 +104,14 @@ function bool(must: Query[], mustNot: Query[]): BoolQuery {
     bool: {
       must,
       must_not: mustNot,
+    },
+  };
+}
+
+export function or(...queries: Query[]): BoolOrQuery {
+  return {
+    bool: {
+      should: queries,
     },
   };
 }
@@ -256,6 +266,19 @@ export class OsMonitorBuilder {
   moreThan(threshold: number = 0): this {
     this.trigger = triggerWhenLinesFound(
       this.name,
+      this.config.slackDestinations,
+      getThrottle(this.config),
+      this.messageSubject,
+      threshold,
+    );
+
+    return this;
+  }
+
+  aggregationBucketsMoreThan(aggName: string, threshold: number = 0): this {
+    this.trigger = triggerWhenAggregationBucketsFound(
+      this.name,
+      aggName,
       this.config.slackDestinations,
       getThrottle(this.config),
       this.messageSubject,

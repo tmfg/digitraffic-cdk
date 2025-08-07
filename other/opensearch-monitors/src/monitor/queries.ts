@@ -23,6 +23,12 @@ export interface BoolQuery {
   };
 }
 
+export interface BoolOrQuery {
+  bool: {
+    should: Query[];
+  };
+}
+
 export interface ScriptedMetric {
   [field: string]: {
     scripted_metric: {
@@ -79,6 +85,7 @@ export interface QueryStringQuery {
 
 export type Query =
   | BoolQuery
+  | BoolOrQuery
   | MatchPhraseQuery
   | WildcardQuery
   | RegExpQuery

@@ -36,6 +36,7 @@ export type CloudfrontField =
   | "httpMethod"
   | "httpStatusCode"
   | "request"
+  | "request.keyword"
   | "subdomain"
   | "timeToFirstByte"
   | "httpHost";

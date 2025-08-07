@@ -21,6 +21,13 @@ function moreThan(threshold: number): string {
 }
 
 /**
+ * Aggregation bucket count more than threshold, exlusive
+ */
+function aggMoreThan(aggName: string, threshold: number) {
+  return `ctx.results[0].aggregations.${aggName}.buckets.length > ${threshold}`;
+}
+
+/**
  * Result count not in inclusive range
  */
 function notBetween(lower: number, upper: number): string {
@@ -92,6 +99,27 @@ export function triggerWhenLinesFound(
   return {
     name: name,
     condition: moreThan(threshold),
+    actions: sendAlerts(destinations, msg, throttleMinutes),
+  };
+}
+
+export function triggerWhenAggregationBucketsFound(
+  name: string,
+  aggName: string,
+  destinations: string[],
+  throttleMinutes: number,
+  message: string,
+  threshold = 0,
+): OSTrigger {
+  const msg: SlackMessage = {
+    emoji: SlackEmoji.RED_CIRCLE,
+    subject:
+      `${name} {{ctx.results.0.aggregations.${aggName}.buckets.length}} should not be more than ${threshold}`,
+    message,
+  };
+  return {
+    name: name,
+    condition: aggMoreThan(aggName, threshold),
     actions: sendAlerts(destinations, msg, throttleMinutes),
   };
 }
