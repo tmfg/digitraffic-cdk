@@ -23,7 +23,7 @@ function moreThan(threshold: number): string {
 /**
  * Aggregation bucket count more than threshold, exlusive
  */
-function aggMoreThan(aggName: string, threshold: number) {
+function aggMoreThan(aggName: string, threshold: number): string {
   return `ctx.results[0].aggregations.${aggName}.buckets.length > ${threshold}`;
 }
 
@@ -127,7 +127,7 @@ export function triggerWhenAggregationBucketsFound(
   destinations: string[],
   throttleMinutes: number,
   message: string,
-  threshold = 0,
+  threshold: number = 0,
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
