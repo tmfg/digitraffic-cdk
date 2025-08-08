@@ -48,10 +48,16 @@ export type AlertField =
   | "alert.id"
   | "alert.correlation_id.keyword";
 
+// prettier-ignore
+export type DefaultPythonField =
+  | "filename.keyword"
+  | "funcName.keyword";
+
 export type OSLogField =
   | DefaultField
   | DefaultJavaField
   | DefaultLambdaField
+  | DefaultPythonField
   | AppField
   | NginxField
   | CloudfrontField

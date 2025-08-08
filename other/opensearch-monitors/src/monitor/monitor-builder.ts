@@ -17,6 +17,7 @@ import type {
 } from "./queries.js";
 import {
   type OSTrigger,
+  triggerAlways,
   triggerWhenAggregationBucketsFound,
   triggerWhenLineCountOutside,
   triggerWhenLinesFound,
@@ -64,7 +65,11 @@ export function matchRegExpPhrase(
 
 export function aggregateTerms(
   field: OSLogField,
-  { name, bucketFilter }: { name?: string; bucketFilter?: AggregateFilter },
+  { name, bucketFilter, innerAggregate }: {
+    name?: string;
+    bucketFilter?: AggregateFilter;
+    innerAggregate?: TermsAggregate;
+  },
 ): TermsAggregate {
   name = name ?? field.replace(".", "_");
   return {
@@ -72,8 +77,11 @@ export function aggregateTerms(
       terms: {
         field: field,
       },
+      ...(innerAggregate && {
+        aggregations: innerAggregate,
+      }),
       ...(bucketFilter && {
-        aggs: {
+        aggregations: {
           [bucketFilter.name]: {
             bucket_selector: {
               buckets_path: bucketFilter.bucketPaths,
@@ -270,6 +278,17 @@ export class OsMonitorBuilder {
       getThrottle(this.config),
       this.messageSubject,
       threshold,
+    );
+
+    return this;
+  }
+
+  always(): this {
+    this.trigger = triggerAlways(
+      this.name,
+      this.config.slackDestinations,
+      getThrottle(this.config),
+      this.messageSubject,
     );
 
     return this;

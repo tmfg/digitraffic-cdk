@@ -103,6 +103,24 @@ export function triggerWhenLinesFound(
   };
 }
 
+export function triggerAlways(
+  name: string,
+  destinations: string[],
+  throttleMinutes: number,
+  message: string,
+): OSTrigger {
+  const msg: SlackMessage = {
+    emoji: SlackEmoji.RED_CIRCLE,
+    subject: `${name}`,
+    message,
+  };
+  return {
+    name: name,
+    condition: "true",
+    actions: sendAlerts(destinations, msg, throttleMinutes),
+  };
+}
+
 export function triggerWhenAggregationBucketsFound(
   name: string,
   aggName: string,
