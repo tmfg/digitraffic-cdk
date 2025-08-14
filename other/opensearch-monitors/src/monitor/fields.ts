@@ -36,20 +36,33 @@ export type CloudfrontField =
   | "httpMethod"
   | "httpStatusCode"
   | "request"
+  | "request.keyword"
   | "subdomain"
   | "timeToFirstByte"
   | "httpHost";
 
 export type HttpUserAgentField = "@fields.http_user_agent";
 
+// prettier-ignore
+export type AlertField =
+  | "alert.id"
+  | "alert.correlation_id.keyword";
+
+// prettier-ignore
+export type DefaultPythonField =
+  | "filename.keyword"
+  | "funcName.keyword";
+
 export type OSLogField =
   | DefaultField
   | DefaultJavaField
   | DefaultLambdaField
+  | DefaultPythonField
   | AppField
   | NginxField
   | CloudfrontField
-  | HttpUserAgentField;
+  | HttpUserAgentField
+  | AlertField;
 
 export enum Bytes {
   KILO = 1000 * 1000,

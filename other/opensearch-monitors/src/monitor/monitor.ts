@@ -1,5 +1,6 @@
 import type { Query, ScriptedMetric, Sort } from "./queries.js";
 import type { OSTrigger } from "./triggers.js";
+import type { TermsAggregate } from "./aggregates.js";
 
 interface OSQueryData {
   readonly size?: number;
@@ -13,7 +14,7 @@ export interface OSMonitor {
   readonly cron: string;
   readonly indices: string[];
   readonly query: OSQueryData;
-  readonly aggregations?: ScriptedMetric;
+  readonly aggregations?: ScriptedMetric | TermsAggregate;
   readonly triggers: OSTrigger[];
 }
 

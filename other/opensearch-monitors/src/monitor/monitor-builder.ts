@@ -1,6 +1,7 @@
 import type { OSLogField } from "./fields.js";
 import type { OSMonitor } from "./monitor.js";
 import type {
+  BoolOrQuery,
   BoolQuery,
   ExistsQuery,
   MatchPhraseQuery,
@@ -8,23 +9,30 @@ import type {
   Query,
   QueryStringQuery,
   RangeQuery,
+  RegExpQuery,
   ScriptedMetric,
   ScriptQuery,
   Sort,
+  WildcardQuery,
 } from "./queries.js";
 import {
   type OSTrigger,
+  triggerAlways,
+  triggerWhenAggregationBucketsFound,
   triggerWhenLineCountOutside,
   triggerWhenLinesFound,
   triggerWhenSumOutside,
 } from "./triggers.js";
+import type { AggregateFilter, TermsAggregate } from "./aggregates.js";
 
 export interface MonitorConfig {
   env: string;
   index: string;
   cron: string;
   rangeInMinutes: number;
+  delayInMinutes?: number;
   phrases: Query[];
+  aggs?: AggregateFilter[];
   slackDestinations: string[];
   throttleMinutes: number;
   messageSubject: string;
@@ -39,6 +47,51 @@ export function matchPhrase(
   query: string,
 ): MatchPhraseQuery {
   return { match_phrase: { [field]: { query } } };
+}
+
+export function matchWildcardPhrase(
+  field: OSLogField,
+  value: string,
+): WildcardQuery {
+  return { wildcard: { [field]: { value } } };
+}
+
+export function matchRegExpPhrase(
+  field: OSLogField,
+  value: string,
+): RegExpQuery {
+  return { regexp: { [field]: { value } } };
+}
+
+export function aggregateTerms(
+  field: OSLogField,
+  { name, bucketFilter, innerAggregate }: {
+    name?: string;
+    bucketFilter?: AggregateFilter;
+    innerAggregate?: TermsAggregate;
+  },
+): TermsAggregate {
+  name = name ?? field.replace(".", "_");
+  return {
+    [name]: {
+      terms: {
+        field: field,
+      },
+      ...(innerAggregate && {
+        aggregations: innerAggregate,
+      }),
+      ...(bucketFilter && {
+        aggregations: {
+          [bucketFilter.name]: {
+            bucket_selector: {
+              buckets_path: bucketFilter.bucketPaths,
+              script: bucketFilter.script,
+            },
+          },
+        },
+      }),
+    },
+  };
 }
 
 /* { "script" : { "script" : "doc['record.metrics.memorySizeMB'].value - doc['record.metrics.maxMemoryUsedMB'].value < 20" }} */
@@ -63,12 +116,27 @@ function bool(must: Query[], mustNot: Query[]): BoolQuery {
   };
 }
 
+export function or(...queries: Query[]): BoolOrQuery {
+  return {
+    bool: {
+      should: queries,
+    },
+  };
+}
+
 function sort(field: OSLogField, order: Order): Sort {
   return { [field]: { order } };
 }
 
-function createTimeRange(minutes: number): RangeQuery {
-  return matchRange("@timestamp", `now-${minutes}m`, null);
+function createTimeRange(
+  minutes: number,
+  minutesTo: number | undefined = undefined,
+): RangeQuery {
+  return matchRange(
+    "@timestamp",
+    `now-${minutes}m`,
+    minutesTo === undefined ? null : `now-${minutesTo}m`,
+  );
 }
 
 /** inclusive range */
@@ -94,11 +162,12 @@ export class OsMonitorBuilder {
   readonly index: string;
   readonly phrases: Query[];
   readonly notPhrases: Query[];
-  readonly aggs: ScriptedMetric;
+  readonly aggs: ScriptedMetric | TermsAggregate;
 
   messageSubject: string;
   messageLink?: string;
   rangeInMinutes: number;
+  delayInMinutes?: number;
   trigger: OSTrigger;
 
   constructor(name: string, config: MonitorConfig) {
@@ -108,6 +177,7 @@ export class OsMonitorBuilder {
     this.index = config.index;
     this.messageSubject = config.messageSubject;
     this.rangeInMinutes = config.rangeInMinutes;
+    this.delayInMinutes = config.delayInMinutes;
     this.phrases = ([] as Query[]).concat(config.phrases);
     this.notPhrases = [];
     this.aggs = {};
@@ -179,6 +249,12 @@ export class OsMonitorBuilder {
     return this;
   }
 
+  delay(minutes: number): this {
+    this.delayInMinutes = minutes;
+
+    return this;
+  }
+
   /**
    * trigger when outside inclusive range
    */
@@ -198,6 +274,30 @@ export class OsMonitorBuilder {
   moreThan(threshold: number = 0): this {
     this.trigger = triggerWhenLinesFound(
       this.name,
+      this.config.slackDestinations,
+      getThrottle(this.config),
+      this.messageSubject,
+      threshold,
+    );
+
+    return this;
+  }
+
+  always(): this {
+    this.trigger = triggerAlways(
+      this.name,
+      this.config.slackDestinations,
+      getThrottle(this.config),
+      this.messageSubject,
+    );
+
+    return this;
+  }
+
+  aggregationBucketsMoreThan(aggName: string, threshold: number = 0): this {
+    this.trigger = triggerWhenAggregationBucketsFound(
+      this.name,
+      aggName,
       this.config.slackDestinations,
       getThrottle(this.config),
       this.messageSubject,
@@ -231,6 +331,18 @@ export class OsMonitorBuilder {
     return this;
   }
 
+  aggregate(agg: TermsAggregate): this {
+    const key = Object.keys(agg)[0];
+    if (key !== undefined) {
+      const val = agg[key];
+      if (val === undefined) {
+        throw new Error(`Aggregate ${key} is undefined`);
+      }
+      this.aggs[key] = val;
+    }
+    return this;
+  }
+
   build(): OSMonitor {
     return {
       name: this.name,
@@ -240,7 +352,7 @@ export class OsMonitorBuilder {
         size: 1,
         query: bool(
           [
-            createTimeRange(this.rangeInMinutes),
+            createTimeRange(this.rangeInMinutes, this.delayInMinutes),
             matchPhrase("env", this.config.env),
             ...this.phrases,
           ],
