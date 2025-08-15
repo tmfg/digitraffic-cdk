@@ -39,7 +39,7 @@
     "constructs": "~10.4.2",
     "ky": "^1.8.2",
     "lodash": "^4.17.21",
-    "zod": "~3.25.67"
+    "zod": "~3.25.76"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",

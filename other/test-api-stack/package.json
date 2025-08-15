@@ -28,7 +28,7 @@
     "@digitraffic/common": "2025.6.27-2",
     "aws-cdk-lib": "^2.211.0",
     "constructs": "~10.4.2",
-    "zod": "~3.25.67"
+    "zod": "~3.25.76"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",

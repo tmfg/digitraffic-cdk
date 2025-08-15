@@ -24,7 +24,7 @@
     "lodash-es": "4.17.21",
     "pg-native": "^3.5.2",
     "pg-promise": "^11.15.0",
-    "zod": "~3.25.67"
+    "zod": "~3.25.76"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
