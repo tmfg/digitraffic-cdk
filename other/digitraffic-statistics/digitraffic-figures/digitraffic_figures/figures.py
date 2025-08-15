@@ -113,8 +113,17 @@ class Figures:
             index="from", columns=["name", "liikennemuoto"], values="value"
         )
 
-        required_rows = 12 + months
-        if len(pivot) < required_rows:
+        # Sort index to ensure rolling window works as expected
+        pivot = pivot.sort_index()
+
+        # Calculate rolling sum for the given number of months
+        rolling_sum = pivot.rolling(window=months, min_periods=months).sum()
+
+        # Drop rows with NaN that result from the rolling window calculation
+        rolling_sum.dropna(inplace=True)
+
+        # We need at least one full year of data plus one row to make a comparison
+        if len(rolling_sum) < 12 + 1:
             return dict(
                 columns=[
                     {
@@ -124,32 +133,15 @@ class Figures:
                 data=[],
             )
 
-        resample = pivot.resample(f"{months}ME", closed="left").sum()
-
-        # For a 12-month comparison, we compare the last period to the one before it.
-        # For shorter periods, we compare to the same period a year ago.
-        periods_in_year = 12 // months
-        lookback_periods = periods_in_year if months < 12 else 1
-
-        if len(resample) < lookback_periods + 1:
-            return dict(
-                columns=[
-                    {
-                        "name": f"<Not enough data for {months}-month year-on-year comparison>"
-                    }
-                ],
-                data=[],
-            )
-
-        latest_period = resample.iloc[-1]
-        previous_period = resample.iloc[-(lookback_periods + 1)]
+        latest_period = rolling_sum.iloc[-1]
+        previous_period = rolling_sum.iloc[-1 - 12]
 
         # Calculate percentage change
         with np.errstate(divide="ignore", invalid="ignore"):
             change = (latest_period - previous_period) / previous_period
             change = change.replace([np.inf, -np.inf], np.nan)
 
-        latest_values = resample.tail(n=1).stack()
+        latest_values = rolling_sum.iloc[[-1]].stack()
 
         change_df = change.to_frame(name=latest_period.name).T
         latest_change = change_df.stack()
