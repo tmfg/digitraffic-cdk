@@ -18,12 +18,12 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.6.27-2",
-    "aws-cdk-lib": "^2.202.0",
+    "aws-cdk-lib": "^2.211.0",
     "constructs": "~10.4.2",
-    "ky": "^1.8.1",
+    "ky": "^1.8.2",
     "lodash-es": "4.17.21",
-    "pg-native": "^3.5.1",
-    "pg-promise": "^11.14.0",
+    "pg-native": "^3.5.2",
+    "pg-promise": "^11.15.0",
     "zod": "~3.25.67"
   },
   "devDependencies": {
@@ -31,15 +31,15 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "^30.0.3",
+    "@jest/globals": "^30.0.5",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.74.0",
-    "@rushstack/heft-jest-plugin": "^0.16.9",
+    "@rushstack/heft": "^0.74.2",
+    "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/lodash-es": "4.17.12",
     "@types/node": "22.15.2",
-    "esbuild": "0.25.5",
+    "esbuild": "0.25.9",
     "eslint": "^8.57.0",
     "typescript": "~5.8.3"
   }

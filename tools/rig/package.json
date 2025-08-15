@@ -10,10 +10,10 @@
     "test": ""
   },
   "dependencies": {
-    "@rushstack/heft": "^0.74.0",
-    "@rushstack/heft-jest-plugin": "^0.16.9",
+    "@rushstack/heft": "^0.74.2",
+    "@rushstack/heft-jest-plugin": "^0.16.11",
     "@rushstack/heft-lint-plugin": "^0.6.1",
-    "@rushstack/heft-typescript-plugin": "^0.9.8",
+    "@rushstack/heft-typescript-plugin": "^0.9.11",
     "eslint": "^8.57.0",
     "typescript": "~5.8.3"
   }

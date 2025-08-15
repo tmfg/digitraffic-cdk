@@ -16,9 +16,9 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.6.27-2",
-    "@aws-sdk/lib-storage": "^3.837.0",
-    "@aws-sdk/client-s3": "^3.837.0",
-    "aws-cdk-lib": "^2.202.0",
+    "@aws-sdk/lib-storage": "^3.864.0",
+    "@aws-sdk/client-s3": "^3.864.0",
+    "aws-cdk-lib": "^2.211.0",
     "aws-sdk": "^2.1692.0",
     "constructs": "~10.4.2"
   },
@@ -27,13 +27,13 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.74.0",
-    "@rushstack/heft-jest-plugin": "^0.16.9",
-    "@types/aws-lambda": "8.10.150",
+    "@rushstack/heft": "^0.74.2",
+    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@types/aws-lambda": "8.10.152",
     "@types/heft-jest": "1.0.6",
     "@types/node": "22.15.2",
     "eslint": "^8.57.0",
-    "jest": "^30.0.3",
+    "jest": "^30.0.5",
     "typescript": "~5.8.3"
   },
   "externals": [

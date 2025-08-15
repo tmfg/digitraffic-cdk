@@ -21,15 +21,15 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.837.0",
+    "@aws-sdk/client-s3": "^3.864.0",
     "@digitraffic/common": "2025.6.27-2",
     "amazon-cognito-identity-js": "6.3.15",
-    "aws-cdk-lib": "^2.202.0",
+    "aws-cdk-lib": "^2.211.0",
     "constructs": "~10.4.2",
     "p-limit": "^6.2.0",
     "pg-native": "^3.5.2",
     "pg-promise": "^11.15.0",
-    "undici": "^7.12.0",
+    "undici": "^7.13.0",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
@@ -38,18 +38,18 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.74.0",
-    "@rushstack/heft-jest-plugin": "^0.16.9",
-    "@types/aws-lambda": "8.10.150",
+    "@rushstack/heft": "^0.74.2",
+    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@types/aws-lambda": "8.10.152",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/node": "22.15.2",
     "@types/xml2js": "0.4.14",
-    "esbuild": "0.25.5",
+    "esbuild": "0.25.9",
     "eslint": "^8.57.0",
-    "jest": "^30.0.3",
+    "jest": "^30.0.5",
     "parallelshell": "^3.0.2",
-    "ts-jest": "^29.4.0",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.8.3"
   }
