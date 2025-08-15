@@ -224,6 +224,65 @@ def create_layout(dash_app, df, figures, logger):
                             )
                         ]
                     ),
+                    html.H2(
+                        children="Muutos 12kk ajalla", style=dict(paddingTop="1em")
+                    ),
+                    html.Div(children=figures.change_in_period_time_frame_12_months()),
+                    dbc.Row(
+                        children=[
+                            dbc.Col(
+                                children=[
+                                    dash_table.DataTable(
+                                        id="table-change-in-period-12-months",
+                                        style_cell=dict(textAlign="left"),
+                                        css=[
+                                            {
+                                                "selector": ".row",
+                                                "rule": "margin: 0; display: block",
+                                            }
+                                        ],
+                                        style_header=dict(
+                                            backgroundColor="black",
+                                            color="white",
+                                            fontWeight="bold",
+                                        ),
+                                        style_data_conditional=[
+                                            {
+                                                "if": dict(
+                                                    filter_query="{Data (muutos-%)} > 0",
+                                                    column_id="Data (muutos-%)",
+                                                ),
+                                                "backgroundColor": "#00cc96",  # green
+                                            },
+                                            {
+                                                "if": dict(
+                                                    filter_query="{Data (muutos-%)} < 0",
+                                                    column_id="Data (muutos-%)",
+                                                ),
+                                                "backgroundColor": "#ef553b",  # red
+                                            },
+                                            {
+                                                "if": dict(
+                                                    filter_query="{Kyselyt (muutos-%)} > 0",
+                                                    column_id="Kyselyt (muutos-%)",
+                                                ),
+                                                "backgroundColor": "#00cc96",  # green
+                                            },
+                                            {
+                                                "if": dict(
+                                                    filter_query="{Kyselyt (muutos-%)} < 0",
+                                                    column_id="Kyselyt (muutos-%)",
+                                                ),
+                                                "backgroundColor": "#ef553b",  # red
+                                            },
+                                        ],
+                                        **figures.change_in_period_12_months(),
+                                    ),
+                                ],
+                                width=7,
+                            )
+                        ]
+                    ),
                     html.H2(children="Käyttäjätiedot", style=dict(paddingTop="1em")),
                     dbc.Row(
                         children=[

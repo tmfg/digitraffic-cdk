@@ -45,24 +45,62 @@ class Figures:
         pivot = dff.pivot(
             index="from", columns=["name", "liikennemuoto"], values="value"
         )
-        dates = pivot.tail(n=6).reset_index()["from"].to_list()
 
-        if len(dates) > 5:
+        # last 15 months
+        if len(pivot) < 15:
+            return "Not enough data for year-on-year comparison"
 
-            p1_from = dates[0].strftime("%d.%m.")
-            p1_to = dates[2].strftime("%d.%m.")
-            p2_from = dates[3].strftime("%d.%m.")
-            p2_to = dates[5].strftime("%d.%m.")
+        dates = pivot.tail(n=15).reset_index()["from"].to_list()
 
-            self.logger.info(
-                f"method=Figures.change_in_period_time_frame took={time.time()-start}"
-            )
-            return f"Verrataan keskenään ajanjaksoja {p1_from}–{p1_to} ja {p2_from}–{p2_to}."
+        # The period from a year ago
+        p1_from = dates[0].strftime("%d.%m.%Y")
+        p1_to = dates[2].strftime("%d.%m.%Y")
+        # The latest period
+        p2_from = dates[12].strftime("%d.%m.%Y")
+        p2_to = dates[14].strftime("%d.%m.%Y")
 
-        else:
-            return f"No data available"
+        self.logger.info(
+            f"method=Figures.change_in_period_time_frame took={time.time()-start}"
+        )
+        return (
+            f"Verrataan keskenään ajanjaksoja {p1_from}–{p1_to} ja {p2_from}–{p2_to}."
+        )
 
-    def change_in_period(self):
+    def change_in_period_time_frame_12_months(self):
+        df = self.df
+        start = time.time()
+
+        dff = df.loc[
+            (df["name"].isin(["Http req", "Bytes out"]))
+            & (df["request_uri"] == "")
+            & (df["liikennemuoto"].isin(["tie", "rata", "meri"])),
+            ["from", "liikennemuoto", "name", "value"],
+        ]
+
+        pivot = dff.pivot(
+            index="from", columns=["name", "liikennemuoto"], values="value"
+        )
+
+        if len(pivot) < 24:
+            return "Not enough data for 12-month year-on-year comparison"
+
+        dates = pivot.tail(n=24).reset_index()["from"].to_list()
+
+        # The period from 2 years ago
+        p1_from = dates[0].strftime("%d.%m.%Y")
+        p1_to = dates[11].strftime("%d.%m.%Y")
+        # The latest 12 month period
+        p2_from = dates[12].strftime("%d.%m.%Y")
+        p2_to = dates[23].strftime("%d.%m.%Y")
+
+        self.logger.info(
+            f"method=Figures.change_in_period_time_frame_12_months took={time.time()-start}"
+        )
+        return (
+            f"Verrataan keskenään ajanjaksoja {p1_from}–{p1_to} ja {p2_from}–{p2_to}."
+        )
+
+    def _generate_change_table(self, months):
         df = self.df
         start = time.time()
 
@@ -74,24 +112,60 @@ class Figures:
         pivot = dff.pivot(
             index="from", columns=["name", "liikennemuoto"], values="value"
         )
-        resample = pivot.tail(n=6).resample("3ME", closed="left").sum()
-        change = resample.pct_change()
+
+        required_rows = 12 + months
+        if len(pivot) < required_rows:
+            return dict(
+                columns=[
+                    {
+                        "name": f"<Not enough data for {months}-month year-on-year comparison>"
+                    }
+                ],
+                data=[],
+            )
+
+        resample = pivot.resample(f"{months}ME", closed="left").sum()
+
+        # For a 12-month comparison, we compare the last period to the one before it.
+        # For shorter periods, we compare to the same period a year ago.
+        periods_in_year = 12 // months
+        lookback_periods = periods_in_year if months < 12 else 1
+
+        if len(resample) < lookback_periods + 1:
+            return dict(
+                columns=[
+                    {
+                        "name": f"<Not enough data for {months}-month year-on-year comparison>"
+                    }
+                ],
+                data=[],
+            )
+
+        latest_period = resample.iloc[-1]
+        previous_period = resample.iloc[-(lookback_periods + 1)]
+
+        # Calculate percentage change
+        with np.errstate(divide="ignore", invalid="ignore"):
+            change = (latest_period - previous_period) / previous_period
+            change = change.replace([np.inf, -np.inf], np.nan)
 
         latest_values = resample.tail(n=1).stack()
-        latest_change = change.tail(n=1).stack()
 
-        if len(latest_values > 0):
+        change_df = change.to_frame(name=latest_period.name).T
+        latest_change = change_df.stack()
+
+        if len(latest_values) > 0:
             latest_values["Kyselyt (Milj.)"] = latest_values["Http req"].apply(
                 lambda x: round(x / MILJ, 2)
             )
             latest_values["Kyselyt (muutos-%)"] = latest_change["Http req"].apply(
-                lambda x: round(x * 100, 2)
+                lambda x: round(x * 100, 2) if pd.notna(x) else "N/A"
             )
             latest_values["Data (Tt)"] = latest_values["Bytes out"].apply(
                 lambda x: round(x / TERA, 2)
             )
             latest_values["Data (muutos-%)"] = latest_change["Bytes out"].apply(
-                lambda x: round(x * 100, 2)
+                lambda x: round(x * 100, 2) if pd.notna(x) else "N/A"
             )
 
             result = (
@@ -100,14 +174,24 @@ class Figures:
                 .rename(columns=dict(liikennemuoto="Liikennemuoto"))
             )
 
-        table = dict(
-            columns=[dict(name=i, id=i) for i in result.columns],
-            data=result.to_dict("records"),
-        )
+            table = dict(
+                columns=[dict(name=i, id=i) for i in result.columns],
+                data=result.to_dict("records"),
+            )
 
-        self.logger.info(f"method=Figures.change_in_period took={time.time()-start}")
+            self.logger.info(
+                f"method=Figures._generate_change_table months={months} took={time.time()-start}"
+            )
 
-        return table
+            return table
+        else:
+            return dict(columns=[{"name": "<ei tietoja valitulta ajalta>"}], data=[])
+
+    def change_in_period(self):
+        return self._generate_change_table(months=3)
+
+    def change_in_period_12_months(self):
+        return self._generate_change_table(months=12)
 
     def top_users_table(
         self,
