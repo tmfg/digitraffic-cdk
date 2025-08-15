@@ -87,8 +87,7 @@ export class MonitoringStack extends Stack {
         conditions: {
           ArnLike: {
             "aws:SourceArn": [
-              `arn:aws:cloudwatch:${this.region}:${this.account}:alarm:*`,
-              `arn:aws:rds:${this.region}:${this.account}:*:*`,
+              `arn:aws:*:${this.region}:${this.account}:*:*`,
             ],
           },
           StringEquals: {

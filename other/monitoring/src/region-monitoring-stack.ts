@@ -4,6 +4,7 @@ import type { Construct } from "constructs";
 import type { MonitoringConfiguration } from "./app-props.js";
 import { CloudfrontMonitoring } from "./cloudfront-monitoring.js";
 import { Route53Monitoring } from "./route53-monitoring.js";
+import { IamMonitoring } from "./iam-monitoring.js";
 
 /**
  * Creates a new stack for all monitoring that must be placed in global region(us-east-1):
@@ -35,5 +36,7 @@ export class RegionMonitoringStack extends Stack {
     if (configuration.route53) {
       new Route53Monitoring(this, topic, configuration.route53);
     }
+
+    new IamMonitoring(this, topic);
   }
 }
