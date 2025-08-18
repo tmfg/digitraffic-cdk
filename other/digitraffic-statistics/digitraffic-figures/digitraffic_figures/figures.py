@@ -15,6 +15,8 @@ TERA = pow(10, 12)
 GIGA = pow(10, 9)
 MILJ = pow(10, 6)
 
+DATE_FORMAT = "%d.%m.%Y"
+
 
 def parse_unidentified(x):
     if isinstance(x, str):
@@ -53,11 +55,11 @@ class Figures:
         dates = pivot.tail(n=15).reset_index()["from"].to_list()
 
         # The period from a year ago
-        p1_from = dates[0].strftime("%d.%m.%Y")
-        p1_to = dates[2].strftime("%d.%m.%Y")
+        p1_from = dates[0].strftime(DATE_FORMAT)
+        p1_to = dates[2].strftime(DATE_FORMAT)
         # The latest period
-        p2_from = dates[12].strftime("%d.%m.%Y")
-        p2_to = dates[14].strftime("%d.%m.%Y")
+        p2_from = dates[12].strftime(DATE_FORMAT)
+        p2_to = dates[14].strftime(DATE_FORMAT)
 
         self.logger.info(
             f"method=Figures.change_in_period_time_frame took={time.time()-start}"
@@ -87,11 +89,11 @@ class Figures:
         dates = pivot.tail(n=24).reset_index()["from"].to_list()
 
         # The period from 2 years ago
-        p1_from = dates[0].strftime("%d.%m.%Y")
-        p1_to = dates[11].strftime("%d.%m.%Y")
+        p1_from = dates[0].strftime(DATE_FORMAT)
+        p1_to = dates[11].strftime(DATE_FORMAT)
         # The latest 12 month period
-        p2_from = dates[12].strftime("%d.%m.%Y")
-        p2_to = dates[23].strftime("%d.%m.%Y")
+        p2_from = dates[12].strftime(DATE_FORMAT)
+        p2_to = dates[23].strftime(DATE_FORMAT)
 
         self.logger.info(
             f"method=Figures.change_in_period_time_frame_12_months took={time.time()-start}"
@@ -113,8 +115,15 @@ class Figures:
             index="from", columns=["name", "liikennemuoto"], values="value"
         )
 
-        # Sort index to ensure rolling window works as expected
+        # Sort index to ensure it's chronological
         pivot = pivot.sort_index()
+
+        # Check for missing months
+        expected_months = pd.date_range(
+            start=pivot.index.min(), end=pivot.index.max(), freq="MS"
+        )
+        if not pivot.index.equals(expected_months):
+            raise ValueError("Missing monthly data in the time series")
 
         # Calculate rolling sum for the given number of months
         rolling_sum = pivot.rolling(window=months, min_periods=months).sum()
@@ -122,8 +131,9 @@ class Figures:
         # Drop rows with NaN that result from the rolling window calculation
         rolling_sum.dropna(inplace=True)
 
-        # We need at least one full year of data plus one row to make a comparison
-        if len(rolling_sum) < 12 + 1:
+        # the rolling sum calculation for the 12 month period is found in 12+1 rows
+        # incomplete periods result in NaN and are stripped above
+        if len(rolling_sum) < 13:
             return dict(
                 columns=[
                     {
