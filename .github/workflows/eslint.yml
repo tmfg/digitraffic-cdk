@@ -14,7 +14,7 @@ jobs:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Git config user
         uses: snow-actions/git-config-user@v1.0.0
         with:
@@ -62,7 +62,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
