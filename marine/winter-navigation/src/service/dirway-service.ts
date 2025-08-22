@@ -5,7 +5,7 @@ import {
 import * as DirwayDB from "../db/dirways.js";
 import type { DTDirway, DTDirwaypoint } from "../model/dt-apidata.js";
 import type { Dirway, Dirwaypoint } from "../model/apidata.js";
-import { groupBy } from "lodash-es";
+import { groupBy } from "es-toolkit/compat";
 
 export function getDirways(): Promise<[DTDirway[], Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {

@@ -1,12 +1,17 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase } from "../db-testutil.js";
-import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
+import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { type DTDirway } from "../../model/dt-apidata.js";
 import { saveAllDirwaypoints, saveAllDirways } from "../../db/dirways.js";
 import { DIRWAY_1, DIRWAYPOINT_1 } from "../service/data-updater.test.js";
+import { jest } from "@jest/globals";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 
-mockProxyHolder();
+// for some reason, mockProxyHolder does not work here!?!
+jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
+  Promise.resolve()
+);
 
 async function insertDirway(db: DTDatabase): Promise<void> {
   await saveAllDirways(db, [DIRWAY_1]);

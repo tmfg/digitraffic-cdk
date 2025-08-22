@@ -20,7 +20,8 @@
     "@digitraffic/common": "2025.8.21-2",
     "aws-cdk-lib": "^2.212.0",
     "constructs": "~10.4.2",
-    "ky": "^1.8.2",
+    "es-toolkit": "1.39.10",
+    "ky": "^1.9.0",
     "pg-native": "^3.5.2",
     "pg-promise": "^11.15.0",
     "zod": "~3.25.76"

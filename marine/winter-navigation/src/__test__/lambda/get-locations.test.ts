@@ -1,6 +1,6 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase } from "../db-testutil.js";
-import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
+import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { saveAllLocations } from "../../db/locations.js";
 import {
   LOCATION_1,
@@ -15,8 +15,13 @@ import {
   saveAllPortSuspensionLocations,
   saveAllPortSuspensions,
 } from "../../db/port-suspensions.js";
+import { jest } from "@jest/globals";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 
-mockProxyHolder();
+// for some reason, mockProxyHolder does not work here!?!
+jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
+  Promise.resolve()
+);
 
 async function insertLocation(db: DTDatabase): Promise<void> {
   await saveAllLocations(db, [LOCATION_1]);

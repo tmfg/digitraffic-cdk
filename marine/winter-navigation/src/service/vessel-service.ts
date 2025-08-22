@@ -6,7 +6,7 @@ import type { DTActivity, DTVessel } from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
 import * as ActivityDB from "../db/activities.js";
 import type { Activity, Vessel } from "../model/apidata.js";
-import { groupBy } from "lodash-es";
+import { groupBy } from "es-toolkit/compat";
 
 export function getVessel(
   vesselId: string,
