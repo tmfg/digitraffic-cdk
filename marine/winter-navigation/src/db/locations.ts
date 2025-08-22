@@ -17,49 +17,57 @@ do update set
     deleted = false
 `;
 
-const SQL_GET_LOCATION = `select id, name, type, locode_list, nationality, latitude, longitude, winterport, deleted
+const SQL_GET_LOCATION =
+  `select id, name, type, locode_list, nationality, latitude, longitude, winterport, deleted
 from wn_location 
 where id = $1`;
 
-const SQL_GET_LOCATIONS = `select id, name, type, locode_list, nationality, latitude, longitude, winterport
+const SQL_GET_LOCATIONS =
+  `select id, name, type, locode_list, nationality, latitude, longitude, winterport
 from wn_location where deleted = false`;
 
 const PS_UPDATE_LOCATIONS = new pgPromise.PreparedStatement({
-    name: "update-locations",
-    text: SQL_UPDATE_LOCATIONS
+  name: "update-locations",
+  text: SQL_UPDATE_LOCATIONS,
 });
 
 const PS_GET_LOCATION = new pgPromise.PreparedStatement({
-    name: "get-location",
-    text: SQL_GET_LOCATION
+  name: "get-location",
+  text: SQL_GET_LOCATION,
 });
 
 const PS_GET_LOCATIONS = new pgPromise.PreparedStatement({
-    name: "get-locations",
-    text: SQL_GET_LOCATIONS
+  name: "get-locations",
+  text: SQL_GET_LOCATIONS,
 });
 
-export async function saveAllLocations(db: DTDatabase, locations: Location[]): Promise<unknown> {
-    return Promise.all(
-        locations.map(async (l) => {
-            return db.any(PS_UPDATE_LOCATIONS, [
-                l.id,
-                l.name,
-                l.type,
-                l.locode_list,
-                l.nationality,
-                l.latitude,
-                l.longitude,
-                l.winterport
-            ]);
-        })
-    );
+export async function saveAllLocations(
+  db: DTDatabase,
+  locations: Location[],
+): Promise<unknown> {
+  return Promise.all(
+    locations.map(async (l) => {
+      return db.any(PS_UPDATE_LOCATIONS, [
+        l.id,
+        l.name,
+        l.type,
+        l.locode_list,
+        l.nationality,
+        l.latitude,
+        l.longitude,
+        l.winterport,
+      ]);
+    }),
+  );
 }
 
-export async function getLocation(db: DTDatabase, locationId: string): Promise<Location | undefined> {
-    return await db.oneOrNone(PS_GET_LOCATION, [locationId]) ?? undefined;
+export async function getLocation(
+  db: DTDatabase,
+  locationId: string,
+): Promise<Location | undefined> {
+  return await db.oneOrNone(PS_GET_LOCATION, [locationId]) ?? undefined;
 }
 
 export async function getLocations(db: DTDatabase): Promise<Location[]> {
-    return db.manyOrNone(PS_GET_LOCATIONS);
+  return db.manyOrNone(PS_GET_LOCATIONS);
 }

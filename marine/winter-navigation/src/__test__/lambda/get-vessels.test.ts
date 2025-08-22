@@ -1,6 +1,6 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase } from "../db-testutil.js";
-import { mockProxyHolder, ExpectResponse } from "@digitraffic-cdk/testing";
+import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { saveAllVessels } from "../../db/vessels.js";
 import { ACTIVITY_1, VESSEL_1 } from "../service/data-updater.test.js";
@@ -10,52 +10,53 @@ import { saveAllActivities } from "../../db/activities.js";
 mockProxyHolder();
 
 async function insertVessel(db: DTDatabase): Promise<void> {
-    await saveAllVessels(db, [VESSEL_1]);
-    await saveAllActivities(db, [ACTIVITY_1]);
+  await saveAllVessels(db, [VESSEL_1]);
+  await saveAllActivities(db, [ACTIVITY_1]);
 }
 
-async function getResponseFromLambda(event: Record<string, string> = {}): Promise<LambdaResponse> {
-    const { handler } = await import("../../lambda/get-vessels/get-vessels.js");
+async function getResponseFromLambda(
+  event: Record<string, string> = {},
+): Promise<LambdaResponse> {
+  const { handler } = await import("../../lambda/get-vessels/get-vessels.js");
 
-    return await handler(event);
+  return await handler(event);
 }
 
 describe(
-    "get-vessels-lambda",
-    dbTestBase((db: DTDatabase) => {
-        test("get all - empty", async () => {
-            const response = await getResponseFromLambda();
+  "get-vessels-lambda",
+  dbTestBase((db: DTDatabase) => {
+    test("get all - empty", async () => {
+      const response = await getResponseFromLambda();
 
-            ExpectResponse.ok(response).expectJson([]);
-        });
+      ExpectResponse.ok(response).expectJson([]);
+    });
 
-        test("get all - one location", async () => {
-            await insertVessel(db);
+    test("get all - one location", async () => {
+      await insertVessel(db);
 
-            const response = await getResponseFromLambda();
+      const response = await getResponseFromLambda();
 
-            ExpectResponse.ok(response).expectContent((vessels: DTVessel[]) => {
-                expect(vessels.length).toEqual(1);
-            });
-        });
+      ExpectResponse.ok(response).expectContent((vessels: DTVessel[]) => {
+        expect(vessels.length).toEqual(1);
+      });
+    });
 
-        test("get one - not found", async () => {
-            const response = await getResponseFromLambda({"vessel-id": "foo"});
+    test("get one - not found", async () => {
+      const response = await getResponseFromLambda({ "vessel-id": "foo" });
 
-            ExpectResponse.notFound(response);
-        });
+      ExpectResponse.notFound(response);
+    });
 
-        test("get one - found", async () => {
-            await insertVessel(db);
+    test("get one - found", async () => {
+      await insertVessel(db);
 
-            const response = await getResponseFromLambda({"vessel-id": "id1"});
+      const response = await getResponseFromLambda({ "vessel-id": "id1" });
 
-            ExpectResponse.ok(response).expectContent((vessel: DTVessel) => {
-                expect(vessel.name).toEqual(VESSEL_1.name);
-                expect(vessel.activities?.length).toEqual(1);
-                expect(vessel.activities![0]!.reason).toEqual(ACTIVITY_1.reason);
-            });
-        });
-
-    })
+      ExpectResponse.ok(response).expectContent((vessel: DTVessel) => {
+        expect(vessel.name).toEqual(VESSEL_1.name);
+        expect(vessel.activities?.length).toEqual(1);
+        expect(vessel.activities![0]!.reason).toEqual(ACTIVITY_1.reason);
+      });
+    });
+  }),
 );

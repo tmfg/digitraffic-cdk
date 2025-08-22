@@ -5,7 +5,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 interface IbnetSecret extends GenericSecret {
-  readonly url: string
+  readonly url: string;
   readonly authHeaderValue: string;
 }
 
