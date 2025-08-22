@@ -1,0 +1,3 @@
+{
+  "app": "node lib/bin/portactivity-app.js"
+}
