@@ -1,3 +1,3 @@
 export interface DbVisit {
-    readonly visit_id: string
+  readonly visit_id: string;
 }

@@ -21,28 +21,28 @@ export class ExpectResponse {
       .expectBody(body);
   }
 
-    static badRequest(response: LambdaResponse): ExpectResponse {
-        return new ExpectResponse(response)
-        .expectStatus(400);
-    }
+  static badRequest(response: LambdaResponse): ExpectResponse {
+    return new ExpectResponse(response)
+      .expectStatus(400);
+  }
 
-    static internalError(response: LambdaResponse): ExpectResponse {
-        return new ExpectResponse(response)
-        .expectStatus(500);
-    }
+  static internalError(response: LambdaResponse): ExpectResponse {
+    return new ExpectResponse(response)
+      .expectStatus(500);
+  }
 
-    static badRequest(response: LambdaResponse): ExpectResponse {
-        return new ExpectResponse(response)
-        .expectStatus(400);
-    }
+  static badRequest(response: LambdaResponse): ExpectResponse {
+    return new ExpectResponse(response)
+      .expectStatus(400);
+  }
 
-    static internalError(response: LambdaResponse): ExpectResponse {
-        return new ExpectResponse(response)
-        .expectStatus(500);
-    }
+  static internalError(response: LambdaResponse): ExpectResponse {
+    return new ExpectResponse(response)
+      .expectStatus(500);
+  }
 
-    expectStatus(expected: number): this {
-        expect(this._response.status).toEqual(expected);
+  expectStatus(expected: number): this {
+    expect(this._response.status).toEqual(expected);
 
     return this;
   }

@@ -10,28 +10,31 @@ const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<PortCallSecret>("port-call");
 
 export const handler = async (): Promise<void> => {
-    const start = Date.now();
+  const start = Date.now();
 
-    try {
-        await proxyHolder.setCredentials();
-        const secret = await secretHolder.get();
+  try {
+    await proxyHolder.setCredentials();
+    const secret = await secretHolder.get();
 
-        const updated = await updateVisits(secret.url, decodeBase64ToAscii(secret.privateKey), decodeBase64ToAscii(secret.certificate));
+    const updated = await updateVisits(
+      secret.url,
+      decodeBase64ToAscii(secret.privateKey),
+      decodeBase64ToAscii(secret.certificate),
+    );
 
-        logger.info({
-            method: "UpdateVisits.handler",
-            customUpdatedCount: updated.updated,
-            customInsertedCount: updated.inserted
-        });
+    logger.info({
+      method: "UpdateVisits.handler",
+      customUpdatedCount: updated.updated,
+      customInsertedCount: updated.inserted,
+    });
+  } catch (error) {
+    logger.debug("got error " + JSON.stringify(error));
 
-    } catch (error) {
-        logger.debug("got error " + JSON.stringify(error));
-
-//        logException(logger, error, true);
-    } finally {
-        logger.info({
-            method: "UpdateVisits.handler",
-            tookMs: Date.now() - start
-        });
-    }
+    //        logException(logger, error, true);
+  } finally {
+    logger.info({
+      method: "UpdateVisits.handler",
+      tookMs: Date.now() - start,
+    });
+  }
 };

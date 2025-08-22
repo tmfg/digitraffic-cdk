@@ -6,31 +6,33 @@ import { getVisit } from "../../service/visit-service.js";
 
 const proxyHolder = ProxyHolder.create();
 interface GetVisitEvent {
-    readonly visitId: string
+  readonly visitId: string;
 }
 
-export const handler = async (event: GetVisitEvent): Promise<LambdaResponse> => {
-    const start = Date.now();
+export const handler = async (
+  event: GetVisitEvent,
+): Promise<LambdaResponse> => {
+  const start = Date.now();
 
-    try {
-        await proxyHolder.setCredentials();
-        const [visit, lastUpdated] = await getVisit(event.visitId);
+  try {
+    await proxyHolder.setCredentials();
+    const [visit, lastUpdated] = await getVisit(event.visitId);
 
-        if(!visit) {
-            return LambdaResponse.notFound();
-        }
-
-        return lastUpdated
-                ? LambdaResponse.okJson(visit).withTimestamp(lastUpdated)
-                : LambdaResponse.okJson(visit);
-    } catch (error) {
-        logException(logger, error, true);
-
-        return LambdaResponse.internalError();
-    } finally {
-        logger.info({
-            method: "GetVisit.handler",
-            tookMs: Date.now() - start
-        });
+    if (!visit) {
+      return LambdaResponse.notFound();
     }
+
+    return lastUpdated
+      ? LambdaResponse.okJson(visit).withTimestamp(lastUpdated)
+      : LambdaResponse.okJson(visit);
+  } catch (error) {
+    logException(logger, error, true);
+
+    return LambdaResponse.internalError();
+  } finally {
+    logger.info({
+      method: "GetVisit.handler",
+      tookMs: Date.now() - start,
+    });
+  }
 };
