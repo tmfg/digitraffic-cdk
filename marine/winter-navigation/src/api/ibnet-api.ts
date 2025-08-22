@@ -4,75 +4,85 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
 
-export type ApiPath = "location" | "restriction" | "vessel" | "activity" | "source" | "port-suspension"
-    | "port-suspension-location" | "queue" | "dirway" | "dirwaypoint";
+export type ApiPath =
+  | "location"
+  | "restriction"
+  | "vessel"
+  | "activity"
+  | "source"
+  | "port-suspension"
+  | "port-suspension-location"
+  | "queue"
+  | "dirway"
+  | "dirwaypoint";
 
 export class IbnetApi {
-    private _baseUrl: string;
-    private _authHeaderValue: string;
+  private _baseUrl: string;
+  private _authHeaderValue: string;
 
-    constructor(baseUrl: string, authHeaderValue: string) {
-        this._baseUrl = baseUrl;
-        this._authHeaderValue = authHeaderValue;
-    }
+  constructor(baseUrl: string, authHeaderValue: string) {
+    this._baseUrl = baseUrl;
+    this._authHeaderValue = authHeaderValue;
+  }
 
-    async fetchFromUrl<T>(url: string): Promise<T> {
-        logger.debug("Fetching from " + url);
-        
-        return ky
-            .get(url, {
-                timeout: 20000,
-                headers: {
-                    Authorization: `Basic ${this._authHeaderValue}`,
-                    Accept: MediaType.APPLICATION_JSON
-                }
-            })            
-            .then(async (resp) => {
-                if (resp.status !== 200) {
-                    logger.error({
-                        method: "IbnetApi.fetchFromUrl",
-                        customStatus: resp.status,
-                        customDetails: resp.statusText
-                    });
+  async fetchFromUrl<T>(url: string): Promise<T> {
+    logger.debug("Fetching from " + url);
 
-                    throw new Error("Fetching failed");
-                }
+    return ky
+      .get(url, {
+        timeout: 20000,
+        headers: {
+          Authorization: `Basic ${this._authHeaderValue}`,
+          Accept: MediaType.APPLICATION_JSON,
+        },
+      })
+      .then(async (resp) => {
+        if (resp.status !== 200) {
+          logger.error({
+            method: "IbnetApi.fetchFromUrl",
+            customStatus: resp.status,
+            customDetails: resp.statusText,
+          });
 
-                return await resp.json<T>();
-            })
-            .catch(error => {
-                logger.debug("error:" + JSON.stringify(error));
-                throw error;
-            });
-    }
-
-    async fetch<T>(path: ApiPath, from: number, to: number): Promise<T[]> {
-        const start = Date.now();
-        const url = `${this._baseUrl}${path}?from=${from}&to=${to}`;
-
-        try {
-            return await this.fetchFromUrl<T[]>(url);
-        } catch (error) {
-            logException(logger, error);
-
-            return [];
-        } finally {
-            logger.info({
-                method: "IbnetApi.fetch",
-                tookMs: Date.now() - start
-            });
+          throw new Error("Fetching failed");
         }
+
+        return await resp.json<T>();
+      })
+      .catch((error) => {
+        logger.debug("error:" + JSON.stringify(error));
+        throw error;
+      });
+  }
+
+  async fetch<T>(path: ApiPath, from: number, to: number): Promise<T[]> {
+    const start = Date.now();
+    const url = `${this._baseUrl}${path}?from=${from}&to=${to}`;
+
+    try {
+      return await this.fetchFromUrl<T[]>(url);
+    } catch (error) {
+      logException(logger, error);
+
+      return [];
+    } finally {
+      logger.info({
+        method: "IbnetApi.fetch",
+        tookMs: Date.now() - start,
+      });
     }
+  }
 
-    async getCurrentVersion(): Promise<number> {
-        try {
-            const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
+  async getCurrentVersion(): Promise<number> {
+    try {
+      const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
 
-            return response.toRv;
-        } catch(error) {
-            logger.debug("got error! " + JSON.stringify(error));
+      return response.toRv;
+    } catch (error) {
+      logException(logger, error);
+      logger.debug("got error! " + JSON.stringify(error));
 
-            return 0;
-        }
+      return -1;
     }
+  }
 }
