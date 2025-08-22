@@ -18,10 +18,12 @@ changes.
 ## Workflow
 
 1. Checkout this repository.
-2. Run install_all.sh to install all projects' dependencies
-3. Cd into your project directory
-4. Execute pnpm run all-watch (compiles TypeScript and bundles Lambdas)
-5. Develop!
+2. Run `pnpm run:hardlink` in ci-project to update properties hardlinks to cdk
+   project
+3. Run install_all.sh to install all projects' dependencies
+4. Cd into your project directory
+5. Execute pnpm run all-watch (compiles TypeScript and bundles Lambdas)
+6. Develop!
 
 One-off builds can also be run with `pnpm build`
 

@@ -70,6 +70,12 @@ case "$ENV" in
   ("parking-test"):
     AWS_PROFILE=<TODO PROFILE>
   ;;
+  ("catalog-prod"):
+  AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("catalog-test"):
+  AWS_PROFILE=<TODO PROFILE>
+  ;;
   ("mcp-prod"):
     AWS_PROFILE=<TODO PROFILE>
   ;;

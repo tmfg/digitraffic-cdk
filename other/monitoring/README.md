@@ -11,6 +11,16 @@ Stack can also be configured to create monitoring for db and mqtt. Please see
 MonitoringConfiguration for more information. For each measure a new alarm is
 created and if alarm is triggered a message will be send to alarm-topic.
 
+Installing stack should create topics
+
+- digitraffic-monitoring-alarms
+  - with subscription to `alarmTopicEmail`
+- digitraffic-monitoring-warnings
+  - with subscription to `warningTopicEmail`
+
+If subscription is not created, you need to change email value deploy and then
+fix back the correct the value and re-deploy.
+
 ### Db-configuration
 
 Currently the following is monitored:
@@ -42,6 +52,7 @@ Cdk bootstrap needst to be done for both regions `eu-west-1` and `us-east-1`
 i.e.
 
 ```
+export AWS_PROFILE=<profile-name>
 npx cdk@latest bootstrap aws://<accountnum>/eu-west-1
 npx cdk@latest bootstrap aws://<accountnum>/us-east-1
 ```
