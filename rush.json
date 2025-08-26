@@ -211,6 +211,12 @@
       "tags": ["cdk", "road"]
     },
     {
+      "packageName": "datex2-upload",
+      "projectFolder": "road/datex2-upload",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "road"]
+    },
+    {
       "packageName": "lam-history",
       "projectFolder": "road/lam-history",
       "decoupledLocalDependencies": ["@digitraffic/common"],
