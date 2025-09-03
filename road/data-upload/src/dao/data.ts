@@ -1,7 +1,7 @@
 import { default as pgPromise } from "pg-promise";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-export interface D2IncomingDb {
+export interface DataIncomingDb {
   data_id: number;
 }
 
@@ -17,17 +17,17 @@ const PS_DELETE_OLD_DATA = new pgPromise.PreparedStatement({
     "delete from data_incoming where created_at < (current_date - interval '7 days')",
 });
 
-export async function insertDatex2(
+export async function insertData(
   db: DTDatabase,
   messageId: string,
   source: string,
   version: string,
   type: string,
-  datex2: string,
+  data: string,
 ): Promise<void> {
-  await db.none(PS_INSERT_DATA, [messageId, source, version, type, datex2]);
+  await db.none(PS_INSERT_DATA, [messageId, source, version, type, data]);
 }
 
-export async function deleteOldDatex2Messages(db: DTDatabase): Promise<void> {
+export async function deleteOldDataMessages(db: DTDatabase): Promise<void> {
   await db.none(PS_DELETE_OLD_DATA);
 }

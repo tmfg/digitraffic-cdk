@@ -1,5 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { deleteOldDatex2Messages, insertDatex2 } from "../dao/data.js";
+import { deleteOldDataMessages, insertData } from "../dao/data.js";
 import {
   inDatabase,
   inDatabaseReadonly,
@@ -15,7 +15,7 @@ const sqs = new SQS({});
 
 export async function deleteOldMessages(): Promise<void> {
   await inDatabase(async (db) => {
-    return await deleteOldDatex2Messages(db);
+    return await deleteOldDataMessages(db);
   });
 }
 
@@ -28,7 +28,7 @@ export async function updateDatex2(
 
   await inDatabaseReadonly((db) => {
     return Promise.all(updateObject.datexIIVersions.map(async (o) => {
-      return await insertDatex2(
+      return await insertData(
         db,
         messageId,
         SOURCES.API,

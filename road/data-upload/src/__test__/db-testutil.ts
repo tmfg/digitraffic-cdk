@@ -15,13 +15,14 @@ function truncate(db: DTDatabase): Promise<void> {
   });
 }
 
-export async function assertD2Count(
+export async function assertDataCount(
   db: DTDatabase,
   expectedCount: number,
+  status?: string,
 ): Promise<void> {
-  const d2Count: Countable = await db.one(
-    "select count(*) as count from data_incoming",
-  );
+  const sql =
+    "select count(*) as count from data_incoming where ($1 is null or status=$1)";
+  const dataCount: Countable = await db.one(sql, [status]);
 
-  expect(d2Count.count).toEqual(expectedCount);
+  expect(dataCount.count).toEqual(expectedCount);
 }

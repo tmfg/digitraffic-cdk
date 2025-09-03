@@ -1,8 +1,8 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertD2Count, dbTestBase } from "./db-testutil.js";
+import { assertDataCount, dbTestBase } from "./db-testutil.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { jest } from "@jest/globals";
-import { insertDatex2 } from "../dao/data.js";
+import { insertData } from "../dao/data.js";
 
 async function getResponseFromLambda(): Promise<void> {
   const { handler } = await import(
@@ -21,24 +21,24 @@ describe(
     test("delete, no data", async () => {
       await getResponseFromLambda();
 
-      await assertD2Count(db, 0);
+      await assertDataCount(db, 0);
     });
 
     test("delete, not old", async () => {
-      await insertDatex2(db, "test1", "TEST", "v1", "TEST", "TEST");
+      await insertData(db, "test1", "TEST", "v1", "TEST", "TEST");
       await getResponseFromLambda();
 
-      await assertD2Count(db, 1);
+      await assertDataCount(db, 1);
     });
 
     test("delete", async () => {
-      await insertDatex2(db, "test1", "TEST", "v1", "TEST", "TEST");
+      await insertData(db, "test1", "TEST", "v1", "TEST", "TEST");
       await db.none(
         "update data_incoming set created_at = (current_date - interval '10 days')",
       );
       await getResponseFromLambda();
 
-      await assertD2Count(db, 0);
+      await assertDataCount(db, 0);
     });
   }),
 );

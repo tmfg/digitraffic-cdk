@@ -1,5 +1,5 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertD2Count, dbTestBase } from "./db-testutil.js";
+import { assertDataCount, dbTestBase } from "./db-testutil.js";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { ERRORS } from "../lambda/upload-datex2/upload-datex2.js";
@@ -35,7 +35,7 @@ describe(
         .expectStatus(400)
         .expectBody(ERRORS.MISSING_BODY);
 
-      await assertD2Count(db, 0);
+      await assertDataCount(db, 0);
     });
 
     test("empty payload", async () => {
@@ -47,7 +47,7 @@ describe(
         .expectStatus(400)
         .expectBody(ERRORS.INVALID_PAYLOAD);
 
-      await assertD2Count(db, 0);
+      await assertDataCount(db, 0);
     });
 
     test("invalid payload", async () => {
@@ -57,7 +57,7 @@ describe(
         .expectStatus(400)
         .expectBody(ERRORS.INVALID_PAYLOAD);
 
-      await assertD2Count(db, 0);
+      await assertDataCount(db, 0);
     });
 
     test("valid payload", async () => {
@@ -67,7 +67,7 @@ describe(
 
       ExpectResponse.ok(response);
 
-      await assertD2Count(db, 1);
+      await assertDataCount(db, 1);
     });
   }),
 );
