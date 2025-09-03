@@ -1,0 +1,54 @@
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { LambdaIntegration, type Resource } from "aws-cdk-lib/aws-apigateway";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+
+export class IntegrationApi {
+  readonly restApi: DigitrafficRestApi;
+  private uploadDatex2Resource!: Resource;
+
+  constructor(stack: DigitrafficStack, d2Queue: Queue) {
+    this.restApi = new DigitrafficRestApi(
+      stack,
+      "Data-Integration",
+      "Data integration API",
+    );
+
+    this.createResourcePaths();
+    this.createDatex2V1Handler(stack, d2Queue);
+
+    this.restApi.createUsagePlanV2("Integration API");
+  }
+
+  createResourcePaths(): void {
+    const uploadResource = this.restApi.root.addResource("upload");
+    const v1Resource = uploadResource.addResource("v1");
+
+    this.uploadDatex2Resource = v1Resource.addResource("datex2");
+  }
+
+  createDatex2V1Handler(stack: DigitrafficStack, d2Queue: Queue): void {
+    const environment = {
+      ...stack.createLambdaEnvironment(),
+      QUEUE_URL: d2Queue.queueUrl,
+    };
+
+    const uploadDatexV1Handler = MonitoredDBFunction.create(
+      stack,
+      "upload-datex2",
+      environment,
+      {
+        memorySize: 256,
+      },
+    );
+
+    this.uploadDatex2Resource.addMethod(
+      "PUT",
+      new LambdaIntegration(uploadDatexV1Handler),
+      {
+        apiKeyRequired: true,
+      },
+    );
+  }
+}
