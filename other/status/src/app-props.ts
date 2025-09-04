@@ -21,11 +21,11 @@ export interface MonitoredEndpoint {
 }
 
 export interface MonitoredApp {
-  readonly name: string; // i.e. Road
-  readonly hostPart: string;
-  readonly url: string;
-  readonly endpoints: MonitoredEndpoint[];
-  readonly excluded: string[];
+  readonly name: string; // e.g. Road
+  readonly hostPart: string; // e.g. https://tie.digitraffic.fi
+  readonly url: string; // e.g. https://tie.digitraffic.fi/swagger/
+  readonly endpoints: MonitoredEndpoint[]; // e.g. [{ name: "Road MQTT", url: "wss://tie.digitraffic.fi/mqtt", protocol: EndpointProtocol.WebSocket }]
+  readonly excluded: string[]; // e.g. ["/api/variable-sign/v1/signs/history", "/api/maintenance/v1/tracking/routes"]
 }
 
 export interface Props {

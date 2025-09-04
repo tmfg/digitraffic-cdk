@@ -6,7 +6,12 @@ import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
  */
 export function removeAppAndTrim(text: string): string {
   for (
-    const appName of [TrafficType.ROAD, TrafficType.MARINE, TrafficType.RAIL]
+    const appName of [
+      TrafficType.ROAD,
+      TrafficType.MARINE,
+      TrafficType.RAIL,
+      TrafficType.PARKING,
+    ]
   ) {
     const app = appName.toLowerCase();
     if (

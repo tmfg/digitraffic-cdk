@@ -7,7 +7,7 @@ import {
 export const monitoredApps: MonitoredApp[] = [
   {
     name: "Road",
-    hostPart: "tie",
+    hostPart: "https://tie.digitraffic.fi",
     url: "https://tie.digitraffic.fi/swagger/openapi.json",
     excluded: [
       // query parameter required
@@ -86,7 +86,7 @@ export const monitoredApps: MonitoredApp[] = [
   },
   {
     name: "Marine",
-    hostPart: "meri",
+    hostPart: "https://meri.digitraffic.fi",
     url: "https://meri.digitraffic.fi/swagger/openapi.json",
     excluded: [],
     endpoints: [
@@ -104,7 +104,7 @@ export const monitoredApps: MonitoredApp[] = [
   },
   {
     name: "Rail",
-    hostPart: "rata",
+    hostPart: "https://rata.digitraffic.fi",
     url: "https://rata.digitraffic.fi/swagger/openapi.json",
     excluded: [],
     endpoints: [
@@ -176,6 +176,34 @@ export const monitoredApps: MonitoredApp[] = [
         method: EndpointHttpMethod.GET,
         contentstring: "false",
         invert: true,
+      },
+    ],
+  },
+  {
+    name: "Parking",
+    hostPart: "https://parking.fintraffic.fi",
+    url: "https://parking-test.fintraffic.fi/v3/api-docs",
+    excluded: [
+      // "/api/v1/utilizations",
+      // "/api/v1/regions",
+      "/api/v1/regions/withHubs", // 403
+      "/api/v1/regions/withFacilities", // 403
+      // "/api/v1/operators",
+      // "/api/v1/hubs",
+      // "/api/v1/facilities",
+      "/api/v1/facilities/summary", // This is not yet at production
+      // "/api/v1/contacts",
+    ],
+    endpoints: [
+      {
+        name: "Parking UI ",
+        url: "https://parking.fintraffic.fi/hubs",
+        protocol: EndpointProtocol.HTTP,
+      },
+      {
+        name: "Parking Swagger UI",
+        url: "https://parking.fintraffic.fi/swagger/swagger-ui/index.html",
+        protocol: EndpointProtocol.HTTP,
       },
     ],
   },

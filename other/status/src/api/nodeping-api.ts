@@ -367,7 +367,7 @@ export class NodePingApi {
     const data: NodePingCheckPostPutData = {
       label: endpoint.includes(appName) ? endpoint : `${appName} ${endpoint}`,
       type,
-      target: extraData?.url ?? `https://${hostPart}.digitraffic.fi${endpoint}`,
+      target: extraData?.url ?? `${hostPart}${endpoint}`,
       interval: this.checkIntervalMinutes,
       threshold: this.checkTimeoutSeconds,
       enabled: true,

@@ -472,9 +472,7 @@ async function testCreateNodepingCheck(
         }
 
         expect(postData.target).toEqual(
-          extraData?.url
-            ? extraData?.url
-            : `https://${hostPart}.digitraffic.fi${endpoint}`,
+          extraData?.url ? extraData?.url : `${hostPart}${endpoint}`,
         );
 
         if (extraData?.method) {

@@ -310,7 +310,7 @@ describe("StatusServiceTest", () => {
 
     const app = {
       name: "Road",
-      hostPart: "tie",
+      hostPart: "https://road",
       url: "https://road/swagger.json",
       endpoints: [] satisfies MonitoredEndpoint[],
       excluded: [] satisfies string[],
@@ -366,7 +366,7 @@ describe("StatusServiceTest", () => {
 
     const app = {
       name: "Road",
-      hostPart: "tie",
+      hostPart: "https://road",
       url: "https://road/swagger.json",
       endpoints: [] satisfies MonitoredEndpoint[],
       excluded: [] satisfies string[],

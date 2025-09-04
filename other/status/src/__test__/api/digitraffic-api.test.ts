@@ -132,7 +132,7 @@ describe("DigitrafficApiTest", () => {
 
     const monitoredApp = {
       name: "Road",
-      hostPart: "tie",
+      hostPart: "https://road",
       url: `http://localhost:${SERVER_PORT}/swagger/openapi.json`,
       excluded,
       endpoints: extraEndpointValues,
