@@ -2,7 +2,11 @@ import { default as pgPromise } from "pg-promise";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export interface DataIncomingDb {
-  data_id: number;
+  readonly data_id: number;
+  readonly source: string;
+  readonly version: string;
+  readonly type: string;
+  readonly data: string;
 }
 
 const PS_INSERT_DATA = new pgPromise.PreparedStatement({
@@ -15,6 +19,13 @@ const PS_DELETE_OLD_DATA = new pgPromise.PreparedStatement({
   name: "delete-old-data",
   text:
     "delete from data_incoming where created_at < (current_date - interval '7 days')",
+});
+
+const PS_NEW_DATA = new pgPromise.PreparedStatement({
+  name: "get-new-data",
+  text: `select data_id, source, version, type, data
+from data_incoming
+where source = $1 and type = $2 and status = 'NEW'`,
 });
 
 export async function insertData(
@@ -30,4 +41,12 @@ export async function insertData(
 
 export async function deleteOldDataMessages(db: DTDatabase): Promise<void> {
   await db.none(PS_DELETE_OLD_DATA);
+}
+
+export async function getNewData(
+  db: DTDatabase,
+  source: string,
+  type: string,
+): Promise<DataIncomingDb[]> {
+  return await db.manyOrNone(PS_NEW_DATA, [source, type]);
 }

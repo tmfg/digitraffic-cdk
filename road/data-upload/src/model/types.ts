@@ -3,5 +3,7 @@ export const SOURCES = {
 } as const;
 
 export const TYPES = {
-  VS: "VS",
+  VS_DATEX2_XML: "VS_DATEX2_XML",
 } as const;
+
+export type DataStatus = "NEW" | "FAILED" | "PROCESSED";
