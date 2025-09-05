@@ -2399,8 +2399,18 @@
 }
 .swagger-ui .sans-serif {
   font-family:
-    -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica, helvetica
-    neue, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+    -apple-system,
+    BlinkMacSystemFont,
+    avenir next,
+    avenir,
+    helvetica,
+    helvetica neue,
+    ubuntu,
+    roboto,
+    noto,
+    segoe ui,
+    arial,
+    sans-serif;
 }
 .swagger-ui .serif {
   font-family: georgia, serif;
@@ -8471,7 +8481,7 @@
   width: 100%;
 }
 .swagger-ui table.model tbody tr td {
-  padding: 0;
+  padding: 0 0 0 1em;
   vertical-align: top;
 }
 .swagger-ui table.model tbody tr td:first-of-type {
