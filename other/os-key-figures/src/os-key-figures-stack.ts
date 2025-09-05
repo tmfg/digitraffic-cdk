@@ -17,7 +17,7 @@ import {
   type FunctionProps,
   Runtime,
 } from "aws-cdk-lib/aws-lambda";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { transportType } from "./constants.js";
 
@@ -118,6 +118,7 @@ export class OsKeyFiguresStack extends Stack {
     );
 
     const functionName = "CreateKeyFigureVisualizations";
+    const logGroup = createLambdaLogGroup(this, functionName);
     const lambdaConf: FunctionProps = {
       role: lambdaRole,
       functionName: functionName,
@@ -125,7 +126,7 @@ export class OsKeyFiguresStack extends Stack {
       handler: "create-visualizations.handler",
       runtime: Runtime.NODEJS_22_X,
       timeout: Duration.minutes(15),
-      logRetention: RetentionDays.ONE_YEAR,
+      logGroup: logGroup,
       vpc: vpc,
       securityGroups: [lambdaSecurityGroup],
       memorySize: 512,
@@ -180,6 +181,7 @@ export class OsKeyFiguresStack extends Stack {
     );
 
     const functionName = "CollectOsKeyFigures";
+    const logGroup = createLambdaLogGroup(this, functionName);
     const lambdaConf: FunctionProps = {
       role: lambdaRole,
       functionName: functionName,
@@ -187,7 +189,7 @@ export class OsKeyFiguresStack extends Stack {
       handler: "collect-os-key-figures.handler",
       runtime: Runtime.NODEJS_22_X,
       timeout: Duration.minutes(15),
-      logRetention: RetentionDays.ONE_YEAR,
+      logGroup: logGroup,
       vpc: vpc,
       securityGroups: [lambdaSecurityGroup],
       memorySize: 512,

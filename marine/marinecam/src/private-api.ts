@@ -9,6 +9,7 @@ import {
 import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import {
   getResponse,
@@ -384,13 +385,21 @@ export class PrivateApi {
       [MarinecamEnvKeys.USERPOOL_ID]: userPool.userPoolId,
       [MarinecamEnvKeys.POOLCLIENT_ID]: userPoolClient.userPoolClientId,
     };
+    const logGroup = createLambdaLogGroup(this.stack, functionName);
 
     const authFunction = MonitoredFunction.create(
       this.stack,
       functionName,
-      lambdaFunctionProps(this.stack, environment, functionName, "authorizer", {
-        timeout: 10,
-      }),
+      lambdaFunctionProps(
+        this.stack,
+        environment,
+        functionName,
+        "authorizer",
+        logGroup,
+        {
+          timeout: 10,
+        },
+      ),
     );
 
     return new RequestAuthorizer(this.stack, "images-authorizer", {

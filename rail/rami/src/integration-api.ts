@@ -1,6 +1,7 @@
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { attachQueueToApiGatewayResource } from "@digitraffic/common/dist/aws/infra/sqs-integration";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import {
   MonitoredDBFunction,
   MonitoredFunction,
@@ -57,12 +58,14 @@ export class IntegrationApi {
   ): MonitoredDBFunction {
     const activeResource = resource.addResource("message");
     const functionName = "RAMI-UploadRamiRosmMessage";
+    const logGroup = createLambdaLogGroup(stack, functionName);
     const uploadLambda = MonitoredFunction.create(stack, functionName, {
       functionName,
       timeout: Duration.seconds(15),
       memorySize: 256,
       code: new AssetCode("dist/lambda/upload-rosm-message"),
       handler: "upload-rosm-message.handler",
+      logGroup: logGroup,
       runtime: Runtime.NODEJS_20_X,
       reservedConcurrentExecutions: 20,
       environment: {

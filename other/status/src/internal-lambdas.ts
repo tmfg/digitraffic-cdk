@@ -1,10 +1,10 @@
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { Duration, type Stack } from "aws-cdk-lib";
 import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { type ISecret, Secret } from "aws-cdk-lib/aws-secretsmanager";
 import type { ITopic } from "aws-cdk-lib/aws-sns";
 import type { Props } from "./app-props.js";
@@ -77,6 +77,7 @@ function createUpdateStatusesLambda(
   const environment: LambdaEnvironment = createCommonEnv(props);
 
   const functionName = "Status-UpdateStatuses";
+  const logGroup = createLambdaLogGroup(stack, functionName);
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     code: new AssetCode("dist/lambda/update-status"),
@@ -85,7 +86,7 @@ function createUpdateStatusesLambda(
     memorySize: 256,
     timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
     environment,
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: logGroup,
     reservedConcurrentExecutions: 1,
   };
 
@@ -114,6 +115,7 @@ function createHandleMaintenanceLambda(
   const functionName = "Status-HandleMaintenance" as const;
 
   const environment = createCommonEnv(props);
+  const logGroup = createLambdaLogGroup(stack, functionName);
 
   const lambdaConf: FunctionProps = {
     functionName: functionName,
@@ -123,7 +125,7 @@ function createHandleMaintenanceLambda(
     memorySize: 256,
     timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
     environment,
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: logGroup,
     reservedConcurrentExecutions: 1,
   };
 
@@ -151,6 +153,7 @@ function createCheckComponentStatesLambda(
 ): void {
   const functionName = "Status-CheckComponentStates";
   const environment = createCommonEnv(props);
+  const logGroup = createLambdaLogGroup(stack, functionName);
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     code: new AssetCode("dist/lambda/check-component-states"),
@@ -159,7 +162,7 @@ function createCheckComponentStatesLambda(
     memorySize: 256,
     timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
     environment,
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: logGroup,
     reservedConcurrentExecutions: 1,
   };
 
@@ -189,6 +192,8 @@ function createTestSlackNotifyLambda(
 
   const environment = createCommonEnv(props);
 
+  const logGroup = createLambdaLogGroup(stack, functionName);
+
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     code: new AssetCode("dist/lambda/test-slack-notify"),
@@ -197,7 +202,7 @@ function createTestSlackNotifyLambda(
     memorySize: 128,
     timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
     environment,
-    logRetention: RetentionDays.ONE_MONTH,
+    logGroup: logGroup,
     reservedConcurrentExecutions: 1,
   };
 

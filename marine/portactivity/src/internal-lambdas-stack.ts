@@ -6,6 +6,7 @@ import {
   databaseFunctionProps,
   defaultLambdaConfiguration,
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
@@ -237,6 +238,7 @@ function createUpdateTimestampsFromSchedules(
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
   environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig
     .enableETBForAllPorts.toString();
+  const logGroup = createLambdaLogGroup(stack, functionName);
   const lambda = MonitoredFunction.create(
     stack,
     functionName,
@@ -245,6 +247,7 @@ function createUpdateTimestampsFromSchedules(
       timeout: 10,
       code: new AssetCode("dist/lambda/update-timestamps-from-schedules"),
       handler: "lambda-update-timestamps-from-schedules.handler",
+      logGroup: logGroup,
       environment,
       memorySize: 256,
       reservedConcurrentExecutions: 1,
@@ -289,9 +292,10 @@ function createProcessDLQLambda(
   environment[PortactivityEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
 
   const functionName = "PortActivity-ProcessTimestampsDLQ";
+  const logGroup = createLambdaLogGroup(stack, functionName);
   const processDLQLambda = MonitoredFunction.create(stack, functionName, {
     runtime: Runtime.NODEJS_22_X,
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: logGroup,
     functionName: functionName,
     code: new AssetCode("dist/lambda/process-dlq"),
     timeout: Duration.seconds(10),
@@ -333,11 +337,13 @@ function createUpdateAwakeAiETXTimestampsLambda(
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
   environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig
     .enableETBForAllPorts.toString();
+  const logGroup = createLambdaLogGroup(stack, functionName);
   const lambdaConf = databaseFunctionProps(
     stack,
     environment,
     functionName,
     lambdaName,
+    logGroup,
     {
       timeout: 30,
       reservedConcurrentExecutions: 20,
@@ -358,11 +364,13 @@ function createUpdateAwakeAiATXTimestampsLambda(
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
   const functionName = "PortActivity-UpdateAwakeAiATXTimestamps";
+  const logGroup = createLambdaLogGroup(stack, functionName);
   const lambdaConf = databaseFunctionProps(
     stack,
     environment,
     functionName,
     "update-awake-ai-atx-timestamps",
+    logGroup,
     {
       timeout: 40,
       memorySize: 256,
