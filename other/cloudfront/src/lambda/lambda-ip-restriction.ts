@@ -1,5 +1,5 @@
 import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
-import { createAndLogError } from "../lambda-util.js";
+import { createAndLogError } from "./header-util.js";
 
 const ALLOWED_IPS = "EXT_IP".split(",");
 

@@ -11,6 +11,8 @@ export type PortactivityConfiguration = StackConfiguration & {
   readonly dlqNotificationDuration: Duration;
   readonly dbClusterIdentifier: string;
   readonly documentationBucketName: string;
+  readonly cloudfrontArn: string;
+  readonly cloudfrontCanonicalId?: string;
   readonly awakeETD: boolean;
   readonly enableETBForAllPorts: boolean;
 };

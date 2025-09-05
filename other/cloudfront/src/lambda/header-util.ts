@@ -1,3 +1,5 @@
+import type { CloudfrontResponse } from "./function-events.js";
+
 interface Response {
   headers: Record<
     string,
@@ -16,7 +18,31 @@ export const AC_HEADERS = {
   EXPOSE_HEADERS: "access-control-expose-headers",
 } as const;
 
-export function addCorsHeaders(response: Response): void {
+export function addCorsHeadersToFunctionResponse(
+  response: CloudfrontResponse,
+): void {
+  const responseHeaders = response.headers;
+
+  responseHeaders[AC_HEADERS.ALLOW_ORIGIN] = {
+    value: "*",
+  };
+
+  responseHeaders[AC_HEADERS.ALLOW_METHODS] = {
+    value: "GET, POST, OPTIONS",
+  };
+
+  responseHeaders[AC_HEADERS.ALLOW_HEADERS] = {
+    value:
+      "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Digitraffic-User",
+  };
+
+  responseHeaders[AC_HEADERS.EXPOSE_HEADERS] = {
+    value:
+      "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Digitraffic-User",
+  };
+}
+
+export function addCorsHeadersToLambdaResponse(response: Response): void {
   const responseHeaders = response.headers;
   responseHeaders[AC_HEADERS.ALLOW_ORIGIN] = [
     {

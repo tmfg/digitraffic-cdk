@@ -2,6 +2,7 @@ import { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/sta
 
 export interface LamHistoryProps extends StackConfiguration {
   readonly bucketName: string;
-  readonly cloudFrontCanonicalUser: string;
+  readonly cloudfrontCanonicalUser?: string;
+  readonly cloudfrontDistributionArn?: string;
   readonly description?: string;
 }

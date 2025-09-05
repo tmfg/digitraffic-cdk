@@ -1,4 +1,7 @@
-import { addCorsHeaders, createAndLogError } from "../lambda-util.js";
+import {
+  addCorsHeadersToLambdaResponse,
+  createAndLogError,
+} from "./header-util.js";
 import type { CloudFrontResponseHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";
@@ -30,7 +33,7 @@ export const handler: CloudFrontResponseHandler = (
     const response = record.cf.response;
 
     if (request.method === "GET") {
-      addCorsHeaders(response);
+      addCorsHeadersToLambdaResponse(response);
     }
 
     callback(null, response);

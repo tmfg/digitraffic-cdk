@@ -27,24 +27,26 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.6.16-1",
-    "aws-cdk-lib": "^2.211.0",
+    "@digitraffic/common": "2025.6.27-2",
+    "aws-cdk-lib": "^2.210.0",
     "constructs": "^10.4.2"
   },
   "devDependencies": {
+    "@aws-sdk/client-api-gateway": "3.855.0",
+    "@aws-sdk/client-ssm": "3.855.0",
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "^30.0.5",
     "@rushstack/eslint-config": "^3.7.1",
-    "@rushstack/heft": "^0.74.2",
-    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@rushstack/heft": "^0.74.1",
+    "@rushstack/heft-jest-plugin": "^0.16.10",
     "@types/aws-lambda": "8.10.152",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/node": "22.15.2",
-    "esbuild": "0.25.9",
+    "esbuild": "0.25.8",
     "eslint": "^8.57.1",
     "jest": "^30.0.5",
     "jest-each": "^30.0.5",
@@ -53,12 +55,12 @@
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "rollup": "~4.46.2",
+    "rollup": "^4.46.1",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.6",
     "globby": "^14.1.0",
-    "@rollup/plugin-typescript": "~12.1.4"
+    "@rollup/plugin-typescript": "^12.1.4"
   }
 }

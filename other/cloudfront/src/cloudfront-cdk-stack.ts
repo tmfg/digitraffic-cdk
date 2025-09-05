@@ -29,7 +29,7 @@ import { createDistribution } from "./distribution-util.js";
 import { LambdaHolder } from "./lambda-holder.js";
 import { createOriginConfig } from "./origin-configs.js";
 import {
-  createHistoryPath,
+  createHistoryRedirectFunction,
   createIndexHtml,
   createRedirectFunction,
   FunctionType,
@@ -41,7 +41,7 @@ import {
   createLamHeaders,
   createLamRedirect,
   createWeathercamHttpHeaders,
-  createWeathercamRedirect,
+  createWeathercamRewrite,
   LambdaType,
 } from "./util/lambda-creator.js";
 
@@ -174,7 +174,7 @@ export class CloudfrontCdkStack extends Stack {
       } else {
         lambdaMap.addLambda(
           LambdaType.WEATHERCAM_REDIRECT,
-          createWeathercamRedirect(
+          createWeathercamRewrite(
             this,
             edgeLambdaRole,
             lParameters.weathercamDomainName,
@@ -230,7 +230,7 @@ export class CloudfrontCdkStack extends Stack {
     if (types.functionTypes.has(FunctionType.HISTORY_REDIRECT)) {
       lambdaMap.addFunction(
         FunctionType.HISTORY_REDIRECT,
-        createHistoryPath(this),
+        createHistoryRedirectFunction(this),
       );
     }
 

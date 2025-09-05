@@ -11,8 +11,10 @@ export interface Props extends StackConfiguration {
   readonly bucketName: string;
   // S3 VPC endpoint id
   readonly s3VpcEndpointId?: string;
-  // Canonical User ID if the Swagger bucket is served through CloudFront
-  readonly cloudFrontCanonicalUser?: string;
+  // Canonical User ID if the Swagger bucket is served with Cloudfront OAI
+  readonly cloudfrontCanonicalUser?: string;
+  /// Cloudfront distribution arn, if the bucket is server with Cloufront OAC
+  readonly cloudfrontArn?: string;
   // Move generated files into a directory, instead of the bucket root
   readonly directory?: string;
   // Host to use as endpoint for HTTP calls from Swagger

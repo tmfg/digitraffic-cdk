@@ -136,8 +136,8 @@ function addRealtimeLogging(
 
   if (bucketLogging) {
     const { bucket, prefix } = bucketLogging;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
     const alias = distributionProps.aliasNames[0] ?? "default";
+
     distributionCf.addPropertyOverride(
       "DistributionConfig.Logging.Bucket",
       bucket,

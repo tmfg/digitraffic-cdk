@@ -1,7 +1,4 @@
-import type {
-  CloudfrontEvent,
-  CloudfrontResponse,
-} from "./function-redirect-history.js";
+import type { CloudfrontEvent, CloudfrontResponse } from "./function-events.js";
 
 const RESPONSE = {
   statusCode: 302,

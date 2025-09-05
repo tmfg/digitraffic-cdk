@@ -14,6 +14,10 @@ import {
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { Canaries } from "./canaries-stack.js";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import {
+  grantOACRights,
+  grantOAIRights,
+} from "@digitraffic/common/dist/aws/infra/bucket-policy";
 
 export class PortActivityStack extends DigitrafficStack {
   readonly portActivityConfig: PortactivityConfiguration;
@@ -41,10 +45,22 @@ export class PortActivityStack extends DigitrafficStack {
 
     new Canaries(this, queueAndDLQ.dlq, publicApi, this.secret);
 
-    new Bucket(this, "DocumentationBucket", {
+    const swaggerBucket = new Bucket(this, "DocumentationBucket", {
       bucketName: config.documentationBucketName,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
+
+    grantOACRights({
+      bucket: swaggerBucket,
+      distributionArn: config.cloudfrontArn,
+    });
+
+    if (config.cloudfrontCanonicalId) {
+      grantOAIRights({
+        bucket: swaggerBucket,
+        canonicalUserId: config.cloudfrontCanonicalId,
+      });
+    }
   }
 
   createRdsProxy(secret: ISecret, clusterIdentifier: string): void {

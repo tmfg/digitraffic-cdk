@@ -1,11 +1,17 @@
-import type { Stack } from "aws-cdk-lib";
-import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
+import {
+  Function as CloudfrontFunction,
+  FunctionCode,
+  FunctionRuntime,
+} from "aws-cdk-lib/aws-cloudfront";
+import type { Construct } from "constructs";
 import fs from "node:fs";
 
 export enum FunctionType {
   INDEX_HTML,
   HISTORY_REDIRECT,
   REDIRECT,
+  PATH_REWRITE,
+  HTTP_HEADERS,
 }
 
 function readFunctionBody(fileName: string): string {
@@ -19,35 +25,70 @@ function readFunctionBody(fileName: string): string {
   return body.toString();
 }
 
-export function createIndexHtml(stack: Stack): Cloudfront.Function {
+export function createIndexHtml(scope: Construct): CloudfrontFunction {
   const body = readFunctionBody("dist/lambda/function-index-html.cjs");
 
-  return createCloudfrontFunction(stack, "index-html", body);
+  return createCloudfrontFunction(scope, "index-html", body);
 }
 
-export function createHistoryPath(stack: Stack): Cloudfront.Function {
+export function createHistoryRedirectFunction(
+  scope: Construct,
+): CloudfrontFunction {
   const body = readFunctionBody("dist/lambda/function-redirect-history.cjs");
 
-  return createCloudfrontFunction(stack, "history-redirect", body);
+  return createCloudfrontFunction(scope, "history-redirect", body);
 }
 
 export function createRedirectFunction(
-  stack: Stack,
+  scope: Construct,
   redirectUrl: string,
-): Cloudfront.Function {
+): CloudfrontFunction {
   const body = readFunctionBody("dist/lambda/function-redirect.cjs")
     .replace(/EXT_REDIRECT_URL/gi, redirectUrl);
 
-  return createCloudfrontFunction(stack, "redirect-function", body);
+  return createCloudfrontFunction(scope, "redirect-function", body);
 }
 
+export function createPathRewriteFunction(
+  scope: Construct,
+  pathRemoveCount: number,
+): CloudfrontFunction {
+  const body = readFunctionBody("dist/lambda/function-rewrite-uri.cjs")
+    .replace(/EXT_PATHS_TO_REMOVE/gi, pathRemoveCount.toString());
+
+  return createCloudfrontFunction(
+    scope,
+    "rewrite-uri-function-" + pathRemoveCount,
+    body,
+  );
+}
+
+export function createHttpHeadersFunction(
+  scope: Construct,
+): CloudfrontFunction {
+  const body = readFunctionBody("dist/lambda/function-http-headers.cjs");
+
+  return createCloudfrontFunction(scope, "http-headers-function", body);
+}
+
+// let's make a chain of dependencies from the functions, as AWS won't allow deploying many functions at the same time!
+let lastFunction: CloudfrontFunction;
+
 export function createCloudfrontFunction(
-  stack: Stack,
+  scope: Construct,
   functionName: string,
   functionBody: string,
-): Cloudfront.Function {
-  return new Cloudfront.Function(stack, functionName, {
-    code: Cloudfront.FunctionCode.fromInline(functionBody),
-    runtime: Cloudfront.FunctionRuntime.JS_2_0,
+): CloudfrontFunction {
+  const newFunction = new CloudfrontFunction(scope, functionName, {
+    code: FunctionCode.fromInline(functionBody),
+    runtime: FunctionRuntime.JS_2_0,
   });
+
+  if (lastFunction) {
+    newFunction.node.addDependency(lastFunction);
+  }
+
+  lastFunction = newFunction;
+
+  return newFunction;
 }

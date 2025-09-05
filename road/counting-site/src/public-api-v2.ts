@@ -24,6 +24,7 @@ import {
   travelModesSchema,
   valueSchema,
 } from "./model/v2/json-schemas.js";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 const COUNTING_SITE_TAGS_V2 = ["Counting site V2"];
 
@@ -36,7 +37,11 @@ export class PublicApiV2 {
       "CountingSite-public-v2",
       "Counting Site Public API V2",
     );
-    this.publicApi.createUsagePlan("CS V2 Api Key", "CS Usage Plan");
+    const apiKeyId = this.publicApi.createUsagePlan(
+      "CS V2 Api Key",
+      "CS Usage Plan",
+    );
+    this.exportApi(stack, apiKeyId);
 
     const v2Resource = this.createResources(this.publicApi);
 
@@ -46,6 +51,19 @@ export class PublicApiV2 {
     this.createValuesEndpoint(stack, v2Resource);
     this.createCsvValuesEndpoint(stack, v2Resource);
     this.createSitesEndpoint(stack, v2Resource);
+  }
+
+  exportApi(stack: DigitrafficStack, apiKeyId: string): void {
+    new StringParameter(stack, "export.endpoint", {
+      parameterName:
+        `/digitraffic/${stack.configuration.shortName}/endpointUrl`,
+      stringValue: this.publicApi.url,
+    });
+
+    new StringParameter(stack, "export.apiKeyId", {
+      parameterName: `/digitraffic/${stack.configuration.shortName}/apiKeyId`,
+      stringValue: apiKeyId,
+    });
   }
 
   createResources(publicApi: DigitrafficRestApi): Resource {

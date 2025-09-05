@@ -1,12 +1,12 @@
 import { handler } from "../../lambda/function-redirect.js";
+import { createCloudfrontEvent } from "./request-util.js";
 
 test("Function recognises correct url", () => {
-  const reply = handler({
-    request: {
-      uri: "/anything",
-    },
-  });
+  const reply = handler(
+    createCloudfrontEvent("/anything"),
+  );
+
   expect(reply.statusCode).toEqual(302);
-  expect(reply.headers.location.value).toEqual("EXT_REDIRECT_URL");
+  // eslint-disable-next-line dot-notation
+  expect(reply.headers["location"]!.value).toEqual("EXT_REDIRECT_URL");
 });
-export {};

@@ -21,7 +21,9 @@ export class NauticalWarningsStack extends DigitrafficStack {
     super(scope, id, configuration);
 
     new InternalLambdas(this);
+
     const publicApi = new PublicApi(this);
+
     new Canaries(this, publicApi);
   }
 }

@@ -3,7 +3,7 @@ import {
   openapiOperation,
   type OpenApiSchema,
 } from "@digitraffic/common/dist/types/openapi-schema";
-import _ from "lodash";
+import { cloneDeep, merge } from "lodash-es";
 import {
   logger,
   type LoggerMethodType,
@@ -66,7 +66,7 @@ export function constructSwagger(spec: object): string {
 }
 
 export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
-  return allApis.reduce((acc, curr) => _.merge(acc, curr));
+  return allApis.reduce((acc, curr) => merge(acc, curr));
 }
 
 function methodIsDeprecated(operation: OpenApiOperation): boolean {
@@ -93,7 +93,7 @@ function isOperation(value: any): value is OpenApiOperation {
 export function withDeprecations(
   paths: OpenApiSchema["paths"],
 ): OpenApiSchema["paths"] {
-  const result = _.cloneDeep(paths);
+  const result = cloneDeep(paths);
 
   Object.values(result).forEach((pathItem) => {
     Object.values(pathItem)
@@ -111,7 +111,7 @@ export function withDeprecations(
 export function withoutSecurity(
   paths: OpenApiSchema["paths"],
 ): OpenApiSchema["paths"] {
-  const result = _.cloneDeep(paths);
+  const result = cloneDeep(paths);
 
   Object.values(result).forEach((pathItem) => {
     Object.values(pathItem)
@@ -133,7 +133,7 @@ export function withoutMethods(
   paths: OpenApiSchema["paths"],
   keyTest: (key: string) => boolean,
 ): OpenApiSchema["paths"] {
-  const result = _.cloneDeep(paths);
+  const result = cloneDeep(paths);
 
   Object.values(result).forEach((pathItem) => {
     Object.keys(pathItem).forEach((key) => {
@@ -156,28 +156,27 @@ export function withoutMethods(
 export function withoutApisWithoutHttpMethods(
   paths: OpenApiSchema["paths"],
 ): OpenApiSchema["paths"] {
-  const result = _.cloneDeep(paths);
+  const result = cloneDeep(paths);
   const method =
     `${SERVICE}."withoutApisWithoutHttpMethods` as const satisfies LoggerMethodType;
   try {
-    return _.chain(result)
-      .toPairs()
-      .filter(([path, pathItem]) => {
-        const pathItemKeys = Object.keys(pathItem);
-        // Check that pathItemKeys contains at least one http method, otherwise delete path
-        const containsHttpMethod = pathItemKeys.some((m) =>
-          HttpMethods.includes(m as HttpMethod)
-        );
-        logger.info({
-          method,
-          message: `path: ${path}, pathItemKeys: ${
-            pathItemKeys.join(",")
-          }, containsHttpMethod: ${containsHttpMethod}`,
-        });
-        return containsHttpMethod;
-      })
-      .fromPairs()
-      .value();
+    return Object.fromEntries(
+      Object.entries(result)
+        .filter(([path, pathItem]) => {
+          const pathItemKeys = Object.keys(pathItem);
+          // Check that pathItemKeys contains at least one http method, otherwise delete path
+          const containsHttpMethod = pathItemKeys.some((m) =>
+            HttpMethods.includes(m as HttpMethod)
+          );
+          logger.info({
+            method,
+            message: `path: ${path}, pathItemKeys: ${
+              pathItemKeys.join(",")
+            }, containsHttpMethod: ${containsHttpMethod}`,
+          });
+          return containsHttpMethod;
+        }),
+    );
   } catch (error) {
     logger.error({
       method,

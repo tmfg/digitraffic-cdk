@@ -41,6 +41,8 @@ export class PublicApi {
 
     this.createResources(this.publicApi);
     this.createEndpoint(stack);
+
+    this.publicApi.exportEndpoint();
   }
 
   createResources(publicApi: DigitrafficRestApi): void {

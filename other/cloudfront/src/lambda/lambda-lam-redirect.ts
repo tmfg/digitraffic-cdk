@@ -19,7 +19,7 @@ import queryStringHelper, {
   type ParsedUrlQueryInput,
 } from "querystring";
 import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
-import { createAndLogError } from "../lambda-util.js";
+import { createAndLogError } from "./header-util.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 setEnvVariable(EnvKeys.SECRET_ID, "road");

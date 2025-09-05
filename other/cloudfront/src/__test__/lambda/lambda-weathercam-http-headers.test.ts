@@ -2,7 +2,7 @@ import {
   lastModifiedHeader,
   xAmzLastModifiedHeader,
   xAmzLastModifiedHeaderUpper,
-} from "../../lambda-util.js";
+} from "../../lambda/header-util.js";
 import { handler } from "../../lambda/lambda-weathercam-http-headers.js";
 import { createHeader } from "./request-util.js";
 import { expectResponse, responseHandlerCall } from "./response-util.js";

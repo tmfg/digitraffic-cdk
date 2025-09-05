@@ -1,11 +1,30 @@
 import type {
+  Callback,
   CloudFrontHeaders,
   CloudFrontRequest,
   CloudFrontRequestEvent,
   CloudFrontRequestHandler,
+  CloudFrontRequestResult,
   Context,
 } from "aws-lambda";
 import { jest } from "@jest/globals";
+import type { CloudfrontEvent } from "../../lambda/function-events.js";
+
+export function createCloudfrontEvent(
+  uri: string,
+  method: string = "GET",
+): CloudfrontEvent {
+  return {
+    request: {
+      uri,
+      method,
+    },
+    response: {
+      statusCode: 200,
+      headers: {},
+    },
+  };
+}
 
 export type MockedRequest = jest.MockedFunction<
   (...args: unknown[]) => unknown
@@ -16,7 +35,7 @@ export async function requestHandlerCall(
   request: Partial<CloudFrontRequest>,
 ): Promise<MockedRequest> {
   const context = {} as unknown as Context;
-  const callback = jest.fn();
+  const callback = jest.fn() as Callback<CloudFrontRequestResult>;
   const event = {
     Records: [{
       cf: {
@@ -43,6 +62,7 @@ export function headersWithAcceptEncoding(value: string): CloudFrontHeaders {
 export interface ExpectedRequest {
   readonly method: string;
   readonly uri?: string;
+  readonly querystring?: string;
   readonly origin?: boolean;
   readonly headers?: Record<string, string | false>;
 }
@@ -60,6 +80,12 @@ export function expectRequest(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(cb.mock.calls[0][1].uri).toEqual(expected.uri);
   }
+
+  if (expected.querystring) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    expect(cb.mock.calls[0][1].querystring).toEqual(expected.querystring);
+  }
+
   if (expected.origin !== undefined && expected.origin === false) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(cb.mock.calls[0][1].origin).not.toBeDefined();

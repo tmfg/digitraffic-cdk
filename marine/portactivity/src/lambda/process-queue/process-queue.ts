@@ -4,7 +4,7 @@ import {
 } from "../../service/timestamps.js";
 import { validateTimestamp } from "../../service/timestamp-validation.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
-import type { SQSEvent } from "aws-lambda";
+import type { Handler, SQSEvent } from "aws-lambda";
 import {
   type DTDatabase,
   inDatabase,
@@ -72,6 +72,6 @@ export function handlerFn(): (
   };
 }
 
-export const handler = middy(handlerFn()).use(
+export const handler: Handler = middy(handlerFn()).use(
   sqsPartialBatchFailureMiddleware(),
 );

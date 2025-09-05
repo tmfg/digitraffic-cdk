@@ -1,7 +1,7 @@
 import {
   addWeathercamImageLastModifiedHeaderFromXAmzMeta,
   createAndLogError,
-} from "../lambda-util.js";
+} from "./header-util.js";
 import type { CloudFrontResponseHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";

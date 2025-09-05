@@ -8,7 +8,7 @@ import type {
 } from "aws-lambda";
 import { jest } from "@jest/globals";
 import { createHeader } from "./request-util.js";
-import { AC_HEADERS } from "../../lambda-util.js";
+import { AC_HEADERS } from "../../lambda/header-util.js";
 
 type MockedResponse = jest.MockedFunction<(...args: unknown[]) => unknown>;
 

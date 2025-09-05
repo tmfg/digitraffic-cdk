@@ -9,6 +9,10 @@ import {
 } from "aws-cdk-lib/aws-iam";
 import { type Construct } from "constructs";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import {
+  grantOACRights,
+  grantOAIRights,
+} from "@digitraffic/common/dist/aws/infra/bucket-policy";
 
 export class SwaggerJoinerStack extends DigitrafficStack {
   constructor(scope: Construct, id: string, swaggerJoinerProps: Props) {
@@ -53,17 +57,19 @@ export class SwaggerJoinerStack extends DigitrafficStack {
       getObjectStatement.addAnyPrincipal();
       bucket.addToResourcePolicy(getObjectStatement);
     }
-    if (props.cloudFrontCanonicalUser) {
-      bucket.addToResourcePolicy(
-        new PolicyStatement({
-          effect: Effect.ALLOW,
-          actions: ["s3:GetObject"],
-          principals: [
-            new CanonicalUserPrincipal(props.cloudFrontCanonicalUser),
-          ],
-          resources: [`${bucket.bucketArn}/*`],
-        }),
-      );
+
+    if (props.cloudfrontArn) {
+      grantOACRights({
+        bucket,
+        distributionArn: props.cloudfrontArn,
+      });
+    }
+
+    if (props.cloudfrontCanonicalUser) {
+      grantOAIRights({
+        bucket,
+        canonicalUserId: props.cloudfrontCanonicalUser,
+      });
     }
 
     return bucket;

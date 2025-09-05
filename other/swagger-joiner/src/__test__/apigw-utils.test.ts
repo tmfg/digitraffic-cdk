@@ -1,6 +1,6 @@
 import { APIGatewayClient } from "@aws-sdk/client-api-gateway";
 import { jest } from "@jest/globals";
-import _ from "lodash";
+import { get } from "lodash-es";
 
 const mockSend = jest.fn(() => Promise.resolve({ items: [] }));
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -17,8 +17,8 @@ const TEST_API_ID = "some-api-id" as const;
 function expectAGCall(expectedClass: string, expected: unknown): void {
   expect(mockSend).toHaveBeenCalled();
 
-  const parameterClass = _.get(mockSend.mock.calls[0], "[0].constructor.name");
-  const input = _.get(mockSend.mock.calls[0], "[0].input");
+  const parameterClass = get(mockSend.mock.calls[0], "[0].constructor.name");
+  const input = get(mockSend.mock.calls[0], "[0].input");
 
   expect(parameterClass).toEqual(expectedClass);
   expect(input).toEqual(expected);

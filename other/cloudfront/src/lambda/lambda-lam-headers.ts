@@ -6,7 +6,7 @@ import type {
 } from "aws-lambda";
 import type { Callback, CloudFrontRequest, Context } from "aws-lambda";
 import queryStringHelper from "querystring";
-import { createAndLogError } from "../lambda-util.js";
+import { createAndLogError } from "./header-util.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const HEADERS = {

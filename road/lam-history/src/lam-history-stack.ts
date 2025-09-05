@@ -9,6 +9,10 @@ import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 import type { Construct } from "constructs";
 import type { LamHistoryProps } from "./app-props.js";
 import { InternalLambdas } from "./internal-lambdas.js";
+import {
+  grantOACRights,
+  grantOAIRights,
+} from "@digitraffic/common/dist/aws/infra/bucket-policy";
 
 export class LamHistoryStack extends DigitrafficStack {
   private readonly appProps: LamHistoryProps;
@@ -39,16 +43,19 @@ export class LamHistoryStack extends DigitrafficStack {
     });
 
     // Allow read from cloudfront
-    bucket.addToResourcePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: ["s3:GetObject"],
-        principals: [
-          new CanonicalUserPrincipal(this.appProps.cloudFrontCanonicalUser),
-        ],
-        resources: [`${bucket.bucketArn}/*`],
-      }),
-    );
+    if (this.appProps.cloudfrontDistributionArn) {
+      grantOACRights({
+        bucket,
+        distributionArn: this.appProps.cloudfrontDistributionArn,
+      });
+    }
+
+    if (this.appProps.cloudfrontCanonicalUser) {
+      grantOAIRights({
+        bucket,
+        canonicalUserId: this.appProps.cloudfrontCanonicalUser,
+      });
+    }
 
     // Upload data
     new BucketDeployment(this, "LamHistoryFiles", {

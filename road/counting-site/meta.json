@@ -36724,6 +36724,96 @@
           "path": "path",
           "kind": "require-call",
           "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
         }
       ],
       "exports": [],
@@ -37095,12 +37185,18 @@
         "../../common/temp/node_modules/.pnpm/@smithy+smithy-client@4.4.9/node_modules/@smithy/smithy-client/dist-cjs/index.js": {
           "bytesInOutput": 22869
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/util.js": {
+          "bytesInOutput": 2023
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/common.js": {
           "bytesInOutput": 421
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/validator.js": {
+          "bytesInOutput": 12716
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/parseJsonBody.js": {
           "bytesInOutput": 2084
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/xmlparser/OptionsBuilder.js": {
+          "bytesInOutput": 1713
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/JsonShapeDeserializer.js": {
           "bytesInOutput": 4173
         },
@@ -37347,6 +37443,7 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+client-sso@3.855.0/node_modules/@aws-sdk/client-sso/dist-cjs/runtimeConfig.shared.js": {
           "bytesInOutput": 2199
         },
+        "../../common/temp/node_modules/.pnpm/@aws-sdk+region-config-resolver@3.775.0/node_modules/@aws-sdk/region-config-resolver/dist-cjs/index.js": {
         "../../common/temp/node_modules/.pnpm/@smithy+util-defaults-mode-node@4.0.25/node_modules/@smithy/util-defaults-mode-node/dist-cjs/index.js": {
           "bytesInOutput": 5172
         },
@@ -37362,12 +37459,17 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/auth/httpAuthSchemeProvider.js": {
           "bytesInOutput": 1971
         },
+        "../../common/temp/node_modules/.pnpm/async@3.2.6/node_modules/async/dist/async.js": {
+          "bytesInOutput": 63365
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/EndpointParameters.js": {
           "bytesInOutput": 835
         },
+        "../../common/temp/node_modules/.pnpm/node-ttl@0.2.0/node_modules/node-ttl/ttl.js": {
+          "bytesInOutput": 6568
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/package.json": {
           "bytesInOutput": 4733
         },
+        "../../common/temp/node_modules/.pnpm/assert-options@0.8.2/node_modules/assert-options/dist/src/types.js": {
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/ruleset.js": {
           "bytesInOutput": 2848
         },
@@ -37731,6 +37833,7 @@
         "../../common/temp/node_modules/.pnpm/pg-native@3.5.1/node_modules/pg-native/package.json": {
           "bytesInOutput": 1553
         },
+        "../../common/temp/node_modules/.pnpm/spex@3.4.0/node_modules/spex/lib/utils/static.js": {
         "../../common/temp/node_modules/.pnpm/pg-native@3.5.1/node_modules/pg-native/index.js": {
           "bytesInOutput": 7960
         },
@@ -39467,6 +39570,96 @@
           "path": "path",
           "kind": "require-call",
           "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
         }
       ],
       "exports": [],
@@ -39628,6 +39821,8 @@
         "../../common/temp/node_modules/.pnpm/@smithy+core@3.7.2/node_modules/@smithy/core/dist-es/submodules/schema/schemas/Schema.js": {
           "bytesInOutput": 306
         },
+        "../../common/temp/node_modules/.pnpm/@smithy+util-endpoints@3.0.2/node_modules/@smithy/util-endpoints/dist-cjs/index.js": {
+          "bytesInOutput": 19357
         "../../common/temp/node_modules/.pnpm/@smithy+core@3.7.2/node_modules/@smithy/core/dist-es/submodules/schema/schemas/ListSchema.js": {
           "bytesInOutput": 875
         },
@@ -40102,9 +40297,13 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+client-sso@3.855.0/node_modules/@aws-sdk/client-sso/dist-cjs/index.js": {
           "bytesInOutput": 26478
         },
+        "../../common/temp/node_modules/.pnpm/async@3.2.6/node_modules/async/dist/async.js": {
+          "bytesInOutput": 63365
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/auth/httpAuthSchemeProvider.js": {
           "bytesInOutput": 1971
         },
+        "../../common/temp/node_modules/.pnpm/node-ttl@0.2.0/node_modules/node-ttl/ttl.js": {
+          "bytesInOutput": 6568
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/EndpointParameters.js": {
           "bytesInOutput": 835
         },
@@ -40168,6 +40367,7 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/endpoint/EndpointParameters.js": {
           "bytesInOutput": 971
         },
+        "../../common/temp/node_modules/.pnpm/assert-options@0.8.2/node_modules/assert-options/dist/src/types.js": {
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/endpoint/ruleset.js": {
           "bytesInOutput": 4926
         },
@@ -40468,6 +40668,7 @@
         "../../common/temp/node_modules/.pnpm/pg-native@3.5.1/node_modules/pg-native/lib/build-result.js": {
           "bytesInOutput": 2432
         },
+        "../../common/temp/node_modules/.pnpm/spex@3.4.0/node_modules/spex/lib/utils/static.js": {
         "../../common/temp/node_modules/.pnpm/pg-native@3.5.1/node_modules/pg-native/lib/copy-stream.js": {
           "bytesInOutput": 3434
         },
@@ -42216,6 +42417,96 @@
           "path": "path",
           "kind": "require-call",
           "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
         }
       ],
       "exports": [],
@@ -42587,12 +42878,18 @@
         "../../common/temp/node_modules/.pnpm/@smithy+smithy-client@4.4.9/node_modules/@smithy/smithy-client/dist-cjs/index.js": {
           "bytesInOutput": 22869
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/util.js": {
+          "bytesInOutput": 2023
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/common.js": {
           "bytesInOutput": 421
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/validator.js": {
+          "bytesInOutput": 12716
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/parseJsonBody.js": {
           "bytesInOutput": 2084
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/xmlparser/OptionsBuilder.js": {
+          "bytesInOutput": 1713
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/JsonShapeDeserializer.js": {
           "bytesInOutput": 4173
         },
@@ -42839,6 +43136,7 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+client-sso@3.855.0/node_modules/@aws-sdk/client-sso/dist-cjs/runtimeConfig.shared.js": {
           "bytesInOutput": 2199
         },
+        "../../common/temp/node_modules/.pnpm/@aws-sdk+region-config-resolver@3.775.0/node_modules/@aws-sdk/region-config-resolver/dist-cjs/index.js": {
         "../../common/temp/node_modules/.pnpm/@smithy+util-defaults-mode-node@4.0.25/node_modules/@smithy/util-defaults-mode-node/dist-cjs/index.js": {
           "bytesInOutput": 5172
         },
@@ -42854,12 +43152,17 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/auth/httpAuthSchemeProvider.js": {
           "bytesInOutput": 1971
         },
+        "../../common/temp/node_modules/.pnpm/async@3.2.6/node_modules/async/dist/async.js": {
+          "bytesInOutput": 63365
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/EndpointParameters.js": {
           "bytesInOutput": 835
         },
+        "../../common/temp/node_modules/.pnpm/node-ttl@0.2.0/node_modules/node-ttl/ttl.js": {
+          "bytesInOutput": 6568
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/package.json": {
           "bytesInOutput": 4733
         },
+        "../../common/temp/node_modules/.pnpm/assert-options@0.8.2/node_modules/assert-options/dist/src/types.js": {
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/ruleset.js": {
           "bytesInOutput": 2848
         },
@@ -43271,6 +43574,7 @@
         "../../common/temp/node_modules/.pnpm/pg-promise@11.14.0_pg-native@3.5.1_pg-query-stream@4.8.1_pg@8.16.3_pg-native@3.5.1__/node_modules/pg-promise/lib/utils/public.js": {
           "bytesInOutput": 4069
         },
+        "../../common/temp/node_modules/.pnpm/spex@3.4.0/node_modules/spex/lib/utils/static.js": {
         "../../common/temp/node_modules/.pnpm/pg-promise@11.14.0_pg-native@3.5.1_pg-query-stream@4.8.1_pg@8.16.3_pg-native@3.5.1__/node_modules/pg-promise/lib/tx-mode.js": {
           "bytesInOutput": 2905
         },
@@ -44955,6 +45259,96 @@
           "path": "path",
           "kind": "require-call",
           "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
         }
       ],
       "exports": [],
@@ -45110,6 +45504,8 @@
         "../../common/temp/node_modules/.pnpm/@smithy+core@3.7.2/node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js": {
           "bytesInOutput": 1885
         },
+        "../../common/temp/node_modules/.pnpm/@smithy+util-endpoints@3.0.2/node_modules/@smithy/util-endpoints/dist-cjs/index.js": {
+          "bytesInOutput": 19362
         "../../common/temp/node_modules/.pnpm/@smithy+core@3.7.2/node_modules/@smithy/core/dist-es/submodules/schema/schemas/Schema.js": {
           "bytesInOutput": 306
         },
@@ -45326,9 +45722,13 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/common.js": {
           "bytesInOutput": 421
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/util.js": {
+          "bytesInOutput": 2023
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/parseJsonBody.js": {
           "bytesInOutput": 2084
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/validator.js": {
+          "bytesInOutput": 12705
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/JsonShapeDeserializer.js": {
           "bytesInOutput": 4173
         },
@@ -45578,6 +45978,7 @@
         "../../common/temp/node_modules/.pnpm/@smithy+util-defaults-mode-node@4.0.25/node_modules/@smithy/util-defaults-mode-node/dist-cjs/index.js": {
           "bytesInOutput": 5172
         },
+        "../../common/temp/node_modules/.pnpm/@aws-sdk+region-config-resolver@3.775.0/node_modules/@aws-sdk/region-config-resolver/dist-cjs/index.js": {
         "../../common/temp/node_modules/.pnpm/@aws-sdk+client-sso@3.855.0/node_modules/@aws-sdk/client-sso/dist-cjs/runtimeConfig.js": {
           "bytesInOutput": 3786
         },
@@ -45593,12 +45994,17 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/EndpointParameters.js": {
           "bytesInOutput": 835
         },
+        "../../common/temp/node_modules/.pnpm/async@3.2.6/node_modules/async/dist/async.js": {
+          "bytesInOutput": 63371
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/package.json": {
           "bytesInOutput": 4733
         },
+        "../../common/temp/node_modules/.pnpm/node-ttl@0.2.0/node_modules/node-ttl/ttl.js": {
+          "bytesInOutput": 6565
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/ruleset.js": {
           "bytesInOutput": 2848
         },
+        "../../common/temp/node_modules/.pnpm/assert-options@0.8.2/node_modules/assert-options/dist/src/types.js": {
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/endpoint/endpointResolver.js": {
           "bytesInOutput": 920
         },
@@ -45959,6 +46365,7 @@
         "../../common/temp/node_modules/.pnpm/pg-native@3.5.1/node_modules/pg-native/package.json": {
           "bytesInOutput": 1553
         },
+        "../../common/temp/node_modules/.pnpm/spex@3.4.0/node_modules/spex/lib/utils/static.js": {
         "../../common/temp/node_modules/.pnpm/pg-native@3.5.1/node_modules/pg-native/index.js": {
           "bytesInOutput": 7958
         },
@@ -47727,6 +48134,96 @@
           "path": "path",
           "kind": "require-call",
           "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "os",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "util",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
         }
       ],
       "exports": [],
@@ -47918,6 +48415,7 @@
         "../../common/temp/node_modules/.pnpm/@smithy+core@3.7.2/node_modules/@smithy/core/dist-es/submodules/serde/parse-utils.js": {
           "bytesInOutput": 8040
         },
+        "../../common/temp/node_modules/.pnpm/@smithy+middleware-stack@4.0.2/node_modules/@smithy/middleware-stack/dist-cjs/index.js": {
         "../../common/temp/node_modules/.pnpm/@smithy+core@3.7.2/node_modules/@smithy/core/dist-es/submodules/serde/date-utils.js": {
           "bytesInOutput": 9403
         },
@@ -48095,12 +48593,18 @@
         "../../common/temp/node_modules/.pnpm/@smithy+smithy-client@4.4.9/node_modules/@smithy/smithy-client/dist-cjs/index.js": {
           "bytesInOutput": 22869
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/util.js": {
+          "bytesInOutput": 2023
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/common.js": {
           "bytesInOutput": 421
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/validator.js": {
+          "bytesInOutput": 12705
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/parseJsonBody.js": {
           "bytesInOutput": 2084
         },
+        "../../common/temp/node_modules/.pnpm/fast-xml-parser@4.4.1/node_modules/fast-xml-parser/src/xmlparser/OptionsBuilder.js": {
+          "bytesInOutput": 1713
         "../../common/temp/node_modules/.pnpm/@aws-sdk+core@3.855.0/node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/JsonShapeDeserializer.js": {
           "bytesInOutput": 4173
         },
@@ -48344,6 +48848,7 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+client-sso@3.855.0/node_modules/@aws-sdk/client-sso/dist-cjs/endpoint/endpointResolver.js": {
           "bytesInOutput": 1020
         },
+        "../../common/temp/node_modules/.pnpm/@aws-sdk+region-config-resolver@3.775.0/node_modules/@aws-sdk/region-config-resolver/dist-cjs/index.js": {
         "../../common/temp/node_modules/.pnpm/@aws-sdk+client-sso@3.855.0/node_modules/@aws-sdk/client-sso/dist-cjs/runtimeConfig.shared.js": {
           "bytesInOutput": 2199
         },
@@ -48383,12 +48888,17 @@
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/auth/httpAuthExtensionConfiguration.js": {
           "bytesInOutput": 1610
         },
+        "../../common/temp/node_modules/.pnpm/async@3.2.6/node_modules/async/dist/async.js": {
+          "bytesInOutput": 63383
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeExtensions.js": {
           "bytesInOutput": 1411
         },
+        "../../common/temp/node_modules/.pnpm/node-ttl@0.2.0/node_modules/node-ttl/ttl.js": {
+          "bytesInOutput": 6565
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/SSOOIDCClient.js": {
           "bytesInOutput": 3284
         },
+        "../../common/temp/node_modules/.pnpm/assert-options@0.8.2/node_modules/assert-options/dist/src/types.js": {
         "../../common/temp/node_modules/.pnpm/@aws-sdk+nested-clients@3.855.0/node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/models/SSOOIDCServiceException.js": {
           "bytesInOutput": 592
         },
@@ -48785,6 +49295,7 @@
         "../../common/temp/node_modules/.pnpm/pg-promise@11.14.0_pg-native@3.5.1_pg-query-stream@4.8.1_pg@8.16.3_pg-native@3.5.1__/node_modules/pg-promise/lib/events.js": {
           "bytesInOutput": 15585
         },
+        "../../common/temp/node_modules/.pnpm/spex@3.4.0/node_modules/spex/lib/utils/static.js": {
         "../../common/temp/node_modules/.pnpm/pg-promise@11.14.0_pg-native@3.5.1_pg-query-stream@4.8.1_pg@8.16.3_pg-native@3.5.1__/node_modules/pg-promise/lib/special-query.js": {
           "bytesInOutput": 872
         },

@@ -28,6 +28,8 @@ const defaultPlugins = (tsConfigOverrides) => [
 ];
 
 const excludeTerser = [
+  "function-http-headers",
+  "function-rewrite-uri",
   "function-redirect",
   "function-index-html",
   "function-redirect-history",

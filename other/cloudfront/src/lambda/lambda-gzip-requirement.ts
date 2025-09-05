@@ -1,4 +1,7 @@
-import { addCorsHeaders, createAndLogError } from "../lambda-util.js";
+import {
+  addCorsHeadersToLambdaResponse,
+  createAndLogError,
+} from "./header-util.js";
 import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";
@@ -42,7 +45,7 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
           ],
         },
       };
-      addCorsHeaders(response);
+      addCorsHeadersToLambdaResponse(response);
       callback(null, response);
       return;
     } else if (!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {

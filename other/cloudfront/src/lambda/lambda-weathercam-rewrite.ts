@@ -1,5 +1,5 @@
 import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
-import { createAndLogError } from "../lambda-util.js";
+import { createAndLogError } from "./header-util.js";
 
 const domainName = "EXT_DOMAIN_NAME";
 const hostName = "EXT_HOST_NAME";
@@ -19,7 +19,11 @@ const sslProtocols = ["TLSv1", "TLSv1.1"];
     https://origin-address/C123.jpg -> no changes, send request to that origin
     https://origin-address/C123.jpg?versionId=123 -> send request to new origin http://DOMAIN_NAME/C123.jpg?versionId=123
  */
-export const handler: CloudFrontRequestHandler = (event, context, callback) => {
+export const handler: CloudFrontRequestHandler = (
+  event,
+  _context,
+  callback,
+) => {
   const records = event.Records;
 
   if (records) {
@@ -40,11 +44,11 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
     if (querystring.length > 0) {
       request.origin = {
         custom: {
-          domainName: domainName,
+          domainName,
           port: 80,
           protocol: "http",
           path: "",
-          sslProtocols: sslProtocols,
+          sslProtocols,
           readTimeout: 5,
           keepaliveTimeout: 5,
           customHeaders: {},
