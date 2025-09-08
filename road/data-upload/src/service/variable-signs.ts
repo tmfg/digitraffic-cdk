@@ -1,33 +1,41 @@
-import { inDatabase } from "@digitraffic/common/dist/database/database";
-import { updateStatus } from "../dao/variable-signs.js";
+import {
+  type DTDatabase,
+  inDatabase,
+} from "@digitraffic/common/dist/database/database";
+import { insertDatex2 } from "../dao/variable-signs.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { type DataIncomingDb, getNewData } from "../dao/data.js";
+import { type DataIncomingDb, getNewData, updateStatus } from "../dao/data.js";
 import { SOURCES, TYPES } from "../model/types.js";
 
 export async function handleVariableSignMessages(): Promise<void> {
   await inDatabase(async (db) => {
-    const unhandled = await getNewData(db, SOURCES.API, TYPES.VS);
+    const unhandled = await getNewData(db, SOURCES.API, TYPES.VS_DATEX2_XML);
 
-    await Promise.all(unhandled.map(async (vs) => {
-      logger.debug("Inserting " + JSON.stringify(vs));
+    await Promise.all(unhandled.map(async (data) => {
+      logger.debug("Inserting " + JSON.stringify(data));
 
       try {
-        await handleVariableSign(vs);
+        await handleVariableSign(db, data);
 
-        await updateStatus(db, vs.data_id, "PROCESSED");
+        await updateStatus(db, data.data_id, "PROCESSED");
       } catch (error) {
         logger.error({
           method: "VariableSignsService.handleVariableSignMessages",
           error,
         });
 
-        await updateStatus(db, vs.data_id, "FAILED");
+        await updateStatus(db, data.data_id, "FAILED");
       }
     }));
   });
 }
 
-async function handleVariableSign(vs: DataIncomingDb): Promise<void> {
+async function handleVariableSign(
+  db: DTDatabase,
+  data: DataIncomingDb,
+): Promise<void> {
+  const xml = data.data;
   // validate xml here?
-  // insert into device_data_datex2
+  // get id,
+  await insertDatex2(db, "id1", xml, new Date());
 }

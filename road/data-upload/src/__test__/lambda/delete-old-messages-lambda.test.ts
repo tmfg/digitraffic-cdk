@@ -1,19 +1,19 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertDataCount, dbTestBase } from "./db-testutil.js";
+import { assertDataCount, dbTestBase } from "../db-testutil.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { jest } from "@jest/globals";
-import { insertData } from "../dao/data.js";
+import { insertData } from "../../dao/data.js";
 
 async function getResponseFromLambda(): Promise<void> {
   const { handler } = await import(
-    "../lambda/delete-old-messages/delete-old-messages.js"
+    "../../lambda/delete-old-messages/delete-old-messages.js"
   );
 
   await handler();
 }
 
 describe(
-  "delete-old-messages-test",
+  "delete-old-messages-lambda-test",
   dbTestBase((db: DTDatabase) => {
     jest.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
     //        jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue({});

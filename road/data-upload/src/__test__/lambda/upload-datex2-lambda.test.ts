@@ -1,16 +1,18 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertDataCount, dbTestBase } from "./db-testutil.js";
+import { assertDataCount, dbTestBase } from "../db-testutil.js";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
-import { ERRORS } from "../lambda/upload-datex2/upload-datex2.js";
-import { type Datex2UpdateObject } from "../model/datex2-update-object.js";
+import { ERRORS } from "../../lambda/upload-datex2/upload-datex2.js";
+import { type Datex2UpdateObject } from "../../model/datex2-update-object.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { jest } from "@jest/globals";
 
 async function getResponseFromLambda(
   event: Record<string, string> = {},
 ): Promise<LambdaResponse> {
-  const { handler } = await import("../lambda/upload-datex2/upload-datex2.js");
+  const { handler } = await import(
+    "../../lambda/upload-datex2/upload-datex2.js"
+  );
 
   return await handler(event);
 }
@@ -24,7 +26,7 @@ const validUpdateObject: Datex2UpdateObject = {
 };
 
 describe(
-  "upload-datex2-test",
+  "upload-datex2-lambda-test",
   dbTestBase((db: DTDatabase) => {
     jest.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
 
