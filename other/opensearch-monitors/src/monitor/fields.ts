@@ -39,7 +39,8 @@ export type CloudfrontField =
   | "request.keyword"
   | "subdomain"
   | "timeToFirstByte"
-  | "httpHost";
+  | "httpHost"
+  | "stack_trace";
 
 export type HttpUserAgentField = "@fields.http_user_agent";
 
