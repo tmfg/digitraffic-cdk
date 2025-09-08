@@ -1,4 +1,9 @@
-import type { Connection, ResultSetHeader } from "mysql2/promise";
+import type {
+  Connection,
+  FieldPacket,
+  QueryResult,
+  ResultSetHeader,
+} from "mysql2/promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const SQL_DELETE_OLD_UDOT_VALUES = `
@@ -19,7 +24,7 @@ AND NOT (unknown_delay = false AND unknown_track = false)`;
 const SQL_UPSERT_UDOT_VALUES = `
 INSERT INTO rami_udot(train_number, train_departure_date, attap_id, unknown_delay, unknown_track)
 VALUES (:trainNumber, :trainDepartureDate, :attapId, :ud, :ut)
-ON DUPLICATE KEY UPDATE
+ON DUPLICATE KEY UPDATE -- unique (train_departure_date, train_number, attap_id)
     unknown_delay = VALUES(unknown_delay),
     unknown_track = VALUES(unknown_track)`;
 
@@ -54,7 +59,11 @@ export async function insertOrUpdate(
     const updateSql = values.ud === false && values.ut === false
       ? SQL_UPDATE_FALSE_VALUES
       : SQL_UPSERT_UDOT_VALUES;
-    const [result] = await conn.execute<ResultSetHeader>(updateSql, values);
+    const result = await executeWithRetry<ResultSetHeader>(
+      conn,
+      updateSql,
+      values,
+    );
 
     if (result.affectedRows > 0) {
       logger.info({
@@ -67,8 +76,42 @@ export async function insertOrUpdate(
       await conn.execute(SQL_MERGE_HISTORY, values);
     }
   } catch (error) {
-    logger.error({ method, error });
+    logger.error({
+      method,
+      customDoUpdate: (values.ud === false && values.ut === false),
+      customSql: SQL_UPSERT_UDOT_VALUES,
+      error,
+    });
   }
+}
+
+async function executeWithRetry<T extends QueryResult>(
+  conn: Connection,
+  sql: string,
+  values: UdotUpsertValues,
+  retries = 3,
+): Promise<T> {
+  let lastError;
+  for (let i = 0; i < retries; i++) {
+    try {
+      return (await conn.execute<T>(sql, values))[0];
+    } catch (err: unknown) {
+      lastError = err;
+      logger.warn({
+        method: "UdotDao.executeWithRetry",
+        message: `Query failed on attempt ${i + 1} of ${retries}.`,
+        customWillRetry: (i < retries - 1),
+        error: err,
+      });
+      if (i < retries - 1) {
+        // Wait only if we will retry again
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw lastError;
 }
 
 export async function deleteOldValues(conn: Connection): Promise<void> {
