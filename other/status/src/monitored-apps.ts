@@ -182,18 +182,8 @@ export const monitoredApps: MonitoredApp[] = [
   {
     name: "Parking",
     hostPart: "https://parking.fintraffic.fi",
-    url: "https://parking-test.fintraffic.fi/v3/api-docs",
-    excluded: [
-      // "/api/v1/utilizations",
-      // "/api/v1/regions",
-      "/api/v1/regions/withHubs", // 403
-      "/api/v1/regions/withFacilities", // 403
-      // "/api/v1/operators",
-      // "/api/v1/hubs",
-      // "/api/v1/facilities",
-      "/api/v1/facilities/summary", // This is not yet at production
-      // "/api/v1/contacts",
-    ],
+    url: "https://parking.fintraffic.fi/v3/api-docs",
+    excluded: [],
     endpoints: [
       {
         name: "Parking UI ",
