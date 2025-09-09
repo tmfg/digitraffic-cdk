@@ -10,7 +10,6 @@ import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/l
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import type { QueueAndDLQ } from "./sqs.js";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";

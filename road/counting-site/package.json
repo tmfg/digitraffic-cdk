@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
-    "@digitraffic/common": "2025.6.27-2",
+    "@digitraffic/common": "2025.9.9-1",
     "@std/csv": "npm:@jsr/std__csv@1.0.3",
     "aws-cdk-lib": "^2.211.0",
     "constructs": "^10.4.2",

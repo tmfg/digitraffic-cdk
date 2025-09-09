@@ -17,7 +17,7 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.6.27-2",
+    "@digitraffic/common": "2025.9.9-1",
     "aws-cdk-lib": "^2.211.0",
     "aws-sdk": "^2.1692.0",
     "constructs": "~10.4.2",

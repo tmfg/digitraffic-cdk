@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.879.0",
-    "@digitraffic/common": "2025.9.4-1",
+    "@digitraffic/common": "2025.9.9-1",
     "aws-cdk-lib": "^2.214.0",
     "constructs": "^10.4.2",
     "date-fns": "^4.1.0",

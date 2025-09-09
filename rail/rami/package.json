@@ -26,7 +26,7 @@
     "@aws-sdk/client-s3": "^3.864.0",
     "@aws-sdk/client-secrets-manager": "^3.864.0",
     "@aws-sdk/client-sqs": "^3.864.0",
-    "@digitraffic/common": "2025.6.27-2",
+    "@digitraffic/common": "2025.9.9-1",
     "@middy/core": "^6.4.3",
     "@middy/sqs-partial-batch-failure": "^6.4.3",
     "ajv": "~8.17.1",
