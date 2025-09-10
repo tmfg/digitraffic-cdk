@@ -385,7 +385,7 @@ export class PrivateApi {
       [MarinecamEnvKeys.USERPOOL_ID]: userPool.userPoolId,
       [MarinecamEnvKeys.POOLCLIENT_ID]: userPoolClient.userPoolClientId,
     };
-    const logGroup = createLambdaLogGroup(this.stack, functionName);
+    const logGroup = createLambdaLogGroup({ stack: this.stack, functionName });
 
     const authFunction = MonitoredFunction.create(
       this.stack,

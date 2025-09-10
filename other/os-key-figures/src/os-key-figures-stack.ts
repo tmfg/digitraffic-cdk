@@ -118,7 +118,7 @@ export class OsKeyFiguresStack extends Stack {
     );
 
     const functionName = "CreateKeyFigureVisualizations";
-    const logGroup = createLambdaLogGroup(this, functionName);
+    const logGroup = createLambdaLogGroup({stack: this, shortName: 'OSKeyFigures', functionName});
     const lambdaConf: FunctionProps = {
       role: lambdaRole,
       functionName: functionName,
@@ -181,7 +181,7 @@ export class OsKeyFiguresStack extends Stack {
     );
 
     const functionName = "CollectOsKeyFigures";
-    const logGroup = createLambdaLogGroup(this, functionName);
+    const logGroup = createLambdaLogGroup({stack: this, shortName: 'OSKeyFigures', functionName});
     const lambdaConf: FunctionProps = {
       role: lambdaRole,
       functionName: functionName,

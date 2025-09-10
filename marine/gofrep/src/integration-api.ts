@@ -100,7 +100,7 @@ function createReceiveMrsReportResource(
   const metadataResource = resource.addResource("report");
   const functionName = "GOFREP-ReceiveMRSReport";
 
-  const logGroup = createLambdaLogGroup(stack, functionName);
+  const logGroup = createLambdaLogGroup({stack, functionName});
   // ATTENTION!
   // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
   // The reason for this is IP based restriction in another system's firewall.

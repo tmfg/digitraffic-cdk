@@ -25,7 +25,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
   lambdaEnv[UPDATE_SWAGGER_KEYS.REGION] = stack.region;
   lambdaEnv[KEY_APIGW_IDS] = JSON.stringify(props.apiGwAppIds);
 
-  const logGroup = createLambdaLogGroup(stack, functionName);
+  const logGroup = createLambdaLogGroup({stack, functionName});
 
   const lambdaConf: FunctionProps = {
     functionName: functionName,
@@ -90,7 +90,7 @@ function createUpdateSwaggerDescriptionsLambda(
     lambdaEnv[UPDATE_SWAGGER_KEYS.REMOVESECURITY] = "true";
   }
 
-  const logGroup = createLambdaLogGroup(stack, functionName);
+  const logGroup = createLambdaLogGroup({stack, functionName});
 
   const lambdaConf: FunctionProps = {
     functionName: functionName,

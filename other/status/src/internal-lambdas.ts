@@ -21,11 +21,13 @@ export function create(
     "Secret",
     configuration.secretId,
   );
+  const shortName = "status";
   createUpdateStatusesLambda(
     secret,
     alarmSnsTopic,
     warningSnsTopic,
     stack,
+    shortName,
     configuration,
   );
   createHandleMaintenanceLambda(
@@ -33,6 +35,7 @@ export function create(
     alarmSnsTopic,
     warningSnsTopic,
     stack,
+    shortName,
     configuration,
   );
   createCheckComponentStatesLambda(
@@ -40,6 +43,7 @@ export function create(
     alarmSnsTopic,
     warningSnsTopic,
     stack,
+    shortName,
     configuration,
   );
   createTestSlackNotifyLambda(
@@ -47,6 +51,7 @@ export function create(
     alarmSnsTopic,
     warningSnsTopic,
     stack,
+    shortName,
     configuration,
   );
 }
@@ -72,12 +77,13 @@ function createUpdateStatusesLambda(
   alarmSnsTopic: ITopic,
   warningSnsTopic: ITopic,
   stack: Stack,
+  shortName: string,
   props: Props,
 ): void {
   const environment: LambdaEnvironment = createCommonEnv(props);
 
   const functionName = "Status-UpdateStatuses";
-  const logGroup = createLambdaLogGroup(stack, functionName);
+  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     code: new AssetCode("dist/lambda/update-status"),
@@ -110,12 +116,13 @@ function createHandleMaintenanceLambda(
   alarmSnsTopic: ITopic,
   warningSnsTopic: ITopic,
   stack: Stack,
+  shortName: string,
   props: Props,
 ): void {
   const functionName = "Status-HandleMaintenance" as const;
 
   const environment = createCommonEnv(props);
-  const logGroup = createLambdaLogGroup(stack, functionName);
+  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
 
   const lambdaConf: FunctionProps = {
     functionName: functionName,
@@ -149,11 +156,12 @@ function createCheckComponentStatesLambda(
   alarmSnsTopic: ITopic,
   warningSnsTopic: ITopic,
   stack: Stack,
+  shortName: string,
   props: Props,
 ): void {
   const functionName = "Status-CheckComponentStates";
   const environment = createCommonEnv(props);
-  const logGroup = createLambdaLogGroup(stack, functionName);
+  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     code: new AssetCode("dist/lambda/check-component-states"),
@@ -186,13 +194,14 @@ function createTestSlackNotifyLambda(
   alarmSnsTopic: ITopic,
   warningSnsTopic: ITopic,
   stack: Stack,
+  shortName: string,
   props: Props,
 ): void {
   const functionName = "Status-TestSlackNotify" as const;
 
   const environment = createCommonEnv(props);
 
-  const logGroup = createLambdaLogGroup(stack, functionName);
+  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
 
   const lambdaConf: FunctionProps = {
     functionName: functionName,
