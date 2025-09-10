@@ -105,7 +105,7 @@ function createUpdateRequestHandlerLambda(
 ): MonitoredFunction {
   const lambdaFunctionName = "SSE-UpdateSseData";
   const environment = stack.createDefaultLambdaEnvironment("SSE");
-  const logGroup = createLambdaLogGroup({ stack, lambdaFunctionName });
+  const logGroup = createLambdaLogGroup({ stack, functionName: lambdaFunctionName });
 
   const updateSseDataLambda = MonitoredFunction.create(
     stack,
