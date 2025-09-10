@@ -1,9 +1,9 @@
 import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
 import { Duration } from "aws-cdk-lib";
 import { type Props } from "./app-props.js";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { type Bucket } from "aws-cdk-lib/aws-s3";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation.js";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
@@ -25,9 +25,11 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
   lambdaEnv[UPDATE_SWAGGER_KEYS.REGION] = stack.region;
   lambdaEnv[KEY_APIGW_IDS] = JSON.stringify(props.apiGwAppIds);
 
+  const logGroup = createLambdaLogGroup({stack, functionName});
+
   const lambdaConf: FunctionProps = {
     functionName: functionName,
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: logGroup,
     code: new AssetCode("dist/lambda/update-api-documentation"),
     handler: "lambda-update-api-documentation.handler",
     runtime: Runtime.NODEJS_22_X,
@@ -88,9 +90,11 @@ function createUpdateSwaggerDescriptionsLambda(
     lambdaEnv[UPDATE_SWAGGER_KEYS.REMOVESECURITY] = "true";
   }
 
+  const logGroup = createLambdaLogGroup({stack, functionName});
+
   const lambdaConf: FunctionProps = {
     functionName: functionName,
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: logGroup,
     code: new AssetCode("dist/lambda/update-swagger"),
     handler: "lambda-update-swagger.handler",
     runtime: Runtime.NODEJS_22_X,

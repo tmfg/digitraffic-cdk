@@ -10,6 +10,7 @@ import {
   RESPONSE_500_SERVER_ERROR,
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import {
   add404Support,
@@ -98,16 +99,25 @@ function createReceiveMrsReportResource(
 ): void {
   const metadataResource = resource.addResource("report");
   const functionName = "GOFREP-ReceiveMRSReport";
+
+  const logGroup = createLambdaLogGroup({stack, functionName});
   // ATTENTION!
   // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
   // The reason for this is IP based restriction in another system's firewall.
   const handler = MonitoredFunction.create(
     stack,
     functionName,
-    databaseFunctionProps(stack, {}, functionName, "receive-epcmessage", {
-      singleLambda: true,
-      timeout: 10,
-    }),
+    databaseFunctionProps(
+      stack,
+      {},
+      functionName,
+      "receive-epcmessage",
+      logGroup,
+      {
+        singleLambda: true,
+        timeout: 10,
+      },
+    ),
   );
 
   // eslint-disable-next-line deprecation/deprecation

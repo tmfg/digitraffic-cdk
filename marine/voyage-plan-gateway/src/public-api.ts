@@ -4,6 +4,7 @@ import {
   add404Support,
   createDefaultPolicyDocument,
 } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import type { Stack } from "aws-cdk-lib";
@@ -58,6 +59,7 @@ function createVtsProxyHandler(
   const env: Record<string, string> = {};
   env[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
   const functionName = "VPGW-Get-Schedules";
+  const logGroup = createLambdaLogGroup({ stack, functionName });
   // ATTENTION!
   // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
   // The reason for this is IP based restriction in another system's firewall.
@@ -68,6 +70,7 @@ function createVtsProxyHandler(
       functionName,
       code: new AssetCode("dist/lambda"),
       handler: "lambda-get-schedules.handler",
+      logGroup: logGroup,
       environment: env,
       vpc: stack.vpc,
       timeout: 10,

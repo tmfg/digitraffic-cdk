@@ -87,6 +87,7 @@
     "./dist/aws/infra/stack/stack-checking-aspect": "./dist/aws/infra/stack/stack-checking-aspect.js",
     "./dist/aws/infra/stack/rest_apis": "./dist/aws/infra/stack/rest_apis.js",
     "./dist/aws/infra/stack/lambda-configs": "./dist/aws/infra/stack/lambda-configs.js",
+    "./dist/aws/infra/stack/lambda-log-group": "./dist/aws/infra/stack/lambda-log-group.js",
     "./dist/aws/infra/stack/monitoredfunction": "./dist/aws/infra/stack/monitoredfunction.js",
     "./dist/aws/infra/stack/subscription": "./dist/aws/infra/stack/subscription.js",
     "./dist/aws/infra/stack/parameters": "./dist/aws/infra/stack/parameters.js",

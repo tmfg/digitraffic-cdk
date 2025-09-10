@@ -1,4 +1,5 @@
 import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import {
   addDefaultValidator,
@@ -104,6 +105,7 @@ function createUpdateRequestHandlerLambda(
 ): MonitoredFunction {
   const lambdaFunctionName = "SSE-UpdateSseData";
   const environment = stack.createDefaultLambdaEnvironment("SSE");
+  const logGroup = createLambdaLogGroup({ stack, functionName: lambdaFunctionName });
 
   const updateSseDataLambda = MonitoredFunction.create(
     stack,
@@ -113,6 +115,7 @@ function createUpdateRequestHandlerLambda(
       environment,
       lambdaFunctionName,
       "lambda-update-sse-data",
+      logGroup,
       {
         singleLambda: true,
         reservedConcurrentExecutions: 10,
