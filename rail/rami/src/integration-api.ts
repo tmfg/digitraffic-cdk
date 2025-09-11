@@ -58,7 +58,7 @@ export class IntegrationApi {
   ): MonitoredDBFunction {
     const activeResource = resource.addResource("message");
     const functionName = "RAMI-UploadRamiRosmMessage";
-    const logGroup = createLambdaLogGroup({stack, functionName});
+    const logGroup = createLambdaLogGroup({ stack, functionName });
     const uploadLambda = MonitoredFunction.create(stack, functionName, {
       functionName,
       timeout: Duration.seconds(15),

@@ -26,10 +26,21 @@ import {
 } from "./triggers.js";
 import type { AggregateFilter, TermsAggregate } from "./aggregates.js";
 
-export type OsDomain = "marine" | "road" | "rail" | "afir" | "catalog" | "parking" | "status" | "tis" |"cloudfront" | "weathercam" | "portactivity";
+export type OsDomain =
+  | "marine"
+  | "road"
+  | "rail"
+  | "afir"
+  | "catalog"
+  | "parking"
+  | "status"
+  | "tis"
+  | "cloudfront"
+  | "weathercam"
+  | "portactivity";
 
 export interface MonitorConfig {
-  domain: OsDomain,
+  domain: OsDomain;
   env: string;
   index: string;
   cron: string;
@@ -189,7 +200,8 @@ export class OsMonitorBuilder {
 
   constructor(name: string, config: MonitorConfig) {
     this.config = config;
-    this.name = `${config.domain.toUpperCase()} ${config.env.toUpperCase()} ${name}`;
+    this.name =
+      `${config.domain.toUpperCase()} ${config.env.toUpperCase()} ${name}`;
     this.cron = config.cron;
     this.index = config.index;
     this.messageSubject = config.messageSubject;

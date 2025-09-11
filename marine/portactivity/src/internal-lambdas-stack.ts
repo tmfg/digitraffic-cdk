@@ -237,7 +237,7 @@ function createUpdateTimestampsFromSchedules(
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
   environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig
     .enableETBForAllPorts.toString();
-  const logGroup = createLambdaLogGroup({stack, functionName});
+  const logGroup = createLambdaLogGroup({ stack, functionName });
   const lambda = MonitoredFunction.create(
     stack,
     functionName,
@@ -291,7 +291,7 @@ function createProcessDLQLambda(
   environment[PortactivityEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
 
   const functionName = "PortActivity-ProcessTimestampsDLQ";
-  const logGroup = createLambdaLogGroup({stack, functionName});
+  const logGroup = createLambdaLogGroup({ stack, functionName });
   const processDLQLambda = MonitoredFunction.create(stack, functionName, {
     runtime: Runtime.NODEJS_22_X,
     logGroup: logGroup,
@@ -336,7 +336,7 @@ function createUpdateAwakeAiETXTimestampsLambda(
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
   environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig
     .enableETBForAllPorts.toString();
-  const logGroup = createLambdaLogGroup({stack, functionName});
+  const logGroup = createLambdaLogGroup({ stack, functionName });
   const lambdaConf = databaseFunctionProps(
     stack,
     environment,
@@ -363,7 +363,7 @@ function createUpdateAwakeAiATXTimestampsLambda(
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
   const functionName = "PortActivity-UpdateAwakeAiATXTimestamps";
-  const logGroup = createLambdaLogGroup({stack, functionName});
+  const logGroup = createLambdaLogGroup({ stack, functionName });
   const lambdaConf = databaseFunctionProps(
     stack,
     environment,

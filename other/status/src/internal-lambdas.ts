@@ -83,7 +83,7 @@ function createUpdateStatusesLambda(
   const environment: LambdaEnvironment = createCommonEnv(props);
 
   const functionName = "Status-UpdateStatuses";
-  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
+  const logGroup = createLambdaLogGroup({ stack, functionName, shortName });
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     code: new AssetCode("dist/lambda/update-status"),
@@ -122,7 +122,7 @@ function createHandleMaintenanceLambda(
   const functionName = "Status-HandleMaintenance" as const;
 
   const environment = createCommonEnv(props);
-  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
+  const logGroup = createLambdaLogGroup({ stack, functionName, shortName });
 
   const lambdaConf: FunctionProps = {
     functionName: functionName,
@@ -161,7 +161,7 @@ function createCheckComponentStatesLambda(
 ): void {
   const functionName = "Status-CheckComponentStates";
   const environment = createCommonEnv(props);
-  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
+  const logGroup = createLambdaLogGroup({ stack, functionName, shortName });
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     code: new AssetCode("dist/lambda/check-component-states"),
@@ -201,7 +201,7 @@ function createTestSlackNotifyLambda(
 
   const environment = createCommonEnv(props);
 
-  const logGroup = createLambdaLogGroup({stack, functionName, shortName});
+  const logGroup = createLambdaLogGroup({ stack, functionName, shortName });
 
   const lambdaConf: FunctionProps = {
     functionName: functionName,
