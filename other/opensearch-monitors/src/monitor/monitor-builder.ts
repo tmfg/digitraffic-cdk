@@ -5,6 +5,7 @@ import type {
   BoolQuery,
   ExistsQuery,
   MatchPhraseQuery,
+  MultiMatchPhraseQuery,
   Order,
   Query,
   QueryStringQuery,
@@ -25,7 +26,10 @@ import {
 } from "./triggers.js";
 import type { AggregateFilter, TermsAggregate } from "./aggregates.js";
 
+export type OsDomain = "marine" | "road" | "rail" | "afir" | "catalog" | "parking" | "status" | "tis" |"cloudfront" | "weathercam" | "portactivity";
+
 export interface MonitorConfig {
+  domain: OsDomain,
   env: string;
   index: string;
   cron: string;
@@ -47,6 +51,19 @@ export function matchPhrase(
   query: string,
 ): MatchPhraseQuery {
   return { match_phrase: { [field]: { query } } };
+}
+
+export function multiMatchPhrase(
+  field: OSLogField | OSLogField[],
+  query: string,
+): MultiMatchPhraseQuery {
+  return {
+    multi_match: {
+      query,
+      fields: Array.isArray(field) ? field : [field],
+      type: "phrase",
+    },
+  };
 }
 
 export function matchWildcardPhrase(
@@ -172,7 +189,7 @@ export class OsMonitorBuilder {
 
   constructor(name: string, config: MonitorConfig) {
     this.config = config;
-    this.name = `${config.env.toUpperCase()} ${name}`;
+    this.name = `${config.domain.toUpperCase()} ${config.env.toUpperCase()} ${name}`;
     this.cron = config.cron;
     this.index = config.index;
     this.messageSubject = config.messageSubject;

@@ -1,6 +1,6 @@
 [
   {
-    "name": "TST Ais metadata sent < 80(Runbook M2)",
+    "name": "MARINE TST RUNBOOK-M2 - Ais metadata sent < 80",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -73,14 +73,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Ais metadata sent < 80(Runbook M2)",
+        "name": "MARINE TST RUNBOOK-M2 - Ais metadata sent < 80",
         "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 5)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Ais metadata sent < 80(Runbook M2) should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE TST RUNBOOK-M2 - Ais metadata sent < 80 should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -89,7 +90,7 @@
     ]
   },
   {
-    "name": "TST Ais metadata sent > 80(Runbook M2)",
+    "name": "MARINE TST RUNBOOK-M2 - Ais metadata sent > 80",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -162,14 +163,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Ais metadata sent > 80(Runbook M2)",
+        "name": "MARINE TST RUNBOOK-M2 - Ais metadata sent > 80",
         "condition": "!(ctx.results[0].hits.total.value >= 6 && ctx.results[0].hits.total.value <= 20)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Ais metadata sent > 80(Runbook M2) should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE TST RUNBOOK-M2 - Ais metadata sent > 80 should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -178,7 +180,7 @@
     ]
   },
   {
-    "name": "TST Ais positions sent < 1000(Runbook M2)",
+    "name": "MARINE TST RUNBOOK-M2 - Ais positions sent < 1000",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -251,14 +253,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Ais positions sent < 1000(Runbook M2)",
+        "name": "MARINE TST RUNBOOK-M2 - Ais positions sent < 1000",
         "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 5)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Ais positions sent < 1000(Runbook M2) should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE TST RUNBOOK-M2 - Ais positions sent < 1000 should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -267,7 +270,7 @@
     ]
   },
   {
-    "name": "TST Ais positions sent > 1000(Runbook M2)",
+    "name": "MARINE TST RUNBOOK-M2 - Ais positions sent > 1000",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -340,14 +343,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Ais positions sent > 1000(Runbook M2)",
+        "name": "MARINE TST RUNBOOK-M2 - Ais positions sent > 1000",
         "condition": "!(ctx.results[0].hits.total.value >= 6 && ctx.results[0].hits.total.value <= 20)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Ais positions sent > 1000(Runbook M2) should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE TST RUNBOOK-M2 - Ais positions sent > 1000 should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -356,7 +360,7 @@
     ]
   },
   {
-    "name": "TST Marine Daemon active",
+    "name": "MARINE TST Daemon active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -407,14 +411,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine Daemon active",
+        "name": "MARINE TST Daemon active",
         "condition": "!(ctx.results[0].hits.total.value >= 500 && ctx.results[0].hits.total.value <= 20000)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine Daemon active should be between 500 and 20000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE TST Daemon active should be between 500 and 20000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -423,7 +428,7 @@
     ]
   },
   {
-    "name": "TST Marine reboots",
+    "name": "MARINE TST RUNBOOK-Y5 - Reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -474,14 +479,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine reboots",
+        "name": "MARINE TST RUNBOOK-Y5 - Reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: MARINE TST RUNBOOK-Y5 - Reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -490,7 +496,7 @@
     ]
   },
   {
-    "name": "TST Marine java errors",
+    "name": "MARINE TST Java errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -554,14 +560,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine java errors",
+        "name": "MARINE TST Java errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE TST Java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/f173baab4efd7231874224afc9aa55e2?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -570,7 +577,7 @@
     ]
   },
   {
-    "name": "TST Marine java OutOfMemory",
+    "name": "MARINE TST Java OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -626,14 +633,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine java OutOfMemory",
+        "name": "MARINE TST Java OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE TST Java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -642,7 +650,7 @@
     ]
   },
   {
-    "name": "TST Marine lambda errors",
+    "name": "MARINE TST Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -689,7 +697,15 @@
               }
             }
           ],
-          "must_not": []
+          "must_not": [
+            {
+              "match_phrase": {
+                "lambdaName": {
+                  "query": "Marinecam-UpdateImages"
+                }
+              }
+            }
+          ]
         }
       },
       "sort": [
@@ -700,14 +716,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine lambda errors",
+        "name": "MARINE TST Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE TST Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/cc396f2ec7eea8c5e4f69ac38f80e1d7?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -716,7 +733,7 @@
     ]
   },
   {
-    "name": "TST Marine lambda timeouts",
+    "name": "MARINE TST Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -774,14 +791,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine lambda timeouts",
+        "name": "MARINE TST Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE TST Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -790,7 +808,7 @@
     ]
   },
   {
-    "name": "TST Marine lambda memory usage over 95%",
+    "name": "MARINE TST Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -853,14 +871,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine lambda memory usage over 95%",
+        "name": "MARINE TST Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE TST Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/384031b2f74b7705d507adbae7d1a1ba?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -869,7 +888,7 @@
     ]
   },
   {
-    "name": "PRD Ais metadata sent < 80(Runbook M2)",
+    "name": "MARINE PRD RUNBOOK-M2 - Ais metadata sent < 80",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -942,14 +961,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Ais metadata sent < 80(Runbook M2)",
+        "name": "MARINE PRD RUNBOOK-M2 - Ais metadata sent < 80",
         "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 5)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Ais metadata sent < 80(Runbook M2) should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE PRD RUNBOOK-M2 - Ais metadata sent < 80 should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -958,7 +978,7 @@
     ]
   },
   {
-    "name": "PRD Ais metadata sent > 80(Runbook M2)",
+    "name": "MARINE PRD RUNBOOK-M2 - Ais metadata sent > 80",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1031,14 +1051,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Ais metadata sent > 80(Runbook M2)",
+        "name": "MARINE PRD RUNBOOK-M2 - Ais metadata sent > 80",
         "condition": "!(ctx.results[0].hits.total.value >= 6 && ctx.results[0].hits.total.value <= 20)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Ais metadata sent > 80(Runbook M2) should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE PRD RUNBOOK-M2 - Ais metadata sent > 80 should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -1047,7 +1068,7 @@
     ]
   },
   {
-    "name": "PRD Ais positions sent < 1000(Runbook M2)",
+    "name": "MARINE PRD RUNBOOK-M2 - Ais positions sent < 1000",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1120,14 +1141,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Ais positions sent < 1000(Runbook M2)",
+        "name": "MARINE PRD RUNBOOK-M2 - Ais positions sent < 1000",
         "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 5)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Ais positions sent < 1000(Runbook M2) should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE PRD RUNBOOK-M2 - Ais positions sent < 1000 should be between 0 and 5, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -1136,7 +1158,7 @@
     ]
   },
   {
-    "name": "PRD Ais positions sent > 1000(Runbook M2)",
+    "name": "MARINE PRD RUNBOOK-M2 - Ais positions sent > 1000",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1209,14 +1231,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Ais positions sent > 1000(Runbook M2)",
+        "name": "MARINE PRD RUNBOOK-M2 - Ais positions sent > 1000",
         "condition": "!(ctx.results[0].hits.total.value >= 6 && ctx.results[0].hits.total.value <= 20)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Ais positions sent > 1000(Runbook M2) should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE PRD RUNBOOK-M2 - Ais positions sent > 1000 should be between 6 and 20, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -1225,7 +1248,7 @@
     ]
   },
   {
-    "name": "PRD Marine Daemon active",
+    "name": "MARINE PRD Daemon active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1276,14 +1299,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Marine Daemon active",
+        "name": "MARINE PRD Daemon active",
         "condition": "!(ctx.results[0].hits.total.value >= 500 && ctx.results[0].hits.total.value <= 20000)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine Daemon active should be between 500 and 20000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: MARINE PRD Daemon active should be between 500 and 20000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -1292,7 +1316,7 @@
     ]
   },
   {
-    "name": "PRD Marine reboots",
+    "name": "MARINE PRD RUNBOOK-Y5 - Reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1343,14 +1367,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Marine reboots",
+        "name": "MARINE PRD RUNBOOK-Y5 - Reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: MARINE PRD RUNBOOK-Y5 - Reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -1359,7 +1384,7 @@
     ]
   },
   {
-    "name": "PRD Marine java errors",
+    "name": "MARINE PRD Java errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1423,14 +1448,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Marine java errors",
+        "name": "MARINE PRD Java errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE PRD Java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/c81b89dad4a270016a2c2d1f83032b0f?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -1439,7 +1465,7 @@
     ]
   },
   {
-    "name": "PRD Marine java OutOfMemory",
+    "name": "MARINE PRD Java OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1495,14 +1521,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Marine java OutOfMemory",
+        "name": "MARINE PRD Java OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE PRD Java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -1511,7 +1538,7 @@
     ]
   },
   {
-    "name": "PRD Marine lambda errors",
+    "name": "MARINE PRD Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1558,7 +1585,15 @@
               }
             }
           ],
-          "must_not": []
+          "must_not": [
+            {
+              "match_phrase": {
+                "lambdaName": {
+                  "query": "Marinecam-UpdateImages"
+                }
+              }
+            }
+          ]
         }
       },
       "sort": [
@@ -1569,14 +1604,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Marine lambda errors",
+        "name": "MARINE PRD Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE PRD Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/2d0da1cb2bd198172ed59a78a681f775?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -1585,7 +1621,7 @@
     ]
   },
   {
-    "name": "PRD Marine lambda timeouts",
+    "name": "MARINE PRD Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1643,14 +1679,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Marine lambda timeouts",
+        "name": "MARINE PRD Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE PRD Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -1659,7 +1696,7 @@
     ]
   },
   {
-    "name": "PRD Marine lambda memory usage over 95%",
+    "name": "MARINE PRD Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1722,14 +1759,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Marine lambda memory usage over 95%",
+        "name": "MARINE PRD Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: MARINE PRD Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/c9d31a20716d87ffe2ac5f83e6a685dc?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -1738,89 +1776,7 @@
     ]
   },
   {
-    "name": "TST Road Web connections pending",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "tst"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "road"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "app": {
-                  "query": "road-web"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "meterName": {
-                  "query": "hikaricp.connections.pending.max"
-                }
-              }
-            },
-            {
-              "range": {
-                "statisticValue": {
-                  "from": 10,
-                  "to": null
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "triggers": [
-      {
-        "name": "TST Road Web connections pending",
-        "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 3)",
-        "actions": [
-          {
-            "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road Web connections pending should be between 0 and 3, was {{ctx.results.0.hits.total.value}}",
-            "message": "",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "TST Road Daemon connections pending",
+    "name": "ROAD TST Daemon connections pending",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1886,14 +1842,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road Daemon connections pending",
+        "name": "ROAD TST Daemon connections pending",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road Daemon connections pending {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Daemon connections pending {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -1902,7 +1859,7 @@
     ]
   },
   {
-    "name": "TST Road Web connections timeout",
+    "name": "ROAD TST Web connections timeout",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -1968,14 +1925,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road Web connections timeout",
+        "name": "ROAD TST Web connections timeout",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road Web connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Web connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -1984,7 +1942,7 @@
     ]
   },
   {
-    "name": "TST Road Daemon connections timeout",
+    "name": "ROAD TST Daemon connections timeout",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2050,14 +2008,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road Daemon connections timeout",
+        "name": "ROAD TST Daemon connections timeout",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road Daemon connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Daemon connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -2066,7 +2025,7 @@
     ]
   },
   {
-    "name": "TST Road Daemon active",
+    "name": "ROAD TST Daemon active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2117,14 +2076,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road Daemon active",
+        "name": "ROAD TST Daemon active",
         "condition": "!(ctx.results[0].hits.total.value >= 10 && ctx.results[0].hits.total.value <= 22000)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road Daemon active should be between 10 and 22000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: ROAD TST Daemon active should be between 10 and 22000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -2133,7 +2093,7 @@
     ]
   },
   {
-    "name": "TST Road Web active",
+    "name": "ROAD TST Web active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2184,14 +2144,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road Web active",
+        "name": "ROAD TST Web active",
         "condition": "!(ctx.results[0].hits.total.value >= 3 && ctx.results[0].hits.total.value <= 30000)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road Web active should be between 3 and 30000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: ROAD TST Web active should be between 3 and 30000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -2200,7 +2161,7 @@
     ]
   },
   {
-    "name": "TST Road reboots",
+    "name": "ROAD TST RUNBOOK-Y5 - Reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2251,14 +2212,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road reboots",
+        "name": "ROAD TST RUNBOOK-Y5 - Reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: ROAD TST RUNBOOK-Y5 - Reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -2267,7 +2229,7 @@
     ]
   },
   {
-    "name": "TST Road java errors",
+    "name": "ROAD TST Java errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2331,14 +2293,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road java errors",
+        "name": "ROAD TST Java errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/f7c8e5a146396c0884557f0f0f3619b9?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -2347,7 +2310,7 @@
     ]
   },
   {
-    "name": "TST Road java OutOfMemory",
+    "name": "ROAD TST Java OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2403,14 +2366,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road java OutOfMemory",
+        "name": "ROAD TST Java OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -2419,7 +2383,7 @@
     ]
   },
   {
-    "name": "TST Road lambda errors",
+    "name": "ROAD TST Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2477,14 +2441,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road lambda errors",
+        "name": "ROAD TST Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/232c398100f80af0d7e3679d56386970?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -2493,7 +2458,7 @@
     ]
   },
   {
-    "name": "TST Road lambda timeouts",
+    "name": "ROAD TST Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2551,14 +2516,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road lambda timeouts",
+        "name": "ROAD TST Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -2567,7 +2533,7 @@
     ]
   },
   {
-    "name": "TST Road lambda memory usage over 95%",
+    "name": "ROAD TST Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2630,14 +2596,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road lambda memory usage over 95%",
+        "name": "ROAD TST Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD TST Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/5cccccb3cc256ae9776f3919a64ee68a?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -2646,89 +2613,7 @@
     ]
   },
   {
-    "name": "PRD Road Web connections pending",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "prd"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "road"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "app": {
-                  "query": "road-web"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "meterName": {
-                  "query": "hikaricp.connections.pending.max"
-                }
-              }
-            },
-            {
-              "range": {
-                "statisticValue": {
-                  "from": 170,
-                  "to": null
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "triggers": [
-      {
-        "name": "PRD Road Web connections pending",
-        "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 3)",
-        "actions": [
-          {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road Web connections pending should be between 0 and 3, was {{ctx.results.0.hits.total.value}}",
-            "message": "",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "PRD Road Daemon connections pending",
+    "name": "ROAD PRD Daemon connections pending",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2794,14 +2679,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road Daemon connections pending",
+        "name": "ROAD PRD Daemon connections pending",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road Daemon connections pending {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Daemon connections pending {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -2810,7 +2696,7 @@
     ]
   },
   {
-    "name": "PRD Road Web connections timeout",
+    "name": "ROAD PRD Web connections timeout",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2876,14 +2762,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road Web connections timeout",
+        "name": "ROAD PRD Web connections timeout",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road Web connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Web connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -2892,7 +2779,7 @@
     ]
   },
   {
-    "name": "PRD Road Daemon connections timeout",
+    "name": "ROAD PRD Daemon connections timeout",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -2958,14 +2845,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road Daemon connections timeout",
+        "name": "ROAD PRD Daemon connections timeout",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road Daemon connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Daemon connections timeout {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -2974,7 +2862,7 @@
     ]
   },
   {
-    "name": "PRD Road Daemon active",
+    "name": "ROAD PRD Daemon active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3025,14 +2913,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road Daemon active",
+        "name": "ROAD PRD Daemon active",
         "condition": "!(ctx.results[0].hits.total.value >= 10 && ctx.results[0].hits.total.value <= 22000)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road Daemon active should be between 10 and 22000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: ROAD PRD Daemon active should be between 10 and 22000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -3041,7 +2930,7 @@
     ]
   },
   {
-    "name": "PRD Road Web active",
+    "name": "ROAD PRD Web active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3092,14 +2981,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road Web active",
+        "name": "ROAD PRD Web active",
         "condition": "!(ctx.results[0].hits.total.value >= 100 && ctx.results[0].hits.total.value <= 30000)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road Web active should be between 100 and 30000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: ROAD PRD Web active should be between 100 and 30000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -3108,7 +2998,7 @@
     ]
   },
   {
-    "name": "PRD Road reboots",
+    "name": "ROAD PRD RUNBOOK-Y5 - Reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3159,14 +3049,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road reboots",
+        "name": "ROAD PRD RUNBOOK-Y5 - Reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: ROAD PRD RUNBOOK-Y5 - Reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -3175,7 +3066,7 @@
     ]
   },
   {
-    "name": "PRD Road java errors",
+    "name": "ROAD PRD Java errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3239,14 +3130,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road java errors",
+        "name": "ROAD PRD Java errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Java errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/bcb236b6012e73c95e7308d3f2e7ea04?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -3255,7 +3147,7 @@
     ]
   },
   {
-    "name": "PRD Road java OutOfMemory",
+    "name": "ROAD PRD Java OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3311,14 +3203,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road java OutOfMemory",
+        "name": "ROAD PRD Java OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Java OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -3327,7 +3220,7 @@
     ]
   },
   {
-    "name": "PRD Road lambda errors",
+    "name": "ROAD PRD Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3385,14 +3278,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road lambda errors",
+        "name": "ROAD PRD Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/edb80b772a0aff5732f2f8fd173bfd6f?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -3401,7 +3295,7 @@
     ]
   },
   {
-    "name": "PRD Road lambda timeouts",
+    "name": "ROAD PRD Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3459,14 +3353,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road lambda timeouts",
+        "name": "ROAD PRD Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -3475,7 +3370,7 @@
     ]
   },
   {
-    "name": "PRD Road lambda memory usage over 95%",
+    "name": "ROAD PRD Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -3538,14 +3433,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Road lambda memory usage over 95%",
+        "name": "ROAD PRD Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: ROAD PRD Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/0f456de30f2ba7b15edfc5b855d3cae7?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -3554,7 +3450,7 @@
     ]
   },
   {
-    "name": "TST Afir active",
+    "name": "AFIR TST Active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -3592,13 +3488,6 @@
                   "query": "*"
                 }
               }
-            },
-            {
-              "match_phrase": {
-                "app": {
-                  "query": "road-web"
-                }
-              }
             }
           ],
           "must_not": []
@@ -3612,14 +3501,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Afir active",
+        "name": "AFIR TST Active",
         "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 50)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Afir active should be between 0 and 50, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: AFIR TST Active should be between 0 and 50, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -3628,7 +3518,7 @@
     ]
   },
   {
-    "name": "TST Afir lambda errors",
+    "name": "AFIR TST Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -3693,14 +3583,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Afir lambda errors",
+        "name": "AFIR TST Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Afir lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: AFIR TST Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/7fd7a861a44eed72e9428c23b18af4f7?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -3709,7 +3600,7 @@
     ]
   },
   {
-    "name": "TST Afir lambda timeouts",
+    "name": "AFIR TST Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -3774,14 +3665,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Afir lambda timeouts",
+        "name": "AFIR TST Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Afir lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: AFIR TST Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -3790,7 +3682,7 @@
     ]
   },
   {
-    "name": "TST Afir lambda memory usage over 95%",
+    "name": "AFIR TST Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -3860,14 +3752,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Afir lambda memory usage over 95%",
+        "name": "AFIR TST Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Afir lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: AFIR TST Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/25328a194d1be48a2bc0d69de2b30dbc?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -3876,7 +3769,7 @@
     ]
   },
   {
-    "name": "PRD Afir active",
+    "name": "AFIR PRD Active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -3914,13 +3807,6 @@
                   "query": "*"
                 }
               }
-            },
-            {
-              "match_phrase": {
-                "app": {
-                  "query": "road-web"
-                }
-              }
             }
           ],
           "must_not": []
@@ -3934,14 +3820,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Afir active",
-        "condition": "!(ctx.results[0].hits.total.value >= 200 && ctx.results[0].hits.total.value <= 15000)",
+        "name": "AFIR PRD Active",
+        "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 15000)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Afir active should be between 200 and 15000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: AFIR PRD Active should be between 0 and 15000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -3950,7 +3837,7 @@
     ]
   },
   {
-    "name": "PRD Afir lambda errors",
+    "name": "AFIR PRD Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -4015,14 +3902,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Afir lambda errors",
+        "name": "AFIR PRD Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Afir lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: AFIR PRD Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/01a085906b0c577b555d29fe296cc611?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -4031,7 +3919,7 @@
     ]
   },
   {
-    "name": "PRD Afir lambda timeouts",
+    "name": "AFIR PRD Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -4096,14 +3984,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Afir lambda timeouts",
+        "name": "AFIR PRD Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Afir lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: AFIR PRD Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -4112,7 +4001,7 @@
     ]
   },
   {
-    "name": "PRD Afir lambda memory usage over 95%",
+    "name": "AFIR PRD Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-afir-cwl*"
@@ -4182,14 +4071,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Afir lambda memory usage over 95%",
+        "name": "AFIR PRD Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Afir lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: AFIR PRD Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/25328a194d1be48a2bc0d69de2b30dbc?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -4198,7 +4088,7 @@
     ]
   },
   {
-    "name": "TST Rail Avoindata-updater active",
+    "name": "RAIL TST Avoindata-updater active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4249,14 +4139,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail Avoindata-updater active",
-        "condition": "!(ctx.results[0].hits.total.value >= 5000 && ctx.results[0].hits.total.value <= 35000)",
+        "name": "RAIL TST Avoindata-updater active",
+        "condition": "!(ctx.results[0].hits.total.value >= 5000 && ctx.results[0].hits.total.value <= 150000)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail Avoindata-updater active should be between 5000 and 35000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: RAIL TST Avoindata-updater active should be between 5000 and 150000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -4265,7 +4156,7 @@
     ]
   },
   {
-    "name": "TST Rail History-updater active",
+    "name": "RAIL TST History-updater active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4316,14 +4207,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail History-updater active",
-        "condition": "!(ctx.results[0].hits.total.value >= 50 && ctx.results[0].hits.total.value <= 200)",
+        "name": "RAIL TST History-updater active",
+        "condition": "!(ctx.results[0].hits.total.value >= 50 && ctx.results[0].hits.total.value <= 500)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail History-updater active should be between 50 and 200, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: RAIL TST History-updater active should be between 50 and 500, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -4332,7 +4224,7 @@
     ]
   },
   {
-    "name": "TST AvoindataUpdater reboots",
+    "name": "RAIL TST RUNBOOK-Y5 - AvoindataUpdater reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4383,14 +4275,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST AvoindataUpdater reboots",
+        "name": "RAIL TST RUNBOOK-Y5 - AvoindataUpdater reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST AvoindataUpdater reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL TST RUNBOOK-Y5 - AvoindataUpdater reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -4399,7 +4292,75 @@
     ]
   },
   {
-    "name": "TST Etj2-Api reboots",
+    "name": "RAIL TST RUNBOOK-Y5 - AvoindataUpdater reboots",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "rail"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "message": {
+                  "query": "Started ServerApplication"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "RAIL TST RUNBOOK-Y5 - AvoindataUpdater reboots",
+        "condition": "ctx.results[0].hits.total.value > 3",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: RAIL TST RUNBOOK-Y5 - AvoindataUpdater reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "RAIL TST RUNBOOK-Y5 - Etj2-Api reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4450,14 +4411,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Etj2-Api reboots",
+        "name": "RAIL TST RUNBOOK-Y5 - Etj2-Api reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Etj2-Api reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL TST RUNBOOK-Y5 - Etj2-Api reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -4466,7 +4428,7 @@
     ]
   },
   {
-    "name": "TST Infra-api reboots",
+    "name": "RAIL TST RUNBOOK-Y5 - Infra-api reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4517,14 +4479,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Infra-api reboots",
+        "name": "RAIL TST RUNBOOK-Y5 - Infra-api reboots",
         "condition": "ctx.results[0].hits.total.value > 6",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Infra-api reboots {{ctx.results.0.hits.total.value}} should not be more than 6",
+            "subject": ":red_circle: RAIL TST RUNBOOK-Y5 - Infra-api reboots {{ctx.results.0.hits.total.value}} should not be more than 6",
             "message": "",
             "throttleMinutes": 30
           }
@@ -4533,7 +4496,7 @@
     ]
   },
   {
-    "name": "TST TrainHistoryBackendApplication reboots",
+    "name": "RAIL TST RUNBOOK-Y5 - TrainHistoryBackendApplication reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4584,14 +4547,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST TrainHistoryBackendApplication reboots",
+        "name": "RAIL TST RUNBOOK-Y5 - TrainHistoryBackendApplication reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST TrainHistoryBackendApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL TST RUNBOOK-Y5 - TrainHistoryBackendApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -4600,7 +4564,7 @@
     ]
   },
   {
-    "name": "TST TrainHistoryUpdaterApplication reboots",
+    "name": "RAIL TST RUNBOOK-Y5 - TrainHistoryUpdaterApplication reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4651,14 +4615,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST TrainHistoryUpdaterApplication reboots",
+        "name": "RAIL TST RUNBOOK-Y5 - TrainHistoryUpdaterApplication reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST TrainHistoryUpdaterApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL TST RUNBOOK-Y5 - TrainHistoryUpdaterApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -4667,7 +4632,78 @@
     ]
   },
   {
-    "name": "TST Rail errors",
+    "name": "RAIL TST RUNBOOK-R4 - Illegal mix of collations",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "rail"
+                }
+              }
+            },
+            {
+              "multi_match": {
+                "query": "mix of collations",
+                "fields": [
+                  "stack_trace",
+                  "dump_log"
+                ],
+                "type": "phrase"
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "RAIL TST RUNBOOK-R4 - Illegal mix of collations",
+        "condition": "ctx.results[0].hits.total.value > 0",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: RAIL TST RUNBOOK-R4 - Illegal mix of collations {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "RAIL TST Avoindata Errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4738,14 +4774,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail errors",
+        "name": "RAIL TST Avoindata Errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Avoindata Errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/cea150b91a7ace1e536d55a50210ebed?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -4754,7 +4791,7 @@
     ]
   },
   {
-    "name": "TST Rail graphql errors",
+    "name": "RAIL TST Graphql errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4825,14 +4862,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail graphql errors",
+        "name": "RAIL TST Graphql errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail graphql errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Graphql errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/cea150b91a7ace1e536d55a50210ebed?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -4841,7 +4879,7 @@
     ]
   },
   {
-    "name": "TST Rail train-history errors",
+    "name": "RAIL TST Train-history errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4912,14 +4950,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail train-history errors",
+        "name": "RAIL TST Train-history errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail train-history errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Train-history errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/cea150b91a7ace1e536d55a50210ebed?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -4928,7 +4967,7 @@
     ]
   },
   {
-    "name": "TST Rail OutOfMemory",
+    "name": "RAIL TST Avoindata OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -4991,14 +5030,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail OutOfMemory",
+        "name": "RAIL TST Avoindata OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Avoindata OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -5007,7 +5047,7 @@
     ]
   },
   {
-    "name": "TST Rail infra-api OutOfMemory",
+    "name": "RAIL TST Infra-api OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5070,14 +5110,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail infra-api OutOfMemory",
+        "name": "RAIL TST Infra-api OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail infra-api OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Infra-api OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -5086,7 +5127,7 @@
     ]
   },
   {
-    "name": "TST Rail graphql OutOfMemory",
+    "name": "RAIL TST Graphql OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5149,14 +5190,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail graphql OutOfMemory",
+        "name": "RAIL TST Graphql OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail graphql OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Graphql OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -5165,7 +5207,7 @@
     ]
   },
   {
-    "name": "TST Rail train-history OutOfMemory",
+    "name": "RAIL TST Train-history OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5228,14 +5270,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail train-history OutOfMemory",
+        "name": "RAIL TST Train-history OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail train-history OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Train-history OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -5244,7 +5287,7 @@
     ]
   },
   {
-    "name": "TST Rail lambda errors",
+    "name": "RAIL TST Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5302,14 +5345,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail lambda errors",
+        "name": "RAIL TST Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/f64be232c96cd88b3fe8f3d2e59f6198?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -5318,7 +5362,7 @@
     ]
   },
   {
-    "name": "TST Rail lambda timeouts",
+    "name": "RAIL TST Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5376,14 +5420,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail lambda timeouts",
+        "name": "RAIL TST Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -5392,7 +5437,7 @@
     ]
   },
   {
-    "name": "TST Rail lambda memory usage over 95%",
+    "name": "RAIL TST Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5455,14 +5500,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail lambda memory usage over 95%",
+        "name": "RAIL TST Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL TST Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/266c9199b73fc3bf9b866e9ddb90780d?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -5471,7 +5517,7 @@
     ]
   },
   {
-    "name": "PRD Rail Avoindata-updater active",
+    "name": "RAIL PRD Avoindata-updater active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5522,14 +5568,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail Avoindata-updater active",
-        "condition": "!(ctx.results[0].hits.total.value >= 5000 && ctx.results[0].hits.total.value <= 35000)",
+        "name": "RAIL PRD Avoindata-updater active",
+        "condition": "!(ctx.results[0].hits.total.value >= 5000 && ctx.results[0].hits.total.value <= 150000)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail Avoindata-updater active should be between 5000 and 35000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: RAIL PRD Avoindata-updater active should be between 5000 and 150000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -5538,7 +5585,7 @@
     ]
   },
   {
-    "name": "PRD Rail History-updater active",
+    "name": "RAIL PRD History-updater active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5589,14 +5636,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail History-updater active",
-        "condition": "!(ctx.results[0].hits.total.value >= 50 && ctx.results[0].hits.total.value <= 200)",
+        "name": "RAIL PRD History-updater active",
+        "condition": "!(ctx.results[0].hits.total.value >= 50 && ctx.results[0].hits.total.value <= 500)",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail History-updater active should be between 50 and 200, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: RAIL PRD History-updater active should be between 50 and 500, was {{ctx.results.0.hits.total.value}}",
             "message": "",
             "throttleMinutes": 30
           }
@@ -5605,7 +5653,7 @@
     ]
   },
   {
-    "name": "PRD AvoindataUpdater reboots",
+    "name": "RAIL PRD RUNBOOK-Y5 - AvoindataUpdater reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5656,14 +5704,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD AvoindataUpdater reboots",
+        "name": "RAIL PRD RUNBOOK-Y5 - AvoindataUpdater reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD AvoindataUpdater reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL PRD RUNBOOK-Y5 - AvoindataUpdater reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -5672,7 +5721,75 @@
     ]
   },
   {
-    "name": "PRD Etj2-Api reboots",
+    "name": "RAIL PRD RUNBOOK-Y5 - AvoindataUpdater reboots",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "rail"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "message": {
+                  "query": "Started ServerApplication"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "RAIL PRD RUNBOOK-Y5 - AvoindataUpdater reboots",
+        "condition": "ctx.results[0].hits.total.value > 3",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: RAIL PRD RUNBOOK-Y5 - AvoindataUpdater reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "RAIL PRD RUNBOOK-Y5 - Etj2-Api reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5723,14 +5840,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Etj2-Api reboots",
+        "name": "RAIL PRD RUNBOOK-Y5 - Etj2-Api reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Etj2-Api reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL PRD RUNBOOK-Y5 - Etj2-Api reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -5739,7 +5857,7 @@
     ]
   },
   {
-    "name": "PRD Infra-api reboots",
+    "name": "RAIL PRD RUNBOOK-Y5 - Infra-api reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5790,14 +5908,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Infra-api reboots",
+        "name": "RAIL PRD RUNBOOK-Y5 - Infra-api reboots",
         "condition": "ctx.results[0].hits.total.value > 6",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Infra-api reboots {{ctx.results.0.hits.total.value}} should not be more than 6",
+            "subject": ":red_circle: RAIL PRD RUNBOOK-Y5 - Infra-api reboots {{ctx.results.0.hits.total.value}} should not be more than 6",
             "message": "",
             "throttleMinutes": 30
           }
@@ -5806,7 +5925,7 @@
     ]
   },
   {
-    "name": "PRD TrainHistoryBackendApplication reboots",
+    "name": "RAIL PRD RUNBOOK-Y5 - TrainHistoryBackendApplication reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5857,14 +5976,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD TrainHistoryBackendApplication reboots",
+        "name": "RAIL PRD RUNBOOK-Y5 - TrainHistoryBackendApplication reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD TrainHistoryBackendApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL PRD RUNBOOK-Y5 - TrainHistoryBackendApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -5873,7 +5993,7 @@
     ]
   },
   {
-    "name": "PRD TrainHistoryUpdaterApplication reboots",
+    "name": "RAIL PRD RUNBOOK-Y5 - TrainHistoryUpdaterApplication reboots",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -5924,14 +6044,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD TrainHistoryUpdaterApplication reboots",
+        "name": "RAIL PRD RUNBOOK-Y5 - TrainHistoryUpdaterApplication reboots",
         "condition": "ctx.results[0].hits.total.value > 3",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD TrainHistoryUpdaterApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
+            "subject": ":red_circle: RAIL PRD RUNBOOK-Y5 - TrainHistoryUpdaterApplication reboots {{ctx.results.0.hits.total.value}} should not be more than 3",
             "message": "",
             "throttleMinutes": 30
           }
@@ -5940,7 +6061,78 @@
     ]
   },
   {
-    "name": "PRD Rail errors",
+    "name": "RAIL PRD RUNBOOK-R4 - Illegal mix of collations",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "rail"
+                }
+              }
+            },
+            {
+              "multi_match": {
+                "query": "mix of collations",
+                "fields": [
+                  "stack_trace",
+                  "dump_log"
+                ],
+                "type": "phrase"
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "RAIL PRD RUNBOOK-R4 - Illegal mix of collations",
+        "condition": "ctx.results[0].hits.total.value > 0",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: RAIL PRD RUNBOOK-R4 - Illegal mix of collations {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "RAIL PRD Avoindata Errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6011,14 +6203,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail errors",
+        "name": "RAIL PRD Avoindata Errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Avoindata Errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/b04e3ee091dde8e82bc72bb99fac5379?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -6027,7 +6220,7 @@
     ]
   },
   {
-    "name": "PRD Rail graphql errors",
+    "name": "RAIL PRD Graphql errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6098,14 +6291,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail graphql errors",
+        "name": "RAIL PRD Graphql errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail graphql errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Graphql errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/b04e3ee091dde8e82bc72bb99fac5379?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -6114,7 +6308,7 @@
     ]
   },
   {
-    "name": "PRD Rail train-history errors",
+    "name": "RAIL PRD Train-history errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6185,14 +6379,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail train-history errors",
+        "name": "RAIL PRD Train-history errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail train-history errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Train-history errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/b04e3ee091dde8e82bc72bb99fac5379?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -6201,7 +6396,7 @@
     ]
   },
   {
-    "name": "PRD Rail OutOfMemory",
+    "name": "RAIL PRD Avoindata OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6264,14 +6459,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail OutOfMemory",
+        "name": "RAIL PRD Avoindata OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Avoindata OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -6280,7 +6476,7 @@
     ]
   },
   {
-    "name": "PRD Rail infra-api OutOfMemory",
+    "name": "RAIL PRD Infra-api OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6343,14 +6539,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail infra-api OutOfMemory",
+        "name": "RAIL PRD Infra-api OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail infra-api OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Infra-api OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -6359,7 +6556,7 @@
     ]
   },
   {
-    "name": "PRD Rail graphql OutOfMemory",
+    "name": "RAIL PRD Graphql OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6422,14 +6619,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail graphql OutOfMemory",
+        "name": "RAIL PRD Graphql OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail graphql OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Graphql OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -6438,7 +6636,7 @@
     ]
   },
   {
-    "name": "PRD Rail train-history OutOfMemory",
+    "name": "RAIL PRD Train-history OutOfMemory",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6501,14 +6699,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail train-history OutOfMemory",
+        "name": "RAIL PRD Train-history OutOfMemory",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail train-history OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Train-history OutOfMemory {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
             "throttleMinutes": 30
           }
@@ -6517,7 +6716,7 @@
     ]
   },
   {
-    "name": "PRD Rail lambda errors",
+    "name": "RAIL PRD Lambda errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6575,14 +6774,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail lambda errors",
+        "name": "RAIL PRD Lambda errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/4b61aad16aa801966eed2fec72477fa6?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -6591,7 +6791,7 @@
     ]
   },
   {
-    "name": "PRD Rail lambda timeouts",
+    "name": "RAIL PRD Lambda timeouts",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6649,14 +6849,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail lambda timeouts",
+        "name": "RAIL PRD Lambda timeouts",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
             "throttleMinutes": 30
           }
@@ -6665,7 +6866,7 @@
     ]
   },
   {
-    "name": "PRD Rail lambda memory usage over 95%",
+    "name": "RAIL PRD Lambda memory usage over 95%",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -6728,14 +6929,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD Rail lambda memory usage over 95%",
+        "name": "RAIL PRD Lambda memory usage over 95%",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: RAIL PRD Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/443db667f3890e1332a069c72aac0df2?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
@@ -6744,7 +6946,7 @@
     ]
   },
   {
-    "name": "TST Road Cloudfront active",
+    "name": "CLOUDFRONT TST ROAD RUNBOOK-C1 - Cloudfront active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-access-cdn*"
@@ -6757,7 +6959,7 @@
             {
               "range": {
                 "@timestamp": {
-                  "from": "now-15m",
+                  "from": "now-60m",
                   "to": null
                 }
               }
@@ -6771,8 +6973,8 @@
             },
             {
               "match_phrase": {
-                "subdomain": {
-                  "query": "tie"
+                "httpHost": {
+                  "query": "tie-test.digitraffic.fi"
                 }
               }
             }
@@ -6788,23 +6990,24 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Road Cloudfront active",
-        "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 10000)",
+        "name": "CLOUDFRONT TST ROAD RUNBOOK-C1 - Cloudfront active",
+        "condition": "!(ctx.results[0].hits.total.value >= 20 && ctx.results[0].hits.total.value <= 100000)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Road Cloudfront active should be between 0 and 10000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: CLOUDFRONT TST ROAD RUNBOOK-C1 - Cloudfront active should be between 20 and 100000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
-            "throttleMinutes": 30
+            "throttleMinutes": 120
           }
         ]
       }
     ]
   },
   {
-    "name": "TST Marine Cloudfront active",
+    "name": "CLOUDFRONT TST MARINE RUNBOOK-C1 - Cloudfront active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-access-cdn*"
@@ -6817,7 +7020,7 @@
             {
               "range": {
                 "@timestamp": {
-                  "from": "now-15m",
+                  "from": "now-60m",
                   "to": null
                 }
               }
@@ -6831,8 +7034,8 @@
             },
             {
               "match_phrase": {
-                "subdomain": {
-                  "query": "meri"
+                "httpHost": {
+                  "query": "meri-test.digitraffic.fi"
                 }
               }
             }
@@ -6848,23 +7051,24 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Marine Cloudfront active",
-        "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 10000)",
+        "name": "CLOUDFRONT TST MARINE RUNBOOK-C1 - Cloudfront active",
+        "condition": "!(ctx.results[0].hits.total.value >= 5 && ctx.results[0].hits.total.value <= 100000)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Marine Cloudfront active should be between 0 and 10000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: CLOUDFRONT TST MARINE RUNBOOK-C1 - Cloudfront active should be between 5 and 100000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
-            "throttleMinutes": 30
+            "throttleMinutes": 120
           }
         ]
       }
     ]
   },
   {
-    "name": "TST Rail Cloudfront active",
+    "name": "CLOUDFRONT TST RAIL RUNBOOK-C1 - Cloudfront active",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-access-cdn*"
@@ -6877,7 +7081,7 @@
             {
               "range": {
                 "@timestamp": {
-                  "from": "now-15m",
+                  "from": "now-60m",
                   "to": null
                 }
               }
@@ -6891,8 +7095,8 @@
             },
             {
               "match_phrase": {
-                "subdomain": {
-                  "query": "rata"
+                "httpHost": {
+                  "query": "rata-beta.digitraffic.fi"
                 }
               }
             }
@@ -6908,23 +7112,85 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST Rail Cloudfront active",
+        "name": "CLOUDFRONT TST RAIL RUNBOOK-C1 - Cloudfront active",
+        "condition": "!(ctx.results[0].hits.total.value >= 100 && ctx.results[0].hits.total.value <= 100000)",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST RAIL RUNBOOK-C1 - Cloudfront active should be between 100 and 100000, was {{ctx.results.0.hits.total.value}}",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT TST WEATHERCAM RUNBOOK-C1 - Cloudfront active",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "weathercam-test.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CLOUDFRONT TST WEATHERCAM RUNBOOK-C1 - Cloudfront active",
         "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 10000)",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST Rail Cloudfront active should be between 0 and 10000, was {{ctx.results.0.hits.total.value}}",
+            "subject": ":red_circle: CLOUDFRONT TST WEATHERCAM RUNBOOK-C1 - Cloudfront active should be between 0 and 10000, was {{ctx.results.0.hits.total.value}}",
             "message": "",
-            "throttleMinutes": 30
+            "throttleMinutes": 120
           }
         ]
       }
     ]
   },
   {
-    "name": "PRD Road Cloudfront active",
+    "name": "CLOUDFRONT TST ROAD RUNBOOK-C2 - Cloudfront data transfer",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-access-cdn*"
@@ -6937,7 +7203,7 @@
             {
               "range": {
                 "@timestamp": {
-                  "from": "now-15m",
+                  "from": "now-60m",
                   "to": null
                 }
               }
@@ -6945,14 +7211,14 @@
             {
               "match_phrase": {
                 "env": {
-                  "query": "prd"
+                  "query": "tst"
                 }
               }
             },
             {
               "match_phrase": {
-                "subdomain": {
-                  "query": "tie"
+                "httpHost": {
+                  "query": "tie-test.digitraffic.fi"
                 }
               }
             }
@@ -6968,23 +7234,33 @@
         }
       ]
     },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
     "triggers": [
       {
-        "name": "PRD Road Cloudfront active",
-        "condition": "!(ctx.results[0].hits.total.value >= 100 && ctx.results[0].hits.total.value <= 75000)",
+        "name": "CLOUDFRONT TST ROAD RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 0 && ctx.results[0].aggregations.sum_bytes.value <= 400)",
         "actions": [
           {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Road Cloudfront active should be between 100 and 75000, was {{ctx.results.0.hits.total.value}}",
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST ROAD RUNBOOK-C2 - Cloudfront data transfer should be between 0 MB and 400 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
             "message": "",
-            "throttleMinutes": 30
+            "throttleMinutes": 120
           }
         ]
       }
     ]
   },
   {
-    "name": "PRD Marine Cloudfront active",
+    "name": "CLOUDFRONT TST WEATHERCAM RUNBOOK-C2 - Cloudfront data transfer",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-access-cdn*"
@@ -6997,7 +7273,7 @@
             {
               "range": {
                 "@timestamp": {
-                  "from": "now-15m",
+                  "from": "now-60m",
                   "to": null
                 }
               }
@@ -7005,14 +7281,14 @@
             {
               "match_phrase": {
                 "env": {
-                  "query": "prd"
+                  "query": "tst"
                 }
               }
             },
             {
               "match_phrase": {
-                "subdomain": {
-                  "query": "meri"
+                "httpHost": {
+                  "query": "weathercam-test.digitraffic.fi"
                 }
               }
             }
@@ -7028,23 +7304,33 @@
         }
       ]
     },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
     "triggers": [
       {
-        "name": "PRD Marine Cloudfront active",
-        "condition": "!(ctx.results[0].hits.total.value >= 100 && ctx.results[0].hits.total.value <= 30000)",
+        "name": "CLOUDFRONT TST WEATHERCAM RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 0 && ctx.results[0].aggregations.sum_bytes.value <= 100)",
         "actions": [
           {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Marine Cloudfront active should be between 100 and 30000, was {{ctx.results.0.hits.total.value}}",
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST WEATHERCAM RUNBOOK-C2 - Cloudfront data transfer should be between 0 MB and 100 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
             "message": "",
-            "throttleMinutes": 30
+            "throttleMinutes": 120
           }
         ]
       }
     ]
   },
   {
-    "name": "PRD Rail Cloudfront active",
+    "name": "CLOUDFRONT TST PORTACTIVITY RUNBOOK-C1 - Cloudfront data transfer",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-access-cdn*"
@@ -7057,7 +7343,7 @@
             {
               "range": {
                 "@timestamp": {
-                  "from": "now-15m",
+                  "from": "now-60m",
                   "to": null
                 }
               }
@@ -7065,14 +7351,14 @@
             {
               "match_phrase": {
                 "env": {
-                  "query": "prd"
+                  "query": "tst"
                 }
               }
             },
             {
               "match_phrase": {
-                "subdomain": {
-                  "query": "rata"
+                "httpHost": {
+                  "query": "portactivity-test.digitraffic.fi"
                 }
               }
             }
@@ -7088,23 +7374,1327 @@
         }
       ]
     },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
     "triggers": [
       {
-        "name": "PRD Rail Cloudfront active",
-        "condition": "!(ctx.results[0].hits.total.value >= 100 && ctx.results[0].hits.total.value <= 75000)",
+        "name": "CLOUDFRONT TST PORTACTIVITY RUNBOOK-C1 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 0 && ctx.results[0].aggregations.sum_bytes.value <= 10)",
         "actions": [
           {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD Rail Cloudfront active should be between 100 and 75000, was {{ctx.results.0.hits.total.value}}",
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST PORTACTIVITY RUNBOOK-C1 - Cloudfront data transfer should be between 0 MB and 10 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
             "message": "",
-            "throttleMinutes": 30
+            "throttleMinutes": 120
           }
         ]
       }
     ]
   },
   {
-    "name": "TST RUNBOOK-L1 Liipi user's organization not found",
+    "name": "CLOUDFRONT TST PARKING RUNBOOK-C1 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "parking-test.fintraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT TST PARKING RUNBOOK-C1 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 2 && ctx.results[0].aggregations.sum_bytes.value <= 100)",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST PARKING RUNBOOK-C1 - Cloudfront data transfer should be between 2 MB and 100 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT TST ROAD RUNBOOK-C2 - integration Cloudfront data transfer IN",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "tie-test.integration.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_requestBytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT TST ROAD RUNBOOK-C2 - integration Cloudfront data transfer IN",
+        "condition": "!(ctx.results[0].aggregations.sum_requestBytes.value >= 0 && ctx.results[0].aggregations.sum_requestBytes.value <= 10)",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST ROAD RUNBOOK-C2 - integration Cloudfront data transfer IN should be between 0 MB and 10 MB, was {{ctx.results.0.aggregations.sum_requestBytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT TST MARINE RUNBOOK-C2 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "meri-test.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT TST MARINE RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 0 && ctx.results[0].aggregations.sum_bytes.value <= 5000)",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST MARINE RUNBOOK-C2 - Cloudfront data transfer should be between 0 MB and 5000 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT TST MARINE RUNBOOK-C2 - integration Cloudfront data transfer IN",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "meri-test.integration.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_requestBytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT TST MARINE RUNBOOK-C2 - integration Cloudfront data transfer IN",
+        "condition": "!(ctx.results[0].aggregations.sum_requestBytes.value >= 0 && ctx.results[0].aggregations.sum_requestBytes.value <= 10)",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST MARINE RUNBOOK-C2 - integration Cloudfront data transfer IN should be between 0 MB and 10 MB, was {{ctx.results.0.aggregations.sum_requestBytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT TST RAIL RUNBOOK-C2 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "rata-beta.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT TST RAIL RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 0 && ctx.results[0].aggregations.sum_bytes.value <= 30)",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST RAIL RUNBOOK-C2 - Cloudfront data transfer should be between 0 MB and 30 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT TST RAIL RUNBOOK-C2 - integration Cloudfront data transfer IN",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "rata-beta.integration.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_requestBytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT TST RAIL RUNBOOK-C2 - integration Cloudfront data transfer IN",
+        "condition": "!(ctx.results[0].aggregations.sum_requestBytes.value >= 0 && ctx.results[0].aggregations.sum_requestBytes.value <= 15)",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CLOUDFRONT TST RAIL RUNBOOK-C2 - integration Cloudfront data transfer IN should be between 0 MB and 15 MB, was {{ctx.results.0.aggregations.sum_requestBytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD ROAD RUNBOOK-C1 - Cloudfront active",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "tie.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD ROAD RUNBOOK-C1 - Cloudfront active",
+        "condition": "!(ctx.results[0].hits.total.value >= 20000 && ctx.results[0].hits.total.value <= 1000000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD ROAD RUNBOOK-C1 - Cloudfront active should be between 20000 and 1000000, was {{ctx.results.0.hits.total.value}}",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD MARINE RUNBOOK-C1 - Cloudfront active",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "meri.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD MARINE RUNBOOK-C1 - Cloudfront active",
+        "condition": "!(ctx.results[0].hits.total.value >= 10000 && ctx.results[0].hits.total.value <= 500000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD MARINE RUNBOOK-C1 - Cloudfront active should be between 10000 and 500000, was {{ctx.results.0.hits.total.value}}",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD RAIL RUNBOOK-C1 - Cloudfront active",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "rata.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD RAIL RUNBOOK-C1 - Cloudfront active",
+        "condition": "!(ctx.results[0].hits.total.value >= 10000 && ctx.results[0].hits.total.value <= 750000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD RAIL RUNBOOK-C1 - Cloudfront active should be between 10000 and 750000, was {{ctx.results.0.hits.total.value}}",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD WEATHERCAM RUNBOOK-C1 - Cloudfront active",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "weathercam.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD WEATHERCAM RUNBOOK-C1 - Cloudfront active",
+        "condition": "!(ctx.results[0].hits.total.value >= 200000 && ctx.results[0].hits.total.value <= 1000000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD WEATHERCAM RUNBOOK-C1 - Cloudfront active should be between 200000 and 1000000, was {{ctx.results.0.hits.total.value}}",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD ROAD RUNBOOK-C2 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "tie.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD ROAD RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 2000 && ctx.results[0].aggregations.sum_bytes.value <= 11000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD ROAD RUNBOOK-C2 - Cloudfront data transfer should be between 2000 MB and 11000 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD WEATHERCAM RUNBOOK-C2 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "weathercam.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD WEATHERCAM RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 40000 && ctx.results[0].aggregations.sum_bytes.value <= 90000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD WEATHERCAM RUNBOOK-C2 - Cloudfront data transfer should be between 40000 MB and 90000 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD PORTACTIVITY RUNBOOK-C1 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "portactivity.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD PORTACTIVITY RUNBOOK-C1 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 5 && ctx.results[0].aggregations.sum_bytes.value <= 30)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD PORTACTIVITY RUNBOOK-C1 - Cloudfront data transfer should be between 5 MB and 30 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD PARKING RUNBOOK-C1 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "parking.fintraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD PARKING RUNBOOK-C1 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 30 && ctx.results[0].aggregations.sum_bytes.value <= 200)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD PARKING RUNBOOK-C1 - Cloudfront data transfer should be between 30 MB and 200 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD ROAD RUNBOOK-C2 - integration Cloudfront data transfer IN",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "tie.integration.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_requestBytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD ROAD RUNBOOK-C2 - integration Cloudfront data transfer IN",
+        "condition": "!(ctx.results[0].aggregations.sum_requestBytes.value >= 0 && ctx.results[0].aggregations.sum_requestBytes.value <= 10)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD ROAD RUNBOOK-C2 - integration Cloudfront data transfer IN should be between 0 MB and 10 MB, was {{ctx.results.0.aggregations.sum_requestBytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD MARINE RUNBOOK-C2 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "meri.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD MARINE RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 1000 && ctx.results[0].aggregations.sum_bytes.value <= 25000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD MARINE RUNBOOK-C2 - Cloudfront data transfer should be between 1000 MB and 25000 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD MARINE RUNBOOK-C2 - integration Cloudfront data transfer IN",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "meri.integration.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_requestBytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD MARINE RUNBOOK-C2 - integration Cloudfront data transfer IN",
+        "condition": "!(ctx.results[0].aggregations.sum_requestBytes.value >= 0 && ctx.results[0].aggregations.sum_requestBytes.value <= 10)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD MARINE RUNBOOK-C2 - integration Cloudfront data transfer IN should be between 0 MB and 10 MB, was {{ctx.results.0.aggregations.sum_requestBytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD RAIL RUNBOOK-C2 - Cloudfront data transfer",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "rata.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_bytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD RAIL RUNBOOK-C2 - Cloudfront data transfer",
+        "condition": "!(ctx.results[0].aggregations.sum_bytes.value >= 300 && ctx.results[0].aggregations.sum_bytes.value <= 30000)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD RAIL RUNBOOK-C2 - Cloudfront data transfer should be between 300 MB and 30000 MB, was {{ctx.results.0.aggregations.sum_bytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CLOUDFRONT PRD RAIL RUNBOOK-C2 - integration Cloudfront data transfer IN",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-60m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "httpHost": {
+                  "query": "rata.integration.digitraffic.fi"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "sum_requestBytes": {
+        "scripted_metric": {
+          "init_script": "state.responses = ['total': 0L]",
+          "map_script": "state.responses.total+= doc['bytes'].value",
+          "combine_script": "state.responses",
+          "reduce_script": "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));"
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CLOUDFRONT PRD RAIL RUNBOOK-C2 - integration Cloudfront data transfer IN",
+        "condition": "!(ctx.results[0].aggregations.sum_requestBytes.value >= 0 && ctx.results[0].aggregations.sum_requestBytes.value <= 15)",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CLOUDFRONT PRD RAIL RUNBOOK-C2 - integration Cloudfront data transfer IN should be between 0 MB and 15 MB, was {{ctx.results.0.aggregations.sum_requestBytes.value}} MB",
+            "message": "",
+            "throttleMinutes": 120
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "PARKING TST RUNBOOK-L1 - Liipi user's organization not found",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -7155,14 +8745,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST RUNBOOK-L1 Liipi user's organization not found",
+        "name": "PARKING TST RUNBOOK-L1 - Liipi user's organization not found",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST RUNBOOK-L1 Liipi user's organization not found {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: PARKING TST RUNBOOK-L1 - Liipi user's organization not found {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -7171,7 +8762,7 @@
     ]
   },
   {
-    "name": "PRD RUNBOOK-L1 Liipi user's organization not found",
+    "name": "PARKING PRD RUNBOOK-L1 - Liipi user's organization not found",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-cwl*"
@@ -7222,14 +8813,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD RUNBOOK-L1 Liipi user's organization not found",
+        "name": "PARKING PRD RUNBOOK-L1 - Liipi user's organization not found",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD RUNBOOK-L1 Liipi user's organization not found {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: PARKING PRD RUNBOOK-L1 - Liipi user's organization not found {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -7238,7 +8830,803 @@
     ]
   },
   {
-    "name": "TST TIS errors",
+    "name": "STATUS TST Errors",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "status"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "level": {
+                  "query": "ERROR"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "STATUS TST Errors",
+        "condition": "ctx.results[0].hits.total.value > 0",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: STATUS TST Errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "STATUS PRD Errors",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "status"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "level": {
+                  "query": "ERROR"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "STATUS PRD Errors",
+        "condition": "ctx.results[0].hits.total.value > 0",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: STATUS PRD Errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG TST Errors",
+    "cron": "0 8 * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-1440m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "level": {
+                  "query": "ERROR"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "filename": {
+        "terms": {
+          "field": "filename.keyword"
+        },
+        "aggregations": {
+          "fn_name": {
+            "terms": {
+              "field": "funcName.keyword"
+            },
+            "aggregations": {
+              "messages": {
+                "terms": {
+                  "field": "message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CATALOG TST Errors",
+        "condition": "true",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CATALOG TST Errors",
+            "message": "*{{ctx.results.0.hits.total.value}}* Errors in total\n\nBreakdown of the errors\n---\n{{#ctx.results.0.aggregations.filename.buckets}}\n*{{key}}*\n{{#fn_name.buckets}}\n`{{key}}` function call emitted {{doc_count}} errors.\nA sample error (there might be different kinds of errors as well)\n```\n{{messages.buckets.0.key}}\n```\n{{/fn_name.buckets}}\n{{/ctx.results.0.aggregations.filename.buckets}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/app/dashboards?security_tenant=FintrafficDigitraffic#/view/77a64560-72c3-11f0-927a-3bf9d46f4557?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-1d,to:now))|Opensearch>",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG TST RUNBOOK-D1 - Unfinished Sign Ins",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": "now-5m"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "alert.id": {
+                  "query": "AUTH_FLOW"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "correlation_ids": {
+        "terms": {
+          "field": "alert.correlation_id.keyword"
+        },
+        "aggregations": {
+          "unfinished_signins": {
+            "bucket_selector": {
+              "buckets_path": {
+                "count": "_count"
+              },
+              "script": "params.count < 2"
+            }
+          }
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CATALOG TST RUNBOOK-D1 - Unfinished Sign Ins",
+        "condition": "ctx.results[0].aggregations.correlation_ids.buckets.length > 2",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CATALOG TST RUNBOOK-D1 - Unfinished Sign Ins {{ctx.results.0.aggregations.correlation_ids.buckets.length}} should not be more than 2",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG PRD Errors",
+    "cron": "0 8 * * *",
+    "indices": [
+      "ft-digitraffic-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-1440m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "level": {
+                  "query": "ERROR"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {
+      "filename": {
+        "terms": {
+          "field": "filename.keyword"
+        },
+        "aggregations": {
+          "fn_name": {
+            "terms": {
+              "field": "funcName.keyword"
+            },
+            "aggregations": {
+              "messages": {
+                "terms": {
+                  "field": "message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "triggers": [
+      {
+        "name": "CATALOG PRD Errors",
+        "condition": "true",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: CATALOG PRD Errors",
+            "message": "*{{ctx.results.0.hits.total.value}}* Errors in total\n\nBreakdown of the errors\n---\n{{#ctx.results.0.aggregations.filename.buckets}}\n*{{key}}*\n{{#fn_name.buckets}}\n`{{key}}` function call emitted {{doc_count}} errors.\nA sample error (there might be different kinds of errors as well)\n```\n{{messages.buckets.0.key}}\n```\n{{/fn_name.buckets}}\n{{/ctx.results.0.aggregations.filename.buckets}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/app/dashboards?security_tenant=FintrafficDigitraffic#/view/525f74f0-7379-11f0-b0d2-67828a0213d5?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-1d,to:now))|Opensearch>",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG TST RUNBOOK-D2 - Error when creating a new dataset",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "request": {
+                  "query": "/dataset/new"
+                }
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "bool": {
+                "should": [
+                  {
+                    "match_phrase": {
+                      "httpStatusCode": {
+                        "query": "200"
+                      }
+                    }
+                  },
+                  {
+                    "match_phrase": {
+                      "httpStatusCode": {
+                        "query": "403"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CATALOG TST RUNBOOK-D2 - Error when creating a new dataset",
+        "condition": "ctx.results[0].hits.total.value > 2",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CATALOG TST RUNBOOK-D2 - Error when creating a new dataset {{ctx.results.0.hits.total.value}} should not be more than 2",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG TST RUNBOOK-D2 - Error when creating a new distribution",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            },
+            {
+              "wildcard": {
+                "request.keyword": {
+                  "value": "/dataset/*/resource/new"
+                }
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "bool": {
+                "should": [
+                  {
+                    "match_phrase": {
+                      "httpStatusCode": {
+                        "query": "200"
+                      }
+                    }
+                  },
+                  {
+                    "match_phrase": {
+                      "httpStatusCode": {
+                        "query": "403"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CATALOG TST RUNBOOK-D2 - Error when creating a new distribution",
+        "condition": "ctx.results[0].hits.total.value > 2",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CATALOG TST RUNBOOK-D2 - Error when creating a new distribution {{ctx.results.0.hits.total.value}} should not be more than 2",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG TST RUNBOOK-D3 - Error when fetching catalog MobilityDCAT-AP metadata",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            },
+            {
+              "wildcard": {
+                "request.keyword": {
+                  "value": "/catalog.*"
+                }
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "match_phrase": {
+                "httpStatusCode": {
+                  "query": "200"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CATALOG TST RUNBOOK-D3 - Error when fetching catalog MobilityDCAT-AP metadata",
+        "condition": "ctx.results[0].hits.total.value > 2",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CATALOG TST RUNBOOK-D3 - Error when fetching catalog MobilityDCAT-AP metadata {{ctx.results.0.hits.total.value}} should not be more than 2",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG TST RUNBOOK-D3 - Error when fetching dataset MobilityDCAT-AP metadata",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            },
+            {
+              "regexp": {
+                "request.keyword": {
+                  "value": "/dataset/[a-zA-Z0-9-]+\\..{1,3}"
+                }
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "match_phrase": {
+                "httpStatusCode": {
+                  "query": "200"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CATALOG TST RUNBOOK-D3 - Error when fetching dataset MobilityDCAT-AP metadata",
+        "condition": "ctx.results[0].hits.total.value > 2",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CATALOG TST RUNBOOK-D3 - Error when fetching dataset MobilityDCAT-AP metadata {{ctx.results.0.hits.total.value}} should not be more than 2",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "CATALOG TST RUNBOOK-D4 - Catalog might be down",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-access-cdn*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "catalog"
+                }
+              }
+            }
+          ],
+          "must_not": [
+            {
+              "range": {
+                "httpStatusCode": {
+                  "from": 500,
+                  "to": 599
+                }
+              }
+            }
+          ]
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "CATALOG TST RUNBOOK-D4 - Catalog might be down",
+        "condition": "ctx.results[0].hits.total.value > 100",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: CATALOG TST RUNBOOK-D4 - Catalog might be down {{ctx.results.0.hits.total.value}} should not be more than 100",
+            "message": "",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "TIS TST Errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-tis-cwl*"
@@ -7282,14 +9670,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "TST TIS errors",
+        "name": "TIS TST Errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: TST TIS errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: TIS TST Errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }
@@ -7298,7 +9687,7 @@
     ]
   },
   {
-    "name": "PRD TIS errors",
+    "name": "TIS PRD Errors",
     "cron": "2/5 * * * *",
     "indices": [
       "ft-digitraffic-tis-cwl*"
@@ -7342,14 +9731,15 @@
         }
       ]
     },
+    "aggregations": {},
     "triggers": [
       {
-        "name": "PRD TIS errors",
+        "name": "TIS PRD Errors",
         "condition": "ctx.results[0].hits.total.value > 0",
         "actions": [
           {
             "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: PRD TIS errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "subject": ":red_circle: TIS PRD Errors {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "",
             "throttleMinutes": 30
           }

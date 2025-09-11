@@ -40,7 +40,8 @@ export type CloudfrontField =
   | "subdomain"
   | "timeToFirstByte"
   | "httpHost"
-  | "stack_trace";
+  | "stack_trace"
+  | "dump_log";
 
 export type HttpUserAgentField = "@fields.http_user_agent";
 

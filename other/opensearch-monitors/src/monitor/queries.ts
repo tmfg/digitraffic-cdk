@@ -46,6 +46,14 @@ export interface MatchPhraseQuery {
   };
 }
 
+export interface MultiMatchPhraseQuery {
+  multi_match: {
+    query: string;
+    fields: string[];
+    type: "phrase";
+  };
+}
+
 export interface WildcardQuery {
   wildcard: {
     [field: string]: { value: string };
@@ -87,6 +95,7 @@ export type Query =
   | BoolQuery
   | BoolOrQuery
   | MatchPhraseQuery
+  | MultiMatchPhraseQuery
   | WildcardQuery
   | RegExpQuery
   | RangeQuery
