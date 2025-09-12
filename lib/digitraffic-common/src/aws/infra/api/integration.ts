@@ -32,6 +32,7 @@ export class DigitrafficIntegration<T extends string> {
   readonly lambda: IFunction;
   readonly mediaType: MediaType;
   readonly parameters: ApiParameter[] = [];
+  readonly deprecation: boolean = false;
   readonly sunset?: string;
 
   _passAllQueryParameters: boolean;
@@ -40,11 +41,13 @@ export class DigitrafficIntegration<T extends string> {
   constructor(
     lambda: IFunction,
     mediaType: MediaType = MediaType.TEXT_PLAIN,
+    deprecation: boolean = false,
     sunset?: string,
   ) {
     this.lambda = lambda;
     this.mediaType = mediaType;
     this.sunset = sunset;
+    this.deprecation = deprecation;
     this._passAllQueryParameters = false;
     this._passBody = false;
   }
@@ -211,6 +214,12 @@ ${this._passBody ? VELOCITY_PASS_BODY : ""}
   }
 
   createResponses(): IntegrationResponse[] {
-    return [DigitrafficIntegrationResponse.ok(this.mediaType, this.sunset)];
+    return [
+      DigitrafficIntegrationResponse.ok(
+        this.mediaType,
+        this.deprecation,
+        this.sunset,
+      ),
+    ];
   }
 }

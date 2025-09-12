@@ -47,12 +47,16 @@ $util.base64Decode($inputRoot.body)`;
  * @param sunset Sunset date as string in ISO 8601 date-time format (YYYY-MM-DD)
  */
 
-export const getDeprecatedDefaultLambdaResponse = (sunset: string): string => {
+export const getDeprecatedDefaultLambdaResponse = (sunset?: string): string => {
   const setDeprecationHeaders =
     `#set ($context.responseOverride.header.Deprecation = 'true')
-#set ($context.responseOverride.header.Sunset = '${
-      dateFromIsoString(sunset).toUTCString()
-    }')`;
+    ${
+      sunset
+        ? `#set ($context.responseOverride.header.Sunset = '${
+          dateFromIsoString(sunset).toUTCString()
+        }')`
+        : ""
+    }`;
   return RESPONSE_DEFAULT_LAMBDA.concat(setDeprecationHeaders);
 };
 
