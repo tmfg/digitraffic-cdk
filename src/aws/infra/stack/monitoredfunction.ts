@@ -17,6 +17,7 @@ import {
 } from "./lambda-configs.js";
 import type { TrafficType } from "../../../types/traffictype.js";
 import { chain } from "lodash-es";
+import { createLambdaLogGroup } from "./lambda-log-group.js";
 
 /**
  * Allows customization of CloudWatch Alarm properties
@@ -244,11 +245,15 @@ export class MonitoredFunction extends Function {
           .replace(/\s/g, "")
           .value()
       }`;
+
+    const logGroup = createLambdaLogGroup({ stack, functionName });
+
     const functionProps = databaseFunctionProps(
       stack,
       environment,
       functionName,
       name,
+      logGroup,
       functionParameters,
     );
 
@@ -327,12 +332,15 @@ export class MonitoredDBFunction {
           .replace(/\s/g, "")
           .value()
       }`;
+
+    const logGroup = createLambdaLogGroup({ stack, functionName });
     const env = environment ? environment : stack.createLambdaEnvironment();
     const functionProps = databaseFunctionProps(
       stack,
       env,
       functionName,
       name,
+      logGroup,
       functionParameters,
     );
 

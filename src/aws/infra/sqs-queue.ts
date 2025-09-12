@@ -3,7 +3,6 @@ import { Duration } from "aws-cdk-lib";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { InlineCode, Runtime } from "aws-cdk-lib/aws-lambda";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import {
   ComparisonOperator,
@@ -20,6 +19,7 @@ import {
 } from "@aws-sdk/client-s3";
 import type { NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { logger } from "../runtime/dt-logger-default.js";
+import { createLambdaLogGroup } from "./stack/lambda-log-group.js";
 
 const DLQ_LAMBDA_CODE = `
 import type { ObjectCannedACL } from "@aws-sdk/client-s3";
@@ -84,6 +84,7 @@ export class DigitrafficSqsQueue extends Queue {
 export class DigitrafficDLQueue {
   static create(stack: DigitrafficStack, name: string): DigitrafficSqsQueue {
     const dlqName = `${stack.configuration.shortName}-${name}-DLQ`;
+    const dlqFunctionName = `${dlqName}-Function`;
 
     const dlq = new DigitrafficSqsQueue(stack, dlqName, {
       queueName: dlqName,
@@ -95,10 +96,14 @@ export class DigitrafficDLQueue {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 
-    const dlqFunctionName = `${dlqName}-Function`;
+    const dlqLogGroup = createLambdaLogGroup({
+      stack,
+      functionName: dlqFunctionName,
+    });
+
     const lambda = MonitoredFunction.create(stack, dlqFunctionName, {
       runtime: Runtime.NODEJS_22_X,
-      logRetention: RetentionDays.ONE_YEAR,
+      logGroup: dlqLogGroup,
       functionName: dlqFunctionName,
       code: getDlqCode(dlqBucket.bucketName),
       timeout: Duration.seconds(10),

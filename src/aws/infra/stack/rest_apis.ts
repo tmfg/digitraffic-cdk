@@ -31,6 +31,7 @@ import { createDefaultUsagePlan, createUsagePlan } from "../usage-plans.js";
 import type { DigitrafficStack } from "./stack.js";
 
 import { set } from "lodash-es";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 export const PUBLIC_REST_API_CORS_CONFIG = {
   defaultCorsPreflightOptions: {
@@ -50,6 +51,8 @@ export const PUBLIC_REST_API_CORS_CONFIG = {
 export class DigitrafficRestApi extends RestApi {
   readonly apiKeyIds: string[];
   readonly enableDocumentation: boolean;
+
+  private readonly _stack: DigitrafficStack;
 
   constructor(
     stack: DigitrafficStack,
@@ -78,6 +81,7 @@ export class DigitrafficRestApi extends RestApi {
 
     super(stack, apiId, apiConfig);
 
+    this._stack = stack;
     this.apiKeyIds = [];
     this.enableDocumentation =
       stack.configuration.stackFeatures?.enableDocumentation ?? true;
@@ -89,6 +93,39 @@ export class DigitrafficRestApi extends RestApi {
     return `${this.restApiId}.execute-api.${
       (this.stack as DigitrafficStack).region
     }.amazonaws.com`;
+  }
+
+  /** Export end point and api key to Parameter store */
+  exportEndpoint(): void;
+  /** Export end point and given api key to Parameter store */
+  exportEndpoint(apiKeyId: string): void;
+
+  exportEndpoint(apiKeyId?: string): void {
+    const firstKey = this.apiKeyIds[0];
+
+    if (!apiKeyId) {
+      if (this.apiKeyIds.length > 1) {
+        throw new Error("Multiple apikeys, configure which to export");
+      }
+
+      if (!firstKey) {
+        throw new Error("No apikeys to export");
+      }
+
+      apiKeyId = firstKey;
+    }
+
+    new StringParameter(this._stack, "export.endpoint", {
+      parameterName:
+        `/digitraffic/${this._stack.configuration.shortName}/endpointUrl`,
+      stringValue: this.url,
+    });
+
+    new StringParameter(this._stack, "export.apiKeyId", {
+      parameterName:
+        `/digitraffic/${this._stack.configuration.shortName}/apiKeyId`,
+      stringValue: apiKeyId,
+    });
   }
 
   createUsagePlan(apiKeyId: string, apiKeyName: string): string {
