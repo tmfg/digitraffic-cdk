@@ -1,19 +1,22 @@
-import type {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import {DigitrafficMethodResponse, MessageModel,} from "@digitraffic/common/dist/aws/infra/api/response";
-import type {Model, Resource} from "aws-cdk-lib/aws-apigateway";
-import {MonitoredDBFunction} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import {
+  DigitrafficMethodResponse,
+  MessageModel,
+} from "@digitraffic/common/dist/aws/infra/api/response";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   addServiceModel,
   featureSchema,
   geojsonSchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import {nauticalWarningSchema} from "./model/nautical-warnings-schema.js";
-import {DocumentationPart} from "@digitraffic/common/dist/aws/infra/documentation";
-import {DigitrafficIntegration} from "@digitraffic/common/dist/aws/infra/api/integration";
-import type {NauticalWarningConfiguration} from "./nautical-warnings-stack.js";
+import { nauticalWarningSchema } from "./model/nautical-warnings-schema.js";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import type { NauticalWarningConfiguration } from "./nautical-warnings-stack.js";
 
 const NAUTICAL_WARNING_TAGS_V1 = ["Nautical Warning V1"];
 
@@ -83,13 +86,13 @@ export class PublicApi {
       lambdaActive,
       MediaType.APPLICATION_GEOJSON,
       // set deprecation
-      true
+      true,
     ).build();
     const archivedIntegration = new DigitrafficIntegration(
       lambdaArchived,
       MediaType.APPLICATION_GEOJSON,
       // set deprecation
-      true
+      true,
     ).build();
 
     ["GET", "HEAD"].forEach((httpMethod) => {
@@ -115,7 +118,7 @@ export class PublicApi {
             this.geojsonModel,
             MediaType.APPLICATION_GEOJSON,
             // set deprecation
-            true
+            true,
           ),
           DigitrafficMethodResponse.response500(),
         ],
