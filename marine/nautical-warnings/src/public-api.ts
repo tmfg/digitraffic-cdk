@@ -1,22 +1,19 @@
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import {
-  DigitrafficMethodResponse,
-  MessageModel,
-} from "@digitraffic/common/dist/aws/infra/api/response";
-import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import type {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
+import {DigitrafficRestApi} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import {DigitrafficMethodResponse, MessageModel,} from "@digitraffic/common/dist/aws/infra/api/response";
+import type {Model, Resource} from "aws-cdk-lib/aws-apigateway";
+import {MonitoredDBFunction} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   addServiceModel,
   featureSchema,
   geojsonSchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import { nauticalWarningSchema } from "./model/nautical-warnings-schema.js";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import type { NauticalWarningConfiguration } from "./nautical-warnings-stack.js";
+import {nauticalWarningSchema} from "./model/nautical-warnings-schema.js";
+import {DocumentationPart} from "@digitraffic/common/dist/aws/infra/documentation";
+import {DigitrafficIntegration} from "@digitraffic/common/dist/aws/infra/api/integration";
+import type {NauticalWarningConfiguration} from "./nautical-warnings-stack.js";
 
 const NAUTICAL_WARNING_TAGS_V1 = ["Nautical Warning V1"];
 
@@ -85,12 +82,14 @@ export class PublicApi {
     const activeIntegration = new DigitrafficIntegration(
       lambdaActive,
       MediaType.APPLICATION_GEOJSON,
-      "TBD",
+      // set deprecation
+      true
     ).build();
     const archivedIntegration = new DigitrafficIntegration(
       lambdaArchived,
       MediaType.APPLICATION_GEOJSON,
-      "TBD",
+      // set deprecation
+      true
     ).build();
 
     ["GET", "HEAD"].forEach((httpMethod) => {
@@ -100,6 +99,8 @@ export class PublicApi {
           DigitrafficMethodResponse.response200(
             this.geojsonModel,
             MediaType.APPLICATION_GEOJSON,
+            // set deprecation
+            true,
           ),
           DigitrafficMethodResponse.response500(),
         ],
@@ -113,6 +114,8 @@ export class PublicApi {
           DigitrafficMethodResponse.response200(
             this.geojsonModel,
             MediaType.APPLICATION_GEOJSON,
+            // set deprecation
+            true
           ),
           DigitrafficMethodResponse.response500(),
         ],
@@ -124,7 +127,7 @@ export class PublicApi {
       DocumentationPart.method(
         NAUTICAL_WARNING_TAGS_V1,
         "GetActiveNauticalWarnings",
-        "Return all active nautical warnings",
+        "Return all active nautical warnings. Will be removed beginning of 2026.",
       ),
     );
     this.publicApi.documentResource(
@@ -132,7 +135,7 @@ export class PublicApi {
       DocumentationPart.method(
         NAUTICAL_WARNING_TAGS_V1,
         "GetArchivedNauticalWarnings",
-        "Return all archived nautical warnings",
+        "Return all archived nautical warnings. Will be removed beginning of 2026.",
       ),
     );
   }
