@@ -117,6 +117,7 @@ export class DigitrafficMethodResponse {
     mediaType: MediaType,
     disableCors: boolean = false,
     deprecation: boolean = false,
+    sunset: boolean = false,
   ): MethodResponse {
     return {
       statusCode,
@@ -129,6 +130,8 @@ export class DigitrafficMethodResponse {
         }),
         ...(deprecation && {
           "method.response.header.Deprecation": true,
+        }),
+        ...(sunset && {
           "method.response.header.Sunset": true,
         }),
       },
@@ -138,8 +141,17 @@ export class DigitrafficMethodResponse {
   static response200(
     model: IModel,
     mediaType: MediaType = MediaType.APPLICATION_JSON,
+    deprecation: boolean = false,
+    sunset: boolean = false,
   ): MethodResponse {
-    return DigitrafficMethodResponse.response("200", model, mediaType, false);
+    return DigitrafficMethodResponse.response(
+      "200",
+      model,
+      mediaType,
+      false,
+      deprecation,
+      sunset,
+    );
   }
 
   static response500(
