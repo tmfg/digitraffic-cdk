@@ -25,7 +25,7 @@ export function createSubscription(
     stack,
     `${lambdaName}LogsSubscription`,
     {
-      logGroupName: `/aws/lambda/${lambdaName}`,
+      logGroupName: lambda.logGroup.logGroupName,
       filterPattern: "",
       destinationArn: logDestinationArn,
     },
@@ -45,7 +45,7 @@ export class DigitrafficLogSubscriptions {
           stack,
           `${lambda.givenName}LogsSubscription`,
           {
-            logGroupName: `/aws/lambda/${lambda.givenName}`,
+            logGroupName: lambda.logGroup.logGroupName,
             filterPattern: "",
             destinationArn,
           },

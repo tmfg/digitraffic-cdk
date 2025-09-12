@@ -37,10 +37,8 @@ export function createExceptionLogger(
 /**
  * Log given exception with level ERROR to given logger.
  *
- * Supports AxiosError, Error and string
- *
  * @param logger - DtLogger to use
- * @param error - AxiosError, Error or string to log
+ * @param error - Error or string to log
  * @param [includeStack=true] - Include stack in the message, default false
  * @returns Logs the error without rethrowing
  * @see {@link DtLogger.log}
@@ -61,24 +59,10 @@ export function logException(
     ? error.stack
     : undefined;
 
-  // In case error is AxiosError, log the custom code property.
-  // eslint-disable-next-line dot-notation
-  const customCode = (error as Record<string, string>)["code"];
-
-  if (customCode) {
-    logger.error({
-      type: "Error",
-      method: `${functionName}.logException`,
-      message: `error=${message}`,
-      customCode,
-      stack,
-    });
-  } else {
-    logger.error({
-      type: "Error",
-      method: `${functionName}.logException`,
-      message: `error=${message}`,
-      stack,
-    });
-  }
+  logger.error({
+    type: "Error",
+    method: `${functionName}.logException`,
+    message: `error=${message}`,
+    stack,
+  });
 }
