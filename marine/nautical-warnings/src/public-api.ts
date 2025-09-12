@@ -85,10 +85,12 @@ export class PublicApi {
     const activeIntegration = new DigitrafficIntegration(
       lambdaActive,
       MediaType.APPLICATION_GEOJSON,
+      "TBD"
     ).build();
     const archivedIntegration = new DigitrafficIntegration(
       lambdaArchived,
       MediaType.APPLICATION_GEOJSON,
+      "TBD"
     ).build();
 
     ["GET", "HEAD"].forEach((httpMethod) => {
