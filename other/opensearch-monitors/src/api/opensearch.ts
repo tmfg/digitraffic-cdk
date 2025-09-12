@@ -6,6 +6,7 @@ import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { opensearchMonitor, type OSMonitor } from "../monitor/monitor.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import * as util from "node:util";
 
 export interface OSResponse {
   readonly result: string;
@@ -66,6 +67,7 @@ export class OpenSearch {
     method: HttpMethod,
     path: string,
     body: string | undefined = undefined,
+    monitorName: string | undefined = undefined,
   ): Promise<OSMonitorsResponse | undefined> {
     const request = new HttpRequest({
       body,
@@ -95,8 +97,7 @@ export class OpenSearch {
 
     // 200 from delete, 201 from create
     if (response.statusCode > 201) {
-      logger.debug(JSON.stringify(response));
-
+      logger.debug("RESPONSE: " + util.inspect(response, { depth: null }));
       logger.error({
         method: "OpenSearch.send",
         customUrl: path,
@@ -104,6 +105,8 @@ export class OpenSearch {
         customStatusCode: response.statusCode,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         customStatusMessage: response.body.statusMessage,
+        customMonitorName: monitorName,
+        customBody: body,
       });
     }
 
@@ -141,10 +144,12 @@ export class OpenSearch {
       : [];
   }
 
-  async deleteMonitor(id: string): Promise<OSMonitorsResponse | undefined> {
-    const queryUrl = `${OS_MONITORS_URL_PATH}${id}`;
+  async deleteMonitor(
+    monitor: MonitorNameAndId,
+  ): Promise<OSMonitorsResponse | undefined> {
+    const queryUrl = `${OS_MONITORS_URL_PATH}${monitor.id}`;
 
-    return this.send("DELETE", queryUrl);
+    return this.send("DELETE", queryUrl, undefined, monitor.name);
   }
 
   addMonitor(monitor: OSMonitor): Promise<OSMonitorsResponse | undefined> {
@@ -154,6 +159,7 @@ export class OpenSearch {
       "POST",
       OS_MONITORS_URL_PATH,
       JSON.stringify(opensearchMonitor(monitor)),
+      monitor.name,
     );
   }
 
@@ -166,18 +172,90 @@ export class OpenSearch {
     });
 
     await Promise.allSettled(
-      monitors.map(async (monitor) => this.deleteMonitor(monitor.id)),
+      monitors.map(async (monitor) => this.deleteMonitor(monitor)),
     );
   }
 
   async addMonitors(monitors: OSMonitor[]): Promise<void> {
     logger.info({
       method: "OpenSearch.addMonitors",
+      message: "Start",
       customCount: monitors.length,
     });
 
     await Promise.allSettled(
-      monitors.map(async (monitor) => this.addMonitor(monitor)),
+      monitors.map(async (monitor) => {
+        try {
+          const response = await this.addMonitor(monitor);
+          logger.info({
+            method: "OpenSearch.addMonitors",
+            message: "Added monitor",
+            customName: monitor.name,
+          });
+          return response;
+        } catch (error) {
+          logger.error({
+            method: "OpenSearch.addMonitors",
+            message: "Failed to add monitor",
+            customName: monitor.name,
+            error,
+          });
+          throw error;
+        }
+      }),
     );
+  }
+
+  async checkMonitorsUptodate(
+    expectedMonitors: OSMonitor[],
+  ): Promise<void> {
+    const currentMonitors = await this.getAllMonitors();
+    // Build a Set of names from currentMonitors
+    const currentNames = new Set(currentMonitors.map((m) => m.name));
+    const expectedNames = new Set(expectedMonitors.map((m) => m.name));
+
+    // Find monitors that are missing in monitorsAfterUpdate
+    // Check for monitors that are in currentMap but missing in updatedMap
+    const unexpectedMonitors = [...currentNames.keys()].filter((name) =>
+      !expectedNames.has(name)
+    );
+
+    const missingMonitors = [...expectedNames.keys()].filter((name) =>
+      !currentNames.has(name)
+    );
+
+    if (missingMonitors.length > 0) {
+      logger.error({
+        method: "UpdateOsMonitors.checkMonitorsUptodate",
+        message: "Missing monitors",
+        customMissingMonitors: missingMonitors.join(", "),
+      });
+      throw new Error(
+        `UpdateOsMonitors.checkMonitorsUptodate failed. Missing monitors ${
+          missingMonitors.join(", ")
+        }`,
+      );
+    } else {
+      logger.info({
+        method: "UpdateOsMonitors.checkMonitorsUptodate",
+        message: "All monitors are present",
+        customCount: expectedMonitors.length,
+      });
+    }
+
+    if (unexpectedMonitors.length > 0) {
+      logger.error({
+        method: "UpdateOsMonitors.checkMonitorsUptodate",
+        message: "Unexpected monitors found:",
+        customNotExpectedMonitors: unexpectedMonitors.join(", "),
+      });
+      throw new Error(
+        `UpdateOsMonitors.checkMonitorsUptodate failed. Unexpected monitors found: ${
+          unexpectedMonitors.join(", ")
+        }`,
+      );
+    } else {
+      logger.debug({ message: "No unexpected monitors are present" });
+    }
   }
 }

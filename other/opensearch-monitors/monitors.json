@@ -1,5 +1,155 @@
 [
   {
+    "name": "AFIR TST Lambda errors",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-afir-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "tst"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "afir"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "@log_group": {
+                  "query": "lambda"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "level": {
+                  "query": "ERROR"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "AFIR TST Lambda errors",
+        "condition": "ctx.results[0].hits.total.value > 0",
+        "actions": [
+          {
+            "destination": "NnNtfocBGCKZ_YfaLa6j",
+            "subject": ":red_circle: AFIR TST Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/7fd7a861a44eed72e9428c23b18af4f7?security_tenant=FintrafficDigitraffic|Opensearch>",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "AFIR PRD Lambda errors",
+    "cron": "2/5 * * * *",
+    "indices": [
+      "ft-digitraffic-afir-cwl*"
+    ],
+    "query": {
+      "size": 1,
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "from": "now-15m",
+                  "to": null
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "env": {
+                  "query": "prd"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "accountName": {
+                  "query": "afir"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "@log_group": {
+                  "query": "lambda"
+                }
+              }
+            },
+            {
+              "match_phrase": {
+                "level": {
+                  "query": "ERROR"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "desc"
+          }
+        }
+      ]
+    },
+    "aggregations": {},
+    "triggers": [
+      {
+        "name": "AFIR PRD Lambda errors",
+        "condition": "ctx.results[0].hits.total.value > 0",
+        "actions": [
+          {
+            "destination": "fzj5-ocBTeP6dVoCrXqR",
+            "subject": ":red_circle: AFIR PRD Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
+            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/01a085906b0c577b555d29fe296cc611?security_tenant=FintrafficDigitraffic|Opensearch>",
+            "throttleMinutes": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
     "name": "MARINE TST RUNBOOK-M2 - Ais metadata sent < 80",
     "cron": "2/5 * * * *",
     "indices": [
@@ -3443,644 +3593,6 @@
             "destination": "fzj5-ocBTeP6dVoCrXqR",
             "subject": ":red_circle: ROAD PRD Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
             "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/0f456de30f2ba7b15edfc5b855d3cae7?security_tenant=FintrafficDigitraffic|Opensearch>",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR TST Active",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "tst"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR TST Active",
-        "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 50)",
-        "actions": [
-          {
-            "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: AFIR TST Active should be between 0 and 50, was {{ctx.results.0.hits.total.value}}",
-            "message": "",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR TST Lambda errors",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "tst"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "@log_group": {
-                  "query": "lambda"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "level": {
-                  "query": "ERROR"
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR TST Lambda errors",
-        "condition": "ctx.results[0].hits.total.value > 0",
-        "actions": [
-          {
-            "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: AFIR TST Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
-            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/7fd7a861a44eed72e9428c23b18af4f7?security_tenant=FintrafficDigitraffic|Opensearch>",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR TST Lambda timeouts",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "tst"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "@log_group": {
-                  "query": "lambda"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "log_line": {
-                  "query": "task timed out"
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR TST Lambda timeouts",
-        "condition": "ctx.results[0].hits.total.value > 0",
-        "actions": [
-          {
-            "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: AFIR TST Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
-            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR TST Lambda memory usage over 95%",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "tst"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "@log_group": {
-                  "query": "lambda"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "type": {
-                  "query": "platform.report"
-                }
-              }
-            },
-            {
-              "script": {
-                "script": "((100.0*doc['record.metrics.maxMemoryUsedMB'].value)/doc['record.metrics.memorySizeMB'].value) > 95"
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR TST Lambda memory usage over 95%",
-        "condition": "ctx.results[0].hits.total.value > 0",
-        "actions": [
-          {
-            "destination": "NnNtfocBGCKZ_YfaLa6j",
-            "subject": ":red_circle: AFIR TST Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
-            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/25328a194d1be48a2bc0d69de2b30dbc?security_tenant=FintrafficDigitraffic|Opensearch>",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR PRD Active",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "prd"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR PRD Active",
-        "condition": "!(ctx.results[0].hits.total.value >= 0 && ctx.results[0].hits.total.value <= 15000)",
-        "actions": [
-          {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: AFIR PRD Active should be between 0 and 15000, was {{ctx.results.0.hits.total.value}}",
-            "message": "",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR PRD Lambda errors",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "prd"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "@log_group": {
-                  "query": "lambda"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "level": {
-                  "query": "ERROR"
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR PRD Lambda errors",
-        "condition": "ctx.results[0].hits.total.value > 0",
-        "actions": [
-          {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: AFIR PRD Lambda errors {{ctx.results.0.hits.total.value}} should not be more than 0",
-            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/01a085906b0c577b555d29fe296cc611?security_tenant=FintrafficDigitraffic|Opensearch>",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR PRD Lambda timeouts",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "prd"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "@log_group": {
-                  "query": "lambda"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "log_line": {
-                  "query": "task timed out"
-                }
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR PRD Lambda timeouts",
-        "condition": "ctx.results[0].hits.total.value > 0",
-        "actions": [
-          {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: AFIR PRD Lambda timeouts {{ctx.results.0.hits.total.value}} should not be more than 0",
-            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
-            "throttleMinutes": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "name": "AFIR PRD Lambda memory usage over 95%",
-    "cron": "2/5 * * * *",
-    "indices": [
-      "ft-digitraffic-afir-cwl*"
-    ],
-    "query": {
-      "size": 1,
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "range": {
-                "@timestamp": {
-                  "from": "now-15m",
-                  "to": null
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "env": {
-                  "query": "prd"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "accountName": {
-                  "query": "afir"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "lambdaName": {
-                  "query": "*"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "@log_group": {
-                  "query": "lambda"
-                }
-              }
-            },
-            {
-              "match_phrase": {
-                "type": {
-                  "query": "platform.report"
-                }
-              }
-            },
-            {
-              "script": {
-                "script": "((100.0*doc['record.metrics.maxMemoryUsedMB'].value)/doc['record.metrics.memorySizeMB'].value) > 95"
-              }
-            }
-          ],
-          "must_not": []
-        }
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "desc"
-          }
-        }
-      ]
-    },
-    "aggregations": {},
-    "triggers": [
-      {
-        "name": "AFIR PRD Lambda memory usage over 95%",
-        "condition": "ctx.results[0].hits.total.value > 0",
-        "actions": [
-          {
-            "destination": "fzj5-ocBTeP6dVoCrXqR",
-            "subject": ":red_circle: AFIR PRD Lambda memory usage over 95% {{ctx.results.0.hits.total.value}} should not be more than 0",
-            "message": "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}} <https://os.fintraffic-centralized-logging-prd.aws.fintraffic.cloud/_dashboards/goto/25328a194d1be48a2bc0d69de2b30dbc?security_tenant=FintrafficDigitraffic|Opensearch>",
             "throttleMinutes": 30
           }
         ]

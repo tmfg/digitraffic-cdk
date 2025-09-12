@@ -55,6 +55,7 @@ export const handler = async (): Promise<void> => {
       const os = new OpenSearch(OS_HOST, OS_VPC_ENDPOINT, role);
       await os.deleteAllMonitors();
       await os.addMonitors(monitors);
+      await os.checkMonitorsUptodate(monitors);
     }
   } catch (error) {
     logException(logger, error);
