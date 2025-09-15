@@ -60,12 +60,6 @@ export class UpdateOSMonitorsStack extends Stack {
         JSON.stringify(config.monitors, null, 2),
       );
 
-      // Just for reference to compare changes
-      writeFileSync(
-        "./monitors.json",
-        JSON.stringify(config.monitors, null, 2),
-      );
-
       this.createLambda(
         vpc,
         lambdaSg,
