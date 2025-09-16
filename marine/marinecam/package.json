@@ -37,7 +37,7 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/aws-lambda": "8.10.152",
@@ -51,6 +51,6 @@
     "parallelshell": "^3.0.2",
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
-    "typescript": "~5.8.3"
+    "typescript": "^5.9.2"
   }
 }

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const serverObject = z.object({
   url: z.string(),
   description: z.string().optional(),
-  variables: z.record(z.unknown()).optional(),
+  variables: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const parameterObject = z.object({
@@ -28,8 +28,8 @@ export const parameterObject = z.object({
   allowReserved: z.boolean().optional(),
   schema: z.unknown().optional(),
   example: z.unknown().optional(),
-  examples: z.record(z.unknown()).optional(),
-  content: z.record(z.unknown()).optional(),
+  examples: z.record(z.string(), z.unknown()).optional(),
+  content: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const referenceObject = z.object({
@@ -50,7 +50,7 @@ export const openapiOperation = z
     responses: z.unknown(),
     callbacks: z.unknown(),
     deprecated: z.boolean(),
-    security: z.array(z.record(z.array(z.string()))),
+    security: z.array(z.record(z.string(), z.array(z.string()))),
     servers: z.array(z.unknown()),
   })
   .partial();
@@ -108,6 +108,7 @@ export const openapiSchema = z
             description: z.string().optional(),
             variables: z
               .record(
+                z.string(),
                 z
                   .object({
                     enum: z.array(z.string()).optional(),
@@ -121,7 +122,7 @@ export const openapiSchema = z
           .strict(),
       )
       .optional(),
-    security: z.array(z.record(z.array(z.string()))).optional(),
+    security: z.array(z.record(z.string(), z.array(z.string()))).optional(),
     tags: z
       .array(
         z
@@ -139,18 +140,18 @@ export const openapiSchema = z
           .strict(),
       )
       .optional(),
-    paths: z.record(openapiPathItem),
+    paths: z.record(z.string(), openapiPathItem),
     components: z
       .object({
-        schemas: z.record(z.any()).optional(),
-        responses: z.record(z.any()).optional(),
-        parameters: z.record(z.any()).optional(),
-        examples: z.record(z.any()).optional(),
-        requestBodies: z.record(z.any()).optional(),
-        headers: z.record(z.any()).optional(),
-        securitySchemes: z.record(z.any()).optional(),
-        links: z.record(z.any()).optional(),
-        callbacks: z.record(z.any()).optional(),
+        schemas: z.record(z.string(), z.any()).optional(),
+        responses: z.record(z.string(), z.any()).optional(),
+        parameters: z.record(z.string(), z.any()).optional(),
+        examples: z.record(z.string(), z.any()).optional(),
+        requestBodies: z.record(z.string(), z.any()).optional(),
+        headers: z.record(z.string(), z.any()).optional(),
+        securitySchemes: z.record(z.string(), z.any()).optional(),
+        links: z.record(z.string(), z.any()).optional(),
+        callbacks: z.record(z.string(), z.any()).optional(),
       })
       .strict()
       .optional(),

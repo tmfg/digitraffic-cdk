@@ -37,7 +37,7 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "^30.0.5",
-    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/aws-lambda": "8.10.152",
@@ -49,6 +49,6 @@
     "esbuild": "0.25.9",
     "eslint": "^8.57.0",
     "lodash": "^4.17.21",
-    "typescript": "~5.8.3"
+    "typescript": "^5.9.2"
   }
 }

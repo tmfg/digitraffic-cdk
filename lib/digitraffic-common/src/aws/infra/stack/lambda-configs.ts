@@ -7,7 +7,7 @@ import {
 } from "aws-cdk-lib/aws-lambda";
 import { Duration } from "aws-cdk-lib";
 import type { IVpc, SubnetSelection } from "aws-cdk-lib/aws-ec2";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import type { ILogGroup } from "aws-cdk-lib/aws-logs";
 import type { Role } from "aws-cdk-lib/aws-iam";
 import type { DigitrafficStack } from "./stack.js";
 import type { MonitoredFunctionAlarmProps } from "./monitoredfunction.js";
@@ -24,6 +24,7 @@ export function databaseFunctionProps(
   environment: LambdaEnvironment,
   lambdaName: string,
   simpleLambdaName: string,
+  logGroup: ILogGroup,
   config?: Partial<FunctionParameters>,
 ): FunctionProps {
   const vpcSubnets = stack.vpc
@@ -38,6 +39,7 @@ export function databaseFunctionProps(
       environment,
       lambdaName,
       simpleLambdaName,
+      logGroup,
       config,
     ),
     ...{
@@ -53,6 +55,7 @@ export function lambdaFunctionProps(
   environment: LambdaEnvironment,
   lambdaName: string,
   simpleLambdaName: string,
+  logGroup: ILogGroup,
   config?: Partial<FunctionParameters>,
 ): FunctionProps {
   return {
@@ -62,7 +65,7 @@ export function lambdaFunctionProps(
     functionName: lambdaName,
     role: config?.role,
     timeout: Duration.seconds(config?.timeout ?? 60),
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: logGroup,
     reservedConcurrentExecutions: config?.reservedConcurrentExecutions ?? 2,
     code: getAssetCode(simpleLambdaName, config?.singleLambda ?? false),
     handler: `${simpleLambdaName}.handler`,
@@ -90,7 +93,7 @@ export function defaultLambdaConfiguration(
     functionName: config.functionName,
     handler: config.handler,
     environment: config.environment ?? {},
-    logRetention: RetentionDays.ONE_YEAR,
+    logGroup: config.logGroup,
     reservedConcurrentExecutions: config.reservedConcurrentExecutions,
     code: config.code,
     role: config.role,
@@ -116,6 +119,7 @@ export interface FunctionParameters {
   functionName?: string;
   code: Code;
   handler: string;
+  logGroup: ILogGroup;
   readOnly?: boolean;
   environment?: Record<string, string>;
   reservedConcurrentExecutions?: number;

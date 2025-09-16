@@ -20,7 +20,9 @@ interface ApiParameter {
 }
 
 const VELOCITY_ALL_PARAMS = `#foreach($paramName in $params.keySet())
-    #set($tmp = $paramMap.put($paramName, $params[$paramName]))
+    #if( ! $paramMap.containsKey("_$paramName"))
+        #set($tmp = $paramMap.put($paramName, $params[$paramName]))
+    #end
 #end`;
 
 const VELOCITY_PASS_BODY =
@@ -30,6 +32,7 @@ export class DigitrafficIntegration<T extends string> {
   readonly lambda: IFunction;
   readonly mediaType: MediaType;
   readonly parameters: ApiParameter[] = [];
+  readonly deprecation: boolean = false;
   readonly sunset?: string;
 
   _passAllQueryParameters: boolean;
@@ -38,11 +41,13 @@ export class DigitrafficIntegration<T extends string> {
   constructor(
     lambda: IFunction,
     mediaType: MediaType = MediaType.TEXT_PLAIN,
+    deprecation: boolean = false,
     sunset?: string,
   ) {
     this.lambda = lambda;
     this.mediaType = mediaType;
     this.sunset = sunset;
+    this.deprecation = deprecation;
     this._passAllQueryParameters = false;
     this._passBody = false;
   }
@@ -69,8 +74,18 @@ export class DigitrafficIntegration<T extends string> {
     return this;
   }
 
+  addParameter(type: ParameterType, name: string): this {
+    if (name.startsWith("_")) {
+      throw new Error("Parameters can't start with _");
+    }
+
+    this.parameters.push({ type, name });
+
+    return this;
+  }
+
   addPathParameter(...names: T[]): this {
-    names.forEach((name) => this.parameters.push({ type: "path", name }));
+    names.forEach((name) => this.addParameter("path", name));
 
     return this;
   }
@@ -80,16 +95,14 @@ export class DigitrafficIntegration<T extends string> {
       throw new Error("Can't add query parameters with pass all");
     }
 
-    names.forEach((name) =>
-      this.parameters.push({ type: "querystring", name })
-    );
+    names.forEach((name) => this.addParameter("querystring", name));
+
     return this;
   }
 
   addMultiValueQueryParameter(...names: T[]): this {
-    names.forEach((name) =>
-      this.parameters.push({ type: "multivaluequerystring", name })
-    );
+    names.forEach((name) => this.addParameter("multivaluequerystring", name));
+
     return this;
   }
 
@@ -100,7 +113,7 @@ export class DigitrafficIntegration<T extends string> {
    * @returns
    */
   addContextParameter(...names: T[]): this {
-    names.forEach((name) => this.parameters.push({ type: "context", name }));
+    names.forEach((name) => this.addParameter("context", name));
 
     return this;
   }
@@ -111,7 +124,7 @@ export class DigitrafficIntegration<T extends string> {
    * @param names for the headers
    */
   addHeaderParameter(...names: T[]): this {
-    names.forEach((name) => this.parameters.push({ type: "header", name }));
+    names.forEach((name) => this.addParameter("header", name));
 
     return this;
   }
@@ -162,7 +175,7 @@ export class DigitrafficIntegration<T extends string> {
       } else if (parameter.type === "multivaluequerystring") {
         // make multivaluequerystring values to array
         parameterAssignments.push(
-          `#set($tmp = $paramMap.put('_${parameter.name}', $util.parseJson($method.request.multivaluequerystring['${parameter.name}'])))`,
+          `#set($tmp = $paramMap.put('_${parameter.name}', $method.request.multivaluequerystring.${parameter.name}))`,
         );
       } else if (parameter.type === "path") {
         parameterAssignments.push(
@@ -179,8 +192,7 @@ export class DigitrafficIntegration<T extends string> {
       }
     });
 
-    // parameters starting with _ will be handled as json, and will not be in quotes
-    // (for example multivalueparameters)
+    // parameters starting with _ will be handled as multivalue querystring
 
     return {
       [MediaType.APPLICATION_JSON]: `
@@ -191,10 +203,10 @@ ${this._passAllQueryParameters ? VELOCITY_ALL_PARAMS : ""}
 ${this._passBody ? VELOCITY_PASS_BODY : ""}
 {
 #foreach($paramName in $paramMap.keySet())
-#if( $paramName[0] != '_')
+#if( $paramName.substring(0, 1) != '_')
     "$paramName":"$paramMap.get($paramName)" #if($foreach.hasNext),\n#end
 #else
-    "$paramName.substring(1)":$paramMap.get($paramName) #if($foreach.hasNext),\n#end
+    "$paramName.substring(1)": [#foreach($val in $paramMap.get($paramName))"$util.escapeJavaScript($val)"#if($foreach.hasNext),#end#end] #if($foreach.hasNext),\n#end
 #end
 #end
 }`,
@@ -202,6 +214,12 @@ ${this._passBody ? VELOCITY_PASS_BODY : ""}
   }
 
   createResponses(): IntegrationResponse[] {
-    return [DigitrafficIntegrationResponse.ok(this.mediaType, this.sunset)];
+    return [
+      DigitrafficIntegrationResponse.ok(
+        this.mediaType,
+        this.deprecation,
+        this.sunset,
+      ),
+    ];
   }
 }

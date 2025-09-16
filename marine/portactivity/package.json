@@ -47,7 +47,7 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^30.0.5",
-    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/amqplib": "0.10.7",
@@ -66,6 +66,6 @@
     "jest-junit": "^16.0.0",
     "parallelshell": "^3.0.2",
     "ts-jest": "^29.4.1",
-    "typescript": "~5.8.3"
+    "typescript": "^5.9.2"
   }
 }

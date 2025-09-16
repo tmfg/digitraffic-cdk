@@ -5,7 +5,7 @@ import type {
   UnknownDelayOrTrackMessage,
 } from "../model/dt-rosm-message.js";
 import {
-  monitoredCall,
+  type monitoredCall,
   ramiSmMessageSchema,
 } from "../model/zod-schema/sm-message.js";
 import type { z } from "zod";

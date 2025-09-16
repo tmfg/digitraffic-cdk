@@ -26,7 +26,7 @@
     "@aws-sdk/client-s3": "^3.864.0",
     "@aws-sdk/client-secrets-manager": "^3.864.0",
     "@aws-sdk/client-sqs": "^3.864.0",
-    "@digitraffic/common": "2025.9.10-1",
+    "@digitraffic/common": "2025.9.12-3",
     "@middy/core": "^6.4.3",
     "@middy/sqs-partial-batch-failure": "^6.4.3",
     "ajv": "~8.17.1",
@@ -45,7 +45,7 @@
     "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/testing": "workspace: *",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/aws-lambda": "8.10.152",
@@ -57,6 +57,6 @@
     "eslint": "^8.57.0",
     "lodash-es": "4.17.21",
     "parallelshell": "^3.0.2",
-    "typescript": "~5.8.3"
+    "typescript": "^5.9.2"
   }
 }

@@ -20,9 +20,9 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@rushstack/eslint-config": "^3.7.1",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
+    "@rushstack/eslint-config": "^4.4.0",
+    "@typescript-eslint/eslint-plugin": "^8.43.0",
+    "@typescript-eslint/parser": "^8.43.0",
     "eslint-plugin-deprecation": "^3.0.0",
     "madge": "^8.0.0"
   },
@@ -32,7 +32,7 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/common": "2025.9.10-1",
     "@jest/globals": "^30.0.5",
-    "@rushstack/eslint-config": "^3.7.1",
+    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/heft-jest": "1.0.6",
@@ -42,6 +42,6 @@
     "esbuild": "0.25.9",
     "eslint": "^8.57.1",
     "rollup": "~4.46.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }
