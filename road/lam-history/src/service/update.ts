@@ -71,6 +71,7 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
         Accept: "application/json",
         "x-api-key": apikey,
       },
+      timeout: 30000,
     });
     if (result.status !== 200) {
       logger.error({
