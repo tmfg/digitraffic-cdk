@@ -60,6 +60,15 @@ export class UpdateOSMonitorsStack extends Stack {
         JSON.stringify(config.monitors, null, 2),
       );
 
+      // Just for local diffing
+      const timestamp = new Date().toISOString()
+        .replace(/\.\d{3}Z$/, "Z") // drop milliseconds
+        .replace(/[:]/g, "-"); // replace ":" with "-"
+      writeFileSync(
+        `./cdk.out/${timestamp}-monitors.json`,
+        JSON.stringify(config.monitors, null, 2),
+      );
+
       this.createLambda(
         vpc,
         lambdaSg,
