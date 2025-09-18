@@ -7,6 +7,7 @@ import type {
   MatchPhraseQuery,
   MultiMatchPhraseQuery,
   Order,
+  PrefixQuery,
   Query,
   QueryStringQuery,
   RangeQuery,
@@ -62,6 +63,13 @@ export function matchPhrase(
   query: string,
 ): MatchPhraseQuery {
   return { match_phrase: { [field]: { query } } };
+}
+
+export function matchPrefix(
+  field: OSLogField,
+  query: string,
+): PrefixQuery {
+  return { prefix: { [field]: query } };
 }
 
 export function multiMatchPhrase(
