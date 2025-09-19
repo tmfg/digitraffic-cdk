@@ -23,7 +23,7 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.8.21-2",
+    "@digitraffic/common": "2025.9.12-3",
     "@rgrove/parse-xml": "4.2.0",
     "aws-cdk-lib": "^2.214.0",
     "constructs": "~10.4.2",

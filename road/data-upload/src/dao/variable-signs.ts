@@ -16,5 +16,6 @@ export async function insertDatex2(
   effectDate: Date,
 ): Promise<void> {
   // TODO: handle datex2-version
+
   await db.none(PS_INSERT_VS, [deviceId, datex2, effectDate]);
 }

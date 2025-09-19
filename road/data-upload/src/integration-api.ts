@@ -50,5 +50,7 @@ export class IntegrationApi {
         apiKeyRequired: true,
       },
     );
+
+    d2Queue.grantSendMessages(uploadDatexV1Handler);
   }
 }

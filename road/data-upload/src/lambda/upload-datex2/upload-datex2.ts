@@ -69,6 +69,8 @@ function parsePayload(body: string): Datex2UpdateObject | undefined {
       return undefined;
     }
 
+    // check type and version?
+
     return parsed.data;
   } catch (error) {
     logger.debug(body);
