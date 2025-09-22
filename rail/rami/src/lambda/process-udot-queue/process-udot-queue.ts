@@ -6,6 +6,47 @@ import { processUdotMessage } from "../../service/process-udot-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { UnknownDelayOrTrackMessage } from "../../model/dt-rosm-message.js";
 
+/**
+ * Sort UDOT messages by their recordedAtTime to ensure they are processed in the correct order.
+ * The oldest message is first in the returned array.
+ *
+ * @param messagesForSameTrainAndDate
+ */
+function sortUdotMessages(
+  messagesForSameTrainAndDate: UnknownDelayOrTrackMessage[],
+): UnknownDelayOrTrackMessage[] {
+  return messagesForSameTrainAndDate.sort((a, b) =>
+    a.recordedAtTime.getTime() - b.recordedAtTime.getTime()
+  );
+}
+
+function groupUdotMessagesByTrainAndDate(
+  event: SQSEvent,
+): { [key: string]: UnknownDelayOrTrackMessage[] } {
+  return event.Records.reduce(
+    (acc: { [s: string]: UnknownDelayOrTrackMessage[] }, r) => {
+      const recordBody = r.body;
+
+      try {
+        const udotMessage = JSON.parse(
+          recordBody,
+        ) as UnknownDelayOrTrackMessage;
+
+        const key = `${udotMessage.trainNumber}-${udotMessage.departureDate}`;
+        if (acc[key]) {
+          acc[key].push(udotMessage);
+        } else {
+          acc[key] = [udotMessage];
+        }
+      } catch (error) {
+        logException(logger, error);
+      }
+      return acc;
+    },
+    {},
+  );
+}
+
 export function handlerFn(): (
   event: SQSEvent,
 ) => Promise<PromiseSettledResult<void>[]> {
@@ -14,45 +55,23 @@ export function handlerFn(): (
 
     try {
       return await Promise.allSettled(
-        Object.values(
-          event.Records.reduce(
-            (acc: { [s: string]: UnknownDelayOrTrackMessage[] }, r) => {
-              const recordBody = r.body;
-
-              try {
-                const udotMessage = JSON.parse(
-                  recordBody,
-                ) as UnknownDelayOrTrackMessage;
-
-                const key =
-                  `${udotMessage.trainNumber}-${udotMessage.departureDate}`;
-                if (acc[key]) {
-                  acc[key].push(udotMessage);
-                } else {
-                  acc[key] = [udotMessage];
-                }
-              } catch (error) {
-                logException(logger, error);
+        Object.values(groupUdotMessagesByTrainAndDate(event))
+          .map(sortUdotMessages)
+          .map(async (udotMessages) => {
+            try {
+              for (const udotMessage of udotMessages) {
+                logger.info({
+                  method: "RAMI-ProcessUDOTQueue.handler",
+                  message:
+                    `processing ${udotMessage.trainNumber} ${udotMessage.departureDate}`,
+                  customCount: udotMessage.data.length,
+                });
+                await processUdotMessage(udotMessage);
               }
-              return acc;
-            },
-            {},
-          ),
-        ).map(async (udotMessages) => {
-          try {
-            for (const udotMessage of udotMessages) {
-              logger.info({
-                method: "RAMI-ProcessUDOTQueue.handler",
-                message:
-                  `processing ${udotMessage.trainNumber} ${udotMessage.departureDate}`,
-                customCount: udotMessage.data.length,
-              });
-              await processUdotMessage(udotMessage);
+            } catch (error) {
+              logException(logger, error);
             }
-          } catch (error) {
-            logException(logger, error);
-          }
-        }),
+          }),
       );
     } finally {
       logger.info({

@@ -11,6 +11,7 @@ export interface UnknownDelayOrTrack {
 
 export interface UnknownDelayOrTrackMessage {
   readonly messageId: string;
+  readonly recordedAtTime: Date;
   readonly trainNumber: number;
   readonly departureDate: string; // YYYYMMDD
   readonly vehicleJourneyName: string;
