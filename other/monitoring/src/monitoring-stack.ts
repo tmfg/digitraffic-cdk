@@ -61,7 +61,12 @@ export class MonitoringStack extends Stack {
     configuration: MonitoringConfiguration,
   ): void {
     if (configuration.db) {
-      new RdsMonitoring(this, alarmsTopic, configuration.db);
+      new RdsMonitoring(
+        this,
+        alarmsTopic,
+        configuration.envName,
+        configuration.db,
+      );
     }
 
     if (configuration.ecs) {
@@ -87,7 +92,7 @@ export class MonitoringStack extends Stack {
         conditions: {
           ArnLike: {
             "aws:SourceArn": [
-              `arn:aws:*:${this.region}:${this.account}:*:*`,
+              `arn:aws:*:*:${this.account}:*:*`,
             ],
           },
           StringEquals: {
