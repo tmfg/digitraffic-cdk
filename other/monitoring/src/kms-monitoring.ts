@@ -25,7 +25,7 @@ export class KmsMonitoring {
       targets: [
         new SnsTopic(alarmsTopic, {
           message: createMessage(
-            "RUNBOOK Y8 - KMS Deletion Pending",
+            "RUNBOOK-Y8 KMS Deletion Pending",
             `eventName: ${TOPICS.eventName}
                      KeyId: ${
               EventField.fromPath("$.detail.requestParameters.keyId")
@@ -52,7 +52,7 @@ export class KmsMonitoring {
       targets: [
         new SnsTopic(alarmsTopic, {
           message: createMessage(
-            "RUNBOOK Y9 - KMS Changes",
+            "RUNBOOK-Y9 KMS Changes",
             `eventName: ${TOPICS.eventName}
                      KeyId: ${
               EventField.fromPath("$.detail.requestParameters.keyId")
