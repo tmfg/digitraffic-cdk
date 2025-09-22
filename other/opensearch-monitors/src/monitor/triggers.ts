@@ -1,4 +1,5 @@
 import { sendSlackMessage, SlackEmoji, type SlackMessage } from "./slack.js";
+import { RUNBOOK_SEARCH_TERM } from "./monitor-builder.js";
 
 export interface OSAction {
   readonly destination: string;
@@ -61,8 +62,34 @@ function sendAlerts(
   );
 }
 
+/**
+ * @param runbookSearchLink e.g. https://example.com/search/SEARCH_TERM
+ * @param term e.g. RUNBOOK-A1
+ * @return https://example.com/search/RUNBOOK-A1
+ */
+function makeRunbookLink(runbookSearchLink: string, term: string): string {
+  const url = runbookSearchLink.replace(
+    RUNBOOK_SEARCH_TERM,
+    encodeURIComponent(term),
+  );
+  return `<${url}|${term}>`;
+}
+
+/**
+ * Rplaces name string containing RUNBOOK-XX with Slack link
+ * e.g. <https://example.com|RUNBOOK-A1>
+ * @param name e.g. ROAD TST RUNBOOK-A1
+ * @param runbookSearchLink e.g. https://example.com/search/SEARCH_TERM
+ */
+function replaceRunbookWithSearchLink(name: string, runbookSearchLink: string) {
+  return name.replace(/\bRUNBOOK-[A-Z0-9]+\b/g, (match: string) => {
+    return makeRunbookLink(runbookSearchLink, match);
+  });
+}
+
 export function triggerWhenSumOutside(
   name: string,
+  runbookSearchLink: string,
   field: string,
   destinations: string[],
   throttleMinutes: number,
@@ -72,8 +99,9 @@ export function triggerWhenSumOutside(
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
-    subject:
-      `${name} should be between ${betweenLower} MB and ${betweenUpper} MB, was {{ctx.results.0.aggregations.sum_${field}.value}} MB`,
+    subject: `${
+      replaceRunbookWithSearchLink(name, runbookSearchLink)
+    } should be between ${betweenLower} MB and ${betweenUpper} MB, was {{ctx.results.0.aggregations.sum_${field}.value}} MB`,
     message,
   };
   return {
@@ -85,6 +113,7 @@ export function triggerWhenSumOutside(
 
 export function triggerWhenLinesFound(
   name: string,
+  runbookSearchLink: string,
   destinations: string[],
   throttleMinutes: number,
   message: string,
@@ -92,8 +121,9 @@ export function triggerWhenLinesFound(
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
-    subject:
-      `${name} {{ctx.results.0.hits.total.value}} should not be more than ${threshold}`,
+    subject: `${
+      replaceRunbookWithSearchLink(name, runbookSearchLink)
+    } {{ctx.results.0.hits.total.value}} should not be more than ${threshold}`,
     message,
   };
   return {
@@ -105,6 +135,7 @@ export function triggerWhenLinesFound(
 
 export function triggerAlways(
   name: string,
+  runbookSearchLink: string,
   destinations: string[],
   throttleMinutes: number,
   message: string,
@@ -115,7 +146,7 @@ export function triggerAlways(
     message,
   };
   return {
-    name: name,
+    name: replaceRunbookWithSearchLink(name, runbookSearchLink),
     condition: "true",
     actions: sendAlerts(destinations, msg, throttleMinutes),
   };
@@ -123,6 +154,7 @@ export function triggerAlways(
 
 export function triggerWhenAggregationBucketsFound(
   name: string,
+  runbookSearchLink: string,
   aggName: string,
   destinations: string[],
   throttleMinutes: number,
@@ -136,7 +168,7 @@ export function triggerWhenAggregationBucketsFound(
     message,
   };
   return {
-    name: name,
+    name: replaceRunbookWithSearchLink(name, runbookSearchLink),
     condition: aggMoreThan(aggName, threshold),
     actions: sendAlerts(destinations, msg, throttleMinutes),
   };
@@ -144,6 +176,7 @@ export function triggerWhenAggregationBucketsFound(
 
 export function triggerWhenLineCountOutside(
   name: string,
+  runbookSearchLink: string,
   destinations: string[],
   throttleMinutes: number,
   betweenLower: number,
@@ -152,8 +185,9 @@ export function triggerWhenLineCountOutside(
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
-    subject:
-      `${name} should be between ${betweenLower} and ${betweenUpper}, was {{ctx.results.0.hits.total.value}}`,
+    subject: `${
+      replaceRunbookWithSearchLink(name, runbookSearchLink)
+    } should be between ${betweenLower} and ${betweenUpper}, was {{ctx.results.0.hits.total.value}}`,
     message,
   };
   return {

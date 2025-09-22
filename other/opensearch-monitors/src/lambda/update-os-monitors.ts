@@ -7,11 +7,14 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { EnvKeys } from "../env.js";
 import { type AssumeRoleRequest, STS } from "@aws-sdk/client-sts";
-
+import { SlackApi } from "@digitraffic/common/dist/utils/slack";
+import { type StatusSecret } from "../secret.js";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
 const OS_VPC_ENDPOINT = getEnvVariable(EnvKeys.OS_VPC_ENDPOINT);
 
+const secretHolder = SecretHolder.create<StatusSecret>();
 const sts = new STS({ apiVersion: "2011-06-15" });
 
 async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
@@ -39,6 +42,10 @@ async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
 }
 
 export const handler = async (): Promise<void> => {
+  const sh = await secretHolder.get();
+  const slackApiSuccess = new SlackApi(sh.reportUrl);
+  const slackApiFailed = new SlackApi(sh.slackAlarmHook);
+
   try {
     const monitors = JSON.parse(
       readFileSync("./monitors.json").toString(),
@@ -56,8 +63,21 @@ export const handler = async (): Promise<void> => {
       await os.deleteAllMonitors();
       await os.addMonitors(monitors);
       await os.checkMonitorsUptodate(monitors);
+      await slackApiSuccess.notify(
+        `UpdateOsMonitors.checkMonitorsUptodate success: ${monitors.length} monitors added/updated`,
+      );
     }
   } catch (error) {
     logException(logger, error);
+    if (error instanceof Error) {
+      await slackApiFailed.notify(error.message);
+    } else {
+      await slackApiFailed.notify(
+        `UpdateOsMonitors.checkMonitorsUptodate failed: ${
+          JSON.stringify(error)
+        }`,
+      );
+    }
+    return Promise.reject(error);
   }
 };
