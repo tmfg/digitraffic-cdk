@@ -9,7 +9,7 @@ const DATEX2_OVERALL_STARTTIME_TAG_END = "</overallStartTime>";
 const DATEX2_VERSION_ATTRIBUTE = "version=";
 //const XML_TAG_START = "<?xml";
 
-export function parseSituations(datex2: string): Situation[] {
+export function parseSituations233(datex2: string): Situation[] {
   const situations: Situation[] = [];
   let index = 0;
   let sitIndex = 0;

@@ -1,53 +1,14 @@
-import type { Situation } from "../model/situation.js";
-import {
-  type StatusCodeValue,
-  StatusCodeValues,
-} from "../model/status-code-value.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { Situation } from "./variable-signs.js";
 
-const REG_PAYLOAD = /<payloadPublication/g;
+//const REG_PAYLOAD = /<payloadPublication/g;
 
-const DATEX2_SITUATION_TAG_START = "<situation ";
-const DATEX2_SITUATION_TAG_END = "</situation>";
+const DATEX2_SITUATION_TAG_START = "<ns3:situation ";
+const DATEX2_SITUATION_TAG_END = "</ns3:situation>";
 const DATEX2_OVERALL_STARTTIME_TAG_START = "<overallStartTime>";
 const DATEX2_OVERALL_STARTTIME_TAG_END = "</overallStartTime>";
-const DATEX2_VERSION_ATTRIBUTE = "version=";
-const XML_TAG_START = "<?xml";
+//const XML_TAG_START = "<?xml";
 
-export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
-  //  const start = Date.now();
-  //  const timestamp = new Date(start);
-
-  if (!validate(datex2)) {
-    return await Promise.resolve(StatusCodeValues.BAD_REQUEST);
-  }
-  // DATEX2-integration through new API
-  /*
-  const situations = parseSituations(datex2);
-
-  await inDatabase((db: DTDatabase) => {
-    return db.tx((tx: DTTransaction) => {
-      return tx.batch([
-        DeviceDB.saveDatex2(tx, situations),
-        LastUpdatedDB.updateLastUpdated(
-          tx,
-          LastUpdatedDB.DataType.VS_DATEX2,
-          timestamp,
-        ),
-      ]);
-    });
-  }).finally(() => {
-    logger.info({
-      method: "Datex2UpdateService.updateDatex2",
-      tookMs: Date.now() - start,
-      customUpdatedCount: situations.length,
-    });
-  });*/
-
-  return StatusCodeValues.OK;
-}
-
-export function parseSituations(datex2: string): Situation[] {
+export function parseSituations35(datex2: string): Situation[] {
   const situations: Situation[] = [];
   let index = 0;
   let sitIndex = 0;
@@ -87,8 +48,8 @@ function parseSituation(datex2: string): Situation {
 }
 
 function parseId(datex2: string): string {
-  const index = datex2.indexOf(DATEX2_VERSION_ATTRIBUTE);
-  return datex2.substring(15, index - 2);
+  const index = datex2.indexOf('">');
+  return datex2.substring(19, index);
 }
 
 function parseEffectDate(datex2: string): Date {
@@ -99,7 +60,7 @@ function parseEffectDate(datex2: string): Date {
 
   return new Date(dateString);
 }
-
+/*
 function validate(datex2: string): boolean {
   if (!datex2.includes(XML_TAG_START)) {
     logger.error({
@@ -124,4 +85,4 @@ function validate(datex2: string): boolean {
 
 function occurrences(string: string, regexp: RegExp): number {
   return (string.match(regexp) ?? []).length;
-}
+}*/

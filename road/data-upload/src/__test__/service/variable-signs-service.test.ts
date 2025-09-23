@@ -1,8 +1,8 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertDataCount, dbTestBase } from "./db-testutil.js";
-import { handleVariableSignMessages } from "../service/variable-signs.js";
-import { insertData } from "../dao/data.js";
-import { SOURCES, TYPES } from "../model/types.js";
+import { assertDataCount, dbTestBase } from "../db-testutil.js";
+import { handleVariableSignMessages } from "../../service/variable-signs.js";
+import { insertData } from "../../dao/data.js";
+import { SOURCES, TYPES } from "../../model/types.js";
 
 describe(
   "variable-signs-service-test",

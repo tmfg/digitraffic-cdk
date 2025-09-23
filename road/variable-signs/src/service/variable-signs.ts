@@ -5,7 +5,8 @@ import {
 import { isProductionMessage } from "./filtering-service.js";
 import { findAll } from "../db/datex2.js";
 
-const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+const DATEX2_223_TEMPLATE =
+  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2LogicalModel modelBaseVersion="2"
                 xsi:schemaLocation="http://datex2.eu/schema/2/2_0 https://tie.digitraffic.fi/schemas/datex2/DATEXIISchema_2_2_3_with_definitions_FI.xsd"
                 xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -26,25 +27,63 @@ const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 </d2LogicalModel>
 `;
 
-export function findActiveSignsDatex2(): Promise<[string, Date]> {
+const DATEX2_35_TEMPLATE =
+  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:situationPublication lang="fi" modelBaseVersion="3" xmlns="http://datex2.eu/schema/3/common" xmlns:ns2="http://datex2.eu/schema/3/roadTrafficData" xmlns:ns4="http://datex2.eu/schema/3/urbanExtensions" xmlns:ns3="http://datex2.eu/schema/3/situation" xmlns:ns6="http://datex2.eu/schema/3/facilities" xmlns:ns5="http://datex2.eu/schema/3/commonExtension" xmlns:ns8="http://datex2.eu/schema/3/locationExtension" xmlns:ns7="http://datex2.eu/schema/3/parking" xmlns:ns13="http://datex2.eu/schema/3/vms" xmlns:ns9="http://datex2.eu/schema/3/locationReferencing" xmlns:ns12="http://datex2.eu/schema/3/reroutingManagementEnhanced" xmlns:ns11="http://datex2.eu/schema/3/trafficManagementPlan" xmlns:ns10="http://datex2.eu/schema/3/faultAndStatus" xmlns:ns15="http://datex2.eu/schema/3/d2Payload" xmlns:ns14="http://datex2.eu/schema/3/energyInfrastructure">
+    <publicationTime>PUBLICATION_TIME</publicationTime>
+    <publicationCreator>
+        <country>FI</country>
+        <nationalIdentifier>FTA</nationalIdentifier>
+    </publicationCreator>
+    SITUATIONS
+</ns3:situationPublication>
+`;
+
+export function findActiveSignsDatex2_35(): Promise<[string, Date]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const [datex2DbSituations, lastModified] = await findAll(db);
+    const [datex2DbSituations, lastModified] = await findAll(db, "DATEXII_3_5");
     const datex2: string[] = datex2DbSituations
       .map((d) => d.datex2)
       .filter(isProductionMessage);
 
-    return [createResponse(datex2, lastModified), lastModified];
+    return [createResponse35(datex2, lastModified), lastModified];
   });
 }
 
-function createResponse(
+export function findActiveSignsDatex2_223(): Promise<[string, Date]> {
+  return inDatabaseReadonly(async (db: DTDatabase) => {
+    const [datex2DbSituations, lastModified] = await findAll(
+      db,
+      "DATEXII_2_2_3",
+    );
+    const datex2: string[] = datex2DbSituations
+      .map((d) => d.datex2)
+      .filter(isProductionMessage);
+
+    return [createResponse223(datex2, lastModified), lastModified];
+  });
+}
+
+function createResponse35(
   datex2: string[],
   lastUpdated: Date | undefined,
 ): string {
   const publicationTime = lastUpdated ?? new Date();
   const situations = datex2.join("\n");
 
-  return DATEX2_TEMPLATE
+  return DATEX2_35_TEMPLATE
+    .replace("PUBLICATION_TIME", publicationTime.toISOString())
+    .replace("SITUATIONS", situations);
+}
+
+function createResponse223(
+  datex2: string[],
+  lastUpdated: Date | undefined,
+): string {
+  const publicationTime = lastUpdated ?? new Date();
+  const situations = datex2.join("\n");
+
+  return DATEX2_223_TEMPLATE
     .replace("PUBLICATION_TIME", publicationTime.toISOString())
     .replace("SITUATIONS", situations);
 }
