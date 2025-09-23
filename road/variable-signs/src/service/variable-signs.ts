@@ -44,7 +44,7 @@ export function findActiveSignsDatex2_35(): Promise<[string, Date]> {
     const [datex2DbSituations, lastModified] = await findAll(db, "DATEXII_3_5");
     const datex2: string[] = datex2DbSituations
       .map((d) => d.datex2)
-      .filter(isProductionMessage);
+      .filter((d) => isProductionMessage(d, true));
 
     return [createResponse35(datex2, lastModified), lastModified];
   });
@@ -58,7 +58,7 @@ export function findActiveSignsDatex2_223(): Promise<[string, Date]> {
     );
     const datex2: string[] = datex2DbSituations
       .map((d) => d.datex2)
-      .filter(isProductionMessage);
+      .filter((d) => isProductionMessage(d, false));
 
     return [createResponse223(datex2, lastModified), lastModified];
   });

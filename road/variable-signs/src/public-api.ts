@@ -61,7 +61,16 @@ export class PublicApi {
       DocumentationPart.method(
         VARIABLE_SIGN_TAGS_V1,
         "GetDatex2",
-        "Return all variables signs as datex2",
+        "Return all variables signs as DatexII 2.3.3",
+      ),
+    );
+
+    this.restApi.documentResource(
+      this.v1Datex35Resource,
+      DocumentationPart.method(
+        VARIABLE_SIGN_TAGS_V1,
+        "GetDatex2",
+        "Return all variables signs as DatexII 3.5",
       ),
     );
 

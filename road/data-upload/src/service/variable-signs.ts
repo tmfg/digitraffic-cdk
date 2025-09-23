@@ -108,14 +108,14 @@ async function handleVariableSign(
 
   logger.info({
     method,
-    customVersion: Datex2Version["2.3.3"],
+    customDatexVersion: Datex2Version["2.3.3"],
     customUpdatedCount: updated23Count,
     customErrorCount: error23Count,
   });
 
   logger.info({
     method,
-    customVersion: Datex2Version["3.5"],
+    customDatexVersion: Datex2Version["3.5"],
     customUpdatedCount: updated35Count,
     customErrorCount: error35Count,
   });
