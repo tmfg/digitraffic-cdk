@@ -49,7 +49,9 @@ export class PublicApi {
     const imagesResource = v1Resource.addResource("images");
 
     this.v1Datex233Resource = v1Resource.addResource("signs.datex2");
-    this.v1Datex35Resource = v1Resource.addResource("signs35");
+    this.v1Datex35Resource = v1Resource.addResource("signs").addResource(
+      "datex2-3.5.xml",
+    );
     this.v1ImageResource = imagesResource.addResource("{text}");
   }
 

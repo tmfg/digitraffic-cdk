@@ -1,4 +1,3 @@
-import * as JsonUpdateService from "../../service/json-update-service.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import {
   type StatusCodeValue,
@@ -6,6 +5,7 @@ import {
 } from "../../model/status-code-value.js";
 import type { TloikTilatiedot } from "../../model/tilatiedot.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { updateJsonData } from "../../service/json-update-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -21,7 +21,7 @@ export const handler = (
 
     return proxyHolder
       .setCredentials()
-      .then(() => JsonUpdateService.updateJsonData(tilatiedot))
+      .then(() => updateJsonData(tilatiedot))
       .finally(() =>
         logger.info({
           method: "UpdateJsonData.handler",

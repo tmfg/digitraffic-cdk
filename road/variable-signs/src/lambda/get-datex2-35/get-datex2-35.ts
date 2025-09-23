@@ -16,7 +16,7 @@ export const handler = (): Promise<LambdaResponse> => {
     )
     .finally(() => {
       logger.info({
-        method: "GetDatex2.handler",
+        method: "GetDatex2-35.handler",
         tookMs: Date.now() - start,
       });
     });
