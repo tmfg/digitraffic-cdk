@@ -2,6 +2,7 @@ import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { Connection } from "mysql2/promise.js";
 import { createPool, type Pool } from "mysql2/promise.js";
 import { getFromEnvOrSecret } from "./secret.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 interface MysqlOpts {
   host: string;
@@ -35,9 +36,37 @@ export async function inTransaction(
   } catch (error: unknown) {
     await conn.rollback();
     return Promise.reject(error);
+  } finally {
+    conn.release();
   }
-  conn.release();
   return Promise.resolve();
+}
+
+export async function inTransactionWithRetry(
+  fn: (conn: Connection) => Promise<void>,
+  retries: number = 3,
+): Promise<void> {
+  let lastError;
+  for (let i = 0; i < retries; i++) {
+    try {
+      await inTransaction(fn);
+    } catch (err: unknown) {
+      lastError = err;
+      logger.warn({
+        method: "database.executeWithRetry",
+        message: `Transaction failed on attempt ${i + 1} of ${retries}.`,
+        customWillRetry: (i < retries - 1),
+        error: err,
+      });
+      if (i < retries - 1) {
+        // Wait only if we will retry again
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw lastError;
 }
 
 export async function inDatabase<T>(
