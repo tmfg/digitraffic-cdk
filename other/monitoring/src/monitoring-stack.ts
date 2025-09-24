@@ -13,6 +13,7 @@ import {
 } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { RegionMonitoringStack } from "./region-monitoring-stack.js";
 import { EcsMonitoring } from "./ecs-monitoring.js";
+import { KmsMonitoring } from "./kms-monitoring.js";
 
 export class MonitoringStack extends Stack {
   constructor(
@@ -72,6 +73,8 @@ export class MonitoringStack extends Stack {
     if (configuration.ecs) {
       new EcsMonitoring(this, alarmsTopic, configuration.ecs);
     }
+
+    new KmsMonitoring(this, alarmsTopic);
   }
 
   createTopic(topicName: string, email: string): Topic {
