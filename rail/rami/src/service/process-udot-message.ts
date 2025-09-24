@@ -1,7 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
 import type { Connection } from "mysql2/promise";
-import { inTransaction } from "../util/database.js";
+import { inTransactionWithRetry } from "../util/database.js";
 import type {
   UnknownDelayOrTrack,
   UnknownDelayOrTrackMessage,
@@ -41,16 +41,18 @@ export async function processUdotMessage(
         foundCount++;
 
         // each update in own transaction, to prevent locking!
-        await inTransaction(async (conn: Connection): Promise<void> => {
-          return await insertOrUpdate(conn, {
-            trainNumber: message.trainNumber,
-            trainDepartureDate: message.departureDate,
-            attapId,
-            messageId: message.messageId,
-            ut: datarow.unknownTrack,
-            ud: datarow.unknownDelay,
-          });
-        });
+        await inTransactionWithRetry(
+          async (conn: Connection): Promise<void> => {
+            return await insertOrUpdate(conn, {
+              trainNumber: message.trainNumber,
+              trainDepartureDate: message.departureDate,
+              attapId,
+              messageId: message.messageId,
+              ut: datarow.unknownTrack,
+              ud: datarow.unknownDelay,
+            });
+          },
+        );
       } else {
         notFoundCount++;
 
