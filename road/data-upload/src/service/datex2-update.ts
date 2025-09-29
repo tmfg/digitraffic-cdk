@@ -20,14 +20,14 @@ export async function updateDatex2(
 ): Promise<void> {
   const messageId = v4();
 
-  await inDatabase((db) => {
-    return Promise.all(updateObject.datexIIVersions.map(async (o) => {
+  await inDatabase(async (db) => {
+    return await Promise.all(updateObject.datexIIVersions.map(async (o) => {
       return await insertData(
         db,
         messageId,
         SOURCES.API,
         o.version,
-        o.type,
+        o.type ?? "VARIABLE_MESSAGE_SIGN_DATEX_XML", // TODO: remove default value
         o.message,
       );
     }));

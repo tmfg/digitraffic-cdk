@@ -1,5 +1,4 @@
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { updateDatex2 } from "../../service/datex2-update.js";
 import {
@@ -17,9 +16,24 @@ export const ERRORS = {
   EMPTY_PAYLOAD: "Empty payload",
 } as const;
 
+export const StatusCodes = {
+  OK: {
+    statusCode: 200,
+  },
+
+  INTERNAL_ERROR: {
+    statusCode: 500,
+  },
+
+  BAD_REQUEST: {
+    statusCode: 400,
+  },
+} as const;
+
+// proxy lambda, do not return LambdaResponse
 export const handler = async (
   event: Record<string, string>,
-): Promise<LambdaResponse> => {
+): Promise<unknown> => {
   // eslint-disable-next-line dot-notation
   const body = event["body"];
   const start = Date.now();
@@ -28,7 +42,10 @@ export const handler = async (
     const payload = parsePayload(body);
 
     if (!payload) {
-      return LambdaResponse.badRequest(ERRORS.INVALID_PAYLOAD);
+      return {
+        statusCode: 400,
+        message: ERRORS.INVALID_PAYLOAD,
+      };
     }
 
     try {
@@ -47,17 +64,27 @@ export const handler = async (
       });
     }
 
-    return LambdaResponse.ok("");
+    return {
+      statusCode: 200,
+    };
   }
 
-  return LambdaResponse.badRequest(ERRORS.MISSING_BODY);
+  return {
+    statusCode: 400,
+    message: ERRORS.MISSING_BODY,
+  };
 };
 
 function parsePayload(body: string): Datex2UpdateObject | undefined {
   try {
-    const parsed = Datex2UpdateObjectSchema.safeParse(JSON.parse(body));
+    const json = JSON.parse(body);
+
+    //    logger.debug("Parsed json " + JSON.stringify(json));
+
+    const parsed = Datex2UpdateObjectSchema.safeParse(json);
 
     if (parsed.error) {
+      logger.debug("parse error from:" + body);
       logger.error({ method, error: parsed.error });
 
       return undefined;
@@ -73,7 +100,7 @@ function parsePayload(body: string): Datex2UpdateObject | undefined {
 
     return parsed.data;
   } catch (error) {
-    logger.debug(body);
+    logger.debug("error from:" + body);
     logger.error({ method, message: ERRORS.INVALID_PAYLOAD });
 
     return undefined;
