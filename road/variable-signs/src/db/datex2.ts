@@ -30,6 +30,7 @@ const PS_FIND_ALL_ACTIVE = new pgPromise.PreparedStatement({
            where ddd.device_id = device.id
              and device.deleted_date is null
             and ddd.version = $1
+            and ddd.type = $2
            order by ddd.device_id`,
 });
 
@@ -43,6 +44,7 @@ const PS_FIND_ALL_ACTIVE_LAST_MODIFIED = new pgPromise.PreparedStatement({
           where ddd.device_id = device.id
             and device.deleted_date is null
             and ddd.version = $1
+            and ddd.type = $2
           UNION
           select to_timestamp(0) as modified
     ) src`,
@@ -51,10 +53,11 @@ const PS_FIND_ALL_ACTIVE_LAST_MODIFIED = new pgPromise.PreparedStatement({
 export function findAll(
   db: DTDatabase,
   version: string,
+  datexType: string,
 ): Promise<[DbSituation[], Date]> {
-  return db.one(PS_FIND_ALL_ACTIVE_LAST_MODIFIED, [version]).then(
+  return db.one(PS_FIND_ALL_ACTIVE_LAST_MODIFIED, [version, datexType]).then(
     (modified: DbModified) => {
-      return db.manyOrNone(PS_FIND_ALL_ACTIVE, [version]).then((
+      return db.manyOrNone(PS_FIND_ALL_ACTIVE, [version, datexType]).then((
         data: DbSituation[],
       ) => [data, modified.modified]);
     },

@@ -1,61 +1,83 @@
-import type { Situation } from "./variable-signs.js";
+import type { DatexFile, DatexType } from "./variable-signs.js";
+import { findWithReg, getTags } from "./xml-util.js";
 
-//const REG_PAYLOAD = /<payloadPublication/g;
+const TAGS = {
+  OVERALL_STARTTIME_START: "overallStartTime>",
+  OVERALL_STARTTIME_END_REG: /<\/.*overallStartTime>/,
+  STATUS_UPDATE_START: "statusUpdateTime>",
+  STATUS_UPDATE_END_REGF: /<\/.*statusUpdateTime>/,
+} as const;
 
-const DATEX2_SITUATION_TAG_START = "<ns3:situation ";
-const DATEX2_SITUATION_TAG_END = "</ns3:situation>";
-const DATEX2_OVERALL_STARTTIME_TAG_START = "<overallStartTime>";
-const DATEX2_OVERALL_STARTTIME_TAG_END = "</overallStartTime>";
-//const XML_TAG_START = "<?xml";
-
-export function parseSituations35(datex2: string): Situation[] {
-  const situations: Situation[] = [];
-  let index = 0;
-  let sitIndex = 0;
-
-  // go through the document and find all situation-blocks
-  // add them to the list and return them
-  do {
-    sitIndex = datex2.indexOf(DATEX2_SITUATION_TAG_START, index);
-
-    if (sitIndex !== -1) {
-      const sitEndIndex = datex2.indexOf(
-        DATEX2_SITUATION_TAG_END,
-        sitIndex + DATEX2_SITUATION_TAG_START.length,
-      );
-      index = sitEndIndex;
-
-      situations.push(
-        parseSituation(
-          datex2.substring(
-            sitIndex,
-            sitEndIndex + DATEX2_SITUATION_TAG_END.length,
-          ),
-        ),
-      );
-    }
-  } while (sitIndex !== -1);
-
-  return situations;
+export function parseDatex(datex2: string): DatexFile[] {
+  switch (getType(datex2)) {
+    case "SITUATION":
+      return getSituations(datex2);
+    case "CONTROLLER_STATUS":
+      return getControllerStatuses(datex2);
+  }
 }
 
-function parseSituation(datex2: string): Situation {
+function getControllerStatuses(datex2: string): DatexFile[] {
+  return getTags(datex2, "vmsControllerStatus")
+    .map((status) => parseControllerStatus(status));
+}
+
+function getSituations(datex2: string): DatexFile[] {
+  return getTags(datex2, "situation")
+    .map((situation) => parseSituation(situation));
+}
+
+function getType(datex2: string): DatexType {
+  if (datex2.includes("situationPublication")) {
+    return "SITUATION";
+  } else if (datex2.includes("VmsPublication")) {
+    return "CONTROLLER_STATUS";
+  }
+
+  throw new Error("Unknown datex type");
+}
+
+function parseControllerStatus(datex2: string): DatexFile {
   return {
     id: parseId(datex2),
+    type: "CONTROLLER_STATUS",
+    datex2: datex2,
+    effectDate: parseStatusUpdateTime(datex2),
+  };
+}
+
+function parseSituation(datex2: string): DatexFile {
+  return {
+    id: parseId(datex2),
+    type: "SITUATION",
     datex2: datex2,
     effectDate: parseEffectDate(datex2),
   };
 }
 
-function parseId(datex2: string): string {
-  const index = datex2.indexOf('">');
-  return datex2.substring(19, index);
+/// parse statusUpdateTime from vmsControllerStatus
+function parseStatusUpdateTime(datex2: string): Date {
+  const index = datex2.indexOf(TAGS.STATUS_UPDATE_START) +
+    TAGS.STATUS_UPDATE_START.length;
+  const index2 = findWithReg(datex2, TAGS.STATUS_UPDATE_END_REGF, index);
+
+  const dateString = datex2.substring(index, index2);
+
+  return new Date(dateString);
 }
 
+function parseId(datex2: string): string {
+  const startIndex = datex2.indexOf("id=") + 4;
+  const index = datex2.indexOf('"', startIndex);
+  return datex2.substring(startIndex, index);
+}
+
+/// parse overallStartTime from situation
 function parseEffectDate(datex2: string): Date {
-  const index = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
-    DATEX2_OVERALL_STARTTIME_TAG_START.length;
-  const index2 = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_END, index);
+  const index = datex2.indexOf(TAGS.OVERALL_STARTTIME_START) +
+    TAGS.OVERALL_STARTTIME_START.length;
+  const index2 = findWithReg(datex2, TAGS.OVERALL_STARTTIME_END_REG, index);
+
   const dateString = datex2.substring(index, index2);
 
   return new Date(dateString);

@@ -6,12 +6,14 @@ import { updateDatex2 } from "../dao/variable-signs.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { type DataIncomingDb, getNewData, updateStatus } from "../dao/data.js";
 import { Datex2Version, SOURCES, TYPES } from "../model/types.js";
-import { parseSituations233 } from "./vs-datex2-233-parser.js";
+import { parseSituations223 } from "./vs-datex2-223-parser.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { parseSituations35 } from "./vs-datex2-35-parser.js";
+import { parseDatex } from "./vs-datex2-35-parser.js";
 
-export interface Situation {
+export type DatexType = "SITUATION" | "CONTROLLER_STATUS";
+export interface DatexFile {
   id: string;
+  type: DatexType;
   datex2: string;
   effectDate: Date;
 }
@@ -42,58 +44,62 @@ async function handleVariableSign(
   data: DataIncomingDb,
 ): Promise<void> {
   const method = "VariableSignsService.handleVariableSign";
-  let updated23Count = 0;
+  let updated223Count = 0;
   let updated35Count = 0;
-  let error23Count = 0;
+  let error223Count = 0;
   let error35Count = 0;
   let unknownCount = 0;
   const xml = data.data;
-  // validate xml here?
-  // get id,
+  const started = Date.now();
 
   switch (data.version) {
-    case Datex2Version["2.3.3"]:
-      const situations23 = parseSituations233(xml);
+    case Datex2Version["2.2.3"]:
+      const situations223 = parseSituations223(xml);
 
-      await Promise.allSettled(situations23.map(async (s) => {
-        updated23Count++;
+      if (situations223.length === 0) {
+        logger.debug(`No situations parsed from ${data.data_id}!`);
+      }
+
+      await Promise.allSettled(situations223.map(async (s) => {
+        updated223Count++;
         try {
-          logger.debug("2.3.3 updating " + s.id);
-          return await updateDatex2(
+          await updateDatex2(
             db,
             s.id,
             data.version,
+            s.type,
             s.datex2,
             s.effectDate,
           );
         } catch (error) {
           logException(logger, error);
-          error23Count++;
-
-          return Promise.resolve();
+          error223Count++;
         }
       }));
 
       break;
 
     case Datex2Version["3.5"]:
-      const situations35 = parseSituations35(xml);
+      const situations35 = parseDatex(xml);
+
+      if (situations35.length === 0) {
+        logger.debug(`No situations parsed from ${data.data_id}!`);
+      }
 
       await Promise.allSettled(situations35.map(async (s) => {
         updated35Count++;
         try {
-          logger.debug("3.5 updating " + s.id);
-          return await updateDatex2(
+          await updateDatex2(
             db,
             s.id,
             data.version,
+            s.type,
             s.datex2,
             s.effectDate,
           );
         } catch (error) {
           logException(logger, error);
           error35Count++;
-          return Promise.resolve();
         }
       }));
 
@@ -108,9 +114,9 @@ async function handleVariableSign(
 
   logger.info({
     method,
-    customDatexVersion: Datex2Version["2.3.3"],
-    customUpdatedCount: updated23Count,
-    customErrorCount: error23Count,
+    customDatexVersion: Datex2Version["2.2.3"],
+    customUpdatedCount: updated223Count,
+    customErrorCount: error223Count,
   });
 
   logger.info({
@@ -123,5 +129,6 @@ async function handleVariableSign(
   logger.info({
     method,
     customUnknownCount: unknownCount,
+    tookMs: Date.now() - started,
   });
 }

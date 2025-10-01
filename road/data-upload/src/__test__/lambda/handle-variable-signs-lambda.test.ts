@@ -8,7 +8,7 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 import { jest } from "@jest/globals";
 import { insertData } from "../../dao/data.js";
 import { Datex2Version, SOURCES, TYPES } from "../../model/types.js";
-import { TEST_DATEX2 } from "../service/datex2_233_files.js";
+import { TEST_DATEX2 } from "../service/datex2_223_files.js";
 
 async function getResponseFromLambda(): Promise<void> {
   const { handler } = await import(
@@ -32,7 +32,7 @@ describe(
         db,
         "test123",
         SOURCES.API,
-        Datex2Version["2.3.3"],
+        Datex2Version["2.2.3"],
         TYPES.VS_DATEX2_XML,
         TEST_DATEX2,
       );
@@ -40,7 +40,7 @@ describe(
 
       await getResponseFromLambda();
       await assertDataCount(db, 1, "PROCESSED");
-      await assertVsDatex2Count(db, 1);
+      await assertVsDatex2Count(db, 2);
     });
   }),
 );

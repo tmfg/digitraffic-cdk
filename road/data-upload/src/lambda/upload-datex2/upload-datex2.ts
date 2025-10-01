@@ -52,6 +52,12 @@ export const handler = async (
       await proxyHolder.setCredentials();
 
       await updateDatex2(payload);
+
+      logger.info({
+        method,
+        customDataIncomingMethod: "API",
+        customDataIncomingCount: payload.datexIIVersions.length,
+      });
     } catch (error) {
       logger.error({
         method,
@@ -77,7 +83,7 @@ export const handler = async (
 
 function parsePayload(body: string): Datex2UpdateObject | undefined {
   try {
-    const json = JSON.parse(body);
+    const json = JSON.parse(body) as unknown;
 
     //    logger.debug("Parsed json " + JSON.stringify(json));
 

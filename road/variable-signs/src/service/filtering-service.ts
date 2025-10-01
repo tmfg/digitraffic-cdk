@@ -21,18 +21,15 @@ export const TEST_TIMES = [
 
 function getChild(
   element: XmlElement,
-  isVersion35: boolean,
   name: string,
 ): XmlElement {
-  const nameToMatch = isVersion35 ? `ns3:${name}` : name;
-
   for (const child of element.children) {
-    if (child instanceof XmlElement && child.name === nameToMatch) {
+    if (child instanceof XmlElement && child.name.includes(name)) {
       return child;
     }
   }
 
-  throw new Error("Missing element " + nameToMatch);
+  throw new Error("Missing element " + name);
 }
 
 function isTestTime(time: Date): boolean {
@@ -43,10 +40,7 @@ function isTestTime(time: Date): boolean {
   ) !== undefined;
 }
 
-export function isProductionMessage(
-  datex2: string,
-  isVersion35: boolean,
-): boolean {
+export function isProductionMessage(datex2: string): boolean {
   try {
     const xml = parseXml(datex2).root;
 
@@ -59,7 +53,7 @@ export function isProductionMessage(
       return true;
     }
 
-    const situationRecord = getChild(xml, isVersion35, "situationRecord");
+    const situationRecord = getChild(xml, "situationRecord");
 
     // check if the device is test device
     // eslint-disable-next-line dot-notation
@@ -67,15 +61,13 @@ export function isProductionMessage(
       return true;
     }
 
-    const validity = getChild(situationRecord, isVersion35, "validity");
+    const validity = getChild(situationRecord, "validity");
     const validityTimeSpecification = getChild(
       validity,
-      isVersion35,
       "validityTimeSpecification",
     );
     const overallStartTime = getChild(
       validityTimeSpecification,
-      isVersion35,
       "overallStartTime",
     );
 

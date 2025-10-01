@@ -39,32 +39,37 @@ const DATEX2_35_TEMPLATE =
 </ns3:situationPublication>
 `;
 
-export function findActiveSignsDatex2_35(): Promise<[string, Date]> {
+export function findSituationsDatex2_35(): Promise<[string, Date]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const [datex2DbSituations, lastModified] = await findAll(db, "DATEXII_3_5");
+    const [datex2DbSituations, lastModified] = await findAll(
+      db,
+      "DATEXII_3_5",
+      "SITUATION",
+    );
     const datex2: string[] = datex2DbSituations
       .map((d) => d.datex2)
-      .filter((d) => isProductionMessage(d, true));
+      .filter((d) => isProductionMessage(d));
 
-    return [createResponse35(datex2, lastModified), lastModified];
+    return [createSituationPublication35(datex2, lastModified), lastModified];
   });
 }
 
-export function findActiveSignsDatex2_223(): Promise<[string, Date]> {
+export function findSituationsDatex2_223(): Promise<[string, Date]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const [datex2DbSituations, lastModified] = await findAll(
       db,
       "DATEXII_2_2_3",
+      "SITUATION",
     );
     const datex2: string[] = datex2DbSituations
       .map((d) => d.datex2)
-      .filter((d) => isProductionMessage(d, false));
+      .filter((d) => isProductionMessage(d));
 
-    return [createResponse223(datex2, lastModified), lastModified];
+    return [createD2LogicalModel223(datex2, lastModified), lastModified];
   });
 }
 
-function createResponse35(
+function createSituationPublication35(
   datex2: string[],
   lastUpdated: Date | undefined,
 ): string {
@@ -76,7 +81,7 @@ function createResponse35(
     .replace("SITUATIONS", situations);
 }
 
-function createResponse223(
+function createD2LogicalModel223(
   datex2: string[],
   lastUpdated: Date | undefined,
 ): string {

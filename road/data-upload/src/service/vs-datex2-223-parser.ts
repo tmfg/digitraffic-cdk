@@ -1,4 +1,4 @@
-import type { Situation } from "./variable-signs.js";
+import type { DatexFile } from "./variable-signs.js";
 
 //const REG_PAYLOAD = /<payloadPublication/g;
 
@@ -9,8 +9,8 @@ const DATEX2_OVERALL_STARTTIME_TAG_END = "</overallStartTime>";
 const DATEX2_VERSION_ATTRIBUTE = "version=";
 //const XML_TAG_START = "<?xml";
 
-export function parseSituations233(datex2: string): Situation[] {
-  const situations: Situation[] = [];
+export function parseSituations223(datex2: string): DatexFile[] {
+  const situations: DatexFile[] = [];
   let index = 0;
   let sitIndex = 0;
 
@@ -40,9 +40,10 @@ export function parseSituations233(datex2: string): Situation[] {
   return situations;
 }
 
-function parseSituation(datex2: string): Situation {
+function parseSituation(datex2: string): DatexFile {
   return {
     id: parseId(datex2),
+    type: "SITUATION",
     datex2: datex2,
     effectDate: parseEffectDate(datex2),
   };
