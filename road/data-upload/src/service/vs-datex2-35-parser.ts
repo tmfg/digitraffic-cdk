@@ -14,7 +14,14 @@ export function parseDatex(datex2: string): DatexFile[] {
       return getSituations(datex2);
     case "CONTROLLER_STATUS":
       return getControllerStatuses(datex2);
+    case "CONTROLLER":
+      return getControllers(datex2);
   }
+}
+
+function getControllers(datex2: string): DatexFile[] {
+  return getTags(datex2, "vmsController")
+    .map((controller) => parseController(controller));
 }
 
 function getControllerStatuses(datex2: string): DatexFile[] {
@@ -32,9 +39,20 @@ function getType(datex2: string): DatexType {
     return "SITUATION";
   } else if (datex2.includes("VmsPublication")) {
     return "CONTROLLER_STATUS";
+  } else if (datex2.includes("VmsTablePublication")) {
+    return "CONTROLLER";
   }
 
   throw new Error("Unknown datex type");
+}
+
+function parseController(datex2: string): DatexFile {
+  return {
+    id: parseId(datex2),
+    type: "CONTROLLER",
+    datex2,
+    effectDate: new Date(),
+  };
 }
 
 function parseControllerStatus(datex2: string): DatexFile {
@@ -50,7 +68,7 @@ function parseSituation(datex2: string): DatexFile {
   return {
     id: parseId(datex2),
     type: "SITUATION",
-    datex2: datex2,
+    datex2,
     effectDate: parseEffectDate(datex2),
   };
 }

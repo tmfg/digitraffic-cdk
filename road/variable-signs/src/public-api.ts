@@ -16,7 +16,8 @@ export class PublicApi {
   private apiResource!: Resource;
   private v1Datex233Resource!: Resource;
   private v1ImageResource!: Resource;
-  private v1Datex35Resource!: Resource;
+  private v1SituationsDatex35Resource!: Resource;
+  private v1StatusesDatex35Resource!: Resource;
 
   constructor(stack: DigitrafficStack) {
     this.restApi = new DigitrafficRestApi(
@@ -32,7 +33,8 @@ export class PublicApi {
 
     this.createV1ResourcePaths();
     this.createDatex233Resource(stack);
-    this.createDatex35Resource(stack);
+    this.createSituationsDatex35Resource(stack);
+    this.createStatusesDatex35Resource(stack);
 
     this.createV1Documentation();
   }
@@ -49,9 +51,14 @@ export class PublicApi {
     const imagesResource = v1Resource.addResource("images");
 
     this.v1Datex233Resource = v1Resource.addResource("signs.datex2");
-    this.v1Datex35Resource = v1Resource.addResource("signs").addResource(
-      "datex2-3.5.xml",
-    );
+    this.v1SituationsDatex35Resource = v1Resource.addResource("signs")
+      .addResource(
+        "datex2-3.5.xml",
+      );
+    this.v1StatusesDatex35Resource = this.v1Datex233Resource.addResource(
+      "statuses",
+    ).addResource("datex2-3.5.xml");
+
     this.v1ImageResource = imagesResource.addResource("{text}");
   }
 
@@ -66,11 +73,11 @@ export class PublicApi {
     );
 
     this.restApi.documentResource(
-      this.v1Datex35Resource,
+      this.v1SituationsDatex35Resource,
       DocumentationPart.method(
         VARIABLE_SIGN_TAGS_V1,
         "GetDatex2",
-        "Return all variables signs as DatexII 3.5",
+        "Return all situations as DatexII 3.5",
       ),
     );
 
@@ -155,12 +162,12 @@ export class PublicApi {
     });
   }
 
-  createDatex35Resource(stack: DigitrafficStack): void {
+  createSituationsDatex35Resource(stack: DigitrafficStack): void {
     const environment = stack.createLambdaEnvironment();
 
-    const getDatex2Lambda = MonitoredDBFunction.create(
+    const getSituationsLambda = MonitoredDBFunction.create(
       stack,
-      "get-datex2-35",
+      "get-situations-datex2-35",
       environment,
       {
         reservedConcurrentExecutions: 3,
@@ -168,22 +175,62 @@ export class PublicApi {
     );
 
     const getDatex2Integration = new DigitrafficIntegration(
-      getDatex2Lambda,
+      getSituationsLambda,
       MediaType.APPLICATION_XML,
     ).build();
 
     const xmlModel = addSimpleServiceModel("Xml35Model", this.restApi);
 
     ["GET", "HEAD"].forEach((httpMethod): void => {
-      this.v1Datex35Resource.addMethod(httpMethod, getDatex2Integration, {
-        apiKeyRequired: true,
-        methodResponses: [
-          DigitrafficMethodResponse.response200(
-            xmlModel,
-            MediaType.APPLICATION_XML,
-          ),
-        ],
-      });
+      this.v1SituationsDatex35Resource.addMethod(
+        httpMethod,
+        getDatex2Integration,
+        {
+          apiKeyRequired: true,
+          methodResponses: [
+            DigitrafficMethodResponse.response200(
+              xmlModel,
+              MediaType.APPLICATION_XML,
+            ),
+          ],
+        },
+      );
+    });
+  }
+
+  createStatusesDatex35Resource(stack: DigitrafficStack): void {
+    const environment = stack.createLambdaEnvironment();
+
+    const getStatusesLambda = MonitoredDBFunction.create(
+      stack,
+      "get-statuses-datex2-35",
+      environment,
+      {
+        reservedConcurrentExecutions: 3,
+      },
+    );
+
+    const getDatex2Integration = new DigitrafficIntegration(
+      getStatusesLambda,
+      MediaType.APPLICATION_XML,
+    ).build();
+
+    const xmlModel = addSimpleServiceModel("Xml35Model", this.restApi);
+
+    ["GET", "HEAD"].forEach((httpMethod): void => {
+      this.v1StatusesDatex35Resource.addMethod(
+        httpMethod,
+        getDatex2Integration,
+        {
+          apiKeyRequired: true,
+          methodResponses: [
+            DigitrafficMethodResponse.response200(
+              xmlModel,
+              MediaType.APPLICATION_XML,
+            ),
+          ],
+        },
+      );
     });
   }
 }

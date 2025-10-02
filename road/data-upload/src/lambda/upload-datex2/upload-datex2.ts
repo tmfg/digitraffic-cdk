@@ -5,6 +5,7 @@ import {
   type Datex2UpdateObject,
   Datex2UpdateObjectSchema,
 } from "../../model/datex2-update-object.js";
+import type { APIGatewayProxyResult } from "aws-lambda";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -33,7 +34,7 @@ export const StatusCodes = {
 // proxy lambda, do not return LambdaResponse
 export const handler = async (
   event: Record<string, string>,
-): Promise<unknown> => {
+): Promise<APIGatewayProxyResult> => {
   // eslint-disable-next-line dot-notation
   const body = event["body"];
   const start = Date.now();
@@ -44,7 +45,7 @@ export const handler = async (
     if (!payload) {
       return {
         statusCode: 400,
-        message: ERRORS.INVALID_PAYLOAD,
+        body: ERRORS.INVALID_PAYLOAD,
       };
     }
 
@@ -72,12 +73,13 @@ export const handler = async (
 
     return {
       statusCode: 200,
+      body: "OK",
     };
   }
 
   return {
     statusCode: 400,
-    message: ERRORS.MISSING_BODY,
+    body: ERRORS.MISSING_BODY,
   };
 };
 

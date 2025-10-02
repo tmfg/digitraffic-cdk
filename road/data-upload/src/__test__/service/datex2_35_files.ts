@@ -269,3 +269,71 @@ export const TEST_DATEX2_VMSPUBLICATION_2 =
 		</ns11:vmsStatus>
 	</ns11:vmsControllerStatus>
 </ns15:payload>`;
+
+export const TEST_DATEX2_VMS_TABLE_PUBLICATION =
+  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns15:payload xsi:type="ns11:VmsTablePublication"
+	xmlns="http://datex2.eu/schema/3/trafficManagementPlan"
+	xmlns:ns2="http://datex2.eu/schema/3/situation"
+	xmlns:ns4="http://datex2.eu/schema/3/urbanExtensions"
+	xmlns:ns3="http://datex2.eu/schema/3/common"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ns6="http://datex2.eu/schema/3/locationExtension"
+	xmlns:ns5="http://datex2.eu/schema/3/commonExtension"
+	xmlns:ns8="http://datex2.eu/schema/3/reroutingManagementEnhanced"
+	xmlns:ns7="http://datex2.eu/schema/3/locationReferencing"
+	xmlns:ns13="http://datex2.eu/schema/3/energyInfrastructure"
+	xmlns:ns9="http://datex2.eu/schema/3/facilities"
+	xmlns:ns12="http://datex2.eu/schema/3/parking"
+	xmlns:ns11="http://datex2.eu/schema/3/vms"
+	xmlns:ns10="http://datex2.eu/schema/3/roadTrafficData"
+	xmlns:ns15="http://datex2.eu/schema/3/d2Payload"
+	xmlns:ns14="http://datex2.eu/schema/3/faultAndStatus">
+	<ns3:publicationTime>2025-10-02T02:11:31.186Z</ns3:publicationTime>
+	<ns3:publicationCreator>
+		<ns3:country>FI</ns3:country>
+		<ns3:nationalIdentifier>FTA</ns3:nationalIdentifier>
+	</ns3:publicationCreator>
+	<ns11:headerInformation>
+		<ns3:confidentiality>noRestriction</ns3:confidentiality>
+		<ns3:informationStatus>real</ns3:informationStatus>
+	</ns11:headerInformation>
+	<ns11:vmsControllerTable>
+		<ns11:vmsController id="VME015511">
+			<ns11:vms vmsIndex="0">
+				<ns11:vms>
+					<ns11:description>
+						<ns3:values>
+							<ns3:value lang="fi">Varoitusmerkki. Yhteismerkki KRM015512-merkin kanssa. Kts. Merkin IP-osoitteet VME015511/KRM015512-hallinta, VME015511/KRM015512-kontrolleri ja VME015511/KRM015512-s laitteilta.</ns3:value>
+						</ns3:values>
+					</ns11:description>
+					<ns11:vmsType>other</ns11:vmsType>
+					<ns11:vmsLocation xsi:type="ns7:PointLocation">
+						<ns7:coordinatesForDisplay>
+							<ns7:latitude>6683809.0</ns7:latitude>
+							<ns7:longitude>406975.0</ns7:longitude>
+						</ns7:coordinatesForDisplay>
+					</ns11:vmsLocation>
+				</ns11:vms>
+			</ns11:vms>
+		</ns11:vmsController>
+		<ns11:vmsController id="VME015651">
+			<ns11:vms vmsIndex="0">
+				<ns11:vms>
+					<ns11:description>
+						<ns3:values>
+							<ns3:value lang="fi">Varoitusmerkki. Yhteismerkki KRM015651-merkin kanssa. Kts. Merkin IP-osoitteet VME/KRM015651-hallinta, VME/KRM015651-kontrolleri ja VME/KRM015651-s laitteilta.</ns3:value>
+						</ns3:values>
+					</ns11:description>
+					<ns11:vmsType>other</ns11:vmsType>
+					<ns11:vmsLocation xsi:type="ns7:PointLocation">
+						<ns7:coordinatesForDisplay>
+							<ns7:latitude>6684359.0</ns7:latitude>
+							<ns7:longitude>407918.0</ns7:longitude>
+						</ns7:coordinatesForDisplay>
+					</ns11:vmsLocation>
+				</ns11:vms>
+			</ns11:vms>
+		</ns11:vmsController>
+	</ns11:vmsControllerTable>
+</ns15:payload>`;

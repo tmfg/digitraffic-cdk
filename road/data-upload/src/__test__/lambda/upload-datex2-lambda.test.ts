@@ -1,38 +1,39 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase } from "../db-testutil.js";
+import { assertDataCount, dbTestBase } from "../db-testutil.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { jest } from "@jest/globals";
+import { type APIGatewayProxyResult } from "aws-lambda";
+import { ERRORS } from "../../lambda/upload-datex2/upload-datex2.js";
+import type { Datex2UpdateObject } from "../../model/datex2-update-object.js";
 
-/*
 async function getResponseFromLambda(
   event: Record<string, string> = {},
-): Promise<unknown> {
+): Promise<APIGatewayProxyResult> {
   const { handler } = await import(
     "../../lambda/upload-datex2/upload-datex2.js"
   );
 
   return await handler(event);
-}*/
-/*
+}
+
 const validUpdateObject: Datex2UpdateObject = {
   datexIIVersions: [{
     type: "variable-sign",
     version: "3.6",
     message: "<datex message>",
   }],
-};*/
+};
 
 describe(
   "upload-datex2-lambda-test",
-  dbTestBase((_db: DTDatabase) => {
+  dbTestBase((db: DTDatabase) => {
     jest.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
-    /*
+
     test("missing body", async () => {
       const response = await getResponseFromLambda({});
 
-      new ExpectResponse(response)
-        .expectStatus(400)
-        .expectBody(ERRORS.MISSING_BODY);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body).toEqual(ERRORS.MISSING_BODY);
 
       await assertDataCount(db, 0);
     });
@@ -42,9 +43,8 @@ describe(
         body: JSON.stringify([]),
       });
 
-      new ExpectResponse(response)
-        .expectStatus(400)
-        .expectBody(ERRORS.INVALID_PAYLOAD);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body).toEqual(ERRORS.INVALID_PAYLOAD);
 
       await assertDataCount(db, 0);
     });
@@ -52,9 +52,8 @@ describe(
     test("invalid payload", async () => {
       const response = await getResponseFromLambda({ body: "invalid" });
 
-      new ExpectResponse(response)
-        .expectStatus(400)
-        .expectBody(ERRORS.INVALID_PAYLOAD);
+      expect(response.statusCode).toEqual(400);
+      expect(response.body).toEqual(ERRORS.INVALID_PAYLOAD);
 
       await assertDataCount(db, 0);
     });
@@ -64,9 +63,9 @@ describe(
         body: JSON.stringify(validUpdateObject),
       });
 
-      ExpectResponse.ok(response);
+      expect(response.statusCode).toEqual(200);
 
       await assertDataCount(db, 1);
-    });*/
+    });
   }),
 );

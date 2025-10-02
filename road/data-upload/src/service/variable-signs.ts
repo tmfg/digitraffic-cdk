@@ -10,7 +10,7 @@ import { parseSituations223 } from "./vs-datex2-223-parser.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { parseDatex } from "./vs-datex2-35-parser.js";
 
-export type DatexType = "SITUATION" | "CONTROLLER_STATUS";
+export type DatexType = "SITUATION" | "CONTROLLER_STATUS" | "CONTROLLER";
 export interface DatexFile {
   id: string;
   type: DatexType;
