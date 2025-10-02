@@ -3,8 +3,7 @@ import * as z from "zod";
 export const Datex2UpdateObjectSchema = z.strictObject({
   datexIIVersions: z.array(
     z.strictObject({
-      // TODO: remove optional
-      type: z.string().optional(),
+      type: z.string(),
       version: z.string(),
       message: z.string(),
     }),

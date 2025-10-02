@@ -27,7 +27,7 @@ export async function updateDatex2(
         messageId,
         SOURCES.API,
         o.version,
-        o.type ?? "VARIABLE_MESSAGE_SIGN_DATEX_XML", // TODO: remove default value
+        o.type,
         o.message,
       );
     }));

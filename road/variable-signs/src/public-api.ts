@@ -61,12 +61,10 @@ export class PublicApi {
       .addResource(
         "datex2-3.5.xml",
       );
-    this.v1StatusesDatex35Resource = this.v1Datex233Resource.addResource(
+    this.v1StatusesDatex35Resource = v1Resource.addResource(
       "statuses",
     ).addResource("datex2-3.5.xml");
-    this.v1ControllersDatex35Resource = this.v1Datex233Resource.addResource(
-      "controllers",
-    )
+    this.v1ControllersDatex35Resource = v1Resource.addResource("controllers")
       .addResource("datex2-3.5.xml");
 
     this.v1ImageResource = imagesResource.addResource("{text}");
