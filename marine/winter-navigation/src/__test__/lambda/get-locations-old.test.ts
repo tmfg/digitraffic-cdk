@@ -4,7 +4,6 @@ import {
   expectNotFound,
   expectResponse,
   expectResponseContent,
-  mockProxyHolder,
 } from "@digitraffic-cdk/testing";
 import { saveAllLocations } from "../../db/locations.js";
 import {
@@ -20,6 +19,7 @@ import {
   saveAllPortSuspensionLocations,
   saveAllPortSuspensions,
 } from "../../db/port-suspensions.js";
+import { mockProxyHolder } from "../mock.js";
 
 mockProxyHolder();
 

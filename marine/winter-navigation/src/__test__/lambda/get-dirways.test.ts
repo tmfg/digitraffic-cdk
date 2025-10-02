@@ -1,10 +1,11 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase } from "../db-testutil.js";
-import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
+import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { type DTDirway } from "../../model/dt-apidata.js";
 import { saveAllDirwaypoints, saveAllDirways } from "../../db/dirways.js";
 import { DIRWAY_1, DIRWAYPOINT_1 } from "../service/data-updater.test.js";
+import { mockProxyHolder } from "../mock.js";
 
 mockProxyHolder();
 
