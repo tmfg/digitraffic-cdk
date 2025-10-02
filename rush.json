@@ -16,8 +16,8 @@
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
   "nodeSupportedVersionRange": ">=22.0.0 <23.0.0",
-  "rushVersion": "5.157.0",
-  "pnpmVersion": "10.14.0",
+  "rushVersion": "5.158.1",
+  "pnpmVersion": "10.17.1",
   "ensureConsistentVersions": false,
   "repository": {
     "url": "https://github.com/fintraffic-vts/mcp-cdk",

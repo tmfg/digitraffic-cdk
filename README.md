@@ -23,15 +23,17 @@ Digitraffic is operated by [Fintraffic](https://www.fintraffic.fi)
 
 ## ESLint
 
-ESLint-configuration can be found in _.eslintrc.json_. A Dockerfile is added to
-enable running eslint in docker:
+ESLint is configured in tools/eslint-config/default.js and can be used in other
+projects by adding it to .eslintrc.cjs ESLint-configuration can be found in
+_.eslintrc.json_. A Dockerfile is added to enable running eslint in docker:
 
-```
-docker build -t eslint .
-docker run -v $(pwd):/data eslint
-```
+You can run eslint to tool projects by running:
 
-Output of eslint in docker is written to file _eslint.html_.
+    rush ci:eslint-report
 
-find . -name tsd -type d -exec rm -rf {} \; tai find . -name tsd -type d
--delete;
+After that you can find the report under projects in file `report.html`
+
+## Rush commands
+
+Global Rush commands are configured in
+[command-line.json](common/config/rush/command-line.json)

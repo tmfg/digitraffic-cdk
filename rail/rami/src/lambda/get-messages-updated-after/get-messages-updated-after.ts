@@ -1,6 +1,9 @@
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { getMessagesUpdatedAfterLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event.js";
+import {
+  getMessagesUpdatedAfterLambdaEvent as lambdaEventSchema,
+} from "../../model/zod-schema/lambda-event.js";
 import { getMessagesUpdatedAfter } from "../../service/get-message.js";
+import { z } from "zod";
 
 export const handler = async (
   event: Record<string, string>,
@@ -8,7 +11,7 @@ export const handler = async (
   const parsedEvent = lambdaEventSchema.safeParse(event);
   if (!parsedEvent.success) {
     return LambdaResponse.badRequest(
-      JSON.stringify(parsedEvent.error.flatten().fieldErrors),
+      JSON.stringify(z.flattenError(parsedEvent.error).fieldErrors),
     );
   }
   const messages = await getMessagesUpdatedAfter(

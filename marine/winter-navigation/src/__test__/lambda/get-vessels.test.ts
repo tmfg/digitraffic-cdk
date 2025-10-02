@@ -1,13 +1,13 @@
+import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase } from "../db-testutil.js";
-import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
+import { dbTestBase, mockProxyHolder } from "../db-testutil.js";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { saveAllVessels } from "../../db/vessels.js";
 import { ACTIVITY_1, VESSEL_1 } from "../service/data-updater.test.js";
-import { type DTVessel } from "../../model/dt-apidata.js";
 import { saveAllActivities } from "../../db/activities.js";
+import type { DTVessel } from "../../model/dt-apidata.js";
 
-mockProxyHolder();
+await mockProxyHolder();
 
 async function insertVessel(db: DTDatabase): Promise<void> {
   await saveAllVessels(db, [VESSEL_1]);

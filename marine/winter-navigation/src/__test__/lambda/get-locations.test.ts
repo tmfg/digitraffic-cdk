@@ -1,6 +1,6 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase } from "../db-testutil.js";
-import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
+import { dbTestBase, mockProxyHolder } from "../db-testutil.js";
+import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { saveAllLocations } from "../../db/locations.js";
 import {
   LOCATION_1,
@@ -16,7 +16,7 @@ import {
   saveAllPortSuspensions,
 } from "../../db/port-suspensions.js";
 
-mockProxyHolder();
+await mockProxyHolder();
 
 async function insertLocation(db: DTDatabase): Promise<void> {
   await saveAllLocations(db, [LOCATION_1]);

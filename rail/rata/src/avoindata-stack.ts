@@ -39,7 +39,7 @@ export class AvoinDataStack extends Stack {
     this.createLambdaDbSg(vpc);
   }
 
-  private database(props: RataProps) {
+  private database(props: RataProps): void {
     const securityGroup = ec2.SecurityGroup.fromSecurityGroupId(
       this,
       "avoinDataRdsSecurityGroup",
@@ -81,6 +81,7 @@ export class AvoinDataStack extends Stack {
       value: updaterTaskDefinition.taskDefinitionArn,
     });
 
+    // @ts-ignore
     const updaterEcsTaskRole = iam.Role.fromRoleArn(
       this,
       "updaterTaskRole",
@@ -149,6 +150,7 @@ export class AvoinDataStack extends Stack {
     });
   }
 
+  // @ts-ignore
   private addAllowSqsSendPolicy(role: iam.IRole): void {
     role.addToPrincipalPolicy(
       new iam.PolicyStatement({

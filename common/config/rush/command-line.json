@@ -14,7 +14,7 @@
     {
       "name": "run:format",
       "commandKind": "global",
-      "summary": "Checks if dependencies are declared correctly",
+      "summary": "Formats all projet files",
       "shellCommand": "deno fmt"
     },
     {

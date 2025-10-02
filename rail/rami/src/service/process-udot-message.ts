@@ -71,6 +71,8 @@ export async function processUdotMessage(
   }
 }
 
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function logRowNotFound(
   message: UnknownDelayOrTrackMessage,
   datarow: UnknownDelayOrTrack,

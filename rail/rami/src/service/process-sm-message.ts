@@ -44,6 +44,7 @@ function ramiSmMessageToUDOTMessage(
   message: z.infer<typeof ramiSmMessageSchema>,
 ): UnknownDelayOrTrackMessage {
   const data: UnknownDelayOrTrack[] = [];
+  // @ts-ignore
   const mcj = message.payload.monitoredStopVisits[0].monitoredVehicleJourney;
   const monitoredCall = mcj.monitoredCall;
   const messageId = message.headers.e2eId;

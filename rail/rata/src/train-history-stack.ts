@@ -13,7 +13,7 @@ export class TrainHistoryStack extends Stack {
     this.ecrRepos(props);
   }
 
-  private ecrRepos(props: RataProps) {
+  private ecrRepos(props: RataProps): void {
     const trainHistoryWebRepo = ecr.Repository.fromRepositoryName(
       this,
       "trainHistoryWebRepo",
@@ -42,7 +42,7 @@ export class TrainHistoryStack extends Stack {
     });
   }
 
-  private database(props: RataProps) {
+  private database(props: RataProps): void {
     const securityGroup = ec2.SecurityGroup.fromSecurityGroupId(
       this,
       "trainHistoryDbSecurityGroup",
