@@ -6,7 +6,7 @@ import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/res
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { Resource } from "aws-cdk-lib/aws-apigateway";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 
 const VARIABLE_SIGN_TAGS_V1 = ["Variable Sign V1"];
 
@@ -18,6 +18,9 @@ export class PublicApi {
   private v1ImageResource!: Resource;
   private v1SituationsDatex35Resource!: Resource;
   private v1StatusesDatex35Resource!: Resource;
+  private v1ControllersDatex35Resource!: Resource;
+
+  private datex2_35_model: Model;
 
   constructor(stack: DigitrafficStack) {
     this.restApi = new DigitrafficRestApi(
@@ -31,10 +34,13 @@ export class PublicApi {
       "VariableSigns Usage Plan",
     );
 
+    this.datex2_35_model = addSimpleServiceModel("Xml35Model", this.restApi);
+
     this.createV1ResourcePaths();
     this.createDatex233Resource(stack);
     this.createSituationsDatex35Resource(stack);
     this.createStatusesDatex35Resource(stack);
+    this.createControllersDatex35Resource(stack);
 
     this.createV1Documentation();
   }
@@ -58,6 +64,10 @@ export class PublicApi {
     this.v1StatusesDatex35Resource = this.v1Datex233Resource.addResource(
       "statuses",
     ).addResource("datex2-3.5.xml");
+    this.v1ControllersDatex35Resource = this.v1Datex233Resource.addResource(
+      "controllers",
+    )
+      .addResource("datex2-3.5.xml");
 
     this.v1ImageResource = imagesResource.addResource("{text}");
   }
@@ -179,8 +189,6 @@ export class PublicApi {
       MediaType.APPLICATION_XML,
     ).build();
 
-    const xmlModel = addSimpleServiceModel("Xml35Model", this.restApi);
-
     ["GET", "HEAD"].forEach((httpMethod): void => {
       this.v1SituationsDatex35Resource.addMethod(
         httpMethod,
@@ -189,7 +197,7 @@ export class PublicApi {
           apiKeyRequired: true,
           methodResponses: [
             DigitrafficMethodResponse.response200(
-              xmlModel,
+              this.datex2_35_model,
               MediaType.APPLICATION_XML,
             ),
           ],
@@ -215,8 +223,6 @@ export class PublicApi {
       MediaType.APPLICATION_XML,
     ).build();
 
-    const xmlModel = addSimpleServiceModel("Xml35Model", this.restApi);
-
     ["GET", "HEAD"].forEach((httpMethod): void => {
       this.v1StatusesDatex35Resource.addMethod(
         httpMethod,
@@ -225,7 +231,41 @@ export class PublicApi {
           apiKeyRequired: true,
           methodResponses: [
             DigitrafficMethodResponse.response200(
-              xmlModel,
+              this.datex2_35_model,
+              MediaType.APPLICATION_XML,
+            ),
+          ],
+        },
+      );
+    });
+  }
+
+  createControllersDatex35Resource(stack: DigitrafficStack): void {
+    const environment = stack.createLambdaEnvironment();
+
+    const getControllersLambda = MonitoredDBFunction.create(
+      stack,
+      "get-controllers-datex2-35",
+      environment,
+      {
+        reservedConcurrentExecutions: 3,
+      },
+    );
+
+    const getDatex2Integration = new DigitrafficIntegration(
+      getControllersLambda,
+      MediaType.APPLICATION_XML,
+    ).build();
+
+    ["GET", "HEAD"].forEach((httpMethod): void => {
+      this.v1ControllersDatex35Resource.addMethod(
+        httpMethod,
+        getDatex2Integration,
+        {
+          apiKeyRequired: true,
+          methodResponses: [
+            DigitrafficMethodResponse.response200(
+              this.datex2_35_model,
               MediaType.APPLICATION_XML,
             ),
           ],
