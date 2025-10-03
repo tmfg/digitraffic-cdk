@@ -5,7 +5,7 @@ import {
   type Datex2UpdateObject,
   Datex2UpdateObjectSchema,
 } from "../../model/datex2-update-object.js";
-import type { APIGatewayProxyResult } from "aws-lambda";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -33,11 +33,15 @@ export const StatusCodes = {
 
 // proxy lambda, do not return LambdaResponse
 export const handler = async (
-  event: Record<string, string>,
+  event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   // eslint-disable-next-line dot-notation
   const body = event["body"];
   const start = Date.now();
+
+  logger.debug(
+    "HEADER x-request-id: " + JSON.stringify(event.headers["x-request-id"]),
+  );
 
   if (body) {
     const payload = parsePayload(body);

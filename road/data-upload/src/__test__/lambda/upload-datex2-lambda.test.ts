@@ -2,18 +2,21 @@ import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import { assertDataCount, dbTestBase } from "../db-testutil.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { jest } from "@jest/globals";
-import { type APIGatewayProxyResult } from "aws-lambda";
+import {
+  type APIGatewayProxyEvent,
+  type APIGatewayProxyResult,
+} from "aws-lambda";
 import { ERRORS } from "../../lambda/upload-datex2/upload-datex2.js";
 import type { Datex2UpdateObject } from "../../model/datex2-update-object.js";
 
 async function getResponseFromLambda(
-  event: Record<string, string> = {},
+  event: Partial<APIGatewayProxyEvent> = {},
 ): Promise<APIGatewayProxyResult> {
   const { handler } = await import(
     "../../lambda/upload-datex2/upload-datex2.js"
   );
 
-  return await handler(event);
+  return await handler(event as APIGatewayProxyEvent);
 }
 
 const validUpdateObject: Datex2UpdateObject = {

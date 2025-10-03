@@ -22,12 +22,9 @@ const PS_DELETE_OLD_DATA = new pgPromise.PreparedStatement({
     "delete from data_incoming where created_at < (current_date - interval '7 days')",
 });
 
-const PS_NEW_DATA = new pgPromise.PreparedStatement({
-  name: "get-new-data",
-  text: `select data_id, source, version, type, data
+const SQL_NEW_DATA = `select data_id, source, version, type, data
 from data_incoming
-where source = $1 and type = $2 and status = 'NEW'`,
-});
+where source = $1 and type in ($2:csv) and status = 'NEW'`;
 
 export async function insertData(
   db: DTDatabase,
@@ -47,9 +44,9 @@ export async function deleteOldDataMessages(db: DTDatabase): Promise<void> {
 export async function getNewData(
   db: DTDatabase,
   source: string,
-  type: string,
+  types: string[],
 ): Promise<DataIncomingDb[]> {
-  return await db.manyOrNone(PS_NEW_DATA, [source, type]);
+  return await db.manyOrNone(SQL_NEW_DATA, [source, types]);
 }
 
 const PS_UPDATE_DATA = new pgPromise.PreparedStatement({

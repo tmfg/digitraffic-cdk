@@ -20,7 +20,10 @@ export interface DatexFile {
 
 export async function handleVariableSignMessages(): Promise<void> {
   await inDatabase(async (db) => {
-    const unhandled = await getNewData(db, SOURCES.API, TYPES.VS_DATEX2_XML);
+    const unhandled = await getNewData(db, SOURCES.API, [
+      TYPES.VMS_DATEX2_XML,
+      TYPES.VMS_DATEX2_METADATA_XML,
+    ]);
 
     await Promise.allSettled(unhandled.map(async (data) => {
       try {
@@ -80,22 +83,22 @@ async function handleVariableSign(
       break;
 
     case Datex2Version["3.5"]:
-      const situations35 = parseDatex(xml);
+      const datexFiles = parseDatex(xml);
 
-      if (situations35.length === 0) {
-        logger.debug(`No situations parsed from ${data.data_id}!`);
+      if (datexFiles.length === 0) {
+        logger.debug(`No datex files parsed from ${data.data_id}!`);
       }
 
-      await Promise.allSettled(situations35.map(async (s) => {
+      await Promise.allSettled(datexFiles.map(async (df) => {
         updated35Count++;
         try {
           await updateDatex2(
             db,
-            s.id,
+            df.id,
             data.version,
-            s.type,
-            s.datex2,
-            s.effectDate,
+            df.type,
+            df.datex2,
+            df.effectDate,
           );
         } catch (error) {
           logException(logger, error);

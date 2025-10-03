@@ -111,8 +111,8 @@ export function findControllersDatex2_35(): Promise<[string, Date]> {
       "CONTROLLER",
     );
     const datex2: string[] = datex2DbSituations
-      .map((d) => d.datex2)
-      .filter((d) => isProductionMessage(d));
+      .map((d) => d.datex2);
+    //      .filter((d) => isProductionMessage(d));
 
     return [createVmsTablePublication35(datex2, lastModified), lastModified];
   });
@@ -126,8 +126,8 @@ export function findStatusesDatex2_35(): Promise<[string, Date]> {
       "CONTROLLER_STATUS",
     );
     const datex2: string[] = datex2DbSituations
-      .map((d) => d.datex2)
-      .filter((d) => isProductionMessage(d));
+      .map((d) => d.datex2);
+    //      .filter((d) => isProductionMessage(d));
 
     return [createVmsPublication35(datex2, lastModified), lastModified];
   });

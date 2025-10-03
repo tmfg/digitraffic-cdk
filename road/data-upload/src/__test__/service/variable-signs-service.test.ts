@@ -18,7 +18,7 @@ describe(
         "test1",
         SOURCES.API,
         "test",
-        TYPES.VS_DATEX2_XML,
+        TYPES.VMS_DATEX2_XML,
         "test_data_1",
       );
       await assertDataCount(db, 1, "NEW");

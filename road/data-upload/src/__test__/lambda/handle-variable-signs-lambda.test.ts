@@ -33,7 +33,7 @@ describe(
         "test123",
         SOURCES.API,
         Datex2Version["2.2.3"],
-        TYPES.VS_DATEX2_XML,
+        TYPES.VMS_DATEX2_XML,
         TEST_DATEX2,
       );
       await assertDataCount(db, 1, "NEW");
