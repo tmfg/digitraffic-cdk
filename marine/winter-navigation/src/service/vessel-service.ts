@@ -2,7 +2,11 @@ import {
   type DTDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
-import type { DTActivity, DTVessel } from "../model/dt-apidata.js";
+import type {
+  DTActivity,
+  DTPlannedAssistance,
+  DTVessel,
+} from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
 import * as ActivityDB from "../db/activities.js";
 import type { Activity, Vessel } from "../model/apidata.js";
@@ -30,6 +34,7 @@ export function getVessel(
 export function getVessels(): Promise<[DTVessel[], Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const vessels = await VesselDB.getVessels(db);
+
     const activities = await ActivityDB.getActivities(db);
     const lastUpdated = undefined;
     const dtVessels = convertVessels(vessels, activities);
@@ -57,7 +62,29 @@ function convertVessel(
     shortcode: v.shortcode,
     mmsi: v.mmsi,
     imo: v.imo,
+    type: v.type,
     activities,
+    plannedAssistances: v.queues?.map((q): DTPlannedAssistance => {
+      return {
+        // vessel is icebreaker, show assisted vessel
+        ...((v.mmsi === q.icebreaker_mmsi || v.imo === q.icebreaker_imo) && {
+          assistedVessel: {
+            imo: q.vessel_imo,
+            mmsi: q.vessel_mmsi,
+          },
+        }),
+        // vessel is not icebreaker, show assisting vessel (icebreaker)
+        ...((v.mmsi === q.vessel_mmsi || v.imo === q.vessel_imo) && {
+          assistingVessel: {
+            imo: q.icebreaker_imo,
+            mmsi: q.icebreaker_mmsi,
+          },
+        }),
+        queuePosition: q.order_num,
+        startTime: q.start_time,
+        endTime: q.end_time,
+      };
+    }),
   };
 }
 

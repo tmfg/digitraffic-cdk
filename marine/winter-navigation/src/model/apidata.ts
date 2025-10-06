@@ -41,6 +41,7 @@ export interface Vessel extends BaseAttributes {
   readonly imo?: number;
   readonly mmsi?: number;
   readonly type?: string;
+  readonly queues?: Queue[];
 }
 
 export interface Source extends BaseAttributes {
@@ -77,7 +78,11 @@ export interface PortSuspensionLocation extends BaseAttributes {
 
 export interface Queue extends BaseAttributes {
   readonly icebreaker_id: string;
+  readonly icebreaker_imo?: number;
+  readonly icebreaker_mmsi?: number;
   readonly vessel_id: string;
+  readonly vessel_imo?: number;
+  readonly vessel_mmsi?: number;
   readonly start_time: Date;
   readonly end_time: Date;
   readonly order_num: number;

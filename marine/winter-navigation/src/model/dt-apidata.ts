@@ -33,6 +33,20 @@ export interface DTActivity {
   readonly endTime?: Date;
 }
 
+export interface DTPlannedAssistance {
+  readonly assistingVessel?: {
+    readonly imo?: number;
+    readonly mmsi?: number;
+  };
+  readonly assistedVessel?: {
+    readonly imo?: number;
+    readonly mmsi?: number;
+  };
+  readonly queuePosition: number;
+  readonly startTime: Date;
+  readonly endTime: Date;
+}
+
 export interface DTVessel {
   readonly name: string;
   readonly callSign?: string;
@@ -41,6 +55,7 @@ export interface DTVessel {
   readonly mmsi?: number;
   readonly type?: string;
   readonly activities?: DTActivity[];
+  readonly plannedAssistances?: DTPlannedAssistance[];
 }
 
 export interface DTDirwaypoint {

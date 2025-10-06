@@ -16,15 +16,84 @@ do update set
     deleted = false
 `;
 
-const SQL_GET_VESSEL =
-  `select id, name, callsign, shortcode, imo, mmsi, type, deleted
-from wn_vessel
-where id = $1`;
+const SQL_GET_VESSEL = `SELECT
+  v.id,
+  v.name,
+  v.callsign,
+  v.shortcode,
+  v.imo,
+  v.mmsi,
+  v.type,
+  COALESCE(
+    JSON_AGG(
+      JSON_BUILD_OBJECT(
+        'start_time', q.start_time,
+        'end_time', q.end_time,
+        'order_num', q.order_num,
+        'icebreaker_id', ib_vessel.id,
+        'icebreaker_imo', ib_vessel.imo,
+        'icebreaker_mmsi', ib_vessel.mmsi,
+        'vessel_id', assisted_vessel.id,
+        'vessel_imo', assisted_vessel.imo,
+        'vessel_mmsi', assisted_vessel.mmsi
+      )
+    ) FILTER (WHERE q.id IS NOT NULL),
+    '[]'::json
+  ) AS queues
+FROM
+  wn_vessel v
+    LEFT JOIN
+  wn_queue q ON q.vessel_id = v.id OR q.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id) AND q.deleted = false
+    LEFT JOIN
+  wn_source s ON q.icebreaker_id = s.id
+    LEFT JOIN
+  wn_vessel assisted_vessel ON q.vessel_id = assisted_vessel.id
+    LEFT JOIN
+  wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+WHERE
+  v.deleted = false AND v.id = $1
+GROUP BY
+  v.id;
+`;
 
-const SQL_GET_VESSELS =
-  `select id, name, callsign, shortcode, imo, mmsi, type, deleted
-from wn_vessel
-where deleted = false`;
+const SQL_GET_VESSELS = `SELECT
+  v.id,
+  v.name,
+  v.callsign,
+  v.shortcode,
+  v.imo,
+  v.mmsi,
+  v.type,
+  COALESCE(
+    JSON_AGG(
+      JSON_BUILD_OBJECT(
+        'start_time', q.start_time,
+        'end_time', q.end_time,
+        'order_num', q.order_num,
+        'icebreaker_id', ib_vessel.id,
+        'icebreaker_imo', ib_vessel.imo,
+        'icebreaker_mmsi', ib_vessel.mmsi,
+        'vessel_id', assisted_vessel.id,
+        'vessel_imo', assisted_vessel.imo,
+        'vessel_mmsi', assisted_vessel.mmsi
+      )
+    ) FILTER (WHERE q.id IS NOT NULL),
+    '[]'::json
+  ) AS queues
+FROM
+  wn_vessel v
+    LEFT JOIN
+  wn_queue q ON q.vessel_id = v.id OR q.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id) AND q.deleted = false
+    LEFT JOIN
+  wn_source s ON q.icebreaker_id = s.id
+    LEFT JOIN
+  wn_vessel assisted_vessel ON q.vessel_id = assisted_vessel.id
+    LEFT JOIN
+  wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+WHERE
+  v.deleted = false
+GROUP BY
+  v.id;`;
 
 const PS_UPDATE_VESSELS = new pgPromise.PreparedStatement({
   name: "update-vessels",

@@ -1,3 +1,4 @@
+import { random, randomInt } from "es-toolkit";
 import type {
   Activity,
   Dirway,
@@ -11,6 +12,7 @@ import type {
   Vessel,
 } from "../../model/apidata.js";
 import { createTestFunctions } from "./data-updater-testutil.js";
+import { addDays } from "date-fns";
 
 export const ACTIVITY_1: Activity = {
   rv: 0,
@@ -88,6 +90,7 @@ export const VESSEL_1: Vessel = {
   deleted: undefined,
   name: "",
   shortcode: "",
+  type: "",
 };
 
 const VESSEL_1_1: Vessel = {
@@ -95,7 +98,30 @@ const VESSEL_1_1: Vessel = {
   ...{ rv: 1, text_compilation: "foo" },
 };
 
-const QUEUE_1: Queue = {
+export function createVessel(
+  props: {
+    id?: string;
+    name?: string;
+    type?: string;
+    rv?: number;
+    imo?: number;
+    mmsi?: number;
+  },
+): Vessel {
+  return {
+    rv: props.rv ?? 1,
+    id: props.id ?? randomInt(1000000).toString(),
+    change_time: new Date(),
+    deleted: undefined,
+    name: props.name ?? "",
+    shortcode: "",
+    type: props.type ?? "",
+    imo: props.imo ?? randomInt(1000000, 9999999),
+    mmsi: props.mmsi ?? randomInt(100000000, 999999999),
+  };
+}
+
+export const QUEUE_1: Queue = {
   id: "id1",
   icebreaker_id: "",
   vessel_id: "",
@@ -108,6 +134,50 @@ const QUEUE_1: Queue = {
 };
 
 const QUEUE_1_1: Queue = { ...QUEUE_1, ...{ rv: 1, order_num: 2 } };
+
+export function createQueue(
+  props: {
+    icebreaker_id?: string;
+    vessel_id?: string;
+    id?: string;
+    order_num?: number;
+    rv?: number;
+  },
+): Queue {
+  return {
+    id: props.id ?? randomInt(1000000).toString(),
+    start_time: new Date(),
+    end_time: addDays(new Date(), 1),
+    change_time: new Date(),
+    icebreaker_id: props.icebreaker_id ?? "",
+    vessel_id: props.vessel_id ?? "",
+    order_num: props.order_num ?? randomInt(1000),
+    rv: props.rv ?? 1,
+    deleted: undefined,
+  };
+}
+
+export function createSource(
+  props: {
+    vessel_id?: string;
+    id?: string;
+    rv?: number;
+    name?: string;
+    nationality?: string;
+    type?: string;
+  },
+): Source {
+  return {
+    id: props.id ?? randomInt(1000000).toString(),
+    vessel_id: props.vessel_id ?? "",
+    name: props.name ?? "",
+    nationality: props.nationality ?? "",
+    type: props.type ?? "",
+    change_time: new Date(),
+    rv: props.rv ?? 1,
+    deleted: undefined,
+  };
+}
 
 export const DIRWAY_1: Dirway = {
   id: "id1",

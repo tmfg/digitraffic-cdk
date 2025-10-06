@@ -13,13 +13,14 @@
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22,es2022",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
     "@digitraffic/common": "2025.9.10-1",
     "aws-cdk-lib": "^2.211.0",
     "constructs": "~10.4.2",
+    "es-toolkit": "1.39.10",
     "ky": "^1.8.2",
     "lodash-es": "4.17.21",
     "pg-native": "^3.5.2",
@@ -39,6 +40,7 @@
     "@types/jest": "30.0.0",
     "@types/lodash-es": "4.17.12",
     "@types/node": "22.15.2",
+    "date-fns": "4.1.0",
     "esbuild": "0.25.9",
     "eslint": "^8.57.0",
     "typescript": "^5.9.2"
