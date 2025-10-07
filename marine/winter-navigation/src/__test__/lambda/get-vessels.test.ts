@@ -10,7 +10,13 @@ import {
   createVessel,
   VESSEL_1,
 } from "../service/data-updater.test.js";
-import { type DTVessel } from "../../model/dt-apidata.js";
+import {
+  type AssistanceGiven,
+  type AssistanceReceived,
+  type DTVessel,
+  isAssistanceGiven,
+  isAssistanceReceived,
+} from "../../model/dt-apidata.js";
 import { saveAllActivities } from "../../db/activities.js";
 import { mockProxyHolder } from "../mock.js";
 import { saveAllQueues } from "../../db/queues.js";
@@ -90,6 +96,8 @@ describe(
         type: "General Cargo",
         imo: 2,
       });
+      const anotherVessel = createVessel({ id: "3" });
+
       const icebreakerSource = createSource({ vessel_id: icebreaker.id });
       const queue = createQueue({
         icebreaker_id: icebreakerSource.id,
@@ -97,7 +105,7 @@ describe(
       });
 
       await insertVessels(db, {
-        vessels: [icebreaker, assistedVessel],
+        vessels: [icebreaker, assistedVessel, anotherVessel],
         queues: [queue],
         sources: [icebreakerSource],
       });
@@ -105,6 +113,7 @@ describe(
       const response = await getResponseFromLambda();
 
       ExpectResponse.ok(response).expectContent((vessels: DTVessel[]) => {
+        expect(vessels.length).toEqual(3);
         const apiVessel = vessels.find((vessel) =>
           vessel.imo === assistedVessel.imo
         );
@@ -113,16 +122,20 @@ describe(
         );
 
         expect(apiVessel?.plannedAssistances?.length).toEqual(1);
-        expect(
-          apiVessel?.plannedAssistances &&
-            apiVessel.plannedAssistances[0]?.assistingVessel?.imo,
-        ).toEqual(icebreaker.imo);
+        const assistance = apiVessel?.plannedAssistances?.[0];
+        if (!assistance || !isAssistanceReceived(assistance)) {
+          fail("Expected assistance to be of type AssistanceReceived");
+        }
+        expect(assistance.assistingVessel.imo).toEqual(icebreaker.imo);
 
         expect(apiIcebreaker?.plannedAssistances?.length).toEqual(1);
-        expect(
-          apiIcebreaker?.plannedAssistances &&
-            apiIcebreaker.plannedAssistances[0]?.assistedVessel?.imo,
-        ).toEqual(assistedVessel.imo);
+        const icebreakerAssistance = apiIcebreaker?.plannedAssistances?.[0];
+        if (!icebreakerAssistance || !isAssistanceGiven(icebreakerAssistance)) {
+          fail("Expected assistance to be of type AssistanceGiven");
+        }
+        expect(icebreakerAssistance.assistedVessel.imo).toEqual(
+          assistedVessel.imo,
+        );
       });
     });
   }),

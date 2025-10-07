@@ -3,9 +3,11 @@ import {
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
 import type {
+  AssistanceGiven,
+  AssistanceReceived,
   DTActivity,
-  DTPlannedAssistance,
   DTVessel,
+  PlannedAssistance,
 } from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
 import * as ActivityDB from "../db/activities.js";
@@ -64,26 +66,31 @@ function convertVessel(
     imo: v.imo,
     type: v.type,
     activities,
-    plannedAssistances: v.queues?.map((q): DTPlannedAssistance => {
-      return {
-        // vessel is icebreaker, show assisted vessel
-        ...((v.mmsi === q.icebreaker_mmsi || v.imo === q.icebreaker_imo) && {
+    plannedAssistances: v.queues?.map((q): PlannedAssistance => {
+      const isIcebreaker = v.mmsi === q.icebreaker_mmsi ||
+        v.imo === q.icebreaker_imo;
+
+      if (isIcebreaker) {
+        return {
           assistedVessel: {
             imo: q.vessel_imo,
             mmsi: q.vessel_mmsi,
           },
-        }),
-        // vessel is not icebreaker, show assisting vessel (icebreaker)
-        ...((v.mmsi === q.vessel_mmsi || v.imo === q.vessel_imo) && {
+          queuePosition: q.order_num,
+          startTime: q.start_time,
+          endTime: q.end_time,
+        };
+      } else {
+        return {
           assistingVessel: {
             imo: q.icebreaker_imo,
             mmsi: q.icebreaker_mmsi,
           },
-        }),
-        queuePosition: q.order_num,
-        startTime: q.start_time,
-        endTime: q.end_time,
-      };
+          queuePosition: q.order_num,
+          startTime: q.start_time,
+          endTime: q.end_time,
+        };
+      }
     }),
   };
 }
