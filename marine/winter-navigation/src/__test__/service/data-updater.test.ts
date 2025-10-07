@@ -31,6 +31,29 @@ const ACTIVITY_1_1: Activity = {
   ...{ rv: 1, text_compilation: "foo" },
 };
 
+export function createActivity(
+  props: {
+    id?: string;
+    vessel_id?: string;
+    icebreaker_id?: string;
+    type?: string;
+    reason?: string;
+    rv?: number;
+  },
+): Activity {
+  return {
+    id: props.id ?? randomInt(1000000).toString(),
+    vessel_id: props.vessel_id ?? "",
+    icebreaker_id: props.icebreaker_id ?? "",
+    type: props.type ?? "",
+    reason: props.reason ?? "",
+    rv: props.rv ?? 1,
+    start_time: new Date(),
+    change_time: new Date(),
+    deleted: undefined,
+  };
+}
+
 export const LOCATION_1: Location = {
   name: "name",
   type: "type",

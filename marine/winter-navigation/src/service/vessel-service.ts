@@ -3,16 +3,12 @@ import {
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
 import type {
-  AssistanceGiven,
-  AssistanceReceived,
   DTActivity,
   DTVessel,
   PlannedAssistance,
 } from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
-import * as ActivityDB from "../db/activities.js";
 import type { Activity, Vessel } from "../model/apidata.js";
-import { groupBy } from "lodash-es";
 
 export function getVessel(
   vesselId: string,
@@ -25,39 +21,25 @@ export function getVessel(
       return Promise.resolve([undefined, lastUpdated ?? undefined]);
     }
 
-    const activities = await ActivityDB.getActivities(db);
-    //        const restrictions = await RestrictionsDB.getRestrictions(db);
-    const dtVessels = convertVessels([vessel], activities);
+    const dtVessel = convertVessel(vessel);
 
-    return [dtVessels[0], lastUpdated ?? undefined];
+    return [dtVessel, lastUpdated ?? undefined];
   });
 }
 
 export function getVessels(): Promise<[DTVessel[], Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const vessels = await VesselDB.getVessels(db);
-
-    const activities = await ActivityDB.getActivities(db);
     const lastUpdated = undefined;
-    const dtVessels = convertVessels(vessels, activities);
+    const dtVessels = vessels.map(convertVessel);
 
     return [dtVessels, lastUpdated ?? undefined];
   });
 }
 
-function convertVessels(vessels: Vessel[], activities: Activity[]): DTVessel[] {
-  const activityMap = groupBy(activities, "vessel_id");
-
-  return vessels.map((v) => convertVessel(v, activityMap));
-}
-
 function convertVessel(
   v: Vessel,
-  activityMap: Record<string, Activity[]>,
 ): DTVessel {
-  const dbActivities = activityMap[v.id];
-  const activities = dbActivities ? convertActivities(dbActivities) : undefined;
-
   return {
     name: v.name,
     callSign: v.callsign,
@@ -65,10 +47,52 @@ function convertVessel(
     mmsi: v.mmsi,
     imo: v.imo,
     type: v.type,
-    activities,
+    activities: v.activities?.map((a): DTActivity => {
+      const isIcebreaker = v.mmsi === a.icebreaker_mmsi ||
+        v.imo === a.icebreaker_imo;
+      const isVessel = v.mmsi === a.vessel_mmsi || v.imo === a.vessel_imo;
+
+      const baseActivity = {
+        type: a.type,
+        reason: a.reason,
+        publicComment: a.public_comment,
+        startTime: a.start_time,
+        endTime: a.end_time,
+      };
+      // activity concerns both assisted vessel and assisting icebreaker
+      if (isVessel && !!a.icebreaker_id) {
+        return {
+          ...baseActivity,
+          assistingVessel: {
+            imo: a.icebreaker_imo,
+            mmsi: a.icebreaker_mmsi,
+          },
+        };
+      }
+
+      // activity concerns both assisted vessel and assisting icebreaker
+      if (isIcebreaker && !!a.vessel_id) {
+        return {
+          ...baseActivity,
+          assistedVessel: {
+            imo: a.vessel_imo,
+            mmsi: a.vessel_mmsi,
+          },
+        };
+      }
+
+      // activity concerns only a single vessel (or icebreaker)
+      return baseActivity;
+    }),
     plannedAssistances: v.queues?.map((q): PlannedAssistance => {
       const isIcebreaker = v.mmsi === q.icebreaker_mmsi ||
         v.imo === q.icebreaker_imo;
+
+      const baseAssistance = {
+        queuePosition: q.order_num,
+        startTime: q.start_time,
+        endTime: q.end_time,
+      };
 
       if (isIcebreaker) {
         return {
@@ -76,9 +100,7 @@ function convertVessel(
             imo: q.vessel_imo,
             mmsi: q.vessel_mmsi,
           },
-          queuePosition: q.order_num,
-          startTime: q.start_time,
-          endTime: q.end_time,
+          ...baseAssistance,
         };
       } else {
         return {
@@ -86,9 +108,7 @@ function convertVessel(
             imo: q.icebreaker_imo,
             mmsi: q.icebreaker_mmsi,
           },
-          queuePosition: q.order_num,
-          startTime: q.start_time,
-          endTime: q.end_time,
+          ...baseAssistance,
         };
       }
     }),

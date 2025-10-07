@@ -25,7 +25,33 @@ export interface DTLocation {
   readonly suspensions?: DTSuspension[];
 }
 
-export interface DTActivity {
+interface BasePlannedAssistance {
+  readonly queuePosition: number;
+  readonly startTime: Date;
+  readonly endTime: Date;
+}
+
+export interface AssistanceReceivedVessel {
+  readonly assistingVessel: {
+    readonly imo?: number;
+    readonly mmsi?: number;
+  };
+}
+
+export interface AssistanceGivenVessel {
+  readonly assistedVessel: {
+    readonly imo?: number;
+    readonly mmsi?: number;
+  };
+}
+
+export type AssistanceReceived =
+  & BasePlannedAssistance
+  & AssistanceReceivedVessel;
+export type AssistanceGiven = BasePlannedAssistance & AssistanceGivenVessel;
+export type PlannedAssistance = AssistanceGiven | AssistanceReceived;
+
+export interface DTBaseActivity {
   readonly type: string;
   readonly reason?: string;
   readonly publicComment?: string;
@@ -33,38 +59,21 @@ export interface DTActivity {
   readonly endTime?: Date;
 }
 
-interface BasePlannedAssistance {
-  readonly queuePosition: number;
-  readonly startTime: Date;
-  readonly endTime: Date;
-}
-
-export interface AssistanceReceived extends BasePlannedAssistance {
-  readonly assistingVessel: {
-    readonly imo?: number;
-    readonly mmsi?: number;
-  };
-}
-
-export interface AssistanceGiven extends BasePlannedAssistance {
-  readonly assistedVessel: {
-    readonly imo?: number;
-    readonly mmsi?: number;
-  };
-}
-
-export type PlannedAssistance = AssistanceGiven | AssistanceReceived;
+export type DTActivity =
+  | DTBaseActivity
+  | DTBaseActivity & AssistanceReceivedVessel
+  | DTBaseActivity & AssistanceGivenVessel;
 
 export function isAssistanceReceived(
-  assistance: PlannedAssistance,
-): assistance is AssistanceReceived {
-  return "assistingVessel" in assistance;
+  a: PlannedAssistance | DTActivity,
+): a is AssistanceReceived | (DTActivity & AssistanceReceivedVessel) {
+  return "assistingVessel" in a;
 }
 
 export function isAssistanceGiven(
-  assistance: PlannedAssistance,
-): assistance is AssistanceGiven {
-  return "assistedVessel" in assistance;
+  a: PlannedAssistance | DTActivity,
+): a is AssistanceGiven | (DTActivity & AssistanceGivenVessel) {
+  return "assistedVessel" in a;
 }
 
 export interface DTVessel {

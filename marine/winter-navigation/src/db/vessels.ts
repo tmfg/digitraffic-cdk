@@ -16,15 +16,9 @@ do update set
     deleted = false
 `;
 
-const SQL_GET_VESSEL = `SELECT
-  v.id,
-  v.name,
-  v.callsign,
-  v.shortcode,
-  v.imo,
-  v.mmsi,
-  v.type,
-  COALESCE(
+const SQL_GET_VESSEL = `WITH vessel_queues AS (
+  SELECT
+    v.id AS vessel_id,
     JSON_AGG(
       JSON_BUILD_OBJECT(
         'start_time', q.start_time,
@@ -37,34 +31,65 @@ const SQL_GET_VESSEL = `SELECT
         'vessel_imo', assisted_vessel.imo,
         'vessel_mmsi', assisted_vessel.mmsi
       )
-    ) FILTER (WHERE q.id IS NOT NULL),
-    '[]'::json
-  ) AS queues
+    ) AS queues
+  FROM
+    wn_vessel v
+    JOIN wn_queue q ON q.vessel_id = v.id OR q.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id)
+    LEFT JOIN wn_source s ON q.icebreaker_id = s.id
+    LEFT JOIN wn_vessel assisted_vessel ON q.vessel_id = assisted_vessel.id
+    LEFT JOIN wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+  WHERE q.deleted = false
+  GROUP BY v.id
+),
+vessel_activities AS (
+  SELECT
+    v.id AS vessel_id,
+    JSON_AGG(
+      JSON_BUILD_OBJECT(
+        'icebreaker_id', ib_vessel.id,
+        'icebreaker_imo', ib_vessel.imo,
+        'icebreaker_mmsi', ib_vessel.mmsi,
+        'vessel_id', assisted_vessel.id,
+        'vessel_imo', assisted_vessel.imo,
+        'vessel_mmsi', assisted_vessel.mmsi,
+        'type', a.type,
+        'reason', a.reason,
+        'public_comment', a.public_comment,
+        'start_time', a.start_time,
+        'end_time', a.end_time
+      )
+    ) AS activities
+  FROM
+    wn_vessel v
+    JOIN wn_activity a ON a.vessel_id = v.id OR a.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id)
+    LEFT JOIN wn_source s ON a.icebreaker_id = s.id
+    LEFT JOIN wn_vessel assisted_vessel ON a.vessel_id = assisted_vessel.id
+    LEFT JOIN wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+  WHERE a.deleted = false
+  GROUP BY v.id
+)
+SELECT
+  v.id,
+  v.name,
+  v.callsign,
+  v.shortcode,
+  v.imo,
+  v.mmsi,
+  v.type,
+  COALESCE(vq.queues, '[]'::json) AS queues,
+  COALESCE(va.activities, '[]'::json) AS activities
 FROM
   wn_vessel v
-    LEFT JOIN
-  wn_queue q ON q.vessel_id = v.id OR q.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id) AND q.deleted = false
-    LEFT JOIN
-  wn_source s ON q.icebreaker_id = s.id
-    LEFT JOIN
-  wn_vessel assisted_vessel ON q.vessel_id = assisted_vessel.id
-    LEFT JOIN
-  wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+  LEFT JOIN vessel_queues vq ON v.id = vq.vessel_id
+  LEFT JOIN vessel_activities va ON v.id = va.vessel_id
 WHERE
-  v.deleted = false AND v.id = $1
-GROUP BY
-  v.id;
+  v.deleted = false AND v.id = $1;
 `;
 
-const SQL_GET_VESSELS = `SELECT
-  v.id,
-  v.name,
-  v.callsign,
-  v.shortcode,
-  v.imo,
-  v.mmsi,
-  v.type,
-  COALESCE(
+const SQL_GET_VESSELS = `
+WITH vessel_queues AS (
+  SELECT
+    v.id AS vessel_id,
     JSON_AGG(
       JSON_BUILD_OBJECT(
         'start_time', q.start_time,
@@ -77,23 +102,60 @@ const SQL_GET_VESSELS = `SELECT
         'vessel_imo', assisted_vessel.imo,
         'vessel_mmsi', assisted_vessel.mmsi
       )
-    ) FILTER (WHERE q.id IS NOT NULL),
-    '[]'::json
-  ) AS queues
+    ) AS queues
+  FROM
+    wn_vessel v
+    JOIN wn_queue q ON q.vessel_id = v.id OR q.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id)
+    LEFT JOIN wn_source s ON q.icebreaker_id = s.id
+    LEFT JOIN wn_vessel assisted_vessel ON q.vessel_id = assisted_vessel.id
+    LEFT JOIN wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+  WHERE q.deleted = false
+  GROUP BY v.id
+),
+vessel_activities AS (
+  SELECT
+    v.id AS vessel_id,
+    JSON_AGG(
+      JSON_BUILD_OBJECT(
+        'icebreaker_id', ib_vessel.id,
+        'icebreaker_imo', ib_vessel.imo,
+        'icebreaker_mmsi', ib_vessel.mmsi,
+        'vessel_id', assisted_vessel.id,
+        'vessel_imo', assisted_vessel.imo,
+        'vessel_mmsi', assisted_vessel.mmsi,
+        'type', a.type,
+        'reason', a.reason,
+        'public_comment', a.public_comment,
+        'start_time', a.start_time,
+        'end_time', a.end_time
+      )
+    ) AS activities
+  FROM
+    wn_vessel v
+    JOIN wn_activity a ON a.vessel_id = v.id OR a.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id)
+    LEFT JOIN wn_source s ON a.icebreaker_id = s.id
+    LEFT JOIN wn_vessel assisted_vessel ON a.vessel_id = assisted_vessel.id
+    LEFT JOIN wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+  WHERE a.deleted = false
+  GROUP BY v.id
+)
+SELECT
+  v.id,
+  v.name,
+  v.callsign,
+  v.shortcode,
+  v.imo,
+  v.mmsi,
+  v.type,
+  COALESCE(vq.queues, '[]'::json) AS queues,
+  COALESCE(va.activities, '[]'::json) AS activities
 FROM
   wn_vessel v
-    LEFT JOIN
-  wn_queue q ON q.vessel_id = v.id OR q.icebreaker_id IN (SELECT s.id FROM wn_source s WHERE s.vessel_id = v.id) AND q.deleted = false
-    LEFT JOIN
-  wn_source s ON q.icebreaker_id = s.id
-    LEFT JOIN
-  wn_vessel assisted_vessel ON q.vessel_id = assisted_vessel.id
-    LEFT JOIN
-  wn_vessel ib_vessel ON s.vessel_id = ib_vessel.id
+  LEFT JOIN vessel_queues vq ON v.id = vq.vessel_id
+  LEFT JOIN vessel_activities va ON v.id = va.vessel_id
 WHERE
-  v.deleted = false
-GROUP BY
-  v.id;`;
+  v.deleted = false;
+`;
 
 const PS_UPDATE_VESSELS = new pgPromise.PreparedStatement({
   name: "update-vessels",

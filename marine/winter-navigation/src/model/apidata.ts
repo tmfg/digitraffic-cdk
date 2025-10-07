@@ -42,6 +42,7 @@ export interface Vessel extends BaseAttributes {
   readonly mmsi?: number;
   readonly type?: string;
   readonly queues?: Queue[];
+  readonly activities?: Activity[];
 }
 
 export interface Source extends BaseAttributes {
@@ -54,7 +55,11 @@ export interface Source extends BaseAttributes {
 
 export interface Activity extends BaseAttributes {
   readonly icebreaker_id: string;
+  readonly icebreaker_imo?: number;
+  readonly icebreaker_mmsi?: number;
   readonly vessel_id?: string;
+  readonly vessel_imo?: number;
+  readonly vessel_mmsi?: number;
   readonly type: string;
   readonly reason?: string;
   readonly public_comment?: string;
