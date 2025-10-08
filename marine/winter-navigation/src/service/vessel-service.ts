@@ -11,7 +11,7 @@ import * as VesselDB from "../db/vessels.js";
 import type { Activity, Queue, Vessel } from "../model/apidata.js";
 
 export function getVessel(
-  vesselId: string,
+  vesselId: number,
 ): Promise<[DTVessel | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const vessel = await VesselDB.getVessel(db, vesselId);

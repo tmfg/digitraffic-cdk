@@ -50,7 +50,7 @@ async function insertVessels(
 }
 
 async function getResponseFromLambda(
-  event: Record<string, string> = {},
+  event: Record<string, number> = {},
 ): Promise<LambdaResponse> {
   const { handler } = await import("../../lambda/get-vessels/get-vessels.js");
 
@@ -76,7 +76,7 @@ describe(
     });
 
     test("get one - not found", async () => {
-      const response = await getResponseFromLambda({ "vessel-id": "foo" });
+      const response = await getResponseFromLambda({ "vessel-id": 123 });
 
       ExpectResponse.notFound(response);
     });
@@ -84,7 +84,9 @@ describe(
     test("get one - found", async () => {
       await insertVessel(db);
 
-      const response = await getResponseFromLambda({ "vessel-id": "id1" });
+      const response = await getResponseFromLambda({
+        "vessel-id": VESSEL_1.imo ?? 123,
+      });
 
       ExpectResponse.ok(response).expectContent((vessel: DTVessel) => {
         expect(vessel.name).toEqual(VESSEL_1.name);

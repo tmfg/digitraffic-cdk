@@ -87,7 +87,7 @@ FROM
   LEFT JOIN vessel_queues vq ON v.id = vq.vessel_id
   LEFT JOIN vessel_activities va ON v.id = va.vessel_id
 WHERE
-  v.deleted = false AND v.id = $1;
+  v.deleted = false AND (v.imo = $1 OR v.mmsi = $1);
 `;
 
 const SQL_GET_VESSELS = `
@@ -202,9 +202,9 @@ export function saveAllVessels(
 
 export async function getVessel(
   db: DTDatabase,
-  locationId: string,
+  vesselId: number,
 ): Promise<Vessel | undefined> {
-  return await db.oneOrNone(PS_GET_VESSEL, [locationId]) ?? undefined;
+  return await db.oneOrNone(PS_GET_VESSEL, [vesselId]) ?? undefined;
 }
 
 export async function getVessels(db: DTDatabase): Promise<Vessel[]> {

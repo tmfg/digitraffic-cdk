@@ -114,6 +114,7 @@ export const VESSEL_1: Vessel = {
   name: "",
   shortcode: "",
   type: "",
+  imo: 1234567,
 };
 
 const VESSEL_1_1: Vessel = {

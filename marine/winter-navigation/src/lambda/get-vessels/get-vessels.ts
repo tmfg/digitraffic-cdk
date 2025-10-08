@@ -8,11 +8,11 @@ import { z, ZodError } from "zod";
 const proxyHolder = ProxyHolder.create();
 
 const GetVesselSchema = z.object({
-  "vessel-id": z.string().optional(),
+  "vessel-id": z.number().optional(),
 }).strict();
 
 export const handler = async (
-  event: Record<string, string>,
+  event: Record<string, number | string>,
 ): Promise<LambdaResponse> => {
   const start = Date.now();
 
