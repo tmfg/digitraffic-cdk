@@ -1,12 +1,12 @@
-import { random, randomInt } from "es-toolkit";
+import { randomInt } from "es-toolkit";
 import type {
-  Activity,
+  ActivityDB,
   Dirway,
   Dirwaypoint,
   Location,
   PortSuspension,
   PortSuspensionLocation,
-  Queue,
+  QueueDB,
   Restriction,
   Source,
   Vessel,
@@ -14,7 +14,7 @@ import type {
 import { createTestFunctions } from "./data-updater-testutil.js";
 import { addDays } from "date-fns";
 
-export const ACTIVITY_1: Activity = {
+export const ACTIVITY_1: ActivityDB = {
   rv: 0,
   id: "id1",
   vessel_id: "id1",
@@ -26,7 +26,7 @@ export const ACTIVITY_1: Activity = {
   type: "",
 };
 
-const ACTIVITY_1_1: Activity = {
+const ACTIVITY_1_1: ActivityDB = {
   ...ACTIVITY_1,
   ...{ rv: 1, text_compilation: "foo" },
 };
@@ -40,7 +40,7 @@ export function createActivity(
     reason?: string;
     rv?: number;
   },
-): Activity {
+): ActivityDB {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     vessel_id: props.vessel_id ?? "",
@@ -144,7 +144,7 @@ export function createVessel(
   };
 }
 
-export const QUEUE_1: Queue = {
+export const QUEUE_1: QueueDB = {
   id: "id1",
   icebreaker_id: "",
   vessel_id: "",
@@ -156,7 +156,7 @@ export const QUEUE_1: Queue = {
   deleted: undefined,
 };
 
-const QUEUE_1_1: Queue = { ...QUEUE_1, ...{ rv: 1, order_num: 2 } };
+const QUEUE_1_1: QueueDB = { ...QUEUE_1, ...{ rv: 1, order_num: 2 } };
 
 export function createQueue(
   props: {
@@ -166,7 +166,7 @@ export function createQueue(
     order_num?: number;
     rv?: number;
   },
-): Queue {
+): QueueDB {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     start_time: new Date(),

@@ -19,7 +19,12 @@ import {
 import { saveAllActivities } from "../../db/activities.js";
 import { mockProxyHolder } from "../mock.js";
 import { saveAllQueues } from "../../db/queues.js";
-import type { Activity, Queue, Source, Vessel } from "../../model/apidata.js";
+import type {
+  ActivityDB,
+  QueueDB,
+  Source,
+  Vessel,
+} from "../../model/apidata.js";
 import { saveAllSources } from "../../db/sources.js";
 
 mockProxyHolder();
@@ -33,8 +38,8 @@ async function insertVessels(
   db: DTDatabase,
   props: {
     vessels: Vessel[];
-    activities?: Activity[];
-    queues?: Queue[];
+    activities?: ActivityDB[];
+    queues?: QueueDB[];
     sources?: Source[];
   },
 ): Promise<void> {

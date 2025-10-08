@@ -15,6 +15,11 @@ do update set
     deleted = false
 `;
 
+const SQL_GET_SOURCES = `
+  select id, name, shortname, nationality, type, vessel_id
+  from wn_source where deleted = false
+`;
+
 const PS_UPDATE_SOURCES = new pgPromise.PreparedStatement({
   name: "update-sources",
   text: SQL_UPDATE_SOURCES,
@@ -36,4 +41,8 @@ export function saveAllSources(
       ]);
     }),
   );
+}
+
+export async function getSources(db: DTDatabase): Promise<Source[]> {
+  return db.any(SQL_GET_SOURCES);
 }

@@ -27,9 +27,11 @@ const SQL_GET_VESSEL = `WITH vessel_queues AS (
         'icebreaker_id', ib_vessel.id,
         'icebreaker_imo', ib_vessel.imo,
         'icebreaker_mmsi', ib_vessel.mmsi,
+        'icebreaker_name', ib_vessel.name,
         'vessel_id', assisted_vessel.id,
         'vessel_imo', assisted_vessel.imo,
-        'vessel_mmsi', assisted_vessel.mmsi
+        'vessel_mmsi', assisted_vessel.mmsi,
+        'vessel_name', assisted_vessel.name
       )
     ) AS queues
   FROM
@@ -49,9 +51,11 @@ vessel_activities AS (
         'icebreaker_id', ib_vessel.id,
         'icebreaker_imo', ib_vessel.imo,
         'icebreaker_mmsi', ib_vessel.mmsi,
+        'icebreaker_name', ib_vessel.name,
         'vessel_id', assisted_vessel.id,
         'vessel_imo', assisted_vessel.imo,
         'vessel_mmsi', assisted_vessel.mmsi,
+        'vessel_name', assisted_vessel.name,
         'type', a.type,
         'reason', a.reason,
         'public_comment', a.public_comment,
@@ -98,9 +102,12 @@ WITH vessel_queues AS (
         'icebreaker_id', ib_vessel.id,
         'icebreaker_imo', ib_vessel.imo,
         'icebreaker_mmsi', ib_vessel.mmsi,
+        'icebreaker_name', ib_vessel.name,
         'vessel_id', assisted_vessel.id,
         'vessel_imo', assisted_vessel.imo,
-        'vessel_mmsi', assisted_vessel.mmsi
+        'vessel_mmsi', assisted_vessel.mmsi,
+        'vessel_name', assisted_vessel.name
+
       )
     ) AS queues
   FROM
@@ -120,9 +127,11 @@ vessel_activities AS (
         'icebreaker_id', ib_vessel.id,
         'icebreaker_imo', ib_vessel.imo,
         'icebreaker_mmsi', ib_vessel.mmsi,
+        'icebreaker_name', ib_vessel.name,
         'vessel_id', assisted_vessel.id,
         'vessel_imo', assisted_vessel.imo,
         'vessel_mmsi', assisted_vessel.mmsi,
+        'vessel_name', assisted_vessel.name,
         'type', a.type,
         'reason', a.reason,
         'public_comment', a.public_comment,

@@ -53,18 +53,23 @@ export interface Source extends BaseAttributes {
   readonly vessel_id?: string;
 }
 
-export interface Activity extends BaseAttributes {
+export interface ActivityDB extends BaseAttributes {
   readonly icebreaker_id: string;
-  readonly icebreaker_imo?: number;
-  readonly icebreaker_mmsi?: number;
   readonly vessel_id?: string;
-  readonly vessel_imo?: number;
-  readonly vessel_mmsi?: number;
   readonly type: string;
   readonly reason?: string;
   readonly public_comment?: string;
   readonly start_time: Date;
   readonly end_time?: Date;
+}
+
+export interface Activity extends ActivityDB {
+  readonly icebreaker_imo?: number;
+  readonly icebreaker_mmsi?: number;
+  readonly icebreaker_name: string;
+  readonly vessel_imo?: number;
+  readonly vessel_mmsi?: number;
+  readonly vessel_name: string;
 }
 
 export interface PortSuspension extends BaseAttributes {
@@ -81,16 +86,21 @@ export interface PortSuspensionLocation extends BaseAttributes {
   readonly location_id: string;
 }
 
-export interface Queue extends BaseAttributes {
+export interface QueueDB extends BaseAttributes {
   readonly icebreaker_id: string;
-  readonly icebreaker_imo?: number;
-  readonly icebreaker_mmsi?: number;
   readonly vessel_id: string;
-  readonly vessel_imo?: number;
-  readonly vessel_mmsi?: number;
   readonly start_time: Date;
   readonly end_time: Date;
   readonly order_num: number;
+}
+
+export interface Queue extends QueueDB {
+  readonly icebreaker_imo?: number;
+  readonly icebreaker_mmsi?: number;
+  readonly icebreaker_name: string;
+  readonly vessel_imo?: number;
+  readonly vessel_mmsi?: number;
+  readonly vessel_name: string;
 }
 
 export interface Dirway extends BaseAttributes {

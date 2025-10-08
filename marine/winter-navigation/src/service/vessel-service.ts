@@ -8,7 +8,7 @@ import type {
   PlannedAssistance,
 } from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
-import type { Activity, Vessel } from "../model/apidata.js";
+import type { Activity, Queue, Vessel } from "../model/apidata.js";
 
 export function getVessel(
   vesselId: string,
@@ -47,82 +47,81 @@ function convertVessel(
     mmsi: v.mmsi,
     imo: v.imo,
     type: v.type,
-    activities: v.activities?.map((a): DTActivity => {
-      const isIcebreaker = v.mmsi === a.icebreaker_mmsi ||
-        v.imo === a.icebreaker_imo;
-      const isVessel = v.mmsi === a.vessel_mmsi || v.imo === a.vessel_imo;
-
-      const baseActivity = {
-        type: a.type,
-        reason: a.reason,
-        publicComment: a.public_comment,
-        startTime: a.start_time,
-        endTime: a.end_time,
-      };
-      // activity concerns both assisted vessel and assisting icebreaker
-      if (isVessel && !!a.icebreaker_id) {
-        return {
-          ...baseActivity,
-          assistingVessel: {
-            imo: a.icebreaker_imo,
-            mmsi: a.icebreaker_mmsi,
-          },
-        };
-      }
-
-      // activity concerns both assisted vessel and assisting icebreaker
-      if (isIcebreaker && !!a.vessel_id) {
-        return {
-          ...baseActivity,
-          assistedVessel: {
-            imo: a.vessel_imo,
-            mmsi: a.vessel_mmsi,
-          },
-        };
-      }
-
-      // activity concerns only a single vessel (or icebreaker)
-      return baseActivity;
-    }),
-    plannedAssistances: v.queues?.map((q): PlannedAssistance => {
-      const isIcebreaker = v.mmsi === q.icebreaker_mmsi ||
-        v.imo === q.icebreaker_imo;
-
-      const baseAssistance = {
-        queuePosition: q.order_num,
-        startTime: q.start_time,
-        endTime: q.end_time,
-      };
-
-      if (isIcebreaker) {
-        return {
-          assistedVessel: {
-            imo: q.vessel_imo,
-            mmsi: q.vessel_mmsi,
-          },
-          ...baseAssistance,
-        };
-      } else {
-        return {
-          assistingVessel: {
-            imo: q.icebreaker_imo,
-            mmsi: q.icebreaker_mmsi,
-          },
-          ...baseAssistance,
-        };
-      }
-    }),
+    activities: v.activities?.map((a): DTActivity => convertActivity(a, v)),
+    plannedAssistances: v.queues?.map((q): PlannedAssistance =>
+      convertQueue(q, v)
+    ),
   };
 }
 
-function convertActivities(activities: Activity[]): DTActivity[] {
-  return activities.map((a) => {
+function convertActivity(a: Activity, v: Vessel): DTActivity {
+  const isIcebreaker = v.mmsi === a.icebreaker_mmsi ||
+    v.imo === a.icebreaker_imo;
+  const isVessel = v.mmsi === a.vessel_mmsi || v.imo === a.vessel_imo;
+
+  const baseActivity = {
+    type: a.type,
+    reason: a.reason,
+    publicComment: a.public_comment,
+    startTime: a.start_time,
+    endTime: a.end_time,
+  };
+  // activity concerns both assisted vessel and assisting icebreaker
+  if (isVessel && !!a.icebreaker_id) {
     return {
-      type: a.type,
-      reason: a.reason,
-      publicComment: a.public_comment,
-      startTime: a.start_time,
-      endTime: a.end_time,
-    } satisfies DTActivity;
-  });
+      ...baseActivity,
+      assistingVessel: {
+        imo: a.icebreaker_imo,
+        mmsi: a.icebreaker_mmsi,
+        name: a.icebreaker_name,
+      },
+    };
+  }
+
+  // activity concerns both assisted vessel and assisting icebreaker
+  if (isIcebreaker && !!a.vessel_id) {
+    return {
+      ...baseActivity,
+      assistedVessel: {
+        imo: a.vessel_imo,
+        mmsi: a.vessel_mmsi,
+        name: a.vessel_name,
+      },
+    };
+  }
+
+  // activity concerns only a single vessel (or icebreaker)
+  return baseActivity;
+}
+
+function convertQueue(q: Queue, v: Vessel): PlannedAssistance {
+  const isIcebreaker = v.mmsi === q.icebreaker_mmsi ||
+    v.imo === q.icebreaker_imo;
+
+  const baseAssistance = {
+    queuePosition: q.order_num,
+    startTime: q.start_time,
+    endTime: q.end_time,
+  };
+
+  // leave out from the assistance object redundant reference to current vessel
+  if (isIcebreaker) {
+    return {
+      assistedVessel: {
+        imo: q.vessel_imo,
+        mmsi: q.vessel_mmsi,
+        name: q.vessel_name,
+      },
+      ...baseAssistance,
+    };
+  } else {
+    return {
+      assistingVessel: {
+        imo: q.icebreaker_imo,
+        mmsi: q.icebreaker_mmsi,
+        name: q.icebreaker_name,
+      },
+      ...baseAssistance,
+    };
+  }
 }

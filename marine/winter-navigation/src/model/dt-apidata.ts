@@ -35,6 +35,7 @@ export interface AssistanceReceivedVessel {
   readonly assistingVessel: {
     readonly imo?: number;
     readonly mmsi?: number;
+    readonly name: string;
   };
 }
 
@@ -42,6 +43,7 @@ export interface AssistanceGivenVessel {
   readonly assistedVessel: {
     readonly imo?: number;
     readonly mmsi?: number;
+    readonly name: string;
   };
 }
 
