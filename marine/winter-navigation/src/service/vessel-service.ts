@@ -9,12 +9,15 @@ import type {
 } from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
 import type { Activity, Queue, Vessel } from "../model/apidata.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export function getVessel(
   vesselId: number,
+  activeFrom?: Date,
+  activeTo?: Date,
 ): Promise<[DTVessel | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const vessel = await VesselDB.getVessel(db, vesselId);
+    const vessel = await VesselDB.getVessel(db, vesselId, activeFrom, activeTo);
     const lastUpdated = undefined;
 
     if (!vessel) {
@@ -27,12 +30,25 @@ export function getVessel(
   });
 }
 
-export function getVessels(): Promise<[DTVessel[], Date | undefined]> {
+export function getVessels(
+  activeFrom?: Date,
+  activeTo?: Date,
+): Promise<[DTVessel[], Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const vessels = await VesselDB.getVessels(db);
+    const vessels = await VesselDB.getVessels(db, activeFrom, activeTo);
     const lastUpdated = undefined;
-    const dtVessels = vessels.map(convertVessel);
 
+    const dtVessels = vessels
+      .filter((v) =>
+        (!!v.queues && v.queues.length > 0) ||
+        (!!v.activities && v.activities.length > 0)
+      )
+      .map(convertVessel);
+
+    logger.info({
+      method: "GetVessels.getVessels",
+      message: JSON.stringify(dtVessels),
+    });
     return [dtVessels, lastUpdated ?? undefined];
   });
 }

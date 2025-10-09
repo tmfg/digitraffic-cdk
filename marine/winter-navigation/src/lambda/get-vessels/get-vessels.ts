@@ -8,7 +8,16 @@ import { z, ZodError } from "zod";
 const proxyHolder = ProxyHolder.create();
 
 const GetVesselSchema = z.object({
-  "vessel-id": z.number().optional(),
+  "vesselId": z.coerce.number().optional(),
+  // query parameters absent from original request appear as empty strings in Lambda event
+  "activeFrom": z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.coerce.date().optional(),
+  ),
+  "activeTo": z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.coerce.date().optional(),
+  ),
 }).strict();
 
 export const handler = async (
@@ -21,9 +30,11 @@ export const handler = async (
     await proxyHolder.setCredentials();
 
     // get single vessel
-    if (getVesselEvent["vessel-id"]) {
+    if (getVesselEvent.vesselId) {
       const [vessel, lastUpdated] = await getVessel(
-        getVesselEvent["vessel-id"],
+        getVesselEvent.vesselId,
+        getVesselEvent.activeFrom,
+        getVesselEvent.activeTo,
       );
 
       if (!vessel) {
@@ -36,13 +47,20 @@ export const handler = async (
     }
 
     // get all vessels
-    const [vessels, lastUpdated] = await getVessels();
+    const [vessels, lastUpdated] = await getVessels(
+      getVesselEvent.activeFrom,
+      getVesselEvent.activeTo,
+    );
 
     return lastUpdated
       ? LambdaResponse.okJson(vessels).withTimestamp(lastUpdated)
       : LambdaResponse.okJson(vessels);
   } catch (error) {
     if (error instanceof ZodError) {
+      logger.info({
+        method: "GetVessels.handler",
+        message: JSON.stringify(error.issues),
+      });
       return LambdaResponse.badRequest(JSON.stringify(error.issues));
     }
 

@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Queue, QueueDB } from "../model/apidata.js";
+import type { QueueDB } from "../model/apidata.js";
 import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_QUEUES = `

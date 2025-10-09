@@ -97,13 +97,13 @@ function createLocationResources(
   );
 
   const locationsResource = v2Resource.addResource("locations");
-  const locationResource = locationsResource.addResource("{location-id}");
+  const locationResource = locationsResource.addResource("{locationId}");
 
   const getLocationIntegration = new DigitrafficIntegration(
     getLocationsLambda,
     MediaType.APPLICATION_JSON,
   )
-    .addPathParameter("location-id")
+    .addPathParameter("locationId")
     .build();
 
   const getLocationsIntegration = new DigitrafficIntegration(
@@ -152,31 +152,38 @@ function createVesselResources(
     "get-vessels",
     undefined,
     {
-      memorySize: 256,
+      memorySize: 512,
       reservedConcurrentExecutions: 6,
     },
   );
 
   const vesselsResource = v2Resource.addResource("vessels");
-  const vesselResource = vesselsResource.addResource("{vessel-id}");
+  const vesselResource = vesselsResource.addResource("{vesselId}");
 
   const getVesselIntegration = new DigitrafficIntegration(
     getVesselsLambda,
     MediaType.APPLICATION_JSON,
   )
-    .addPathParameter("vessel-id")
+    .addPathParameter("vesselId")
+    .addQueryParameter("activeFrom")
+    .addQueryParameter("activeTo")
     .build();
 
   const getVesselsIntegration = new DigitrafficIntegration(
     getVesselsLambda,
     MediaType.APPLICATION_JSON,
   )
-    .passAllQueryParameters()
+    .addQueryParameter("activeFrom")
+    .addQueryParameter("activeTo")
     .build();
 
   ["GET", "HEAD"].forEach((httpMethod) => {
     vesselResource.addMethod(httpMethod, getVesselIntegration, {
       //            apiKeyRequired: true,
+      requestParameters: {
+        "method.request.querystring.activeFrom": false,
+        "method.request.querystring.activeTo": false,
+      },
       methodResponses: [
         DigitrafficMethodResponse.response200(
           locationsModel,
@@ -189,6 +196,10 @@ function createVesselResources(
 
     vesselsResource.addMethod(httpMethod, getVesselsIntegration, {
       //            apiKeyRequired: true,
+      requestParameters: {
+        "method.request.querystring.activeFrom": false,
+        "method.request.querystring.activeTo": false,
+      },
       methodResponses: [
         DigitrafficMethodResponse.response200(
           locationsModel,
