@@ -12,8 +12,8 @@ import * as RestrictionsDB from "../db/restrictions.js";
 import * as SuspensionDB from "../db/port-suspensions.js";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import type { Location, Restriction } from "../model/apidata.js";
-import { groupBy } from "lodash-es";
 import type { PortSuspensionWithLocations } from "../model/db-models.js";
+import { groupBy } from "es-toolkit/compat";
 
 export const LOCATIONS_CHECK = "LOCATIONS_CHECK";
 

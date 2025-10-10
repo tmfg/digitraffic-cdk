@@ -79,9 +79,10 @@ export class IbnetApi {
 
       return response.toRv;
     } catch (error) {
+      logException(logger, error);
       logger.debug("got error! " + JSON.stringify(error));
 
-      return 0;
+      return -1;
     }
   }
 }

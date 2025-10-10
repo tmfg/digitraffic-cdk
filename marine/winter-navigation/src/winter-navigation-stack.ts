@@ -11,6 +11,8 @@ export class WinterNavigationStack extends DigitrafficStack {
     super(scope, id, configuration);
 
     InternalLambdas.create(this);
-    PublicApi.create(this);
+    const publicApi = PublicApi.create(this);
+
+    publicApi.exportEndpoint();
   }
 }

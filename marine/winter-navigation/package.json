@@ -22,7 +22,6 @@
     "constructs": "~10.4.2",
     "es-toolkit": "1.39.10",
     "ky": "^1.8.2",
-    "lodash-es": "4.17.21",
     "pg-native": "^3.5.2",
     "pg-promise": "^11.15.0",
     "zod": "~3.25.76"
@@ -38,7 +37,6 @@
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/lodash-es": "4.17.12",
     "@types/node": "22.15.2",
     "date-fns": "4.1.0",
     "esbuild": "0.25.9",
