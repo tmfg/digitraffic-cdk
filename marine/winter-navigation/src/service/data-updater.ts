@@ -92,15 +92,6 @@ export class DataUpdater {
 
     const from = await getDataVersion(db, tableName);
 
-    if (from === -1) {
-      logger.error({
-        method: "DataUpdater.updateObjects",
-        message: "Could not get current version from server",
-      });
-
-      return;
-    }
-
     const objects = await this._api.fetch<T>(apiPath, from, to);
     const deleted: Deleted[] = [];
     const updated: T[] = [];

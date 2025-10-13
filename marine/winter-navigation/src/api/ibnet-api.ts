@@ -74,15 +74,8 @@ export class IbnetApi {
   }
 
   async getCurrentVersion(): Promise<number> {
-    try {
-      const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
+    const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
 
-      return response.toRv;
-    } catch (error) {
-      logException(logger, error);
-      logger.debug("got error! " + JSON.stringify(error));
-
-      return -1;
-    }
+    return response.toRv;
   }
 }
