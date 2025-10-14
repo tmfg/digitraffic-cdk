@@ -48,7 +48,6 @@ function ramiSmMessageToUDOTMessage(
   const mcj = message.payload.monitoredStopVisits[0].monitoredVehicleJourney;
   const monitoredCall = mcj.monitoredCall;
   const messageId = message.headers.e2eId;
-  const recordedAtTime = new Date(message.headers.recordedAtTime);
   const vehicleJourneyName = mcj.vehicleJourneyName;
   const { trainNumber, departureDate } = parseTrain(vehicleJourneyName);
 
@@ -58,14 +57,7 @@ function ramiSmMessageToUDOTMessage(
     data.push(...parseMonitoredCall(oc));
   });
 
-  return {
-    messageId,
-    trainNumber,
-    departureDate,
-    vehicleJourneyName,
-    data,
-    recordedAtTime,
-  };
+  return { messageId, trainNumber, departureDate, vehicleJourneyName, data };
 }
 
 function parseMonitoredCall(
