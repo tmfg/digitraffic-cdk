@@ -13,47 +13,26 @@ export function handlerFn(): (
     const start = Date.now();
 
     try {
-      return await Promise.allSettled(
-        Object.values(
-          event.Records.reduce(
-            (acc: { [s: string]: UnknownDelayOrTrackMessage[] }, r) => {
-              const recordBody = r.body;
+      return await Promise.allSettled(event.Records.map(async (r) => {
+        const recordBody = r.body;
 
-              try {
-                const udotMessage = JSON.parse(
-                  recordBody,
-                ) as UnknownDelayOrTrackMessage;
+        try {
+          const udotMessage = JSON.parse(
+            recordBody,
+          ) as UnknownDelayOrTrackMessage;
 
-                const key =
-                  `${udotMessage.trainNumber}-${udotMessage.departureDate}`;
-                if (acc[key]) {
-                  acc[key].push(udotMessage);
-                } else {
-                  acc[key] = [udotMessage];
-                }
-              } catch (error) {
-                logException(logger, error);
-              }
-              return acc;
-            },
-            {},
-          ),
-        ).map(async (udotMessages) => {
-          try {
-            for (const udotMessage of udotMessages) {
-              logger.info({
-                method: "RAMI-ProcessUDOTQueue.handler",
-                message:
-                  `processing ${udotMessage.trainNumber} ${udotMessage.departureDate}`,
-                customCount: udotMessage.data.length,
-              });
-              await processUdotMessage(udotMessage);
-            }
-          } catch (error) {
-            logException(logger, error);
-          }
-        }),
-      );
+          logger.info({
+            method: "RAMI-ProcessUDOTQueue.handler",
+            message:
+              `processing ${udotMessage.trainNumber} ${udotMessage.departureDate}`,
+            customCount: udotMessage.data.length,
+          });
+
+          return processUdotMessage(udotMessage);
+        } catch (error) {
+          logException(logger, error);
+        }
+      }));
     } finally {
       logger.info({
         method: "RAMI-ProcessUDOTQueue.handler",
