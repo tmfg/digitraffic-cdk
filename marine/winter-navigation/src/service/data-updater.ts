@@ -92,6 +92,14 @@ export class DataUpdater {
 
     const from = await getDataVersion(db, tableName);
 
+    if (from === to) {
+      logger.info({
+        method: "DataUpdater.updateObjects",
+        message: `Version number for ${tableName} not changed, skipping update`,
+      });
+      return;
+    }
+
     const objects = await this._api.fetch<T>(apiPath, from, to);
     const deleted: Deleted[] = [];
     const updated: T[] = [];
