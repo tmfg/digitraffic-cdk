@@ -2,6 +2,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Vessel } from "../model/apidata.js";
 import { default as pgPromise } from "pg-promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { subDays } from "date-fns";
 
 const SQL_UPDATE_VESSELS = `
 insert into wn_vessel(id, name, callsign, shortcode, imo, mmsi, type, deleted)
@@ -28,14 +29,12 @@ all_queue_relations AS (
         q.vessel_id AS related_vessel_id
     FROM wn_queue q
     WHERE q.deleted = false AND q.vessel_id = (SELECT id FROM target_vessel) AND
-          (CASE
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-            -- no time constraints by default for single vessel query, return all available history
-              TRUE
-            ELSE
-              q.start_time > COALESCE($1::timestamp, '-infinity') AND q.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
-
+          (
+            -- end_time may be null
+            (q.end_time IS NOT NULL AND q.start_time <= COALESCE($2::timestamp, 'infinity') AND q.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (q.end_time IS NULL AND q.start_time >= COALESCE($1::timestamp, '-infinity') AND q.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
     UNION ALL
 
     -- Get queues where the target vessel is the icebreaker
@@ -45,13 +44,12 @@ all_queue_relations AS (
     FROM wn_queue q
     JOIN wn_source s ON q.icebreaker_id = s.id
     WHERE q.deleted = false AND s.vessel_id = (SELECT id FROM target_vessel) AND
-          (CASE
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-            -- no time constraints by default for single vessel query, return all available history
-              TRUE
-            ELSE
-              q.start_time > COALESCE($1::timestamp, '-infinity') AND q.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
+          (
+            -- end_time may be null
+            (q.end_time IS NOT NULL AND q.start_time <= COALESCE($2::timestamp, 'infinity') AND q.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (q.end_time IS NULL AND q.start_time >= COALESCE($1::timestamp, '-infinity') AND q.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
 ),
 vessel_queues AS (
     SELECT
@@ -85,14 +83,12 @@ all_activity_relations AS (
         a.vessel_id AS related_vessel_id
     FROM wn_activity a
     WHERE a.deleted = false AND a.vessel_id = (SELECT id FROM target_vessel) AND
-          (CASE
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-            -- no time constraints by default for single vessel query, return all available history
-              TRUE
-            ELSE
-              a.start_time > COALESCE($1::timestamp, '-infinity') AND a.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
-
+          (
+            -- end_time may be null
+            (a.end_time IS NOT NULL AND a.start_time <= COALESCE($2::timestamp, 'infinity') AND a.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (a.end_time IS NULL AND a.start_time >= COALESCE($1::timestamp, '-infinity') AND a.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
     UNION ALL
 
     -- Get activities where the target vessel is the icebreaker
@@ -102,14 +98,12 @@ all_activity_relations AS (
     FROM wn_activity a
     JOIN wn_source s ON a.icebreaker_id = s.id
     WHERE a.deleted = false AND s.vessel_id = (SELECT id FROM target_vessel) AND
-          (CASE
-          -- if no parameters are given, return only activities and assistances that are currently active or set in the future
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-            -- no time constraints by default for single vessel query, return all available history
-              TRUE
-            ELSE
-              a.start_time > COALESCE($1::timestamp, '-infinity') AND a.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
+          (
+            -- end_time may be null
+            (a.end_time IS NOT NULL AND a.start_time <= COALESCE($2::timestamp, 'infinity') AND a.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (a.end_time IS NULL AND a.start_time >= COALESCE($1::timestamp, '-infinity') AND a.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
 ),
 vessel_activities AS (
     SELECT
@@ -164,14 +158,12 @@ WITH all_queue_relations AS (
         q.vessel_id AS related_vessel_id
     FROM wn_queue q
     WHERE q.deleted = false AND q.vessel_id IS NOT NULL AND 
-          (CASE
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-          -- if no parameters are given, return only activities and assistances that are currently active or set in the future
-              q.end_time > NOW()
-            ELSE
-              q.start_time > COALESCE($1::timestamp, '-infinity') AND q.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
-
+          (
+            -- end_time may be null
+            (q.end_time IS NOT NULL AND q.start_time <= COALESCE($2::timestamp, 'infinity') AND q.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (q.end_time IS NULL AND q.start_time >= COALESCE($1::timestamp, '-infinity') AND q.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
     UNION ALL
 
     -- Get queues where vessel is icebreaker and get actual vessel id of icebreaker via table wn_source
@@ -181,13 +173,12 @@ WITH all_queue_relations AS (
     FROM wn_queue q
     JOIN wn_source s ON q.icebreaker_id = s.id
     WHERE q.deleted = false AND s.vessel_id IS NOT NULL AND 
-          (CASE
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-          -- if no parameters are given, return only activities and assistances that are currently active or set in the future
-              q.end_time > NOW()
-            ELSE
-              q.start_time > COALESCE($1::timestamp, '-infinity') AND q.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
+          (
+            -- end_time may be null
+            (q.end_time IS NOT NULL AND q.start_time <= COALESCE($2::timestamp, 'infinity') AND q.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (q.end_time IS NULL AND q.start_time >= COALESCE($1::timestamp, '-infinity') AND q.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
 ),
 vessel_queues AS (
     SELECT
@@ -221,14 +212,12 @@ all_activity_relations AS (
         a.vessel_id AS related_vessel_id
     FROM wn_activity a
     WHERE a.deleted = false AND a.vessel_id IS NOT NULL AND 
-          (CASE
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-          -- if no parameters are given, return only activities and assistances that are currently active or set in the future
-              a.end_time > NOW()
-            ELSE
-              a.start_time > COALESCE($1::timestamp, '-infinity') AND a.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
-
+          (
+            -- end_time may be null
+            (a.end_time IS NOT NULL AND a.start_time <= COALESCE($2::timestamp, 'infinity') AND a.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (a.end_time IS NULL AND a.start_time >= COALESCE($1::timestamp, '-infinity') AND a.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
     UNION ALL
 
     -- Get activities where a vessel is the icebreaker
@@ -238,13 +227,12 @@ all_activity_relations AS (
     FROM wn_activity a
     JOIN wn_source s ON a.icebreaker_id = s.id
     WHERE a.deleted = false AND s.vessel_id IS NOT NULL AND 
-          (CASE
-            WHEN $1::timestamp IS NULL AND $2::timestamp IS NULL THEN
-          -- if no parameters are given, return only activities and assistances that are currently active or set in the future
-              a.end_time > NOW()
-            ELSE
-              a.start_time > COALESCE($1::timestamp, '-infinity') AND a.end_time <= COALESCE($2::timestamp, 'infinity')
-          END)
+          (
+            -- end_time may be null
+            (a.end_time IS NOT NULL AND a.start_time <= COALESCE($2::timestamp, 'infinity') AND a.end_time >= COALESCE($1::timestamp, '-infinity'))
+            OR
+            (a.end_time IS NULL AND a.start_time >= COALESCE($1::timestamp, '-infinity') AND a.start_time <= COALESCE($2::timestamp, 'infinity'))
+          )
 ),
 vessel_activities AS (
     SELECT
@@ -331,7 +319,11 @@ export async function getVessel(
   activeFrom?: Date,
   activeTo?: Date,
 ): Promise<Vessel | undefined> {
-  return await db.oneOrNone(PS_GET_VESSEL, [activeFrom, activeTo, vesselId]) ??
+  return await db.oneOrNone(PS_GET_VESSEL, [
+    activeFrom ?? subDays(new Date(), 7),
+    activeTo,
+    vesselId,
+  ]) ??
     undefined;
 }
 
@@ -347,5 +339,8 @@ export async function getVessels(
     }`,
   });
 
-  return db.manyOrNone(PS_GET_VESSELS, [activeFrom, activeTo]);
+  return db.manyOrNone(PS_GET_VESSELS, [
+    activeFrom ?? subDays(new Date(), 7),
+    activeTo,
+  ]);
 }

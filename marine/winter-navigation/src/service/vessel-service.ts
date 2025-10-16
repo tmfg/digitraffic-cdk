@@ -63,10 +63,14 @@ function convertVessel(
     mmsi: v.mmsi,
     imo: v.imo,
     type: v.type,
-    activities: v.activities?.map((a): DTActivity => convertActivity(a, v)),
-    plannedAssistances: v.queues?.map((q): PlannedAssistance =>
-      convertQueue(q, v)
-    ),
+    ...(v.activities && v.activities.length > 0 && {
+      activities: v.activities.map((a): DTActivity => convertActivity(a, v)),
+    }),
+    ...(v.queues && v.queues.length > 0 && {
+      plannedAssistances: v.queues.map((q): PlannedAssistance =>
+        convertQueue(q, v)
+      ),
+    }),
   };
 }
 

@@ -28,7 +28,7 @@ export interface DTLocation {
 interface BasePlannedAssistance {
   readonly queuePosition: number;
   readonly startTime: Date;
-  readonly endTime: Date;
+  readonly endTime?: Date;
 }
 
 export interface AssistanceReceivedVessel {

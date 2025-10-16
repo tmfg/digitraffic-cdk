@@ -20,8 +20,10 @@ const GetVesselSchema = z.object({
   ),
 }).strict();
 
+export type GetVesselEvent = z.input<typeof GetVesselSchema>;
+
 export const handler = async (
-  event: Record<string, number | string>,
+  event: GetVesselEvent,
 ): Promise<LambdaResponse> => {
   const start = Date.now();
 

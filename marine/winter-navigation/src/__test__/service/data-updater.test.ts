@@ -39,6 +39,8 @@ export function createActivity(
     type?: string;
     reason?: string;
     rv?: number;
+    start_time?: Date;
+    end_time?: Date;
   },
 ): ActivityDB {
   return {
@@ -48,8 +50,9 @@ export function createActivity(
     type: props.type ?? "",
     reason: props.reason ?? "",
     rv: props.rv ?? 1,
-    start_time: new Date(),
     change_time: new Date(),
+    start_time: props.start_time ?? new Date(),
+    end_time: props.end_time,
     deleted: undefined,
   };
 }
@@ -166,12 +169,14 @@ export function createQueue(
     id?: string;
     order_num?: number;
     rv?: number;
+    start_time?: Date;
+    end_time?: Date;
   },
 ): QueueDB {
   return {
     id: props.id ?? randomInt(1000000).toString(),
-    start_time: new Date(),
-    end_time: addDays(new Date(), 1),
+    start_time: props.start_time ?? new Date(),
+    end_time: props.end_time,
     change_time: new Date(),
     icebreaker_id: props.icebreaker_id ?? "",
     vessel_id: props.vessel_id ?? "",

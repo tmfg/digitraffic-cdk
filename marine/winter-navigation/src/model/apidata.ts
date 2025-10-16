@@ -90,7 +90,7 @@ export interface QueueDB extends BaseAttributes {
   readonly icebreaker_id: string;
   readonly vessel_id: string;
   readonly start_time: Date;
-  readonly end_time: Date;
+  readonly end_time?: Date;
   readonly order_num: number;
 }
 
