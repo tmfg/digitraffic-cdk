@@ -96,14 +96,14 @@ export class SecretHolder<Secret extends GenericSecret> {
   }
 
   private async getSecret(): Promise<Secret> {
-    if (this.expirationTime.getTime() < Date.now()) {
+    if(this.expirationTime.getTime() < Date.now()) {
       await this.initSecret();
     }
 
-    if (this.cachedSecret === undefined) {
+    if(this.cachedSecret === undefined) {
       throw new Error("SecretHolder in illegal state");
     }
-
+    
     return this.cachedSecret;
   }
 }

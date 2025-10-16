@@ -17,6 +17,21 @@ Format code
     pnpm run:format-changed # Formats stagged files
     pnpm run:format # Format all files
 
+## Update deps
+
+To update all dependencies to the latest versions allowed by your semver ranges:
+
+```bash
+pnpm up
+```
+
+If you want to ignore the version ranges in package.json and install the
+absolute latest versions:
+
+```bash
+pnpm up --latest
+```
+
 ## Reinstall lefthook git hooks
 
     pnpm prepare

@@ -87,7 +87,7 @@ export const openapiSchema = z
           .object({
             name: z.string().optional(),
             url: z.string().optional(),
-            email: z.string().email().optional(),
+            email: z.email().optional(),
           })
           .strict()
           .optional(),
