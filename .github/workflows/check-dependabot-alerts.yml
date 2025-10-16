@@ -7,7 +7,7 @@ on:
 
 jobs:
   check_alerts:
-    if: github.repository != 'tmfg/digitraffic-cdk'
+    if: github.repository != 'tmfg/digitraffic-common'
     runs-on: ubuntu-24.04
     steps:
       - name: Check Dependabot alerts

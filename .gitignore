@@ -1,52 +1,36 @@
 *
 
-!.gitignore
-!/.git-blame-ignore-revs
+!/deno.json
 !/.editorconfig
+!/.eslintignore
+!/.eslintrc.cjs
 !/.gitattributes
-!/.node-version
-!/.prettierignore
-!/.prettierrc.cjs
-!/*.md
-!/*.sh
-!/*.py
-!/Dockerfile
-!/LICENCE
-!/rush.json
+!/.gitignore
+!/.git-blame-ignore-revs
+!/.npmignore
+!/.npmrc
+!/.madgerc
+!/jest.config.mjs
+!/lefthook.yml
+!/LICENSE
+!/package.json
+!/pnpm-lock.yaml
+!/README.md
+!/tsconfig.json
+!/tsconfig.test.json
+!/tsconfig.eslint.json
+!/dependabot.yml
 
-# for creating empty directories
-!.git-create
+!src/
+!src/**/
+!src/**/*.ts
 
-!/scripts/
-!/scripts/*.sh
-!/scripts/*.template
-!/scripts/*.md
-!/scripts/*.py
+!config/
+!config/**/
+!config/**/*.json
 
-!/lib/
-!/lib/*/
-!/tools/
-!/tools/*/
-
-!/common/
-
-# Project folders
-!aviation/
-!aviation/*/
-!marine/
-!marine/*/
-!other/
-!other/*/
-!rail/
-!rail/*/
-!road/
-!road/*/
-!template/
-!template/esm/
-
-# Github
 !.github/
 !.github/**/
 !.github/workflows/**/**.yml
 !.github/CODEOWNERS
-!/.github/dependabot.yml
+!.github/dependabot.yml
