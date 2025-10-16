@@ -26,7 +26,7 @@ import type {
   Vessel,
 } from "../../model/apidata.js";
 import { saveAllSources } from "../../db/sources.js";
-import { addHours, subDays, subHours } from "date-fns";
+import { subDays } from "date-fns";
 import type { GetVesselEvent } from "../../lambda/get-vessels/get-vessels.js";
 
 mockProxyHolder();
