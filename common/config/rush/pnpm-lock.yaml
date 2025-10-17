@@ -2249,6 +2249,9 @@ importers:
       uuid:
         specifier: 13.0.0
         version: 13.0.0
+      xml2js:
+        specifier: 0.6.2
+        version: 0.6.2
       zod:
         specifier: 4.1.11
         version: 4.1.11

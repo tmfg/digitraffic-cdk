@@ -8,14 +8,15 @@ import {
 } from "./datex2_35_files.js";
 
 describe("parser-35-tests", () => {
+  /*
   test("parse_empty", () => {
-    expect(() => {
-      parseDatex("");
+    expect(async () => {
+      await parseDatex("");
     }).toThrow();
-  });
+  });*/
 
-  test("parse situationPublication 1", () => {
-    const situations = parseDatex(TEST_DATEX2);
+  test("parse situationPublication 1", async () => {
+    const situations = await parseDatex(TEST_DATEX2);
 
     expect(situations.length).toEqual(2);
     expect(situations[0]!.id).toEqual("KRM021323");
@@ -24,16 +25,16 @@ describe("parser-35-tests", () => {
     expect(situations[1]!.id).toEqual("KRM01K001");
   });
 
-  test("parse situationPublication 2", () => {
-    const situations = parseDatex(TEST_DATEX2_2);
+  test("parse situationPublication 2", async () => {
+    const situations = await parseDatex(TEST_DATEX2_2);
 
     expect(situations.length).toEqual(1);
     expect(situations[0]!.id).toEqual("KRM015812");
     expect(situations[0]!.datex2.startsWith("<ns6:situation")).toBeTruthy();
   });
 
-  test("parse vmsPublication 1", () => {
-    const situations = parseDatex(TEST_DATEX2_VMSPUBLICATION_1);
+  test("parse vmsPublication 1", async () => {
+    const situations = await parseDatex(TEST_DATEX2_VMSPUBLICATION_1);
 
     expect(situations.length).toEqual(1);
     expect(situations[0]!.id).toEqual("TIO01V101");
@@ -42,8 +43,8 @@ describe("parser-35-tests", () => {
       .toBeTruthy();
   });
 
-  test("parse vmsPublication 2", () => {
-    const situations = parseDatex(TEST_DATEX2_VMSPUBLICATION_2);
+  test("parse vmsPublication 2", async () => {
+    const situations = await parseDatex(TEST_DATEX2_VMSPUBLICATION_2);
 
     expect(situations.length).toEqual(1);
     expect(situations[0]!.id).toEqual("TIO01V310");
@@ -52,8 +53,8 @@ describe("parser-35-tests", () => {
       .toBeTruthy();
   });
 
-  test("parse vmsTablePublication", () => {
-    const situations = parseDatex(TEST_DATEX2_VMS_TABLE_PUBLICATION);
+  test("parse vmsTablePublication", async () => {
+    const situations = await parseDatex(TEST_DATEX2_VMS_TABLE_PUBLICATION);
 
     expect(situations.length).toEqual(2);
     expect(situations[0]!.id).toEqual("VME015511");

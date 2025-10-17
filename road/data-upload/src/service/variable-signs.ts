@@ -83,7 +83,7 @@ async function handleVariableSign(
       break;
 
     case Datex2Version["3.5"]:
-      const datexFiles = parseDatex(xml);
+      const datexFiles = await parseDatex(xml);
 
       if (datexFiles.length === 0) {
         logger.debug(`No datex files parsed from ${data.data_id}!`);

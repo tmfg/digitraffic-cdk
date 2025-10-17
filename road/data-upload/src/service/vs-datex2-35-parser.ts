@@ -1,5 +1,6 @@
 import type { DatexFile, DatexType } from "./variable-signs.js";
-import { findWithReg, getTags } from "./xml-util.js";
+import { getTags } from "./xml-util.js";
+import { Builder, type ParserOptions, parseStringPromise } from "xml2js";
 
 const TAGS = {
   OVERALL_STARTTIME_START: "overallStartTime>",
@@ -8,12 +9,55 @@ const TAGS = {
   STATUS_UPDATE_END_REGF: /<\/.*statusUpdateTime>/,
 } as const;
 
-export function parseDatex(datex2: string): DatexFile[] {
-  switch (getType(datex2)) {
+interface SituationRecord {
+  "validity": {
+    validityTimeSpecification: {
+      overallStartTime: Date[];
+    }[];
+  }[];
+}
+
+interface Situation {
+  "$": {
+    id: string;
+  };
+  "situationRecord": SituationRecord[];
+}
+
+interface SituationPublication {
+  "situation": Situation[];
+}
+
+interface VmsControllerStatus {
+  "$": {
+    id: string;
+  };
+  "ns11:statusUpdateTime": Date[];
+}
+
+interface Datex35File {
+  "sit:situationPublication": SituationPublication;
+  "ns15:payload": {
+    "$": {
+      "xsi:type": string;
+    };
+    "ns11:vmsControllerStatus": VmsControllerStatus[];
+  };
+}
+
+export async function parseDatex(datex2: string): Promise<DatexFile[]> {
+  const xml = await parseStringPromise(datex2) as Datex35File;
+
+  // eslint-disable-next-line
+  console.debug("xml " + JSON.stringify(xml));
+
+  switch (getType(xml)) {
     case "SITUATION":
-      return getSituations(datex2);
+      return getSituations(xml["sit:situationPublication"]);
     case "CONTROLLER_STATUS":
-      return getControllerStatuses(datex2);
+      return getControllerStatus(
+        xml["ns15:payload"]["ns11:vmsControllerStatus"],
+      );
     case "CONTROLLER":
       return getControllers(datex2);
   }
@@ -24,26 +68,33 @@ function getControllers(datex2: string): DatexFile[] {
     .map((controller) => parseController(controller));
 }
 
-function getControllerStatuses(datex2: string): DatexFile[] {
-  return getTags(datex2, "vmsControllerStatus")
-    .map((status) => parseControllerStatus(status));
+function getControllerStatus(statuses: VmsControllerStatus[]): DatexFile[] {
+  return statuses.map(parseControllerStatus);
 }
 
-function getSituations(datex2: string): DatexFile[] {
-  return getTags(datex2, "situation")
-    .map((situation) => parseSituation(situation));
+function getSituations(publication: SituationPublication): DatexFile[] {
+  return publication.situation.map(parseSituation);
 }
 
-function getType(datex2: string): DatexType {
-  if (datex2.includes("situationPublication")) {
+function getType(datex2: Datex35File): DatexType {
+  if (!datex2) {
+    throw new Error("unknown datex type");
+  }
+
+  if (datex2["sit:situationPublication"]) {
     return "SITUATION";
-  } else if (datex2.includes("VmsPublication")) {
+  }
+
+  const payload = datex2["ns15:payload"];
+  const type = payload.$["xsi:type"];
+
+  if (type === "ns12:VmsPublication") {
     return "CONTROLLER_STATUS";
-  } else if (datex2.includes("VmsTablePublication")) {
+  } else if (type === "ns11:VmsTablePublication") {
     return "CONTROLLER";
   }
 
-  throw new Error("Unknown datex type");
+  throw new Error("Unknown datex type " + type);
 }
 
 function parseController(datex2: string): DatexFile {
@@ -55,33 +106,52 @@ function parseController(datex2: string): DatexFile {
   };
 }
 
-function parseControllerStatus(datex2: string): DatexFile {
-  return {
-    id: parseId(datex2),
-    type: "CONTROLLER_STATUS",
-    datex2: datex2,
-    effectDate: parseStatusUpdateTime(datex2),
-  };
+function parseControllerStatus(status: VmsControllerStatus): DatexFile {
+  const id = status.$.id;
+  const type = "CONTROLLER_STATUS";
+  const datex2 = new Builder({
+    headless: true,
+    rootName: "ns11:vmsControllerStatus",
+  }).buildObject(status);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const effectDate = status["ns11:statusUpdateTime"][0]!;
+
+  return { id, type, datex2, effectDate };
 }
 
-function parseSituation(datex2: string): DatexFile {
-  return {
-    id: parseId(datex2),
-    type: "SITUATION",
-    datex2,
-    effectDate: parseEffectDate(datex2),
-  };
+function parseSituation(situation: Situation): DatexFile {
+  const id = situation.$.id;
+  const type = "SITUATION";
+  const datex2 = new Builder({ headless: true, rootName: "ns3:situation" })
+    .buildObject(situation);
+  const effectDate = getEffectDate(situation);
+
+  // eslint-disable-next-line
+  console.debug("generated xml " + datex2);
+
+  return { id, type, datex2, effectDate };
 }
 
-/// parse statusUpdateTime from vmsControllerStatus
-function parseStatusUpdateTime(datex2: string): Date {
-  const index = datex2.indexOf(TAGS.STATUS_UPDATE_START) +
-    TAGS.STATUS_UPDATE_START.length;
-  const index2 = findWithReg(datex2, TAGS.STATUS_UPDATE_END_REGF, index);
+function getEffectDate(situation: Situation): Date {
+  const record = situation.situationRecord[0];
 
-  const dateString = datex2.substring(index, index2);
+  if (record) {
+    const validity = record.validity[0];
 
-  return new Date(dateString);
+    if (validity) {
+      const specification = validity.validityTimeSpecification[0];
+
+      if (specification) {
+        const time = specification.overallStartTime[0];
+
+        if (time) {
+          return time;
+        }
+      }
+    }
+  }
+
+  return new Date();
 }
 
 function parseId(datex2: string): string {
@@ -89,40 +159,3 @@ function parseId(datex2: string): string {
   const index = datex2.indexOf('"', startIndex);
   return datex2.substring(startIndex, index);
 }
-
-/// parse overallStartTime from situation
-function parseEffectDate(datex2: string): Date {
-  const index = datex2.indexOf(TAGS.OVERALL_STARTTIME_START) +
-    TAGS.OVERALL_STARTTIME_START.length;
-  const index2 = findWithReg(datex2, TAGS.OVERALL_STARTTIME_END_REG, index);
-
-  const dateString = datex2.substring(index, index2);
-
-  return new Date(dateString);
-}
-/*
-function validate(datex2: string): boolean {
-  if (!datex2.includes(XML_TAG_START)) {
-    logger.error({
-      method: "Datex2UpdateService.validate",
-      message: "no xml-tag",
-    });
-    return false;
-  }
-
-  const ppCount = occurrences(datex2, REG_PAYLOAD);
-  if (ppCount !== 1) {
-    logger.error({
-      method: "Datex2UpdateService.validate",
-      message: `${ppCount} payloadPublications`,
-    });
-
-    return false;
-  }
-
-  return true;
-}
-
-function occurrences(string: string, regexp: RegExp): number {
-  return (string.match(regexp) ?? []).length;
-}*/

@@ -6,6 +6,7 @@ import {
   Datex2UpdateObjectSchema,
 } from "../../model/datex2-update-object.js";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { v4 } from "uuid";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -37,11 +38,8 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
   // eslint-disable-next-line dot-notation
   const body = event["body"];
+  const requestId = event.headers["x-request-id"];
   const start = Date.now();
-
-  logger.debug(
-    "HEADER x-request-id: " + JSON.stringify(event.headers["x-request-id"]),
-  );
 
   if (body) {
     const payload = parsePayload(body);
@@ -56,7 +54,7 @@ export const handler = async (
     try {
       await proxyHolder.setCredentials();
 
-      await updateDatex2(payload);
+      await updateDatex2(payload, requestId ?? v4());
 
       logger.info({
         method,

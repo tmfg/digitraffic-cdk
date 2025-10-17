@@ -97,64 +97,63 @@ export const TEST_DATEX2 = `
 
 export const TEST_DATEX2_2 =
   `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns6:situationPublication lang="fi" modelBaseVersion="3"
-	xmlns="http://datex2.eu/schema/3/trafficManagementPlan"
-	xmlns:ns2="http://datex2.eu/schema/3/common"
-	xmlns:ns4="http://datex2.eu/schema/3/facilities"
-	xmlns:ns3="http://datex2.eu/schema/3/roadTrafficData"
-	xmlns:ns6="http://datex2.eu/schema/3/situation"
-	xmlns:ns5="http://datex2.eu/schema/3/parking"
-	xmlns:ns8="http://datex2.eu/schema/3/commonExtension"
-	xmlns:ns7="http://datex2.eu/schema/3/urbanExtensions"
-	xmlns:ns13="http://datex2.eu/schema/3/energyInfrastructure"
-	xmlns:ns9="http://datex2.eu/schema/3/locationExtension"
-	xmlns:ns12="http://datex2.eu/schema/3/vms"
-	xmlns:ns11="http://datex2.eu/schema/3/reroutingManagementEnhanced"
-	xmlns:ns10="http://datex2.eu/schema/3/locationReferencing"
-	xmlns:ns15="http://datex2.eu/schema/3/d2Payload"
-	xmlns:ns14="http://datex2.eu/schema/3/faultAndStatus">
-	<ns2:publicationTime>2025-09-30T10:00:20.801Z</ns2:publicationTime>
-	<ns2:publicationCreator>
-		<ns2:country>FI</ns2:country>
-		<ns2:nationalIdentifier>FTA</ns2:nationalIdentifier>
-	</ns2:publicationCreator>
-	<ns6:situation id="KRM015812">
-		<ns6:overallSeverity>high</ns6:overallSeverity>
-		<ns6:situationVersionTime>2025-09-30T10:00:01.407Z</ns6:situationVersionTime>
-		<ns6:headerInformation>
-			<ns2:confidentiality>noRestriction</ns2:confidentiality>
-			<ns2:informationStatus>real</ns2:informationStatus>
-		</ns6:headerInformation>
-		<ns6:situationRecord xsi:type="ns6:SpeedManagement" id="KRM015812" version="1759226406352"
+<sit:situationPublication lang="fi" modelBaseVersion="3"
+	xmlns:com="http://datex2.eu/schema/3/common"
+	xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
+	xmlns:roa="http://datex2.eu/schema/3/roadTrafficData"
+	xmlns:fst="http://datex2.eu/schema/3/faultAndStatus"
+	xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure"
+	xmlns:prk="http://datex2.eu/schema/3/parking"
+	xmlns:fac="http://datex2.eu/schema/3/facilities"
+	xmlns:ubx="http://datex2.eu/schema/3/urbanExtensions"
+	xmlns:locx="http://datex2.eu/schema/3/locationExtension"
+	xmlns:d2="http://datex2.eu/schema/3/d2Payload"
+	xmlns:tmp="http://datex2.eu/schema/3/trafficManagementPlan"
+	xmlns:comx="http://datex2.eu/schema/3/commonExtension"
+	xmlns:vms="http://datex2.eu/schema/3/vms"
+	xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
+	xmlns:sit="http://datex2.eu/schema/3/situation">
+	<publicationTime>2025-10-17T08:15:52.992Z</publicationTime>
+	<publicationCreator>
+		<country>FI</country>
+		<nationalIdentifier>FTA</nationalIdentifier>
+	</publicationCreator>
+	<situation id="KRM123456">
+		<overallSeverity>high</overallSeverity>
+		<situationVersionTime>2024-12-03T16:01:13.526Z</situationVersionTime>
+		<headerInformation>
+			<confidentiality>noRestriction</confidentiality>
+			<informationStatus>real</informationStatus>
+		</headerInformation>
+		<situationRecord xsi:type="sit:SpeedManagement" id="KRM123456" version="123"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-			<ns6:situationRecordCreationTime>2025-09-30T10:00:01.407Z</ns6:situationRecordCreationTime>
-			<ns6:situationRecordObservationTime>2025-09-30T10:00:01.407Z</ns6:situationRecordObservationTime>
-			<ns6:situationRecordVersionTime>2025-09-30T10:00:01.407Z</ns6:situationRecordVersionTime>
-			<ns6:confidentialityOverride>noRestriction</ns6:confidentialityOverride>
-			<ns6:probabilityOfOccurrence>certain</ns6:probabilityOfOccurrence>
-			<ns6:severity>high</ns6:severity>
-			<ns6:validity>
-				<ns2:validityStatus>active</ns2:validityStatus>
-				<ns2:validityTimeSpecification>
-					<ns2:overallStartTime>2025-09-30T10:00:01.407Z</ns2:overallStartTime>
-				</ns2:validityTimeSpecification>
-			</ns6:validity>
-			<ns6:locationReference xsi:type="ns10:PointLocation">
-				<ns10:pointByCoordinates>
-					<ns10:pointCoordinates>
-						<ns10:latitude>6689696.0</ns10:latitude>
-						<ns10:longitude>416897.0</ns10:longitude>
-					</ns10:pointCoordinates>
-				</ns10:pointByCoordinates>
-			</ns6:locationReference>
-			<ns6:actionOrigin>internal</ns6:actionOrigin>
-			<ns6:complianceOption>mandatory</ns6:complianceOption>
-			<ns6:automaticallyInitiated>true</ns6:automaticallyInitiated>
-			<ns6:speedManagementType>speedRestrictionInOperation</ns6:speedManagementType>
-			<ns6:temporarySpeedLimit>80.0</ns6:temporarySpeedLimit>
-		</ns6:situationRecord>
-	</ns6:situation>
-</ns6:situationPublication>`;
+			<situationRecordCreationTime>2024-12-03T16:01:13.526Z</situationRecordCreationTime>
+			<situationRecordObservationTime>2024-12-03T16:01:13.526Z</situationRecordObservationTime>
+			<situationRecordVersionTime>2024-12-03T16:01:13.526Z</situationRecordVersionTime>
+			<confidentialityOverride>noRestriction</confidentialityOverride>
+			<probabilityOfOccurrence>certain</probabilityOfOccurrence>
+			<severity>high</severity>
+			<validity>
+				<validityStatus>active</validityStatus>
+				<validityTimeSpecification>
+					<overallStartTime>2024-12-03T16:01:13.526Z</overallStartTime>
+				</validityTimeSpecification>
+			</validity>
+			<locationReference xsi:type="PointLocation">
+				<pointByCoordinates>
+					<pointCoordinates>
+						<latitude>123.0</latitude>
+						<longitude>456.0</longitude>
+					</pointCoordinates>
+				</pointByCoordinates>
+			</locationReference>
+			<actionOrigin>internal</actionOrigin>
+			<complianceOption>mandatory</complianceOption>
+			<automaticallyInitiated>true</automaticallyInitiated>
+			<speedManagementType>speedRestrictionInOperation</speedManagementType>
+		</situationRecord>
+	</situation>
+</sit:situationPublication>`;
 
 export const TEST_DATEX2_VMSPUBLICATION_1 =
   `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

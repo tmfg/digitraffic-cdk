@@ -1,7 +1,6 @@
 import { deleteOldDataMessages, insertData } from "../dao/data.js";
 import { inDatabase } from "@digitraffic/common/dist/database/database";
 import { type Datex2UpdateObject } from "../model/datex2-update-object.js";
-import { v4 } from "uuid";
 import { SOURCES } from "../model/types.js";
 import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
 import { SQS } from "@aws-sdk/client-sqs";
@@ -17,9 +16,8 @@ export async function deleteOldMessages(): Promise<void> {
 
 export async function updateDatex2(
   updateObject: Datex2UpdateObject,
+  messageId: string,
 ): Promise<void> {
-  const messageId = v4();
-
   await inDatabase(async (db) => {
     return await Promise.all(updateObject.datexIIVersions.map(async (o) => {
       return await insertData(
