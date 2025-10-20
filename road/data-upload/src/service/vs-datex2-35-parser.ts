@@ -1,13 +1,6 @@
 import type { DatexFile, DatexType } from "./variable-signs.js";
-import { getTags } from "./xml-util.js";
-import { Builder, type ParserOptions, parseStringPromise } from "xml2js";
-
-const TAGS = {
-  OVERALL_STARTTIME_START: "overallStartTime>",
-  OVERALL_STARTTIME_END_REG: /<\/.*overallStartTime>/,
-  STATUS_UPDATE_START: "statusUpdateTime>",
-  STATUS_UPDATE_END_REGF: /<\/.*statusUpdateTime>/,
-} as const;
+import { createXml, type IdentityAttribute } from "./xml-util.js";
+import { parseStringPromise } from "xml2js";
 
 interface SituationRecord {
   "validity": {
@@ -17,10 +10,7 @@ interface SituationRecord {
   }[];
 }
 
-interface Situation {
-  "$": {
-    id: string;
-  };
+interface Situation extends IdentityAttribute {
   "situationRecord": SituationRecord[];
 }
 
@@ -29,19 +19,25 @@ interface SituationPublication {
 }
 
 interface VmsControllerStatus {
-  "$": {
-    id: string;
-  };
-  "ns11:statusUpdateTime": Date[];
+  vmsControllerReference: IdentityAttribute[];
+
+  "statusUpdateTime": Date[];
+}
+
+interface VmsController extends IdentityAttribute {
+}
+interface VmsControllerTable {
+  vmsController: VmsController[];
 }
 
 interface Datex35File {
   "sit:situationPublication": SituationPublication;
-  "ns15:payload": {
+  "d2:payload": {
     "$": {
       "xsi:type": string;
     };
-    "ns11:vmsControllerStatus": VmsControllerStatus[];
+    "vmsControllerStatus": VmsControllerStatus[];
+    "vmsControllerTable": VmsControllerTable[];
   };
 }
 
@@ -49,23 +45,23 @@ export async function parseDatex(datex2: string): Promise<DatexFile[]> {
   const xml = await parseStringPromise(datex2) as Datex35File;
 
   // eslint-disable-next-line
-  console.debug("xml " + JSON.stringify(xml));
+  //  console.debug("xml " + JSON.stringify(xml));
 
   switch (getType(xml)) {
     case "SITUATION":
       return getSituations(xml["sit:situationPublication"]);
     case "CONTROLLER_STATUS":
       return getControllerStatus(
-        xml["ns15:payload"]["ns11:vmsControllerStatus"],
+        xml["d2:payload"].vmsControllerStatus,
       );
     case "CONTROLLER":
-      return getControllers(datex2);
+      return getControllers(xml["d2:payload"].vmsControllerTable);
   }
 }
 
-function getControllers(datex2: string): DatexFile[] {
-  return getTags(datex2, "vmsController")
-    .map((controller) => parseController(controller));
+function getControllers(controllerTable: VmsControllerTable[]): DatexFile[] {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return controllerTable[0]!.vmsController.map(parseController);
 }
 
 function getControllerStatus(statuses: VmsControllerStatus[]): DatexFile[] {
@@ -85,36 +81,35 @@ function getType(datex2: Datex35File): DatexType {
     return "SITUATION";
   }
 
-  const payload = datex2["ns15:payload"];
+  const payload = datex2["d2:payload"];
   const type = payload.$["xsi:type"];
 
-  if (type === "ns12:VmsPublication") {
+  if (type === "vms:VmsPublication") {
     return "CONTROLLER_STATUS";
-  } else if (type === "ns11:VmsTablePublication") {
+  } else if (type === "vms:VmsTablePublication") {
     return "CONTROLLER";
   }
 
-  throw new Error("Unknown datex type " + type);
+  throw new Error(`Unknown datex type ${type}`);
 }
 
-function parseController(datex2: string): DatexFile {
-  return {
-    id: parseId(datex2),
-    type: "CONTROLLER",
-    datex2,
-    effectDate: new Date(),
-  };
+function parseController(controller: VmsController): DatexFile {
+  const id = controller.$.id;
+  const type = "CONTROLLER";
+  const datex2 = createXml(controller, "vmsController");
+  const effectDate = new Date();
+
+  return { id, type, datex2, effectDate };
 }
 
 function parseControllerStatus(status: VmsControllerStatus): DatexFile {
-  const id = status.$.id;
-  const type = "CONTROLLER_STATUS";
-  const datex2 = new Builder({
-    headless: true,
-    rootName: "ns11:vmsControllerStatus",
-  }).buildObject(status);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const effectDate = status["ns11:statusUpdateTime"][0]!;
+  const id = status.vmsControllerReference[0]!.$.id;
+  const type = "CONTROLLER_STATUS";
+  const datex2 = createXml(status, "vmsControllerStatus");
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const effectDate = status.statusUpdateTime[0]!;
 
   return { id, type, datex2, effectDate };
 }
@@ -122,12 +117,8 @@ function parseControllerStatus(status: VmsControllerStatus): DatexFile {
 function parseSituation(situation: Situation): DatexFile {
   const id = situation.$.id;
   const type = "SITUATION";
-  const datex2 = new Builder({ headless: true, rootName: "ns3:situation" })
-    .buildObject(situation);
+  const datex2 = createXml(situation, "situation");
   const effectDate = getEffectDate(situation);
-
-  // eslint-disable-next-line
-  console.debug("generated xml " + datex2);
 
   return { id, type, datex2, effectDate };
 }
@@ -152,10 +143,4 @@ function getEffectDate(situation: Situation): Date {
   }
 
   return new Date();
-}
-
-function parseId(datex2: string): string {
-  const startIndex = datex2.indexOf("id=") + 4;
-  const index = datex2.indexOf('"', startIndex);
-  return datex2.substring(startIndex, index);
 }

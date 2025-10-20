@@ -29,79 +29,94 @@ const DATEX2_223_TEMPLATE =
 
 const DATEX2_SITUATION_PUBLICATION_35_TEMPLATE =
   `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns3:situationPublication lang="fi" modelBaseVersion="3" xmlns="http://datex2.eu/schema/3/common" xmlns:ns2="http://datex2.eu/schema/3/roadTrafficData" xmlns:ns4="http://datex2.eu/schema/3/urbanExtensions" xmlns:ns3="http://datex2.eu/schema/3/situation" xmlns:ns6="http://datex2.eu/schema/3/facilities" xmlns:ns5="http://datex2.eu/schema/3/commonExtension" xmlns:ns8="http://datex2.eu/schema/3/locationExtension" xmlns:ns7="http://datex2.eu/schema/3/parking" xmlns:ns13="http://datex2.eu/schema/3/vms" xmlns:ns9="http://datex2.eu/schema/3/locationReferencing" xmlns:ns12="http://datex2.eu/schema/3/reroutingManagementEnhanced" xmlns:ns11="http://datex2.eu/schema/3/trafficManagementPlan" xmlns:ns10="http://datex2.eu/schema/3/faultAndStatus" xmlns:ns15="http://datex2.eu/schema/3/d2Payload" xmlns:ns14="http://datex2.eu/schema/3/energyInfrastructure">
+<sit:situationPublication lang="fi" modelBaseVersion="3" 
+    xmlns:com="http://datex2.eu/schema/3/common"
+	  xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
+    xmlns:roa="http://datex2.eu/schema/3/roadTrafficData"
+    xmlns:fst="http://datex2.eu/schema/3/faultAndStatus"
+    xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure"
+    xmlns:prk="http://datex2.eu/schema/3/parking"
+    xmlns:fac="http://datex2.eu/schema/3/facilities"
+    xmlns:ubx="http://datex2.eu/schema/3/urbanExtensions"
+    xmlns:locx="http://datex2.eu/schema/3/locationExtension"
+    xmlns:d2="http://datex2.eu/schema/3/d2Payload"
+    xmlns:tmp="http://datex2.eu/schema/3/trafficManagementPlan"
+    xmlns:comx="http://datex2.eu/schema/3/commonExtension"
+    xmlns:vms="http://datex2.eu/schema/3/vms"
+    xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
+    xmlns:sit="http://datex2.eu/schema/3/situation">
     <publicationTime>PUBLICATION_TIME</publicationTime>
     <publicationCreator>
         <country>FI</country>
         <nationalIdentifier>FTA</nationalIdentifier>
     </publicationCreator>
     SITUATIONS
-</ns3:situationPublication>
+</sit:situationPublication>
 `;
 
 const DATEX2_VMS_PUBLICATION_35_TEMPLATE =
   `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns15:payload xsi:type="ns11:VmsPublication"
-	xmlns="http://datex2.eu/schema/3/trafficManagementPlan"
-	xmlns:ns2="http://datex2.eu/schema/3/situation"
-	xmlns:ns4="http://datex2.eu/schema/3/urbanExtensions"
-	xmlns:ns3="http://datex2.eu/schema/3/common"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:ns6="http://datex2.eu/schema/3/locationExtension"
-	xmlns:ns5="http://datex2.eu/schema/3/commonExtension"
-	xmlns:ns8="http://datex2.eu/schema/3/reroutingManagementEnhanced"
-	xmlns:ns7="http://datex2.eu/schema/3/locationReferencing"
-	xmlns:ns13="http://datex2.eu/schema/3/energyInfrastructure"
-	xmlns:ns9="http://datex2.eu/schema/3/facilities"
-	xmlns:ns12="http://datex2.eu/schema/3/parking"
-	xmlns:ns11="http://datex2.eu/schema/3/vms"
-	xmlns:ns10="http://datex2.eu/schema/3/roadTrafficData"
-	xmlns:ns15="http://datex2.eu/schema/3/d2Payload"
-	xmlns:ns14="http://datex2.eu/schema/3/faultAndStatus">
-	<ns3:publicationTime>PUBLICATION_TIME</ns3:publicationTime>
-	<ns3:publicationCreator>
-		<ns3:country>FI</ns3:country>
-		<ns3:nationalIdentifier>FTA</ns3:nationalIdentifier>
-	</ns3:publicationCreator>
-	<ns11:headerInformation>
-		<ns3:confidentiality>noRestriction</ns3:confidentiality>
-		<ns3:informationStatus>real</ns3:informationStatus>
-	</ns11:headerInformation>
-	STATUSES
-</ns15:payload>`;
+<d2:payload xsi:type="vms:VmsPublication"
+    xmlns:com="http://datex2.eu/schema/3/common"
+    xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
+    xmlns:roa="http://datex2.eu/schema/3/roadTrafficData"
+    xmlns:fst="http://datex2.eu/schema/3/faultAndStatus"
+    xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure"
+    xmlns:prk="http://datex2.eu/schema/3/parking"
+    xmlns:fac="http://datex2.eu/schema/3/facilities"
+    xmlns:ubx="http://datex2.eu/schema/3/urbanExtensions"
+    xmlns:locx="http://datex2.eu/schema/3/locationExtension"
+    xmlns:d2="http://datex2.eu/schema/3/d2Payload"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tmp="http://datex2.eu/schema/3/trafficManagementPlan"
+    xmlns:comx="http://datex2.eu/schema/3/commonExtension"
+    xmlns:vms="http://datex2.eu/schema/3/vms"
+    xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
+    xmlns:sit="http://datex2.eu/schema/3/situation">
+    <publicationTime>PUBLICATION_TIME<publicationTime>
+    <publicationCreator>
+        <country>FI</country>
+        <nationalIdentifier>FTA</nationalIdentifier>
+    </publicationCreator>
+    <headerInformation>
+        <confidentiality>noRestriction</confidentiality>
+        <informationStatus>real</informationStatus>
+    </headerInformation>
+    STATUSES
+</d2:payload>`;
 
 const DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE =
   `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns15:payload xsi:type="ns11:VmsTablePublication"
-	xmlns="http://datex2.eu/schema/3/trafficManagementPlan"
-	xmlns:ns2="http://datex2.eu/schema/3/situation"
-	xmlns:ns4="http://datex2.eu/schema/3/urbanExtensions"
-	xmlns:ns3="http://datex2.eu/schema/3/common"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:ns6="http://datex2.eu/schema/3/locationExtension"
-	xmlns:ns5="http://datex2.eu/schema/3/commonExtension"
-	xmlns:ns8="http://datex2.eu/schema/3/reroutingManagementEnhanced"
-	xmlns:ns7="http://datex2.eu/schema/3/locationReferencing"
-	xmlns:ns13="http://datex2.eu/schema/3/energyInfrastructure"
-	xmlns:ns9="http://datex2.eu/schema/3/facilities"
-	xmlns:ns12="http://datex2.eu/schema/3/parking"
-	xmlns:ns11="http://datex2.eu/schema/3/vms"
-	xmlns:ns10="http://datex2.eu/schema/3/roadTrafficData"
-	xmlns:ns15="http://datex2.eu/schema/3/d2Payload"
-	xmlns:ns14="http://datex2.eu/schema/3/faultAndStatus">
-	<ns3:publicationTime>PUBLICATION_TIME</ns3:publicationTime>
-	<ns3:publicationCreator>
-		<ns3:country>FI</ns3:country>
-		<ns3:nationalIdentifier>FTA</ns3:nationalIdentifier>
-	</ns3:publicationCreator>
-	<ns11:headerInformation>
-		<ns3:confidentiality>noRestriction</ns3:confidentiality>
-		<ns3:informationStatus>real</ns3:informationStatus>
-	</ns11:headerInformation>
-	<ns11:vmsControllerTable>
-		CONTROLLERS
-	</ns11:vmsControllerTable>
-</ns15:payload>`;
+<d2:payload xsi:type="vms:VmsTablePublication"
+    xmlns:com="http://datex2.eu/schema/3/common"
+    xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
+    xmlns:roa="http://datex2.eu/schema/3/roadTrafficData"
+    xmlns:fst="http://datex2.eu/schema/3/faultAndStatus"
+    xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure"
+    xmlns:prk="http://datex2.eu/schema/3/parking"
+    xmlns:fac="http://datex2.eu/schema/3/facilities"
+    xmlns:ubx="http://datex2.eu/schema/3/urbanExtensions"
+    xmlns:locx="http://datex2.eu/schema/3/locationExtension"
+    xmlns:d2="http://datex2.eu/schema/3/d2Payload"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tmp="http://datex2.eu/schema/3/trafficManagementPlan"
+    xmlns:comx="http://datex2.eu/schema/3/commonExtension"
+    xmlns:vms="http://datex2.eu/schema/3/vms"
+    xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
+    xmlns:sit="http://datex2.eu/schema/3/situation">
+  	<publicationTime>PUBLICATION_TIME</publicationTime>
+	  <publicationCreator>
+		    <country>FI</country>
+		    <nationalIdentifier>FTA</nationalIdentifier>
+	  </publicationCreator>
+	  <headerInformation>
+		    <confidentiality>noRestriction</confidentiality>
+		    <informationStatus>real</informationStatus>
+	  </headerInformation>
+	  <vmsControllerTable>
+		    CONTROLLERS
+	  </vmsControllerTable>
+</d2:payload>`;
 
 export function findControllersDatex2_35(): Promise<[string, Date]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {

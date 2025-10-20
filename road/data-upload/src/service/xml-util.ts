@@ -1,4 +1,11 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { Builder } from "xml2js";
+
+export type IdentityAttribute = {
+  "$": {
+    id: string;
+  };
+};
 
 export function findWithReg(
   text: string,
@@ -8,6 +15,10 @@ export function findWithReg(
   const index = text.substring(startpos).search(regex);
 
   return index >= 0 ? index + startpos : index;
+}
+
+export function createXml(object: unknown, rootName: string): string {
+  return new Builder({ headless: true, rootName }).buildObject(object);
 }
 
 export function getTags(xml: string, tag: string): string[] {

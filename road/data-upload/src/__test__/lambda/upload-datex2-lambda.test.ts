@@ -16,7 +16,9 @@ async function getResponseFromLambda(
     "../../lambda/upload-datex2/upload-datex2.js"
   );
 
-  return await handler(event as APIGatewayProxyEvent);
+  const finalEvent = { ...event, headers: [] };
+
+  return await handler(finalEvent as unknown as APIGatewayProxyEvent);
 }
 
 const validUpdateObject: Datex2UpdateObject = {
