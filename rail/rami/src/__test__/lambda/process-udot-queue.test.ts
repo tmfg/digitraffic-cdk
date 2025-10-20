@@ -150,8 +150,8 @@ describe(
       expect(results).toHaveLength(1);
       expect(results[0]?.status).toBe("fulfilled");
 
-      await expectRowCount(2, "SELECT COUNT(*) FROM rami_udot");
-      await expectRowCount(2, "SELECT COUNT(*) FROM rami_udot_history");
+      await expectRowCount(2, "SELECT count(*) FROM rami_udot");
+      await expectRowCount(2, "SELECT count(*) FROM rami_udot_history");
     });
 
     test("handler processes multiple messages independently", async () => {
@@ -204,7 +204,7 @@ describe(
 
       await expectRowCount(
         0,
-        "SELECT COUNT(*) FROM rami_udot WHERE train_number = 999",
+        "SELECT count(*) FROM rami_udot WHERE train_number = 999",
       );
     });
   }, {

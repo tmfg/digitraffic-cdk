@@ -1,7 +1,6 @@
 import type { Connection, QueryResult, ResultSetHeader } from "mysql2/promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { TraceContext } from "../util/tracing.js";
-import { createChildSpan, getTraceFields } from "../util/tracing.js";
+import { getTraceFields } from "../util/tracing.js";
 
 const SQL_DELETE_OLD_UDOT_VALUES = `
 DELETE FROM rami_udot
@@ -48,10 +47,8 @@ export interface UdotUpsertValues {
 export async function insertOrUpdate(
   conn: Connection,
   values: UdotUpsertValues,
-  traceContext?: TraceContext,
 ): Promise<void> {
   const method = "UdotDao.insertOrUpdate" as const;
-  const spanContext = traceContext ? createChildSpan(traceContext) : undefined;
   const start = Date.now();
 
   try {
@@ -64,12 +61,11 @@ export async function insertOrUpdate(
       updateSql,
       values,
       3,
-      spanContext,
     );
 
     if (result.affectedRows > 0) {
       logger.info({
-        ...(spanContext ? getTraceFields(spanContext) : {}),
+        ...getTraceFields(),
         method: "UdotDao.insertOrUpdate",
         customEvent: "query_completed",
         customAffectedRows: result.affectedRows,
@@ -84,7 +80,7 @@ export async function insertOrUpdate(
     }
   } catch (error) {
     logger.error({
-      ...(spanContext ? getTraceFields(spanContext) : {}),
+      ...getTraceFields(),
       method,
       customEvent: "query_failed",
       customDoUpdate: (values.ud === false && values.ut === false),
@@ -105,7 +101,6 @@ async function executeWithRetry<T extends QueryResult>(
   sql: string,
   values: UdotUpsertValues,
   retries: number = 3,
-  traceContext?: TraceContext,
 ): Promise<T> {
   let lastError: unknown;
   for (let i = 0; i < retries; i++) {
@@ -114,7 +109,7 @@ async function executeWithRetry<T extends QueryResult>(
     } catch (err: unknown) {
       lastError = err;
       logger.warn({
-        ...(traceContext ? getTraceFields(traceContext) : {}),
+        ...getTraceFields(),
         method: "UdotDao.executeWithRetry",
         message: `Query failed on attempt ${i + 1} of ${retries}.`,
         customWillRetry: i < retries - 1,

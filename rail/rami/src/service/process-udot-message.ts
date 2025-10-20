@@ -7,70 +7,69 @@ import type {
   UnknownDelayOrTrackMessage,
 } from "../model/dt-rosm-message.js";
 import { insertOrUpdate } from "../dao/udot.js";
-import type { TraceContext } from "../util/tracing.js";
-import { createChildSpan, getTraceFields } from "../util/tracing.js";
+import { getTraceFields, runWithChildSpan } from "../util/tracing.js";
 
 export async function processUdotMessage(
   message: UnknownDelayOrTrackMessage,
-  traceContext: TraceContext,
 ): Promise<void> {
-  const spanContext = createChildSpan(traceContext);
-  const start = Date.now();
-  let foundCount = 0;
-  let notFoundCount = 0;
+  return runWithChildSpan(async () => {
+    const start = Date.now();
+    let foundCount = 0;
+    let notFoundCount = 0;
 
-  try {
-    const rows = await findTimeTableRows(
-      message.trainNumber,
-      message.departureDate,
-    );
+    try {
+      const rows = await findTimeTableRows(
+        message.trainNumber,
+        message.departureDate,
+      );
 
-    if (rows.length === 0) {
+      if (rows.length === 0) {
+        logger.info({
+          ...getTraceFields(),
+          method: "ProcessUdotMessageService.processUdotMessage",
+          message:
+            `Could not find rows for ${message.trainNumber} ${message.departureDate}`,
+          customTrainNumber: message.trainNumber,
+          customTrainDepartureDate: message.departureDate,
+        });
+
+        return Promise.resolve();
+      }
+
+      await inTransaction(async (conn: Connection): Promise<void> => {
+        for (const datarow of message.data) {
+          const attapId = findAttapId(rows, datarow);
+
+          if (attapId) {
+            foundCount++;
+
+            await insertOrUpdate(conn, {
+              trainNumber: message.trainNumber,
+              trainDepartureDate: message.departureDate,
+              attapId,
+              messageId: message.messageId,
+              ut: datarow.unknownTrack,
+              ud: datarow.unknownDelay,
+            });
+          } else {
+            notFoundCount++;
+          }
+        }
+      });
+    } finally {
       logger.info({
-        ...getTraceFields(spanContext),
+        ...getTraceFields(),
         method: "ProcessUdotMessageService.processUdotMessage",
         message:
-          `Could not find rows for ${message.trainNumber} ${message.departureDate}`,
+          `udot for ${message.trainNumber} ${message.departureDate} processed`,
         customTrainNumber: message.trainNumber,
         customTrainDepartureDate: message.departureDate,
+        tookMs: Date.now() - start,
+        customFoundCount: foundCount,
+        customNotFoundCount: notFoundCount,
       });
-
-      return Promise.resolve();
     }
-
-    await inTransaction(async (conn: Connection): Promise<void> => {
-      for (const datarow of message.data) {
-        const attapId = findAttapId(rows, datarow);
-
-        if (attapId) {
-          foundCount++;
-
-          await insertOrUpdate(conn, {
-            trainNumber: message.trainNumber,
-            trainDepartureDate: message.departureDate,
-            attapId,
-            messageId: message.messageId,
-            ut: datarow.unknownTrack,
-            ud: datarow.unknownDelay,
-          }, spanContext);
-        } else {
-          notFoundCount++;
-        }
-      }
-    }, spanContext);
-  } finally {
-    logger.info({
-      ...getTraceFields(spanContext),
-      method: "ProcessUdotMessageService.processUdotMessage",
-      message:
-        `udot for ${message.trainNumber} ${message.departureDate} processed`,
-      customTrainNumber: message.trainNumber,
-      customTrainDepartureDate: message.departureDate,
-      tookMs: Date.now() - start,
-      customFoundCount: foundCount,
-      customNotFoundCount: notFoundCount,
-    });
-  }
+  });
 }
 
 // @ts-ignore

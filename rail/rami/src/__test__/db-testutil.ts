@@ -30,10 +30,7 @@ export async function expectRowCount(
     const [rows] = await conn.query(sql);
 
     expect(rows).toHaveLength(1);
-    // MySQL returns COUNT(*) in uppercase, but also check lowercase for compatibility
-    const count: number =
-      (get(rows, ["0", "COUNT(*)"]) ?? get(rows, ["0", "count(*)"])) as number;
-    expect(count).toEqual(expectedCount);
+    expect(get(rows, ["0", "count(*)"])).toEqual(expectedCount);
   });
 }
 

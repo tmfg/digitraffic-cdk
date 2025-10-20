@@ -1,10 +1,13 @@
 import { randomUUID } from "crypto";
+import { AsyncLocalStorage } from "async_hooks";
 
 export interface TraceContext {
   readonly traceId: string;
   readonly spanId: string;
   readonly parentSpanId?: string;
 }
+
+const asyncLocalStorage = new AsyncLocalStorage<TraceContext>();
 
 export function createTraceContext(): TraceContext {
   const traceId = randomUUID();
@@ -20,15 +23,43 @@ export function createChildSpan(parent: TraceContext): TraceContext {
   };
 }
 
-export function getTraceFields(context: TraceContext): {
+export function runWithTraceContext<T>(
+  context: TraceContext,
+  fn: () => Promise<T>,
+): Promise<T> {
+  return asyncLocalStorage.run(context, fn);
+}
+
+export function runWithChildSpan<T>(fn: () => Promise<T>): Promise<T> {
+  const currentContext = asyncLocalStorage.getStore();
+  if (!currentContext) {
+    const newContext = createTraceContext();
+    return asyncLocalStorage.run(newContext, fn);
+  }
+  const childContext = createChildSpan(currentContext);
+  return asyncLocalStorage.run(childContext, fn);
+}
+
+export function getCurrentTraceContext(): TraceContext | undefined {
+  return asyncLocalStorage.getStore();
+}
+
+export function getTraceFields(context?: TraceContext): {
   traceId: string;
   spanId: string;
   parentSpanId?: string;
 } {
+  const ctx = context ?? asyncLocalStorage.getStore();
+  if (!ctx) {
+    return {
+      traceId: "no-trace-context",
+      spanId: "no-trace-context",
+    };
+  }
   return {
-    traceId: context.traceId,
-    spanId: context.spanId,
-    ...(context?.parentSpanId && { parentSpanId: context.parentSpanId }),
+    traceId: ctx.traceId,
+    spanId: ctx.spanId,
+    ...(ctx?.parentSpanId && { parentSpanId: ctx.parentSpanId }),
   };
 }
 

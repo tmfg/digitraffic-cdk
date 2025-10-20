@@ -3,8 +3,7 @@ import type { Connection } from "mysql2/promise.js";
 import { createPool, type Pool } from "mysql2/promise.js";
 import { getFromEnvOrSecret } from "./secret.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { TraceContext } from "./tracing.js";
-import { createChildSpan, getTraceFields } from "./tracing.js";
+import { getTraceFields, runWithChildSpan } from "./tracing.js";
 
 interface MysqlOpts {
   host: string;
@@ -29,61 +28,53 @@ export async function end(): Promise<void> {
 
 export async function inTransaction(
   fn: (conn: Connection) => Promise<void>,
-  traceContext?: TraceContext,
 ): Promise<void> {
-  const spanContext = traceContext ? createChildSpan(traceContext) : undefined;
-  const start = Date.now();
-  const conn = await pool.getConnection();
+  return runWithChildSpan(async () => {
+    const start = Date.now();
+    const conn = await pool.getConnection();
 
-  if (spanContext) {
-    logger.debug({
-      ...getTraceFields(spanContext),
+    logger.info({
+      ...getTraceFields(),
       method: "database.inTransaction",
       customEvent: "transaction_started",
     });
-  }
 
-  await conn.beginTransaction();
-  try {
-    await fn(conn);
-    await conn.commit();
+    await conn.beginTransaction();
+    try {
+      await fn(conn);
+      await conn.commit();
 
-    if (spanContext) {
       logger.info({
-        ...getTraceFields(spanContext),
+        ...getTraceFields(),
         method: "database.inTransaction",
         customEvent: "transaction_committed",
         customDurationMs: Date.now() - start,
       });
-    }
-  } catch (error: unknown) {
-    await conn.rollback();
+    } catch (error: unknown) {
+      await conn.rollback();
 
-    if (spanContext) {
       logger.error({
-        ...getTraceFields(spanContext),
+        ...getTraceFields(),
         method: "database.inTransaction",
         customEvent: "transaction_rolled_back",
         customDurationMs: Date.now() - start,
         customIsDeadlock: String(error).includes("Deadlock"),
         error,
       });
-    }
 
-    return Promise.reject(error);
-  } finally {
-    conn.release();
+      return Promise.reject(error);
+    } finally {
+      conn.release();
 
-    if (spanContext) {
       logger.debug({
-        ...getTraceFields(spanContext),
+        ...getTraceFields(),
         method: "database.inTransaction",
         customEvent: "connection_released",
         customTotalDurationMs: Date.now() - start,
       });
     }
-  }
-  return Promise.resolve();
+    return Promise.resolve();
+  });
 }
 
 export async function inDatabase<T>(
