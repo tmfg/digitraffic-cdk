@@ -7,10 +7,14 @@ import type {
   UnknownDelayOrTrackMessage,
 } from "../model/dt-rosm-message.js";
 import { insertOrUpdate } from "../dao/udot.js";
+import type { TraceContext } from "../util/tracing.js";
+import { createChildSpan, getTraceFields } from "../util/tracing.js";
 
 export async function processUdotMessage(
   message: UnknownDelayOrTrackMessage,
+  traceContext: TraceContext,
 ): Promise<void> {
+  const spanContext = createChildSpan(traceContext);
   const start = Date.now();
   let foundCount = 0;
   let notFoundCount = 0;
@@ -23,45 +27,45 @@ export async function processUdotMessage(
 
     if (rows.length === 0) {
       logger.info({
+        ...getTraceFields(spanContext),
         method: "ProcessUdotMessageService.processUdotMessage",
         message:
           `Could not find rows for ${message.trainNumber} ${message.departureDate}`,
+        customTrainNumber: message.trainNumber,
+        customTrainDepartureDate: message.departureDate,
       });
 
       return Promise.resolve();
     }
 
-    //        logger.debug(`rows for ${message.trainNumber} ${message.departureDate} : ${JSON.stringify(rows)}`);
+    await inTransaction(async (conn: Connection): Promise<void> => {
+      for (const datarow of message.data) {
+        const attapId = findAttapId(rows, datarow);
 
-    for (const datarow of message.data) {
-      // find attap_id for each line
-      const attapId = findAttapId(rows, datarow);
+        if (attapId) {
+          foundCount++;
 
-      if (attapId) {
-        foundCount++;
-
-        // each update in own transaction, to prevent locking!
-        await inTransaction(async (conn: Connection): Promise<void> => {
-          return await insertOrUpdate(conn, {
+          await insertOrUpdate(conn, {
             trainNumber: message.trainNumber,
             trainDepartureDate: message.departureDate,
             attapId,
             messageId: message.messageId,
             ut: datarow.unknownTrack,
             ud: datarow.unknownDelay,
-          });
-        });
-      } else {
-        notFoundCount++;
-
-        //        logRowNotFound(message, datarow, rows);
+          }, spanContext);
+        } else {
+          notFoundCount++;
+        }
       }
-    }
+    }, spanContext);
   } finally {
     logger.info({
+      ...getTraceFields(spanContext),
       method: "ProcessUdotMessageService.processUdotMessage",
       message:
         `udot for ${message.trainNumber} ${message.departureDate} processed`,
+      customTrainNumber: message.trainNumber,
+      customTrainDepartureDate: message.departureDate,
       tookMs: Date.now() - start,
       customFoundCount: foundCount,
       customNotFoundCount: notFoundCount,

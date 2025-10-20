@@ -5,15 +5,16 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { processUdotMessage } from "../../service/process-udot-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { UnknownDelayOrTrackMessage } from "../../model/dt-rosm-message.js";
+import { createTraceContext, getTraceFields } from "../../util/tracing.js";
 
 export function handlerFn(): (
   event: SQSEvent,
 ) => Promise<PromiseSettledResult<void>[]> {
   return async (event: SQSEvent) => {
-    const start = Date.now();
-
-    try {
-      return await Promise.allSettled(event.Records.map(async (r) => {
+    return await Promise.allSettled(
+      event.Records.map(async (r) => {
+        const traceContext = createTraceContext();
+        const start = Date.now();
         const recordBody = r.body;
 
         try {
@@ -22,24 +23,45 @@ export function handlerFn(): (
           ) as UnknownDelayOrTrackMessage;
 
           logger.info({
+            ...getTraceFields(traceContext),
             method: "RAMI-ProcessUDOTQueue.handler",
-            message:
-              `processing ${udotMessage.trainNumber} ${udotMessage.departureDate}`,
-            customCount: udotMessage.data.length,
+            customEvent: "message_processing_started",
+            customSqsMessageId: r.messageId,
+            customTrainNumber: udotMessage.trainNumber,
+            customTrainDepartureDate: udotMessage.departureDate,
+            customDataRowCount: udotMessage.data.length,
+            customApproximateReceiveCount: parseInt(
+              r.attributes.ApproximateReceiveCount,
+              10,
+            ),
           });
 
-          return processUdotMessage(udotMessage);
+          await processUdotMessage(udotMessage, traceContext);
+
+          logger.info({
+            ...getTraceFields(traceContext),
+            method: "RAMI-ProcessUDOTQueue.handler",
+            customEvent: "message_processing_succeeded",
+            customSqsMessageId: r.messageId,
+            tookMs: Date.now() - start,
+          });
+
+          return Promise.resolve();
         } catch (error) {
           logException(logger, error);
+          logger.error({
+            ...getTraceFields(traceContext),
+            method: "RAMI-ProcessUDOTQueue.handler",
+            customEvent: "message_processing_failed",
+            customSqsMessageId: r.messageId,
+            tookMs: Date.now() - start,
+            customIsDeadlock: String(error).includes("Deadlock"),
+            error,
+          });
+          return Promise.reject(error);
         }
-      }));
-    } finally {
-      logger.info({
-        method: "RAMI-ProcessUDOTQueue.handler",
-        tookMs: Date.now() - start,
-        customRecordCount: event.Records.length,
-      });
-    }
+      }),
+    );
   };
 }
 

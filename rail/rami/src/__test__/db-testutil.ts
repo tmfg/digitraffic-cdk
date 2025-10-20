@@ -30,22 +30,49 @@ export async function expectRowCount(
     const [rows] = await conn.query(sql);
 
     expect(rows).toHaveLength(1);
-    expect(get(rows, ["0", "count(*)"])).toEqual(expectedCount);
+    // MySQL returns COUNT(*) in uppercase, but also check lowercase for compatibility
+    const count: number =
+      (get(rows, ["0", "COUNT(*)"]) ?? get(rows, ["0", "count(*)"])) as number;
+    expect(count).toEqual(expectedCount);
   });
 }
 
-export function dbTestBase(fn: JestEmptyFunction): JestEmptyFunction {
+export interface TestConfiguration {
+  beforeAll?: (db: Connection) => Promise<void>;
+  afterAll?: (db: Connection) => Promise<void>;
+  beforeEach?: (db: Connection) => Promise<void>;
+}
+
+export function dbTestBase(
+  fn: JestEmptyFunction,
+  config?: TestConfiguration,
+): JestEmptyFunction {
   return () => {
     beforeAll(async () => {
-      await mysql.inTransaction(truncate);
+      await mysql.inTransaction(async (db) => {
+        await truncate(db);
+        if (config?.beforeAll) {
+          await config.beforeAll(db);
+        }
+      });
     });
 
     afterAll(async () => {
-      await mysql.inTransaction(truncate);
+      await mysql.inTransaction(async (db) => {
+        await truncate(db);
+        if (config?.afterAll) {
+          await config.afterAll(db);
+        }
+      });
     });
 
     beforeEach(async () => {
-      await mysql.inTransaction(truncate);
+      await mysql.inTransaction(async (db) => {
+        await truncate(db);
+        if (config?.beforeEach) {
+          await config.beforeEach(db);
+        }
+      });
     });
 
     fn();

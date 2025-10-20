@@ -1,10 +1,7 @@
-import type {
-  Connection,
-  FieldPacket,
-  QueryResult,
-  ResultSetHeader,
-} from "mysql2/promise";
+import type { Connection, QueryResult, ResultSetHeader } from "mysql2/promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { TraceContext } from "../util/tracing.js";
+import { createChildSpan, getTraceFields } from "../util/tracing.js";
 
 const SQL_DELETE_OLD_UDOT_VALUES = `
 DELETE FROM rami_udot
@@ -51,8 +48,11 @@ export interface UdotUpsertValues {
 export async function insertOrUpdate(
   conn: Connection,
   values: UdotUpsertValues,
+  traceContext?: TraceContext,
 ): Promise<void> {
   const method = "UdotDao.insertOrUpdate" as const;
+  const spanContext = traceContext ? createChildSpan(traceContext) : undefined;
+  const start = Date.now();
 
   try {
     // if both values are false, there is no point inserting it, you can just update existing values if any
@@ -63,13 +63,20 @@ export async function insertOrUpdate(
       conn,
       updateSql,
       values,
+      3,
+      spanContext,
     );
 
     if (result.affectedRows > 0) {
       logger.info({
+        ...(spanContext ? getTraceFields(spanContext) : {}),
         method: "UdotDao.insertOrUpdate",
+        customEvent: "query_completed",
         customAffectedRows: result.affectedRows,
         customTrainNumber: values.trainNumber,
+        customTrainDepartureDate: values.trainDepartureDate,
+        customAttapId: values.attapId,
+        tookMs: Date.now() - start,
       });
 
       // insert history only if something was updated
@@ -77,11 +84,19 @@ export async function insertOrUpdate(
     }
   } catch (error) {
     logger.error({
+      ...(spanContext ? getTraceFields(spanContext) : {}),
       method,
+      customEvent: "query_failed",
       customDoUpdate: (values.ud === false && values.ut === false),
       customSql: SQL_UPSERT_UDOT_VALUES,
+      customTrainNumber: values.trainNumber,
+      customTrainDepartureDate: values.trainDepartureDate,
+      customAttapId: values.attapId,
+      customIsDeadlock: String(error).includes("Deadlock"),
+      tookMs: Date.now() - start,
       error,
     });
+    throw error;
   }
 }
 
@@ -89,18 +104,24 @@ async function executeWithRetry<T extends QueryResult>(
   conn: Connection,
   sql: string,
   values: UdotUpsertValues,
-  retries = 3,
+  retries: number = 3,
+  traceContext?: TraceContext,
 ): Promise<T> {
-  let lastError;
+  let lastError: unknown;
   for (let i = 0; i < retries; i++) {
     try {
       return (await conn.execute<T>(sql, values))[0];
     } catch (err: unknown) {
       lastError = err;
       logger.warn({
+        ...(traceContext ? getTraceFields(traceContext) : {}),
         method: "UdotDao.executeWithRetry",
         message: `Query failed on attempt ${i + 1} of ${retries}.`,
-        customWillRetry: (i < retries - 1),
+        customWillRetry: i < retries - 1,
+        customIsDeadlock: String(err).includes("Deadlock"),
+        customTrainNumber: values.trainNumber,
+        customTrainDepartureDate: values.trainDepartureDate,
+        customAttapId: values.attapId,
         error: err,
       });
       if (i < retries - 1) {
