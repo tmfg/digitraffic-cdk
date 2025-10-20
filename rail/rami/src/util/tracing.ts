@@ -23,6 +23,10 @@ export function createChildSpan(parent: TraceContext): TraceContext {
   };
 }
 
+export function getCurrentTraceContext(): TraceContext | undefined {
+  return asyncLocalStorage.getStore();
+}
+
 export function runWithTraceContext<T>(
   context: TraceContext,
   fn: () => Promise<T>,
@@ -31,7 +35,7 @@ export function runWithTraceContext<T>(
 }
 
 export function runWithChildSpan<T>(fn: () => Promise<T>): Promise<T> {
-  const currentContext = asyncLocalStorage.getStore();
+  const currentContext = getCurrentTraceContext();
   if (!currentContext) {
     const newContext = createTraceContext();
     return asyncLocalStorage.run(newContext, fn);
@@ -40,16 +44,12 @@ export function runWithChildSpan<T>(fn: () => Promise<T>): Promise<T> {
   return asyncLocalStorage.run(childContext, fn);
 }
 
-export function getCurrentTraceContext(): TraceContext | undefined {
-  return asyncLocalStorage.getStore();
-}
-
 export function getTraceFields(context?: TraceContext): {
   traceId: string;
   spanId: string;
   parentSpanId?: string;
 } {
-  const ctx = context ?? asyncLocalStorage.getStore();
+  const ctx = context ?? getCurrentTraceContext();
   if (!ctx) {
     return {
       traceId: "no-trace-context",
