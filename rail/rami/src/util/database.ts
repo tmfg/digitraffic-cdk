@@ -50,7 +50,7 @@ export async function inTransaction(
         customEvent: "transaction_committed",
         customDurationMs: Date.now() - start,
       });
-    } catch (error: unknown) {
+    } catch (error) {
       await conn.rollback();
 
       logger.error({
@@ -58,7 +58,6 @@ export async function inTransaction(
         method: "database.inTransaction",
         customEvent: "transaction_rolled_back",
         customDurationMs: Date.now() - start,
-        customIsDeadlock: String(error).includes("Deadlock"),
         error,
       });
 

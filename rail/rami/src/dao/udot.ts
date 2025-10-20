@@ -88,7 +88,6 @@ export async function insertOrUpdate(
       customTrainNumber: values.trainNumber,
       customTrainDepartureDate: values.trainDepartureDate,
       customAttapId: values.attapId,
-      customIsDeadlock: String(error).includes("Deadlock"),
       tookMs: Date.now() - start,
       error,
     });
@@ -113,7 +112,6 @@ async function executeWithRetry<T extends QueryResult>(
         method: "UdotDao.executeWithRetry",
         message: `Query failed on attempt ${i + 1} of ${retries}.`,
         customWillRetry: i < retries - 1,
-        customIsDeadlock: String(err).includes("Deadlock"),
         customTrainNumber: values.trainNumber,
         customTrainDepartureDate: values.trainDepartureDate,
         customAttapId: values.attapId,
