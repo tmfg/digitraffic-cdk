@@ -1,3 +1,5 @@
+import type { BaseAttributes, Dirwaypoint } from "./apidata.js";
+
 export interface PortSuspensionWithLocations {
   readonly id: string;
   readonly start_time: Date;
@@ -9,4 +11,10 @@ export interface PortSuspensionWithLocations {
 
   // from locations
   readonly location_id: string;
+}
+
+export interface DirwayWithPoints extends BaseAttributes {
+  readonly name: string;
+  readonly description: string;
+  readonly dirwaypoints: Dirwaypoint[];
 }

@@ -233,6 +233,30 @@ export const DIRWAYPOINT_1: Dirwaypoint = {
 
 const DIRWAYPOINT_1_1 = { ...DIRWAYPOINT_1, ...{ rv: 1, name: "foo" } };
 
+export function createDirwaypoint(
+  props: {
+    id?: string;
+    dirway_id?: string;
+    order_num?: number;
+    name?: string;
+    latitude?: number;
+    longitude?: number;
+    rv?: number;
+  },
+): Dirwaypoint {
+  return {
+    id: props.id ?? randomInt(1000000).toString(),
+    dirway_id: props.dirway_id ?? "",
+    order_num: props.order_num ?? randomInt(1000),
+    name: props.name ?? "",
+    latitude: props.latitude ?? 0,
+    longitude: props.longitude ?? 0,
+    rv: props.rv ?? 0,
+    change_time: new Date(),
+    deleted: undefined,
+  };
+}
+
 export const PORT_SUSPENSION_1: PortSuspension = {
   start_time: new Date(),
   prenotification: false,

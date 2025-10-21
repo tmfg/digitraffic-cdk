@@ -1,3 +1,5 @@
+import type { FeatureCollection, Geometry } from "geojson";
+
 export interface DTRestriction {
   readonly startTime: Date;
   readonly endTime?: Date;
@@ -99,5 +101,9 @@ export interface DTDirwaypoint {
 export interface DTDirway {
   readonly name: string;
   readonly description: string;
-  readonly dirwaypoints?: DTDirwaypoint[];
 }
+
+export type DirwayFeatureCollection = FeatureCollection<
+  Geometry,
+  DTDirway
+>;

@@ -1,6 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Dirway, Dirwaypoint } from "../model/apidata.js";
 import { default as pgPromise } from "pg-promise";
+import type { DirwayWithPoints } from "../model/db-models.js";
 
 const SQL_UPDATE_DIRWAYS = `
 insert into wn_dirway(id, name, description, deleted)
@@ -25,9 +26,20 @@ do update set
     deleted = false
 `;
 
-const SQL_GET_DIRWAYS = `select id, name, description
-from wn_dirway
-where deleted = false`;
+const SQL_GET_DIRWAYS = `
+SELECT 
+  d.id, d.name, d.description,
+  JSON_AGG(JSON_BUILD_OBJECT(
+    'order_num', p.order_num,
+    'name', p.name,
+    'latitude', p.latitude,
+    'longitude', p.longitude  
+  )) as dirwaypoints
+FROM wn_dirway d
+JOIN wn_dirwaypoint p ON d.id = p.dirway_id
+WHERE d.deleted = FALSE AND p.deleted = false
+GROUP BY d.id
+`;
 
 const SQL_GET_DIRWAYPOINTS =
   `select dirway_id, order_num, name, latitude, longitude
@@ -84,7 +96,7 @@ export function saveAllDirwaypoints(
   );
 }
 
-export async function getDirways(db: DTDatabase): Promise<Dirway[]> {
+export async function getDirways(db: DTDatabase): Promise<DirwayWithPoints[]> {
   return db.manyOrNone(PS_GET_DIRWAYS);
 }
 
