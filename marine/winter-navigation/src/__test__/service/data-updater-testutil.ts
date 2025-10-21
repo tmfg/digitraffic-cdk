@@ -9,8 +9,9 @@ import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 export async function mockApiResponseAndUpdate<T>(
   mockedApiPath: ApiPath,
   response: Response<T>,
+  to: number,
 ): Promise<void> {
-  jest.spyOn(IbnetApi.prototype, "getCurrentVersion").mockResolvedValue(0);
+  jest.spyOn(IbnetApi.prototype, "getCurrentVersion").mockResolvedValue(to);
 
   jest.spyOn(IbnetApi.prototype, "fetch").mockImplementation(
     (apiPath: ApiPath, _from: number, _to: number) => {
@@ -29,7 +30,7 @@ const DELETED_1: Deleted = {
   deleted: true,
 };
 
-export function createTestFunctions<T>(
+export function createTestFunctions<T extends { rv: number }>(
   tableName: TableName,
   apiPath: ApiPath,
   newObject: T,
@@ -38,25 +39,29 @@ export function createTestFunctions<T>(
   return dbTestBase((db: DTDatabase) => {
     test(`update empty ${tableName}`, async () => {
       await assertCountFromTable(db, tableName, 0);
-      await mockApiResponseAndUpdate(apiPath, []);
+      await mockApiResponseAndUpdate(apiPath, [], 0);
       await assertCountFromTable(db, tableName, 0);
     });
 
     test(`update one ${tableName} then update it`, async () => {
       await assertCountFromTable(db, tableName, 0);
-      await mockApiResponseAndUpdate(apiPath, [newObject]);
+      await mockApiResponseAndUpdate(apiPath, [newObject], newObject.rv);
       await assertCountFromTable(db, tableName, 1);
 
-      await mockApiResponseAndUpdate(apiPath, [updatedObject]);
+      await mockApiResponseAndUpdate(
+        apiPath,
+        [updatedObject],
+        updatedObject.rv,
+      );
       await assertCountFromTable(db, tableName, 1);
     });
 
     test(`update one ${tableName} then delete it`, async () => {
       await assertCountFromTable(db, tableName, 0);
-      await mockApiResponseAndUpdate(apiPath, [newObject]);
+      await mockApiResponseAndUpdate(apiPath, [newObject], newObject.rv);
       await assertCountFromTable(db, tableName, 1);
 
-      await mockApiResponseAndUpdate(apiPath, [DELETED_1]);
+      await mockApiResponseAndUpdate(apiPath, [DELETED_1], newObject.rv + 1);
       await assertCountFromTable(db, tableName, 1, 1);
     });
   });

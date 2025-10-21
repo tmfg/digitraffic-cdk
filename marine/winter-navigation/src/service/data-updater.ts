@@ -120,7 +120,9 @@ export class DataUpdater {
       await setDeleted(db, tableName, deleted);
     }
 
-    await updateDataVersion(db, tableName, to);
+    if (deleted.length > 0 || updated.length > 0) {
+      await updateDataVersion(db, tableName, to);
+    }
 
     logger.info({
       method: "DataUpdater.updateObjects",

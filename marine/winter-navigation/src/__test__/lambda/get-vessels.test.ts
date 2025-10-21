@@ -91,7 +91,6 @@ describe(
       });
 
       ExpectResponse.ok(response).expectContent((vessel: DTVessel) => {
-        console.log("joo: " + JSON.stringify(vessel));
         expect(vessel.name).toEqual(VESSEL_1.name);
         expect(vessel.activities?.length).toEqual(1);
         expect(vessel.activities![0]!.reason).toEqual(ACTIVITY_1.reason);
