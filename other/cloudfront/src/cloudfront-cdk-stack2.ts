@@ -26,6 +26,8 @@ import {
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import type { Construct } from "constructs";
 import type { WafRules } from "./acl/waf-rules.js";
+import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+
 import {
   type Behavior,
   Origin,
@@ -37,6 +39,7 @@ import { EdgeLambdaFactory } from "./util/edgalambda-factory.js";
 import { EdgeFunctionFactory } from "./util/edgefunction-factory.js";
 import { FunctionType } from "./util/function-creator.js";
 import { LambdaType } from "./util/lambda-creator.js";
+import { createWebAcl } from "./acl/acl-creator.js";
 
 export class CloudfrontCdkStack2 extends Stack {
   readonly _cachePolicyFactory: CachePolicyFactory;
@@ -74,7 +77,6 @@ export class CloudfrontCdkStack2 extends Stack {
 
   public withAclRule(aclRule: WafRules): this {
     this._defaults.aclRule = aclRule;
-
     return this;
   }
 
@@ -103,7 +105,6 @@ export class CloudfrontCdkStack2 extends Stack {
     if (builder.behaviors.length === 0) {
       throw new Error("No behaviors defined for " + builder.name);
     }
-
     this.addDistribution(builder);
 
     return this;
@@ -113,7 +114,6 @@ export class CloudfrontCdkStack2 extends Stack {
     if (!builder.logConfig) {
       throw new Error("Missing logConfig for " + builder.name);
     }
-
     const defaultBehavior = builder.findDefaultBehavior();
     const additionalBehaviors = builder.behaviors.filter((b) =>
       b !== defaultBehavior
@@ -141,6 +141,14 @@ export class CloudfrontCdkStack2 extends Stack {
       );
     });
 
+    const webAcl: CfnWebACL = createWebAcl(
+      this,
+      builder.aliasNames[0] ?? "",
+      builder.wafRules,
+      builder.name,
+      builder.logGroupName,
+    );
+
     const distribution = new Distribution(this, builder.name, {
       defaultBehavior: this.createBehavior(defaultBehavior, builder.logConfig),
       additionalBehaviors: this.createAdditionalBehaviors(
@@ -151,6 +159,7 @@ export class CloudfrontCdkStack2 extends Stack {
       httpVersion: HttpVersion.HTTP2_AND_3,
       defaultRootObject: builder.defaultRootObject,
       certificate,
+      webAclId: webAcl.attrArn,
     });
 
     Tags.of(distribution).add("EnableShieldAdvanced", "true");
@@ -195,7 +204,9 @@ export class CloudfrontCdkStack2 extends Stack {
 
     return {
       realtimeLogConfig: {
-        realtimeLogConfigArn,
+        realtimeLogConfigRef: {
+          realtimeLogConfigArn,
+        },
       } as IRealtimeLogConfig,
       viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       allowedMethods: behavior.allowedMethods,
