@@ -85,18 +85,18 @@ function convertToFeature(
 function convertSuspension(s: PortSuspension): DTSuspension {
   return {
     startTime: s.start_time,
-    endTime: s.end_time,
+    ...(s.end_time && { endTime: s.end_time }),
     prenotification: s.prenotification,
     portsClosed: s.ports_closed,
     dueTo: s.due_to,
-    specifications: s.specifications,
+    ...(s.specifications && { specifications: s.specifications }),
   };
 }
 
 function convertRestriction(r: Restriction): DTRestriction {
   return {
     startTime: r.start_time,
-    endTime: r.end_time,
+    ...(r.end_time && { endTime: r.end_time }),
     textCompilation: r.text_compilation,
   } satisfies DTRestriction;
 }
