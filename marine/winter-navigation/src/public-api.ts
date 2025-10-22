@@ -77,7 +77,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
 function createResources(publicApi: DigitrafficRestApi): Resource {
   const apiResource = publicApi.root.addResource("api");
-  const wnResource = apiResource.addResource("wn");
+  const wnResource = apiResource.addResource("winter-navigation");
   return publicApi.addResourceWithCorsOptionsSubTree(wnResource, "v2");
 }
 
