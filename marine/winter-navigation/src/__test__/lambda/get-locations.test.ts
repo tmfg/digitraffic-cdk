@@ -8,7 +8,11 @@ import {
   PORT_SUSPENSION_LOCATION_1,
   RESTRICTION_1,
 } from "../service/data-updater.test.js";
-import { type DTLocation } from "../../model/dt-apidata.js";
+import {
+  type DTLocation,
+  type LocationFeature,
+  type LocationFeatureCollection,
+} from "../../model/dt-apidata.js";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { saveAllRestrictions } from "../../db/restrictions.js";
 import {
@@ -42,7 +46,10 @@ describe(
     test("get all - empty", async () => {
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectJson([]);
+      ExpectResponse.ok(response).expectJson({
+        "type": "FeatureCollection",
+        "features": [],
+      });
     });
 
     test("get all - one location", async () => {
@@ -50,9 +57,11 @@ describe(
 
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectContent((locations: DTLocation[]) => {
-        expect(locations.length).toEqual(1);
-      });
+      ExpectResponse.ok(response).expectContent(
+        (locations: LocationFeatureCollection) => {
+          expect(locations.features.length).toEqual(1);
+        },
+      );
     });
 
     test("get one - not found", async () => {
@@ -66,15 +75,15 @@ describe(
 
       const response = await getResponseFromLambda({ "location-id": "id1" });
 
-      ExpectResponse.ok(response).expectContent((location: DTLocation) => {
-        expect(location.name).toEqual(LOCATION_1.name);
-        expect(location.restrictions?.length).toEqual(1);
-        expect(location.restrictions![0]!.textCompilation).toEqual(
+      ExpectResponse.ok(response).expectContent((location: LocationFeature) => {
+        expect(location.properties.name).toEqual(LOCATION_1.name);
+        expect(location.properties.restrictions?.length).toEqual(1);
+        expect(location.properties.restrictions![0]!.textCompilation).toEqual(
           RESTRICTION_1.text_compilation,
         );
 
-        expect(location.suspensions?.length).toEqual(1);
-        expect(location.suspensions![0]!.dueTo).toEqual(
+        expect(location.properties.suspensions?.length).toEqual(1);
+        expect(location.properties.suspensions![0]!.dueTo).toEqual(
           PORT_SUSPENSION_1.due_to,
         );
       });

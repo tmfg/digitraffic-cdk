@@ -1,4 +1,4 @@
-import type { FeatureCollection, Geometry } from "geojson";
+import type { Feature, FeatureCollection, Geometry } from "geojson";
 
 export interface DTRestriction {
   readonly startTime: Date;
@@ -9,7 +9,7 @@ export interface DTRestriction {
 export interface DTSuspension {
   readonly startTime: Date;
   readonly endTime?: Date;
-  readonly prenotification: string;
+  readonly prenotification: boolean;
   readonly portsClosed: boolean;
   readonly dueTo: string;
   readonly specifications?: string;
@@ -20,8 +20,6 @@ export interface DTLocation {
   readonly type: string;
   readonly locodeList: string;
   readonly nationality: string;
-  readonly latitude: number;
-  readonly longitude: number;
   readonly winterport: boolean;
   readonly restrictions?: DTRestriction[];
   readonly suspensions?: DTSuspension[];
@@ -107,3 +105,10 @@ export type DirwayFeatureCollection = FeatureCollection<
   Geometry,
   DTDirway
 >;
+export type DirwayFeature = Feature<
+  Geometry,
+  DTDirway
+>;
+
+export type LocationFeatureCollection = FeatureCollection<Geometry, DTLocation>;
+export type LocationFeature = Feature<Geometry, DTLocation>;
