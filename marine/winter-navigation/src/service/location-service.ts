@@ -12,9 +12,10 @@ import * as LocationDB from "../db/locations.js";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import type { PortSuspension, Restriction } from "../model/apidata.js";
 import type { LocationWithRelations } from "../model/db-models.js";
-import type { Feature, Geometry, Point } from "geojson";
+import type { Feature, FeatureCollection, Geometry, Point } from "geojson";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 
-export const LOCATIONS_CHECK = "LOCATIONS_CHECK";
+export const LOCATIONS_CHECK = "WN_LOCATION_CHECK";
 
 export function getLocation(
   locationId: string,
@@ -30,12 +31,15 @@ export function getLocation(
       return Promise.resolve([undefined, lastUpdated ?? undefined]);
     }
 
-    return [convertToFeature(location), lastUpdated ?? undefined];
+    return [{
+      ...convertToFeature(location),
+      lastUpdated,
+    }, lastUpdated ?? undefined];
   });
 }
 
 export function getLocations(): Promise<
-  [LocationFeatureCollection, Date | undefined]
+  [FeatureCollection, Date | undefined]
 > {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const locations = await LocationDB.getLocations(db);
@@ -43,19 +47,12 @@ export function getLocations(): Promise<
       db,
       LOCATIONS_CHECK,
     );
-    const featureCollection = convertToFeatureCollection(locations);
+    const featureCollection = createFeatureCollection(
+      locations.map(convertToFeature),
+      lastUpdated,
+    );
     return [featureCollection, lastUpdated ?? undefined];
   });
-}
-
-function convertToFeatureCollection(
-  locations: LocationWithRelations[],
-): LocationFeatureCollection {
-  const features = locations.map(convertToFeature);
-  return {
-    type: "FeatureCollection",
-    features,
-  };
 }
 
 function convertToFeature(

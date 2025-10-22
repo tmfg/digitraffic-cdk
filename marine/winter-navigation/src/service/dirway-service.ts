@@ -3,41 +3,33 @@ import {
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
 import * as DirwayDB from "../db/dirways.js";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import type { Feature, FeatureCollection, LineString, Point } from "geojson";
 import type { DirwayWithPoints } from "../model/db-models.js";
-import type { DirwayFeatureCollection, DTDirway } from "../model/dt-apidata.js";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
+
+export const DIRWAYS_CHECK = "WN_DIRWAY_CHECK";
 
 export function getDirways(): Promise<[FeatureCollection, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const dirways = await DirwayDB.getDirways(db);
-    const lastUpdated = new Date(); //await LastUpdatedDB.getUpdatedTimestamp(db, LOCATIONS_CHECK);
-    const featureCollection = convertToFeatureCollection(dirways);
+    const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
+      db,
+      DIRWAYS_CHECK,
+    );
+    const featureCollection = createFeatureCollection(
+      dirways.map(convertToFeature),
+      lastUpdated,
+    );
 
     return [featureCollection, lastUpdated ?? undefined];
   });
 }
 
-function convertToFeatureCollection(
-  dirways: DirwayWithPoints[],
-): DirwayFeatureCollection {
-  const features = dirways
-    .map((d) => convertToFeature(d))
-    .filter((f): f is Feature<LineString, DTDirway> => f !== undefined);
-
-  return {
-    type: "FeatureCollection",
-    features,
-  };
-}
-
 function convertToFeature(
   dirway: DirwayWithPoints,
-): Feature<LineString> | Feature<Point> | undefined {
+): Feature<LineString> | Feature<Point> {
   const points = dirway.dirwaypoints;
-
-  if (!points || points.length === 0) {
-    return undefined;
-  }
 
   let geometry: Point | LineString;
 

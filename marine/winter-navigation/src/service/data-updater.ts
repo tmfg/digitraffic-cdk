@@ -18,6 +18,7 @@ import { saveAllActivities } from "../db/activities.js";
 import { saveAllSources } from "../db/sources.js";
 import { saveAllQueues } from "../db/queues.js";
 import { saveAllDirwaypoints, saveAllDirways } from "../db/dirways.js";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 
 type SaveFunction<T> = (db: DTDatabase, objects: T[]) => unknown;
 
@@ -88,9 +89,15 @@ export class DataUpdater {
     apiPath: ApiPath,
     saveObjects: SaveFunction<T>,
   ): Promise<void> {
-    const start = Date.now();
+    const start = new Date();
 
     const from = await getDataVersion(db, tableName);
+
+    await LastUpdatedDB.updateUpdatedTimestamp(
+      db,
+      `${tableName.toUpperCase()}_CHECK`,
+      start,
+    );
 
     if (from === to) {
       logger.info({
@@ -129,7 +136,7 @@ export class DataUpdater {
       customObjectName: tableName,
       customUpdatedCount: updated.length,
       customDeletedCount: deleted.length,
-      tookMs: Date.now() - start,
+      tookMs: Date.now() - start.getTime(),
     });
   }
 }
