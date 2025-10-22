@@ -1,5 +1,6 @@
-import type { Connection, ResultSetHeader } from "mysql2/promise";
+import type { Connection, QueryResult, ResultSetHeader } from "mysql2/promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getTraceFields } from "../util/tracing.js";
 
 const SQL_DELETE_OLD_UDOT_VALUES = `
 DELETE FROM rami_udot
@@ -48,19 +49,30 @@ export async function insertOrUpdate(
   values: UdotUpsertValues,
 ): Promise<void> {
   const method = "UdotDao.insertOrUpdate" as const;
+  const start = Date.now();
 
   try {
     // if both values are false, there is no point inserting it, you can just update existing values if any
     const updateSql = values.ud === false && values.ut === false
       ? SQL_UPDATE_FALSE_VALUES
       : SQL_UPSERT_UDOT_VALUES;
-    const result = (await conn.execute<ResultSetHeader>(updateSql, values))[0];
+    const result = await executeWithRetry<ResultSetHeader>(
+      conn,
+      updateSql,
+      values,
+      3,
+    );
 
     if (result.affectedRows > 0) {
       logger.info({
+        ...getTraceFields(),
         method: "UdotDao.insertOrUpdate",
+        customEvent: "query_completed",
         customAffectedRows: result.affectedRows,
         customTrainNumber: values.trainNumber,
+        customTrainDepartureDate: values.trainDepartureDate,
+        customAttapId: values.attapId,
+        tookMs: Date.now() - start,
       });
 
       // insert history only if something was updated
@@ -68,12 +80,52 @@ export async function insertOrUpdate(
     }
   } catch (error) {
     logger.error({
+      ...getTraceFields(),
       method,
+      customEvent: "query_failed",
       customDoUpdate: (values.ud === false && values.ut === false),
       customSql: SQL_UPSERT_UDOT_VALUES,
+      customTrainNumber: values.trainNumber,
+      customTrainDepartureDate: values.trainDepartureDate,
+      customAttapId: values.attapId,
+      tookMs: Date.now() - start,
       error,
     });
+    throw error;
   }
+}
+
+async function executeWithRetry<T extends QueryResult>(
+  conn: Connection,
+  sql: string,
+  values: UdotUpsertValues,
+  retries: number = 3,
+): Promise<T> {
+  let lastError: unknown;
+  for (let i = 0; i < retries; i++) {
+    try {
+      return (await conn.execute<T>(sql, values))[0];
+    } catch (err: unknown) {
+      lastError = err;
+      logger.warn({
+        ...getTraceFields(),
+        method: "UdotDao.executeWithRetry",
+        message: `Query failed on attempt ${i + 1} of ${retries}.`,
+        customWillRetry: i < retries - 1,
+        customTrainNumber: values.trainNumber,
+        customTrainDepartureDate: values.trainDepartureDate,
+        customAttapId: values.attapId,
+        error: err,
+      });
+      if (i < retries - 1) {
+        // Wait only if we will retry again
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw lastError;
 }
 
 export async function deleteOldValues(conn: Connection): Promise<void> {

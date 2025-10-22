@@ -111,7 +111,11 @@ export const handler = async (
   const firstPath = apiPaths[0];
 
   if (!firstPath) {
-    throw new Error("No paths found");
+    logger.error({
+      method: "collect-os-key-figures.handler",
+      message: "No API paths found in Lambda event",
+    });
+    throw new Error("No API paths found in Lambda event");
   }
 
   logger.info({
@@ -227,6 +231,10 @@ export async function getOsResults(
         apiPath.transportType,
       );
       if (!osFilter) {
+        logger.error({
+          method: "collect-os-key-figures.getOsResults",
+          message: "Could not parse OS search filter from transport type",
+        });
         throw new Error("Could not parse OS search filter from transport type");
       }
       osResults.push(
@@ -281,6 +289,10 @@ async function getRowAmountWithDateNameFilter(
     )) as { count: number }[];
     const firstRow = existingRowsFromDate[0];
     if (!firstRow) {
+      logger.error({
+        method: "collect-os-key-figures.getRowAmountWithDateNameFilter",
+        message: "Could not find any rows",
+      });
       throw new Error("Could not find any rows");
     }
     return Promise.resolve(firstRow[resultKey]);
@@ -329,6 +341,10 @@ async function persistToDatabase(osResults: KeyFigureResult[]) {
   const osResult = osResults[0];
 
   if (!osResult) {
+    logger.error({
+      method: "collect-os-key-figures.persistToDatabase",
+      message: "No OS results available",
+    });
     throw new Error("No OS results available");
   }
 
@@ -435,6 +451,10 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
     for (const pathsKey in paths) {
       const splitResult = pathsKey.split("{")[0];
       if (!splitResult) {
+        logger.error({
+          message: `Couldn't split the path`,
+          method: "collect-os-key-figures.getPaths",
+        });
         throw new Error("Couldn't split the path");
       }
       output.add(splitResult.endsWith("/") ? splitResult : splitResult + "/");

@@ -1,85 +1,83 @@
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
-import type { Handler, SQSEvent } from "aws-lambda";
+import type { Handler, SQSEvent, SQSRecord } from "aws-lambda";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { processUdotMessage } from "../../service/process-udot-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { UnknownDelayOrTrackMessage } from "../../model/dt-rosm-message.js";
+import {
+  createTraceContext,
+  getTraceFields,
+  runWithChildSpan,
+  runWithTraceContext,
+} from "../../util/tracing.js";
 
-/**
- * Sort UDOT messages by their recordedAtTime to ensure they are processed in the correct order.
- * The oldest message is first in the returned array.
- *
- * @param messagesForSameTrainAndDate
- */
-function sortUdotMessages(
-  messagesForSameTrainAndDate: UnknownDelayOrTrackMessage[],
-): UnknownDelayOrTrackMessage[] {
-  return messagesForSameTrainAndDate.sort((a, b) =>
-    a.recordedAtTime.getTime() - b.recordedAtTime.getTime()
-  );
-}
+async function handleSQSRecord(r: SQSRecord): Promise<void> {
+  return runWithChildSpan(async () => {
+    const start = Date.now();
+    const recordBody = r.body;
 
-function groupUdotMessagesByTrainAndDate(
-  event: SQSEvent,
-): { [key: string]: UnknownDelayOrTrackMessage[] } {
-  return event.Records.reduce(
-    (acc: { [s: string]: UnknownDelayOrTrackMessage[] }, r) => {
-      const recordBody = r.body;
+    try {
+      const udotMessage = JSON.parse(
+        recordBody,
+      ) as UnknownDelayOrTrackMessage;
 
-      try {
-        const udotMessage = JSON.parse(
-          recordBody,
-        ) as UnknownDelayOrTrackMessage;
+      logger.info({
+        ...getTraceFields(),
+        method: "RAMI-ProcessUDOTQueue.handleSQSRecord",
+        customEvent: "message_processing_started",
+        customSqsMessageId: r.messageId,
+        customTrainNumber: udotMessage.trainNumber,
+        customTrainDepartureDate: udotMessage.departureDate,
+        customDataRowCount: udotMessage.data.length,
+      });
 
-        const key = `${udotMessage.trainNumber}-${udotMessage.departureDate}`;
-        if (acc[key]) {
-          acc[key].push(udotMessage);
-        } else {
-          acc[key] = [udotMessage];
-        }
-      } catch (error) {
-        logException(logger, error);
-      }
-      return acc;
-    },
-    {},
-  );
+      await processUdotMessage(udotMessage);
+
+      logger.info({
+        ...getTraceFields(),
+        method: "RAMI-ProcessUDOTQueue.handleSQSRecord",
+        customEvent: "message_processing_succeeded",
+        customSqsMessageId: r.messageId,
+        tookMs: Date.now() - start,
+      });
+
+      return Promise.resolve();
+    } catch (error) {
+      logException(logger, error);
+      logger.error({
+        ...getTraceFields(),
+        method: "RAMI-ProcessUDOTQueue.handleSQSRecord",
+        customEvent: "message_processing_failed",
+        customSqsMessageId: r.messageId,
+        tookMs: Date.now() - start,
+        error,
+      });
+      return Promise.reject(error);
+    }
+  });
 }
 
 export function handlerFn(): (
   event: SQSEvent,
 ) => Promise<PromiseSettledResult<void>[]> {
   return async (event: SQSEvent) => {
-    const start = Date.now();
-
-    try {
-      return await Promise.allSettled(
-        Object.values(groupUdotMessagesByTrainAndDate(event))
-          .map(sortUdotMessages)
-          .map(async (udotMessages) => {
-            try {
-              for (const udotMessage of udotMessages) {
-                logger.info({
-                  method: "RAMI-ProcessUDOTQueue.handler",
-                  message:
-                    `processing ${udotMessage.trainNumber} ${udotMessage.departureDate}`,
-                  customCount: udotMessage.data.length,
-                });
-                await processUdotMessage(udotMessage);
-              }
-            } catch (error) {
-              logException(logger, error);
-            }
-          }),
-      );
-    } finally {
-      logger.info({
-        method: "RAMI-ProcessUDOTQueue.handler",
-        tookMs: Date.now() - start,
-        customRecordCount: event.Records.length,
-      });
-    }
+    const startEventProcessing = Date.now();
+    const traceContext = createTraceContext();
+    return await runWithTraceContext(traceContext, async () => {
+      try {
+        return await Promise.allSettled(
+          event.Records.map(handleSQSRecord),
+        );
+      } finally {
+        logger.info({
+          ...getTraceFields(),
+          method: "RAMI-ProcessUDOTQueue.handler",
+          tookMs: Date.now() - startEventProcessing,
+          customRecordCount: event.Records.length,
+        });
+      }
+    });
   };
 }
 

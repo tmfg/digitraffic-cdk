@@ -15,6 +15,7 @@ export class DistributionBuilder {
   defaultRootObject: string = "index.html";
 
   logConfig: string;
+  logGroupName?: string;
   logicalId?: string;
 
   readonly vpcOrigins: Record<string, string> = {};
@@ -77,7 +78,16 @@ export class DistributionBuilder {
     return this;
   }
 
+  public withLogGroupName(name: string): this {
+    this.logGroupName = name;
+
+    return this;
+  }
+
   withAclRule(...wafRules: WafRules[]): this {
+    // clear array - rules can be set at the stack level, but if we also set them here,
+    // then previous ones should be overridden since duplicate rules will fail deployment
+    this.wafRules.length = 0;
     this.wafRules.push(...wafRules);
 
     return this;

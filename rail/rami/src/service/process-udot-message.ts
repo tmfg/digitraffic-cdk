@@ -1,12 +1,13 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
 import type { Connection } from "mysql2/promise";
-import { inTransactionWithRetry } from "../util/database.js";
+import { inTransaction } from "../util/database.js";
 import type {
   UnknownDelayOrTrack,
   UnknownDelayOrTrackMessage,
 } from "../model/dt-rosm-message.js";
 import { insertOrUpdate } from "../dao/udot.js";
+import { getTraceFields } from "../util/tracing.js";
 
 export async function processUdotMessage(
   message: UnknownDelayOrTrackMessage,
@@ -23,47 +24,45 @@ export async function processUdotMessage(
 
     if (rows.length === 0) {
       logger.info({
+        ...getTraceFields(),
         method: "ProcessUdotMessageService.processUdotMessage",
         message:
           `Could not find rows for ${message.trainNumber} ${message.departureDate}`,
+        customTrainNumber: message.trainNumber,
+        customTrainDepartureDate: message.departureDate,
       });
 
       return Promise.resolve();
     }
 
-    //        logger.debug(`rows for ${message.trainNumber} ${message.departureDate} : ${JSON.stringify(rows)}`);
+    await inTransaction(async (conn: Connection): Promise<void> => {
+      for (const datarow of message.data) {
+        const attapId = findAttapId(rows, datarow);
 
-    for (const datarow of message.data) {
-      // find attap_id for each line
-      const attapId = findAttapId(rows, datarow);
+        if (attapId) {
+          foundCount++;
 
-      if (attapId) {
-        foundCount++;
-
-        // each update in own transaction, to prevent locking!
-        await inTransactionWithRetry(
-          async (conn: Connection): Promise<void> => {
-            return await insertOrUpdate(conn, {
-              trainNumber: message.trainNumber,
-              trainDepartureDate: message.departureDate,
-              attapId,
-              messageId: message.messageId,
-              ut: datarow.unknownTrack,
-              ud: datarow.unknownDelay,
-            });
-          },
-        );
-      } else {
-        notFoundCount++;
-
-        //        logRowNotFound(message, datarow, rows);
+          await insertOrUpdate(conn, {
+            trainNumber: message.trainNumber,
+            trainDepartureDate: message.departureDate,
+            attapId,
+            messageId: message.messageId,
+            ut: datarow.unknownTrack,
+            ud: datarow.unknownDelay,
+          });
+        } else {
+          notFoundCount++;
+        }
       }
-    }
+    });
   } finally {
     logger.info({
+      ...getTraceFields(),
       method: "ProcessUdotMessageService.processUdotMessage",
       message:
         `udot for ${message.trainNumber} ${message.departureDate} processed`,
+      customTrainNumber: message.trainNumber,
+      customTrainDepartureDate: message.departureDate,
       tookMs: Date.now() - start,
       customFoundCount: foundCount,
       customNotFoundCount: notFoundCount,
@@ -71,6 +70,8 @@ export async function processUdotMessage(
   }
 }
 
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function logRowNotFound(
   message: UnknownDelayOrTrackMessage,
   datarow: UnknownDelayOrTrack,

@@ -34,18 +34,42 @@ export async function expectRowCount(
   });
 }
 
-export function dbTestBase(fn: JestEmptyFunction): JestEmptyFunction {
+export interface TestConfiguration {
+  beforeAll?: (db: Connection) => Promise<void>;
+  afterAll?: (db: Connection) => Promise<void>;
+  beforeEach?: (db: Connection) => Promise<void>;
+}
+
+export function dbTestBase(
+  fn: JestEmptyFunction,
+  config?: TestConfiguration,
+): JestEmptyFunction {
   return () => {
     beforeAll(async () => {
-      await mysql.inTransaction(truncate);
+      await mysql.inTransaction(async (db) => {
+        await truncate(db);
+        if (config?.beforeAll) {
+          await config.beforeAll(db);
+        }
+      });
     });
 
     afterAll(async () => {
-      await mysql.inTransaction(truncate);
+      await mysql.inTransaction(async (db) => {
+        await truncate(db);
+        if (config?.afterAll) {
+          await config.afterAll(db);
+        }
+      });
     });
 
     beforeEach(async () => {
-      await mysql.inTransaction(truncate);
+      await mysql.inTransaction(async (db) => {
+        await truncate(db);
+        if (config?.beforeEach) {
+          await config.beforeEach(db);
+        }
+      });
     });
 
     fn();

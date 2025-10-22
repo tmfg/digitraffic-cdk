@@ -3,6 +3,10 @@ import type {
   ExcludedAWSRules,
 } from "@digitraffic/common/dist/aws/infra/acl-builder";
 
+interface PathLimit {
+  path: RegExp;
+  limit: number;
+}
 export class WafRules {
   readonly awsCommonRuleSets: "all" | AWSManagedWafRule[];
   readonly excludedRules: ExcludedAWSRules | undefined;
@@ -12,6 +16,7 @@ export class WafRules {
   readonly perIpWithoutHeader?: number;
   readonly perIpAndQueryWithHeader?: number;
   readonly perIpAndQueryWithoutHeader?: number;
+  readonly perIpAndQueryWithoutHeaderByPath?: PathLimit;
 
   readonly isCountOnly?: boolean;
 
@@ -22,6 +27,7 @@ export class WafRules {
     perIpWithoutHeader?: number,
     perIpAndQueryWithHeader?: number,
     perIpAndQueryWithoutHeader?: number,
+    perIpAndQueryWithoutHeaderByPath?: PathLimit,
     excludedRules?: ExcludedAWSRules,
     isCountOnly: boolean = false,
   ) {
@@ -37,6 +43,7 @@ export class WafRules {
     this.perIpWithoutHeader = perIpWithoutHeader;
     this.perIpAndQueryWithHeader = perIpAndQueryWithHeader;
     this.perIpAndQueryWithoutHeader = perIpAndQueryWithoutHeader;
+    this.perIpAndQueryWithoutHeaderByPath = perIpAndQueryWithoutHeaderByPath;
     this.excludedRules = excludedRules;
     this.isCountOnly = isCountOnly;
   }
@@ -46,13 +53,15 @@ export class WafRules {
     perIpWithoutHeader: number,
     perIpAndQueryWithHeader?: number,
     perIpAndQueryWithoutHeader?: number,
+    perIpAndQueryWithoutHeaderByPath?: PathLimit,
   ): void {
     const minimumLimit = 50;
     if (
       perIpWithHeader < minimumLimit ||
       perIpWithoutHeader < minimumLimit ||
       (perIpAndQueryWithHeader ?? minimumLimit) < minimumLimit ||
-      (perIpAndQueryWithoutHeader ?? minimumLimit) < minimumLimit
+      (perIpAndQueryWithoutHeader ?? minimumLimit) < minimumLimit ||
+      (perIpAndQueryWithoutHeaderByPath?.limit ?? minimumLimit) < minimumLimit
     ) {
       throw new Error("Minimum limit is 50");
     }
@@ -63,6 +72,7 @@ export class WafRules {
     perIpWithoutHeader: number,
     perIpAndQueryWithHeader?: number,
     perIpAndQueryWithoutHeader?: number,
+    perIpAndQueryWithoutHeaderByPath?: PathLimit,
     excludedRules?: ExcludedAWSRules,
   ): WafRules {
     WafRules.checkLimits(
@@ -79,6 +89,7 @@ export class WafRules {
       perIpWithoutHeader,
       perIpAndQueryWithHeader,
       perIpAndQueryWithoutHeader,
+      perIpAndQueryWithoutHeaderByPath,
       excludedRules,
     );
   }
@@ -88,6 +99,7 @@ export class WafRules {
     perIpWithoutHeader?: number,
     perIpAndQueryWithHeader?: number,
     perIpAndQueryWithoutHeader?: number,
+    perIpAndQueryWithoutHeaderByPath?: PathLimit,
   ): WafRules {
     return new WafRules(
       [],
@@ -96,6 +108,7 @@ export class WafRules {
       perIpWithoutHeader,
       perIpAndQueryWithHeader,
       perIpAndQueryWithoutHeader,
+      perIpAndQueryWithoutHeaderByPath,
       undefined,
       true,
     );
@@ -123,6 +136,7 @@ export class WafRules {
       perIpWithoutHeader,
       perIpAndQueryWithHeader,
       perIpAndQueryWithoutHeader,
+      undefined,
       excludedRules,
     );
   }

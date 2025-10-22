@@ -10,6 +10,7 @@ below as marine, then run `update-db.sh`
 CREATE USER marinecam WITH PASSWORD 'marinecam';
 
 GRANT marinecam TO dt_superuser;
+-- GRANT marinecam TO marine; -- local db
 
 CREATE SCHEMA marinecam AUTHORIZATION marinecam;
 ```

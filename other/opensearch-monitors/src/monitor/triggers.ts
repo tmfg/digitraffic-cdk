@@ -81,7 +81,10 @@ function makeRunbookLink(runbookSearchLink: string, term: string): string {
  * @param name e.g. ROAD TST RUNBOOK-A1
  * @param runbookSearchLink e.g. https://example.com/search/SEARCH_TERM
  */
-function replaceRunbookWithSearchLink(name: string, runbookSearchLink: string) {
+function replaceRunbookWithSearchLink(
+  name: string,
+  runbookSearchLink: string,
+): string {
   return name.replace(/\bRUNBOOK-[A-Z0-9]+\b/g, (match: string) => {
     return makeRunbookLink(runbookSearchLink, match);
   });
