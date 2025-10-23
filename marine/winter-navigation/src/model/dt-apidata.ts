@@ -1,5 +1,12 @@
 import type { Feature, FeatureCollection, Geometry } from "geojson";
+import { z } from "zod";
 
+import {
+  FeatureCollectionSchema,
+  FeatureSchema,
+  GeometrySchema,
+  PointSchema,
+} from "@digitraffic/common/dist/types/geojson";
 export interface DTRestriction {
   readonly startTime: Date;
   readonly endTime?: Date;
@@ -100,15 +107,6 @@ export interface DTDirway {
   readonly name: string;
   readonly description: string;
 }
-
-export type DirwayFeatureCollection = FeatureCollection<
-  Geometry,
-  DTDirway
->;
-export type DirwayFeature = Feature<
-  Geometry,
-  DTDirway
->;
 
 export type LocationFeatureCollection = FeatureCollection<Geometry, DTLocation>;
 export type LocationFeature = Feature<Geometry, DTLocation>;

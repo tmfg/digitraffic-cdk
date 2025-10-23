@@ -44,11 +44,6 @@ export function getVessels(
         (!!v.activities && v.activities.length > 0)
       )
       .map(convertVessel);
-
-    logger.info({
-      method: "GetVessels.getVessels",
-      message: JSON.stringify(dtVessels),
-    });
     return [dtVessels, lastUpdated ?? undefined];
   });
 }

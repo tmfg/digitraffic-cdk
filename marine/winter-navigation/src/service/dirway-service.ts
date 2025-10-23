@@ -4,9 +4,10 @@ import {
 } from "@digitraffic/common/dist/database/database";
 import * as DirwayDB from "../db/dirways.js";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-import type { Feature, FeatureCollection, LineString, Point } from "geojson";
+import type { FeatureCollection, LineString, Point } from "geojson";
 import type { DirwayWithPoints } from "../model/db-models.js";
 import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
+import type { DirwayFeature } from "../model/public-api-model.js";
 
 export const DIRWAYS_CHECK = "WN_DIRWAY_CHECK";
 
@@ -28,7 +29,7 @@ export function getDirways(): Promise<[FeatureCollection, Date | undefined]> {
 
 function convertToFeature(
   dirway: DirwayWithPoints,
-): Feature<LineString> | Feature<Point> {
+): DirwayFeature {
   const points = dirway.dirwaypoints;
 
   let geometry: Point | LineString;
@@ -55,5 +56,5 @@ function convertToFeature(
       description: dirway.description,
     },
     geometry,
-  } as Feature<Point> | Feature<LineString>;
+  };
 }

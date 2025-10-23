@@ -1198,8 +1198,8 @@ importers:
   ../../marine/winter-navigation:
     dependencies:
       '@digitraffic/common':
-        specifier: 2025.10.16-2
-        version: 2025.10.16-2(@aws-sdk/client-api-gateway@3.911.0)(@aws-sdk/client-s3@3.911.0)(@aws-sdk/client-secrets-manager@3.911.0)(@aws-sdk/client-sns@3.911.0)(@aws-sdk/lib-storage@3.911.0(@aws-sdk/client-s3@3.911.0))(@date-fns/tz@1.4.1)(@smithy/fetch-http-handler@5.3.4)(@smithy/node-http-handler@4.4.2)(aws-cdk-lib@2.214.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(geojson-validation@1.0.2)(ky@1.10.0)(lodash-es@4.17.21)(pg-native@3.5.2)(pg-promise@11.15.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2))))(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(zod@3.25.76)
+        specifier: 2025.10.21-1
+        version: 2025.10.21-1(@aws-sdk/client-api-gateway@3.911.0)(@aws-sdk/client-s3@3.911.0)(@aws-sdk/client-secrets-manager@3.911.0)(@aws-sdk/client-sns@3.911.0)(@aws-sdk/lib-storage@3.911.0(@aws-sdk/client-s3@3.911.0))(@date-fns/tz@1.4.1)(@smithy/fetch-http-handler@5.3.4)(@smithy/node-http-handler@4.4.2)(aws-cdk-lib@2.214.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(geojson-validation@1.0.2)(ky@1.10.0)(lodash-es@4.17.21)(pg-native@3.5.2)(pg-promise@11.15.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2))))(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(zod@4.1.12)
       aws-cdk-lib:
         specifier: ^2.211.0
         version: 2.214.0(constructs@10.4.2)
@@ -1219,8 +1219,8 @@ importers:
         specifier: ^11.15.0
         version: 11.15.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))
       zod:
-        specifier: ~3.25.76
-        version: 3.25.76
+        specifier: ~4.1.12
+        version: 4.1.12
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -3399,30 +3399,6 @@ packages:
   '@dependents/detective-less@5.0.1':
     resolution: {integrity: sha512-Y6+WUMsTFWE5jb20IFP4YGa5IrGY/+a/FbOSjDF/wz9gepU2hwCYSXRHP/vPwBvwcY3SVMASt4yXxbXNXigmZQ==}
     engines: {node: '>=18'}
-
-  '@digitraffic/common@2025.10.16-2':
-    resolution: {integrity: sha512-0f4MmJ8LYn5xHCwxTGQIjd0Xe0p9MmmF+Con1rvzg5azi2AFWibhOJxdvcR9Sv/G75XG634WvrZ0ApDj6iPNAw==}
-    engines: {node: '>=22 <23'}
-    peerDependencies:
-      '@aws-sdk/client-api-gateway': ^3.896.0
-      '@aws-sdk/client-s3': ^3.896.0
-      '@aws-sdk/client-secrets-manager': ^3.896.0
-      '@aws-sdk/client-sns': ^3.896.0
-      '@aws-sdk/lib-storage': ^3.896.0
-      '@date-fns/tz': ^1.4.1
-      '@smithy/fetch-http-handler': ^5.2.1
-      '@smithy/node-http-handler': ^4.2.1
-      aws-cdk-lib: ^2.217.0
-      change-case: ^5.4.4
-      constructs: ^10.4.2
-      date-fns: ^4.1.0
-      geojson-validation: ^1.0.2
-      ky: ^1.10.0
-      lodash-es: ^4.17.21
-      pg-native: ^3.5.2
-      pg-promise: ^12.1.3
-      pg-query-stream: ^4.10.3
-      zod: ^3.25.76
 
   '@digitraffic/common@2025.10.21-1':
     resolution: {integrity: sha512-xDS6CKHP5v+jNFZ8j4+TZ5RVxaLXwmzuAo7OkU2KNDL0IPk1yBqvYPJH0qb9ToqXYdOJHGQmMbHerr8b6QBY2g==}
@@ -8702,9 +8678,6 @@ packages:
     resolution: {integrity: sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==}
     engines: {node: '>=12.20'}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
   zod@4.1.12:
     resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
 
@@ -10265,7 +10238,7 @@ snapshots:
       gonzales-pe: 4.3.0
       node-source-walk: 7.0.1
 
-  '@digitraffic/common@2025.10.16-2(@aws-sdk/client-api-gateway@3.911.0)(@aws-sdk/client-s3@3.911.0)(@aws-sdk/client-secrets-manager@3.911.0)(@aws-sdk/client-sns@3.911.0)(@aws-sdk/lib-storage@3.911.0(@aws-sdk/client-s3@3.911.0))(@date-fns/tz@1.4.1)(@smithy/fetch-http-handler@5.3.4)(@smithy/node-http-handler@4.4.2)(aws-cdk-lib@2.214.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(geojson-validation@1.0.2)(ky@1.10.0)(lodash-es@4.17.21)(pg-native@3.5.2)(pg-promise@11.15.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2))))(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(zod@3.25.76)':
+  '@digitraffic/common@2025.10.21-1(@aws-sdk/client-api-gateway@3.911.0)(@aws-sdk/client-s3@3.911.0)(@aws-sdk/client-secrets-manager@3.911.0)(@aws-sdk/client-sns@3.911.0)(@aws-sdk/lib-storage@3.911.0(@aws-sdk/client-s3@3.911.0))(@date-fns/tz@1.4.1)(@smithy/fetch-http-handler@5.3.4)(@smithy/node-http-handler@4.4.2)(aws-cdk-lib@2.214.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(geojson-validation@1.0.2)(ky@1.10.0)(lodash-es@4.17.21)(pg-native@3.5.2)(pg-promise@11.15.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2))))(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(zod@4.1.12)':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.911.0
       '@aws-sdk/client-s3': 3.911.0
@@ -10285,7 +10258,7 @@ snapshots:
       pg-native: 3.5.2
       pg-promise: 11.15.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))
       pg-query-stream: 4.10.3(pg@8.16.3(pg-native@3.5.2))
-      zod: 3.25.76
+      zod: 4.1.12
 
   '@digitraffic/common@2025.10.21-1(@aws-sdk/client-api-gateway@3.911.0)(@aws-sdk/client-s3@3.911.0)(@aws-sdk/client-secrets-manager@3.911.0)(@aws-sdk/client-sns@3.911.0)(@aws-sdk/lib-storage@3.911.0(@aws-sdk/client-s3@3.911.0))(@date-fns/tz@1.4.1)(@smithy/fetch-http-handler@5.3.4)(@smithy/node-http-handler@4.4.2)(aws-cdk-lib@2.220.0(constructs@10.4.2))(change-case@5.4.4)(constructs@10.4.2)(date-fns@4.1.0)(geojson-validation@1.0.2)(ky@1.13.0)(lodash-es@4.17.21)(pg-native@3.5.2)(pg-promise@12.1.3(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2))))(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2)))(zod@4.1.12)':
     dependencies:
@@ -18154,8 +18127,6 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yocto-queue@1.2.1: {}
-
-  zod@3.25.76: {}
 
   zod@4.1.12: {}
 

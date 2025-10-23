@@ -8,16 +8,13 @@ import { z, ZodError } from "zod";
 const proxyHolder = ProxyHolder.create();
 
 const GetVesselSchema = z.object({
-  "vesselId": z.coerce.number().optional(),
+  // path parameter
+  "vesselId": z.string().transform(Number).optional(),
   // query parameters absent from original request appear as empty strings in Lambda event
-  "activeFrom": z.preprocess(
-    (val) => (val === "" ? undefined : val),
-    z.coerce.date().optional(),
-  ),
-  "activeTo": z.preprocess(
-    (val) => (val === "" ? undefined : val),
-    z.coerce.date().optional(),
-  ),
+  "activeFrom": z.string().transform((val) => val ? new Date(val) : undefined)
+    .optional(),
+  "activeTo": z.string().transform((val) => val ? new Date(val) : undefined)
+    .optional(),
 }).strict();
 
 export type GetVesselEvent = z.input<typeof GetVesselSchema>;

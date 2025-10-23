@@ -78,7 +78,7 @@ describe(
     });
 
     test("get one - not found", async () => {
-      const response = await getResponseFromLambda({ "vesselId": 123 });
+      const response = await getResponseFromLambda({ "vesselId": "123" });
 
       ExpectResponse.notFound(response);
     });
@@ -87,7 +87,7 @@ describe(
       await insertVessel(db);
 
       const response = await getResponseFromLambda({
-        "vesselId": VESSEL_1.imo ?? 123,
+        "vesselId": String(VESSEL_1.imo) ?? "123",
       });
 
       ExpectResponse.ok(response).expectContent((vessel: DTVessel) => {
