@@ -60,7 +60,6 @@ function convertToFeature(
 ): Feature<Point, DTLocation> {
   return {
     type: "Feature",
-    id: location.id,
     geometry: {
       type: "Point",
       coordinates: [location.longitude, location.latitude],

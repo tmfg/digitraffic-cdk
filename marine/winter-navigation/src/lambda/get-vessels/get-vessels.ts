@@ -59,7 +59,7 @@ export const handler = async (
       : LambdaResponse.okJson(vessels);
   } catch (error) {
     if (error instanceof ZodError) {
-      logger.info({
+      logger.error({
         method: "GetVessels.handler",
         message: JSON.stringify(error.issues),
       });

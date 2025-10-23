@@ -29,11 +29,13 @@ describe(
   dbTestBase((db: DTDatabase) => {
     test("get all - empty", async () => {
       const response = await getResponseFromLambda();
-
-      ExpectResponse.ok(response).expectJson({
-        "type": "FeatureCollection",
-        "features": [],
-      });
+      ExpectResponse.ok(response).expectContent(
+        (body: DirwayFeatureCollection) => {
+          expect(body.type).toEqual("FeatureCollection");
+          expect(body.features).toEqual([]);
+          expect(body).toHaveProperty("lastUpdated");
+        },
+      );
     });
 
     test("get all - one dirway", async () => {

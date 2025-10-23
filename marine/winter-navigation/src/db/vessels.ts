@@ -28,7 +28,8 @@ all_queue_relations AS (
         q.id AS queue_id,
         q.vessel_id AS related_vessel_id
     FROM wn_queue q
-    WHERE q.deleted = false AND q.vessel_id = (SELECT id FROM target_vessel) AND
+    JOIN target_vessel tv ON q.vessel_id = tv.id
+    WHERE q.deleted = false AND
           (
             -- end_time may be null
             (q.end_time IS NOT NULL AND q.start_time <= COALESCE($2::timestamp, 'infinity') AND q.end_time >= COALESCE($1::timestamp, '-infinity'))
@@ -43,7 +44,8 @@ all_queue_relations AS (
         s.vessel_id AS related_vessel_id
     FROM wn_queue q
     JOIN wn_source s ON q.icebreaker_id = s.id
-    WHERE q.deleted = false AND s.vessel_id = (SELECT id FROM target_vessel) AND
+    JOIN target_vessel tv ON s.vessel_id = tv.id
+    WHERE q.deleted = false AND
           (
             -- end_time may be null
             (q.end_time IS NOT NULL AND q.start_time <= COALESCE($2::timestamp, 'infinity') AND q.end_time >= COALESCE($1::timestamp, '-infinity'))
@@ -82,7 +84,8 @@ all_activity_relations AS (
         a.id AS activity_id,
         a.vessel_id AS related_vessel_id
     FROM wn_activity a
-    WHERE a.deleted = false AND a.vessel_id = (SELECT id FROM target_vessel) AND
+    JOIN target_vessel tv ON a.vessel_id = tv.id
+    WHERE a.deleted = false AND
           (
             -- end_time may be null
             (a.end_time IS NOT NULL AND a.start_time <= COALESCE($2::timestamp, 'infinity') AND a.end_time >= COALESCE($1::timestamp, '-infinity'))
@@ -97,7 +100,8 @@ all_activity_relations AS (
         s.vessel_id AS related_vessel_id
     FROM wn_activity a
     JOIN wn_source s ON a.icebreaker_id = s.id
-    WHERE a.deleted = false AND s.vessel_id = (SELECT id FROM target_vessel) AND
+    JOIN target_vessel tv ON s.vessel_id = tv.id
+    WHERE a.deleted = false AND
           (
             -- end_time may be null
             (a.end_time IS NOT NULL AND a.start_time <= COALESCE($2::timestamp, 'infinity') AND a.end_time >= COALESCE($1::timestamp, '-infinity'))
@@ -144,10 +148,9 @@ SELECT
   COALESCE(va.activities, '[]'::json) AS activities
 FROM
   wn_vessel v
+  JOIN target_vessel tv ON v.id = tv.id
   LEFT JOIN vessel_queues vq ON v.id = vq.related_vessel_id
   LEFT JOIN vessel_activities va ON v.id = va.related_vessel_id
-WHERE
-  v.id = (SELECT id FROM target_vessel);
 `;
 
 const SQL_GET_VESSELS = `

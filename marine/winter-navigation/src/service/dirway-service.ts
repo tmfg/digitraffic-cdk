@@ -50,7 +50,6 @@ function convertToFeature(
 
   return {
     type: "Feature",
-    id: dirway.id,
     properties: {
       name: dirway.name,
       description: dirway.description,

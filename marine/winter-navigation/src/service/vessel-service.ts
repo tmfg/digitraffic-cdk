@@ -105,7 +105,7 @@ function convertActivity(a: Activity, v: Vessel): DTActivity {
       ...baseActivity,
       assistedVessel: {
         ...(a.vessel_imo && { imo: a.vessel_imo }),
-        ...(a.vessel_mmsi && { imo: a.vessel_mmsi }),
+        ...(a.vessel_mmsi && { mmsi: a.vessel_mmsi }),
         name: a.vessel_name,
       },
     };
@@ -130,7 +130,7 @@ function convertQueue(q: Queue, v: Vessel): PlannedAssistance {
     return {
       assistedVessel: {
         ...(q.vessel_imo && { imo: q.vessel_imo }),
-        ...(q.vessel_mmsi && { imo: q.vessel_mmsi }),
+        ...(q.vessel_mmsi && { mmsi: q.vessel_mmsi }),
         name: q.vessel_name,
       },
       ...baseAssistance,
