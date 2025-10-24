@@ -8,12 +8,24 @@ changes.
 ## Prerequisites
 
 1. Install Prerequisites
-   - awscli entr deno
+   - awscli entr
      ```
      brew update
-     brew install awscli entr deno
+     brew install awscli entr
      ```
    - [Command Line Tools for Xcode](https://developer.apple.com/download/more/?q=Command%20Line%20Tools)
+
+2. Init rush, (e.g., installs Git hooks).
+
+```shell
+rush install
+```
+
+Later if you do changes to hooks, just run `rush install` again.
+
+Hooks are defined in [common/git-hooks](common/git-hooks) and currently
+pre-commit hook reorders package.json and other files are formated with deno
+fmt.
 
 ## Workflow
 
@@ -26,6 +38,21 @@ changes.
 6. Develop!
 
 One-off builds can also be run with `pnpm build`
+
+## Formatting files
+
+Formating is done before commit with
+[common/git-hooks/pre-commit](common/git-hooks/pre-commit)
+
+Manually formatting can be done with the following commands.
+
+Format code is done with `deno fmt` that can be run with
+
+    rush run:format
+
+To format package.json files run
+
+    rush run:format-package-json
 
 ## Creating a new project
 

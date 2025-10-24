@@ -11,11 +11,25 @@ Projects are categorized as:
 
 ## Links
 
-- [Developer guide](https://github.com/tmfg/digitraffic-cdk/blob/master/DEVELOPMENT.md)
-- [Architecture](https://github.com/tmfg/digitraffic-cdk/blob/master/ARCHITECTURE.md)
-- [Conventions](https://github.com/tmfg/digitraffic-cdk/blob/master/CONVENTIONS.md)
+- [Developer guide](DEVELOPMENT.md)
+- [Architecture](ARCHITECTURE.md)
+- [Conventions](CONVENTIONS.md)
 
 Digitraffic is operated by [Fintraffic](https://www.fintraffic.fi)
+
+## TL;DR
+
+Init rush, (e.g., installs Git hooks).
+
+```shell
+rush install
+```
+
+Update dependencies for all projects
+
+```shell
+rush update
+```
 
 ## Format
 

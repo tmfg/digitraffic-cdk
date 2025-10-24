@@ -15,17 +15,17 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.9.26-1",
-    "@aws-sdk/lib-storage": "^3.896.0",
     "@aws-sdk/client-s3": "^3.896.0",
+    "@aws-sdk/lib-storage": "^3.896.0",
+    "@digitraffic/common": "2025.9.26-1",
     "aws-cdk-lib": "^2.217.0",
     "aws-sdk": "^2.1692.0",
     "constructs": "~10.4.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
+    "@digitraffic/eslint-config": "workspace:*",
     "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",

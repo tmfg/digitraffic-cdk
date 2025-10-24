@@ -33,10 +33,10 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@date-fns/tz": "^1.4.1",
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/eslint-config": "workspace:*",
-    "@date-fns/tz": "^1.4.1",
     "@jest/globals": "^30.2.0",
     "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.3",
