@@ -18,7 +18,7 @@ export class AvoinDataStack extends Stack {
     this.graphQL(props);
   }
 
-  private common(props: RataProps) {
+  private common(props: RataProps): void {
     const ecsCluster: ecs.ICluster = ecs.Cluster.fromClusterArn(
       this,
       "ecsCluster",
@@ -81,8 +81,7 @@ export class AvoinDataStack extends Stack {
       value: updaterTaskDefinition.taskDefinitionArn,
     });
 
-    // @ts-ignore
-    const updaterEcsTaskRole = iam.Role.fromRoleArn(
+    iam.Role.fromRoleArn(
       this,
       "updaterTaskRole",
       props.avoinData.updater.ecsTaskRoleArn,
