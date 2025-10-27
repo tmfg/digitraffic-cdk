@@ -118,8 +118,23 @@ export class Behavior {
       .withApiKey(param2.apiKey);
   }
 
-  public static apiGatewayPlain(path: string, originUrl: string): Behavior {
-    return new Behavior(path, Origin.apiGateway(originUrl))
+  public static apiGatewayPlain(path: string, originUrl: string): Behavior;
+  public static apiGatewayPlain(
+    path: string,
+    endpointMetadata: EndpointMetadata,
+  ): Behavior;
+
+  public static apiGatewayPlain(
+    path: string,
+    param2: string | EndpointMetadata,
+  ): Behavior {
+    if (typeof param2 === "string") {
+      return new Behavior(path, Origin.apiGateway(param2))
+        .withAllowAllMethods();
+    }
+
+    return new Behavior(path, Origin.apiGateway(param2.endpointUrl))
+      .withApiKey(param2.apiKey)
       .withAllowAllMethods();
   }
 
