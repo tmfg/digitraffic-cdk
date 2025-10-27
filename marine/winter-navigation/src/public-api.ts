@@ -1,14 +1,18 @@
-import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import type { JsonSchema, Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import { locationSchema } from "./model/location-schema.js";
-import { vesselSchema } from "./model/vessel-schema.js";
-import { dirwaySchema } from "./model/dirway-schema.js";
+import { toJSONSchema } from "zod";
+import {
+  DirwayFeatureCollectionSchema,
+  LocationFeatureCollectionSchema,
+  VesselSchema,
+} from "./model/public-api-model.js";
+import { omitDeep } from "@digitraffic/common/dist/utils/utils";
 
 const WN_TAGS_V2 = ["Winter Navigation V2"];
 
@@ -20,8 +24,13 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
   const v2Resource = createResources(publicApi);
 
   const locationsModel = publicApi.addJsonModel(
-    "LocationsModel",
-    locationSchema,
+    "Locations",
+    omitDeep(
+      toJSONSchema(LocationFeatureCollectionSchema, {
+        target: "openapi-3.0",
+      }) as JsonSchema,
+      "pattern",
+    ),
   );
   const [locationResource, locationsResource] = createLocationResources(
     stack,
@@ -29,14 +38,30 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     locationsModel,
   );
 
-  const vesselsModel = publicApi.addJsonModel("VesselsModel", vesselSchema);
+  const vesselsModel = publicApi.addJsonModel(
+    "Vessels",
+    omitDeep(
+      toJSONSchema(VesselSchema, {
+        target: "openapi-3.0",
+      }) as JsonSchema,
+      "pattern",
+    ),
+  );
   const [vesselResource, vesselsResource] = createVesselResources(
     stack,
     v2Resource,
     vesselsModel,
   );
 
-  const dirwaysModel = publicApi.addJsonModel("DirwaysModel", dirwaySchema);
+  const dirwaysModel = publicApi.addJsonModel(
+    "Dirways",
+    omitDeep(
+      toJSONSchema(DirwayFeatureCollectionSchema, {
+        target: "openapi-3.0",
+      }) as JsonSchema,
+      "pattern",
+    ),
+  );
   const dirwaysResource = createDirwayResources(
     stack,
     v2Resource,
@@ -60,11 +85,27 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
   publicApi.documentResource(
     vesselResource,
     DocumentationPart.method(WN_TAGS_V2, "GetVessel", "Return one vessel"),
+    DocumentationPart.queryParameter(
+      "activeFrom",
+      "An ISO 8601 date-time. Filters for vessels with related activities or planned assistances starting or in progress after this time.",
+    ),
+    DocumentationPart.queryParameter(
+      "activeTo",
+      "An ISO 8601 date-time. Filters for vessels with related activities or planned assistances starting or in progress before this time.",
+    ),
   );
 
   publicApi.documentResource(
     vesselsResource,
     DocumentationPart.method(WN_TAGS_V2, "GetVessels", "Return all vessels"),
+    DocumentationPart.queryParameter(
+      "activeFrom",
+      "An ISO 8601 date-time. Filters for vessels with related activities or planned assistances starting or in progress after this time. If omitted, defaults to one week ago.",
+    ),
+    DocumentationPart.queryParameter(
+      "activeTo",
+      "An ISO 8601 date-time. Filters for vessels with related activities or planned assistances starting or in progress before this time.",
+    ),
   );
 
   publicApi.documentResource(

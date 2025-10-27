@@ -88,6 +88,7 @@ function convertSuspension(s: SuspensionDTO): Suspension {
     prenotification: s.prenotification,
     portsClosed: s.ports_closed,
     dueTo: s.due_to,
+    // field name is in plural in the database but in the source data it is singular
     ...(s.specifications && { specifications: s.specifications }),
   };
 }
