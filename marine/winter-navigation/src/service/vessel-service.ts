@@ -2,20 +2,19 @@ import {
   type DTDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
-import type {
-  DTActivity,
-  DTVessel,
-  PlannedAssistance,
-} from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
-import type { Activity, Queue, Vessel } from "../model/apidata.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { ActivityDTO, QueueDTO, VesselDTO } from "../model/dto-model.js";
+import type {
+  Activity,
+  PlannedAssistance,
+  Vessel,
+} from "../model/public-api-model.js";
 
 export function getVessel(
   vesselId: number,
   activeFrom?: Date,
   activeTo?: Date,
-): Promise<[DTVessel | undefined, Date | undefined]> {
+): Promise<[Vessel | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const vessel = await VesselDB.getVessel(db, vesselId, activeFrom, activeTo);
     const lastUpdated = undefined;
@@ -33,7 +32,7 @@ export function getVessel(
 export function getVessels(
   activeFrom?: Date,
   activeTo?: Date,
-): Promise<[DTVessel[], Date | undefined]> {
+): Promise<[Vessel[], Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const vessels = await VesselDB.getVessels(db, activeFrom, activeTo);
     const lastUpdated = undefined;
@@ -49,8 +48,8 @@ export function getVessels(
 }
 
 function convertVessel(
-  v: Vessel,
-): DTVessel {
+  v: VesselDTO,
+): Vessel {
   return {
     name: v.name,
     ...(v.callsign && { callSign: v.callsign }),
@@ -59,7 +58,7 @@ function convertVessel(
     ...(v.imo && { imo: v.imo }),
     ...(v.type && { type: v.type }),
     ...(v.activities && v.activities.length > 0 && {
-      activities: v.activities.map((a): DTActivity => convertActivity(a, v)),
+      activities: v.activities.map((a): Activity => convertActivity(a, v)),
     }),
     ...(v.queues && v.queues.length > 0 && {
       plannedAssistances: v.queues.map((q): PlannedAssistance =>
@@ -69,11 +68,10 @@ function convertVessel(
   };
 }
 
-function convertActivity(a: Activity, v: Vessel): DTActivity {
+function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
   const isIcebreaker = v.mmsi === a.icebreaker_mmsi ||
     v.imo === a.icebreaker_imo;
   const isVessel = v.mmsi === a.vessel_mmsi || v.imo === a.vessel_imo;
-
   const baseActivity = {
     type: a.type,
     ...(a.reason && { reason: a.reason }),
@@ -110,7 +108,7 @@ function convertActivity(a: Activity, v: Vessel): DTActivity {
   return baseActivity;
 }
 
-function convertQueue(q: Queue, v: Vessel): PlannedAssistance {
+function convertQueue(q: QueueDTO, v: VesselDTO): PlannedAssistance {
   const isIcebreaker = v.mmsi === q.icebreaker_mmsi ||
     v.imo === q.icebreaker_imo;
 

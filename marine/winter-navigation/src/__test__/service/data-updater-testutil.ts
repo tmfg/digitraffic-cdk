@@ -1,5 +1,5 @@
 import { type ApiPath, IbnetApi } from "../../api/ibnet-api.js";
-import type { Deleted, Response } from "../../model/apidata.js";
+import type { Deleted, Response } from "../../model/api-db-model.js";
 import { jest } from "@jest/globals";
 import { DataUpdater } from "../../service/data-updater.js";
 import { type TableName } from "../../db/deleted.js";

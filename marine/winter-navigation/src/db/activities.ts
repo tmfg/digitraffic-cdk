@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { ActivityDB } from "../model/apidata.js";
+import type { Activity, ApiData } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_ACTIVITIES = `
@@ -34,7 +34,7 @@ const PS_GET_ACTIVITIES = new pgPromise.PreparedStatement({
 
 export function saveAllActivities(
   db: DTDatabase,
-  activities: ActivityDB[],
+  activities: ApiData<Activity>[],
 ): Promise<unknown> {
   return Promise.all(
     activities.map(async (a) => {
@@ -52,6 +52,6 @@ export function saveAllActivities(
   );
 }
 
-export async function getActivities(db: DTDatabase): Promise<ActivityDB[]> {
+export async function getActivities(db: DTDatabase): Promise<Activity[]> {
   return db.manyOrNone(PS_GET_ACTIVITIES);
 }

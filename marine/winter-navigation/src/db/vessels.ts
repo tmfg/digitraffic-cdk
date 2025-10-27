@@ -1,8 +1,9 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Vessel } from "../model/apidata.js";
+import type { ApiData, Vessel } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { subDays } from "date-fns";
+import type { VesselDTO } from "../model/dto-model.js";
 
 const SQL_UPDATE_VESSELS = `
 insert into wn_vessel(id, name, callsign, shortcode, imo, mmsi, type, deleted)
@@ -299,7 +300,7 @@ const PS_GET_VESSELS = new pgPromise.PreparedStatement({
 
 export function saveAllVessels(
   db: DTDatabase,
-  vessels: Vessel[],
+  vessels: ApiData<Vessel>[],
 ): Promise<unknown> {
   return Promise.all(
     vessels.map(async (v) => {
@@ -321,7 +322,7 @@ export async function getVessel(
   vesselId: number,
   activeFrom?: Date,
   activeTo?: Date,
-): Promise<Vessel | undefined> {
+): Promise<VesselDTO | undefined> {
   return await db.oneOrNone(PS_GET_VESSEL, [
     activeFrom ?? subDays(new Date(), 7),
     activeTo,
@@ -334,7 +335,7 @@ export async function getVessels(
   db: DTDatabase,
   activeFrom?: Date,
   activeTo?: Date,
-): Promise<Vessel[]> {
+): Promise<VesselDTO[]> {
   logger.info({
     method: "GetVessels.getVessels",
     message: `from: ${JSON.stringify(activeFrom)} to: ${

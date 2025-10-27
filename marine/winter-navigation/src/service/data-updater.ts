@@ -3,7 +3,7 @@ import {
   inDatabase,
 } from "@digitraffic/common/dist/database/database";
 import { type ApiPath, IbnetApi } from "../api/ibnet-api.js";
-import type { BaseAttributes, Deleted } from "../model/apidata.js";
+import type { ApiMetaData, Deleted } from "../model/api-db-model.js";
 import { setDeleted, type TableName } from "../db/deleted.js";
 import { getDataVersion, updateDataVersion } from "../db/data-version.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -82,7 +82,7 @@ export class DataUpdater {
     });
   }
 
-  async updateObjects<T extends BaseAttributes | Deleted>(
+  async updateObjects<T extends ApiMetaData | Deleted>(
     db: DTDatabase,
     tableName: TableName,
     to: number,

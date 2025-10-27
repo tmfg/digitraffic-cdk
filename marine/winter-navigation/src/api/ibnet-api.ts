@@ -1,4 +1,4 @@
-import type { EndpointResponse } from "../model/apidata.js";
+import type { EndpointResponse } from "../model/api-db-model.js";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";

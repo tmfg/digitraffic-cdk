@@ -1,7 +1,7 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Location } from "../model/apidata.js";
+import type { ApiData, Location } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
-import type { LocationWithRelations } from "../model/db-models.js";
+import type { LocationDTO } from "../model/dto-model.js";
 
 const SQL_UPDATE_LOCATIONS = `
 insert into wn_location(id, name, type, locode_list, nationality, latitude, longitude, winterport, deleted)
@@ -90,7 +90,7 @@ const PS_GET_LOCATIONS = new pgPromise.PreparedStatement({
 
 export async function saveAllLocations(
   db: DTDatabase,
-  locations: Location[],
+  locations: ApiData<Location>[],
 ): Promise<unknown> {
   return Promise.all(
     locations.map(async (l) => {
@@ -111,12 +111,12 @@ export async function saveAllLocations(
 export async function getLocation(
   db: DTDatabase,
   locationId: string,
-): Promise<LocationWithRelations | undefined> {
+): Promise<LocationDTO | undefined> {
   return await db.oneOrNone(PS_GET_LOCATION, [locationId]) ?? undefined;
 }
 
 export async function getLocations(
   db: DTDatabase,
-): Promise<LocationWithRelations[]> {
+): Promise<LocationDTO[]> {
   return db.manyOrNone(PS_GET_LOCATIONS, [null]);
 }

@@ -1,7 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Dirway, Dirwaypoint } from "../model/apidata.js";
+import type { ApiData, Dirway, Dirwaypoint } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
-import type { DirwayWithPoints } from "../model/db-models.js";
+import type { DirwayDTO } from "../model/dto-model.js";
 
 const SQL_UPDATE_DIRWAYS = `
 insert into wn_dirway(id, name, description, deleted)
@@ -69,7 +69,7 @@ const PS_GET_DIRWAYPOINTS = new pgPromise.PreparedStatement({
 
 export function saveAllDirways(
   db: DTDatabase,
-  dirways: Dirway[],
+  dirways: ApiData<Dirway>[],
 ): Promise<unknown> {
   return Promise.all(
     dirways.map(async (d) => {
@@ -80,7 +80,7 @@ export function saveAllDirways(
 
 export function saveAllDirwaypoints(
   db: DTDatabase,
-  dirwaypoints: Dirwaypoint[],
+  dirwaypoints: ApiData<Dirwaypoint>[],
 ): Promise<unknown> {
   return Promise.all(
     dirwaypoints.map(async (d) => {
@@ -96,10 +96,6 @@ export function saveAllDirwaypoints(
   );
 }
 
-export async function getDirways(db: DTDatabase): Promise<DirwayWithPoints[]> {
+export async function getDirways(db: DTDatabase): Promise<DirwayDTO[]> {
   return db.manyOrNone(PS_GET_DIRWAYS);
-}
-
-export async function getDirwaypoints(db: DTDatabase): Promise<Dirwaypoint[]> {
-  return db.manyOrNone(PS_GET_DIRWAYPOINTS);
 }

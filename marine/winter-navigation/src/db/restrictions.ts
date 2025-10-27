@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Restriction } from "../model/apidata.js";
+import type { ApiData, DbData, Restriction } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_RESTRICTIONS = `
@@ -30,7 +30,7 @@ const PS_GET_RESTRICTIONS = new pgPromise.PreparedStatement({
 
 export function saveAllRestrictions(
   db: DTDatabase,
-  restrictions: Restriction[],
+  restrictions: ApiData<Restriction>[],
 ): Promise<unknown> {
   return Promise.all(
     restrictions.map(async (r) => {
@@ -44,6 +44,8 @@ export function saveAllRestrictions(
     }),
   );
 }
-export async function getRestrictions(db: DTDatabase): Promise<Restriction[]> {
+export async function getRestrictions(
+  db: DTDatabase,
+): Promise<DbData<Restriction>[]> {
   return db.manyOrNone(PS_GET_RESTRICTIONS);
 }

@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { QueueDB } from "../model/apidata.js";
+import type { ApiData, Queue } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_QUEUES = `
@@ -27,7 +27,7 @@ const PS_UPDATE_QUEUES = new pgPromise.PreparedStatement({
 
 export function saveAllQueues(
   db: DTDatabase,
-  queues: QueueDB[],
+  queues: ApiData<Queue>[],
 ): Promise<unknown> {
   return Promise.all(
     queues.map(async (q) => {
@@ -43,6 +43,6 @@ export function saveAllQueues(
   );
 }
 
-export async function getQueues(db: DTDatabase): Promise<QueueDB[]> {
+export async function getQueues(db: DTDatabase): Promise<Queue[]> {
   return db.any(SQL_GET_QUEUES);
 }

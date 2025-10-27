@@ -2,24 +2,27 @@ import {
   type DTDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
-import {
-  type DTLocation,
-  type DTRestriction,
-  type DTSuspension,
-  type LocationFeatureCollection,
-} from "../model/dt-apidata.js";
 import * as LocationDB from "../db/locations.js";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-import type { PortSuspension, Restriction } from "../model/apidata.js";
-import type { LocationWithRelations } from "../model/db-models.js";
-import type { Feature, FeatureCollection, Geometry, Point } from "geojson";
+import type {
+  LocationDTO,
+  RestrictionDTO,
+  SuspensionDTO,
+} from "../model/dto-model.js";
+import type { Feature, FeatureCollection, Geometry } from "geojson";
 import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
+import type {
+  Location,
+  LocationFeature,
+  Restriction,
+  Suspension,
+} from "../model/public-api-model.js";
 
 export const LOCATIONS_CHECK = "WN_LOCATION_CHECK";
 
 export function getLocation(
   locationId: string,
-): Promise<[Feature<Geometry, DTLocation> | undefined, Date | undefined]> {
+): Promise<[Feature<Geometry, Location> | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const location = await LocationDB.getLocation(db, locationId);
     const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
@@ -56,8 +59,8 @@ export function getLocations(): Promise<
 }
 
 function convertToFeature(
-  location: LocationWithRelations,
-): Feature<Point, DTLocation> {
+  location: LocationDTO,
+): LocationFeature {
   return {
     type: "Feature",
     geometry: {
@@ -78,7 +81,7 @@ function convertToFeature(
   };
 }
 
-function convertSuspension(s: PortSuspension): DTSuspension {
+function convertSuspension(s: SuspensionDTO): Suspension {
   return {
     startTime: s.start_time,
     ...(s.end_time && { endTime: s.end_time }),
@@ -89,10 +92,10 @@ function convertSuspension(s: PortSuspension): DTSuspension {
   };
 }
 
-function convertRestriction(r: Restriction): DTRestriction {
+function convertRestriction(r: RestrictionDTO): Restriction {
   return {
     startTime: r.start_time,
     ...(r.end_time && { endTime: r.end_time }),
     textCompilation: r.text_compilation,
-  } satisfies DTRestriction;
+  };
 }

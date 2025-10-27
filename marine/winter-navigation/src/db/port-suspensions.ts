@@ -1,9 +1,9 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type {
-  PortSuspension,
+  ApiData,
   PortSuspensionLocation,
-} from "../model/apidata.js";
-import type { PortSuspensionWithLocations } from "../model/db-models.js";
+  Suspension,
+} from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_SUSPENSIONS = `
@@ -26,14 +26,6 @@ values ($1, $2, $3, false)
 on conflict(id)
 do nothing`;
 
-const SQL_GET_SUSPENSIONS =
-  `select ps.id, start_time, end_time, prenotification, ports_closed, due_to, specifications, location_id 
-from wn_port_suspension ps, wn_port_suspension_location wpsl 
-where wpsl.suspension_id = ps.id
-and ps.deleted = false 
-and wpsl.deleted = false 
-order by ps.id, wpsl.id`;
-
 const PS_UPDATE_SUSPENSIONS = new pgPromise.PreparedStatement({
   name: "update-suspensions",
   text: SQL_UPDATE_SUSPENSIONS,
@@ -44,14 +36,9 @@ const PS_UPDATE_SUSPENSION_LOCATIONS = new pgPromise.PreparedStatement({
   text: SQL_UPDATE_SUSPENSION_LOCATIONS,
 });
 
-const PS_GET_SUSPENSIONS = new pgPromise.PreparedStatement({
-  name: "get-suspensions",
-  text: SQL_GET_SUSPENSIONS,
-});
-
 export function saveAllPortSuspensions(
   db: DTDatabase,
-  suspensions: PortSuspension[],
+  suspensions: ApiData<Suspension>[],
 ): Promise<unknown> {
   return Promise.all(
     suspensions.map(async (s) => {
@@ -70,7 +57,7 @@ export function saveAllPortSuspensions(
 
 export function saveAllPortSuspensionLocations(
   db: DTDatabase,
-  locations: PortSuspensionLocation[],
+  locations: ApiData<PortSuspensionLocation>[],
 ): Promise<unknown> {
   return Promise.all(
     locations.map(async (l) => {
@@ -81,10 +68,4 @@ export function saveAllPortSuspensionLocations(
       ]);
     }),
   );
-}
-
-export async function getSuspensions(
-  db: DTDatabase,
-): Promise<PortSuspensionWithLocations[]> {
-  return db.manyOrNone(PS_GET_SUSPENSIONS);
 }

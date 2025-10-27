@@ -8,11 +8,7 @@ import {
   PORT_SUSPENSION_LOCATION_1,
   RESTRICTION_1,
 } from "../service/data-updater.test.js";
-import {
-  type DTLocation,
-  type LocationFeature,
-  type LocationFeatureCollection,
-} from "../../model/dt-apidata.js";
+
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { saveAllRestrictions } from "../../db/restrictions.js";
 import {
@@ -20,6 +16,10 @@ import {
   saveAllPortSuspensions,
 } from "../../db/port-suspensions.js";
 import { mockProxyHolder } from "../mock.js";
+import type {
+  LocationFeature,
+  LocationFeatureCollection,
+} from "../../model/public-api-model.js";
 
 mockProxyHolder();
 

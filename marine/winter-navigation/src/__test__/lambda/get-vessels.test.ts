@@ -12,19 +12,20 @@ import {
   VESSEL_1,
 } from "../service/data-updater.test.js";
 import {
-  type DTVessel,
   isAssistanceGiven,
   isAssistanceReceived,
-} from "../../model/dt-apidata.js";
+  type Vessel as PublicApiVessel,
+} from "../../model/public-api-model.js";
 import { saveAllActivities } from "../../db/activities.js";
 import { mockProxyHolder } from "../mock.js";
 import { saveAllQueues } from "../../db/queues.js";
 import type {
-  ActivityDB,
-  QueueDB,
+  Activity,
+  ApiData,
+  Queue,
   Source,
   Vessel,
-} from "../../model/apidata.js";
+} from "../../model/api-db-model.js";
 import { saveAllSources } from "../../db/sources.js";
 import { subDays } from "date-fns";
 import type { GetVesselEvent } from "../../lambda/get-vessels/get-vessels.js";
@@ -39,10 +40,10 @@ async function insertVessel(db: DTDatabase): Promise<void> {
 async function insertVessels(
   db: DTDatabase,
   props: {
-    vessels: Vessel[];
-    activities?: ActivityDB[];
-    queues?: QueueDB[];
-    sources?: Source[];
+    vessels: ApiData<Vessel>[];
+    activities?: ApiData<Activity>[];
+    queues?: ApiData<Queue>[];
+    sources?: ApiData<Source>[];
   },
 ): Promise<void> {
   await saveAllVessels(db, props.vessels);
@@ -72,7 +73,7 @@ describe(
       await insertVessel(db);
 
       const response = await getResponseFromLambda();
-      ExpectResponse.ok(response).expectContent((vessels: DTVessel[]) => {
+      ExpectResponse.ok(response).expectContent((vessels: Vessel[]) => {
         expect(vessels.length).toEqual(1);
       });
     });
@@ -90,7 +91,7 @@ describe(
         "vesselId": String(VESSEL_1.imo) ?? "123",
       });
 
-      ExpectResponse.ok(response).expectContent((vessel: DTVessel) => {
+      ExpectResponse.ok(response).expectContent((vessel: PublicApiVessel) => {
         expect(vessel.name).toEqual(VESSEL_1.name);
         expect(vessel.activities?.length).toEqual(1);
         expect(vessel.activities![0]!.reason).toEqual(ACTIVITY_1.reason);
@@ -129,43 +130,45 @@ describe(
 
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectContent((vessels: DTVessel[]) => {
-        expect(vessels.length).toEqual(3);
+      ExpectResponse.ok(response).expectContent(
+        (vessels: PublicApiVessel[]) => {
+          expect(vessels.length).toEqual(3);
 
-        const apiIcebreaker = vessels.find((v) => v.imo === icebreaker.imo);
-        const apiAssistedVessel = vessels.find(
-          (v) => v.imo === assistedVessel.imo,
-        );
-        const apiAnotherVessel = vessels.find(
-          (v) => v.imo === anotherVessel.imo,
-        );
+          const apiIcebreaker = vessels.find((v) => v.imo === icebreaker.imo);
+          const apiAssistedVessel = vessels.find(
+            (v) => v.imo === assistedVessel.imo,
+          );
+          const apiAnotherVessel = vessels.find(
+            (v) => v.imo === anotherVessel.imo,
+          );
 
-        expect(apiAssistedVessel?.activities).toHaveLength(1);
-        const receivedActivity = apiAssistedVessel?.activities?.[0];
-        expect(receivedActivity).toEqual(
-          expect.objectContaining({ type: "TOW" }),
-        );
-        if (!receivedActivity || !isAssistanceReceived(receivedActivity)) {
-          fail("Expected activity to be of type AssistanceReceived");
-        }
-        expect(receivedActivity.assistingVessel.imo).toEqual(icebreaker.imo);
+          expect(apiAssistedVessel?.activities).toHaveLength(1);
+          const receivedActivity = apiAssistedVessel?.activities?.[0];
+          expect(receivedActivity).toEqual(
+            expect.objectContaining({ type: "TOW" }),
+          );
+          if (!receivedActivity || !isAssistanceReceived(receivedActivity)) {
+            fail("Expected activity to be of type AssistanceReceived");
+          }
+          expect(receivedActivity.assistingVessel.imo).toEqual(icebreaker.imo);
 
-        expect(apiIcebreaker?.activities).toHaveLength(2);
-        const givenActivity = apiIcebreaker?.activities?.find(
-          (a) => a.type === "TOW",
-        );
-        expect(givenActivity).toBeDefined();
-        if (!givenActivity || !isAssistanceGiven(givenActivity)) {
-          fail("Expected activity to be of type AssistanceGiven");
-        }
-        expect(givenActivity.assistedVessel.imo).toEqual(assistedVessel.imo);
+          expect(apiIcebreaker?.activities).toHaveLength(2);
+          const givenActivity = apiIcebreaker?.activities?.find(
+            (a) => a.type === "TOW",
+          );
+          expect(givenActivity).toBeDefined();
+          if (!givenActivity || !isAssistanceGiven(givenActivity)) {
+            fail("Expected activity to be of type AssistanceGiven");
+          }
+          expect(givenActivity.assistedVessel.imo).toEqual(assistedVessel.imo);
 
-        expect(apiAnotherVessel?.activities).toHaveLength(1);
-        const singleVesselActivity = apiAnotherVessel?.activities?.[0];
-        expect(singleVesselActivity?.type).toEqual("WAIT");
-        expect(singleVesselActivity).not.toHaveProperty("assistedVessel");
-        expect(singleVesselActivity).not.toHaveProperty("assistingVessel");
-      });
+          expect(apiAnotherVessel?.activities).toHaveLength(1);
+          const singleVesselActivity = apiAnotherVessel?.activities?.[0];
+          expect(singleVesselActivity?.type).toEqual("WAIT");
+          expect(singleVesselActivity).not.toHaveProperty("assistedVessel");
+          expect(singleVesselActivity).not.toHaveProperty("assistingVessel");
+        },
+      );
     });
 
     test("get multiple - found with valid planned assistances", async () => {
@@ -191,35 +194,41 @@ describe(
 
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectContent((vessels: DTVessel[]) => {
-        expect(vessels.length).toEqual(2);
-        const apiVessel = vessels.find(
-          (vessel) => vessel.imo === assistedVessel.imo,
-        );
-        const apiIcebreaker = vessels.find(
-          (vessel) => vessel.imo === icebreaker.imo,
-        );
+      ExpectResponse.ok(response).expectContent(
+        (vessels: PublicApiVessel[]) => {
+          expect(vessels.length).toEqual(2);
+          const apiVessel = vessels.find(
+            (vessel) => vessel.imo === assistedVessel.imo,
+          );
+          const apiIcebreaker = vessels.find(
+            (vessel) => vessel.imo === icebreaker.imo,
+          );
 
-        // Check the assisted vessel's planned assistance
-        expect(apiVessel?.plannedAssistances).toHaveLength(1);
-        const receivedAssistance = apiVessel?.plannedAssistances?.[0];
-        if (!receivedAssistance || !isAssistanceReceived(receivedAssistance)) {
-          fail("Expected assistance to be of type AssistanceReceived");
-        }
-        expect(receivedAssistance.assistingVessel.imo).toEqual(
-          icebreaker.imo,
-        );
+          // Check the assisted vessel's planned assistance
+          expect(apiVessel?.plannedAssistances).toHaveLength(1);
+          const receivedAssistance = apiVessel?.plannedAssistances?.[0];
+          if (
+            !receivedAssistance || !isAssistanceReceived(receivedAssistance)
+          ) {
+            fail("Expected assistance to be of type AssistanceReceived");
+          }
+          expect(receivedAssistance.assistingVessel.imo).toEqual(
+            icebreaker.imo,
+          );
 
-        // Check the icebreaker's planned assistance
-        expect(apiIcebreaker?.plannedAssistances).toHaveLength(1);
-        const icebreakerAssistance = apiIcebreaker?.plannedAssistances?.[0];
-        if (!icebreakerAssistance || !isAssistanceGiven(icebreakerAssistance)) {
-          fail("Expected assistance to be of type AssistanceGiven");
-        }
-        expect(icebreakerAssistance.assistedVessel.imo).toEqual(
-          assistedVessel.imo,
-        );
-      });
+          // Check the icebreaker's planned assistance
+          expect(apiIcebreaker?.plannedAssistances).toHaveLength(1);
+          const icebreakerAssistance = apiIcebreaker?.plannedAssistances?.[0];
+          if (
+            !icebreakerAssistance || !isAssistanceGiven(icebreakerAssistance)
+          ) {
+            fail("Expected assistance to be of type AssistanceGiven");
+          }
+          expect(icebreakerAssistance.assistedVessel.imo).toEqual(
+            assistedVessel.imo,
+          );
+        },
+      );
     });
 
     test("get multiple - time ranges are correct", async () => {
@@ -273,15 +282,19 @@ describe(
       // vessels that have been active in the last 7 days or will be in the future
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectContent((vessels: DTVessel[]) => {
-        expect(vessels.length).toEqual(4);
+      ExpectResponse.ok(response).expectContent(
+        (vessels: PublicApiVessel[]) => {
+          expect(vessels.length).toEqual(4);
 
-        const foundIcebreaker3 = vessels.find((v) => v.imo === icebreaker3.imo);
-        expect(foundIcebreaker3).toBeUndefined();
+          const foundIcebreaker3 = vessels.find((v) =>
+            v.imo === icebreaker3.imo
+          );
+          expect(foundIcebreaker3).toBeUndefined();
 
-        const foundVessel3 = vessels.find((v) => v.imo === vessel3.imo);
-        expect(foundVessel3).toBeUndefined();
-      });
+          const foundVessel3 = vessels.find((v) => v.imo === vessel3.imo);
+          expect(foundVessel3).toBeUndefined();
+        },
+      );
     });
   }),
 );

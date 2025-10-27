@@ -1,20 +1,20 @@
 import { randomInt } from "es-toolkit";
 import type {
-  ActivityDB,
+  Activity,
+  ApiData,
   Dirway,
   Dirwaypoint,
   Location,
-  PortSuspension,
   PortSuspensionLocation,
-  QueueDB,
+  Queue,
   Restriction,
   Source,
+  Suspension,
   Vessel,
-} from "../../model/apidata.js";
+} from "../../model/api-db-model.js";
 import { createTestFunctions } from "./data-updater-testutil.js";
-import { addDays } from "date-fns";
 
-export const ACTIVITY_1: ActivityDB = {
+export const ACTIVITY_1: ApiData<Activity> = {
   rv: 0,
   id: "id1",
   vessel_id: "id1",
@@ -26,7 +26,7 @@ export const ACTIVITY_1: ActivityDB = {
   type: "",
 };
 
-const ACTIVITY_1_1: ActivityDB = {
+const ACTIVITY_1_1: ApiData<Activity> = {
   ...ACTIVITY_1,
   ...{ rv: 1, text_compilation: "foo" },
 };
@@ -42,7 +42,7 @@ export function createActivity(
     start_time?: Date;
     end_time?: Date;
   },
-): ActivityDB {
+): ApiData<Activity> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     vessel_id: props.vessel_id ?? "",
@@ -57,7 +57,7 @@ export function createActivity(
   };
 }
 
-export const LOCATION_1: Location = {
+export const LOCATION_1: ApiData<Location> = {
   name: "name",
   type: "type",
   locode_list: "",
@@ -71,7 +71,7 @@ export const LOCATION_1: Location = {
   deleted: undefined,
 };
 
-const LOCATION_1_1: Location = {
+const LOCATION_1_1: ApiData<Location> = {
   ...LOCATION_1,
   ...{
     name: "newName",
@@ -79,7 +79,7 @@ const LOCATION_1_1: Location = {
   },
 };
 
-export const RESTRICTION_1: Restriction = {
+export const RESTRICTION_1: ApiData<Restriction> = {
   rv: 0,
   id: "id1",
   location_id: "id1",
@@ -89,12 +89,12 @@ export const RESTRICTION_1: Restriction = {
   text_compilation: "",
 };
 
-const RESTRICTION_1_1: Restriction = {
+const RESTRICTION_1_1: ApiData<Restriction> = {
   ...RESTRICTION_1,
   ...{ rv: 1, text_compilation: "foo" },
 };
 
-const SOURCE_1: Source = {
+const SOURCE_1: ApiData<Source> = {
   rv: 0,
   id: "id1",
   change_time: new Date(),
@@ -104,12 +104,12 @@ const SOURCE_1: Source = {
   type: "",
 };
 
-const SOURCE_1_1: Source = {
+const SOURCE_1_1: ApiData<Source> = {
   ...SOURCE_1,
   ...{ rv: 1, text_compilation: "foo" },
 };
 
-export const VESSEL_1: Vessel = {
+export const VESSEL_1: ApiData<Vessel> = {
   rv: 0,
   id: "id1",
   change_time: new Date(),
@@ -120,7 +120,7 @@ export const VESSEL_1: Vessel = {
   imo: 1234567,
 };
 
-const VESSEL_1_1: Vessel = {
+const VESSEL_1_1: ApiData<Vessel> = {
   ...VESSEL_1,
   ...{ rv: 1, text_compilation: "foo" },
 };
@@ -134,7 +134,7 @@ export function createVessel(
     imo?: number;
     mmsi?: number;
   },
-): Vessel {
+): ApiData<Vessel> {
   return {
     rv: props.rv ?? 1,
     id: props.id ?? randomInt(1000000).toString(),
@@ -148,7 +148,7 @@ export function createVessel(
   };
 }
 
-export const QUEUE_1: QueueDB = {
+export const QUEUE_1: ApiData<Queue> = {
   id: "id1",
   icebreaker_id: "",
   vessel_id: "",
@@ -160,7 +160,7 @@ export const QUEUE_1: QueueDB = {
   deleted: undefined,
 };
 
-const QUEUE_1_1: QueueDB = { ...QUEUE_1, ...{ rv: 1, order_num: 2 } };
+const QUEUE_1_1: ApiData<Queue> = { ...QUEUE_1, ...{ rv: 1, order_num: 2 } };
 
 export function createQueue(
   props: {
@@ -172,7 +172,7 @@ export function createQueue(
     start_time?: Date;
     end_time?: Date;
   },
-): QueueDB {
+): ApiData<Queue> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     start_time: props.start_time ?? new Date(),
@@ -195,7 +195,7 @@ export function createSource(
     nationality?: string;
     type?: string;
   },
-): Source {
+): ApiData<Source> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     vessel_id: props.vessel_id ?? "",
@@ -208,7 +208,7 @@ export function createSource(
   };
 }
 
-export const DIRWAY_1: Dirway = {
+export const DIRWAY_1: ApiData<Dirway> = {
   id: "id1",
   name: "name",
   description: "empty",
@@ -217,9 +217,12 @@ export const DIRWAY_1: Dirway = {
   deleted: undefined,
 };
 
-const DIRWAY_1_1: Dirway = { ...DIRWAY_1, ...{ rv: 1, description: "foo" } };
+const DIRWAY_1_1: ApiData<Dirway> = {
+  ...DIRWAY_1,
+  ...{ rv: 1, description: "foo" },
+};
 
-export const DIRWAYPOINT_1: Dirwaypoint = {
+export const DIRWAYPOINT_1: ApiData<Dirwaypoint> = {
   id: "id1",
   dirway_id: "id1",
   order_num: 0,
@@ -243,7 +246,7 @@ export function createDirwaypoint(
     longitude?: number;
     rv?: number;
   },
-): Dirwaypoint {
+): ApiData<Dirwaypoint> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     dirway_id: props.dirway_id ?? "",
@@ -257,7 +260,7 @@ export function createDirwaypoint(
   };
 }
 
-export const PORT_SUSPENSION_1: PortSuspension = {
+export const PORT_SUSPENSION_1: ApiData<Suspension> = {
   start_time: new Date(),
   prenotification: false,
   ports_closed: false,
@@ -268,12 +271,12 @@ export const PORT_SUSPENSION_1: PortSuspension = {
   deleted: undefined,
 };
 
-const PORT_SUSPENSION_1_1: PortSuspension = {
+const PORT_SUSPENSION_1_1: ApiData<Suspension> = {
   ...PORT_SUSPENSION_1,
   ...{ rv: 1, due_to: "foo" },
 };
 
-export const PORT_SUSPENSION_LOCATION_1: PortSuspensionLocation = {
+export const PORT_SUSPENSION_LOCATION_1: ApiData<PortSuspensionLocation> = {
   suspension_id: "id1",
   location_id: "id1",
   rv: 0,
