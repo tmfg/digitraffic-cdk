@@ -50,7 +50,7 @@ jobs:
         run: python ${{ env.CI_DIR }}/find-reports.py
 
       - name: Archive reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: reports
           path: ${{ github.ref_name }}/
