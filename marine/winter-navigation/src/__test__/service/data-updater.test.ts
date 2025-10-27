@@ -60,7 +60,7 @@ export function createActivity(
 export const LOCATION_1: ApiData<Location> = {
   name: "name",
   type: "type",
-  locode_list: "",
+  locode_list: "FIHEL",
   nationality: "",
   latitude: 12,
   longitude: 13,

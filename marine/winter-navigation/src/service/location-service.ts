@@ -17,8 +17,7 @@ import type {
   Restriction,
   Suspension,
 } from "../model/public-api-model.js";
-
-export const LOCATIONS_CHECK = "WN_LOCATION_CHECK";
+import { LOCATIONS_CHECK } from "../keys.js";
 
 export function getLocation(
   locode: string,

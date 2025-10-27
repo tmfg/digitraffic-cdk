@@ -3,12 +3,16 @@ import {
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
 import * as VesselDB from "../db/vessels.js";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+
 import type { ActivityDTO, QueueDTO, VesselDTO } from "../model/dto-model.js";
 import type {
   Activity,
   PlannedAssistance,
   Vessel,
+  VesselsResponse,
 } from "../model/public-api-model.js";
+import { VESSEL_CHECK } from "../keys.js";
 
 export function getVessel(
   vesselId: number,
@@ -17,13 +21,16 @@ export function getVessel(
 ): Promise<[Vessel | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const vessel = await VesselDB.getVessel(db, vesselId, activeFrom, activeTo);
-    const lastUpdated = undefined;
+    const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
+      db,
+      VESSEL_CHECK,
+    );
 
     if (!vessel) {
       return Promise.resolve([undefined, lastUpdated ?? undefined]);
     }
 
-    const dtVessel = convertVessel(vessel);
+    const dtVessel = convertVessel(vessel, lastUpdated ?? undefined);
 
     return [dtVessel, lastUpdated ?? undefined];
   });
@@ -32,23 +39,30 @@ export function getVessel(
 export function getVessels(
   activeFrom?: Date,
   activeTo?: Date,
-): Promise<[Vessel[], Date | undefined]> {
+): Promise<[VesselsResponse, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const vessels = await VesselDB.getVessels(db, activeFrom, activeTo);
-    const lastUpdated = undefined;
-
+    const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
+      db,
+      VESSEL_CHECK,
+    );
     const dtVessels = vessels
       .filter((v) =>
         (!!v.queues && v.queues.length > 0) ||
         (!!v.activities && v.activities.length > 0)
       )
-      .map(convertVessel);
-    return [dtVessels, lastUpdated ?? undefined];
+      .map((v) => convertVessel(v));
+    const response = {
+      lastUpdated: lastUpdated?.toISOString(),
+      vessels: dtVessels,
+    };
+    return [response, lastUpdated ?? undefined];
   });
 }
 
 function convertVessel(
   v: VesselDTO,
+  lastUpdated?: Date,
 ): Vessel {
   return {
     name: v.name,
@@ -65,6 +79,7 @@ function convertVessel(
         convertQueue(q, v)
       ),
     }),
+    ...(lastUpdated && { lastUpdated: lastUpdated.toISOString() }),
   };
 }
 

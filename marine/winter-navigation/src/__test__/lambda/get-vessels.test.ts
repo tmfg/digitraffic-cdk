@@ -15,6 +15,7 @@ import {
   isAssistanceGiven,
   isAssistanceReceived,
   type Vessel as PublicApiVessel,
+  type VesselsResponse,
 } from "../../model/public-api-model.js";
 import { saveAllActivities } from "../../db/activities.js";
 import { mockProxyHolder } from "../mock.js";
@@ -66,15 +67,20 @@ describe(
     test("get all - empty", async () => {
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectJson([]);
+      ExpectResponse.ok(response).expectContent(
+        (body: VesselsResponse) => {
+          expect(body.vessels).toEqual([]);
+          expect(body).toHaveProperty("lastUpdated");
+        },
+      );
     });
 
     test("get all - one location", async () => {
       await insertVessel(db);
 
       const response = await getResponseFromLambda();
-      ExpectResponse.ok(response).expectContent((vessels: Vessel[]) => {
-        expect(vessels.length).toEqual(1);
+      ExpectResponse.ok(response).expectContent((vessels: VesselsResponse) => {
+        expect(vessels.vessels.length).toEqual(1);
       });
     });
 
@@ -131,7 +137,9 @@ describe(
       const response = await getResponseFromLambda();
 
       ExpectResponse.ok(response).expectContent(
-        (vessels: PublicApiVessel[]) => {
+        (vesselsResponse: VesselsResponse) => {
+          const vessels = vesselsResponse.vessels;
+
           expect(vessels.length).toEqual(3);
 
           const apiIcebreaker = vessels.find((v) => v.imo === icebreaker.imo);
@@ -195,7 +203,8 @@ describe(
       const response = await getResponseFromLambda();
 
       ExpectResponse.ok(response).expectContent(
-        (vessels: PublicApiVessel[]) => {
+        (vesselsResponse: VesselsResponse) => {
+          const vessels = vesselsResponse.vessels;
           expect(vessels.length).toEqual(2);
           const apiVessel = vessels.find(
             (vessel) => vessel.imo === assistedVessel.imo,
@@ -283,7 +292,8 @@ describe(
       const response = await getResponseFromLambda();
 
       ExpectResponse.ok(response).expectContent(
-        (vessels: PublicApiVessel[]) => {
+        (vesselsResponse: VesselsResponse) => {
+          const vessels = vesselsResponse.vessels;
           expect(vessels.length).toEqual(4);
 
           const foundIcebreaker3 = vessels.find((v) =>

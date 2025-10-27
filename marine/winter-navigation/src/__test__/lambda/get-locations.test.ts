@@ -68,7 +68,7 @@ describe(
     });
 
     test("get one - not found", async () => {
-      const response = await getResponseFromLambda({ "location-id": "foo" });
+      const response = await getResponseFromLambda({ "locode": "foo" });
 
       ExpectResponse.notFound(response);
     });
@@ -76,7 +76,7 @@ describe(
     test("get one - found", async () => {
       await insertLocation(db);
 
-      const response = await getResponseFromLambda({ "location-id": "id1" });
+      const response = await getResponseFromLambda({ "locode": "FIHEL" });
 
       ExpectResponse.ok(response).expectContent((location: LocationFeature) => {
         expect(location.properties.name).toEqual(LOCATION_1.name);

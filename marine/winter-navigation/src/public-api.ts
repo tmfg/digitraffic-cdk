@@ -11,6 +11,7 @@ import {
   DirwayFeatureCollectionSchema,
   LocationFeatureCollectionSchema,
   VesselSchema,
+  VesselsResponseSchema,
 } from "./model/public-api-model.js";
 import { omitDeep } from "@digitraffic/common/dist/utils/utils";
 
@@ -41,7 +42,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
   const vesselsModel = publicApi.addJsonModel(
     "Vessels",
     omitDeep(
-      toJSONSchema(VesselSchema, {
+      toJSONSchema(VesselsResponseSchema, {
         target: "openapi-3.0",
       }) as JsonSchema,
       "pattern",

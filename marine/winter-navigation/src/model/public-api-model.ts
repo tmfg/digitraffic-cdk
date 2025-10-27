@@ -157,6 +157,12 @@ export const VesselSchema = z.object({
   plannedAssistances: z.array(PlannedAssistanceSchema).optional().describe(
     "Planned assistances where the vessel is either the icebreaker or the one being assisted.",
   ),
+  lastUpdated: z.iso.datetime().optional(),
+});
+
+export const VesselsResponseSchema = z.object({
+  lastUpdated: z.iso.datetime().optional(),
+  vessels: z.array(VesselSchema),
 });
 
 export type Vessel = z.infer<typeof VesselSchema>;
@@ -175,6 +181,7 @@ export type LocationFeature = z.infer<typeof LocationFeatureSchema>;
 export type LocationFeatureCollection = z.infer<
   typeof LocationFeatureCollectionSchema
 >;
+export type VesselsResponse = z.infer<typeof VesselsResponseSchema>;
 
 export function isAssistanceReceived(
   a: PlannedAssistance | Activity,

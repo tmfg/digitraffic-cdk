@@ -8,15 +8,14 @@ import type { FeatureCollection, LineString, Point } from "geojson";
 import type { DirwayDTO } from "../model/dto-model.js";
 import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import type { DirwayFeature } from "../model/public-api-model.js";
-
-export const DIRWAYS_CHECK = "WN_DIRWAY_CHECK";
+import { DIRWAY_CHECK } from "../keys.js";
 
 export function getDirways(): Promise<[FeatureCollection, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const dirways = await DirwayDB.getDirways(db);
     const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
       db,
-      DIRWAYS_CHECK,
+      DIRWAY_CHECK,
     );
     const featureCollection = createFeatureCollection(
       dirways.map(convertToFeature),
