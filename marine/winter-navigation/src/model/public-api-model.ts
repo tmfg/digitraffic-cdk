@@ -98,7 +98,9 @@ export const AssistanceGivenVesselSchema = z.object({
 });
 
 export const BasePlannedAssistanceSchema = z.object({
-  queuePosition: z.number(),
+  queuePosition: z.number().describe(
+    "Order number of this assistance in the icebreaker's queue of planned assistances",
+  ),
   startTime: z.iso.datetime(),
   endTime: z.iso.datetime().optional(),
 });
