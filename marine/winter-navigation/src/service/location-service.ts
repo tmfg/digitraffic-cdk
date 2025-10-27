@@ -21,10 +21,10 @@ import type {
 export const LOCATIONS_CHECK = "WN_LOCATION_CHECK";
 
 export function getLocation(
-  locationId: string,
+  locode: string,
 ): Promise<[Feature<Geometry, Location> | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const location = await LocationDB.getLocation(db, locationId);
+    const location = await LocationDB.getLocation(db, locode);
     const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
       db,
       LOCATIONS_CHECK,

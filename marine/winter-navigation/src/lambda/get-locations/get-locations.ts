@@ -8,7 +8,7 @@ import { z, ZodError } from "zod";
 const proxyHolder = ProxyHolder.create();
 
 const GetLocationSchema = z.object({
-  "location-id": z.string().optional(),
+  "locode": z.string().optional(),
 }).strict();
 
 export const handler = async (
@@ -21,9 +21,9 @@ export const handler = async (
     await proxyHolder.setCredentials();
 
     // get single location
-    if (getLocationEvent["location-id"]) {
+    if (getLocationEvent.locode) {
       const [location, lastUpdated] = await getLocation(
-        getLocationEvent["location-id"],
+        getLocationEvent.locode,
       );
 
       if (!location) {

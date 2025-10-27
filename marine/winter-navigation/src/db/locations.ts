@@ -70,7 +70,7 @@ LEFT JOIN location_restrictions lr ON l.id = lr.location_id
 LEFT JOIN location_suspensions ls ON l.id = ls.location_id
 WHERE
     l.deleted = false
-    AND ($1::text IS NULL OR l.id = $1);
+    AND ($1::text IS NULL OR $1 = ANY(string_to_array(l.locode_list, ',')));
 `;
 
 const PS_UPDATE_LOCATIONS = new pgPromise.PreparedStatement({
@@ -110,9 +110,9 @@ export async function saveAllLocations(
 
 export async function getLocation(
   db: DTDatabase,
-  locationId: string,
+  locode: string,
 ): Promise<LocationDTO | undefined> {
-  return await db.oneOrNone(PS_GET_LOCATION, [locationId]) ?? undefined;
+  return await db.oneOrNone(PS_GET_LOCATION, [locode]) ?? undefined;
 }
 
 export async function getLocations(

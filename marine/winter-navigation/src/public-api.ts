@@ -138,13 +138,13 @@ function createLocationResources(
   );
 
   const locationsResource = v2Resource.addResource("locations");
-  const locationResource = locationsResource.addResource("{locationId}");
+  const locationResource = locationsResource.addResource("{locode}");
 
   const getLocationIntegration = new DigitrafficIntegration(
     getLocationsLambda,
     MediaType.APPLICATION_JSON,
   )
-    .addPathParameter("locationId")
+    .addPathParameter("locode")
     .build();
 
   const getLocationsIntegration = new DigitrafficIntegration(
