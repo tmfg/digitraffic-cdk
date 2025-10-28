@@ -1,9 +1,19 @@
+import {
+  type DTDatabase,
+  type DTTransaction,
+  inDatabase,
+} from "@digitraffic/common/dist/database/database";
 import type { Situation } from "../model/situation.js";
 import {
   type StatusCodeValue,
   StatusCodeValues,
 } from "../model/status-code-value.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { saveDatex2 } from "../db/datex2.js";
+import {
+  DataType,
+  updateLastUpdated,
+} from "@digitraffic/common/dist/database/last-updated";
 
 const REG_PAYLOAD = /<payloadPublication/g;
 
@@ -15,23 +25,24 @@ const DATEX2_VERSION_ATTRIBUTE = "version=";
 const XML_TAG_START = "<?xml";
 
 export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
-  //  const start = Date.now();
-  //  const timestamp = new Date(start);
+  const start = Date.now();
+  const timestamp = new Date(start);
 
   if (!validate(datex2)) {
     return await Promise.resolve(StatusCodeValues.BAD_REQUEST);
   }
+
   // DATEX2-integration through new API
-  /*
+
   const situations = parseSituations(datex2);
 
   await inDatabase((db: DTDatabase) => {
     return db.tx((tx: DTTransaction) => {
       return tx.batch([
-        DeviceDB.saveDatex2(tx, situations),
-        LastUpdatedDB.updateLastUpdated(
+        saveDatex2(tx, situations),
+        updateLastUpdated(
           tx,
-          LastUpdatedDB.DataType.VS_DATEX2,
+          DataType.VS_DATEX2,
           timestamp,
         ),
       ]);
@@ -42,7 +53,7 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
       tookMs: Date.now() - start,
       customUpdatedCount: situations.length,
     });
-  });*/
+  });
 
   return StatusCodeValues.OK;
 }
