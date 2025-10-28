@@ -2,7 +2,6 @@ import type { Function as CloudfrontFunction } from "aws-cdk-lib/aws-cloudfront"
 import type { Construct } from "constructs";
 import type { Stack } from "aws-cdk-lib";
 import {
-  createHistoryRedirectFunction,
   createHttpHeadersFunction,
   createIndexHtml,
   createPathRewriteFunction,
@@ -31,13 +30,6 @@ export class EdgeFunctionFactory {
 
   getIndexHtmlFunction(): CloudfrontFunction {
     return this.getFunction("index-html", () => createIndexHtml(this._scope));
-  }
-
-  getHistoryRedirectFunction(): CloudfrontFunction {
-    return this.getFunction(
-      "history_redirect",
-      () => createHistoryRedirectFunction(this._scope),
-    );
   }
 
   getRedirectFunction(redirectUrl: string): CloudfrontFunction {

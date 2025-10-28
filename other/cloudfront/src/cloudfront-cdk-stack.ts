@@ -29,7 +29,6 @@ import { createDistribution } from "./distribution-util.js";
 import { LambdaHolder } from "./lambda-holder.js";
 import { createOriginConfig } from "./origin-configs.js";
 import {
-  createHistoryRedirectFunction,
   createIndexHtml,
   createRedirectFunction,
   FunctionType,
@@ -225,13 +224,6 @@ export class CloudfrontCdkStack extends Stack {
 
     if (types.functionTypes.has(FunctionType.INDEX_HTML)) {
       lambdaMap.addFunction(FunctionType.INDEX_HTML, createIndexHtml(this));
-    }
-
-    if (types.functionTypes.has(FunctionType.HISTORY_REDIRECT)) {
-      lambdaMap.addFunction(
-        FunctionType.HISTORY_REDIRECT,
-        createHistoryRedirectFunction(this),
-      );
     }
 
     // handle ip restrictions

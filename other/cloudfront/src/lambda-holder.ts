@@ -74,7 +74,6 @@ export class LambdaHolder {
     switch (functionType) {
       case FunctionType.REDIRECT:
       case FunctionType.INDEX_HTML:
-      case FunctionType.HISTORY_REDIRECT:
       case FunctionType.PATH_REWRITE:
         return FunctionEventType.VIEWER_REQUEST;
       case FunctionType.HTTP_HEADERS:
