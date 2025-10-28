@@ -3,11 +3,7 @@ import { dbTestBase } from "../db-testutil.js";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { saveAllDirwaypoints, saveAllDirways } from "../../db/dirways.js";
-import {
-  createDirwaypoint,
-  DIRWAY_1,
-  DIRWAYPOINT_1,
-} from "../service/data-updater.test.js";
+import { createDirwaypoint, DIRWAY_1 } from "../service/data-updater.test.js";
 import { mockProxyHolder } from "../mock.js";
 import type { DirwayFeatureCollection } from "../../model/public-api-model.js";
 

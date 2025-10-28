@@ -10,7 +10,6 @@ import { toJSONSchema } from "zod";
 import {
   DirwayFeatureCollectionSchema,
   LocationFeatureCollectionSchema,
-  VesselSchema,
   VesselsResponseSchema,
 } from "./model/public-api-model.js";
 import { omitDeep } from "@digitraffic/common/dist/utils/utils";
@@ -20,7 +19,7 @@ const WN_TAGS_V2 = ["Winter Navigation V2"];
 export function create(stack: DigitrafficStack): DigitrafficRestApi {
   const publicApi = new DigitrafficRestApi(stack, "WN-public", "WN public API");
 
-  publicApi.createUsagePlan("WN Api Key", "WN Usage Plan");
+  publicApi.createUsagePlanV2("WN Api Key");
 
   const v2Resource = createResources(publicApi);
 
@@ -157,7 +156,7 @@ function createLocationResources(
 
   ["GET", "HEAD"].forEach((httpMethod) => {
     locationResource.addMethod(httpMethod, getLocationIntegration, {
-      //            apiKeyRequired: true,
+      apiKeyRequired: true,
       methodResponses: [
         DigitrafficMethodResponse.response200(
           locationsModel,
@@ -169,7 +168,7 @@ function createLocationResources(
     });
 
     locationsResource.addMethod(httpMethod, getLocationsIntegration, {
-      //            apiKeyRequired: true,
+      apiKeyRequired: true,
       methodResponses: [
         DigitrafficMethodResponse.response200(
           locationsModel,
@@ -221,7 +220,7 @@ function createVesselResources(
 
   ["GET", "HEAD"].forEach((httpMethod) => {
     vesselResource.addMethod(httpMethod, getVesselIntegration, {
-      //            apiKeyRequired: true,
+      apiKeyRequired: true,
       requestParameters: {
         "method.request.querystring.activeFrom": false,
         "method.request.querystring.activeTo": false,
@@ -237,7 +236,7 @@ function createVesselResources(
     });
 
     vesselsResource.addMethod(httpMethod, getVesselsIntegration, {
-      //            apiKeyRequired: true,
+      apiKeyRequired: true,
       requestParameters: {
         "method.request.querystring.activeFrom": false,
         "method.request.querystring.activeTo": false,
@@ -282,7 +281,7 @@ function createDirwayResources(
 
   ["GET", "HEAD"].forEach((httpMethod) => {
     dirwaysResource.addMethod(httpMethod, getDirwaysIntegration, {
-      //            apiKeyRequired: true,
+      apiKeyRequired: true,
       methodResponses: [
         DigitrafficMethodResponse.response200(
           dirwaysModel,

@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   FeatureCollectionSchema,
   FeatureSchema,
-  GeometrySchema,
+  LineStringSchema,
   PointSchema,
 } from "@digitraffic/common/dist/types/geojson";
 
@@ -17,7 +17,7 @@ export const DirwaySchema = z.object({
 
 export const DirwayFeatureSchema = FeatureSchema.omit({ id: true }).extend({
   properties: DirwaySchema,
-  geometry: GeometrySchema,
+  geometry: z.union([PointSchema, LineStringSchema]),
 }).describe("GeoJSON Feature");
 
 export const DirwayFeatureCollectionSchema = FeatureCollectionSchema.extend({
@@ -47,7 +47,7 @@ export const SuspensionSchema = z.object({
     "Whether suspension is announced to users before it starts.",
   ),
   portsClosed: z.boolean().describe(
-    "Bit indicating whether the port is closed to all operations entirely.",
+    "Bit indicating whether the port is entirely closed to all operations.",
   ),
   dueTo: z.string().describe("Main reason for port suspension."),
   specifications: z.string().optional().describe(

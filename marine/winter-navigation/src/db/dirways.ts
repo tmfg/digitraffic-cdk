@@ -41,12 +41,6 @@ WHERE d.deleted = FALSE AND p.deleted = false
 GROUP BY d.id
 `;
 
-const SQL_GET_DIRWAYPOINTS =
-  `select dirway_id, order_num, name, latitude, longitude
-from wn_dirwaypoint
-where deleted = false
-order by dirway_id, order_num`;
-
 const PS_UPDATE_DIRWAYS = new pgPromise.PreparedStatement({
   name: "update-dirways",
   text: SQL_UPDATE_DIRWAYS,
@@ -60,11 +54,6 @@ const PS_UPDATE_DIRWAYPOINTS = new pgPromise.PreparedStatement({
 const PS_GET_DIRWAYS = new pgPromise.PreparedStatement({
   name: "get-dirways",
   text: SQL_GET_DIRWAYS,
-});
-
-const PS_GET_DIRWAYPOINTS = new pgPromise.PreparedStatement({
-  name: "get-dirwaypoints",
-  text: SQL_GET_DIRWAYPOINTS,
 });
 
 export function saveAllDirways(
