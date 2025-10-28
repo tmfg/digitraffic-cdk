@@ -6,7 +6,7 @@ import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/res
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { Resource } from "aws-cdk-lib/aws-apigateway";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 
 const VARIABLE_SIGN_TAGS_V1 = ["Variable Sign V1"];
 
@@ -14,8 +14,13 @@ export class PublicApi {
   readonly restApi: DigitrafficRestApi;
 
   private apiResource!: Resource;
-  private v1Datex2Resource!: Resource;
+  private v1Datex233Resource!: Resource;
   private v1ImageResource!: Resource;
+  private v1SituationsDatex35Resource!: Resource;
+  private v1StatusesDatex35Resource!: Resource;
+  private v1ControllersDatex35Resource!: Resource;
+
+  private datex2_35_model: Model;
 
   constructor(stack: DigitrafficStack) {
     this.restApi = new DigitrafficRestApi(
@@ -29,10 +34,14 @@ export class PublicApi {
       "VariableSigns Usage Plan",
     );
 
-    this.createV1ResourcePaths();
-    this.createDatex2Resource(stack);
+    this.datex2_35_model = addSimpleServiceModel("Xml35Model", this.restApi);
 
-    this.createV1Documentation();
+    this.createV1ResourcePaths();
+    this.createDatex233Resource(stack);
+    this.createImageResource(stack);
+    this.createSituationsDatex35Resource(stack);
+    this.createStatusesDatex35Resource(stack);
+    this.createControllersDatex35Resource(stack);
   }
 
   createV1ResourcePaths(): void {
@@ -46,46 +55,21 @@ export class PublicApi {
 
     const imagesResource = v1Resource.addResource("images");
 
-    this.v1Datex2Resource = v1Resource.addResource("signs.datex2");
+    this.v1Datex233Resource = v1Resource.addResource("signs.datex2");
+    this.v1SituationsDatex35Resource = v1Resource.addResource("signs")
+      .addResource(
+        "datex2-3.5.xml",
+      );
+    this.v1StatusesDatex35Resource = v1Resource.addResource(
+      "statuses",
+    ).addResource("datex2-3.5.xml");
+    this.v1ControllersDatex35Resource = v1Resource.addResource("controllers")
+      .addResource("datex2-3.5.xml");
+
     this.v1ImageResource = imagesResource.addResource("{text}");
   }
 
-  createV1Documentation(): void {
-    this.restApi.documentResource(
-      this.v1Datex2Resource,
-      DocumentationPart.method(
-        VARIABLE_SIGN_TAGS_V1,
-        "GetDatex2",
-        "Return all variables signs as datex2",
-      ),
-    );
-
-    this.restApi.documentResource(
-      this.v1ImageResource,
-      DocumentationPart.method(
-        VARIABLE_SIGN_TAGS_V1,
-        "GetImage",
-        "Generate svg-image from given text",
-      ),
-      DocumentationPart.queryParameter(
-        "text",
-        "formatted [text] from variable sign text rows, without the brackets",
-      ),
-    );
-  }
-
-  createDatex2Resource(stack: DigitrafficStack): void {
-    const environment = stack.createLambdaEnvironment();
-
-    const getDatex2Lambda = MonitoredDBFunction.create(
-      stack,
-      "get-datex2",
-      environment,
-      {
-        reservedConcurrentExecutions: 3,
-      },
-    );
-
+  createImageResource(stack: DigitrafficStack): void {
     const getImageLambda = MonitoredDBFunction.create(
       stack,
       "get-sign-image",
@@ -95,29 +79,11 @@ export class PublicApi {
       },
     );
 
-    const getDatex2Integration = new DigitrafficIntegration(
-      getDatex2Lambda,
-      MediaType.APPLICATION_XML,
-    ).build();
-
-    const xmlModel = addSimpleServiceModel("XmlModel", this.restApi);
     const svgModel = addSimpleServiceModel(
       "SvgModel",
       this.restApi,
       MediaType.IMAGE_SVG,
     );
-
-    ["GET", "HEAD"].forEach((httpMethod): void => {
-      this.v1Datex2Resource.addMethod(httpMethod, getDatex2Integration, {
-        apiKeyRequired: true,
-        methodResponses: [
-          DigitrafficMethodResponse.response200(
-            xmlModel,
-            MediaType.APPLICATION_XML,
-          ),
-        ],
-      });
-    });
 
     const getImageIntegration = new DigitrafficIntegration(
       getImageLambda,
@@ -139,5 +105,188 @@ export class PublicApi {
         ],
       });
     });
+
+    this.restApi.documentResource(
+      this.v1ImageResource,
+      DocumentationPart.method(
+        VARIABLE_SIGN_TAGS_V1,
+        "GetImage",
+        "Generate svg-image from given text",
+      ),
+      DocumentationPart.queryParameter(
+        "text",
+        "formatted [text] from variable sign text rows, without the brackets",
+      ),
+    );
+  }
+
+  createDatex233Resource(stack: DigitrafficStack): void {
+    const environment = stack.createLambdaEnvironment();
+
+    const getDatex2Lambda = MonitoredDBFunction.create(
+      stack,
+      "get-datex2",
+      environment,
+      {
+        reservedConcurrentExecutions: 3,
+      },
+    );
+
+    const getDatex2Integration = new DigitrafficIntegration(
+      getDatex2Lambda,
+      MediaType.APPLICATION_XML,
+    ).build();
+
+    const xmlModel = addSimpleServiceModel("XmlModel", this.restApi);
+
+    ["GET", "HEAD"].forEach((httpMethod): void => {
+      this.v1Datex233Resource.addMethod(httpMethod, getDatex2Integration, {
+        apiKeyRequired: true,
+        methodResponses: [
+          DigitrafficMethodResponse.response200(
+            xmlModel,
+            MediaType.APPLICATION_XML,
+          ),
+        ],
+      });
+    });
+
+    this.restApi.documentResource(
+      this.v1Datex233Resource,
+      DocumentationPart.method(
+        VARIABLE_SIGN_TAGS_V1,
+        "GetDatex2",
+        "Return all variables signs as DatexII 2.3.3",
+      ),
+    );
+  }
+
+  createSituationsDatex35Resource(stack: DigitrafficStack): void {
+    const environment = stack.createLambdaEnvironment();
+
+    const getSituationsLambda = MonitoredDBFunction.create(
+      stack,
+      "get-situations-datex2-35",
+      environment,
+      {
+        reservedConcurrentExecutions: 3,
+      },
+    );
+
+    const getDatex2Integration = new DigitrafficIntegration(
+      getSituationsLambda,
+      MediaType.APPLICATION_XML,
+    ).build();
+
+    ["GET", "HEAD"].forEach((httpMethod): void => {
+      this.v1SituationsDatex35Resource.addMethod(
+        httpMethod,
+        getDatex2Integration,
+        {
+          apiKeyRequired: true,
+          methodResponses: [
+            DigitrafficMethodResponse.response200(
+              this.datex2_35_model,
+              MediaType.APPLICATION_XML,
+            ),
+          ],
+        },
+      );
+    });
+
+    this.restApi.documentResource(
+      this.v1SituationsDatex35Resource,
+      DocumentationPart.method(
+        VARIABLE_SIGN_TAGS_V1,
+        "GetDatex2",
+        "Return all situations as DatexII 3.5",
+      ),
+    );
+  }
+
+  createStatusesDatex35Resource(stack: DigitrafficStack): void {
+    const environment = stack.createLambdaEnvironment();
+
+    const getStatusesLambda = MonitoredDBFunction.create(
+      stack,
+      "get-statuses-datex2-35",
+      environment,
+      {
+        reservedConcurrentExecutions: 3,
+      },
+    );
+
+    const getDatex2Integration = new DigitrafficIntegration(
+      getStatusesLambda,
+      MediaType.APPLICATION_XML,
+    ).build();
+
+    ["GET", "HEAD"].forEach((httpMethod): void => {
+      this.v1StatusesDatex35Resource.addMethod(
+        httpMethod,
+        getDatex2Integration,
+        {
+          apiKeyRequired: true,
+          methodResponses: [
+            DigitrafficMethodResponse.response200(
+              this.datex2_35_model,
+              MediaType.APPLICATION_XML,
+            ),
+          ],
+        },
+      );
+    });
+
+    this.restApi.documentResource(
+      this.v1StatusesDatex35Resource,
+      DocumentationPart.method(
+        VARIABLE_SIGN_TAGS_V1,
+        "GetStatuses",
+        "Return all controller statuses as DatexII 3.5",
+      ),
+    );
+  }
+
+  createControllersDatex35Resource(stack: DigitrafficStack): void {
+    const environment = stack.createLambdaEnvironment();
+
+    const getControllersLambda = MonitoredDBFunction.create(
+      stack,
+      "get-controllers-datex2-35",
+      environment,
+      {
+        reservedConcurrentExecutions: 3,
+      },
+    );
+
+    const getDatex2Integration = new DigitrafficIntegration(
+      getControllersLambda,
+      MediaType.APPLICATION_XML,
+    ).build();
+
+    ["GET", "HEAD"].forEach((httpMethod): void => {
+      this.v1ControllersDatex35Resource.addMethod(
+        httpMethod,
+        getDatex2Integration,
+        {
+          apiKeyRequired: true,
+          methodResponses: [
+            DigitrafficMethodResponse.response200(
+              this.datex2_35_model,
+              MediaType.APPLICATION_XML,
+            ),
+          ],
+        },
+      );
+    });
+
+    this.restApi.documentResource(
+      this.v1ControllersDatex35Resource,
+      DocumentationPart.method(
+        VARIABLE_SIGN_TAGS_V1,
+        "GetControllers",
+        "Return all controllers as DatexII 3.5",
+      ),
+    );
   }
 }

@@ -1,65 +1,16 @@
-import {
-  type DTDatabase,
-  type DTTransaction,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
-import type { Situation } from "../model/situation.js";
-import {
-  type StatusCodeValue,
-  StatusCodeValues,
-} from "../model/status-code-value.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { saveDatex2 } from "../db/datex2.js";
-import {
-  DataType,
-  updateLastUpdated,
-} from "@digitraffic/common/dist/database/last-updated";
+import type { DatexFile } from "./variable-signs.js";
 
-const REG_PAYLOAD = /<payloadPublication/g;
+//const REG_PAYLOAD = /<payloadPublication/g;
 
 const DATEX2_SITUATION_TAG_START = "<situation ";
 const DATEX2_SITUATION_TAG_END = "</situation>";
 const DATEX2_OVERALL_STARTTIME_TAG_START = "<overallStartTime>";
 const DATEX2_OVERALL_STARTTIME_TAG_END = "</overallStartTime>";
 const DATEX2_VERSION_ATTRIBUTE = "version=";
-const XML_TAG_START = "<?xml";
+//const XML_TAG_START = "<?xml";
 
-export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
-  const start = Date.now();
-  const timestamp = new Date(start);
-
-  if (!validate(datex2)) {
-    return await Promise.resolve(StatusCodeValues.BAD_REQUEST);
-  }
-
-  // DATEX2-integration through new API
-
-  const situations = parseSituations(datex2);
-
-  await inDatabase((db: DTDatabase) => {
-    return db.tx((tx: DTTransaction) => {
-      return tx.batch([
-        saveDatex2(tx, situations),
-        updateLastUpdated(
-          tx,
-          DataType.VS_DATEX2,
-          timestamp,
-        ),
-      ]);
-    });
-  }).finally(() => {
-    logger.info({
-      method: "Datex2UpdateService.updateDatex2",
-      tookMs: Date.now() - start,
-      customUpdatedCount: situations.length,
-    });
-  });
-
-  return StatusCodeValues.OK;
-}
-
-export function parseSituations(datex2: string): Situation[] {
-  const situations: Situation[] = [];
+export function parseSituations223(datex2: string): DatexFile[] {
+  const situations: DatexFile[] = [];
   let index = 0;
   let sitIndex = 0;
 
@@ -89,9 +40,10 @@ export function parseSituations(datex2: string): Situation[] {
   return situations;
 }
 
-function parseSituation(datex2: string): Situation {
+function parseSituation(datex2: string): DatexFile {
   return {
     id: parseId(datex2),
+    type: "SITUATION",
     datex2: datex2,
     effectDate: parseEffectDate(datex2),
   };
@@ -110,7 +62,7 @@ function parseEffectDate(datex2: string): Date {
 
   return new Date(dateString);
 }
-
+/*
 function validate(datex2: string): boolean {
   if (!datex2.includes(XML_TAG_START)) {
     logger.error({
@@ -135,4 +87,4 @@ function validate(datex2: string): boolean {
 
 function occurrences(string: string, regexp: RegExp): number {
   return (string.match(regexp) ?? []).length;
-}
+}*/
