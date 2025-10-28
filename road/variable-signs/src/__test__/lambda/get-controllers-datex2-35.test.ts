@@ -1,7 +1,5 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase } from "../db-testutil.js";
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { jest } from "@jest/globals";
+import { dbTestBase, mockProxyHolder } from "../db-testutil.js";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 
@@ -16,7 +14,7 @@ async function getResponseFromLambda(): Promise<LambdaResponse> {
 describe(
   "get-controllers-datex2-35-lambda-test",
   dbTestBase((_db: DTDatabase) => {
-    jest.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
+    mockProxyHolder();
 
     test("empty", async () => {
       const response = await getResponseFromLambda();
