@@ -75,17 +75,16 @@ export function fixApiGatewayNullable(schema: OpenApiSchema): void {
     return;
   }
 
-  const toVisit: unknown[] = [schema];
+  const toVisit: Record<string, unknown>[] = [schema];
   const visited = new Set<unknown>();
 
   while (toVisit.length > 0) {
-    const item = toVisit.pop();
+    const current = toVisit.pop();
 
-    if (!isObject(item) || visited.has(item)) {
+    if (!isObject(current) || visited.has(current)) {
       continue;
     }
 
-    const current = item as Record<string, unknown>;
     visited.add(current);
 
     // Determine if the current object has a broken `anyOf` or `oneOf` structure
@@ -129,7 +128,7 @@ export function fixApiGatewayNullable(schema: OpenApiSchema): void {
     // Find nested objects/arrays to visit next
     for (const key in current) {
       if (Object.prototype.hasOwnProperty.call(current, key)) {
-        const value: unknown = current[key];
+        const value = current[key] as Record<string, unknown>;
         if (isObject(value) || Array.isArray(value)) {
           toVisit.push(value);
         }

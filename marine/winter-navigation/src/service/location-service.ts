@@ -18,10 +18,11 @@ import type {
   Suspension,
 } from "../model/public-api-model.js";
 import { LOCATIONS_CHECK } from "../keys.js";
-import { createFeatureCollection } from "../util.js";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 
 export function getLocation(
   locode: string,
+  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<[Feature<Geometry | null, Location> | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const location = await LocationDB.getLocation(db, locode);

@@ -8,7 +8,7 @@ import type { FeatureCollection, LineString, Point } from "geojson";
 import type { DirwayDTO } from "../model/dto-model.js";
 import type { DirwayFeature } from "../model/public-api-model.js";
 import { DIRWAY_CHECK } from "../keys.js";
-import { createFeatureCollection } from "../util.js";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 
 export function getDirways(): Promise<[FeatureCollection, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
