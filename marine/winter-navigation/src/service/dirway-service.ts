@@ -6,9 +6,9 @@ import * as DirwayDB from "../db/dirways.js";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import type { FeatureCollection, LineString, Point } from "geojson";
 import type { DirwayDTO } from "../model/dto-model.js";
-import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import type { DirwayFeature } from "../model/public-api-model.js";
 import { DIRWAY_CHECK } from "../keys.js";
+import { createFeatureCollection } from "../util.js";
 
 export function getDirways(): Promise<[FeatureCollection, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {

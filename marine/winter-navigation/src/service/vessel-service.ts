@@ -53,7 +53,7 @@ export function getVessels(
       )
       .map((v) => convertVessel(v));
     const response = {
-      lastUpdated: lastUpdated?.toISOString(),
+      lastUpdated: lastUpdated?.toISOString() ?? null,
       vessels: dtVessels,
     };
     return [response, lastUpdated ?? undefined];
@@ -66,20 +66,18 @@ function convertVessel(
 ): Vessel {
   return {
     name: v.name,
-    ...(v.callsign && { callSign: v.callsign }),
-    ...(v.shortcode && { shortcode: v.shortcode }),
-    ...(v.mmsi && { mmsi: v.mmsi }),
-    ...(v.imo && { imo: v.imo }),
-    ...(v.type && { type: v.type }),
-    ...(v.activities && v.activities.length > 0 && {
-      activities: v.activities.map((a): Activity => convertActivity(a, v)),
-    }),
-    ...(v.queues && v.queues.length > 0 && {
-      plannedAssistances: v.queues.map((q): PlannedAssistance =>
-        convertQueue(q, v)
-      ),
-    }),
-    ...(lastUpdated && { lastUpdated: lastUpdated.toISOString() }),
+    callSign: v.callsign ?? null,
+    shortcode: v.shortcode ?? null,
+    mmsi: v.mmsi ?? null,
+    imo: v.imo ?? null,
+    type: v.type ?? null,
+    activities: (v.activities && v.activities.length > 0)
+      ? v.activities.map((a): Activity => convertActivity(a, v))
+      : null,
+    plannedAssistances: (v.queues && v.queues.length > 0)
+      ? v.queues.map((q): PlannedAssistance => convertQueue(q, v))
+      : null,
+    lastUpdated: lastUpdated?.toISOString() ?? null,
   };
 }
 
@@ -89,10 +87,10 @@ function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
   const isVessel = v.mmsi === a.vessel_mmsi || v.imo === a.vessel_imo;
   const baseActivity = {
     type: a.type,
-    ...(a.reason && { reason: a.reason }),
-    ...(a.public_comment && { publicComment: a.public_comment }),
+    reason: a.reason ?? null,
+    publicComment: a.public_comment ?? null,
     startTime: a.start_time,
-    ...(a.end_time && { endTime: a.end_time }),
+    endTime: a.end_time ?? null,
   };
   // If this activity concerns both an assisted vessel and an assisting icebreaker and
   // the current vessel is not the icebreaker, the property assistingVessel is set.
@@ -101,8 +99,8 @@ function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
     return {
       ...baseActivity,
       assistingVessel: {
-        ...(a.icebreaker_imo && { imo: a.icebreaker_imo }),
-        ...(a.icebreaker_mmsi && { mmsi: a.icebreaker_mmsi }),
+        imo: a.icebreaker_imo ?? null,
+        mmsi: a.icebreaker_mmsi ?? null,
         name: a.icebreaker_name,
       },
     };
@@ -112,8 +110,8 @@ function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
     return {
       ...baseActivity,
       assistedVessel: {
-        ...(a.vessel_imo && { imo: a.vessel_imo }),
-        ...(a.vessel_mmsi && { mmsi: a.vessel_mmsi }),
+        imo: a.vessel_imo ?? null,
+        mmsi: a.vessel_mmsi ?? null,
         name: a.vessel_name,
       },
     };
@@ -130,15 +128,15 @@ function convertQueue(q: QueueDTO, v: VesselDTO): PlannedAssistance {
   const baseAssistance = {
     queuePosition: q.order_num,
     startTime: q.start_time,
-    ...(q.end_time && { endTime: q.end_time }),
+    endTime: q.end_time ?? null,
   };
 
   // leave out from the assistance object redundant reference to current vessel
   if (isIcebreaker) {
     return {
       assistedVessel: {
-        ...(q.vessel_imo && { imo: q.vessel_imo }),
-        ...(q.vessel_mmsi && { mmsi: q.vessel_mmsi }),
+        imo: q.vessel_imo ?? null,
+        mmsi: q.vessel_mmsi ?? null,
         name: q.vessel_name,
       },
       ...baseAssistance,
@@ -146,8 +144,8 @@ function convertQueue(q: QueueDTO, v: VesselDTO): PlannedAssistance {
   } else {
     return {
       assistingVessel: {
-        ...(q.icebreaker_imo && { imo: q.icebreaker_imo }),
-        ...(q.icebreaker_mmsi && { mmsi: q.icebreaker_mmsi }),
+        imo: q.icebreaker_imo ?? null,
+        mmsi: q.icebreaker_mmsi ?? null,
         name: q.icebreaker_name,
       },
       ...baseAssistance,

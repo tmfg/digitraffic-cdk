@@ -9,19 +9,20 @@ import type {
   RestrictionDTO,
   SuspensionDTO,
 } from "../model/dto-model.js";
-import type { Feature, FeatureCollection, Geometry } from "geojson";
-import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
+import type { Feature, Geometry } from "geojson";
 import type {
   Location,
   LocationFeature,
+  LocationFeatureCollection,
   Restriction,
   Suspension,
 } from "../model/public-api-model.js";
 import { LOCATIONS_CHECK } from "../keys.js";
+import { createFeatureCollection } from "../util.js";
 
 export function getLocation(
   locode: string,
-): Promise<[Feature<Geometry, Location> | undefined, Date | undefined]> {
+): Promise<[Feature<Geometry | null, Location> | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const location = await LocationDB.getLocation(db, locode);
     const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
@@ -41,7 +42,7 @@ export function getLocation(
 }
 
 export function getLocations(): Promise<
-  [FeatureCollection, Date | undefined]
+  [LocationFeatureCollection, Date | undefined]
 > {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const locations = await LocationDB.getLocations(db);
@@ -49,6 +50,7 @@ export function getLocations(): Promise<
       db,
       LOCATIONS_CHECK,
     );
+
     const featureCollection = createFeatureCollection(
       locations.map(convertToFeature),
       lastUpdated,
@@ -60,22 +62,27 @@ export function getLocations(): Promise<
 function convertToFeature(
   location: LocationDTO,
 ): LocationFeature {
+  const geometry = location.longitude && location.latitude
+    ? {
+      type: "Point" as const,
+      coordinates: [location.longitude, location.latitude],
+    }
+    : null;
   return {
     type: "Feature",
-    geometry: {
-      type: "Point",
-      coordinates: [location.longitude, location.latitude],
-    },
+    geometry,
     properties: {
       name: location.name,
       type: location.type,
       locodeList: location.locode_list,
       nationality: location.nationality,
       winterport: location.winterport,
-      ...(location.restrictions && location.restrictions.length > 0 &&
-        { restrictions: location.restrictions.map(convertRestriction) }),
-      ...(location.suspensions && location.suspensions.length > 0 &&
-        { suspensions: location.suspensions.map(convertSuspension) }),
+      restrictions: (location.restrictions && location.restrictions.length > 0)
+        ? location.restrictions.map(convertRestriction)
+        : null,
+      suspensions: (location.suspensions && location.suspensions.length > 0)
+        ? location.suspensions.map(convertSuspension)
+        : null,
     },
   };
 }
@@ -83,19 +90,19 @@ function convertToFeature(
 function convertSuspension(s: SuspensionDTO): Suspension {
   return {
     startTime: s.start_time,
-    ...(s.end_time && { endTime: s.end_time }),
+    endTime: s.end_time ?? null,
     prenotification: s.prenotification,
     portsClosed: s.ports_closed,
     dueTo: s.due_to,
     // field name is in plural in the database but in the source data it is singular
-    ...(s.specifications && { specifications: s.specifications }),
+    specifications: s.specifications ?? null,
   };
 }
 
 function convertRestriction(r: RestrictionDTO): Restriction {
   return {
     startTime: r.start_time,
-    ...(r.end_time && { endTime: r.end_time }),
+    endTime: r.end_time ?? null,
     textCompilation: r.text_compilation,
   };
 }

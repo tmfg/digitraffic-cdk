@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import type { JsonSchema, Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
@@ -23,14 +24,16 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
   const v2Resource = createResources(publicApi);
 
+  const locationsSchema = omitDeep(
+    toJSONSchema(LocationFeatureCollectionSchema, {
+      target: "draft-4",
+    }) as JsonSchema,
+    "pattern",
+  );
+
   const locationsModel = publicApi.addJsonModel(
     "Locations",
-    omitDeep(
-      toJSONSchema(LocationFeatureCollectionSchema, {
-        target: "openapi-3.0",
-      }) as JsonSchema,
-      "pattern",
-    ),
+    locationsSchema,
   );
   const [locationResource, locationsResource] = createLocationResources(
     stack,
@@ -38,14 +41,16 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     locationsModel,
   );
 
+  const vesselsSchema = omitDeep(
+    toJSONSchema(VesselsResponseSchema, {
+      target: "draft-4",
+    }) as JsonSchema,
+    "pattern",
+  );
+
   const vesselsModel = publicApi.addJsonModel(
     "Vessels",
-    omitDeep(
-      toJSONSchema(VesselsResponseSchema, {
-        target: "openapi-3.0",
-      }) as JsonSchema,
-      "pattern",
-    ),
+    vesselsSchema,
   );
   const [vesselResource, vesselsResource] = createVesselResources(
     stack,
@@ -53,14 +58,16 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     vesselsModel,
   );
 
+  const dirwaysSchema = omitDeep(
+    toJSONSchema(DirwayFeatureCollectionSchema, {
+      target: "draft-4",
+    }) as JsonSchema,
+    "pattern",
+  );
+
   const dirwaysModel = publicApi.addJsonModel(
     "Dirways",
-    omitDeep(
-      toJSONSchema(DirwayFeatureCollectionSchema, {
-        target: "openapi-3.0",
-      }) as JsonSchema,
-      "pattern",
-    ),
+    dirwaysSchema,
   );
   const dirwaysResource = createDirwayResources(
     stack,
@@ -93,6 +100,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
       "activeTo",
       "An ISO 8601 date-time. Filters for vessels with related activities or planned assistances starting or in progress before this time.",
     ),
+    DocumentationPart.pathParameter("vesselId", "IMO or MMSI"),
   );
 
   publicApi.documentResource(

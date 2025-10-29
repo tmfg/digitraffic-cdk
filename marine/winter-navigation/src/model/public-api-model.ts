@@ -12,7 +12,7 @@ export const DirwaySchema = z.object({
   name: z.string(),
   description: z.string(),
 }).describe(
-  "Dirways are paths published by icebreakers to help coordinate the movement of vessel through the ice.",
+  "Dirways are paths published by icebreakers to help coordinate the movement of vessels through the ice.",
 );
 
 export const DirwayFeatureSchema = FeatureSchema.omit({ id: true }).extend({
@@ -32,7 +32,7 @@ export type DirwayFeature = z.infer<typeof DirwayFeatureSchema>;
 //locations
 export const RestrictionSchema = z.object({
   startTime: z.iso.datetime(),
-  endTime: z.iso.datetime().optional(),
+  endTime: z.iso.datetime().nullable(),
   textCompilation: z.string().describe(
     "Textual presentation of the restriction.",
   ),
@@ -42,7 +42,7 @@ export const RestrictionSchema = z.object({
 
 export const SuspensionSchema = z.object({
   startTime: z.iso.datetime(),
-  endTime: z.iso.datetime().optional(),
+  endTime: z.iso.datetime().nullable(),
   prenotification: z.boolean().describe(
     "Whether suspension is announced to users before it starts.",
   ),
@@ -50,7 +50,7 @@ export const SuspensionSchema = z.object({
     "Bit indicating whether the port is entirely closed to all operations.",
   ),
   dueTo: z.string().describe("Main reason for port suspension."),
-  specifications: z.string().optional().describe(
+  specifications: z.string().nullable().describe(
     "More specific reason for port suspension. ",
   ),
 }).describe("Information on port suspensions.");
@@ -65,15 +65,15 @@ export const LocationSchema = z.object({
   winterport: z.boolean().describe(
     "Boolean indicating whether a port is a winterport or not.",
   ),
-  restrictions: z.array(RestrictionSchema).optional(),
-  suspensions: z.array(SuspensionSchema).optional(),
+  restrictions: z.array(RestrictionSchema).nullable(),
+  suspensions: z.array(SuspensionSchema).nullable(),
 }).describe(
   "Locations are points of interest on a map, usually ports, that can have restrictions placed on them.",
 );
 
 export const LocationFeatureSchema = FeatureSchema.omit({ id: true }).extend({
   properties: LocationSchema,
-  geometry: PointSchema,
+  geometry: PointSchema.nullable(),
 }).describe("GeoJSON Feature");
 
 export const LocationFeatureCollectionSchema = FeatureCollectionSchema.extend({
@@ -83,16 +83,16 @@ export const LocationFeatureCollectionSchema = FeatureCollectionSchema.extend({
 // vessels
 export const AssistanceReceivedVesselSchema = z.object({
   assistingVessel: z.object({
-    imo: z.number().optional(),
-    mmsi: z.number().optional(),
+    imo: z.number().nullable(),
+    mmsi: z.number().nullable(),
     name: z.string(),
   }).describe("Vessel that is assisting"),
 });
 
 export const AssistanceGivenVesselSchema = z.object({
   assistedVessel: z.object({
-    imo: z.number().optional(),
-    mmsi: z.number().optional(),
+    imo: z.number().nullable(),
+    mmsi: z.number().nullable(),
     name: z.string(),
   }).describe("Vessel that is being assisted"),
 });
@@ -102,7 +102,7 @@ export const BasePlannedAssistanceSchema = z.object({
     "Order number of this assistance in the icebreaker's queue of planned assistances",
   ),
   startTime: z.iso.datetime(),
-  endTime: z.iso.datetime().optional(),
+  endTime: z.iso.datetime().nullable(),
 });
 
 export const AssistanceReceivedSchema = BasePlannedAssistanceSchema.extend(
@@ -128,12 +128,12 @@ export const BaseActivitySchema = z.object({
       "Activities that affect both vessel and icebreaker:\n" +
       "- LED, TOW",
   ),
-  reason: z.string().optional().describe("Optional reason for activity"),
-  publicComment: z.string().optional().describe(
+  reason: z.string().nullable().describe("Optional reason for activity"),
+  publicComment: z.string().nullable().describe(
     "Optional publicly available specification for activity.",
   ),
   startTime: z.iso.datetime(),
-  endTime: z.iso.datetime().optional(),
+  endTime: z.iso.datetime().nullable(),
 });
 
 export const ActivitySchema = z.union([
@@ -144,26 +144,26 @@ export const ActivitySchema = z.union([
 
 export const VesselSchema = z.object({
   name: z.string(),
-  callSign: z.string().optional().describe("VHF callsign"),
-  shortcode: z.string().optional().describe(
+  callSign: z.string().nullable().describe("VHF callsign"),
+  shortcode: z.string().nullable().describe(
     "Three letter code for vessel. Not unique, but might be useful to differentiate between vessels where space is limited.",
   ),
-  imo: z.number().optional(),
-  mmsi: z.number().optional(),
-  type: z.string().optional().describe(
+  imo: z.number().nullable(),
+  mmsi: z.number().nullable(),
+  type: z.string().nullable().describe(
     "Vessel type. Current list of types (subject to change): Barge, Bulk Cargo, Container Cargo, General Cargo, Icebreaker, Other vessel, Passenger Ship, Pusher, Pusher+Barge, Refridgerated Cargo, River Tonnage, Roro Cargo, Supply Ship, Tanker, Tug, Tug+Barge, Vehicle Carrier",
   ),
-  activities: z.array(ActivitySchema).optional().describe(
+  activities: z.array(ActivitySchema).nullable().describe(
     "A list of all activities related to this vessel.",
   ),
-  plannedAssistances: z.array(PlannedAssistanceSchema).optional().describe(
+  plannedAssistances: z.array(PlannedAssistanceSchema).nullable().describe(
     "Planned assistances where the vessel is either the icebreaker or the one being assisted.",
   ),
-  lastUpdated: z.iso.datetime().optional(),
+  lastUpdated: z.iso.datetime().nullable(),
 });
 
 export const VesselsResponseSchema = z.object({
-  lastUpdated: z.iso.datetime().optional(),
+  lastUpdated: z.iso.datetime().nullable(),
   vessels: z.array(VesselSchema),
 });
 
