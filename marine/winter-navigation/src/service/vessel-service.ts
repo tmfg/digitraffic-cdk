@@ -77,7 +77,8 @@ function convertVessel(
     plannedAssistances: (v.queues && v.queues.length > 0)
       ? v.queues.map((q): PlannedAssistance => convertQueue(q, v))
       : null,
-    lastUpdated: lastUpdated?.toISOString() ?? null,
+    // lastUpdated should be left out from responses containing multiple vessels (a single property should be placed in response root instead)
+    ...(lastUpdated && { lastUpdated: lastUpdated.toISOString() }),
   };
 }
 

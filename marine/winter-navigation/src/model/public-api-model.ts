@@ -159,7 +159,7 @@ export const VesselSchema = z.object({
   plannedAssistances: z.array(PlannedAssistanceSchema).nullable().describe(
     "Planned assistances where the vessel is either the icebreaker or the one being assisted.",
   ),
-  lastUpdated: z.iso.datetime().nullable(),
+  lastUpdated: z.iso.datetime().nullable().optional(),
 });
 
 export const VesselsResponseSchema = z.object({
