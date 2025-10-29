@@ -39,9 +39,9 @@ export class PublicApi {
     this.createV1ResourcePaths();
     this.createDatex233Resource(stack);
     this.createImageResource(stack);
-    this.createSituationsDatex35Resource(stack);
-    this.createStatusesDatex35Resource(stack);
-    this.createControllersDatex35Resource(stack);
+    //    this.createSituationsDatex35Resource(stack);
+    //    this.createStatusesDatex35Resource(stack);
+    //    this.createControllersDatex35Resource(stack);
   }
 
   createV1ResourcePaths(): void {
