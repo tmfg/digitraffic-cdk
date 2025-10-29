@@ -92,7 +92,7 @@ export const handler = async (): Promise<void> => {
     return openapiSchema.parse(JSON.parse(schema));
   });
 
-  // add nullable: true in place of broken anyOf: [schema, null] fields added by apigw
+  // add nullable: true in place of broken anyOf: [schema, null] and similar oneOf fields produced by apigw
   apis.forEach(fixApiGatewayNullable);
 
   const appApi = await getAppData(appUrl);

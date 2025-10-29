@@ -94,11 +94,11 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     DocumentationPart.method(WN_TAGS_V2, "GetVessel", "Return one vessel"),
     DocumentationPart.queryParameter(
       "activeFrom",
-      "An ISO 8601 date-time. Filters for vessels with related activities or planned assistances starting or in progress after this time.",
+      "An ISO 8601 date-time. Filters for related activities or planned assistances starting or in progress after this time.",
     ),
     DocumentationPart.queryParameter(
       "activeTo",
-      "An ISO 8601 date-time. Filters for vessels with related activities or planned assistances starting or in progress before this time.",
+      "An ISO 8601 date-time. Filters for related activities or planned assistances starting or in progress before this time.",
     ),
     DocumentationPart.pathParameter("vesselId", "IMO or MMSI"),
   );
