@@ -1,4 +1,4 @@
-import { convertTextToSvg } from "../../../service/text-converter.js";
+import { convertTextToSvg } from "../../service/text-converter.js";
 
 describe("text-converter-tests", () => {
   test("empty_errors", () => {

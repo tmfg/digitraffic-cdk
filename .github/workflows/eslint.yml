@@ -20,7 +20,7 @@ jobs:
         with:
           name: Digitraffic CI
           email: digitraffic@solita.fi
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
 
@@ -50,7 +50,7 @@ jobs:
         run: python ${{ env.CI_DIR }}/find-reports.py
 
       - name: Archive reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: reports
           path: ${{ github.ref_name }}/
@@ -68,7 +68,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Download reports
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: reports
           path: reports/${{ github.ref_name }}/

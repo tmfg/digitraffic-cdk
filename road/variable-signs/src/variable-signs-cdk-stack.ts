@@ -17,6 +17,7 @@ export class VariableSignsCdkStack extends DigitrafficStack {
 
     new IntegrationApi(this);
     const publicApi = new PublicApi(this);
+    publicApi.restApi.exportEndpoint();
     new Canaries(this, publicApi.restApi);
   }
 }

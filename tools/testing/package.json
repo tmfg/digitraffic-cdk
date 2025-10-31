@@ -28,9 +28,9 @@
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/common": "2025.9.26-1",
+    "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "^30.2.0",
     "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
