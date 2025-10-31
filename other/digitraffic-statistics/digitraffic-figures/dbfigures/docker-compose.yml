@@ -17,7 +17,7 @@ services:
       - 8080:8080
 
   flyway:
-    image: flyway/flyway:11.8.0-alpine
+    image: flyway/flyway:11-alpine
     command: "-url=jdbc:mysql://db/${DB_DATABASE}?allowPublicKeyRetrieval=true -password=${DB_PASSWORD} -user=${DB_USER} -connectRetries=60 migrate"
     volumes:
       - ./sql:/flyway/sql
