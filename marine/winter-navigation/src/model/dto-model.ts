@@ -16,8 +16,8 @@ export interface DirwayDTO extends DbData<Dirway> {
 export type SuspensionDTO = DbData<Suspension>;
 export type RestrictionDTO = DbData<Restriction>;
 export interface LocationDTO extends DbData<Location> {
-  readonly restrictions: RestrictionDTO[];
-  readonly suspensions: SuspensionDTO[];
+  readonly restrictions?: RestrictionDTO[];
+  readonly suspensions?: SuspensionDTO[];
 }
 export type QueueDTO = DbData<Queue> & {
   readonly icebreaker_imo?: number;

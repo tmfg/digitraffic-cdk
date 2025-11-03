@@ -80,10 +80,10 @@ function convertToFeature(
       winterport: location.winterport,
       restrictions: (location.restrictions && location.restrictions.length > 0)
         ? location.restrictions.map(convertRestriction)
-        : null,
+        : [],
       suspensions: (location.suspensions && location.suspensions.length > 0)
         ? location.suspensions.map(convertSuspension)
-        : null,
+        : [],
     },
   };
 }

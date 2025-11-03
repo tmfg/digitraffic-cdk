@@ -73,10 +73,10 @@ function convertVessel(
     type: v.type ?? null,
     activities: (v.activities && v.activities.length > 0)
       ? v.activities.map((a): Activity => convertActivity(a, v))
-      : null,
+      : [],
     plannedAssistances: (v.queues && v.queues.length > 0)
       ? v.queues.map((q): PlannedAssistance => convertQueue(q, v))
-      : null,
+      : [],
     // lastUpdated should be left out from responses containing multiple vessels (a single property should be placed in response root instead)
     ...(lastUpdated && { lastUpdated: lastUpdated.toISOString() }),
   };
