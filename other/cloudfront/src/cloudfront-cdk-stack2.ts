@@ -393,12 +393,6 @@ export class CloudfrontCdkStack2 extends Stack {
       let functionVersion;
 
       switch (functionType) {
-        case FunctionType.HISTORY_REDIRECT:
-          functionVersion = this._edgeFunctionFactory
-            .getHistoryRedirectFunction();
-
-          break;
-
         case FunctionType.INDEX_HTML:
           functionVersion = this._edgeFunctionFactory.getIndexHtmlFunction();
 

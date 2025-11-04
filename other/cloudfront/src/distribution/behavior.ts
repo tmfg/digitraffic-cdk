@@ -222,15 +222,6 @@ export class Behavior {
     return this;
   }
 
-  public withHistoryRedirectFunction(): this {
-    this.addFunction(
-      FunctionEventType.VIEWER_REQUEST,
-      FunctionType.HISTORY_REDIRECT,
-    );
-
-    return this;
-  }
-
   public withRedirectFunction(redirectUrl: string): this {
     this.addFunction(FunctionEventType.VIEWER_REQUEST, FunctionType.REDIRECT);
 

@@ -14,15 +14,6 @@ export class TrainHistoryStack extends Stack {
   }
 
   private ecrRepos(props: RataProps): void {
-    const trainHistoryWebRepo = ecr.Repository.fromRepositoryName(
-      this,
-      "trainHistoryWebRepo",
-      props.trainHistory.web.ecrRepo,
-    );
-    new CfnOutput(this, "trainHistoryWebRepoArnOutput", {
-      value: trainHistoryWebRepo.repositoryArn,
-    });
-
     const trainHistoryBackendRepo = ecr.Repository.fromRepositoryName(
       this,
       "trainHistoryBackendRepo",
