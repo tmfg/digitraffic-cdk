@@ -8521,8 +8521,11 @@
 .swagger-ui .parameters-col_description select {
   border-width: 1px;
 }
-.swagger-ui .parameters-col_description .markdown p,
-.swagger-ui .parameters-col_description .renderedMarkdown p {
+.swagger-ui .parameters-col_description .markdown:first-child p:first-child,
+.swagger-ui
+  .parameters-col_description
+  .renderedMarkdown:first-child
+  p:first-child {
   margin: 0;
 }
 .swagger-ui .parameter__name {
@@ -8579,9 +8582,13 @@
 .swagger-ui .response-col_description {
   width: 99%;
 }
-.swagger-ui .response-col_description .markdown p,
-.swagger-ui .response-col_description .renderedMarkdown p {
+.swagger-ui .response-col_description .markdown p:first-child,
+.swagger-ui .response-col_description .renderedMarkdown p:first-child {
   margin: 0;
+}
+.swagger-ui .response-col_description .markdown p:last-child,
+.swagger-ui .response-col_description .renderedMarkdown p:last-child {
+  margin-bottom: 0;
 }
 .swagger-ui .response-col_links {
   min-width: 6em;
