@@ -324,7 +324,7 @@ export async function getVessel(
   activeTo?: Date,
 ): Promise<VesselDTO | undefined> {
   return await db.oneOrNone(PS_GET_VESSEL, [
-    activeFrom ?? subDays(new Date(), 7),
+    activeFrom,
     activeTo,
     vesselId,
   ]) ??
@@ -338,9 +338,8 @@ export async function getVessels(
 ): Promise<VesselDTO[]> {
   logger.info({
     method: "GetVessels.getVessels",
-    message: `from: ${JSON.stringify(activeFrom)} to: ${
-      JSON.stringify(activeTo)
-    }`,
+    message: `from: ${JSON.stringify(activeFrom)} to: ${JSON.stringify(activeTo)
+      }`,
   });
 
   return db.manyOrNone(PS_GET_VESSELS, [
