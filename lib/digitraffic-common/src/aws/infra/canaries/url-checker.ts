@@ -131,6 +131,7 @@ export class UrlChecker {
   expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
     if (
       !this.requestOptions.headers ||
+      !(API_KEY_HEADER in this.requestOptions.headers) ||
       !this.requestOptions.headers[API_KEY_HEADER]
     ) {
       logger.error({

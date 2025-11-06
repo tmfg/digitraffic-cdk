@@ -1,6 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Dirway, Dirwaypoint } from "../model/apidata.js";
+import type { ApiData, Dirway, Dirwaypoint } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
+import type { DirwayDTO } from "../model/dto-model.js";
 
 const SQL_UPDATE_DIRWAYS = `
 insert into wn_dirway(id, name, description, deleted)
@@ -25,15 +26,20 @@ do update set
     deleted = false
 `;
 
-const SQL_GET_DIRWAYS = `select id, name, description
-from wn_dirway
-where deleted = false`;
-
-const SQL_GET_DIRWAYPOINTS =
-  `select dirway_id, order_num, name, latitude, longitude
-from wn_dirwaypoint
-where deleted = false
-order by dirway_id, order_num`;
+const SQL_GET_DIRWAYS = `
+SELECT 
+  d.id, d.name, d.description,
+  JSON_AGG(JSON_BUILD_OBJECT(
+    'order_num', p.order_num,
+    'name', p.name,
+    'latitude', p.latitude,
+    'longitude', p.longitude  
+  )) as dirwaypoints
+FROM wn_dirway d
+JOIN wn_dirwaypoint p ON d.id = p.dirway_id
+WHERE d.deleted = FALSE AND p.deleted = false
+GROUP BY d.id
+`;
 
 const PS_UPDATE_DIRWAYS = new pgPromise.PreparedStatement({
   name: "update-dirways",
@@ -50,14 +56,9 @@ const PS_GET_DIRWAYS = new pgPromise.PreparedStatement({
   text: SQL_GET_DIRWAYS,
 });
 
-const PS_GET_DIRWAYPOINTS = new pgPromise.PreparedStatement({
-  name: "get-dirwaypoints",
-  text: SQL_GET_DIRWAYPOINTS,
-});
-
 export function saveAllDirways(
   db: DTDatabase,
-  dirways: Dirway[],
+  dirways: ApiData<Dirway>[],
 ): Promise<unknown> {
   return Promise.all(
     dirways.map(async (d) => {
@@ -68,7 +69,7 @@ export function saveAllDirways(
 
 export function saveAllDirwaypoints(
   db: DTDatabase,
-  dirwaypoints: Dirwaypoint[],
+  dirwaypoints: ApiData<Dirwaypoint>[],
 ): Promise<unknown> {
   return Promise.all(
     dirwaypoints.map(async (d) => {
@@ -84,10 +85,6 @@ export function saveAllDirwaypoints(
   );
 }
 
-export async function getDirways(db: DTDatabase): Promise<Dirway[]> {
+export async function getDirways(db: DTDatabase): Promise<DirwayDTO[]> {
   return db.manyOrNone(PS_GET_DIRWAYS);
-}
-
-export async function getDirwaypoints(db: DTDatabase): Promise<Dirwaypoint[]> {
-  return db.manyOrNone(PS_GET_DIRWAYPOINTS);
 }

@@ -8,7 +8,7 @@ import {
   withoutMethods,
   withoutSecurity,
 } from "../../swagger-utils.js";
-import { exportSwaggerApi } from "../../apigw-utils.js";
+import { exportSwaggerApi, fixApiGatewayNullable } from "../../apigw-utils.js";
 import {
   ObjectCannedACL,
   PutObjectCommand,
@@ -89,14 +89,11 @@ export const handler = async (): Promise<void> => {
     const body: Uint8Array = resp.body;
     const schema = Buffer.from(body.buffer).toString();
 
-    /*
-    logger.info({
-      method: "UpdateSwagger.handler",
-      customSchema: schema,
-    });*/
-
     return openapiSchema.parse(JSON.parse(schema));
   });
+
+  // add nullable: true in place of broken anyOf: [schema, null] and similar oneOf fields produced by apigw
+  apis.forEach(fixApiGatewayNullable);
 
   const appApi = await getAppData(appUrl);
   const appBetaApi = await getAppData(appBetaUrl);

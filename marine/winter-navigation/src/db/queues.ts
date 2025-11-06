@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Queue } from "../model/apidata.js";
+import type { ApiData, Queue } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_QUEUES = `
@@ -15,6 +15,11 @@ do update set
     deleted = false
 `;
 
+const SQL_GET_QUEUES = `
+  select id, icebreaker_id, vessel_id, start_time, end_time, order_num
+  from wn_queue where deleted = false
+`;
+
 const PS_UPDATE_QUEUES = new pgPromise.PreparedStatement({
   name: "update-queues",
   text: SQL_UPDATE_QUEUES,
@@ -22,7 +27,7 @@ const PS_UPDATE_QUEUES = new pgPromise.PreparedStatement({
 
 export function saveAllQueues(
   db: DTDatabase,
-  queues: Queue[],
+  queues: ApiData<Queue>[],
 ): Promise<unknown> {
   return Promise.all(
     queues.map(async (q) => {
@@ -36,4 +41,8 @@ export function saveAllQueues(
       ]);
     }),
   );
+}
+
+export async function getQueues(db: DTDatabase): Promise<Queue[]> {
+  return db.any(SQL_GET_QUEUES);
 }

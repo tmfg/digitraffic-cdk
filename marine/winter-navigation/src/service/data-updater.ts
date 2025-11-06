@@ -3,7 +3,7 @@ import {
   inDatabase,
 } from "@digitraffic/common/dist/database/database";
 import { type ApiPath, IbnetApi } from "../api/ibnet-api.js";
-import type { BaseAttributes, Deleted } from "../model/apidata.js";
+import type { ApiMetaData, Deleted } from "../model/api-db-model.js";
 import { setDeleted, type TableName } from "../db/deleted.js";
 import { getDataVersion, updateDataVersion } from "../db/data-version.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -18,6 +18,7 @@ import { saveAllActivities } from "../db/activities.js";
 import { saveAllSources } from "../db/sources.js";
 import { saveAllQueues } from "../db/queues.js";
 import { saveAllDirwaypoints, saveAllDirways } from "../db/dirways.js";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 
 type SaveFunction<T> = (db: DTDatabase, objects: T[]) => unknown;
 
@@ -81,23 +82,28 @@ export class DataUpdater {
     });
   }
 
-  async updateObjects<T extends BaseAttributes | Deleted>(
+  async updateObjects<T extends ApiMetaData | Deleted>(
     db: DTDatabase,
     tableName: TableName,
     to: number,
     apiPath: ApiPath,
     saveObjects: SaveFunction<T>,
   ): Promise<void> {
-    const start = Date.now();
+    const start = new Date();
 
     const from = await getDataVersion(db, tableName);
 
-    if (from === -1) {
-      logger.error({
-        method: "DataUpdater.updateObjects",
-        message: "Could not get current version from server",
-      });
+    await LastUpdatedDB.updateUpdatedTimestamp(
+      db,
+      `${tableName.toUpperCase()}_CHECK`,
+      start,
+    );
 
+    if (from === to) {
+      logger.info({
+        method: "DataUpdater.updateObjects",
+        message: `Version number for ${tableName} not changed, skipping update`,
+      });
       return;
     }
 
@@ -121,14 +127,16 @@ export class DataUpdater {
       await setDeleted(db, tableName, deleted);
     }
 
-    await updateDataVersion(db, tableName, to);
+    if (deleted.length > 0 || updated.length > 0) {
+      await updateDataVersion(db, tableName, to);
+    }
 
     logger.info({
       method: "DataUpdater.updateObjects",
       customObjectName: tableName,
       customUpdatedCount: updated.length,
       customDeletedCount: deleted.length,
-      tookMs: Date.now() - start,
+      tookMs: Date.now() - start.getTime(),
     });
   }
 }
