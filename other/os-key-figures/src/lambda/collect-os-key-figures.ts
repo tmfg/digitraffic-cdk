@@ -402,7 +402,7 @@ export async function getApiPaths(): Promise<
   railSwaggerPaths.add("/api/v1/trains/history");
   railSwaggerPaths.add("/infra-api/");
   railSwaggerPaths.add("/jeti-api/");
-  railSwaggerPaths.add("/history/");
+  railSwaggerPaths.add("/history");
   railSwaggerPaths.add("/vuosisuunnitelmat");
 
   roadSwaggerPaths.add("/*.JPG");
