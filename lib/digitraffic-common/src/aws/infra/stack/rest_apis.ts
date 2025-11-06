@@ -115,12 +115,14 @@ export class DigitrafficRestApi extends RestApi {
       apiKeyId = firstKey;
     }
 
+    // eslint-disable-next-line no-new
     new StringParameter(this._stack, "export.endpoint", {
       parameterName:
         `/digitraffic/${this._stack.configuration.shortName}/endpointUrl`,
       stringValue: this.url,
     });
 
+    // eslint-disable-next-line no-new
     new StringParameter(this._stack, "export.apiKeyId", {
       parameterName:
         `/digitraffic/${this._stack.configuration.shortName}/apiKeyId`,
@@ -128,7 +130,13 @@ export class DigitrafficRestApi extends RestApi {
     });
   }
 
+  /**
+   * @param apiKeyId
+   * @param apiKeyName
+   * @deprecated Uses deprecated createUsagePlan that creates randomized API key names, use createUsagePlanV2 instead
+   */
   createUsagePlan(apiKeyId: string, apiKeyName: string): string {
+    // eslint-disable-next-line deprecation/deprecation
     const newKeyId = createUsagePlan(this, apiKeyId, apiKeyName).keyId;
 
     this.apiKeyIds.push(newKeyId);

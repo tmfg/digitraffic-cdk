@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Source } from "../model/apidata.js";
+import type { ApiData, Source } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_SOURCES = `
@@ -15,6 +15,11 @@ do update set
     deleted = false
 `;
 
+const SQL_GET_SOURCES = `
+  select id, name, shortname, nationality, type, vessel_id
+  from wn_source where deleted = false
+`;
+
 const PS_UPDATE_SOURCES = new pgPromise.PreparedStatement({
   name: "update-sources",
   text: SQL_UPDATE_SOURCES,
@@ -22,7 +27,7 @@ const PS_UPDATE_SOURCES = new pgPromise.PreparedStatement({
 
 export function saveAllSources(
   db: DTDatabase,
-  sources: Source[],
+  sources: ApiData<Source>[],
 ): Promise<unknown> {
   return Promise.all(
     sources.map(async (s) => {
@@ -36,4 +41,8 @@ export function saveAllSources(
       ]);
     }),
   );
+}
+
+export async function getSources(db: DTDatabase): Promise<Source[]> {
+  return db.any(SQL_GET_SOURCES);
 }

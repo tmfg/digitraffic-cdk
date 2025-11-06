@@ -7,12 +7,23 @@ import { z, ZodError } from "zod";
 
 const proxyHolder = ProxyHolder.create();
 
+// the total payload size limit is 6291556 bytes, but there will be other data in the payload in addition to the body
+const MAX_PAYLOAD_BODY_SIZE_BYTES = 4.5 * 1024 * 1024;
+
 const GetVesselSchema = z.object({
-  "vessel-id": z.string().optional(),
+  // path parameter
+  "vesselId": z.string().transform(Number).optional(),
+  // query parameters absent from original request appear as empty strings in Lambda event
+  "activeFrom": z.string().transform((val) => val ? new Date(val) : undefined)
+    .optional(),
+  "activeTo": z.string().transform((val) => val ? new Date(val) : undefined)
+    .optional(),
 }).strict();
 
+export type GetVesselEvent = z.input<typeof GetVesselSchema>;
+
 export const handler = async (
-  event: Record<string, string>,
+  event: GetVesselEvent,
 ): Promise<LambdaResponse> => {
   const start = Date.now();
 
@@ -21,9 +32,11 @@ export const handler = async (
     await proxyHolder.setCredentials();
 
     // get single vessel
-    if (getVesselEvent["vessel-id"]) {
+    if (getVesselEvent.vesselId) {
       const [vessel, lastUpdated] = await getVessel(
-        getVesselEvent["vessel-id"],
+        getVesselEvent.vesselId,
+        getVesselEvent.activeFrom,
+        getVesselEvent.activeTo,
       );
 
       if (!vessel) {
@@ -36,13 +49,36 @@ export const handler = async (
     }
 
     // get all vessels
-    const [vessels, lastUpdated] = await getVessels();
+    const [vessels, lastUpdated] = await getVessels(
+      getVesselEvent.activeFrom,
+      getVesselEvent.activeTo,
+    );
+
+    const responseBody = JSON.stringify(vessels);
+    const payloadSizeBytes = Buffer.from(responseBody).length;
+
+    if (payloadSizeBytes > MAX_PAYLOAD_BODY_SIZE_BYTES) {
+      logger.warn({
+        method: "GetVessels.handler",
+        message:
+          `Response payload is too large with parameters ${getVesselEvent.activeFrom?.toISOString()} and ${getVesselEvent.activeTo?.toISOString()}`,
+        customBytes: payloadSizeBytes,
+        customLimit: MAX_PAYLOAD_BODY_SIZE_BYTES,
+      });
+      return LambdaResponse.contentTooLarge(
+        "Response too large. Please use query parameters to limit the size.",
+      );
+    }
 
     return lastUpdated
       ? LambdaResponse.okJson(vessels).withTimestamp(lastUpdated)
       : LambdaResponse.okJson(vessels);
   } catch (error) {
     if (error instanceof ZodError) {
+      logger.error({
+        method: "GetVessels.handler",
+        message: JSON.stringify(error.issues),
+      });
       return LambdaResponse.badRequest(JSON.stringify(error.issues));
     }
 

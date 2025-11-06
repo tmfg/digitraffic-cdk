@@ -1,5 +1,5 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase, mockProxyHolder } from "../db-testutil.js";
+import { dbTestBase } from "../db-testutil.js";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { saveAllLocations } from "../../db/locations.js";
 import {
@@ -8,15 +8,20 @@ import {
   PORT_SUSPENSION_LOCATION_1,
   RESTRICTION_1,
 } from "../service/data-updater.test.js";
-import { type DTLocation } from "../../model/dt-apidata.js";
+
 import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { saveAllRestrictions } from "../../db/restrictions.js";
 import {
   saveAllPortSuspensionLocations,
   saveAllPortSuspensions,
 } from "../../db/port-suspensions.js";
+import { mockProxyHolder } from "../mock.js";
+import type {
+  LocationFeature,
+  LocationFeatureCollection,
+} from "../../model/public-api-model.js";
 
-await mockProxyHolder();
+mockProxyHolder();
 
 async function insertLocation(db: DTDatabase): Promise<void> {
   await saveAllLocations(db, [LOCATION_1]);
@@ -41,7 +46,13 @@ describe(
     test("get all - empty", async () => {
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectJson([]);
+      ExpectResponse.ok(response).expectContent(
+        (body: LocationFeatureCollection) => {
+          expect(body.type).toEqual("FeatureCollection");
+          expect(body.features).toEqual([]);
+          expect(body).toHaveProperty("lastUpdated");
+        },
+      );
     });
 
     test("get all - one location", async () => {
@@ -49,13 +60,15 @@ describe(
 
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectContent((locations: DTLocation[]) => {
-        expect(locations.length).toEqual(1);
-      });
+      ExpectResponse.ok(response).expectContent(
+        (locations: LocationFeatureCollection) => {
+          expect(locations.features.length).toEqual(1);
+        },
+      );
     });
 
     test("get one - not found", async () => {
-      const response = await getResponseFromLambda({ "location-id": "foo" });
+      const response = await getResponseFromLambda({ "locode": "foo" });
 
       ExpectResponse.notFound(response);
     });
@@ -63,17 +76,17 @@ describe(
     test("get one - found", async () => {
       await insertLocation(db);
 
-      const response = await getResponseFromLambda({ "location-id": "id1" });
+      const response = await getResponseFromLambda({ "locode": "FIHEL" });
 
-      ExpectResponse.ok(response).expectContent((location: DTLocation) => {
-        expect(location.name).toEqual(LOCATION_1.name);
-        expect(location.restrictions?.length).toEqual(1);
-        expect(location.restrictions![0]!.textCompilation).toEqual(
+      ExpectResponse.ok(response).expectContent((location: LocationFeature) => {
+        expect(location.properties.name).toEqual(LOCATION_1.name);
+        expect(location.properties.restrictions?.length).toEqual(1);
+        expect(location.properties.restrictions![0]!.textCompilation).toEqual(
           RESTRICTION_1.text_compilation,
         );
 
-        expect(location.suspensions?.length).toEqual(1);
-        expect(location.suspensions![0]!.dueTo).toEqual(
+        expect(location.properties.suspensions?.length).toEqual(1);
+        expect(location.properties.suspensions![0]!.dueTo).toEqual(
           PORT_SUSPENSION_1.due_to,
         );
       });

@@ -61,9 +61,9 @@ function coordinatePair(coordinate: Position): string {
  * @param features List of Features
  * @param lastUpdated Last updated date
  */
-// eslint-disable-next-line @rushstack/no-new-null
 export function createFeatureCollection(
   features: Feature[],
+  // eslint-disable-next-line @rushstack/no-new-null
   lastUpdated: Date | null,
 ): FeatureCollection {
   return {

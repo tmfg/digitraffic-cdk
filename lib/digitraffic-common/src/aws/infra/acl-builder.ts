@@ -307,6 +307,32 @@ export class AclBuilder {
     );
   }
 
+  /**
+   * Block requests with a query string larger than the specified size.
+   */
+  withQueryStringSizeRestriction(limit: number): this {
+    this._blockRules.push({
+      name: "QueryStringSizeRestriction",
+      action: { block: {} },
+      statement: {
+        sizeConstraintStatement: {
+          fieldToMatch: {
+            queryString: {},
+          },
+          comparisonOperator: "GT",
+          size: limit,
+          textTransformations: [{ priority: 0, type: "NONE" }],
+        },
+      },
+      visibilityConfig: {
+        sampledRequestsEnabled: true,
+        cloudWatchMetricsEnabled: true,
+        metricName: "QueryStringSizeRestriction",
+      },
+    });
+    return this;
+  }
+
   _isCustomResponseBodyKeySet(key: string): boolean {
     return key in this._customResponseBodies;
   }

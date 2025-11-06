@@ -2,73 +2,154 @@ import {
   type DTDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
-import type { DTActivity, DTVessel } from "../model/dt-apidata.js";
 import * as VesselDB from "../db/vessels.js";
-import * as ActivityDB from "../db/activities.js";
-import type { Activity, Vessel } from "../model/apidata.js";
-import { groupBy } from "lodash-es";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+
+import type { ActivityDTO, QueueDTO, VesselDTO } from "../model/dto-model.js";
+import type {
+  Activity,
+  PlannedAssistance,
+  Vessel,
+  VesselsResponse,
+} from "../model/public-api-model.js";
+import { VESSEL_CHECK } from "../keys.js";
 
 export function getVessel(
-  vesselId: string,
-): Promise<[DTVessel | undefined, Date | undefined]> {
+  vesselId: number,
+  activeFrom?: Date,
+  activeTo?: Date,
+): Promise<[Vessel | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const vessel = await VesselDB.getVessel(db, vesselId);
-    const lastUpdated = undefined;
+    const vessel = await VesselDB.getVessel(db, vesselId, activeFrom, activeTo);
+    const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
+      db,
+      VESSEL_CHECK,
+    );
 
     if (!vessel) {
       return Promise.resolve([undefined, lastUpdated ?? undefined]);
     }
 
-    const activities = await ActivityDB.getActivities(db);
-    //        const restrictions = await RestrictionsDB.getRestrictions(db);
-    const dtVessels = convertVessels([vessel], activities);
+    const dtVessel = convertVessel(vessel, lastUpdated ?? undefined);
 
-    return [dtVessels[0], lastUpdated ?? undefined];
+    return [dtVessel, lastUpdated ?? undefined];
   });
 }
 
-export function getVessels(): Promise<[DTVessel[], Date | undefined]> {
+export function getVessels(
+  activeFrom?: Date,
+  activeTo?: Date,
+): Promise<[VesselsResponse, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const vessels = await VesselDB.getVessels(db);
-    const activities = await ActivityDB.getActivities(db);
-    const lastUpdated = undefined;
-    const dtVessels = convertVessels(vessels, activities);
-
-    return [dtVessels, lastUpdated ?? undefined];
+    const vessels = await VesselDB.getVessels(db, activeFrom, activeTo);
+    const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
+      db,
+      VESSEL_CHECK,
+    );
+    const dtVessels = vessels
+      .filter((v) =>
+        (!!v.queues && v.queues.length > 0) ||
+        (!!v.activities && v.activities.length > 0)
+      )
+      .map((v) => convertVessel(v));
+    const response = {
+      lastUpdated: lastUpdated?.toISOString() ?? null,
+      vessels: dtVessels,
+    };
+    return [response, lastUpdated ?? undefined];
   });
-}
-
-function convertVessels(vessels: Vessel[], activities: Activity[]): DTVessel[] {
-  const activityMap = groupBy(activities, "vessel_id");
-
-  return vessels.map((v) => convertVessel(v, activityMap));
 }
 
 function convertVessel(
-  v: Vessel,
-  activityMap: Record<string, Activity[]>,
-): DTVessel {
-  const dbActivities = activityMap[v.id];
-  const activities = dbActivities ? convertActivities(dbActivities) : undefined;
-
+  v: VesselDTO,
+  lastUpdated?: Date,
+): Vessel {
   return {
     name: v.name,
-    callSign: v.callsign,
-    shortcode: v.shortcode,
-    mmsi: v.mmsi,
-    imo: v.imo,
-    activities,
+    callSign: v.callsign ?? null,
+    shortcode: v.shortcode ?? null,
+    mmsi: v.mmsi ?? null,
+    imo: v.imo ?? null,
+    type: v.type ?? null,
+    activities: (v.activities && v.activities.length > 0)
+      ? v.activities.map((a): Activity => convertActivity(a, v))
+      : [],
+    plannedAssistances: (v.queues && v.queues.length > 0)
+      ? v.queues.map((q): PlannedAssistance => convertQueue(q, v))
+      : [],
+    // lastUpdated should be left out from responses containing multiple vessels (a single property should be placed in response root instead)
+    ...(lastUpdated && { lastUpdated: lastUpdated.toISOString() }),
   };
 }
 
-function convertActivities(activities: Activity[]): DTActivity[] {
-  return activities.map((a) => {
+function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
+  const isIcebreaker = v.mmsi === a.icebreaker_mmsi ||
+    v.imo === a.icebreaker_imo;
+  const isVessel = v.mmsi === a.vessel_mmsi || v.imo === a.vessel_imo;
+  const baseActivity = {
+    type: a.type,
+    reason: a.reason ?? null,
+    publicComment: a.public_comment ?? null,
+    startTime: a.start_time,
+    endTime: a.end_time ?? null,
+  };
+  // If this activity concerns both an assisted vessel and an assisting icebreaker and
+  // the current vessel is not the icebreaker, the property assistingVessel is set.
+  // In the opposite situation (current vessel is icebreaker), the property assistedVessel is set.
+  if (isVessel && !!a.icebreaker_id) {
     return {
-      type: a.type,
-      reason: a.reason,
-      publicComment: a.public_comment,
-      startTime: a.start_time,
-      endTime: a.end_time,
-    } satisfies DTActivity;
-  });
+      ...baseActivity,
+      assistingVessel: {
+        imo: a.icebreaker_imo ?? null,
+        mmsi: a.icebreaker_mmsi ?? null,
+        name: a.icebreaker_name,
+      },
+    };
+  }
+
+  if (isIcebreaker && !!a.vessel_id) {
+    return {
+      ...baseActivity,
+      assistedVessel: {
+        imo: a.vessel_imo ?? null,
+        mmsi: a.vessel_mmsi ?? null,
+        name: a.vessel_name,
+      },
+    };
+  }
+
+  // In this case current activity concerns only a single vessel (or icebreaker)
+  return baseActivity;
+}
+
+function convertQueue(q: QueueDTO, v: VesselDTO): PlannedAssistance {
+  const isIcebreaker = v.mmsi === q.icebreaker_mmsi ||
+    v.imo === q.icebreaker_imo;
+
+  const baseAssistance = {
+    queuePosition: q.order_num,
+    startTime: q.start_time,
+    endTime: q.end_time ?? null,
+  };
+
+  // leave out from the assistance object redundant reference to current vessel
+  if (isIcebreaker) {
+    return {
+      assistedVessel: {
+        imo: q.vessel_imo ?? null,
+        mmsi: q.vessel_mmsi ?? null,
+        name: q.vessel_name,
+      },
+      ...baseAssistance,
+    };
+  } else {
+    return {
+      assistingVessel: {
+        imo: q.icebreaker_imo ?? null,
+        mmsi: q.icebreaker_mmsi ?? null,
+        name: q.icebreaker_name,
+      },
+      ...baseAssistance,
+    };
+  }
 }

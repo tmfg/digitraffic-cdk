@@ -2,26 +2,30 @@ import {
   type DTDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
-import {
-  type DTLocation,
-  type DTRestriction,
-  type DTSuspension,
-} from "../model/dt-apidata.js";
 import * as LocationDB from "../db/locations.js";
-import * as RestrictionsDB from "../db/restrictions.js";
-import * as SuspensionDB from "../db/port-suspensions.js";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-import type { Location, Restriction } from "../model/apidata.js";
-import { groupBy } from "lodash-es";
-import type { PortSuspensionWithLocations } from "../model/db-models.js";
-
-export const LOCATIONS_CHECK = "LOCATIONS_CHECK";
+import type {
+  LocationDTO,
+  RestrictionDTO,
+  SuspensionDTO,
+} from "../model/dto-model.js";
+import type { Feature, Geometry } from "geojson";
+import type {
+  Location,
+  LocationFeature,
+  LocationFeatureCollection,
+  Restriction,
+  Suspension,
+} from "../model/public-api-model.js";
+import { LOCATIONS_CHECK } from "../keys.js";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 
 export function getLocation(
-  locationId: string,
-): Promise<[DTLocation | undefined, Date | undefined]> {
+  locode: string,
+  // eslint-disable-next-line @rushstack/no-new-null
+): Promise<[Feature<Geometry | null, Location> | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
-    const location = await LocationDB.getLocation(db, locationId);
+    const location = await LocationDB.getLocation(db, locode);
     const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
       db,
       LOCATIONS_CHECK,
@@ -31,91 +35,75 @@ export function getLocation(
       return Promise.resolve([undefined, lastUpdated ?? undefined]);
     }
 
-    const restrictions = await RestrictionsDB.getRestrictions(db);
-    const suspensions = await SuspensionDB.getSuspensions(db);
-    const dtLocations = convertLocations([location], restrictions, suspensions);
-
-    return [dtLocations[0], lastUpdated ?? undefined];
+    return [{
+      ...convertToFeature(location),
+      lastUpdated,
+    }, lastUpdated ?? undefined];
   });
 }
 
-export function getLocations(): Promise<[DTLocation[], Date | undefined]> {
+export function getLocations(): Promise<
+  [LocationFeatureCollection, Date | undefined]
+> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const locations = await LocationDB.getLocations(db);
     const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
       db,
       LOCATIONS_CHECK,
     );
-    const restrictions = await RestrictionsDB.getRestrictions(db);
-    const suspensions = await SuspensionDB.getSuspensions(db);
-    const dtLocations = convertLocations(locations, restrictions, suspensions);
 
-    return [dtLocations, lastUpdated ?? undefined];
+    const featureCollection = createFeatureCollection(
+      locations.map(convertToFeature),
+      lastUpdated,
+    );
+    return [featureCollection, lastUpdated ?? undefined];
   });
 }
 
-function convertLocations(
-  locations: Location[],
-  restrictions: Restriction[],
-  suspensions: PortSuspensionWithLocations[],
-): DTLocation[] {
-  const restrictionMap = groupBy(restrictions, "location_id");
-  const suspensionMap = groupBy(suspensions, "location_id");
-
-  return locations.map((l) =>
-    convertLocation(l, restrictionMap, suspensionMap)
-  );
-}
-
-function convertLocation(
-  l: Location,
-  restrictionMap: Record<string, Restriction[]>,
-  suspensionMap: Record<string, PortSuspensionWithLocations[]>,
-): DTLocation {
-  const dbRestrictions = restrictionMap[l.id];
-  const dbSuspensions = suspensionMap[l.id];
-
-  const restrictions = dbRestrictions
-    ? convertRestrictions(dbRestrictions)
-    : undefined;
-  const suspensions = dbSuspensions
-    ? convertSuspensions(dbSuspensions)
-    : undefined;
-
+function convertToFeature(
+  location: LocationDTO,
+): LocationFeature {
+  const geometry = location.longitude && location.latitude
+    ? {
+      type: "Point" as const,
+      coordinates: [location.longitude, location.latitude],
+    }
+    : null;
   return {
-    name: l.name,
-    type: l.type,
-    locodeList: l.locode_list,
-    nationality: l.nationality,
-    latitude: l.latitude,
-    longitude: l.longitude,
-    winterport: l.winterport,
-    restrictions,
-    suspensions,
-  } satisfies DTLocation;
+    type: "Feature",
+    geometry,
+    properties: {
+      name: location.name,
+      type: location.type,
+      locodeList: location.locode_list,
+      nationality: location.nationality,
+      winterport: location.winterport,
+      restrictions: (location.restrictions && location.restrictions.length > 0)
+        ? location.restrictions.map(convertRestriction)
+        : [],
+      suspensions: (location.suspensions && location.suspensions.length > 0)
+        ? location.suspensions.map(convertSuspension)
+        : [],
+    },
+  };
 }
 
-function convertRestrictions(restrictions: Restriction[]): DTRestriction[] {
-  return restrictions.map((r) => {
-    return {
-      startTime: r.start_time,
-      endTime: r.end_time,
-      textCompilation: r.text_compilation,
-    } satisfies DTRestriction;
-  });
+function convertSuspension(s: SuspensionDTO): Suspension {
+  return {
+    startTime: s.start_time,
+    endTime: s.end_time ?? null,
+    prenotification: s.prenotification,
+    portsClosed: s.ports_closed,
+    dueTo: s.due_to,
+    // field name is in plural in the database but in the source data it is singular
+    specifications: s.specifications ?? null,
+  };
 }
 
-function convertSuspensions(
-  suspensions: PortSuspensionWithLocations[],
-): DTSuspension[] {
-  return suspensions.map((s) => {
-    return {
-      startTime: s.start_time,
-      endTime: s.end_time,
-      prenotification: s.prenotification,
-      portsClosed: s.ports_closed,
-      dueTo: s.due_to,
-      specifications: s.specifications,
-    } satisfies DTSuspension;
-  });
+function convertRestriction(r: RestrictionDTO): Restriction {
+  return {
+    startTime: r.start_time,
+    endTime: r.end_time ?? null,
+    textCompilation: r.text_compilation,
+  };
 }
