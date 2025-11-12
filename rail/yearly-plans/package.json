@@ -1,0 +1,46 @@
+{
+  "name": "yearly-plans",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "heft build --clean && npm run build:bundle",
+    "build:bundle": "npm run compile-lambda",
+    "build:tsc": "heft build --clean",
+    "build:watch": "heft build-watch --clean",
+    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node22",
+    "cdk": "npx cdk@latest",
+    "compile-lambda": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda/update-plans --target=node22,es2022",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.700.0",
+    "@digitraffic/common": "2025.11.11-1",
+    "archiver": "^7.0.1",
+    "aws-cdk-lib": "~2.222.0",
+    "constructs": "~10.4.2",
+    "es-toolkit": "~1.41.0",
+    "ky": "~1.14.0",
+    "zod": "~4.1.12"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic/eslint-config": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@jest/globals": "^30.0.5",
+    "@rushstack/eslint-config": "^4.4.0",
+    "@rushstack/heft": "^0.74.2",
+    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@types/heft-jest": "1.0.6",
+    "@types/jest": "30.0.0",
+    "@types/node": "22.15.2",
+    "@types/geojson": "^7946.0.16",
+    "@types/archiver": "^7.0.0",
+    "date-fns": "4.1.0",
+    "esbuild": "0.25.9",
+    "eslint": "^8.57.0",
+    "typescript": "^5.9.2"
+  }
+}
