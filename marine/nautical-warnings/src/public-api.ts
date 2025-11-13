@@ -85,10 +85,14 @@ export class PublicApi {
     const activeIntegration = new DigitrafficIntegration(
       lambdaActive,
       MediaType.APPLICATION_GEOJSON,
+      // set deprecation
+      true,
     ).build();
     const archivedIntegration = new DigitrafficIntegration(
       lambdaArchived,
       MediaType.APPLICATION_GEOJSON,
+      // set deprecation
+      true,
     ).build();
 
     ["GET", "HEAD"].forEach((httpMethod) => {
@@ -98,6 +102,8 @@ export class PublicApi {
           DigitrafficMethodResponse.response200(
             this.geojsonModel,
             MediaType.APPLICATION_GEOJSON,
+            // set deprecation
+            true,
           ),
           DigitrafficMethodResponse.response500(),
         ],
@@ -111,6 +117,8 @@ export class PublicApi {
           DigitrafficMethodResponse.response200(
             this.geojsonModel,
             MediaType.APPLICATION_GEOJSON,
+            // set deprecation
+            true,
           ),
           DigitrafficMethodResponse.response500(),
         ],
@@ -122,7 +130,7 @@ export class PublicApi {
       DocumentationPart.method(
         NAUTICAL_WARNING_TAGS_V1,
         "GetActiveNauticalWarnings",
-        "Return all active nautical warnings",
+        "Return all active nautical warnings. Will be removed beginning of 2026.",
       ),
     );
     this.publicApi.documentResource(
@@ -130,7 +138,7 @@ export class PublicApi {
       DocumentationPart.method(
         NAUTICAL_WARNING_TAGS_V1,
         "GetArchivedNauticalWarnings",
-        "Return all archived nautical warnings",
+        "Return all archived nautical warnings. Will be removed beginning of 2026.",
       ),
     );
   }
