@@ -131,6 +131,24 @@ export async function updateData(
             message: "Skipping update, no values",
             customSite: site.id,
           });
+          if (
+            site.last_data_timestamp &&
+            site.last_data_timestamp < subDays(new Date(), 7)
+          ) {
+            // if we are more than seven days in the past and there's no new data for the requested time interval, add 1 day to last_data_timestamp of this site in order to not get stuck
+            await updateSiteTimestamp(
+              db,
+              site.id,
+              addDays(site.last_data_timestamp, 1),
+            );
+            logger.info({
+              method: "V2UpdateService.updateDataForDomain",
+              message:
+                `Over 7 days since last data update for site - Adding 1 day to previous last_data_timestamp`,
+              customSite: site.id,
+              customPreviousLastDataTimestamp: site.last_data_timestamp,
+            });
+          }
         } else {
           const actualEndStamp = max(
             data.flatMap((d) => d.data).map((p) => p.timestamp),
