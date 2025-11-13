@@ -2149,15 +2149,9 @@ importers:
       constructs:
         specifier: ~10.4.2
         version: 10.4.2
-      es-toolkit:
-        specifier: ~1.41.0
-        version: 1.41.0
       ky:
         specifier: ~1.14.0
         version: 1.14.0
-      zod:
-        specifier: ~4.1.12
-        version: 4.1.12
     devDependencies:
       '@digitraffic-cdk/digitraffic-cdk-rig':
         specifier: workspace:*
@@ -2186,9 +2180,6 @@ importers:
       '@types/archiver':
         specifier: ^7.0.0
         version: 7.0.0
-      '@types/geojson':
-        specifier: ^7946.0.16
-        version: 7946.0.16
       '@types/heft-jest':
         specifier: 1.0.6
         version: 1.0.6
@@ -2198,9 +2189,6 @@ importers:
       '@types/node':
         specifier: 22.15.2
         version: 22.15.2
-      date-fns:
-        specifier: 4.1.0
-        version: 4.1.0
       esbuild:
         specifier: 0.25.9
         version: 0.25.9
