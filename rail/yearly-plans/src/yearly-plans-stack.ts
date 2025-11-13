@@ -12,7 +12,7 @@ import {
 export interface YearlyPlansConfiguration extends StackConfiguration {
   readonly yearlyPlansBucketName: string;
   readonly projectPlansBucketName: string;
-  readonly cloudFrontArn?: string;
+  readonly cloudFrontArn: string;
 }
 
 export class YearlyPlansStack extends DigitrafficStack {
@@ -24,16 +24,14 @@ export class YearlyPlansStack extends DigitrafficStack {
 
     InternalLambdas.create(this, yearlyPlansBucket, projectPlansBucket);
 
-    if (configuration.cloudFrontArn) {
-      grantOACRights({
-        bucket: yearlyPlansBucket,
-        distributionArn: configuration.cloudFrontArn,
-      });
-      grantOACRights({
-        bucket: projectPlansBucket,
-        distributionArn: configuration.cloudFrontArn,
-      });
-    }
+    grantOACRights({
+      bucket: yearlyPlansBucket,
+      distributionArn: configuration.cloudFrontArn,
+    });
+    grantOACRights({
+      bucket: projectPlansBucket,
+      distributionArn: configuration.cloudFrontArn,
+    });
 
   }
 
