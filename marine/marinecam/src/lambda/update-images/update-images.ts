@@ -28,6 +28,7 @@ export const handler: () => Promise<void> = () => {
         bucketName,
         secret.certificate,
         secret.ca,
+        secret.hostname,
       );
     })
     .catch((error: Error) => {

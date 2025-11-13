@@ -4,37 +4,37 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "eslint --cache .",
-    "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "echo 'No tests implemented'",
-    "watch": "tsc -w",
     "build": "heft build --clean",
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node22",
     "cdk": "npx cdk@latest",
-    "ci:eslint-report": "eslint . --format html -o report.html || true"
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
+    "lint": "eslint --cache .",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "test": "echo 'No tests implemented'",
+    "watch": "tsc -w"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.211.0",
+    "@digitraffic/common": "2025.9.26-1",
+    "aws-cdk-lib": "^2.217.0",
     "aws-sdk": "^2.1692.0",
-    "constructs": "~10.4.2",
-    "@digitraffic/common": "2025.9.10-1"
+    "constructs": "~10.4.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.7.1",
-    "@types/aws-lambda": "8.10.152",
-    "@types/node": "22.15.2",
-    "@rushstack/heft-jest-plugin": "^0.16.11",
-    "@types/heft-jest": "1.0.6",
-    "eslint": "^8.57.0",
-    "jest": "^30.0.5",
-    "typescript": "~5.8.3",
+    "@digitraffic/eslint-config": "workspace:*",
+    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
-    "esbuild": "0.25.9"
+    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@types/aws-lambda": "8.10.152",
+    "@types/heft-jest": "1.0.6",
+    "@types/node": "22.18.6",
+    "esbuild": "0.25.10",
+    "eslint": "^8.57.1",
+    "jest": "^30.2.0",
+    "typescript": "^5.9.2"
   },
   "externals": [
     "aws-sdk"

@@ -66,7 +66,23 @@ export function constructSwagger(spec: object): string {
 }
 
 export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
-  return allApis.reduce((acc, curr) => merge(acc, curr));
+  if (
+    allApis.length === 0 || (allApis.length === 1 && allApis[0] === undefined)
+  ) {
+    throw new Error(
+      `method=mergeApiDescriptions No APIs to merge. allApis: ${
+        JSON.stringify(allApis)
+      }`,
+    );
+  }
+  if (allApis.length === 1 && allApis[0]) {
+    return allApis[0];
+  }
+  // Use the first element as the base, then merge the rest into it
+  return allApis.slice(1).reduce<OpenApiSchema>(
+    (acc, curr) => merge(acc, curr),
+    merge({}, allApis[0]), // clone to avoid mutating caller’s object
+  );
 }
 
 function methodIsDeprecated(operation: OpenApiOperation): boolean {

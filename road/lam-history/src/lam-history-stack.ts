@@ -1,9 +1,4 @@
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {
-  CanonicalUserPrincipal,
-  Effect,
-  PolicyStatement,
-} from "aws-cdk-lib/aws-iam";
 import { BlockPublicAccess, Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
 import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 import type { Construct } from "constructs";
@@ -51,6 +46,7 @@ export class LamHistoryStack extends DigitrafficStack {
     }
 
     if (this.appProps.cloudfrontCanonicalUser) {
+      // eslint-disable-next-line deprecation/deprecation
       grantOAIRights({
         bucket,
         canonicalUserId: this.appProps.cloudfrontCanonicalUser,

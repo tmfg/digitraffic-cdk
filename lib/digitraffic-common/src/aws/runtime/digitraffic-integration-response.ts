@@ -8,7 +8,7 @@ import {
 export abstract class DigitrafficIntegrationResponse {
   static ok(
     mediaType: MediaType,
-    deprecation = false,
+    deprecation: boolean = false,
     sunset?: string,
   ): IntegrationResponse {
     return this.create("200", mediaType, deprecation, sunset);
@@ -25,7 +25,7 @@ export abstract class DigitrafficIntegrationResponse {
   static create(
     statusCode: string,
     mediaType: MediaType,
-    deprecation = false,
+    deprecation: boolean = false,
     sunset?: string,
   ): IntegrationResponse {
     return {

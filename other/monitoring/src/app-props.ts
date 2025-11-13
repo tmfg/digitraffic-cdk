@@ -4,6 +4,7 @@ import type { IClusterEngine } from "aws-cdk-lib/aws-rds";
 export interface MonitoringConfiguration {
   readonly warningTopicEmail: string;
   readonly alarmTopicEmail: string;
+  readonly envName: string;
 
   readonly ecs?: EcsConfiguration;
   readonly db?: DBConfiguration;
@@ -25,15 +26,28 @@ export interface EcsService {
 }
 
 export interface DBLimits {
-  readonly cpuLimit: number;
+  readonly cpuMax?: number;
   readonly writeIOPSLimit: number;
   readonly readIOPSLimit: number;
   readonly volumeWriteIOPSLimit: number;
   readonly volumeReadIOPSLimit: number;
+  readonly freeStorageMin: number;
+
+  readonly cpuCreditBalanceMin?: number;
+  readonly replicaLagMax?: number;
+  readonly dmlLatencyMax?: number;
 }
+
+export type InstanceLimits = Pick<
+  DBLimits,
+  "cpuMax" | "freeStorageMin" | "cpuCreditBalanceMin"
+>;
+
 export interface DBConfiguration {
   readonly clusters?: {
     readonly dbClusterIdentifier: string;
+    /// override cluster name in alarm
+    readonly clusterName?: string;
     readonly engine?: IClusterEngine;
 
     readonly limits?: DBLimits;
@@ -41,6 +55,10 @@ export interface DBConfiguration {
 
   readonly instances?: {
     readonly instanceIdentifier: string;
+    /// override instance name in alarm
+    readonly instanceName?: string;
+
+    readonly limits?: InstanceLimits;
   }[];
 }
 

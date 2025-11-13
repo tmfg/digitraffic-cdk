@@ -14,6 +14,7 @@ import type { Construct } from "constructs";
 import type { OSMonitor } from "./monitor/monitor.js";
 import { writeFileSync } from "node:fs";
 import { EnvKeys } from "./env.js";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 
 export interface OSMonitorsConfiguration {
   /** account */
@@ -32,6 +33,7 @@ export interface OSMonitorsConfiguration {
   readonly createLambda: boolean;
   /** OpenSearch monitors that lambda should create */
   readonly monitors: OSMonitor[];
+  readonly secretId: string;
 }
 
 /**
@@ -60,19 +62,30 @@ export class UpdateOSMonitorsStack extends Stack {
         JSON.stringify(config.monitors, null, 2),
       );
 
-      // Just for reference to compare changes
+      // Just for local diffing
+      const timestamp = new Date().toISOString()
+        .replace(/\.\d{3}Z$/, "Z") // drop milliseconds
+        .replace(/[:]/g, "-"); // replace ":" with "-"
       writeFileSync(
-        "./monitors.json",
+        `./cdk.out/${timestamp}-monitors.json`,
         JSON.stringify(config.monitors, null, 2),
       );
 
-      this.createLambda(
+      const lambda = this.createLambda(
         vpc,
         lambdaSg,
         config.osHost,
         config.osVpcEndpoint,
         config.osRoleArn,
+        config.secretId,
       );
+
+      const secret = Secret.fromSecretNameV2(
+        this,
+        "Secret",
+        config.secretId,
+      );
+      secret.grantRead(lambda);
     }
   }
 
@@ -106,7 +119,8 @@ export class UpdateOSMonitorsStack extends Stack {
     osHost: string,
     osVpcEndpoint: string,
     roleArn: string,
-  ): void {
+    secretId: string,
+  ): TriggerFunction {
     const triggerFunction = new TriggerFunction(this, "UpdateOSMonitors", {
       vpc: vpc,
       securityGroups: [sg],
@@ -119,6 +133,7 @@ export class UpdateOSMonitorsStack extends Stack {
         [EnvKeys.ROLE]: roleArn,
         [EnvKeys.OS_HOST]: osHost,
         [EnvKeys.OS_VPC_ENDPOINT]: osVpcEndpoint,
+        [EnvKeys.SECRET_ID]: secretId,
       },
     });
 
@@ -129,5 +144,6 @@ export class UpdateOSMonitorsStack extends Stack {
         resources: [roleArn],
       }),
     );
+    return triggerFunction;
   }
 }

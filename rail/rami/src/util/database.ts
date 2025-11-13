@@ -2,6 +2,8 @@ import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { Connection } from "mysql2/promise.js";
 import { createPool, type Pool } from "mysql2/promise.js";
 import { getFromEnvOrSecret } from "./secret.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getTraceFields, runWithChildSpan } from "./tracing.js";
 
 interface MysqlOpts {
   host: string;
@@ -27,17 +29,51 @@ export async function end(): Promise<void> {
 export async function inTransaction(
   fn: (conn: Connection) => Promise<void>,
 ): Promise<void> {
-  const conn = await pool.getConnection();
-  await conn.beginTransaction();
-  try {
-    await fn(conn);
-    await conn.commit();
-  } catch (error: unknown) {
-    await conn.rollback();
-    return Promise.reject(error);
-  }
-  conn.release();
-  return Promise.resolve();
+  return runWithChildSpan(async () => {
+    const start = Date.now();
+    const conn = await pool.getConnection();
+
+    logger.info({
+      ...getTraceFields(),
+      method: "database.inTransaction",
+      customEvent: "transaction_started",
+    });
+
+    await conn.beginTransaction();
+    try {
+      await fn(conn);
+      await conn.commit();
+
+      logger.info({
+        ...getTraceFields(),
+        method: "database.inTransaction",
+        customEvent: "transaction_committed",
+        customDurationMs: Date.now() - start,
+      });
+    } catch (error) {
+      await conn.rollback();
+
+      logger.error({
+        ...getTraceFields(),
+        method: "database.inTransaction",
+        customEvent: "transaction_rolled_back",
+        customDurationMs: Date.now() - start,
+        error,
+      });
+
+      return Promise.reject(error);
+    } finally {
+      conn.release();
+
+      logger.debug({
+        ...getTraceFields(),
+        method: "database.inTransaction",
+        customEvent: "connection_released",
+        customTotalDurationMs: Date.now() - start,
+      });
+    }
+    return Promise.resolve();
+  });
 }
 
 export async function inDatabase<T>(

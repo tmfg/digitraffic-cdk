@@ -46,6 +46,12 @@ export interface MatchPhraseQuery {
   };
 }
 
+export interface PrefixQuery {
+  prefix: {
+    [field: string]: string;
+  };
+}
+
 export interface MultiMatchPhraseQuery {
   multi_match: {
     query: string;
@@ -95,6 +101,7 @@ export type Query =
   | BoolQuery
   | BoolOrQuery
   | MatchPhraseQuery
+  | PrefixQuery
   | MultiMatchPhraseQuery
   | WildcardQuery
   | RegExpQuery

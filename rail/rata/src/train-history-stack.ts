@@ -13,16 +13,7 @@ export class TrainHistoryStack extends Stack {
     this.ecrRepos(props);
   }
 
-  private ecrRepos(props: RataProps) {
-    const trainHistoryWebRepo = ecr.Repository.fromRepositoryName(
-      this,
-      "trainHistoryWebRepo",
-      props.trainHistory.web.ecrRepo,
-    );
-    new CfnOutput(this, "trainHistoryWebRepoArnOutput", {
-      value: trainHistoryWebRepo.repositoryArn,
-    });
-
+  private ecrRepos(props: RataProps): void {
     const trainHistoryBackendRepo = ecr.Repository.fromRepositoryName(
       this,
       "trainHistoryBackendRepo",
@@ -42,7 +33,7 @@ export class TrainHistoryStack extends Stack {
     });
   }
 
-  private database(props: RataProps) {
+  private database(props: RataProps): void {
     const securityGroup = ec2.SecurityGroup.fromSecurityGroupId(
       this,
       "trainHistoryDbSecurityGroup",

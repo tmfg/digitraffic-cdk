@@ -12,10 +12,23 @@
    */
   "commands": [
     {
+      "name": "run:format-package-json",
+      "commandKind": "global",
+      "summary": "Sorts all package.json files using sort-package-json",
+      "shellCommand": "find . -name package.json \\\n\
+        -not -path '*/node_modules/*' \\\n\
+        -not -path '*/digitraffic-common/*' \\\n\
+        -not -path '*/dist/*' \\\n\
+        -not -path '*/temp/*' \\\n\
+        -not -path '*/build/*' \\\n\
+        -not -path '*/cdk.out/*' \\\n\
+        | xargs npx --yes sort-package-json"
+    },
+    {
       "name": "run:format",
       "commandKind": "global",
-      "summary": "Checks if dependencies are declared correctly",
-      "shellCommand": "deno fmt"
+      "summary": "Formats all projet files",
+      "shellCommand": "npx --yes deno fmt"
     },
     {
       "name": "build",
@@ -42,7 +55,8 @@
       "name": "repo:unify-deps",
       "commandKind": "global",
       "summary": "Checks if dependencies are declared correctly",
-      "shellCommand": "node common/scripts/unify-deps.mjs"
+      // Using pnpm to install zx here to ensure that zx is found
+      "shellCommand": "pnpm install zx && npx zx common/scripts/unify-deps.mjs"
     },
     {
       "name": "ci:eslint-report",

@@ -243,7 +243,7 @@ function createCopyOfSqsReceiveMessageCommandOutputAndFillBody(
       outputValueWithBigJsonFromS3.Messages &&
       outputValueWithBigJsonFromS3.Messages[index]
     ) {
-      _.set(outputValueWithBigJsonFromS3.Messages[index]!, "Body", json); //  Set payload from S3
+      _.set(outputValueWithBigJsonFromS3.Messages[index], "Body", json); //  Set payload from S3
     } else {
       throw new Error(
         `outputValueWithBigJsonFromS3.Messages[${index}] was missing`,

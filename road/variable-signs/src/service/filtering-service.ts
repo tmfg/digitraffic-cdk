@@ -19,9 +19,12 @@ export const TEST_TIMES = [
   },
 ] as const;
 
-function getChild(element: XmlElement, name: string): XmlElement {
+function getChild(
+  element: XmlElement,
+  name: string,
+): XmlElement {
   for (const child of element.children) {
-    if (child instanceof XmlElement && child.name === name) {
+    if (child instanceof XmlElement && child.name.includes(name)) {
       return child;
     }
   }
@@ -70,6 +73,8 @@ export function isProductionMessage(datex2: string): boolean {
 
     return !isTestTime(new Date(overallStartTime.text));
   } catch (t) {
+    logger.debug("some error from " + datex2);
+
     logger.error({
       method: "FilteringService.isProductionMessage",
       message: "Error",

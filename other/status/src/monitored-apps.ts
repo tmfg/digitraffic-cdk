@@ -136,7 +136,7 @@ export const monitoredApps: MonitoredApp[] = [
 
       {
         name: "Rail train history UI",
-        url: "https://rata.digitraffic.fi/history/",
+        url: "https://rata.digitraffic.fi/history",
         protocol: EndpointProtocol.HTTP,
       },
       {

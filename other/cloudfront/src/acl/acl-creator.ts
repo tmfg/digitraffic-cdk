@@ -9,6 +9,7 @@ export function createWebAcl(
   environment: string,
   rulesCollection: WafRules[],
   distributionName: string,
+  logGroupName?: string,
 ): CfnWebACL {
   const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
 
@@ -27,6 +28,10 @@ export function createWebAcl(
         .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
         .withThrottleAnonymousUserIpAndUriPath(
           rules.perIpAndQueryWithoutHeader,
+        )
+        .withThrottleAnonymousUserIpByUriPath(
+          rules.perIpAndQueryWithoutHeaderByPath?.limit,
+          rules.perIpAndQueryWithoutHeaderByPath?.path,
         );
     }
   }
@@ -36,7 +41,9 @@ export function createWebAcl(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
     // group name must begin with aws-waf-logs!!!!
-    logGroupName: `aws-waf-logs-${distributionName}-${environment}`,
+    logGroupName: `aws-waf-logs-${
+      logGroupName ?? distributionName
+    }-${environment}`,
     removalPolicy: RemovalPolicy.RETAIN,
   });
 

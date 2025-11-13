@@ -30,16 +30,18 @@ export class Session {
   readonly communicationUrl: string;
   readonly videoUrl: string;
   readonly dispatcher: Dispatcher;
+  readonly hostname: string;
 
   // this increases for every command
   sequenceId: number;
   // this is received after successful connect and must be used in every command after that
   connectionId: string | undefined = undefined;
 
-  constructor(url: string, certificate: string, ca: string) {
+  constructor(url: string, certificate: string, ca: string, hostname: string) {
     this.communicationUrl = url + COMMUNICATION_URL_PART;
     this.videoUrl = url + VIDEO_URL_PART;
     this.sequenceId = 1;
+    this.hostname = hostname;
 
     const agent = new Agent({
       connect: {
@@ -69,7 +71,7 @@ export class Session {
         method: "POST",
         body: xml,
         headers: {
-          host: "VideoOSLogServer",
+          host: this.hostname,
           "accept": "application/json",
         },
         dispatcher: this.dispatcher,

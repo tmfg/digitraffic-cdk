@@ -13,6 +13,7 @@ import {
 } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { RegionMonitoringStack } from "./region-monitoring-stack.js";
 import { EcsMonitoring } from "./ecs-monitoring.js";
+import { KmsMonitoring } from "./kms-monitoring.js";
 
 export class MonitoringStack extends Stack {
   constructor(
@@ -61,12 +62,19 @@ export class MonitoringStack extends Stack {
     configuration: MonitoringConfiguration,
   ): void {
     if (configuration.db) {
-      new RdsMonitoring(this, alarmsTopic, configuration.db);
+      new RdsMonitoring(
+        this,
+        alarmsTopic,
+        configuration.envName,
+        configuration.db,
+      );
     }
 
     if (configuration.ecs) {
       new EcsMonitoring(this, alarmsTopic, configuration.ecs);
     }
+
+    new KmsMonitoring(this, alarmsTopic);
   }
 
   createTopic(topicName: string, email: string): Topic {
@@ -87,7 +95,7 @@ export class MonitoringStack extends Stack {
         conditions: {
           ArnLike: {
             "aws:SourceArn": [
-              `arn:aws:*:${this.region}:${this.account}:*:*`,
+              `arn:aws:*:*:${this.account}:*:*`,
             ],
           },
           StringEquals: {

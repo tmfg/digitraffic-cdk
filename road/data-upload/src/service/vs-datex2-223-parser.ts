@@ -1,0 +1,90 @@
+import type { DatexFile } from "./variable-signs.js";
+
+//const REG_PAYLOAD = /<payloadPublication/g;
+
+const DATEX2_SITUATION_TAG_START = "<situation ";
+const DATEX2_SITUATION_TAG_END = "</situation>";
+const DATEX2_OVERALL_STARTTIME_TAG_START = "<overallStartTime>";
+const DATEX2_OVERALL_STARTTIME_TAG_END = "</overallStartTime>";
+const DATEX2_VERSION_ATTRIBUTE = "version=";
+//const XML_TAG_START = "<?xml";
+
+export function parseSituations223(datex2: string): DatexFile[] {
+  const situations: DatexFile[] = [];
+  let index = 0;
+  let sitIndex = 0;
+
+  // go through the document and find all situation-blocks
+  // add them to the list and return them
+  do {
+    sitIndex = datex2.indexOf(DATEX2_SITUATION_TAG_START, index);
+
+    if (sitIndex !== -1) {
+      const sitEndIndex = datex2.indexOf(
+        DATEX2_SITUATION_TAG_END,
+        sitIndex + DATEX2_SITUATION_TAG_START.length,
+      );
+      index = sitEndIndex;
+
+      situations.push(
+        parseSituation(
+          datex2.substring(
+            sitIndex,
+            sitEndIndex + DATEX2_SITUATION_TAG_END.length,
+          ),
+        ),
+      );
+    }
+  } while (sitIndex !== -1);
+
+  return situations;
+}
+
+function parseSituation(datex2: string): DatexFile {
+  return {
+    id: parseId(datex2),
+    type: "SITUATION",
+    datex2: datex2,
+    effectDate: parseEffectDate(datex2),
+  };
+}
+
+function parseId(datex2: string): string {
+  const index = datex2.indexOf(DATEX2_VERSION_ATTRIBUTE);
+  return datex2.substring(15, index - 2);
+}
+
+function parseEffectDate(datex2: string): Date {
+  const index = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
+    DATEX2_OVERALL_STARTTIME_TAG_START.length;
+  const index2 = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_END, index);
+  const dateString = datex2.substring(index, index2);
+
+  return new Date(dateString);
+}
+/*
+function validate(datex2: string): boolean {
+  if (!datex2.includes(XML_TAG_START)) {
+    logger.error({
+      method: "Datex2UpdateService.validate",
+      message: "no xml-tag",
+    });
+    return false;
+  }
+
+  const ppCount = occurrences(datex2, REG_PAYLOAD);
+  if (ppCount !== 1) {
+    logger.error({
+      method: "Datex2UpdateService.validate",
+      message: `${ppCount} payloadPublications`,
+    });
+
+    return false;
+  }
+
+  return true;
+}
+
+function occurrences(string: string, regexp: RegExp): number {
+  return (string.match(regexp) ?? []).length;
+}*/

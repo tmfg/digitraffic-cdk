@@ -1,10 +1,10 @@
-import * as Datex2UpdateService from "../../service/datex2-update-service.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import {
   type StatusCodeValue,
   StatusCodeValues,
 } from "../../model/status-code-value.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { updateDatex2 } from "../../service/datex2-update-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -16,11 +16,11 @@ export const handler = (
   const start = Date.now();
 
   if (datex2) {
-    logger.debug(datex2);
+    //    logger.debug(datex2);
 
     return proxyHolder
       .setCredentials()
-      .then(() => Datex2UpdateService.updateDatex2(datex2))
+      .then(() => updateDatex2(datex2))
       .finally(() =>
         logger.info({
           method: "UpdateDatex2.handler",

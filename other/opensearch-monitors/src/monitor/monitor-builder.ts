@@ -7,6 +7,7 @@ import type {
   MatchPhraseQuery,
   MultiMatchPhraseQuery,
   Order,
+  PrefixQuery,
   Query,
   QueryStringQuery,
   RangeQuery,
@@ -25,6 +26,8 @@ import {
   triggerWhenSumOutside,
 } from "./triggers.js";
 import type { AggregateFilter, TermsAggregate } from "./aggregates.js";
+
+export const RUNBOOK_SEARCH_TERM = "SEARCH_TERM" as const;
 
 export type OsDomain =
   | "marine"
@@ -51,6 +54,7 @@ export interface MonitorConfig {
   slackDestinations: string[];
   throttleMinutes: number;
   messageSubject: string;
+  runbookSearchLink: string;
 }
 
 export function queryString(query: string): QueryStringQuery {
@@ -62,6 +66,13 @@ export function matchPhrase(
   query: string,
 ): MatchPhraseQuery {
   return { match_phrase: { [field]: { query } } };
+}
+
+export function matchPrefix(
+  field: OSLogField,
+  query: string,
+): PrefixQuery {
+  return { prefix: { [field]: query } };
 }
 
 export function multiMatchPhrase(
@@ -193,7 +204,6 @@ export class OsMonitorBuilder {
   readonly aggs: ScriptedMetric | TermsAggregate;
 
   messageSubject: string;
-  messageLink?: string;
   rangeInMinutes: number;
   delayInMinutes?: number;
   trigger: OSTrigger;
@@ -212,6 +222,7 @@ export class OsMonitorBuilder {
     this.aggs = {};
     this.trigger = triggerWhenLinesFound(
       this.name,
+      this.config.runbookSearchLink,
       this.config.slackDestinations,
       getThrottle(config),
       this.messageSubject,
@@ -290,6 +301,7 @@ export class OsMonitorBuilder {
   notInRange(from: number, to: number): this {
     this.trigger = triggerWhenLineCountOutside(
       this.name,
+      this.config.runbookSearchLink,
       this.config.slackDestinations,
       getThrottle(this.config),
       from,
@@ -303,6 +315,7 @@ export class OsMonitorBuilder {
   moreThan(threshold: number = 0): this {
     this.trigger = triggerWhenLinesFound(
       this.name,
+      this.config.runbookSearchLink,
       this.config.slackDestinations,
       getThrottle(this.config),
       this.messageSubject,
@@ -315,6 +328,7 @@ export class OsMonitorBuilder {
   always(): this {
     this.trigger = triggerAlways(
       this.name,
+      this.config.runbookSearchLink,
       this.config.slackDestinations,
       getThrottle(this.config),
       this.messageSubject,
@@ -326,6 +340,7 @@ export class OsMonitorBuilder {
   aggregationBucketsMoreThan(aggName: string, threshold: number = 0): this {
     this.trigger = triggerWhenAggregationBucketsFound(
       this.name,
+      this.config.runbookSearchLink,
       aggName,
       this.config.slackDestinations,
       getThrottle(this.config),
@@ -349,6 +364,7 @@ export class OsMonitorBuilder {
 
     this.trigger = triggerWhenSumOutside(
       this.name,
+      this.config.runbookSearchLink,
       field,
       this.config.slackDestinations,
       getThrottle(this.config),

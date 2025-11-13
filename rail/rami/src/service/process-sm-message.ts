@@ -5,7 +5,7 @@ import type {
   UnknownDelayOrTrackMessage,
 } from "../model/dt-rosm-message.js";
 import {
-  monitoredCall,
+  type monitoredCall,
   ramiSmMessageSchema,
 } from "../model/zod-schema/sm-message.js";
 import type { z } from "zod";
@@ -44,6 +44,7 @@ function ramiSmMessageToUDOTMessage(
   message: z.infer<typeof ramiSmMessageSchema>,
 ): UnknownDelayOrTrackMessage {
   const data: UnknownDelayOrTrack[] = [];
+  // @ts-ignore
   const mcj = message.payload.monitoredStopVisits[0].monitoredVehicleJourney;
   const monitoredCall = mcj.monitoredCall;
   const messageId = message.headers.e2eId;

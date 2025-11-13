@@ -5,8 +5,7 @@
 !/.editorconfig
 !/.gitattributes
 !/.node-version
-!/.prettierignore
-!/.prettierrc.cjs
+
 !/*.md
 !/*.sh
 !/*.py

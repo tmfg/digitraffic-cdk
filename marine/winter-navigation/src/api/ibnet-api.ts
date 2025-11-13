@@ -1,4 +1,4 @@
-import type { EndpointResponse } from "../model/apidata.js";
+import type { EndpointResponse } from "../model/api-db-model.js";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
@@ -74,14 +74,8 @@ export class IbnetApi {
   }
 
   async getCurrentVersion(): Promise<number> {
-    try {
-      const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
+    const response: EndpointResponse = await this.fetchFromUrl(this._baseUrl);
 
-      return response.toRv;
-    } catch (error) {
-      logger.debug("got error! " + JSON.stringify(error));
-
-      return 0;
-    }
+    return response.toRv;
   }
 }

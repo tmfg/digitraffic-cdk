@@ -1,10 +1,12 @@
-import type { DBConfiguration, DBLimits } from "./app-props.js";
+import type { DBConfiguration, DBLimits, InstanceLimits } from "./app-props.js";
 import type { Stack } from "aws-cdk-lib";
 import {
   CfnEventSubscription,
   DatabaseCluster,
   DatabaseClusterEngine,
+  DatabaseInstance,
   type IDatabaseCluster,
+  type IDatabaseInstance,
 } from "aws-cdk-lib/aws-rds";
 import type { Topic } from "aws-cdk-lib/aws-sns";
 import { ComparisonOperator, type Metric } from "aws-cdk-lib/aws-cloudwatch";
@@ -14,13 +16,17 @@ export class RdsMonitoring {
   private readonly stack: Stack;
   private readonly alarmsTopic: Topic;
 
+  private readonly envName: string;
+
   constructor(
     stack: Stack,
     alarmsTopic: Topic,
+    envName: string,
     dbConfiguration: DBConfiguration,
   ) {
     this.stack = stack;
     this.alarmsTopic = alarmsTopic;
+    this.envName = envName;
 
     if (dbConfiguration.clusters) {
       dbConfiguration.clusters.forEach((c) => {
@@ -35,34 +41,87 @@ export class RdsMonitoring {
         );
 
         if (c.limits) {
-          this.createLimits(cluster, c.limits);
+          const identifier = c.clusterName ?? c.dbClusterIdentifier;
+          this.createLimitsForCluster(identifier, cluster, c.limits);
         }
       });
     }
 
     if (dbConfiguration.instances) {
-      // nothing for instances yet
+      dbConfiguration.instances.forEach((i) => {
+        const instance = DatabaseInstance.fromLookup(
+          stack,
+          `DbInstance-${i.instanceIdentifier}`,
+          {
+            instanceIdentifier: i.instanceIdentifier,
+          },
+        );
+
+        if (i.limits) {
+          const identifier = i.instanceName ?? instance.instanceIdentifier;
+          this.createLimitsForInstance(identifier, instance, i.limits);
+        }
+      });
     }
 
     this.createEventSubscriptions();
   }
 
-  createLimits(cluster: IDatabaseCluster, limits: DBLimits): void {
-    const cpuLimit = limits.cpuLimit;
-    const freeMemoryLimit = 200 * 1024 * 1024; // 200 * MiB
-    const writeIOPSLimit = limits.writeIOPSLimit;
-    const readIOPSLimit = limits.readIOPSLimit;
-    const volumeWriteIOPSLimit = limits.volumeWriteIOPSLimit;
-    const volumeReadIOPSLimit = limits.volumeReadIOPSLimit;
+  createLimitsForInstance(
+    identifier: string,
+    instance: IDatabaseInstance,
+    limits: InstanceLimits,
+  ): void {
+    if (limits.cpuMax) {
+      this.createAlarm(
+        identifier,
+        "CPU",
+        instance.metricCPUUtilization(),
+        limits.cpuMax,
+      );
+    }
+    this.createAlarm(
+      identifier,
+      "FreeStorage",
+      instance.metricFreeStorageSpace(),
+      limits.freeStorageMin,
+      ComparisonOperator.LESS_THAN_THRESHOLD,
+    );
 
-    const identifier = cluster.clusterIdentifier;
+    if (limits.cpuCreditBalanceMin) {
+      this.createAlarm(
+        identifier,
+        "CpuCredit",
+        instance.metric("CPUCreditBalance"),
+        limits.cpuCreditBalanceMin,
+        ComparisonOperator.LESS_THAN_THRESHOLD,
+      );
+    }
+  }
+
+  createLimitsForCluster(
+    identifier: string,
+    cluster: IDatabaseCluster,
+    limits: DBLimits,
+  ): void {
+    const freeMemoryLimit = 200 * 1024 * 1024; // 200 * MiB
+    const deadLocksMax = 1;
 
     this.createAlarm(
       identifier,
-      "CPU",
-      cluster.metricCPUUtilization(),
-      cpuLimit,
+      "FreeLocalStorage",
+      cluster.metricFreeLocalStorage(),
+      limits.freeStorageMin,
+      ComparisonOperator.LESS_THAN_THRESHOLD,
     );
+    if (limits.cpuMax) {
+      this.createAlarm(
+        identifier,
+        "CPU",
+        cluster.metricCPUUtilization(),
+        limits.cpuMax,
+      );
+    }
     this.createAlarm(
       identifier,
       "FreeMemory",
@@ -74,27 +133,60 @@ export class RdsMonitoring {
       identifier,
       "WriteIOPS",
       cluster.metric("WriteIOPS"),
-      writeIOPSLimit,
+      limits.writeIOPSLimit,
     );
     this.createAlarm(
       identifier,
       "ReadIOPS",
       cluster.metric("ReadIOPS"),
-      readIOPSLimit,
+      limits.readIOPSLimit,
     );
     this.createAlarm(
       identifier,
       "VolumeWriteIOPS",
       cluster.metricVolumeWriteIOPs(),
-      volumeWriteIOPSLimit,
+      limits.volumeWriteIOPSLimit,
     );
     this.createAlarm(
       identifier,
       "VolumeReadIOPS",
       cluster.metricVolumeReadIOPs(),
-      volumeReadIOPSLimit,
+      limits.volumeReadIOPSLimit,
     );
-    this.createAlarm(identifier, "Deadlocks", cluster.metricDeadlocks());
+    this.createAlarm(
+      identifier,
+      "Deadlocks",
+      cluster.metricDeadlocks(),
+      deadLocksMax,
+    );
+
+    if (limits.cpuCreditBalanceMin) {
+      this.createAlarm(
+        identifier,
+        "CpuCredit",
+        cluster.metric("CPUCreditBalance"),
+        limits.cpuCreditBalanceMin,
+        ComparisonOperator.LESS_THAN_THRESHOLD,
+      );
+    }
+
+    if (limits.replicaLagMax) {
+      this.createAlarm(
+        identifier,
+        "ReplicaLag",
+        cluster.metric("AuroraReplicaLag"),
+        limits.replicaLagMax,
+      );
+    }
+
+    if (limits.dmlLatencyMax) {
+      this.createAlarm(
+        identifier,
+        "DMLLatency",
+        cluster.metric("DMLLatency"),
+        limits.dmlLatencyMax,
+      );
+    }
   }
 
   createEventSubscriptions(): void {
@@ -127,14 +219,14 @@ export class RdsMonitoring {
   }
 
   createAlarm(
-    identifier: string,
+    dbIdentifier: string,
     name: string,
     metric: Metric,
-    threshold: number = 1,
+    threshold: number,
     comparisonOperator: ComparisonOperator =
       ComparisonOperator.GREATER_THAN_THRESHOLD,
   ): void {
-    const alarmName = `DB-${identifier}-${name}`;
+    const alarmName = `${this.envName} DB-${dbIdentifier}-${name}`;
 
     createAlarm(
       this.stack,

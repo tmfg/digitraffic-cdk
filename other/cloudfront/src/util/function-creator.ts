@@ -8,7 +8,6 @@ import fs from "node:fs";
 
 export enum FunctionType {
   INDEX_HTML,
-  HISTORY_REDIRECT,
   REDIRECT,
   PATH_REWRITE,
   HTTP_HEADERS,
@@ -29,14 +28,6 @@ export function createIndexHtml(scope: Construct): CloudfrontFunction {
   const body = readFunctionBody("dist/lambda/function-index-html.cjs");
 
   return createCloudfrontFunction(scope, "index-html", body);
-}
-
-export function createHistoryRedirectFunction(
-  scope: Construct,
-): CloudfrontFunction {
-  const body = readFunctionBody("dist/lambda/function-redirect-history.cjs");
-
-  return createCloudfrontFunction(scope, "history-redirect", body);
 }
 
 export function createRedirectFunction(

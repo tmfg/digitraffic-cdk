@@ -3,7 +3,7 @@ import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/ap
 import { attachQueueToApiGatewayResource } from "@digitraffic/common/dist/aws/infra/sqs-integration";
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import {
-  MonitoredDBFunction,
+  type MonitoredDBFunction,
   MonitoredFunction,
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";

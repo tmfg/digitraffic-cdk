@@ -19,6 +19,7 @@ import {
   ParameterGroup,
 } from "aws-cdk-lib/aws-rds";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import { Key } from "aws-cdk-lib/aws-kms";
 import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib/core";
 import type { Construct } from "constructs/lib/construct.js";
 import { exportValue, importVpc } from "../import-util.js";
@@ -28,6 +29,7 @@ import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
 export interface DbConfiguration {
   readonly cluster?: ClusterConfiguration;
   readonly clusterImport?: ClusterImportConfiguration;
+  readonly storageEncrypted?: boolean; // default true
 
   readonly customParameterGroups: AuroraPostgresEngineVersion[];
   readonly workmem?: number; // default 524288, 512MiB
@@ -50,7 +52,6 @@ export interface ClusterConfiguration {
   readonly securityGroupId: string;
   readonly snapshotIdentifier?: string;
   readonly dbVersion: AuroraPostgresEngineVersion;
-  readonly storageEncrypted?: boolean; // default true
 
   readonly writer: ClusterDbInstanceConfiguration;
   readonly readers: ClusterDbInstanceConfiguration[];
@@ -134,6 +135,11 @@ export class DbStack extends Stack {
       throw new Error("Configure either cluster or clusterImport");
     }
 
+    const instanceName = isc.environmentName + "-db";
+    const rdsKey = configuration?.storageEncrypted
+      ? this.createRDSKey(instanceName, isc.environmentName)
+      : undefined;
+
     // create cluster if this is wanted, should do it only once
     if (configuration.cluster) {
       const cluster = this.createAuroraCluster(
@@ -141,6 +147,8 @@ export class DbStack extends Stack {
         configuration,
         configuration.cluster,
         parameterGroups,
+        instanceName,
+        rdsKey,
       );
 
       exportValue(
@@ -229,6 +237,8 @@ export class DbStack extends Stack {
     vpc: IVpc,
     securityGroup: ISecurityGroup,
     parameterGroup: IParameterGroup,
+    storageEncrypted: boolean | undefined,
+    rdsKey: Key | undefined,
   ): DatabaseClusterProps {
     const secret = Secret.fromSecretCompleteArn(this, "DBSecret", secretArn);
 
@@ -286,8 +296,19 @@ export class DbStack extends Stack {
       ),
       parameterGroup,
       monitoringInterval: Duration.seconds(30),
-      storageEncrypted: clusterConfiguration.storageEncrypted ?? true,
+      storageEncrypted: storageEncrypted ?? true,
+      ...(rdsKey ? { storageEncryptionKey: rdsKey } : {}),
     };
+  }
+
+  createRDSKey(instanceName: string, environmentName: string): Key {
+    return new Key(this, "RDSKey", {
+      alias: `${environmentName}/db`,
+      enableKeyRotation: true,
+      description: `KMS key for RDS cluster ${instanceName}`,
+      removalPolicy: RemovalPolicy.RETAIN,
+      pendingWindow: Duration.days(30),
+    });
   }
 
   createAuroraCluster(
@@ -295,8 +316,9 @@ export class DbStack extends Stack {
     configuration: DbConfiguration,
     clusterConfiguration: ClusterConfiguration,
     parameterGroups: IParameterGroup[],
+    instanceName: string,
+    rdsKey: Key | undefined,
   ): DatabaseCluster {
-    const instanceName = isc.environmentName + "-db";
     const securityGroup = SecurityGroup.fromSecurityGroupId(
       this,
       "securitygroup",
@@ -317,17 +339,22 @@ export class DbStack extends Stack {
       vpc,
       securityGroup,
       parameterGroups[0],
+      configuration.storageEncrypted,
+      rdsKey,
     );
 
-    // create cluster from the snapshot or from the scratch
-    const cluster = clusterConfiguration.snapshotIdentifier
-      ? new DatabaseClusterFromSnapshot(this, instanceName, {
+    let cluster: DatabaseCluster;
+
+    if (clusterConfiguration.snapshotIdentifier) {
+      cluster = new DatabaseClusterFromSnapshot(this, instanceName, {
         ...parameters,
         ...{
           snapshotIdentifier: clusterConfiguration.snapshotIdentifier,
         },
-      })
-      : new DatabaseCluster(this, instanceName, parameters);
+      });
+    } else {
+      cluster = new DatabaseCluster(this, instanceName, parameters);
+    }
 
     // this workaround should prevent stack failing on version upgrade
     // https://github.com/aws/aws-cdk/issues/21758
