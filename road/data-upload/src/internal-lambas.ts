@@ -7,7 +7,10 @@ import {
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 
-export function create(stack: DigitrafficStack, dataQueue: Queue): void {
+export function createInternalLambdas(
+  stack: DigitrafficStack,
+  dataQueue: Queue,
+): void {
   const deleteLambda = createDeleteOldData(stack);
   Scheduler.everyHour(stack, "DeleteOldMessagesRule", deleteLambda);
 
