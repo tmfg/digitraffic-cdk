@@ -5,11 +5,11 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-interface RipaSecret extends GenericSecret {
+interface YearlyPlansSecret extends GenericSecret {
   readonly url: string;
   readonly apiKey: string;
 }
-const secretHolder = SecretHolder.create<RipaSecret>("ripa");
+const secretHolder = SecretHolder.create<YearlyPlansSecret>("yp");
 
 
 export const handler = async (): Promise<void> => {
@@ -24,18 +24,18 @@ export const handler = async (): Promise<void> => {
   try {
     const secret = await secretHolder.get();
 
-    const yearlyPlansData = await fetchData(`${secret.url}/supa-api/v1/yearly-plan`, secret.apiKey);
+    const yearlyPlansData = await fetchData(`${secret.url}/yearly-plan`, secret.apiKey);
     const yearlyPlansDataString = JSON.stringify(yearlyPlansData, null, 2);
-    const yearlyPlansS3Key = await uploadCompressedDataToS3(bucketName, yearlyPlansDataString, "yearly-plans/yearly-plans.json");
+    const yearlyPlansS3Key = await uploadCompressedDataToS3(bucketName, yearlyPlansDataString, "yearly-plans");
 
     logger.info({
       method: "UpdatePlans.handler",
       message: `Successfully uploaded ${yearlyPlansS3Key}`,
     });
 
-    const projectPlansData = await fetchData(`${secret.url}/supa-api/v1/project-plan`, secret.apiKey);
+    const projectPlansData = await fetchData(`${secret.url}/project-plan`, secret.apiKey);
     const projectPlansDataString = JSON.stringify(projectPlansData, null, 2);
-    const projectPlansS3Key = await uploadCompressedDataToS3(bucketName, projectPlansDataString, "project-plans/project-plans.json");
+    const projectPlansS3Key = await uploadCompressedDataToS3(bucketName, projectPlansDataString, "project-plans");
 
     logger.info({
       method: "UpdatePlans.handler",

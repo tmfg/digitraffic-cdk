@@ -1,48 +1,42 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import archiver from "archiver";
-import { file } from "zod";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
+
 
 const s3Client = new S3Client({ region: "eu-west-1" });
 
 export async function uploadCompressedDataToS3(
   bucketName: string,
   data: string,
-  filePath: string
+  dataType: string
 ): Promise<string> {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const key = `${filePath}.zip`;
+  // 2025-11-13T12-00-01Z
+  const timestamp = `${new Date().toISOString().slice(0, 19).replace(/[:.]/g, "-")}Z`;
+  const key = `${dataType}/${dataType}.json.zip`;
 
-  // Create archive in memory
   const archive = archiver('zip', { zlib: { level: 9 } });
   const chunks: Buffer[] = [];
 
-  // Collect chunks as they're generated
   archive.on('data', (chunk: Buffer) => chunks.push(chunk));
 
-  // Handle errors
-  archive.on('error', (err) => {
-    throw err;
+  archive.on('error', (error) => {
+    logException(logger, error);
+    throw error;
   });
 
-  // Add JSON data to the archive
-  archive.append(data, { name: `yearly-plans-${timestamp}.json` });
+  archive.append(data, { name: `${dataType}-${timestamp}.json` });
 
-  // Finalize the archive (this triggers the 'data' events)
   await archive.finalize();
 
-  // Combine all chunks into a single buffer
   const zipBuffer = Buffer.concat(chunks);
 
-  // Upload to S3
   await s3Client.send(new PutObjectCommand({
     Bucket: bucketName,
     Key: key,
     Body: zipBuffer,
     ContentType: "application/zip",
   }));
-
-  // eslint-disable-next-line no-console
-  console.log(`Successfully uploaded data to S3: ${key}`);
 
   return key;
 }

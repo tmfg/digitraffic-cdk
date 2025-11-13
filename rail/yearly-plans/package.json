@@ -20,9 +20,7 @@
     "archiver": "^7.0.1",
     "aws-cdk-lib": "~2.222.0",
     "constructs": "~10.4.2",
-    "es-toolkit": "~1.41.0",
-    "ky": "~1.14.0",
-    "zod": "~4.1.12"
+    "ky": "~1.14.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
@@ -36,9 +34,7 @@
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/node": "22.15.2",
-    "@types/geojson": "^7946.0.16",
     "@types/archiver": "^7.0.0",
-    "date-fns": "4.1.0",
     "esbuild": "0.25.9",
     "eslint": "^8.57.0",
     "typescript": "^5.9.2"

@@ -7,6 +7,7 @@ import { Runtime } from "aws-cdk-lib/aws-lambda";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { YearlyPlansEnvKeys } from "./keys.js";
+import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 
 export function create(
   stack: DigitrafficStack,
@@ -27,7 +28,7 @@ function createFetchYearlyPlansLambda(
 
   const lambdaEnv = {
     [YearlyPlansEnvKeys.S3_BUCKET_NAME]: bucket.bucketName,
-    SECRET_ID: stack.configuration.secretId
+    [EnvKeys.SECRET_ID]: stack.configuration.secretId
   };
 
   const fetchYearlyPlansLambda = MonitoredFunction.createV2(
@@ -36,7 +37,7 @@ function createFetchYearlyPlansLambda(
     lambdaEnv,
     {
       reservedConcurrentExecutions: 1,
-      timeout: 300, // 5 minutes in seconds
+      timeout: 300,
       memorySize: 512,
       runtime: Runtime.NODEJS_22_X,
     },

@@ -4,6 +4,12 @@ import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export async function fetchData<T>(url: string, apiKey: string): Promise<T> {
   const start = Date.now();
+
+  logger.info({
+    method: "YearlyPlansService.fetchData",
+    message: `Fetching from ${url}`
+  });
+
   try {
     const response = await ky.get(url, {
       timeout: 30000,
