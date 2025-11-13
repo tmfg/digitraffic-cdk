@@ -15,10 +15,11 @@ const secretHolder = SecretHolder.create<YearlyPlansSecret>("yp");
 export const handler = async (): Promise<void> => {
   const start = Date.now();
 
-  const bucketName = process.env[YearlyPlansEnvKeys.S3_BUCKET_NAME];
+  const yearlyPlansBucketName = process.env[YearlyPlansEnvKeys.YEARLY_PLANS_BUCKET_NAME];
+  const projectPlansBucketName = process.env[YearlyPlansEnvKeys.PROJECT_PLANS_BUCKET_NAME];
 
-  if (!bucketName) {
-    throw new Error("S3_BUCKET_NAME environment variable is required");
+  if (!yearlyPlansBucketName || !projectPlansBucketName) {
+    throw new Error("YEARLY_PLANS_BUCKET_NAME and PROJECT_PLANS_BUCKET_NAME environment variables are required");
   }
 
   try {
@@ -26,7 +27,7 @@ export const handler = async (): Promise<void> => {
 
     const yearlyPlansData = await fetchData(`${secret.url}/yearly-plan`, secret.apiKey);
     const yearlyPlansDataString = JSON.stringify(yearlyPlansData, null, 2);
-    const yearlyPlansS3Key = await uploadCompressedDataToS3(bucketName, yearlyPlansDataString, "yearly-plans");
+    const yearlyPlansS3Key = await uploadCompressedDataToS3(yearlyPlansBucketName, yearlyPlansDataString, "yearly-plans");
 
     logger.info({
       method: "UpdatePlans.handler",
@@ -35,7 +36,7 @@ export const handler = async (): Promise<void> => {
 
     const projectPlansData = await fetchData(`${secret.url}/project-plan`, secret.apiKey);
     const projectPlansDataString = JSON.stringify(projectPlansData, null, 2);
-    const projectPlansS3Key = await uploadCompressedDataToS3(bucketName, projectPlansDataString, "project-plans");
+    const projectPlansS3Key = await uploadCompressedDataToS3(projectPlansBucketName, projectPlansDataString, "project-plans");
 
     logger.info({
       method: "UpdatePlans.handler",

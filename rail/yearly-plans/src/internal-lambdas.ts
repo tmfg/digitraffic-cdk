@@ -11,14 +11,16 @@ import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 
 export function create(
   stack: DigitrafficStack,
-  bucket: Bucket,
+  yearlyPlansBucket: Bucket,
+  projectPlansBucket: Bucket
 ): void {
-  createFetchYearlyPlansLambda(stack, bucket);
+  createFetchYearlyPlansLambda(stack, yearlyPlansBucket, projectPlansBucket);
 }
 
 function createFetchYearlyPlansLambda(
   stack: DigitrafficStack,
-  bucket: Bucket,
+  yearlyPlansBucket: Bucket,
+  projectPlansBucket: Bucket
 ): MonitoredFunction {
   const secret = stack.configuration.secretId
 
@@ -27,7 +29,8 @@ function createFetchYearlyPlansLambda(
   }
 
   const lambdaEnv = {
-    [YearlyPlansEnvKeys.S3_BUCKET_NAME]: bucket.bucketName,
+    [YearlyPlansEnvKeys.YEARLY_PLANS_BUCKET_NAME]: yearlyPlansBucket.bucketName,
+    [YearlyPlansEnvKeys.PROJECT_PLANS_BUCKET_NAME]: projectPlansBucket.bucketName,
     [EnvKeys.SECRET_ID]: stack.configuration.secretId
   };
 
@@ -50,7 +53,9 @@ function createFetchYearlyPlansLambda(
   const s3Statement = new PolicyStatement();
   s3Statement.addActions("s3:PutObject");
   s3Statement.addActions("s3:PutObjectAcl");
-  s3Statement.addResources(bucket.bucketArn + "/*");
+  s3Statement.addResources(yearlyPlansBucket.bucketArn + "/*");
+  s3Statement.addResources(projectPlansBucket.bucketArn + "/*");
+
   fetchYearlyPlansLambda.addToRolePolicy(s3Statement);
 
   return fetchYearlyPlansLambda;

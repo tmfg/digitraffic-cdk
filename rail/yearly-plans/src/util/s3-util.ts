@@ -13,7 +13,7 @@ export async function uploadCompressedDataToS3(
 ): Promise<string> {
   // 2025-11-13T12-00-01Z
   const timestamp = `${new Date().toISOString().slice(0, 19).replace(/[:.]/g, "-")}Z`;
-  const key = `${dataType}/${dataType}.json.zip`;
+  const key = `${dataType}.json.zip`;
 
   const archive = archiver('zip', { zlib: { level: 9 } });
   const chunks: Buffer[] = [];
