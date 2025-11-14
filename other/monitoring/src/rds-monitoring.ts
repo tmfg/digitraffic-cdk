@@ -11,6 +11,9 @@ import {
 import type { Topic } from "aws-cdk-lib/aws-sns";
 import { ComparisonOperator, type Metric } from "aws-cdk-lib/aws-cloudwatch";
 import { createAlarm } from "./alarms.js";
+import { EventField, Rule } from "aws-cdk-lib/aws-events";
+import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
+import { createMessage, TOPICS } from "./topic-tools.js";
 
 export class RdsMonitoring {
   private readonly stack: Stack;
@@ -65,6 +68,30 @@ export class RdsMonitoring {
     }
 
     this.createEventSubscriptions();
+
+    // eslint-disable-next-line no-new
+    new Rule(this.stack, "RdsOsUpdateRule", {
+      eventPattern: {
+        source: ["aws.rds"],
+        detail: {
+          EventID: [
+            "RDS-EVENT-0287", // OS upgrade requirement detected (https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_UpgradeDBInstance.Maintenance.html#Aurora_OS_updates)
+            "RDS-EVENT-0230", // OS patch available (https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_UpgradeDBInstance.Maintenance.html#Aurora_OS_updates)
+          ],
+        },
+      },
+      targets: [
+        new SnsTopic(this.alarmsTopic, {
+          message: createMessage(
+            `RDS OS patch or OS upgrade available in ${EventField.fromPath("$.account")}`,
+            `EventID: ${EventField.fromPath("$.detail.EventID")}
+           Database: ${EventField.fromPath("$.detail.SourceArn")}
+           Message: ${EventField.fromPath("$.detail.Message")}
+          `,
+          ),
+        }),
+      ],
+    });
   }
 
   createLimitsForInstance(
