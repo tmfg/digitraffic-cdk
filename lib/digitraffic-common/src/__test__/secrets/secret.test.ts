@@ -1,9 +1,10 @@
-import {
-  type GetSecretValueCommandInput,
-  type GetSecretValueCommandOutput,
-  SecretsManager,
+import type {
+  GetSecretValueCommandInput,
+  GetSecretValueCommandOutput,
 } from "@aws-sdk/client-secrets-manager";
+import { SecretsManager } from "@aws-sdk/client-secrets-manager";
 import { jest } from "@jest/globals";
+import { setEnvVariableAwsRegion } from "../../utils/utils.js";
 
 const SECRET_ID = "test_secret";
 const SECRET_WITH_PREFIX = {
@@ -14,16 +15,15 @@ const SECRET_WITH_PREFIX = {
 
 const emptySecret: GetSecretValueCommandOutput = { $metadata: {} };
 
-const getSecretValueMock = jest.fn<
-  (arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>
->();
+const getSecretValueMock =
+  jest.fn<
+    (arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>
+  >();
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-jest.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(
-  getSecretValueMock,
-);
+jest
+  .spyOn(SecretsManager.prototype, "getSecretValue")
+  .mockImplementation(getSecretValueMock);
 
-// eslint-disable-next-line @rushstack/no-new-null
 function mockSecret<T>(secret: null | T): void {
   if (!secret) {
     getSecretValueMock.mockImplementation(() => Promise.resolve(emptySecret));
@@ -32,13 +32,12 @@ function mockSecret<T>(secret: null | T): void {
       Promise.resolve({
         ...emptySecret,
         ...{ SecretString: JSON.stringify(secret) },
-      })
+      }),
     );
   }
 }
 
-// eslint-disable-next-line dot-notation
-process.env["AWS_REGION"] = "eu-west-1";
+setEnvVariableAwsRegion("eu-west-1");
 
 const secret = await import("../../aws/runtime/secrets/secret.js");
 const { getSecret } = secret;

@@ -1,4 +1,4 @@
-import { Writable } from "stream";
+import { Writable } from "node:stream";
 import { DtLogger } from "../../aws/runtime/dt-logger.js";
 import { logException } from "../../utils/logging.js";
 

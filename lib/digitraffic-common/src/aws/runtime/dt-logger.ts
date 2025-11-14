@@ -1,5 +1,5 @@
+import type { Writable } from "node:stream";
 import { lowerFirst, mapKeys } from "lodash-es";
-import type { Writable } from "stream";
 import { getEnvVariableOrElse } from "../../utils/utils.js";
 
 /** Logging level */
@@ -42,7 +42,6 @@ export interface CustomParams {
     | bigint
     | boolean
     | Date
-    // eslint-disable-next-line @rushstack/no-new-null
     | null
     | undefined;
 }
@@ -92,9 +91,11 @@ export class DtLogger {
    * @param {LoggerConfiguration?} [config] - Accepts configuration options @see {@link LoggerConfiguration}
    */
   constructor(config?: LoggerConfiguration) {
-    this.lambdaName = config?.lambdaName ??
+    this.lambdaName =
+      config?.lambdaName ??
       getEnvVariableOrElse("AWS_LAMBDA_FUNCTION_NAME", "unknown lambda name");
-    this.runtime = config?.runTime ??
+    this.runtime =
+      config?.runTime ??
       getEnvVariableOrElse("AWS_EXECUTION_ENV", "unknown runtime");
     this.writeStream = config?.writeStream ?? process.stdout;
   }
@@ -114,7 +115,7 @@ export class DtLogger {
       runtime: this.runtime,
     };
 
-    this.writeStream.write(JSON.stringify(logMessage) + "\n");
+    this.writeStream.write(`${JSON.stringify(logMessage)}\n`);
   }
 
   /**
@@ -165,25 +166,28 @@ export class DtLogger {
   private log(message: LoggableTypeInternal): void {
     // Append always method to message
     if (
-      !message.message || !message.message.length ||
+      !message.message ||
+      !message.message.length ||
       !message.message.includes(message.method)
     ) {
       message.message = `${message.method} ${message.message ?? ""}`;
     }
 
     const error = message.error
-      ? (message.error instanceof Error)
+      ? message.error instanceof Error
         ? `${message.error.name}: ${message.error.message}`
         : typeof message.error === "string"
-        ? message.error
-        : JSON.stringify(message.error)
+          ? message.error
+          : JSON.stringify(message.error)
       : undefined;
 
     const stack = message.stack
       ? message.stack
       : message.error
-      ? (message.error instanceof Error) ? message.error.stack : undefined
-      : undefined;
+        ? message.error instanceof Error
+          ? message.error.stack
+          : undefined
+        : undefined;
 
     const messageFields = removePrefix("custom", message);
     messageFields.message = this.appendMessageFieldsToMessage(messageFields);
@@ -195,7 +199,7 @@ export class DtLogger {
       runtime: this.runtime,
     };
 
-    this.writeStream.write(JSON.stringify(logMessage) + "\n");
+    this.writeStream.write(`${JSON.stringify(logMessage)}\n`);
   }
 
   private appendMessageFieldsToMessage(message: LoggableType): string {
@@ -203,15 +207,16 @@ export class DtLogger {
     const fielValuePairs = Object.entries(message)
       // Remove fields not logged in message field
       .filter(([key]) => {
-        return !["message", "level", "method", "stack", "error"].includes(
-          key,
-        ) && !(message.message ?? "").includes(`${key}=`);
+        return (
+          !["message", "level", "method", "stack", "error"].includes(key) &&
+          !(message.message ?? "").includes(`${key}=`)
+        );
       })
       // Map value to string
       .map(([key, value]) => `${key}=${valueToString(value)}`)
       .join(" ");
     return `${message.message ?? ""}${
-      fielValuePairs ? " " + fielValuePairs : ""
+      fielValuePairs ? ` ${fielValuePairs}` : ""
     }`;
   }
 }
@@ -220,10 +225,8 @@ export class DtLogger {
  * Removes given prefixes from the keys of the object.
  */
 function removePrefix(prefix: string, loggable: LoggableType): LoggableType {
-  return mapKeys(
-    loggable,
-    (_index, key: string) =>
-      key.startsWith(prefix) ? lowerFirst(key.replace(prefix, "")) : key,
+  return mapKeys(loggable, (_index, key: string) =>
+    key.startsWith(prefix) ? lowerFirst(key.replace(prefix, "")) : key,
   ) as unknown as LoggableType;
 }
 

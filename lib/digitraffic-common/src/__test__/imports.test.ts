@@ -50,11 +50,6 @@ test("nullable import ok?", () => {
   return expect(nullable).resolves.toBeDefined();
 });
 
-test("awsEnv import ok?", () => {
-  const awsEnv = import("../types/aws-env.js");
-  return expect(awsEnv).resolves.toBeDefined();
-});
-
 test("asyncTimeoutError import ok?", () => {
   const asyncTimeoutError = import("../types/async-timeout-error.js");
   return expect(asyncTimeoutError).resolves.toBeDefined();
@@ -133,6 +128,11 @@ test("geojsonTypes import ok?", () => {
 test("slack import ok?", () => {
   const slack = import("../utils/slack.js");
   return expect(slack).resolves.toBeDefined();
+});
+
+test("stopWatch import ok?", () => {
+  const stopWatch = import("../utils/stop-watch.js");
+  return expect(stopWatch).resolves.toBeDefined();
 });
 
 test("utils import ok?", () => {
@@ -240,7 +240,7 @@ test("stackCheckingAspect import ok?", () => {
 });
 
 test("restApis import ok?", () => {
-  const restApis = import("../aws/infra/stack/rest_apis.js");
+  const restApis = import("../aws/infra/stack/rest-api.js");
   return expect(restApis).resolves.toBeDefined();
 });
 

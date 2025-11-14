@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "build": "",
-    "ci:eslint-report": "",
     "test": ""
   }
 }

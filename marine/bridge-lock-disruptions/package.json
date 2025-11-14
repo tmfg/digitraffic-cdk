@@ -15,7 +15,6 @@
     "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
-    "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "watch": "heft build-watch --clean"
@@ -39,9 +38,7 @@
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
     "@jest/globals": "^30.2.0",
-    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/aws-lambda": "8.10.152",
@@ -53,7 +50,6 @@
     "@types/source-map-support": "^0.5.10",
     "@types/xml2js": "0.4.14",
     "esbuild": "0.25.10",
-    "eslint": "^8.57.1",
     "parallelshell": "^3.0.2",
     "typescript": "^5.9.2"
   }

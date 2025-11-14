@@ -14,8 +14,12 @@ function imoChecksumIsValid(imo: number): boolean {
   const imoDigit6 = Number(imoStr[5]);
   const checkDigit = Number(imoStr[6]);
   const checkCalculation = Number(
-    imoDigit1 * 7 + imoDigit2 * 6 + imoDigit3 * 5 + imoDigit4 * 4 +
-      imoDigit5 * 3 + imoDigit6 * 2,
+    imoDigit1 * 7 +
+      imoDigit2 * 6 +
+      imoDigit3 * 5 +
+      imoDigit4 * 4 +
+      imoDigit5 * 3 +
+      imoDigit6 * 2,
   );
   const checkResult = checkCalculation % 10 === checkDigit;
   if (!checkResult) {

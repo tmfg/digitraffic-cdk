@@ -1,11 +1,8 @@
-import { type IVpc, Vpc } from "aws-cdk-lib/aws-ec2";
-import { CfnOutput, Fn, type Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
+import { CfnOutput, Fn } from "aws-cdk-lib";
+import type { IVpc } from "aws-cdk-lib/aws-ec2";
+import { Vpc } from "aws-cdk-lib/aws-ec2";
 import type { Construct } from "constructs";
-
-export class OldStackImports {
-  public static AURORAINSTANCE_SG_IMPORT_NAME: string = "AuroraSG";
-  public static RDSPROXY_SG_IMPORT_NAME: string = "RDSProxySG";
-}
 
 /**
  * Import VPC from other stack outputs
@@ -46,7 +43,6 @@ export function exportValue(
 ): void {
   const exportName = outputName(environmentName, name);
 
-  // eslint-disable-next-line no-new
   new CfnOutput(stack, exportName, {
     exportName,
     value,

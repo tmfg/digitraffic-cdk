@@ -2,19 +2,20 @@ import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/i
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { attachQueueToApiGatewayResource } from "@digitraffic/common/dist/aws/infra/sqs-integration";
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
-import {
-  type MonitoredDBFunction,
-  MonitoredFunction,
-} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { Duration } from "aws-cdk-lib";
-import { EndpointType, Model, type Resource } from "aws-cdk-lib/aws-apigateway";
+import type { Resource } from "aws-cdk-lib/aws-apigateway";
+import {
+  EndpointType,
+  Model,
+  RequestValidator,
+} from "aws-cdk-lib/aws-apigateway";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { RamiEnvKeys } from "./keys.js";
-import { RequestValidator } from "aws-cdk-lib/aws-apigateway";
 
 export class IntegrationApi {
   readonly integrationApi: DigitrafficRestApi;
@@ -55,7 +56,7 @@ export class IntegrationApi {
     resource: Resource,
     sqs: Queue,
     dlq: Queue,
-  ): MonitoredDBFunction {
+  ): MonitoredFunction {
     const activeResource = resource.addResource("message");
     const functionName = "RAMI-UploadRamiRosmMessage";
     const logGroup = createLambdaLogGroup({ stack, functionName });

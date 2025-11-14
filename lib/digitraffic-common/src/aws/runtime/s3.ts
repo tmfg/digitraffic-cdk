@@ -1,6 +1,6 @@
-import type { ObjectCannedACL } from "@aws-sdk/client-s3";
-import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
-import { type NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
+import type { ObjectCannedACL, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import type { NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { logger } from "./dt-logger-default.js";
 
 export async function uploadToS3(
@@ -20,7 +20,7 @@ export async function uploadToS3(
   });
   try {
     await s3.send(command);
-  } catch (error) {
+  } catch (_error) {
     logger.error({
       method: "s3.uploadToS3",
       message: `upload failed to bucket ${bucketName}`,

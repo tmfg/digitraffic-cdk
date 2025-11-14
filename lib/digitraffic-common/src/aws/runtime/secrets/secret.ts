@@ -37,9 +37,7 @@ export async function getSecret<Secret>(
 
   const secret: GenericSecret | Secret = JSON.parse(
     secretObj.SecretString,
-  ) as unknown as
-    | GenericSecret
-    | Secret;
+  ) as unknown as GenericSecret | Secret;
 
   if (!prefix) {
     return secret as Secret;

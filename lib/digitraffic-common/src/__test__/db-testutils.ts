@@ -1,6 +1,6 @@
+import type { DTDatabase } from "../database/database.js";
 import {
   DatabaseEnvironmentKeys,
-  type DTDatabase,
   initDbConnection,
 } from "../database/database.js";
 import type { Countable } from "../database/models.js";
@@ -49,7 +49,7 @@ export function dbTestBase(
       try {
         await truncateFn(db);
       } catch (e) {
-        console.info("cought in commonDbTest:" + JSON.stringify(e));
+        console.info(`cought in commonDbTest:${JSON.stringify(e)}`);
         throw e;
       }
     });

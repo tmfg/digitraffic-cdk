@@ -1,25 +1,22 @@
+import type { InstanceType, ISecurityGroup, IVpc } from "aws-cdk-lib/aws-ec2";
+import { SecurityGroup, SubnetType } from "aws-cdk-lib/aws-ec2";
+import { Key } from "aws-cdk-lib/aws-kms";
+import type {
+  AuroraPostgresEngineVersion,
+  DatabaseClusterProps,
+  IParameterGroup,
+} from "aws-cdk-lib/aws-rds";
 import {
-  type InstanceType,
-  type ISecurityGroup,
-  type IVpc,
-  SecurityGroup,
-  SubnetType,
-} from "aws-cdk-lib/aws-ec2";
-import {
-  type AuroraPostgresEngineVersion,
   CfnDBInstance,
   ClusterInstance,
   Credentials,
   DatabaseCluster,
   DatabaseClusterEngine,
   DatabaseClusterFromSnapshot,
-  type DatabaseClusterProps,
   InstanceUpdateBehaviour,
-  type IParameterGroup,
   ParameterGroup,
 } from "aws-cdk-lib/aws-rds";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
-import { Key } from "aws-cdk-lib/aws-kms";
 import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib/core";
 import type { Construct } from "constructs/lib/construct.js";
 import { exportValue, importVpc } from "../import-util.js";
@@ -75,20 +72,20 @@ export function parseClusterIdentifier(
   fallbackValue?: string,
 ): string {
   if (
-    clusterImport &&
-    clusterImport.clusterWriteEndpoint.includes(".cluster") &&
+    clusterImport?.clusterWriteEndpoint.includes(".cluster") &&
     clusterImport.clusterWriteEndpoint.split(".cluster")[0]
   ) {
-    // @ts-ignore this is checked above
+    // @ts-expect-error this is checked above
     return clusterImport.clusterWriteEndpoint.split(".cluster")[0];
   }
   if (fallbackValue) {
     return fallbackValue;
   }
   throw new Error(
-    [`Could not resolve 'clusterIdentifier' from 'configuration.clusterImport': ${clusterImport?.clusterWriteEndpoint}.,
-     'configuration.clusterImport.clusterWriteEndpoint' didn't contain '.cluster'`]
-      .join(" "),
+    [
+      `Could not resolve 'clusterIdentifier' from 'configuration.clusterImport': ${clusterImport?.clusterWriteEndpoint}.,
+     'configuration.clusterImport.clusterWriteEndpoint' didn't contain '.cluster'`,
+    ].join(" "),
   );
 }
 
@@ -135,7 +132,7 @@ export class DbStack extends Stack {
       throw new Error("Configure either cluster or clusterImport");
     }
 
-    const instanceName = isc.environmentName + "-db";
+    const instanceName = `${isc.environmentName}-db`;
     const rdsKey = configuration?.storageEncrypted
       ? this.createRDSKey(instanceName, isc.environmentName)
       : undefined;
@@ -265,7 +262,7 @@ export class DbStack extends Stack {
           isFromLegacyInstanceProps: reader.isFromLegacyInstanceProps,
         },
         ...defaultDbInstanceProps,
-      })
+      }),
     );
 
     return {
@@ -280,7 +277,7 @@ export class DbStack extends Stack {
       securityGroups: [securityGroup],
       vpc,
       instanceUpdateBehaviour: InstanceUpdateBehaviour.ROLLING,
-      instanceIdentifierBase: instanceName + "-",
+      instanceIdentifierBase: `${instanceName}-`,
       cloudwatchLogsExports: ["postgresql"],
       backup: {
         retention: Duration.days(35),
@@ -366,7 +363,9 @@ export class DbStack extends Stack {
     // if (cfnInstances.length === 0) {
     //     throw new Error("Couldn't pull CfnDBInstances from the L1 constructs!");
     // }
-    cfnInstances.forEach((cfnInstance) => delete cfnInstance.engineVersion);
+    cfnInstances.forEach((cfnInstance) => {
+      delete cfnInstance.engineVersion;
+    });
 
     return cluster;
   }

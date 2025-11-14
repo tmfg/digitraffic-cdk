@@ -1,33 +1,55 @@
 *
 
-!.gitignore
-!/.git-blame-ignore-revs
+# Github
+!/.github/
+!/.github/**/
+!/.github/workflows/**/**.yml
+!/.github/CODEOWNERS
+!/.github/dependabot.yml
+
 !/.editorconfig
+!/.git-blame-ignore-revs
+# for creating empty directories
+!/.git-create
 !/.gitattributes
+!/.gitignore
 !/.node-version
 
 !/*.md
 !/*.sh
 !/*.py
-!/Dockerfile
+
+!/biome.jsonc
 !/LICENCE
 !/rush.json
 
-# for creating empty directories
-!.git-create
+# Rush stuff
+!/common/
+!/common/*
 
-!/scripts/
-!/scripts/*.sh
-!/scripts/*.template
-!/scripts/*.md
-!/scripts/*.py
-
+# digitraffic-common and repo-scripts
 !/lib/
 !/lib/*/
-!/tools/
-!/tools/*/
+!/lib/repo-scripts/*
+!/lib/repo-scripts/**/*
 
-!/common/
+# Helpper scripts
+!/scripts/
+!/scripts/*.sh
+!/scripts/*.md
+!/scripts/*.py
+!/scripts/*.template
+
+# Templlate for new projects
+!/template/
+!/template/*
+!/template/esm/*
+!/template/esm/**/*
+
+# Tools
+!/tools/
+!/tools/*
+!/tools/**/*
 
 # Project folders
 !aviation/
@@ -39,13 +61,9 @@
 !rail/
 !rail/*/
 !road/
-!road/*/
+!road/*/*
 !template/
 !template/esm/
 
-# Github
-!.github/
-!.github/**/
-!.github/workflows/**/**.yml
-!.github/CODEOWNERS
-!/.github/dependabot.yml
+# Always ignored at last
+.DS_Store

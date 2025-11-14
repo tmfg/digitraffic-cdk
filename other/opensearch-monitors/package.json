@@ -34,8 +34,6 @@
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
-    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.4",
     "@rushstack/heft-jest-plugin": "^0.16.13",
     "@types/heft-jest": "1.0.6",

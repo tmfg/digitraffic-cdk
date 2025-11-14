@@ -4,8 +4,9 @@ import {
   MessageModel,
 } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import type { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
@@ -16,12 +17,12 @@ import {
   createArraySchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import {
-  EndpointType,
-  type IModel,
-  type RequestValidator,
-  type Resource,
+import type {
+  IModel,
+  RequestValidator,
+  Resource,
 } from "aws-cdk-lib/aws-apigateway";
+import { EndpointType } from "aws-cdk-lib/aws-apigateway";
 import {
   createAudioSchema,
   createPassengerInformationMessageSchema,
@@ -85,11 +86,12 @@ export class PublicApi {
     messageJsonModel: IModel,
     errorResponseModel: IModel,
     validator: RequestValidator,
-  ): MonitoredDBFunction {
+  ): MonitoredFunction {
     const activeResource = resource.addResource("active");
     const lambdaEnv = {
-      ...(stack.configuration.secretId &&
-        { SECRET_ID: stack.configuration.secretId }),
+      ...(stack.configuration.secretId && {
+        SECRET_ID: stack.configuration.secretId,
+      }),
       DB_APPLICATION: "avoindata",
     };
     const getActiveMessagesLambda = MonitoredDBFunction.create(
@@ -170,12 +172,14 @@ export class PublicApi {
     messageJsonModel: IModel,
     errorResponseModel: IModel,
     validator: RequestValidator,
-  ): MonitoredDBFunction {
-    const updatedAfterResource = resource.addResource("updated-after")
+  ): MonitoredFunction {
+    const updatedAfterResource = resource
+      .addResource("updated-after")
       .addResource("{date}");
     const lambdaEnv = {
-      ...(stack.configuration.secretId &&
-        { SECRET_ID: stack.configuration.secretId }),
+      ...(stack.configuration.secretId && {
+        SECRET_ID: stack.configuration.secretId,
+      }),
       DB_APPLICATION: "avoindata",
     };
     const getMessagesUpdatedAfterLambda = MonitoredDBFunction.create(

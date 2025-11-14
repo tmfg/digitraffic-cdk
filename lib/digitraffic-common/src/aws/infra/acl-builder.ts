@@ -1,7 +1,7 @@
 import { CfnIPSet, CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import type { Construct } from "constructs";
-import { logger } from "../runtime/dt-logger-default.js";
 import { concat, range, zipWith } from "lodash-es";
+import { logger } from "../runtime/dt-logger-default.js";
 
 interface RuleProperty {
   action?: CfnWebACL.RuleActionProperty;
@@ -19,8 +19,10 @@ export type ExcludedAWSRules = {
 };
 
 export type CfnWebAclRuleProperty = {
-  [P in keyof CfnWebACL.RuleProperty as Exclude<P, "priority">]:
-    CfnWebACL.RuleProperty[P];
+  [P in keyof CfnWebACL.RuleProperty as Exclude<
+    P,
+    "priority"
+  >]: CfnWebACL.RuleProperty[P];
 };
 
 /**
@@ -149,21 +151,22 @@ export class AclBuilder {
     isHeaderRequired: boolean,
     isBasedOnIpAndUriPath: boolean,
     customResponseBodyKey?: string,
+    path?: RegExp,
   ): this {
     const isBlockRule = !!customResponseBodyKey;
     const rules = isBlockRule ? this._blockRules : this._countRules;
     const action = isBlockRule
       ? {
-        block: {
-          customResponse: {
-            responseCode: 429,
-            customResponseBodyKey,
+          block: {
+            customResponse: {
+              responseCode: 429,
+              customResponseBodyKey,
+            },
           },
-        },
-      }
+        }
       : {
-        count: {},
-      };
+          count: {},
+        };
     rules.push({
       name,
       visibilityConfig: {
@@ -176,6 +179,7 @@ export class AclBuilder {
         limit,
         isHeaderRequired,
         isBasedOnIpAndUriPath,
+        path,
       ),
     });
 
@@ -189,8 +193,7 @@ export class AclBuilder {
     if (key in this._customResponseBodies) {
       logger.warn({
         method: "acl-builder.withCustomResponseBody",
-        message:
-          `Overriding custom response body with key ${key} for distribution ${this._name}`,
+        message: `Overriding custom response body with key ${key} for distribution ${this._name}`,
       });
     }
     this._customResponseBodies[key] = customResponseBody;
@@ -212,9 +215,7 @@ export class AclBuilder {
     );
   }
 
-  withThrottleDigitrafficUserIpAndUriPath(
-    limit: number | undefined,
-  ): this {
+  withThrottleDigitrafficUserIpAndUriPath(limit: number | undefined): this {
     if (limit === undefined) {
       return this;
     }
@@ -241,6 +242,25 @@ export class AclBuilder {
       false,
       false,
       customResponseBodyKey,
+    );
+  }
+
+  withThrottleAnonymousUserIpByUriPath(
+    limit: number | undefined,
+    path: RegExp | undefined,
+  ): AclBuilder {
+    if (limit === undefined || path === undefined) {
+      return this;
+    }
+    const customResponseBodyKey = `IP_THROTTLE_ANONYMOUS_USER_BY_PATH_${limit}`;
+    this._addThrottleResponseBody(customResponseBodyKey, limit);
+    return this.withThrottleRule(
+      "ThrottleRuleWithAnonymousUserByPath",
+      limit,
+      false,
+      false,
+      customResponseBodyKey,
+      path,
     );
   }
 
@@ -340,8 +360,7 @@ export class AclBuilder {
   _addThrottleResponseBody(customResponseBodyKey: string, limit: number): void {
     if (!this._isCustomResponseBodyKeySet(customResponseBodyKey)) {
       this.withCustomResponseBody(customResponseBodyKey, {
-        content:
-          `Request rate is limited to ${limit} requests in a 5 minute window.`,
+        content: `Request rate is limited to ${limit} requests in a 5 minute window.`,
         contentType: "TEXT_PLAIN",
       });
     }
@@ -392,8 +411,8 @@ export class AclBuilder {
   }
 }
 
-const CUSTOM_KEYS_IP_AND_URI_PATH:
-  CfnWebACL.RateBasedStatementCustomKeyProperty[] = [
+const CUSTOM_KEYS_IP_AND_URI_PATH: CfnWebACL.RateBasedStatementCustomKeyProperty[] =
+  [
     {
       uriPath: {
         textTransformations: [
@@ -426,10 +445,12 @@ function notStatement(
     },
   };
 }
+
 function createThrottleStatement(
   limit: number,
   isHeaderRequired: boolean,
   isBasedOnIpAndUriPath: boolean,
+  path?: RegExp,
 ): CfnWebACL.StatementProperty {
   // this statement matches empty digitraffic-user -header
   const matchStatement: CfnWebACL.StatementProperty = {
@@ -448,15 +469,35 @@ function createThrottleStatement(
   // header present       -> size > 0
   // header not present   -> NOT(size >= 0)
 
+  let scopeDownStatement = isHeaderRequired
+    ? matchStatement
+    : notStatement(matchStatement);
+
+  if (path) {
+    const pathMatchStatement: CfnWebACL.StatementProperty = {
+      regexMatchStatement: {
+        fieldToMatch: {
+          uriPath: {},
+        },
+        regexString: path.source,
+        textTransformations: [{ priority: 0, type: "NONE" }],
+      },
+    };
+
+    scopeDownStatement = {
+      andStatement: {
+        statements: [scopeDownStatement, pathMatchStatement],
+      },
+    };
+  }
+
   if (isBasedOnIpAndUriPath) {
     return {
       rateBasedStatement: {
         aggregateKeyType: "CUSTOM_KEYS",
         customKeys: CUSTOM_KEYS_IP_AND_URI_PATH,
         limit: limit,
-        scopeDownStatement: isHeaderRequired
-          ? matchStatement
-          : notStatement(matchStatement),
+        scopeDownStatement,
       },
     };
   }
@@ -465,9 +506,7 @@ function createThrottleStatement(
     rateBasedStatement: {
       aggregateKeyType: "IP",
       limit: limit,
-      scopeDownStatement: isHeaderRequired
-        ? matchStatement
-        : notStatement(matchStatement),
+      scopeDownStatement,
     },
   };
 }

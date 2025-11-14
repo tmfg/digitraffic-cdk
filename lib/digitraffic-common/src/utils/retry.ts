@@ -1,6 +1,6 @@
-import { HttpError } from "../types/http-error.js";
-import { AsyncTimeoutError } from "../types/async-timeout-error.js";
 import { logger } from "../aws/runtime/dt-logger-default.js";
+import { AsyncTimeoutError } from "../types/async-timeout-error.js";
+import { HttpError } from "../types/http-error.js";
 
 export enum RetryLogError {
   LOG_ALL_AS_ERRORS,
@@ -14,21 +14,19 @@ export type RetryPredicate = (error: unknown) => boolean;
 /**
  * Utility timeout functions for "retry" function.
  */
-export const timeoutFunctions = (function () {
-  return {
-    noTimeout: (_: number): number => {
-      return 0;
-    },
-    exponentialTimeout: (retryCount: number): number => {
-      return 2 ** retryCount * 1000;
-    },
-  };
-})();
+export const timeoutFunctions = (() => ({
+  noTimeout: (_: number): number => {
+    return 0;
+  },
+  exponentialTimeout: (retryCount: number): number => {
+    return 2 ** retryCount * 1000;
+  },
+}))();
 
 /**
  * Utility retry predicates for "retry" function.
  */
-export const retryPredicates = (function () {
+export const retryPredicates = (() => {
   const retryStatusCodes = new Set([
     // service might return 403 for no apparent reason
     403,
@@ -67,7 +65,7 @@ async function retryRecursive<T>(
   retryPredicate: RetryPredicate,
 ): Promise<T> {
   const asyncFnTimeout = 30 * 60 * 1000; // 30 minutes
-  if (!isFinite(retries)) {
+  if (!Number.isFinite(retries)) {
     throw new Error("Only finite numbers are supported");
   }
   if (retries > 100) {
@@ -79,7 +77,7 @@ async function retryRecursive<T>(
     const result: T = await Promise.race([
       asyncFn(),
       new Promise<never>((_resolve, reject) =>
-        setTimeout(() => reject(new AsyncTimeoutError()), asyncFnTimeout)
+        setTimeout(() => reject(new AsyncTimeoutError()), asyncFnTimeout),
       ),
     ]);
     return result;
@@ -151,8 +149,7 @@ async function retryRecursive<T>(
 export async function retry<T>(
   asyncFn: () => Promise<T>,
   retries: number = 3,
-  logError: RetryLogError =
-    RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
+  logError: RetryLogError = RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
   timeoutBetweenRetries: TimeoutFn = timeoutFunctions.noTimeout,
   retryPredicate: RetryPredicate = retryPredicates.alwaysRetry,
 ): Promise<T> {

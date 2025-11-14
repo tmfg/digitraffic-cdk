@@ -10,7 +10,7 @@ describe("CommonDateUtilsTest", () => {
   });
 
   test("dateFromIsoString fails", () => {
-    expect(() => CommonDateUtils.dateFromIsoString(ISO + "foobar")).toThrow();
+    expect(() => CommonDateUtils.dateFromIsoString(`${ISO}foobar`)).toThrow();
   });
 
   test("countDiffMs", () => {
@@ -32,9 +32,7 @@ describe("CommonDateUtilsTest", () => {
         date,
         CommonDateUtils.MYSQL_DATETIME_FORMAT,
       ),
-    ).toEqual(
-      "2023-01-01 00:00",
-    );
+    ).toEqual("2023-01-01 00:00");
   });
 
   test("dateToUTCString - +02:00 to UTC from parsed string", () => {
@@ -44,8 +42,6 @@ describe("CommonDateUtilsTest", () => {
         date,
         CommonDateUtils.MYSQL_DATETIME_FORMAT,
       ),
-    ).toEqual(
-      "2022-12-31 22:00",
-    );
+    ).toEqual("2022-12-31 22:00");
   });
 });

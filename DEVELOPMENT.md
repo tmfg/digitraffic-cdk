@@ -7,25 +7,42 @@ changes.
 
 ## Prerequisites
 
-1. Install Prerequisites
+### 1. Install required tools
    - awscli entr
      ```
      brew update
      brew install awscli entr
      ```
    - [Command Line Tools for Xcode](https://developer.apple.com/download/more/?q=Command%20Line%20Tools)
+   - Biome globally if you want to run it directly
+     ```
+     npm install -g @biomejs/biome
+     biome --version
+     ```
 
-2. Init rush, (e.g., installs Git hooks).
+### 2. Init rush, (e.g., installs Git hooks).
 
+Install all dependencies and git hooks centrally:
 ```shell
 rush install
 ```
+Install command line tools with auto installer that are used in various rush command-line scripts:
+```shell
+rush update-autoinstaller --name rush-command-line-tools
+```
+
+Finally run update to make sure all dependencies are up to date:
+```shell
+rush update
+```
+
+Later on you can just run `rush update` to update dependencies when you have done
+changes to package.json or fetch update from vcs.
 
 Later if you do changes to hooks, just run `rush install` again.
 
 Hooks are defined in [common/git-hooks](common/git-hooks) and currently
-pre-commit hook reorders package.json and other files are formated with deno
-fmt.
+pre-commit hook reorders package.json and other files are formated with biomejs .
 
 ## Workflow
 
@@ -38,21 +55,6 @@ fmt.
 6. Develop!
 
 One-off builds can also be run with `pnpm build`
-
-## Formatting files
-
-Formating is done before commit with
-[common/git-hooks/pre-commit](common/git-hooks/pre-commit)
-
-Manually formatting can be done with the following commands.
-
-Format code is done with `deno fmt` that can be run with
-
-    rush run:format
-
-To format package.json files run
-
-    rush run:format-package-json
 
 ## Creating a new project
 
@@ -82,9 +84,9 @@ After adding a dependency, remember to commit the changes made to pnpm.lock.
 
 ## Updating all dependencies
 
-Run the script [update-deps.sh](update-deps.sh). This script updates all
-dependencies to their latest patch version and compiles projects. Any
-compilation errors should be fixed before committing dependency changes.
+Run the script update-deps.sh. This script updates all dependencies to their
+latest patch version and compiles projects. Any compilation errors should be
+fixed before committing dependency changes.
 
 ## Running tests
 
@@ -109,3 +111,105 @@ compilation errors should be fixed before committing dependency changes.
     rush common-subtree -h
     rush common-subtree -c pull -r master
     rush common-subtree -c push -r master
+
+You can also define new branch to push changes with parameter
+`-r feature/DPO-123` i.e. for pull request.
+
+## Formatting/Linting files
+
+Formatting and linting of file is done with BiomeJS and sort-package-json tools.
+
+Formatting is done before commit with
+[common/git-hooks/pre-commit](common/git-hooks/pre-commit)
+
+It runs `rush format:package-json` and `rush format:fix-staged`. 
+
+Manually formatting can be done with the following commands.
+
+    rush format:package-json
+                        Sorts all package.json files using sort-package-json
+    
+    rush format:check   
+                        Runs Biome’s linting and formatting checks on the 
+                        repo without modifying files.
+    
+    rush format:check-staged
+                        Runs Biome’s linting and formatting checks only on 
+                        staged files without modifying files.
+
+    rush format:check-changed
+                        Runs Biome’s linting and formatting checks only on
+                        changed (according to Git) files without modifying
+                        files.
+    
+    rush format:fix     
+                        Runs Biome to check and automatically fix linting and 
+                        formatting issues in the repo.
+    
+    rush format:fix-staged   
+                        Runs Biome to check and automatically fix linting and 
+                        formatting issues only in staged files.
+
+    rush format:fix-changed  
+                        Runs Biome’s linting and formatting checks only on 
+                        changed (according to Git) files without modifying 
+                        files.
+    
+    npx --yes --package=@biomejs/biome@latest biome check [--write] <file-path>
+                        Runs Biome to check and automatically fix linting and 
+                        formatting issues in the specified file.
+
+    biome check [--write] <file-path>
+                        If you have installed BiomeJS globally you can run the 
+                        above command without npx.
+
+
+## All rush commands
+
+Global Rush commands are configured in
+[command-line.json](common/config/rush/command-line.json)
+
+You can list them with:
+
+```shell
+rush --help
+```
+
+## Developing with local @digitraffic/common
+
+Comment out `decoupledLocalDependencies` line in [rush.json](rush.json)
+
+    {
+      "packageName": "charging-network",
+      "projectFolder": "afir/charging-network",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk"]
+    }
+
+Update package.json:
+
+    "dependencies": {
+      ...
+      "@digitraffic/common": "workspace:*",
+      ...
+    }
+
+Then run `rush update` to use the local version of the common. Maybe even
+`rush purge && rush update --full`.
+
+When building the project run folowing command:
+
+```bash
+cd road/counting-site
+rushx build
+```
+OR
+```bash
+rush build --to road/counting-site
+```
+OR
+
+```bash
+cd road/counting-site
+rush build --to .
+```

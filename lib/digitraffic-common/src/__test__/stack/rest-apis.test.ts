@@ -1,8 +1,8 @@
 import { App } from "aws-cdk-lib";
-import { DigitrafficRestApi } from "../../aws/infra/stack/rest_apis.js";
+import { Match, Template } from "aws-cdk-lib/assertions";
+import { DigitrafficRestApi } from "../../aws/infra/stack/rest-api.js";
 import { DigitrafficStack } from "../../aws/infra/stack/stack.js";
 import { TrafficType } from "../../types/traffictype.js";
-import { Match, Template } from "aws-cdk-lib/assertions";
 
 describe("Rest api test", () => {
   test("OPTIONS method is added to API-gateway", () => {
@@ -26,9 +26,13 @@ describe("Rest api test", () => {
 
     const template = Template.fromStack(stack);
 
-    template.resourcePropertiesCountIs("AWS::ApiGateway::Method", {
-      HttpMethod: "OPTIONS",
-    }, 2);
+    template.resourcePropertiesCountIs(
+      "AWS::ApiGateway::Method",
+      {
+        HttpMethod: "OPTIONS",
+      },
+      2,
+    );
     template.hasResource("AWS::ApiGateway::Method", {
       Properties: {
         HttpMethod: "OPTIONS",

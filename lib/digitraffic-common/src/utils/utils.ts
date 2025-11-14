@@ -1,6 +1,6 @@
-import type { AwsEnv } from "../types/aws-env.js";
-import type { Either } from "../types/either.js";
+import { forIn, isObject } from "es-toolkit/compat";
 import { EnvKeys } from "../aws/runtime/environment.js";
+import type { Either } from "../types/either.js";
 
 /**
  * Check if arrays have only elements that also exists also in other array.
@@ -24,9 +24,8 @@ import { EnvKeys } from "../aws/runtime/environment.js";
  * @param b second array to compare
  */
 export function bothArraysHasSameValues(
-  // eslint-disable-next-line @rushstack/no-new-null
   a: null | undefined | unknown[],
-  // eslint-disable-next-line @rushstack/no-new-null
+
   b: null | undefined | unknown[],
 ): boolean {
   if ((a && !b) || (!a && b)) {
@@ -77,19 +76,6 @@ function getFirstOrLast<T>(
 }
 
 /**
- * Gets basic AWS environment variables. Throws error if variables are not found.
- *
- * @param key Environment key
- * @return string
- * @See https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html
- */
-export function getAwsEnv(): AwsEnv {
-  return {
-    region: getEnvVariable("AWS_REGION"),
-  };
-}
-
-/**
  * Gets environment variable. Throws error if variable is not found.
  *
  * @param key Environment key
@@ -129,6 +115,10 @@ export function getEnvVariableSafe(key: string): Either<string> {
  */
 export function setEnvVariable(key: string, value: string): void {
   process.env[key] = value;
+}
+
+export function setEnvVariableAwsRegion(value: string): void {
+  setEnvVariable(EnvKeys.AWS_REGION, value);
 }
 
 /**
@@ -171,7 +161,7 @@ export function hasOwnPropertySafe(
   object: object,
   propertyName: string,
 ): boolean {
-  return Object.prototype.hasOwnProperty.call(object, propertyName);
+  return Object.hasOwn(object, propertyName);
 }
 
 /**
@@ -180,7 +170,7 @@ export function hasOwnPropertySafe(
  */
 export function getErrorMessage(maybeError: unknown): string {
   if (maybeError instanceof Error) {
-    return maybeError.name + ": " + maybeError.message;
+    return `${maybeError.name}: ${maybeError.message}`;
   }
   return String(maybeError);
 }
@@ -188,7 +178,36 @@ export function getErrorMessage(maybeError: unknown): string {
 /**
  * @param value
  */
-// eslint-disable-next-line @rushstack/no-new-null
+
 export function isDefined<T>(value: T | undefined | null): value is T {
   return value !== undefined && value !== null;
+}
+
+/**
+ * Omits a key from an object deeply (also in nested objects). Creates and returns new object.
+ *
+ * @param obj Object to omit from
+ * @param keysToOmit Keys to omit
+ * @returns New same type of object as that was given as input but with the keys omitted.
+ */
+export function omitDeep<T>(obj: T, ...keysToOmit: readonly string[]): T {
+  if (!isObject(obj)) {
+    // primitive values are returned as-is
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    // recursively process arrays
+    return obj.map((item) => omitDeep(item, ...keysToOmit)) as unknown as T;
+  }
+
+  const result: Record<string, unknown> = {};
+
+  forIn(obj, (value, key) => {
+    if (!keysToOmit.includes(key)) {
+      result[key] = omitDeep(value, ...keysToOmit);
+    }
+  });
+
+  return result as T;
 }

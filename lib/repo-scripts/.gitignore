@@ -1,7 +1,5 @@
 *
 
-!.eslintignore
-!.eslintrc.cjs
 !.gitignore
 !README.md
 !command-line.json

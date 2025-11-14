@@ -19,35 +19,32 @@ Digitraffic is operated by [Fintraffic](https://www.fintraffic.fi)
 
 ## TL;DR
 
-Init rush, (e.g., installs Git hooks).
+### Init rush, (e.g., installs Git hooks).
 
 ```shell
 rush install
+rush update-autoinstaller --name rush-command-line-tools
+rush update
 ```
 
-Update dependencies for all projects
+### Update dependencies for all projects
 
 ```shell
 rush update
 ```
 
-## Format
+### Format
 
-    rush run:format
-
-## ESLint
-
-ESLint is configured in tools/eslint-config/default.js and can be used in other
-projects by adding it to .eslintrc.cjs ESLint-configuration can be found in
-_.eslintrc.json_. A Dockerfile is added to enable running eslint in docker:
-
-You can run eslint to tool projects by running:
-
-    rush ci:eslint-report
-
-After that you can find the report under projects in file `report.html`
+    rush format:package-json
+    rush format:fix-changed
 
 ## Rush commands
 
 Global Rush commands are configured in
 [command-line.json](common/config/rush/command-line.json)
+
+You can list them with:
+
+```shell
+rush --help
+```

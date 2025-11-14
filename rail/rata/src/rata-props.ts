@@ -33,11 +33,6 @@ export interface RataProps extends StackProps {
       securityGroupId: string;
       clusterId: string;
     };
-    web: {
-      ecrRepo: string;
-      taskDefinitionArn: string;
-      serviceArn: string;
-    };
     backend: {
       ecrRepo: string;
       taskDefinitionArn: string;

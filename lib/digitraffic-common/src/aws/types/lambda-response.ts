@@ -28,56 +28,63 @@ export class LambdaResponse {
    * Create LambdaResponse for HTTP 200 from json.
    */
   static okJson<T>(json: T, fileName?: string): LambdaResponse {
-    return this.ok(JSON.stringify(json), fileName);
+    return LambdaResponse.ok(JSON.stringify(json), fileName);
   }
 
   /**
    * Create LambdaResponse for HTTP 200 from string.
    */
   static ok(body: string, fileName?: string): LambdaResponse {
-    return this.okBinary(toBase64(body), fileName);
+    return LambdaResponse.okBinary(toBase64(body), fileName);
   }
 
   /**
    * Create LambdaResponse for HTTP 200 from base64-encoded data.
    */
   static okBinary(base64: string, fileName?: string): LambdaResponse {
-    return this.createForBase64(200, base64, fileName);
+    return LambdaResponse.createForBase64(200, base64, fileName);
   }
 
   /**
    * Create LambdaResponse for HTTP 400
    */
   static badRequest(error: string): LambdaResponse {
-    return this.createForString(400, error);
+    return LambdaResponse.createForString(400, error);
   }
 
   /**
    * Create LambdaResponse for HTTP 404
    */
   static notFound(error: string = "Not found"): LambdaResponse {
-    return this.createForString(404, error);
+    return LambdaResponse.createForString(404, error);
   }
 
   /**
    * Create LambdaResponse for HTTP 500
    */
   static internalError(error: string = "Internal error"): LambdaResponse {
-    return this.createForString(500, error);
+    return LambdaResponse.createForString(500, error);
   }
 
   /**
    * Create LambdaResponse for HTTP 401
    */
   static unauthorized(error: string = "Unauthorized"): LambdaResponse {
-    return this.createForString(401, error);
+    return LambdaResponse.createForString(401, error);
+  }
+
+  /**
+   * Create LambdaResponse for HTTP 413
+   */
+  static contentTooLarge(error: string = "Content too large"): LambdaResponse {
+    return LambdaResponse.createForString(413, error);
   }
 
   /**
    * Create LambdaResponse for HTTP 501
    */
   static notImplemented(error: string = "Not implemented"): LambdaResponse {
-    return this.createForString(501, error);
+    return LambdaResponse.createForString(501, error);
   }
 
   private static createForString(
@@ -85,7 +92,7 @@ export class LambdaResponse {
     body: string,
     fileName?: string,
   ): LambdaResponse {
-    return this.createForBase64(status, toBase64(body), fileName);
+    return LambdaResponse.createForBase64(status, toBase64(body), fileName);
   }
 
   private static createForBase64(

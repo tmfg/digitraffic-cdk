@@ -19,8 +19,9 @@ describe("ArrayUtils", () => {
     expect(ArrayUtils.bothArraysHasSameValues(["a", "b"], ["a", "a"])).toEqual(
       false,
     );
-    expect(ArrayUtils.bothArraysHasSameValues(["a", "a", "a"], ["a", "b", "c"]))
-      .toEqual(false);
+    expect(
+      ArrayUtils.bothArraysHasSameValues(["a", "a", "a"], ["a", "b", "c"]),
+    ).toEqual(false);
 
     const o1 = { a: 1, b: 2 };
     const o2 = { a: 1, b: 2 };
@@ -56,9 +57,7 @@ describe("ArrayUtils", () => {
 
   test("isDefined", () => {
     expect([1, 2, undefined, null, 3].filter(ArrayUtils.isDefined)).toEqual([
-      1,
-      2,
-      3,
+      1, 2, 3,
     ]);
   });
 });

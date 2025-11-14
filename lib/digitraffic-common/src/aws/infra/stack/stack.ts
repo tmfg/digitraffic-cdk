@@ -1,26 +1,23 @@
-import { Aspects, Stack, type StackProps } from "aws-cdk-lib";
-import {
-  type ISecurityGroup,
-  type IVpc,
-  SecurityGroup,
-  Vpc,
-} from "aws-cdk-lib/aws-ec2";
-import { type ITopic, Topic } from "aws-cdk-lib/aws-sns";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { type ISecret, Secret } from "aws-cdk-lib/aws-secretsmanager";
+import type { StackProps } from "aws-cdk-lib";
+import { Aspects, Stack } from "aws-cdk-lib";
+import type { ISecurityGroup, IVpc } from "aws-cdk-lib/aws-ec2";
+import { SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
-
-import { StackCheckingAspect } from "./stack-checking-aspect.js";
+import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import type { ITopic } from "aws-cdk-lib/aws-sns";
+import { Topic } from "aws-cdk-lib/aws-sns";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import type { Construct } from "constructs";
 import type { TrafficType } from "../../../types/traffictype.js";
 import type { DBLambdaEnvironment } from "./lambda-configs.js";
+import { StackCheckingAspect } from "./stack-checking-aspect.js";
 
 const SSM_ROOT = "/digitraffic";
 export const SOLUTION_KEY = "Solution";
 const MONITORING_ROOT = "/monitoring";
 
-export const SSM_KEY_WARNING_TOPIC =
-  `${SSM_ROOT}${MONITORING_ROOT}/warning-topic`;
+export const SSM_KEY_WARNING_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/warning-topic`;
 export const SSM_KEY_ALARM_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/alarm-topic`;
 
 export interface StackConfiguration {
@@ -105,8 +102,7 @@ export class DigitrafficStack extends Stack {
         this,
         "WarningTopicParam",
         SSM_KEY_WARNING_TOPIC,
-      )
-        .stringValue,
+      ).stringValue,
     );
 
     this.addAspects();
@@ -128,12 +124,12 @@ export class DigitrafficStack extends Stack {
   createDefaultLambdaEnvironment(dbApplication: string): DBLambdaEnvironment {
     return this.configuration.secretId
       ? {
-        SECRET_ID: this.configuration.secretId,
-        DB_APPLICATION: dbApplication,
-      }
+          SECRET_ID: this.configuration.secretId,
+          DB_APPLICATION: dbApplication,
+        }
       : {
-        DB_APPLICATION: dbApplication,
-      };
+          DB_APPLICATION: dbApplication,
+        };
   }
 
   getSecret(): ISecret {
@@ -145,6 +141,8 @@ export class DigitrafficStack extends Stack {
 
   grantSecret(...lambdas: AWSFunction[]): void {
     const secret = this.getSecret();
-    lambdas.forEach((l: AWSFunction) => secret.grantRead(l));
+    lambdas.forEach((l: AWSFunction) => {
+      secret.grantRead(l);
+    });
   }
 }

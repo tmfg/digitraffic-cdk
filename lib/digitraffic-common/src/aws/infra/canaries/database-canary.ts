@@ -1,12 +1,11 @@
+import { Duration } from "aws-cdk-lib";
+import { Schedule } from "aws-cdk-lib/aws-events";
 import type { Role } from "aws-cdk-lib/aws-iam";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { CfnCanary } from "aws-cdk-lib/aws-synthetics";
-import { Schedule } from "aws-cdk-lib/aws-events";
-import { Duration } from "aws-cdk-lib";
-
-import type { CanaryParameters } from "./canary-parameters.js";
-import { DigitrafficCanary } from "./canary.js";
 import type { DigitrafficStack } from "../stack/stack.js";
+import { DigitrafficCanary } from "./canary.js";
+import type { CanaryParameters } from "./canary-parameters.js";
 
 export class DatabaseCanary extends DigitrafficCanary {
   constructor(
@@ -28,13 +27,15 @@ export class DatabaseCanary extends DigitrafficCanary {
 
     // need to override vpc and security group, can't do this with cdk
     if (this.node.defaultChild instanceof CfnCanary) {
-      const subnetIds = stack.vpc === undefined
-        ? []
-        : stack.vpc.privateSubnets.map((subnet) => subnet.subnetId);
+      const subnetIds =
+        stack.vpc === undefined
+          ? []
+          : stack.vpc.privateSubnets.map((subnet) => subnet.subnetId);
 
-      const securityGroupIds = stack.lambdaDbSg === undefined
-        ? []
-        : [stack.lambdaDbSg.securityGroupId];
+      const securityGroupIds =
+        stack.lambdaDbSg === undefined
+          ? []
+          : [stack.lambdaDbSg.securityGroupId];
 
       this.node.defaultChild.vpcConfig = {
         vpcId: stack.vpc?.vpcId,
@@ -82,9 +83,10 @@ export class DatabaseCanary extends DigitrafficCanary {
         handler: `${name}-db.handler`,
         name: canaryName,
         alarm: {
-          alarmName: canaryName === name
-            ? `${stack.configuration.shortName}-DB-Alarm`
-            : `${canaryName}-DB-Alarm`,
+          alarmName:
+            canaryName === name
+              ? `${stack.configuration.shortName}-DB-Alarm`
+              : `${canaryName}-DB-Alarm`,
           topicArn: stack.configuration.alarmTopicArn,
         },
       },

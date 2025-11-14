@@ -1,5 +1,6 @@
 declare module "Synthetics" {
-  import { type RequestOptions } from "http";
+  import { type RequestOptions } from "node:http";
+  import type { IncomingMessage } from "node:http";
 
   interface SyntheticsConfiguration {
     withIncludeRequestBody: (value: boolean) => SyntheticsConfiguration;
@@ -13,7 +14,7 @@ declare module "Synthetics" {
   export function executeHttpStep<T>(
     name: string,
     requestOptions: RequestOptions,
-    callback: (t: T, body: string, message: any) => Promise<void>,
+    callback: (t: T, body: string, message: IncomingMessage) => Promise<void>,
   ): Promise<void>;
   export function getConfiguration(): SyntheticsConfiguration;
 

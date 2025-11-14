@@ -1,7 +1,7 @@
-import { AclBuilder } from "../../aws/infra/acl-builder.js";
-import { App, Stack } from "aws-cdk-lib";
 import { expect } from "@jest/globals";
+import { App, Stack } from "aws-cdk-lib";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { AclBuilder } from "../../aws/infra/acl-builder.js";
 
 describe("acl-builder tests", () => {
   function createBuilder(): AclBuilder {
@@ -22,69 +22,75 @@ describe("acl-builder tests", () => {
   });
 
   test("two aws rules", () => {
-    const acl = createBuilder().withAWSManagedRules([
-      "CommonRuleSet",
-      "AmazonIpReputationList",
-    ]).build();
+    const acl = createBuilder()
+      .withAWSManagedRules(["CommonRuleSet", "AmazonIpReputationList"])
+      .build();
 
     expect(acl.rules).toHaveLength(2);
   });
 
   test("ip blacklist", () => {
-    const acl = createBuilder().withIpBlacklistRule(["1.2.3.4", "1.2.6.6"])
+    const acl = createBuilder()
+      .withIpBlacklistRule(["1.2.3.4", "1.2.6.6"])
       .build();
 
     expect(acl.rules).toHaveLength(1);
   });
 
   test("ip whitelist", () => {
-    const acl = createBuilder().withIpWhitelistRule(["1.2.3.4", "1.2.6.6"])
+    const acl = createBuilder()
+      .withIpWhitelistRule(["1.2.3.4", "1.2.6.6"])
       .build();
 
     expect(acl.rules).toHaveLength(1);
   });
 
   test("throttle rules", () => {
-    for (
-      const aclBuilder of [
-        createBuilder().withThrottleDigitrafficUserIp(100),
-        createBuilder().withThrottleDigitrafficUserIpAndUriPath(100),
-        createBuilder().withThrottleAnonymousUserIp(100),
-        createBuilder().withThrottleAnonymousUserIpAndUriPath(100),
-      ]
-    ) {
+    for (const aclBuilder of [
+      createBuilder().withThrottleDigitrafficUserIp(100),
+      createBuilder().withThrottleDigitrafficUserIpAndUriPath(100),
+      createBuilder().withThrottleAnonymousUserIp(100),
+      createBuilder().withThrottleAnonymousUserIpAndUriPath(100),
+      createBuilder().withThrottleAnonymousUserIpByUriPath(500, /abc/),
+    ]) {
       const acl = aclBuilder.build();
       // Check that the rule exists and a custom response is defined
       expect(acl.rules).toHaveLength(1);
-      expect(Object.keys(acl.customResponseBodies as Record<string, unknown>))
-        .toHaveLength(1);
+      expect(
+        Object.keys(acl.customResponseBodies as Record<string, unknown>),
+      ).toHaveLength(1);
       // Check that the rule does throttle
       const throttleRule = (acl.rules! as Array<CfnWebACL.RuleProperty>)[0]!;
       expect(
         (throttleRule.statement as CfnWebACL.StatementProperty)
           .rateBasedStatement,
       ).toBeDefined();
-      expect((throttleRule.action as CfnWebACL.RuleActionProperty).block)
-        .toBeDefined();
+      expect(
+        (throttleRule.action as CfnWebACL.RuleActionProperty).block,
+      ).toBeDefined();
     }
   });
 
   test("Cannot define two rules with the same name", () => {
     expect(() =>
-      createBuilder().withThrottleAnonymousUserIp(10)
-        .withThrottleAnonymousUserIp(200).build()
+      createBuilder()
+        .withThrottleAnonymousUserIp(10)
+        .withThrottleAnonymousUserIp(200)
+        .build(),
     ).toThrow();
   });
 
   test("throtle rule without limit does nothing", () => {
-    for (
-      const aclBuilder of [
-        createBuilder().withThrottleDigitrafficUserIp(undefined),
-        createBuilder().withThrottleDigitrafficUserIpAndUriPath(undefined),
-        createBuilder().withThrottleAnonymousUserIp(undefined),
-        createBuilder().withThrottleAnonymousUserIpAndUriPath(undefined),
-      ]
-    ) {
+    for (const aclBuilder of [
+      createBuilder().withThrottleDigitrafficUserIp(undefined),
+      createBuilder().withThrottleDigitrafficUserIpAndUriPath(undefined),
+      createBuilder().withThrottleAnonymousUserIp(undefined),
+      createBuilder().withThrottleAnonymousUserIpAndUriPath(undefined),
+      createBuilder().withThrottleAnonymousUserIpByUriPath(
+        undefined,
+        undefined,
+      ),
+    ]) {
       expect(() => aclBuilder.build()).toThrow("No rules");
     }
   });
