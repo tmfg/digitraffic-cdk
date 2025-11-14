@@ -1,0 +1,100 @@
+# Does check full repo and generates links to branch files not curren commit
+name: Biome Check Full Branch
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  biome:
+    name: Biome Lint & Format
+    if: github.repository != 'tmfg/digitraffic-cdk'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # 1. Checkout full repo
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # fetch full history so all files exist
+          ref: ${{ github.ref }} # ensure the branch tip is checked out
+
+      - name: Set Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+
+      - name: Run Biome CI (GitHub reporter)
+        run: |
+          mkdir -p reports
+          # Run Biome and capture GitHub annotations. Need to capture both stdout and stderr as annotations may be in either.
+          biome ci --reporter=github --no-errors-on-unmatched 2>&1 | tee reports/biome-gh.txt
+
+      - name: Parse Biome GitHub annotations & generate Markdown
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME  || 'master';
+          const repo = process.env.GITHUB_REPOSITORY;
+
+          const levelIcon = {
+            notice: 'ℹ️',
+            warning: '⚠️',
+            error: '❌'
+          };
+
+          const raw = fs.readFileSync('reports/biome-gh.txt', 'utf8');
+
+          const regex = /^::(notice|warning|error) title=([^,]+),file=([^,]+),line=(\d+),endLine=(\d+),col=(\d+),endColumn=(\d+)::(.*)$/gm;
+          let m, annotations = [];
+          while ((m = regex.exec(raw)) !== null) {
+            annotations.push({
+              level: m[1],
+              title: m[2],
+              file: m[3],
+              line: parseInt(m[4]),
+              endLine: parseInt(m[5]),
+              message: m[8]
+            });
+          }
+
+          const md = annotations.map(a => {
+            const icon = levelIcon[a.level.toLowerCase()] || '';
+            const url = a.line === a.endLine
+            ? `https://github.com/${repo}/blob/${branch}/${a.file}#L${a.line}`
+              : `https://github.com/${repo}/blob/${branch}/${a.file}#L${a.line}-L${a.endLine}`;
+          
+            // Append line info to link name
+            const linkName = a.line === a.endLine
+            ? `${a.file}:${a.line}`
+              : `${a.file}:${a.line}-${a.endLine}`;
+          
+            
+            return `- ${icon} \`${a.title}\` in [${linkName}](${url}) : ${a.message}
+            \`${linkName}\``; // This is here to make it double-clickable and easier to copy
+          }).join('\n');
+          
+          // Also write to GitHub Actions step summary 
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+          if (summaryPath) {
+            fs.writeFileSync(summaryPath, md + '\n', { flag: 'a' });
+          }
+          
+          console.log(md);
+          
+          // Fail the job if any error-level violations exist
+          const hasError = annotations.some(a => a.level.toLowerCase() === 'error');
+          if (hasError) {
+            console.error('Biome found errors, failing the job.');
+            process.exit(1); // <- this will fail the step/job
+          }
+          EOF

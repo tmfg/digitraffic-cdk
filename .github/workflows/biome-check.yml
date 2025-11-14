@@ -10,7 +10,7 @@ permissions:
 jobs:
   biome:
     name: Biome Lint & Format
-    if: github.repository != 'tmfg/digitraffic-afir'
+    if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-latest
     permissions:
       contents: read
