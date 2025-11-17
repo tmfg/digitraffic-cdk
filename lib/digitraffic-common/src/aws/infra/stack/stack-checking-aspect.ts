@@ -1,13 +1,14 @@
-import { Annotations, type IAspect, Stack } from "aws-cdk-lib";
-import { CfnFunction, Runtime } from "aws-cdk-lib/aws-lambda";
-import { CfnBucket } from "aws-cdk-lib/aws-s3";
-import { DigitrafficStack, SOLUTION_KEY } from "./stack.js";
-import type { IConstruct } from "constructs";
+import type { IAspect } from "aws-cdk-lib";
+import { Annotations, Stack } from "aws-cdk-lib";
 import { CfnMethod, CfnResource } from "aws-cdk-lib/aws-apigateway";
-import { CfnQueue } from "aws-cdk-lib/aws-sqs";
+import { CfnFunction, Runtime } from "aws-cdk-lib/aws-lambda";
 import { LogRetention } from "aws-cdk-lib/aws-logs";
+import { CfnBucket } from "aws-cdk-lib/aws-s3";
+import { CfnQueue } from "aws-cdk-lib/aws-sqs";
 import { kebabCase } from "change-case";
+import type { IConstruct } from "constructs";
 import { snakeCase } from "lodash-es";
+import { DigitrafficStack, SOLUTION_KEY } from "./stack.js";
 
 const MAX_CONCURRENCY_LIMIT = 100;
 const NODE_RUNTIMES = [Runtime.NODEJS_22_X.name, Runtime.NODEJS_20_X.name];
@@ -49,7 +50,6 @@ export class StackCheckingAspect implements IAspect {
 
   private isWhitelisted(key: string): boolean | undefined {
     return this.whitelistedResources?.some((wl) => {
-      // eslint-disable-next-line @rushstack/security/no-unsafe-regexp
       return key.matchAll(new RegExp(wl, "g"));
     });
   }
@@ -193,11 +193,11 @@ export class StackCheckingAspect implements IAspect {
     }
     // if path includes . or { check only the trailing part of path
     if (path.includes(".")) {
-      return this.isValidPath(path.split(".")[0]);
+      return StackCheckingAspect.isValidPath(path.split(".")[0]);
     }
 
     if (path.includes("{")) {
-      return this.isValidPath(path.split("{")[0]);
+      return StackCheckingAspect.isValidPath(path.split("{")[0]);
     }
 
     return kebabCase(path) === path;
@@ -260,12 +260,14 @@ export class StackCheckingAspect implements IAspect {
 
   private checkLogGroupRetention(node: IConstruct): void {
     if (node instanceof LogRetention) {
-      const child = node.node.defaultChild as unknown as Record<
-        string,
-        Record<string, string>
-      >;
-      // eslint-disable-next-line dot-notation
-      const retention = child?.["_cfnProperties"]?.["RetentionInDays"];
+      const child = node.node.defaultChild as unknown as {
+        _cfnProperties?: {
+          RetentionInDays?: string;
+          [key: string]: unknown;
+        };
+        [key: string]: unknown;
+      };
+      const retention = child?._cfnProperties?.RetentionInDays;
 
       if (!retention) {
         this.addAnnotation(

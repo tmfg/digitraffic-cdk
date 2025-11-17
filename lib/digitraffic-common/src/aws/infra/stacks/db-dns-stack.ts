@@ -1,14 +1,14 @@
 import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
-import { type Construct } from "constructs";
 import {
   PrivateHostedZone,
   RecordSet,
   RecordTarget,
   RecordType,
 } from "aws-cdk-lib/aws-route53";
-import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
+import type { Construct } from "constructs";
 import { importVpc } from "../import-util.js";
 import { getParameterValue } from "../stack/parameters.js";
+import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
 
 const DEFAULT_RECORD_TTL = Duration.seconds(30);
 
@@ -30,7 +30,7 @@ export class DbDnsStack extends Stack {
   createDnsRecords(isc: InfraStackConfiguration): void {
     const vpc = importVpc(this, isc.environmentName);
     const zone = new PrivateHostedZone(this, "DNSHostedZone", {
-      zoneName: isc.environmentName + ".local",
+      zoneName: `${isc.environmentName}.local`,
       vpc,
     });
 

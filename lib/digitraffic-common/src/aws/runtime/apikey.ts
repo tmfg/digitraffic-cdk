@@ -1,7 +1,7 @@
+import type { GetApiKeyCommandOutput } from "@aws-sdk/client-api-gateway";
 import {
   APIGatewayClient,
   GetApiKeyCommand,
-  type GetApiKeyCommandOutput,
 } from "@aws-sdk/client-api-gateway";
 import { FetchHttpHandler } from "@smithy/fetch-http-handler";
 
@@ -16,5 +16,5 @@ export async function getApiKeyFromAPIGateway(
     includeValue: true,
   });
 
-  return (await client.send(command));
+  return await client.send(command);
 }

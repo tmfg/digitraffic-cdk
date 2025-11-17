@@ -338,8 +338,9 @@ export async function getVessels(
 ): Promise<VesselDTO[]> {
   logger.info({
     method: "GetVessels.getVessels",
-    message: `from: ${JSON.stringify(activeFrom)} to: ${JSON.stringify(activeTo)
-      }`,
+    message: `from: ${JSON.stringify(activeFrom)} to: ${
+      JSON.stringify(activeTo)
+    }`,
   });
 
   return db.manyOrNone(PS_GET_VESSELS, [

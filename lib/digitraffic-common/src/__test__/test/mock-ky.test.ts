@@ -1,5 +1,5 @@
-import { mockKyResponse } from "../../__test__/mock-ky.js";
 import { describe, jest, test } from "@jest/globals";
+import { mockKyResponse } from "../../__test__/mock-ky.js";
 
 const ky = (await import("ky")).default;
 
@@ -13,18 +13,18 @@ describe("mockKyResponse", () => {
   });
 
   test("works with all methods", async () => {
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
-    jest.spyOn(ky, "post").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
-    jest.spyOn(ky, "put").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
-    jest.spyOn(ky, "delete").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(200, testJson));
+    jest
+      .spyOn(ky, "post")
+      .mockImplementation(() => mockKyResponse(200, testJson));
+    jest
+      .spyOn(ky, "put")
+      .mockImplementation(() => mockKyResponse(200, testJson));
+    jest
+      .spyOn(ky, "delete")
+      .mockImplementation(() => mockKyResponse(200, testJson));
 
     expect(await ky.get(url).text()).toEqual(testJson);
     expect(await ky.put(url).text()).toEqual(testJson);
@@ -33,46 +33,46 @@ describe("mockKyResponse", () => {
   });
 
   test("returns correct status", async () => {
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(200, testJson));
     expect((await ky.get(url)).status).toEqual(200);
 
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(400, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(400, testJson));
     expect((await ky.get(url)).status).toEqual(400);
   });
 
   test("returns correct ok", async () => {
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(200, testJson));
     expect((await ky.get(url)).ok).toEqual(true);
 
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(299, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(299, testJson));
     expect((await ky.get(url)).ok).toEqual(true);
 
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(300, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(300, testJson));
     expect((await ky.get(url)).ok).toEqual(false);
   });
 
   test("convenience methods work: text", async () => {
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(200, testJson));
     expect(await ky.get(url).text()).toEqual(testJson);
     expect(await (await ky.get(url)).text()).toEqual(testJson);
   });
 
   test("convenience methods work: json", async () => {
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(200, testJson)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(200, testJson));
     expect(await ky.get(url).json()).toEqual(testObj);
     expect(await (await ky.get(url)).json()).toEqual(testObj);
   });

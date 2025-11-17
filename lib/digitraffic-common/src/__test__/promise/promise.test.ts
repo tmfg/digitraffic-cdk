@@ -1,7 +1,7 @@
-import { getRandomInteger } from "../../__test__/testutils.js";
-import { retry, RetryLogError } from "../../utils/retry.js";
-import { logger } from "../../aws/runtime/dt-logger-default.js";
 import { jest } from "@jest/globals";
+import { getRandomInteger } from "../../__test__/testutils.js";
+import { logger } from "../../aws/runtime/dt-logger-default.js";
+import { RetryLogError, retry } from "../../utils/retry.js";
 
 jest.useFakeTimers();
 
@@ -84,8 +84,9 @@ describe("Promise utils tests", () => {
   test("retry - exceeded retry count throws error", async () => {
     const fn = jest.fn(() => Promise.reject("error"));
 
-    await expect(() => retry(fn, 3, RetryLogError.LOG_ALL_AS_ERRORS)).rejects
-      .toThrow();
+    await expect(() =>
+      retry(fn, 3, RetryLogError.LOG_ALL_AS_ERRORS),
+    ).rejects.toThrow();
   });
 
   test("retry - defaults", async () => {
@@ -105,22 +106,24 @@ describe("Promise utils tests", () => {
   test("retry - NaN throws error", async () => {
     const fn = jest.fn(() => Promise.resolve(NaN));
 
-    await expect(() => retry(fn, NaN, RetryLogError.NO_LOGGING)).rejects
-      .toThrow();
+    await expect(() =>
+      retry(fn, NaN, RetryLogError.NO_LOGGING),
+    ).rejects.toThrow();
   });
 
   test("retry - Infinity throws error", async () => {
     const fn = jest.fn(() => Promise.resolve(NaN));
 
-    await expect(() => retry(fn, Infinity, RetryLogError.NO_LOGGING)).rejects
-      .toThrow();
+    await expect(() =>
+      retry(fn, Infinity, RetryLogError.NO_LOGGING),
+    ).rejects.toThrow();
   });
 
   test("retry - exceeded maximum retry count throws error", async () => {
     const fn = jest.fn(() => Promise.resolve(NaN));
 
     await expect(() =>
-      retry(fn, getRandomInteger(101, 1000000), RetryLogError.NO_LOGGING)
+      retry(fn, getRandomInteger(101, 1000000), RetryLogError.NO_LOGGING),
     ).rejects.toThrow();
   });
 

@@ -42,9 +42,9 @@ export type Geometry =
   | z.infer<typeof PolygonSchema>
   | z.infer<typeof MultiPolygonSchema>
   | {
-    type: "GeometryCollection";
-    geometries: Geometry[];
-  };
+      type: "GeometryCollection";
+      geometries: Geometry[];
+    };
 
 // --- Recursive GeometrySchema ---
 export const GeometrySchema: z.ZodType<Geometry> = z.lazy(() =>
@@ -60,7 +60,7 @@ export const GeometrySchema: z.ZodType<Geometry> = z.lazy(() =>
       type: z.literal("GeometryCollection"),
       geometries: z.array(GeometrySchema),
     }),
-  ])
+  ]),
 );
 
 export const FeatureSchema = z.object({

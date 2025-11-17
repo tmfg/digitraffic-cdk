@@ -1,8 +1,6 @@
+import type { Resource } from "aws-cdk-lib/aws-apigateway";
+import { CfnDocumentationPart } from "aws-cdk-lib/aws-apigateway";
 import type { Construct } from "constructs";
-import {
-  CfnDocumentationPart,
-  type Resource,
-} from "aws-cdk-lib/aws-apigateway";
 
 // Documentation parts are objects that describe an API Gateway API or parts of an API
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-documenting-api.html
@@ -22,7 +20,6 @@ export function addQueryParameterDescription(
   resource: Resource,
   stack: Construct,
 ): void {
-  // eslint-disable-next-line no-new
   new CfnDocumentationPart(stack, `${name}Documentation`, {
     restApiId: resource.api.restApiId,
     location: {
@@ -47,7 +44,6 @@ export function addDocumentation(
   resource: Resource,
   stack: Construct,
 ): void {
-  // eslint-disable-next-line no-new
   new CfnDocumentationPart(stack, `${methodDescription}Documentation`, {
     restApiId: resource.api.restApiId,
     location: {
@@ -120,7 +116,7 @@ export class DocumentationPart {
   deprecated(note: string): this {
     // deprecated is not supported ATM: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-known-issues.html
     this.documentationProperties.deprecated = true;
-    this.documentationProperties.summary += ". " + note;
+    this.documentationProperties.summary += `. ${note}`;
 
     return this;
   }

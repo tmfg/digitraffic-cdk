@@ -1,6 +1,6 @@
+import type { Stack } from "aws-cdk-lib";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import type { DigitrafficStack } from "./stack.js";
-import type { Stack } from "aws-cdk-lib";
 
 export interface CreateLambdaLogGroupParams {
   functionName: string;
@@ -23,8 +23,9 @@ function isCreateLambdaLogGroupParamsForDigitrafficStack(
     | CreateLambdaLogGroupParamsForStack
     | CreateLambdaLogGroupParamsForDigitrafficStack,
 ): params is CreateLambdaLogGroupParamsForDigitrafficStack {
-  return !!("configuration" in params.stack &&
-    params.stack?.configuration?.shortName);
+  return !!(
+    "configuration" in params.stack && params.stack?.configuration?.shortName
+  );
 }
 
 export function createLambdaLogGroup(

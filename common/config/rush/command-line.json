@@ -12,23 +12,53 @@
    */
   "commands": [
     {
-      "name": "run:format-package-json",
+      "name": "format:package-json",
       "commandKind": "global",
       "summary": "Sorts all package.json files using sort-package-json",
-      "shellCommand": "find . -name package.json \\\n\
-        -not -path '*/node_modules/*' \\\n\
-        -not -path '*/digitraffic-common/*' \\\n\
-        -not -path '*/dist/*' \\\n\
-        -not -path '*/temp/*' \\\n\
-        -not -path '*/build/*' \\\n\
-        -not -path '*/cdk.out/*' \\\n\
-        | xargs npx --yes sort-package-json"
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "sort-package-json $(git ls-files '*package.json')"
     },
     {
-      "name": "run:format",
+      "name": "format:check",
       "commandKind": "global",
-      "summary": "Formats all projet files",
-      "shellCommand": "npx --yes deno fmt"
+      "summary": "Runs Biome’s linting and formatting checks on the repo without modifying files.",
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "biome check --files-ignore-unknown=true --no-errors-on-unmatched"
+    },
+    {
+      "name": "format:check-staged",
+      "commandKind": "global",
+      "summary": "Runs Biome’s linting and formatting checks only on staged files without modifying files.",
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "biome check --staged --files-ignore-unknown=true --no-errors-on-unmatched"
+    },
+    {
+      "name": "format:check-changed",
+      "commandKind": "global",
+      "summary": "Runs Biome’s linting and formatting checks only on changed (according to Git) files without modifying files.",
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "biome check --changed --files-ignore-unknown=true --no-errors-on-unmatched"
+    },
+    {
+      "name": "format:fix",
+      "commandKind": "global",
+      "summary": "Runs Biome to check and automatically fix linting and formatting issues in the repo.",
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "biome check --write --files-ignore-unknown=true --no-errors-on-unmatched"
+    },
+    {
+      "name": "format:fix-staged",
+      "commandKind": "global",
+      "summary": "Runs Biome to check and automatically fix linting and formatting issues only in staged files.",
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "biome check --write --staged --files-ignore-unknown=true --no-errors-on-unmatched"
+    },
+    {
+      "name": "format:fix-changed",
+      "commandKind": "global",
+      "summary": "Runs Biome’s linting and formatting checks only on changed (according to Git) files without modifying files.",
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "biome check --write --changed --files-ignore-unknown=true --no-errors-on-unmatched"
     },
     {
       "name": "build",
@@ -55,8 +85,8 @@
       "name": "repo:unify-deps",
       "commandKind": "global",
       "summary": "Checks if dependencies are declared correctly",
-      // Using pnpm to install zx here to ensure that zx is found
-      "shellCommand": "pnpm install zx && npx zx common/scripts/unify-deps.mjs"
+      "autoinstallerName": "rush-command-line-tools",
+      "shellCommand": "zx common/scripts/unify-deps.mjs"
     },
     {
       "name": "ci:eslint-report",

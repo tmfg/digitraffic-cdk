@@ -1,7 +1,7 @@
+import type { PolicyStatementProps } from "aws-cdk-lib/aws-iam";
 import {
   ManagedPolicy,
   PolicyStatement,
-  type PolicyStatementProps,
   Role,
   ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
@@ -30,7 +30,7 @@ const CLOUDWATCH_STATEMENT_PROPS: PolicyStatementProps = {
 
 export class DigitrafficCanaryRole extends Role {
   constructor(stack: Construct, canaryName: string) {
-    super(stack, "canary-role-" + canaryName, {
+    super(stack, `canary-role-${canaryName}`, {
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(

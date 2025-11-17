@@ -77,7 +77,7 @@ export const openapiPathItem = z
 
 export const openapiSchema = z
   .object({
-    openapi: z.string().regex(new RegExp("^3\\.\\d\\.\\d(-.+)?$")),
+    openapi: z.string().regex(/^3\.\d\.\d(-.+)?$/),
     info: z
       .object({
         title: z.string(),
@@ -91,15 +91,20 @@ export const openapiSchema = z
           })
           .strict()
           .optional(),
-        license: z.object({ name: z.string(), url: z.string().optional() })
-          .strict().optional(),
+        license: z
+          .object({ name: z.string(), url: z.string().optional() })
+          .strict()
+          .optional(),
         version: z.string(),
       })
       .strict(),
-    externalDocs: z.object({
-      description: z.string().optional(),
-      url: z.string(),
-    }).strict().optional(),
+    externalDocs: z
+      .object({
+        description: z.string().optional(),
+        url: z.string(),
+      })
+      .strict()
+      .optional(),
     servers: z
       .array(
         z

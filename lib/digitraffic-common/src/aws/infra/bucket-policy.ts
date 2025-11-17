@@ -48,10 +48,10 @@ export function grantOACRights(config: CloudfrontGrantConfiguration): void {
     new PolicyStatement({
       effect: config.effect ?? Effect.ALLOW,
       principals: [new ServicePrincipal("cloudfront.amazonaws.com")],
-      resources: config.resources ?? [config.bucket.bucketArn + "/*"],
+      resources: config.resources ?? [`${config.bucket.bucketArn}/*`],
       actions: config.actions ?? ["s3:GetObject"],
       conditions: {
-        "StringEquals": {
+        StringEquals: {
           "AWS:SourceArn": config.distributionArn,
         },
       },
@@ -68,7 +68,7 @@ export function grantOAIRights(config: CloudfrontOAIGrantConfiguration): void {
     new PolicyStatement({
       effect: config.effect ?? Effect.ALLOW,
       principals: [new CanonicalUserPrincipal(config.canonicalUserId)],
-      resources: config.resources ?? [config.bucket.bucketArn + "/*"],
+      resources: config.resources ?? [`${config.bucket.bucketArn}/*`],
       actions: config.actions ?? ["s3:GetObject"],
     }),
   );

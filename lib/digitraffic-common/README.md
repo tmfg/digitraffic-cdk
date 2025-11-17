@@ -3,6 +3,24 @@
 This is a place for common utilities and classes that can be used in other
 cdk-projects.
 
+## Setup
+
+Initialize the project scripts by running the following command. This only needs
+to be done once, after cloning or pulling the repository for the first time. It
+will install/reinstall lefthook git hooks.
+
+```shell
+pnpm run setup
+```
+
+After that approve esbuild:
+
+```shell
+pnpm approve-builds
+```
+
+And then run again the setup.
+
 ## How to build
 
 Use `pnpm` to build the code i.e.
@@ -11,11 +29,15 @@ Use `pnpm` to build the code i.e.
     pnpm build
     pnpm test
     pnpm test --test-path-pattern 'dt-logger.test'
+    pnpm test:watch
+    pnpm test:watch --test-path-pattern 'dt-logger.test'
 
 Format code
 
-    pnpm run:format-changed # Formats stagged files
-    pnpm run:format # Format all files
+    pnpm format:check # Checks all files
+    pnpm format:check-staged # Checks stagged files
+    pnpm format:fix # Format all files
+    pnpm format:fix-staged # Formats stagged files
 
 ## Update deps
 
@@ -31,10 +53,6 @@ absolute latest versions:
 ```bash
 pnpm up --latest
 ```
-
-## Reinstall lefthook git hooks
-
-    pnpm prepare
 
 ## How to use
 

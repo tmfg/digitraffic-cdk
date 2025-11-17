@@ -1,7 +1,4 @@
 *
-
-!.eslintignore
-!.eslintrc.cjs
 !.gitignore
 !cdk.json
 !package.json

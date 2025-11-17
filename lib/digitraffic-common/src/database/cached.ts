@@ -19,8 +19,7 @@ const PS_UPDATE_CACHE_VALUE = new PreparedStatement({
 
 const PS_GET_CACHE_VALUE = new PreparedStatement({
   name: "get-cache-value",
-  text:
-    "select content, last_updated, modified from cached_json where cache_id = $1",
+  text: "select content, last_updated, modified from cached_json where cache_id = $1",
 });
 
 export enum JSON_CACHE_KEY {
@@ -56,9 +55,9 @@ export async function getFromCache<T>(
   db: DTDatabase | DTTransaction,
   cacheKey: JSON_CACHE_KEY,
 ): Promise<CachedValue<T> | undefined> {
-  return db.oneOrNone<CachedValue<T>>(PS_GET_CACHE_VALUE, [cacheKey]).then(
-    (result) => {
+  return db
+    .oneOrNone<CachedValue<T>>(PS_GET_CACHE_VALUE, [cacheKey])
+    .then((result) => {
       return result ?? undefined;
-    },
-  );
+    });
 }

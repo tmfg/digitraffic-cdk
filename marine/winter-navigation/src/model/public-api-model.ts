@@ -120,13 +120,13 @@ export const PlannedAssistanceSchema = z.union([
 export const BaseActivitySchema = z.object({
   type: z.string().describe(
     "Current list of types (subject to change): CREWA (Actual crew change), LED (Lead), LOC (Local Icebreaking), MOVE (Move), ORDER (Order), OUT (Out of Operation), CREWP (Planned crew change), STOP (Stop), TOW (Tow), TRANS (Transfer), WAIT (Wait)\n\n" +
-    "Activities that affect vessels subject to icebreaker assistance:\n" +
-    "- WAIT: vessel is waiting for icebreaker assistance\n" +
-    "- STOP: vessel is waiting for other reason\n\n" +
-    "Activities that affect icebreakers:\n" +
-    "- STOP, LOC, MOVE, TRANS\n\n" +
-    "Activities that affect both vessel and icebreaker:\n" +
-    "- LED, TOW",
+      "Activities that affect vessels subject to icebreaker assistance:\n" +
+      "- WAIT: vessel is waiting for icebreaker assistance\n" +
+      "- STOP: vessel is waiting for other reason\n\n" +
+      "Activities that affect icebreakers:\n" +
+      "- STOP, LOC, MOVE, TRANS\n\n" +
+      "Activities that affect both vessel and icebreaker:\n" +
+      "- LED, TOW",
   ),
   reason: z.string().nullable().describe("Optional reason for activity"),
   publicComment: z.string().nullable().describe(

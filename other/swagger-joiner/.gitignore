@@ -1,7 +1,4 @@
 *
-
-!/.eslintignore
-!/.eslintrc.cjs
 !/.gitignore
 !/cdk.json
 !/jest.config.js

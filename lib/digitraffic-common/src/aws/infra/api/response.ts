@@ -1,13 +1,15 @@
-import { MediaType } from "../../types/mediatypes.js";
+import type {
+  IModel,
+  JsonSchema,
+  MethodResponse,
+} from "aws-cdk-lib/aws-apigateway";
 import {
-  type IModel,
-  type JsonSchema,
   JsonSchemaType,
   JsonSchemaVersion,
-  type MethodResponse,
   Model,
 } from "aws-cdk-lib/aws-apigateway";
 import { dateFromIsoString } from "../../../utils/date-utils.js";
+import { MediaType } from "../../types/mediatypes.js";
 
 /**
  * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
@@ -48,13 +50,12 @@ $util.base64Decode($inputRoot.body)`;
  */
 
 export const getDeprecatedDefaultLambdaResponse = (sunset?: string): string => {
-  const setDeprecationHeaders =
-    `#set ($context.responseOverride.header.Deprecation = 'true')
+  const setDeprecationHeaders = `#set ($context.responseOverride.header.Deprecation = 'true')
     ${
       sunset
-        ? `#set ($context.responseOverride.header.Sunset = '${
-          dateFromIsoString(sunset).toUTCString()
-        }')`
+        ? `#set ($context.responseOverride.header.Sunset = '${dateFromIsoString(
+            sunset,
+          ).toUTCString()}')`
         : ""
     }`;
   return RESPONSE_DEFAULT_LAMBDA.concat(setDeprecationHeaders);
@@ -62,7 +63,9 @@ export const getDeprecatedDefaultLambdaResponse = (sunset?: string): string => {
 
 const BODY_FROM_INPUT_PATH = "$input.path('$').body";
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 const messageSchema: JsonSchema = {
   schema: JsonSchemaVersion.DRAFT4,
   type: JsonSchemaType.OBJECT,
@@ -75,7 +78,9 @@ const messageSchema: JsonSchema = {
   },
 };
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const MessageModel = {
   contentType: MediaType.APPLICATION_JSON,
   modelName: "MessageResponseModel",
@@ -93,25 +98,33 @@ const InternalServerErrorResponse = JSON.stringify({
 const BadRequestMessage = "Bad request";
 const BadRequestResponse = JSON.stringify({ message: BadRequestMessage });
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const BadRequestResponseTemplate = {
   [MediaType.APPLICATION_JSON]: BadRequestResponse,
 };
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const NotFoundResponseTemplate = {
   [MediaType.APPLICATION_JSON]: NotFoundResponse,
 };
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const XmlResponseTemplate = {
   [MediaType.APPLICATION_XML]: BODY_FROM_INPUT_PATH,
 };
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const InternalServerErrorResponseTemplate = {
   [MediaType.APPLICATION_JSON]: InternalServerErrorResponse,
 };
 
-export class DigitrafficMethodResponse {
-  static response(
+export const DigitrafficMethodResponse = {
+  response(
     statusCode: string,
     model: IModel,
     mediaType: MediaType,
@@ -136,9 +149,9 @@ export class DigitrafficMethodResponse {
         }),
       },
     };
-  }
+  },
 
-  static response200(
+  response200(
     model: IModel,
     mediaType: MediaType = MediaType.APPLICATION_JSON,
     deprecation: boolean = false,
@@ -152,19 +165,19 @@ export class DigitrafficMethodResponse {
       deprecation,
       sunset,
     );
-  }
+  },
 
-  static response500(
+  response500(
     model: IModel = Model.EMPTY_MODEL,
     mediaType: MediaType = MediaType.APPLICATION_JSON,
   ): MethodResponse {
     return DigitrafficMethodResponse.response("500", model, mediaType, false);
-  }
+  },
 
-  static response400(
+  response400(
     model: IModel = Model.EMPTY_MODEL,
     mediaType: MediaType = MediaType.APPLICATION_JSON,
   ): MethodResponse {
     return DigitrafficMethodResponse.response("400", model, mediaType, false);
-  }
-}
+  },
+};

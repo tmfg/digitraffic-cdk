@@ -9,7 +9,6 @@
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "echo no tests for this project",
     "watch": "tsc -w"
@@ -21,13 +20,10 @@
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/eslint-config": "workspace:*",
-    "@rushstack/eslint-config": "^4.4.0",
     "@rushstack/heft": "^0.74.2",
     "@rushstack/heft-jest-plugin": "^0.16.11",
     "@types/heft-jest": "1.0.6",
     "@types/node": "22.18.6",
-    "eslint": "^8.57.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },

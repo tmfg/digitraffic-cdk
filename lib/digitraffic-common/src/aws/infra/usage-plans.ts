@@ -35,8 +35,8 @@ export function createDefaultUsagePlan(
   apiName: string,
   value?: string,
 ): IApiKey {
-  const apiKeyName = apiName + " API Key";
-  const usagePlanName = apiName + " API Usage Plan";
+  const apiKeyName = `${apiName} API Key`;
+  const usagePlanName = `${apiName} API Usage Plan`;
   const apiKey = api.addApiKey(apiKeyName, { apiKeyName: apiKeyName, value });
   const plan = api.addUsagePlan(usagePlanName, {
     name: usagePlanName,

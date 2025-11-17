@@ -3,28 +3,24 @@
 # exit with non-zero status after issuing an appropriate message if
 # it wants to stop the commit.
 
+set -e  # Exit immediately if any command fails
+
 # Reorder changed package.json contents add reformatted files to staging to be committed
 echo "Sort package.jsons..."
-git diff --cached --name-only --diff-filter=ACM \
-  | grep package.json \
-  | grep -v 'digitraffic-common' \
-  | while IFS= read -r pkg; do
-  echo "Sorting $pkg"
-  npx --yes sort-package-json "$pkg"
-  git add "$pkg"
-done
+# Ensure Rush and its autoinstaller are available, then format package.json files and stage any changes
+node common/scripts/install-run-rush.js format:package-json
+# -r prevents xargs from running if no input
+git diff --name-only | grep 'package.json$' | xargs -r git add
 echo "Sort package.jsons done."
 
-# run formatting to all files and add reformatted files to staging to be committed
-FILES=$(npx --yes deno fmt 2>&1)
-if [ -n "$FILES" ]; then
-  CHANGES=$(echo $FILES | tail -n 1)
-  echo $CHANGES
-  echo "Adding (git add) formatted files"
-  echo "$FILES" | sed '$d'
-  echo "$FILES" | sed '$d' | xargs -I "{}" git add "{}"
-  echo "Done"
-fi
+echo "Running Biome linting and formatting checks on staged files..."
+# Ensure Rush and its autoinstaller are available, then lint staged files and stage any fixes
+node common/scripts/install-run-rush.js format:fix-staged
+# Re-stage any previously staged files
+git update-index --again
+echo "Biome linting and formatting checks done."
 
 # Check package dependencies
-node common/scripts/install-run-rush.js repo:check-dependencies || exit $?
+echo "Running check package dependencies..."
+node common/scripts/check-dependencies.mjs
+echo "Running check package dependencies done."

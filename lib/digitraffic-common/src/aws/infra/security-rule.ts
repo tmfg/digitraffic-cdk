@@ -1,7 +1,7 @@
-import type { Construct } from "constructs";
 import { Rule } from "aws-cdk-lib/aws-events";
-import type { ITopic } from "aws-cdk-lib/aws-sns";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
+import type { ITopic } from "aws-cdk-lib/aws-sns";
+import type { Construct } from "constructs";
 
 /**
  * Automatic rule for Security Hub.  Send notification to given topic if the following conditions apply:

@@ -1,6 +1,6 @@
-import { RESPONSE_DEFAULT_LAMBDA } from "../../../aws/infra/api/response.js";
 import etag from "etag";
 import velocity from "velocityjs";
+import { RESPONSE_DEFAULT_LAMBDA } from "../../../aws/infra/api/response.js";
 
 const TEST_BODY = "Hello world!";
 
@@ -57,7 +57,6 @@ describe("response tests", () => {
     });
 
     // @ts-expect-error: context is not in the type definition
-    // eslint-disable-next-line
     return [output as string, compile.context.context];
   }
 

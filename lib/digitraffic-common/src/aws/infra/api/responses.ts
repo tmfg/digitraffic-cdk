@@ -1,14 +1,10 @@
+import type {
+  IModel,
+  IntegrationResponse,
+  MethodResponse,
+} from "aws-cdk-lib/aws-apigateway";
 import {
-  BadRequestResponseTemplate,
-  InternalServerErrorResponseTemplate,
-  NotFoundResponseTemplate,
-  XmlResponseTemplate,
-} from "./response.js";
-import {
-  type IModel,
-  type IntegrationResponse,
   LambdaIntegration,
-  type MethodResponse,
   PassthroughBehavior,
 } from "aws-cdk-lib/aws-apigateway";
 import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
@@ -18,39 +14,57 @@ import {
   NOT_FOUND_MESSAGE,
 } from "../../types/errors.js";
 import type { MediaType } from "../../types/mediatypes.js";
+import {
+  BadRequestResponseTemplate,
+  InternalServerErrorResponseTemplate,
+  NotFoundResponseTemplate,
+  XmlResponseTemplate,
+} from "./response.js";
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const RESPONSE_200_OK: IntegrationResponse = {
   statusCode: "200",
 };
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const RESPONSE_400_BAD_REQUEST: IntegrationResponse = {
   statusCode: "400",
   selectionPattern: BAD_REQUEST_MESSAGE,
   responseTemplates: BadRequestResponseTemplate,
 };
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
   statusCode: "500",
   selectionPattern: ERROR_MESSAGE,
   responseTemplates: InternalServerErrorResponseTemplate,
 };
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 const RESPONSE_XML = {
   responseTemplates: XmlResponseTemplate,
 };
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const RESPONSE_CORS_INTEGRATION = {
   responseParameters: {
     "method.response.header.Access-Control-Allow-Origin": "'*'",
   },
 };
 
-/// @deprecated
+/**
+ * @deprecated
+ */
 export const RESPONSE_404_NOT_FOUND = {
   statusCode: "404",
   selectionPattern: NOT_FOUND_MESSAGE,
@@ -105,8 +119,8 @@ export function defaultIntegration(
     ],
     requestParameters: options?.requestParameters ?? {},
     requestTemplates: options?.requestTemplates ?? {},
-    passthroughBehavior: options?.passthroughBehavior ??
-      PassthroughBehavior.WHEN_NO_MATCH,
+    passthroughBehavior:
+      options?.passthroughBehavior ?? PassthroughBehavior.WHEN_NO_MATCH,
   });
 }
 

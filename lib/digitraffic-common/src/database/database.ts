@@ -20,10 +20,9 @@ export enum DatabaseEnvironmentKeys {
 // pg-promise initialization options
 // https://vitaly-t.github.io/pg-promise/global.html#event:receive
 const pgpPromiseInitOptions: IInitOptions = {
-  // eslint-disable-next-line
-  receive(e: { data: any[] }): void {
+  receive(e: { data: unknown[] }): void {
     if (e.data) {
-      convertNullColumnsToUndefined(e.data);
+      convertNullColumnsToUndefined(e.data as Record<string, unknown>[]);
     }
   },
 };
@@ -37,7 +36,7 @@ function initPgp(
 
   // convert numeric types to number instead of string
   pgp.pg.types.setTypeParser(pgp.pg.types.builtins.INT8, (value: string) => {
-    return parseInt(value);
+    return parseInt(value, 10);
   });
 
   pgp.pg.types.setTypeParser(pgp.pg.types.builtins.FLOAT8, (value: string) => {
@@ -75,8 +74,7 @@ export function initDbConnection(
   convertNullsToUndefined: boolean,
   options?: object,
 ): DTDatabase {
-  const finalUrl =
-    `postgresql://${username}:${password}@${url}?application_name=${applicationName}`;
+  const finalUrl = `postgresql://${username}:${password}@${url}?application_name=${applicationName}`;
 
   return initPgp(convertNullsToUndefined ? pgpPromiseInitOptions : undefined)(
     finalUrl,
@@ -84,6 +82,7 @@ export function initDbConnection(
   );
 }
 
+// noinspection JSUnusedGlobalSymbols
 export function inTransaction<T>(
   fn: (db: DTTransaction) => Promise<T>,
   convertNullsToUndefined: boolean = false,
@@ -142,15 +141,11 @@ async function doInDatabase<T>(
   }
 }
 
-// eslint-disable-next-line
-function convertNullColumnsToUndefined(rows: any[]) {
+function convertNullColumnsToUndefined(rows: Record<string, unknown>[]) {
   rows.forEach((row) => {
-    // eslint-disable-next-line guard-for-in
     for (const column in row) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
       const columnValue = row[column];
       if (columnValue === null) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         row[column] = undefined;
       }
     }

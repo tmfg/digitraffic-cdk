@@ -1,16 +1,15 @@
-import type { IncomingMessage, RequestOptions } from "http";
-import { Asserter } from "../../../__test__/asserter.js";
-
 import synthetics from "Synthetics";
-import zlib from "zlib";
-import { MediaType } from "../../types/mediatypes.js";
-import { getApiKeyFromAPIGateway } from "../../runtime/apikey.js";
+import type { IncomingMessage, RequestOptions } from "node:http";
+import zlib from "node:zlib";
 import type { FeatureCollection } from "geojson";
+import { Asserter } from "../../../__test__/asserter.js";
 import { isValidGeoJson } from "../../../utils/geometry.js";
-import { getEnvVariable } from "../../../utils/utils.js";
-import { ENV_API_KEY, ENV_HOSTNAME } from "./canary-keys.js";
-import { logger } from "../../runtime/dt-logger-default.js";
 import { logException } from "../../../utils/logging.js";
+import { getEnvVariable } from "../../../utils/utils.js";
+import { getApiKeyFromAPIGateway } from "../../runtime/apikey.js";
+import { logger } from "../../runtime/dt-logger-default.js";
+import { MediaType } from "../../types/mediatypes.js";
+import { ENV_API_KEY, ENV_HOSTNAME } from "./canary-keys.js";
 
 export const API_KEY_HEADER = "x-api-key";
 
@@ -62,7 +61,7 @@ export class UrlChecker {
   }
 
   static createV2(): Promise<UrlChecker> {
-    return this.create(
+    return UrlChecker.create(
       getEnvVariable(ENV_HOSTNAME),
       getEnvVariable(ENV_API_KEY),
     );
@@ -203,14 +202,14 @@ function validateStatusCodeAndContentType(
   return (res: IncomingMessage) => {
     return new Promise((resolve) => {
       if (res.statusCode !== statusCode) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        throw new Error(`${res.statusCode!} ${res.statusMessage!}`);
+        throw new Error(
+          `${res.statusCode ?? undefined} ${res.statusMessage ?? undefined}`,
+        );
       }
 
       if (res.headers["content-type"] !== contentType) {
         throw new Error(
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          `Wrong content-type ${res.headers["content-type"]!}`,
+          `Wrong content-type ${res.headers["content-type"] ?? undefined}`,
         );
       }
 
@@ -267,8 +266,7 @@ export class ResponseChecker {
       }
 
       if (res.statusCode < 200 || res.statusCode > 299) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        throw new Error(`${res.statusCode} ${res.statusMessage!}`);
+        throw new Error(`${res.statusCode} ${res.statusMessage ?? undefined}`);
       }
 
       if (this.checkCors && !res.headers["access-control-allow-origin"]) {
@@ -277,8 +275,7 @@ export class ResponseChecker {
 
       if (res.headers["content-type"] !== this.contentType) {
         throw new Error(
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          `Wrong content-type ${res.headers["content-type"]!}`,
+          `Wrong content-type ${res.headers["content-type"] ?? undefined}`,
         );
       }
 
@@ -289,8 +286,8 @@ export class ResponseChecker {
   }
 }
 
-export class ContentChecker {
-  static checkJson<T>(
+export const ContentChecker = {
+  checkJson<T>(
     fn: (json: T, body: string, res: IncomingMessage) => void,
   ): CheckerFunction {
     return async (res: IncomingMessage): Promise<void> => {
@@ -298,9 +295,9 @@ export class ContentChecker {
 
       fn(JSON.parse(body) as unknown as T, body, res);
     };
-  }
+  },
 
-  static checkResponse(
+  checkResponse(
     fn: (body: string, res: IncomingMessage) => void,
   ): CheckerFunction {
     return async (res: IncomingMessage): Promise<void> => {
@@ -308,19 +305,18 @@ export class ContentChecker {
 
       fn(body, res);
     };
-  }
-}
+  },
+};
 
-export class ContentTypeChecker {
-  static checkContentType(contentType: MediaType): CheckerFunction {
+export const ContentTypeChecker = {
+  checkContentType(contentType: MediaType): CheckerFunction {
     return (res: IncomingMessage) => {
       if (!res.statusCode) {
         throw new Error("statusCode missing");
       }
 
       if (res.statusCode < 200 || res.statusCode > 299) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        throw new Error(`${res.statusCode} ${res.statusMessage!}`);
+        throw new Error(`${res.statusCode} ${res.statusMessage ?? undefined}`);
       }
 
       if (!res.headers["access-control-allow-origin"]) {
@@ -329,18 +325,17 @@ export class ContentTypeChecker {
 
       if (res.headers["content-type"] !== contentType) {
         throw new Error(
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          `Wrong content-type ${res.headers["content-type"]!}`,
+          `Wrong content-type ${res.headers["content-type"] ?? undefined}`,
         );
       }
 
       return Promise.resolve();
     };
-  }
-}
+  },
+};
 
-export class GeoJsonChecker {
-  static validFeatureCollection(
+export const GeoJsonChecker = {
+  validFeatureCollection(
     fn?: (json: FeatureCollection) => void,
   ): CheckerFunction {
     return ResponseChecker.forGeojson().checkJson((json: FeatureCollection) => {
@@ -351,27 +346,27 @@ export class GeoJsonChecker {
         fn(json);
       }
     });
-  }
-}
+  },
+};
 
-export class HeaderChecker {
-  static checkHeaderExists(headerName: string): CheckerFunction {
+export const HeaderChecker = {
+  checkHeaderExists(headerName: string): CheckerFunction {
     return (res: IncomingMessage) => {
       if (!res.headers[headerName]) {
-        throw new Error("Missing header: " + headerName);
+        throw new Error(`Missing header: ${headerName}`);
       }
 
       return Promise.resolve();
     };
-  }
+  },
 
-  static checkHeaderMissing(headerName: string): CheckerFunction {
+  checkHeaderMissing(headerName: string): CheckerFunction {
     return (res: IncomingMessage) => {
       if (res.headers[headerName]) {
-        throw new Error("Header should not exist: " + headerName);
+        throw new Error(`Header should not exist: ${headerName}`);
       }
 
       return Promise.resolve();
     };
-  }
-}
+  },
+};

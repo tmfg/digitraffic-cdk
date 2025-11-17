@@ -15,6 +15,7 @@ export async function updateAllCameras(
   bucketName: string,
   certificate: string,
   ca: string,
+  hostname: string,
 ): Promise<void> {
   const cameraIds = await MetadataService.getAllCameraIdsForGroup(
     CAMERA_GROUP_ID,
@@ -25,6 +26,7 @@ export async function updateAllCameras(
     password,
     certificate,
     ca,
+    hostname,
   );
 
   return updateAllImages(cameraIds, session, bucketName);
@@ -68,8 +70,9 @@ async function loginToCameraServer(
   password: string,
   certificate: string,
   ca: string,
+  hostname: string,
 ): Promise<Session> {
-  const session = new Session(url, certificate, ca);
+  const session = new Session(url, certificate, ca, hostname);
   await session.connect();
   await session.login(username, password);
 

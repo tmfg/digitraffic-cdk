@@ -1,23 +1,24 @@
+import type { Stack } from "aws-cdk-lib";
+import type { Metric } from "aws-cdk-lib/aws-cloudwatch";
+import { ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
+import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
+import type { FunctionProps } from "aws-cdk-lib/aws-lambda";
 import {
   ApplicationLogLevel,
-  Function,
-  type FunctionProps,
+  Function as LambdaFunction,
   LoggingFormat,
   SystemLogLevel,
 } from "aws-cdk-lib/aws-lambda";
-import type { Stack } from "aws-cdk-lib";
-import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
-import { ComparisonOperator, type Metric } from "aws-cdk-lib/aws-cloudwatch";
-import type { DigitrafficStack } from "./stack.js";
 import type { ITopic } from "aws-cdk-lib/aws-sns";
-import {
-  databaseFunctionProps,
-  type LambdaEnvironment,
-  type MonitoredFunctionParameters,
-} from "./lambda-configs.js";
-import type { TrafficType } from "../../../types/traffictype.js";
 import { chain } from "lodash-es";
+import type { TrafficType } from "../../../types/traffictype.js";
+import type {
+  LambdaEnvironment,
+  MonitoredFunctionParameters,
+} from "./lambda-configs.js";
+import { databaseFunctionProps } from "./lambda-configs.js";
 import { createLambdaLogGroup } from "./lambda-log-group.js";
+import type { DigitrafficStack } from "./stack.js";
 
 /**
  * Allows customization of CloudWatch Alarm properties
@@ -50,7 +51,7 @@ export interface MonitoredFunctionProps {
 /**
  * Creates a Lambda function that monitors default CloudWatch Lambda metrics with CloudWatch Alarms.
  */
-export class MonitoredFunction extends Function {
+export class MonitoredFunction extends LambdaFunction {
   readonly givenName: string;
 
   /** disable all alarms */
@@ -86,7 +87,6 @@ export class MonitoredFunction extends Function {
     alarmSnsTopic: ITopic,
     warningSnsTopic: ITopic,
     production: boolean,
-    // eslint-disable-next-line @rushstack/no-new-null
     trafficType: TrafficType | null,
     props?: MonitoredFunctionProps,
   ) {
@@ -203,9 +203,9 @@ export class MonitoredFunction extends Function {
       stack.configuration.production
     ) {
       throw new Error(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        `Function ${functionProps
-          .functionName!} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`,
+        `Function ${
+          functionProps.functionName ?? undefined
+        } has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`,
       );
     }
 
@@ -221,6 +221,7 @@ export class MonitoredFunction extends Function {
     );
   }
 
+  // noinspection JSUnusedGlobalSymbols
   /**
    * Create new MonitoredFunction.  Use topics from given DigitrafficStack.  Generate names from given name and configuration shortName.
    *
@@ -237,14 +238,13 @@ export class MonitoredFunction extends Function {
     environment: LambdaEnvironment,
     functionParameters?: Partial<MonitoredFunctionParameters>,
   ): MonitoredFunction {
-    const functionName = functionParameters?.functionName ??
-      `${stack.configuration.shortName}-${
-        chain(name)
-          .camelCase()
-          .startCase()
-          .replace(/\s/g, "")
-          .value()
-      }`;
+    const functionName =
+      functionParameters?.functionName ??
+      `${stack.configuration.shortName}-${chain(name)
+        .camelCase()
+        .startCase()
+        .replace(/\s/g, "")
+        .value()}`;
 
     const logGroup = createLambdaLogGroup({ stack, functionName });
 
@@ -288,8 +288,8 @@ export class MonitoredFunction extends Function {
         threshold: alarmProps?.threshold ?? threshold,
         evaluationPeriods: alarmProps?.evaluationPeriods ?? evaluationPeriods,
         datapointsToAlarm: alarmProps?.datapointsToAlarm ?? datapointsToAlarm,
-        comparisonOperator: alarmProps?.comparisonOperator ??
-          comparisonOperator,
+        comparisonOperator:
+          alarmProps?.comparisonOperator ?? comparisonOperator,
       })
       .addAlarmAction(alarmSnsAction);
   }
@@ -303,7 +303,7 @@ export class MonitoredFunction extends Function {
   }
 }
 
-export class MonitoredDBFunction {
+export const MonitoredDBFunction = {
   /**
    * Create new MonitoredDBFunction.  Use topics from given DigitrafficStack.  Generate names from given name and configuration shortName.
    * Grant secret.
@@ -318,20 +318,19 @@ export class MonitoredDBFunction {
    * @param environment Lambda environment
    * @param functionParameters Lambda function parameters
    */
-  static create(
+  create(
     stack: DigitrafficStack,
     name: string,
     environment?: LambdaEnvironment,
     functionParameters?: Partial<MonitoredFunctionParameters>,
   ): MonitoredFunction {
-    const functionName = functionParameters?.functionName ??
-      `${stack.configuration.shortName}-${
-        chain(name)
-          .camelCase()
-          .startCase()
-          .replace(/\s/g, "")
-          .value()
-      }`;
+    const functionName =
+      functionParameters?.functionName ??
+      `${stack.configuration.shortName}-${chain(name)
+        .camelCase()
+        .startCase()
+        .replace(/\s/g, "")
+        .value()}`;
 
     const logGroup = createLambdaLogGroup({ stack, functionName });
     const env = environment ? environment : stack.createLambdaEnvironment();
@@ -354,5 +353,5 @@ export class MonitoredDBFunction {
     stack.grantSecret(mf);
 
     return mf;
-  }
-}
+  },
+};

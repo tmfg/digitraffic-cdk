@@ -1,10 +1,12 @@
+import type {
+  IModel,
+  IntegrationResponse,
+  MethodResponse,
+  Resource,
+} from "aws-cdk-lib/aws-apigateway";
 import {
-  type IModel,
-  type IntegrationResponse,
-  type MethodResponse,
   MockIntegration,
   PassthroughBehavior,
-  type Resource,
 } from "aws-cdk-lib/aws-apigateway";
 import { MediaType } from "../../types/mediatypes.js";
 
@@ -33,8 +35,8 @@ export class DigitrafficStaticIntegration extends MockIntegration {
       headers = { ...headers, "Access-Control-Allow-Origin": "*" };
     }
 
-    const integrationResponse = DigitrafficStaticIntegration
-      .createIntegrationResponse(
+    const integrationResponse =
+      DigitrafficStaticIntegration.createIntegrationResponse(
         response,
         mediaType,
         headers,
@@ -86,10 +88,10 @@ export class DigitrafficStaticIntegration extends MockIntegration {
     mediaType: MediaType,
     headers: Record<string, string> = {},
   ): IntegrationResponse {
-    const params = mapRecord(
-      headers,
-      (entry) => ["method.response.header." + entry[0], `'${entry[1]}'`],
-    );
+    const params = mapRecord(headers, (entry) => [
+      `method.response.header.${entry[0]}`,
+      `'${entry[1]}'`,
+    ]);
 
     return {
       statusCode: "200",
@@ -125,7 +127,7 @@ function mapRecord<T>(
   func: (entry: [string, T]) => [string, T],
 ): Record<string, T> {
   const mappedEntries = Object.entries(obj).map((entry: [string, T]) =>
-    func(entry)
+    func(entry),
   );
   return Object.fromEntries(mappedEntries);
 }

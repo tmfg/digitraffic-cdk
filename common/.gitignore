@@ -1,24 +1,20 @@
 *
 
-!/config/
-!/config/**/
-!/config/repo/*.default.json
-!/config/rush/*
-!/git-hooks/
-!/git-hooks/*
-!/lib/
-!/lib/**/
-!/lib/*/*.js
-!/scripts/
-!/scripts/**/
-!/scripts/**/*.js
-!/scripts/**/*.mjs
-!/scripts/**/*.py
-!/scripts/**/*.sh
-
 # Rush autoinstallers
 !/autoinstallers/
-!/autoinstallers/*/
-!/autoinstallers/*/.npmrc
-!/autoinstallers/*/package.json
-!/autoinstallers/*/pnpm-lock.yaml
+!/autoinstallers/*
+!/autoinstallers/rush-command-line-tools/
+!/autoinstallers/rush-command-line-tools/package.json
+!/autoinstallers/rush-command-line-tools/pnpm-lock.yaml
+# Rush configs
+!/config/
+!/config/*
+!/config/**/*
+# Rush scripts
+!/scripts/
+!/scripts/*
+!/scripts/**/*
+# Rush git-hook
+!/git-hooks/
+!/git-hooks/*
+!/git-hooks/**/*
