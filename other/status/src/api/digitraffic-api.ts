@@ -1,23 +1,23 @@
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import ky from "ky";
+import _ from "lodash";
 import type { MonitoredApp } from "../app-props.js";
 import type { AppWithEndpoints } from "../model/app-with-endpoints.js";
-import {
-  logger,
-  type LoggerMethodType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import _ from "lodash";
-import ky from "ky";
 
 const BETA = "/beta/" as const;
 
 export interface PathOperation {
-  readonly parameters?: [{
-    readonly name: string;
-    readonly in: "query" | "header" | "path" | "cookie";
-    readonly required: boolean;
-    readonly schema: {
-      default?: string[] | string;
-    };
-  }];
+  readonly parameters?: [
+    {
+      readonly name: string;
+      readonly in: "query" | "header" | "path" | "cookie";
+      readonly required: boolean;
+      readonly schema: {
+        default?: string[] | string;
+      };
+    },
+  ];
 }
 
 export interface PathItem {
@@ -42,6 +42,20 @@ export class DigitrafficApi {
   async getAppWithEndpoints(app: MonitoredApp): Promise<AppWithEndpoints> {
     const method =
       "DigitrafficApi.getAppEndpoints" as const satisfies LoggerMethodType;
+    if (app.hasOpenApiSpec === false) {
+      const message =
+        `App ${app.name} has no OpenAPI specification, skipping fetching endpoints` as const;
+      logger.info({
+        method,
+        message,
+      });
+      return {
+        app: app.name,
+        hostPart: app.hostPart,
+        endpoints: [],
+        extraEndpoints: app.endpoints,
+      } as const satisfies AppWithEndpoints;
+    }
     const start = Date.now();
     const message =
       `Fetch digitraffic endpoints for ${app.name} from ${app.url}` as const;
@@ -57,9 +71,9 @@ export class DigitrafficApi {
         },
       })
       .catch((error: Error) => {
-        const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(error.message)
-        }`;
+        const errorMessage = `${message} failed with reason: ${JSON.stringify(
+          error.message,
+        )}`;
         logger.error({
           method,
           message: errorMessage,
@@ -74,7 +88,7 @@ export class DigitrafficApi {
           method: method,
           message: `${message} done`,
           tookMs: Date.now() - start,
-        })
+        }),
       );
   }
 
@@ -85,10 +99,11 @@ export class DigitrafficApi {
     const method =
       "DigitrafficApi.createEndpointResponse" as const satisfies LoggerMethodType;
 
-    const apisToTest = Object.entries(resp.paths).map(
-      ([path, item]) =>
+    const apisToTest = Object.entries(resp.paths)
+      .map(([path, item]) =>
         checkApiCanBeTestedAndAppendQueryStringToPath(path, item),
-    ).filter((api) => api.canBeCalled)
+      )
+      .filter((api) => api.canBeCalled)
       .map((api) => api.pathWithMaybeQueryString);
 
     const notBeta = apisToTest.filter((e) => !e.includes(BETA));
@@ -124,7 +139,8 @@ function checkApiCanBeTestedAndAppendQueryStringToPath(
   readonly pathWithMaybeQueryString: string;
 } {
   try {
-    if (!pathItem.get) { // For now support only GET method
+    if (!pathItem.get) {
+      // For now support only GET method
       logger.info({
         method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
         customPath: path,
@@ -154,7 +170,8 @@ function checkApiCanBeTestedAndAppendQueryStringToPath(
     const operation = pathItem.get;
     // No parameters or all are not required parameters -> ok to call
     if (
-      !operation.parameters || !operation.parameters.find((p) => p.required)
+      !operation.parameters ||
+      !operation.parameters.find((p) => p.required)
     ) {
       logger.info({
         method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
@@ -191,7 +208,8 @@ function checkApiCanBeTestedAndAppendQueryStringToPath(
       .filter((p) => p.required && p.schema.default?.length)
       .map((p) => {
         if (Array.isArray(p.schema.default)) {
-          return p.schema.default.map((paramValue) => `${p.name}=${paramValue}`)
+          return p.schema.default
+            .map((paramValue) => `${p.name}=${paramValue}`)
             .join("&");
         } else {
           return `${p.name}=${p.schema.default}`;

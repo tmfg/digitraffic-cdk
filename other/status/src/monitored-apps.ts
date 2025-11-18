@@ -1,8 +1,5 @@
-import {
-  EndpointHttpMethod,
-  EndpointProtocol,
-  type MonitoredApp,
-} from "./app-props.js";
+import type { MonitoredApp } from "./app-props.js";
+import { EndpointHttpMethod, EndpointProtocol } from "./app-props.js";
 
 export const monitoredApps: MonitoredApp[] = [
   {
@@ -41,8 +38,7 @@ export const monitoredApps: MonitoredApp[] = [
       },
       {
         name: "Road TMS history API",
-        url:
-          "https://tie.digitraffic.fi/api/tms/v1/history?api=liikennemaara&tyyppi=vrk&pvm=2023-03-01&loppu=2023-03-01&lam_type=option1&piste=1",
+        url: "https://tie.digitraffic.fi/api/tms/v1/history?api=liikennemaara&tyyppi=vrk&pvm=2023-03-01&loppu=2023-03-01&lam_type=option1&piste=1",
         protocol: EndpointProtocol.HTTP,
         method: EndpointHttpMethod.GET,
         //contentstring: "vt7_Rita" this is not working and head is not supported
@@ -58,28 +54,24 @@ export const monitoredApps: MonitoredApp[] = [
       // },
       {
         name: "/api/tms/v1/history/raw",
-        url:
-          "https://tie.digitraffic.fi/api/tms/v1/history/raw/lamraw_101_23_359.csv",
+        url: "https://tie.digitraffic.fi/api/tms/v1/history/raw/lamraw_101_23_359.csv",
         protocol: EndpointProtocol.HTTP,
         method: EndpointHttpMethod.GET,
         contentstring: "101",
       },
       {
         name: "/api/maintenance/v1/tracking/routes",
-        url:
-          "https://tie.digitraffic.fi/api/maintenance/v1/tracking/routes?xMax=20&xMin=19&yMax=60&yMin=59",
+        url: "https://tie.digitraffic.fi/api/maintenance/v1/tracking/routes?xMax=20&xMin=19&yMax=60&yMin=59",
         protocol: EndpointProtocol.HTTP,
       },
       {
         name: "/api/weather/v1/forecast-sections",
-        url:
-          "https://tie.digitraffic.fi/api/weather/v1/forecast-sections/00001_001_00000_2_0",
+        url: "https://tie.digitraffic.fi/api/weather/v1/forecast-sections/00001_001_00000_2_0",
         protocol: EndpointProtocol.HTTP,
       },
       {
         name: "/api/weather/v1/forecast-sections/forecasts",
-        url:
-          "https://tie.digitraffic.fi/api/weather/v1/forecast-sections/00001_001_00000_2_0/forecasts",
+        url: "https://tie.digitraffic.fi/api/weather/v1/forecast-sections/00001_001_00000_2_0/forecasts",
         protocol: EndpointProtocol.HTTP,
       },
     ],
@@ -129,8 +121,7 @@ export const monitoredApps: MonitoredApp[] = [
       },
       {
         name: "Rail train history",
-        url:
-          "https://rata.digitraffic.fi/api/v1/compositions/history/2019-01-01/1",
+        url: "https://rata.digitraffic.fi/api/v1/compositions/history/2019-01-01/1",
         protocol: EndpointProtocol.HTTP,
       },
 
@@ -193,6 +184,20 @@ export const monitoredApps: MonitoredApp[] = [
       {
         name: "Parking Swagger UI",
         url: "https://parking.fintraffic.fi/swagger/swagger-ui/index.html",
+        protocol: EndpointProtocol.HTTP,
+      },
+    ],
+  },
+  {
+    name: "Catalog",
+    hostPart: "https://catalog.digitraffic.fi",
+    url: "https://catalog.digitraffic.fi",
+    excluded: [],
+    hasOpenApiSpec: false,
+    endpoints: [
+      {
+        name: "Catalog Front Page",
+        url: "https://catalog.digitraffic.fi",
         protocol: EndpointProtocol.HTTP,
       },
     ],
