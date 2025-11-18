@@ -1,6 +1,4 @@
-import {
-  MonitoredFunction,
-} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
@@ -12,7 +10,7 @@ import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 export function create(
   stack: DigitrafficStack,
   yearlyPlansBucket: Bucket,
-  projectPlansBucket: Bucket
+  projectPlansBucket: Bucket,
 ): void {
   createFetchYearlyPlansLambda(stack, yearlyPlansBucket, projectPlansBucket);
 }
@@ -20,18 +18,19 @@ export function create(
 function createFetchYearlyPlansLambda(
   stack: DigitrafficStack,
   yearlyPlansBucket: Bucket,
-  projectPlansBucket: Bucket
+  projectPlansBucket: Bucket,
 ): MonitoredFunction {
-  const secret = stack.configuration.secretId
+  const secret = stack.configuration.secretId;
 
   if (!secret) {
-    throw Error("Secret ID required")
+    throw Error("Secret ID required");
   }
 
   const lambdaEnv = {
     [YearlyPlansEnvKeys.YEARLY_PLANS_BUCKET_NAME]: yearlyPlansBucket.bucketName,
-    [YearlyPlansEnvKeys.PROJECT_PLANS_BUCKET_NAME]: projectPlansBucket.bucketName,
-    [EnvKeys.SECRET_ID]: stack.configuration.secretId
+    [YearlyPlansEnvKeys.PROJECT_PLANS_BUCKET_NAME]:
+      projectPlansBucket.bucketName,
+    [EnvKeys.SECRET_ID]: stack.configuration.secretId,
   };
 
   const fetchYearlyPlansLambda = MonitoredFunction.createV2(
@@ -53,8 +52,8 @@ function createFetchYearlyPlansLambda(
   const s3Statement = new PolicyStatement();
   s3Statement.addActions("s3:PutObject");
   s3Statement.addActions("s3:PutObjectAcl");
-  s3Statement.addResources(yearlyPlansBucket.bucketArn + "/*");
-  s3Statement.addResources(projectPlansBucket.bucketArn + "/*");
+  s3Statement.addResources(`${yearlyPlansBucket.bucketArn}/*`);
+  s3Statement.addResources(`${projectPlansBucket.bucketArn}/*`);
 
   fetchYearlyPlansLambda.addToRolePolicy(s3Statement);
 

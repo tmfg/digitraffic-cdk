@@ -1,13 +1,9 @@
-import {
-  DigitrafficStack,
-  type StackConfiguration,
-} from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Construct } from "constructs";
 import * as InternalLambdas from "./internal-lambdas.js";
-import {
-  grantOACRights,
-} from "@digitraffic/common/dist/aws/infra/bucket-policy";
+import { grantOACRights } from "@digitraffic/common/dist/aws/infra/bucket-policy";
 
 export interface YearlyPlansConfiguration extends StackConfiguration {
   readonly yearlyPlansBucketName: string;
@@ -16,11 +12,19 @@ export interface YearlyPlansConfiguration extends StackConfiguration {
 }
 
 export class YearlyPlansStack extends DigitrafficStack {
-  constructor(scope: Construct, id: string, configuration: YearlyPlansConfiguration) {
+  constructor(
+    scope: Construct,
+    id: string,
+    configuration: YearlyPlansConfiguration,
+  ) {
     super(scope, id, configuration);
 
-    const yearlyPlansBucket = this.createS3Bucket(configuration.yearlyPlansBucketName);
-    const projectPlansBucket = this.createS3Bucket(configuration.projectPlansBucketName);
+    const yearlyPlansBucket = this.createS3Bucket(
+      configuration.yearlyPlansBucketName,
+    );
+    const projectPlansBucket = this.createS3Bucket(
+      configuration.projectPlansBucketName,
+    );
 
     InternalLambdas.create(this, yearlyPlansBucket, projectPlansBucket);
 
@@ -32,7 +36,6 @@ export class YearlyPlansStack extends DigitrafficStack {
       bucket: projectPlansBucket,
       distributionArn: configuration.cloudFrontArn,
     });
-
   }
 
   private createS3Bucket(bucketName: string): Bucket {
