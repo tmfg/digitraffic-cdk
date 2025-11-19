@@ -1,6 +1,6 @@
 import { YearlyPlansEnvKeys } from "../../keys.js";
 import { fetchData } from "../../service/yearly-plans-service.js";
-import { uploadCompressedDataToS3 } from "../../util/s3-util.js";
+import { uploadDataToS3 } from "../../util/s3-util.js";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -62,7 +62,7 @@ export const handler = async (): Promise<void> => {
     }
 
     const yearlyPlansDataString = JSON.stringify(yearlyPlansData, null, 2);
-    const yearlyPlansS3Key = await uploadCompressedDataToS3(
+    const yearlyPlansS3Key = await uploadDataToS3(
       yearlyPlansBucketName,
       yearlyPlansDataString,
       "yearly-plans",
@@ -88,7 +88,7 @@ export const handler = async (): Promise<void> => {
     }
 
     const projectPlansDataString = JSON.stringify(projectPlansData, null, 2);
-    const projectPlansS3Key = await uploadCompressedDataToS3(
+    const projectPlansS3Key = await uploadDataToS3(
       projectPlansBucketName,
       projectPlansDataString,
       "project-plans",
