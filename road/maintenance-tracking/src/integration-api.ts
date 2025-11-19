@@ -170,7 +170,7 @@ function createLambdaRoleWithWriteToSqsAndS3Policy(
   const s3PolicyStatement = new PolicyStatement();
   s3PolicyStatement.addActions("s3:PutObject");
   s3PolicyStatement.addActions("s3:PutObjectAcl");
-  s3PolicyStatement.addResources(sqsExtendedMessageBucketArn + "/*");
+  s3PolicyStatement.addResources(`${sqsExtendedMessageBucketArn}/*`);
 
   lambdaRole.addManagedPolicy(
     ManagedPolicy.fromAwsManagedPolicyName(

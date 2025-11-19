@@ -11,7 +11,7 @@ import {
   geojsonSchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import type { JsonSchema, Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { JsonSchemaType } from "aws-cdk-lib/aws-apigateway";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import {
@@ -110,7 +110,7 @@ export class PublicApiV2 {
     if (geojsonSchemaWithDataUpdatedTime?.properties === undefined) {
       throw new Error("GeoJSON schema creation failed");
     }
-    geojsonSchemaWithDataUpdatedTime.properties["dataUpdatedTime"] = {
+    geojsonSchemaWithDataUpdatedTime.properties.dataUpdatedTime = {
       type: JsonSchemaType.STRING,
       format: "date-time",
       description: "Data updated timestamp",
