@@ -6,5 +6,6 @@ export enum TrafficType {
   AVIATION = "Aviation",
   AFIR = "Afir",
   MCP = "MCP",
+  CATALOG = "Catalog",
   OTHER = "Other",
 }

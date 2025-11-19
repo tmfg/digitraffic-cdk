@@ -1,6 +1,23 @@
+import {
+  DigitrafficMethodResponse,
+  MessageModel,
+} from "@digitraffic/common/dist/aws/infra/api/response";
+import {
+  defaultIntegration,
+  getResponse,
+  RESPONSE_200_OK,
+} from "@digitraffic/common/dist/aws/infra/api/responses";
 import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
-import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import {
+  BAD_REQUEST_MESSAGE,
+  ERROR_MESSAGE,
+} from "@digitraffic/common/dist/aws/types/errors";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   addDefaultValidator,
   addServiceModel,
@@ -12,24 +29,6 @@ import type {
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-
-import {
-  DigitrafficMethodResponse,
-  MessageModel,
-} from "@digitraffic/common/dist/aws/infra/api/response";
-import {
-  defaultIntegration,
-  getResponse,
-  RESPONSE_200_OK,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import {
-  BAD_REQUEST_MESSAGE,
-  ERROR_MESSAGE,
-} from "@digitraffic/common/dist/aws/types/errors";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import * as ApiResponseSchema from "./model/api-response-schema.js";
 import * as SseSchema from "./model/sse-schema.js";
 
@@ -71,7 +70,9 @@ export function createIntegrationApiAndHandlerLambda(
 }
 
 function createUpdateSseApiGatewayResource(integrationApi: RestApi): Resource {
-  const apiResource = integrationApi.root.addResource("sse").addResource("v1")
+  const apiResource = integrationApi.root
+    .addResource("sse")
+    .addResource("v1")
     .addResource("update");
 
   addDefaultValidator(integrationApi);

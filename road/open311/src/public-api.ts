@@ -1,6 +1,4 @@
 import apigateway = require("aws-cdk-lib/aws-apigateway");
-import { EndpointType } from "aws-cdk-lib/aws-apigateway";
-import type * as lambda from "aws-cdk-lib/aws-lambda";
 
 import {
   DigitrafficMethodResponse,
@@ -9,7 +7,7 @@ import {
 import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { addTags } from "@digitraffic/common/dist/aws/infra/documentation";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { createIpRestrictionPolicyDocument } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
@@ -19,6 +17,8 @@ import {
   addServiceModel,
   createArraySchema,
 } from "@digitraffic/common/dist/utils/api-model";
+import { EndpointType } from "aws-cdk-lib/aws-apigateway";
+import type * as lambda from "aws-cdk-lib/aws-lambda";
 
 import type { Open311Props } from "./app-props.js";
 import { default as RequestSchema } from "./model/request-schema.js";

@@ -1,17 +1,17 @@
-import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
-import { faultsSchema } from "./model/fault-schema.js";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   featureSchema,
   geojsonSchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { faultsSchema } from "./model/fault-schema.js";
 
 const ATON_FAULT_TAGS_V1 = ["Aton Fault V1"];
 

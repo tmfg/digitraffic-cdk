@@ -1,17 +1,19 @@
-import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
-import { Schedule } from "aws-cdk-lib/aws-events";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
+import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
 import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
-import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Duration } from "aws-cdk-lib";
+import { Schedule } from "aws-cdk-lib/aws-events";
 
 export class Canaries {
   constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
     if (stack.configuration.stackFeatures?.enableCanaries ?? true) {
       const urlRole = new DigitrafficCanaryRole(stack, "cs-url");
-      const dbRole = new DigitrafficCanaryRole(stack, "cs-db")
-        .withDatabaseAccess();
+      const dbRole = new DigitrafficCanaryRole(
+        stack,
+        "cs-db",
+      ).withDatabaseAccess();
 
       DatabaseCanary.createV2(stack, dbRole, "cs");
 
