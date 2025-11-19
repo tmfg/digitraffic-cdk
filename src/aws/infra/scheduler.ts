@@ -1,5 +1,5 @@
-import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { Duration } from "aws-cdk-lib";
+import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 import type { Construct } from "constructs";

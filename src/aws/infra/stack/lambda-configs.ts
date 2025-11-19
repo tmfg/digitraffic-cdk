@@ -1,16 +1,11 @@
-import {
-  Architecture,
-  AssetCode,
-  type Code,
-  type FunctionProps,
-  Runtime,
-} from "aws-cdk-lib/aws-lambda";
 import { Duration } from "aws-cdk-lib";
 import type { IVpc, SubnetSelection } from "aws-cdk-lib/aws-ec2";
-import type { ILogGroup } from "aws-cdk-lib/aws-logs";
 import type { Role } from "aws-cdk-lib/aws-iam";
-import type { DigitrafficStack } from "./stack.js";
+import type { Code, FunctionProps } from "aws-cdk-lib/aws-lambda";
+import { Architecture, AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import type { ILogGroup } from "aws-cdk-lib/aws-logs";
 import type { MonitoredFunctionAlarmProps } from "./monitoredfunction.js";
+import type { DigitrafficStack } from "./stack.js";
 
 export type LambdaEnvironment = Record<string, string>;
 
@@ -29,8 +24,8 @@ export function databaseFunctionProps(
 ): FunctionProps {
   const vpcSubnets = stack.vpc
     ? {
-      subnets: stack.vpc.privateSubnets,
-    }
+        subnets: stack.vpc.privateSubnets,
+      }
     : undefined;
 
   return {

@@ -1,13 +1,15 @@
 import { Aws } from "aws-cdk-lib";
+import type {
+  IModel,
+  RequestValidator,
+  Resource,
+} from "aws-cdk-lib/aws-apigateway";
 import {
   AwsIntegration,
-  type IModel,
   PassthroughBehavior,
-  type RequestValidator,
-  type Resource,
 } from "aws-cdk-lib/aws-apigateway";
-import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
 
 export function attachQueueToApiGatewayResource(
@@ -63,8 +65,7 @@ export function attachQueueToApiGatewayResource(
       requestTemplates: {
         // map the JSON request to a form parameter, FIFO needs also MessageGroupId
         // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html
-        "application/json":
-          `Action=SendMessage${fifoMessageGroupId}&MessageBody=$util.urlEncode($input.body)`,
+        "application/json": `Action=SendMessage${fifoMessageGroupId}&MessageBody=$util.urlEncode($input.body)`,
       },
       // these are required by SQS
       integrationResponses: [

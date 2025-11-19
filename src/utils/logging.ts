@@ -49,15 +49,15 @@ export function logException(
   error: unknown,
   includeStack: boolean = false,
 ): void {
-  const message = error instanceof Error
-    ? error.message
-    : typeof error === "string"
-    ? error
-    : JSON.stringify(error);
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : JSON.stringify(error);
 
-  const stack = error instanceof Error && includeStack
-    ? error.stack
-    : undefined;
+  const stack =
+    error instanceof Error && includeStack ? error.stack : undefined;
 
   logger.error({
     type: "Error",

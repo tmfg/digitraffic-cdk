@@ -1,8 +1,8 @@
-import { CfnSubscriptionFilter } from "aws-cdk-lib/aws-logs";
 import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
-import type { DigitrafficStack } from "./stack.js";
+import { CfnSubscriptionFilter } from "aws-cdk-lib/aws-logs";
 import type { Construct } from "constructs";
 import type { MonitoredFunction } from "./monitoredfunction.js";
+import type { DigitrafficStack } from "./stack.js";
 
 /**
  * Creates a subscription filter that subscribes to a Lambda Log Group and delivers the logs to another destination.

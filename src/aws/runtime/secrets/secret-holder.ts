@@ -1,7 +1,8 @@
-import { type GenericSecret, getSecret } from "./secret.js";
-import { checkExpectedSecretKeys } from "./dbsecret.js";
 import { getEnvVariable } from "../../../utils/utils.js";
 import { logger } from "../dt-logger-default.js";
+import { checkExpectedSecretKeys } from "./dbsecret.js";
+import type { GenericSecret } from "./secret.js";
+import { getSecret } from "./secret.js";
 
 const DEFAULT_PREFIX = "";
 const DEFAULT_CONFIGURATION = {
@@ -46,7 +47,7 @@ export class SecretHolder<Secret extends GenericSecret> {
 
     logger.info({
       method: "SecretHolder.initSecret",
-      message: "Refreshing secret " + this.secretId,
+      message: `Refreshing secret ${this.secretId}`,
     });
 
     this.cachedSecret = secretValue;
@@ -66,9 +67,10 @@ export class SecretHolder<Secret extends GenericSecret> {
 
   public async get(): Promise<Secret> {
     const secret = await this.getSecret();
-    const parsedSecret = this.prefix === DEFAULT_PREFIX
-      ? secret
-      : this.parseSecret(secret, `${this.prefix}.`);
+    const parsedSecret =
+      this.prefix === DEFAULT_PREFIX
+        ? secret
+        : this.parseSecret(secret, `${this.prefix}.`);
 
     if (this.expectedKeys.length > 0) {
       checkExpectedSecretKeys(this.expectedKeys, parsedSecret);
@@ -96,14 +98,14 @@ export class SecretHolder<Secret extends GenericSecret> {
   }
 
   private async getSecret(): Promise<Secret> {
-    if(this.expirationTime.getTime() < Date.now()) {
+    if (this.expirationTime.getTime() < Date.now()) {
       await this.initSecret();
     }
 
-    if(this.cachedSecret === undefined) {
+    if (this.cachedSecret === undefined) {
       throw new Error("SecretHolder in illegal state");
     }
-    
+
     return this.cachedSecret;
   }
 }

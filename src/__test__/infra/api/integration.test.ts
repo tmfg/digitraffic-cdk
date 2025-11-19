@@ -1,26 +1,31 @@
-import { DigitrafficIntegration } from "../../../aws/infra/api/integration.js";
-import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 import { App, Stack } from "aws-cdk-lib";
-import { MediaType } from "../../../aws/types/mediatypes.js";
+import {
+  Code,
+  Function as LambdaFunction,
+  Runtime,
+} from "aws-cdk-lib/aws-lambda";
 import velocity from "velocityjs";
+import { DigitrafficIntegration } from "../../../aws/infra/api/integration.js";
+import { MediaType } from "../../../aws/types/mediatypes.js";
 import { decodeBase64ToAscii } from "../../../utils/base64.js";
 
 describe("integration tests", () => {
   function createTemplate(i: DigitrafficIntegration<string>): unknown {
-    const template = i.createRequestTemplates()[MediaType.APPLICATION_JSON]!
-      .trim();
+    const template = i
+      .createRequestTemplates()
+      [MediaType.APPLICATION_JSON]!.trim();
 
     // assert template parses
     const response = createResponseFromTemplate(template);
 
     // assert response parses
-    console.info("response " + response);
+    console.info(`response ${response}`);
 
     return JSON.parse(response);
   }
 
   function createResponseFromTemplate(template: string): string {
-    console.info("compile " + template);
+    console.info(`compile ${template}`);
     const compile = new velocity.Compile(velocity.parse(template));
     return compile.render({
       method: {
@@ -64,7 +69,7 @@ describe("integration tests", () => {
     const app = new App();
     const stack = new Stack(app);
 
-    const f = new Function(stack, "id", {
+    const f = new LambdaFunction(stack, "id", {
       runtime: Runtime.NODEJS_22_X,
       code: Code.fromInline("placeholder"),
       handler: "handler",
@@ -81,8 +86,7 @@ describe("integration tests", () => {
   });
 
   test("query parameter", () => {
-    const i = createIntegration()
-      .addQueryParameter("q1");
+    const i = createIntegration().addQueryParameter("q1");
 
     const t = createTemplate(i);
     expect(t).toEqual({
@@ -103,8 +107,7 @@ describe("integration tests", () => {
   });
 
   test("multivaluequery parameter", () => {
-    const i = createIntegration()
-      .addMultiValueQueryParameter("m1");
+    const i = createIntegration().addMultiValueQueryParameter("m1");
 
     const t = createTemplate(i);
     expect(t).toEqual({
@@ -113,8 +116,7 @@ describe("integration tests", () => {
   });
 
   test("all parameters", () => {
-    const i = createIntegration()
-      .passAllQueryParameters();
+    const i = createIntegration().passAllQueryParameters();
 
     const t = createTemplate(i);
     expect(t).toEqual({
@@ -124,8 +126,7 @@ describe("integration tests", () => {
   });
 
   test("path parameter", () => {
-    const i = createIntegration()
-      .addPathParameter("p1");
+    const i = createIntegration().addPathParameter("p1");
 
     const t = createTemplate(i);
     expect(t).toEqual({
@@ -134,8 +135,7 @@ describe("integration tests", () => {
   });
 
   test("context parameter", () => {
-    const i = createIntegration()
-      .addContextParameter("c1");
+    const i = createIntegration().addContextParameter("c1");
 
     const t = createTemplate(i);
     expect(t).toEqual({
@@ -144,8 +144,7 @@ describe("integration tests", () => {
   });
 
   test("context parameter authorizer", () => {
-    const i = createIntegration()
-      .addContextParameter("authorizer.c2");
+    const i = createIntegration().addContextParameter("authorizer.c2");
 
     const t = createTemplate(i);
     expect(t).toEqual({
@@ -168,9 +167,7 @@ describe("integration tests", () => {
 
   test("all parameters & parameter - fail", () => {
     expect(() => {
-      createIntegration()
-        .passAllQueryParameters()
-        .addQueryParameter("q1");
+      createIntegration().passAllQueryParameters().addQueryParameter("q1");
     }).toThrow();
   });
 
@@ -188,8 +185,7 @@ describe("integration tests", () => {
   });
 
   test("path body", () => {
-    const i = createIntegration()
-      .passBody();
+    const i = createIntegration().passBody();
 
     const t = createTemplate(i);
     // body base64-encoded

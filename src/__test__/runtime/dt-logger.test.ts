@@ -1,9 +1,9 @@
-import { Writable } from "stream";
-import type { LoggableType } from "../../aws/runtime/dt-logger.js";
-import {
-  DtLogger,
-  type LoggerConfiguration,
+import { Writable } from "node:stream";
+import type {
+  LoggableType,
+  LoggerConfiguration,
 } from "../../aws/runtime/dt-logger.js";
+import { DtLogger } from "../../aws/runtime/dt-logger.js";
 
 const LOG_LINE: LoggableType = {
   method: "dt-logger.test",
@@ -79,23 +79,23 @@ describe("dt-logger", () => {
 
     expect(logged.length).toBe(1);
 
-    const loggedLine = JSON.parse(logged[0]!) as Record<string, unknown>;
+    const loggedLine = JSON.parse(logged[0]!) as {
+      stack?: string;
+      [key: string]: unknown;
+    };
     console.info(loggedLine);
 
     if (typeof expected === "object" && "stack" in expected && expected.stack) {
-      // eslint-disable-next-line dot-notation
-      const stack = loggedLine["stack"];
-
+      const stack = loggedLine.stack;
       expect(stack).toBeDefined();
-      // @ts-ignore // stack should be multiline string
+      // stack should be multiline string
       const stackLines: string[] = (stack as string).split("\n");
       expect(stackLines.length).toBeGreaterThanOrEqual(2);
       expect(stackLines[0]).toEqual(expected.stack);
-      // @ts-ignore
-      expect(stackLines[1].trim().startsWith("at ")).toBe(true);
 
-      // eslint-disable-next-line dot-notation
-      delete loggedLine["stack"];
+      expect(stackLines[1]?.trim()?.startsWith("at ")).toBe(true);
+
+      delete loggedLine.stack;
       delete expected.stack;
     }
 
@@ -115,8 +115,7 @@ describe("dt-logger", () => {
       },
       {
         method: EXPECTED_LOG_LINE.method,
-        message:
-          `${EXPECTED_LOG_LINE.message} date=${date.toISOString()} number=123 text=abc equalsText=\"foo=bar\"`,
+        message: `${EXPECTED_LOG_LINE.message} date=${date.toISOString()} number=123 text=abc equalsText="foo=bar"`,
         date: date.toISOString(),
         number: 123,
         text: "abc",
@@ -253,13 +252,13 @@ describe("dt-logger", () => {
   });
 
   test("error - Error with stack", () => {
-    let error;
+    let error: Error | unknown;
 
     try {
-      // @ts-ignore
+      // @ts-expect-error
       console.log(`Result: ${undefined.length}`);
-    } catch (e) {
-      // @ts-ignore
+    } catch (e: unknown) {
+      // @ts-expect-error
       console.debug(`Failed message: ${e.message}`);
       console.debug(`Failed stack: ${(e as Error).stack}`);
       error = e;

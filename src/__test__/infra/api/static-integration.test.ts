@@ -4,8 +4,8 @@ import { MediaType } from "../../../aws/types/mediatypes.js";
 
 describe("response tests", () => {
   it("createIntegrationResponse works", () => {
-    const integrationResponse = DigitrafficStaticIntegration
-      .createIntegrationResponse(
+    const integrationResponse =
+      DigitrafficStaticIntegration.createIntegrationResponse(
         "FakeResource",
         MediaType.APPLICATION_JSON,
         { "test-header": "test-value" },

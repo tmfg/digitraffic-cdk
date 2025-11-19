@@ -1,6 +1,6 @@
 import { App, Stack } from "aws-cdk-lib";
-import { Scheduler } from "../../aws/infra/scheduler.js";
 import { Template } from "aws-cdk-lib/assertions";
+import { Scheduler } from "../../aws/infra/scheduler.js";
 
 describe("scheduler tests", () => {
   function expectRate(

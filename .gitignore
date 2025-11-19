@@ -1,9 +1,7 @@
 *
 
-!/deno.json
+
 !/.editorconfig
-!/.eslintignore
-!/.eslintrc.cjs
 !/.gitattributes
 !/.gitignore
 !/.git-blame-ignore-revs
@@ -18,8 +16,8 @@
 !/README.md
 !/tsconfig.json
 !/tsconfig.test.json
-!/tsconfig.eslint.json
 !/dependabot.yml
+!/biome.jsonc
 
 !src/
 !src/**/
@@ -34,3 +32,9 @@
 !.github/workflows/**/**.yml
 !.github/CODEOWNERS
 !.github/dependabot.yml
+
+!scripts/
+!scripts/**/
+!scripts/**/*.js
+!scripts/**/*.ts
+

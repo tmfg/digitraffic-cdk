@@ -1,17 +1,19 @@
+import type {
+  IResource,
+  JsonSchema,
+  Model,
+  Resource,
+  ResourceOptions,
+  RestApiProps,
+} from "aws-cdk-lib/aws-apigateway";
 import {
   CfnDocumentationPart,
   Cors,
   EndpointType,
   GatewayResponse,
-  type IResource,
-  type JsonSchema,
   MethodLoggingLevel,
-  type Model,
-  type Resource,
-  type ResourceOptions,
   ResponseType,
   RestApi,
-  type RestApiProps,
 } from "aws-cdk-lib/aws-apigateway";
 import {
   AnyPrincipal,
@@ -19,7 +21,9 @@ import {
   PolicyDocument,
   PolicyStatement,
 } from "aws-cdk-lib/aws-iam";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import type { Construct } from "constructs";
+import { set } from "lodash-es";
 import { getModelReference } from "../../../utils/api-model.js";
 import { MediaType } from "../../types/mediatypes.js";
 import type { ModelWithReference } from "../../types/model-with-reference.js";
@@ -29,9 +33,6 @@ import type {
 } from "../documentation.js";
 import { createDefaultUsagePlan, createUsagePlan } from "../usage-plans.js";
 import type { DigitrafficStack } from "./stack.js";
-
-import { set } from "lodash-es";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
 
 export const PUBLIC_REST_API_CORS_CONFIG = {
   defaultCorsPreflightOptions: {
@@ -47,6 +48,13 @@ export const PUBLIC_REST_API_CORS_CONFIG = {
     allowMethods: ["OPTIONS", "GET", "HEAD"],
   },
 } as const satisfies Pick<ResourceOptions, "defaultCorsPreflightOptions">;
+
+export interface ExportParams {
+  /** Set apiKeyId when needed */
+  readonly apiKeyId?: string;
+  /** Override exportName, default is stack shortname */
+  readonly exportName?: string;
+}
 
 export class DigitrafficRestApi extends RestApi {
   readonly apiKeyIds: string[];
@@ -96,12 +104,13 @@ export class DigitrafficRestApi extends RestApi {
   }
 
   /** Export end point and api key to Parameter store */
-  exportEndpoint(): void;
+  exportEndpoint(): [StringParameter, StringParameter];
   /** Export end point and given api key to Parameter store */
-  exportEndpoint(apiKeyId: string): void;
+  exportEndpoint(params: ExportParams): [StringParameter, StringParameter];
 
-  exportEndpoint(apiKeyId?: string): void {
+  exportEndpoint(params?: ExportParams): [StringParameter, StringParameter] {
     const firstKey = this.apiKeyIds[0];
+    var apiKeyId = params?.apiKeyId;
 
     if (!apiKeyId) {
       if (this.apiKeyIds.length > 1) {
@@ -115,19 +124,28 @@ export class DigitrafficRestApi extends RestApi {
       apiKeyId = firstKey;
     }
 
-    // eslint-disable-next-line no-new
-    new StringParameter(this._stack, "export.endpoint", {
-      parameterName:
-        `/digitraffic/${this._stack.configuration.shortName}/endpointUrl`,
-      stringValue: this.url,
-    });
+    const exportName =
+      params?.exportName ?? this._stack.configuration.shortName;
 
-    // eslint-disable-next-line no-new
-    new StringParameter(this._stack, "export.apiKeyId", {
-      parameterName:
-        `/digitraffic/${this._stack.configuration.shortName}/apiKeyId`,
-      stringValue: apiKeyId,
-    });
+    const sp1 = new StringParameter(
+      this._stack,
+      `export.endpoint.${exportName}`,
+      {
+        parameterName: `/digitraffic/${exportName}/endpointUrl`,
+        stringValue: this.url,
+      },
+    );
+
+    const sp2 = new StringParameter(
+      this._stack,
+      `export.apiKeyId.${exportName}`,
+      {
+        parameterName: `/digitraffic/${exportName}/apiKeyId`,
+        stringValue: apiKeyId,
+      },
+    );
+
+    return [sp1, sp2];
   }
 
   /**
@@ -136,7 +154,6 @@ export class DigitrafficRestApi extends RestApi {
    * @deprecated Uses deprecated createUsagePlan that creates randomized API key names, use createUsagePlanV2 instead
    */
   createUsagePlan(apiKeyId: string, apiKeyName: string): string {
-    // eslint-disable-next-line deprecation/deprecation
     const newKeyId = createUsagePlan(this, apiKeyId, apiKeyName).keyId;
 
     this.apiKeyIds.push(newKeyId);
@@ -193,7 +210,6 @@ export class DigitrafficRestApi extends RestApi {
       name: type !== "METHOD" ? parameterName : undefined,
     };
 
-    // eslint-disable-next-line no-new
     new CfnDocumentationPart(this.stack, resourceName, {
       restApiId: resource.api.restApiId,
       location,
@@ -206,17 +222,16 @@ export class DigitrafficRestApi extends RestApi {
     ...documentationPart: DocumentationPart[]
   ): void {
     if (this.enableDocumentation) {
-      documentationPart.forEach((dp) =>
+      documentationPart.forEach((dp) => {
         this.addDocumentationPart(
           resource,
           dp.parameterName,
           `${resource.path}.${dp.parameterName}.Documentation`,
           dp.type,
           dp.documentationProperties,
-        )
-      );
+        );
+      });
     } else {
-      // eslint-disable-next-line no-console
       console.info("Skipping documentation for %s", resource.path);
     }
   }
@@ -253,7 +268,6 @@ export class DigitrafficRestApi extends RestApi {
  * @param stack Construct
  */
 export function add404Support(restApi: RestApi, stack: Construct): void {
-  // eslint-disable-next-line no-new
   new GatewayResponse(
     stack,
     `MissingAuthenticationTokenResponse-${restApi.restApiName}`,
@@ -269,7 +283,6 @@ export function add404Support(restApi: RestApi, stack: Construct): void {
 }
 
 export function add401Support(restApi: RestApi, stack: Construct): void {
-  // eslint-disable-next-line no-new
   new GatewayResponse(
     stack,
     `AuthenticationFailedResponse-${restApi.restApiName}`,
@@ -299,7 +312,6 @@ export function setReturnCodeForMissingAuthenticationToken(
   restApi: RestApi,
   stack: Construct,
 ): void {
-  // eslint-disable-next-line no-new
   new GatewayResponse(
     stack,
     `MissingAuthenticationTokenResponse-${restApi.restApiName}`,

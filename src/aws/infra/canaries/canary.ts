@@ -1,4 +1,5 @@
 import { Duration } from "aws-cdk-lib";
+import type { Role } from "aws-cdk-lib/aws-iam";
 import {
   AssetCode,
   Canary,
@@ -6,11 +7,10 @@ import {
   Schedule,
   Test,
 } from "aws-cdk-lib/aws-synthetics";
-import type { Role } from "aws-cdk-lib/aws-iam";
-import { CanaryAlarm } from "./canary-alarm.js";
-import type { CanaryParameters } from "./canary-parameters.js";
 import type { Construct } from "constructs";
 import type { LambdaEnvironment } from "../stack/lambda-configs.js";
+import { CanaryAlarm } from "./canary-alarm.js";
+import type { CanaryParameters } from "./canary-parameters.js";
 
 export class DigitrafficCanary extends Canary {
   constructor(
@@ -39,7 +39,6 @@ export class DigitrafficCanary extends Canary {
 
     this.artifactsBucket.grantWrite(role);
 
-    // eslint-disable-next-line no-new
     new CanaryAlarm(scope, this, params);
   }
 }

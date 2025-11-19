@@ -11,7 +11,7 @@ export function mockKyResponse(status: number, body: string): ResponsePromise {
   return Object.assign(promise as ResponsePromise, {
     arrayBuffer: () => response.arrayBuffer(),
     blob: () => response.blob(),
-    // eslint-disable-next-line deprecation/deprecation
+
     formData: () => response.formData(),
     json: () => response.json(),
     text: () => response.text(),

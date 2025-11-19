@@ -56,8 +56,10 @@ describe("lambda-response", () => {
   });
 
   test("okJson - with fileName and timestamp", () => {
-    const response = LambdaResponse.okJson(TEST_JSON, TEST_FILENAME)
-      .withTimestamp(TEST_TIMESTAMP);
+    const response = LambdaResponse.okJson(
+      TEST_JSON,
+      TEST_FILENAME,
+    ).withTimestamp(TEST_TIMESTAMP);
 
     assertJson(response, TEST_JSON, 200, TEST_FILENAME, TEST_TIMESTAMP);
   });

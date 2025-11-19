@@ -1,9 +1,9 @@
-import type { Construct } from "constructs";
-import type { CanaryParameters } from "./canary-parameters.js";
 import { Alarm, ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
-import type { Canary } from "aws-cdk-lib/aws-synthetics";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { Topic } from "aws-cdk-lib/aws-sns";
+import type { Canary } from "aws-cdk-lib/aws-synthetics";
+import type { Construct } from "constructs";
+import type { CanaryParameters } from "./canary-parameters.js";
 
 export class CanaryAlarm {
   constructor(stack: Construct, canary: Canary, params: CanaryParameters) {

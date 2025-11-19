@@ -1,14 +1,11 @@
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "../../../database/database.js";
+import synthetics from "Synthetics";
+import type { DTDatabase } from "../../../database/database.js";
+import { inDatabaseReadonly } from "../../../database/database.js";
+import type { Countable } from "../../../database/models.js";
+import { getEnvVariable } from "../../../utils/utils.js";
+import { logger } from "../../runtime/dt-logger-default.js";
 import { ProxyHolder } from "../../runtime/secrets/proxy-holder.js";
 import { RdsHolder } from "../../runtime/secrets/rds-holder.js";
-import { getEnvVariable } from "../../../utils/utils.js";
-import type { Countable } from "../../../database/models.js";
-import { logger } from "../../runtime/dt-logger-default.js";
-
-import synthetics from "Synthetics";
 
 abstract class DatabaseCheck<T> {
   readonly name: string;
@@ -25,17 +22,13 @@ abstract class DatabaseCheck<T> {
 }
 
 class CountDatabaseCheck extends DatabaseCheck<Countable> {
-  // eslint-disable-next-line @rushstack/no-new-null
   readonly minCount: number | undefined | null;
-  // eslint-disable-next-line @rushstack/no-new-null
   readonly maxCount: number | undefined | null;
 
   constructor(
     name: string,
     sql: string,
-    // eslint-disable-next-line @rushstack/no-new-null
     minCount: number | undefined | null,
-    // eslint-disable-next-line @rushstack/no-new-null
     maxCount: number | undefined | null,
   ) {
     super(name, sql);
@@ -101,13 +94,13 @@ export class DatabaseCountChecker {
 
   static createForProxy(): DatabaseCountChecker {
     return new DatabaseCountChecker(() =>
-      new ProxyHolder(getEnvVariable("SECRET_ID")).setCredentials()
+      new ProxyHolder(getEnvVariable("SECRET_ID")).setCredentials(),
     );
   }
 
   static createForRds(): DatabaseCountChecker {
     return new DatabaseCountChecker(() =>
-      new RdsHolder(getEnvVariable("SECRET_ID")).setCredentials()
+      new RdsHolder(getEnvVariable("SECRET_ID")).setCredentials(),
     );
   }
 
@@ -148,7 +141,7 @@ export class DatabaseCountChecker {
       for (const check of this.checks) {
         logger.info({
           method: "DatabaseCountChecker.expect",
-          message: "Running sql: " + check.sql,
+          message: `Running sql: ${check.sql}`,
         });
 
         const value = await db.one<Countable>(check.sql);

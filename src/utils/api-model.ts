@@ -1,11 +1,10 @@
-import {
-  type JsonSchema,
-  JsonSchemaType,
-  JsonSchemaVersion,
-  type Model,
-  type RequestValidator,
-  type RestApi,
+import type {
+  JsonSchema,
+  Model,
+  RequestValidator,
+  RestApi,
 } from "aws-cdk-lib/aws-apigateway";
+import { JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
 import type { ModelWithReference } from "../aws/types/model-with-reference.js";
 
 type ModelReferenceUrl =
@@ -39,7 +38,7 @@ export function addDefaultValidator(api: RestApi): RequestValidator {
 /**
  * Adds a JSON Schema model to an API Gateway API. Can be used later to generate OpenAPI specifications.
  * This method adds a schema for _a single object._
- * @param name Name of the model
+ * @param modelName
  * @param api REST API
  * @param schema JSON Schema
  * @return ModelWithReference A model object with a reference to an API Gateway model object.

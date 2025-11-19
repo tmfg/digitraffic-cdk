@@ -13,13 +13,11 @@ const UNSET_SUBTYPE = "-";
 
 type UpdatedTimestamp = {
   updated: Date;
-  // eslint-disable-next-line @rushstack/no-new-null
 } | null;
 
 export function getLastUpdated(
   db: DTDatabase,
   datatype: DataType,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<Date | null> {
   return db.oneOrNone(
     "select updated from data_updated where data_type=$(datatype) and subtype=$(subtype)",
@@ -35,7 +33,6 @@ export function getLastUpdatedWithSubtype(
   db: DTDatabase,
   datatype: DataType,
   subtype: string,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<Date | null> {
   return db.oneOrNone(
     "SELECT updated FROM data_updated WHERE data_type=$(datatype) AND subtype=$(subtype)",
@@ -51,7 +48,6 @@ export function updateLastUpdated(
   db: DTDatabase | DTTransaction,
   datatype: DataType,
   updated: Date,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<null> {
   return db.none(
     `insert into data_updated(id, data_type, updated)
@@ -67,7 +63,6 @@ export function updateLastUpdatedWithSubtype(
   datatype: DataType,
   subtype: string,
   updated: Date,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<null> {
   return db.none(
     `insert into data_updated(id, data_type, subtype, updated)
@@ -81,7 +76,6 @@ export function updateLastUpdatedWithSubtype(
 export function getUpdatedTimestamp(
   db: DTDatabase,
   datatype: string,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<Date | null> {
   return db.oneOrNone(
     "select updated_time as updated from updated_timestamp where updated_name=$(datatype)",
@@ -97,7 +91,6 @@ export function updateUpdatedTimestamp(
   datatype: string,
   date: Date,
   by: string = "",
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<null> {
   return db.none(
     `insert into updated_timestamp(updated_name, updated_time, updated_by)

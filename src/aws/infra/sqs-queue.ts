@@ -1,25 +1,23 @@
-import { Queue, QueueEncryption, type QueueProps } from "aws-cdk-lib/aws-sqs";
+import type { ObjectCannedACL } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import type { NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { Duration } from "aws-cdk-lib";
-import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
-import { PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { InlineCode, Runtime } from "aws-cdk-lib/aws-lambda";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import {
   ComparisonOperator,
   TreatMissingData,
 } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { InlineCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
+import type { QueueProps } from "aws-cdk-lib/aws-sqs";
+import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
 import type { SQSEvent, SQSHandler, SQSRecord } from "aws-lambda";
-import type { DigitrafficStack } from "./stack/stack.js";
-import { MonitoredFunction } from "./stack/monitoredfunction.js";
-import {
-  type ObjectCannedACL,
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
-import type { NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { logger } from "../runtime/dt-logger-default.js";
 import { createLambdaLogGroup } from "./stack/lambda-log-group.js";
+import { MonitoredFunction } from "./stack/monitoredfunction.js";
+import type { DigitrafficStack } from "./stack/stack.js";
 
 const DLQ_LAMBDA_CODE = `
 import type { ObjectCannedACL } from "@aws-sdk/client-s3";
@@ -54,7 +52,6 @@ export class DigitrafficSqsQueue extends Queue {
       queueName,
       deadLetterQueue: props.deadLetterQueue ?? {
         maxReceiveCount: 2,
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         queue: DigitrafficDLQueue.create(stack, name),
       },
     };
@@ -81,8 +78,8 @@ export class DigitrafficSqsQueue extends Queue {
   }
 }
 
-export class DigitrafficDLQueue {
-  static create(stack: DigitrafficStack, name: string): DigitrafficSqsQueue {
+export const DigitrafficDLQueue = {
+  create(stack: DigitrafficStack, name: string): DigitrafficSqsQueue {
     const dlqName = `${stack.configuration.shortName}-${name}-DLQ`;
     const dlqFunctionName = `${dlqName}-Function`;
 
@@ -115,7 +112,7 @@ export class DigitrafficDLQueue {
     const statement = new PolicyStatement();
     statement.addActions("s3:PutObject");
     statement.addActions("s3:PutObjectAcl");
-    statement.addResources(dlqBucket.bucketArn + "/*");
+    statement.addResources(`${dlqBucket.bucketArn}/*`);
 
     lambda.addToRolePolicy(statement);
     lambda.addEventSource(new SqsEventSource(dlq));
@@ -123,8 +120,8 @@ export class DigitrafficDLQueue {
     addDLQAlarm(stack, dlqName, dlq);
 
     return dlq;
-  }
-}
+  },
+};
 
 function addDLQAlarm(
   stack: DigitrafficStack,
@@ -132,9 +129,10 @@ function addDLQAlarm(
   dlq: Queue,
 ): void {
   const alarmName = `${dlqName}-Alarm`;
-  dlq.metricNumberOfMessagesReceived({
-    period: Duration.minutes(5),
-  })
+  dlq
+    .metricNumberOfMessagesReceived({
+      period: Duration.minutes(5),
+    })
     .createAlarm(stack, alarmName, {
       alarmName,
       threshold: 0,
@@ -170,7 +168,7 @@ async function uploadToS3(
   });
   try {
     await s3.send(command);
-  } catch (error) {
+  } catch (_error) {
     logger.error({
       method: "s3.uploadToS3",
       message: `upload failed to bucket ${bucketName}`,
@@ -183,7 +181,7 @@ const bucketName = "";
 
 function createHandler(): SQSHandler {
   return async function handler(event: SQSEvent): Promise<void> {
-    const millis = new Date().getTime();
+    const millis = Date.now();
     const s3 = new S3Client({});
     await Promise.all(
       event.Records.map((e: SQSRecord, idx: number) => {
