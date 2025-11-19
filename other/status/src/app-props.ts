@@ -26,6 +26,7 @@ export interface MonitoredApp {
   readonly url: string; // e.g. https://tie.digitraffic.fi/swagger/
   readonly endpoints: MonitoredEndpoint[]; // e.g. [{ name: "Road MQTT", url: "wss://tie.digitraffic.fi/mqtt", protocol: EndpointProtocol.WebSocket }]
   readonly excluded: string[]; // e.g. ["/api/variable-sign/v1/signs/history", "/api/maintenance/v1/tracking/routes"]
+  readonly hasOpenApiSpec?: boolean; // e.g. false
 }
 
 export interface Props {
