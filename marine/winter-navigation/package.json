@@ -17,28 +17,28 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.10.29-2",
-    "aws-cdk-lib": "^2.211.0",
-    "constructs": "~10.4.2",
+    "@digitraffic/common": "2025.11.11-1",
+    "aws-cdk-lib": "^2.225.0",
+    "constructs": "^10.4.3",
     "es-toolkit": "1.39.10",
     "ky": "^1.8.2",
     "pg-native": "^3.5.2",
-    "pg-promise": "^11.15.0",
-    "zod": "~4.1.12"
+    "pg-promise": "^12.3.0",
+    "zod": "4.1.12"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^30.0.5",
-    "@rushstack/heft": "^0.74.2",
-    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@rushstack/heft": "^1.1.5",
+    "@rushstack/heft-jest-plugin": "^1.1.5",
     "@types/geojson": "^7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.15.2",
+    "@types/node": "^22.19.1",
     "date-fns": "4.1.0",
-    "esbuild": "0.25.9",
-    "typescript": "^5.9.2"
+    "esbuild": "0.27.0",
+    "typescript": "~5.9.3"
   }
 }
