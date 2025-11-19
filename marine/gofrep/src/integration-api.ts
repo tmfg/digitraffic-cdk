@@ -15,18 +15,17 @@ import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/moni
 import {
   add404Support,
   createDefaultPolicyDocument,
-} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+} from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
+import type { IModel, Resource } from "aws-cdk-lib/aws-apigateway";
 import {
   EndpointType,
-  type IModel,
   MethodLoggingLevel,
   MockIntegration,
   PassthroughBehavior,
-  type Resource,
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import type { Construct } from "constructs";

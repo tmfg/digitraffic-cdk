@@ -1,22 +1,19 @@
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import {
-  JsonSchemaType,
-  type Model,
-  type Resource,
-} from "aws-cdk-lib/aws-apigateway";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   featureSchema,
   geojsonSchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import { AllDirections, AllDomains, AllTravelModes } from "./model/v2/types.js";
+import type { JsonSchema, Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { JsonSchemaType } from "aws-cdk-lib/aws-apigateway";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import {
   directionsSchema,
   domainsSchema,
@@ -24,7 +21,7 @@ import {
   travelModesSchema,
   valueSchema,
 } from "./model/v2/json-schemas.js";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import { AllDirections, AllDomains, AllTravelModes } from "./model/v2/types.js";
 
 const COUNTING_SITE_TAGS_V2 = ["Counting site V2"];
 
@@ -55,8 +52,7 @@ export class PublicApiV2 {
 
   exportApi(stack: DigitrafficStack, apiKeyId: string): void {
     new StringParameter(stack, "export.endpoint", {
-      parameterName:
-        `/digitraffic/${stack.configuration.shortName}/endpointUrl`,
+      parameterName: `/digitraffic/${stack.configuration.shortName}/endpointUrl`,
       stringValue: this.publicApi.url,
     });
 
@@ -111,8 +107,10 @@ export class PublicApiV2 {
     const geojsonSchemaWithDataUpdatedTime = geojsonSchema(
       getModelReference(featureModel.modelId, this.publicApi.restApiId),
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (geojsonSchemaWithDataUpdatedTime as any).properties.dataUpdatedTime = {
+    if (geojsonSchemaWithDataUpdatedTime?.properties === undefined) {
+      throw new Error("GeoJSON schema creation failed");
+    }
+    geojsonSchemaWithDataUpdatedTime.properties["dataUpdatedTime"] = {
       type: JsonSchemaType.STRING,
       format: "date-time",
       description: "Data updated timestamp",

@@ -1,40 +1,38 @@
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import {
+  getResponse,
+  methodResponse,
+} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { lambdaFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
+import {
+  MonitoredDBFunction,
+  MonitoredFunction,
+} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import {
+  add401Support,
+  DigitrafficRestApi,
+} from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { BETA_TAGS } from "@digitraffic/common/dist/aws/types/tags";
+import type { Resource } from "aws-cdk-lib/aws-apigateway";
 import {
   AwsIntegration,
   ContentHandling,
   IdentitySource,
   Model,
   RequestAuthorizer,
-  type Resource,
 } from "aws-cdk-lib/aws-apigateway";
 import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
-import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import {
-  getResponse,
-  methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { BETA_TAGS } from "@digitraffic/common/dist/aws/types/tags";
-import {
-  type LambdaEnvironment,
-  lambdaFunctionProps,
-} from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import { MarinecamEnvKeys } from "./keys.js";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {
-  add401Support,
-  DigitrafficRestApi,
-} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import {
-  MonitoredDBFunction,
-  MonitoredFunction,
-} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import type { MobileServerProps } from "./app-props.js";
 import type { Construct } from "constructs";
+import type { MobileServerProps } from "./app-props.js";
+import { MarinecamEnvKeys } from "./keys.js";
 
 export class PrivateApi {
   private readonly stack: DigitrafficStack;
@@ -149,12 +147,10 @@ export class PrivateApi {
 
       this.ibnetImageResource = ibnetResource.addResource("{imageName}");
       this.ibnetMetadataResource = ibnetResource.addResource("metadata");
-      this.apiImageResource = marinecamCamerasResource.addResource(
-        "{imageName}",
-      );
-      this.apiMetadataResource = marinecamCamerasResource.addResource(
-        "metadata",
-      );
+      this.apiImageResource =
+        marinecamCamerasResource.addResource("{imageName}");
+      this.apiMetadataResource =
+        marinecamCamerasResource.addResource("metadata");
     }
   }
 
@@ -169,7 +165,7 @@ export class PrivateApi {
       MediaType.APPLICATION_JSON,
     ).build();
 
-    resources.forEach((resource) =>
+    resources.forEach((resource) => {
       resource.addMethod("GET", metadataIntegration, {
         apiKeyRequired: true,
         methodResponses: [
@@ -187,8 +183,8 @@ export class PrivateApi {
             MediaType.APPLICATION_JSON,
           ),
         ],
-      })
-    );
+      });
+    });
   }
 
   createListCamerasResource(authorizer: RequestAuthorizer): void {
@@ -243,7 +239,7 @@ export class PrivateApi {
   createImageResource(readImageRole: Role, ...resources: Resource[]): void {
     const getImageIntegration = new AwsIntegration({
       service: "s3",
-      path: this.bucket.bucketName + "/images/Saimaa/{objectName}",
+      path: `${this.bucket.bucketName}/images/Saimaa/{objectName}`,
       integrationHttpMethod: "GET",
       options: {
         credentialsRole: readImageRole,
@@ -276,7 +272,7 @@ export class PrivateApi {
       },
     });
 
-    resources.forEach((resource) =>
+    resources.forEach((resource) => {
       resource.addMethod("GET", getImageIntegration, {
         apiKeyRequired: true,
         requestParameters: {
@@ -302,8 +298,8 @@ export class PrivateApi {
             MediaType.APPLICATION_JSON,
           ),
         ],
-      })
-    );
+      });
+    });
   }
 
   createGetImageResource(
@@ -312,7 +308,7 @@ export class PrivateApi {
   ): void {
     const getImageIntegration = new AwsIntegration({
       service: "s3",
-      path: this.bucket.bucketName + "/images/{folderName}/{objectName}",
+      path: `${this.bucket.bucketName}/images/{folderName}/{objectName}`,
       integrationHttpMethod: "GET",
       options: {
         credentialsRole: readImageRole,

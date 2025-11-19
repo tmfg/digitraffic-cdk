@@ -1,11 +1,12 @@
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import {
   DigitrafficMethodResponse,
   MessageModel,
 } from "@digitraffic/common/dist/aws/infra/api/response";
-import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   addServiceModel,
@@ -13,9 +14,8 @@ import {
   geojsonSchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { nauticalWarningSchema } from "./model/nautical-warnings-schema.js";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import type { NauticalWarningConfiguration } from "./nautical-warnings-stack.js";
 
 const NAUTICAL_WARNING_TAGS_V1 = ["Nautical Warning V1"];

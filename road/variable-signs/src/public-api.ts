@@ -1,11 +1,11 @@
-import { addSimpleServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { addSimpleServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 
 const VARIABLE_SIGN_TAGS_V1 = ["Variable Sign V1"];
@@ -56,14 +56,14 @@ export class PublicApi {
     const imagesResource = v1Resource.addResource("images");
 
     this.v1Datex233Resource = v1Resource.addResource("signs.datex2");
-    this.v1SituationsDatex35Resource = v1Resource.addResource("signs")
-      .addResource(
-        "datex2-3.5.xml",
-      );
-    this.v1StatusesDatex35Resource = v1Resource.addResource(
-      "statuses",
-    ).addResource("datex2-3.5.xml");
-    this.v1ControllersDatex35Resource = v1Resource.addResource("controllers")
+    this.v1SituationsDatex35Resource = v1Resource
+      .addResource("signs")
+      .addResource("datex2-3.5.xml");
+    this.v1StatusesDatex35Resource = v1Resource
+      .addResource("statuses")
+      .addResource("datex2-3.5.xml");
+    this.v1ControllersDatex35Resource = v1Resource
+      .addResource("controllers")
       .addResource("datex2-3.5.xml");
 
     this.v1ImageResource = imagesResource.addResource("{text}");

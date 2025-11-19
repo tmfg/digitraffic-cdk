@@ -1,31 +1,35 @@
-import type { RequestValidator, Resource } from "aws-cdk-lib/aws-apigateway";
-import { LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
-import {
-  createTimestampSchema,
-  LocationSchema,
-  ShipSchema,
-} from "./model/timestamp-schema.js";
-import { LocodeMetadataSchema } from "./model/locode-metadata.js";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import type { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   addDefaultValidator,
   addServiceModel,
   createArraySchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import type {
+  IModel,
+  RequestValidator,
+  Resource,
+} from "aws-cdk-lib/aws-apigateway";
+import { LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
+import { LocodeMetadataSchema } from "./model/locode-metadata.js";
 import {
   TimestampMetadata,
   TimestampMetadataSchema,
 } from "./model/timestamp-metadata.js";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { IModel } from "aws-cdk-lib/aws-apigateway";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
+import {
+  createTimestampSchema,
+  LocationSchema,
+  ShipSchema,
+} from "./model/timestamp-schema.js";
 
 export class PublicApi {
   readonly apiKeyId: string;
@@ -101,7 +105,7 @@ export class PublicApi {
     resource: Resource,
     timestampsJsonModel: IModel,
     validator: RequestValidator,
-  ): MonitoredDBFunction {
+  ): MonitoredFunction {
     const getTimestampsLambda = MonitoredDBFunction.create(
       stack,
       "get-timestamps",
@@ -159,7 +163,7 @@ export class PublicApi {
     return getTimestampsLambda;
   }
 
-  createShiplistResource(stack: DigitrafficStack): MonitoredDBFunction {
+  createShiplistResource(stack: DigitrafficStack): MonitoredFunction {
     const lambda = MonitoredDBFunction.create(
       stack,
       "get-shiplist-public",
@@ -205,9 +209,8 @@ export class PublicApi {
     metadataResource: Resource,
     timestampMetadataModel: IModel,
   ): void {
-    const timestampMetadataResource = metadataResource.addResource(
-      "timestamps",
-    );
+    const timestampMetadataResource =
+      metadataResource.addResource("timestamps");
 
     new DigitrafficStaticIntegration(
       timestampMetadataResource,
@@ -232,7 +235,7 @@ export class PublicApi {
     stack: DigitrafficStack,
     metadataResource: Resource,
     locodeMetadataModel: IModel,
-  ): MonitoredDBFunction {
+  ): MonitoredFunction {
     const getLocodeMetadataLambda = MonitoredDBFunction.create(
       stack,
       "get-locode-metadata",
