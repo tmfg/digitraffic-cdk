@@ -69,8 +69,7 @@ export const schema = {
               { type: "null" },
             ],
           },
-          oid: {
-          },
+          oid: {},
         },
         required: ["trackOid"],
       },
@@ -168,8 +167,7 @@ export const schema = {
               { type: "null" },
             ],
           },
-          oid: {
-          },
+          oid: {},
         },
       },
       YearlyPlanComputedDataDto: {

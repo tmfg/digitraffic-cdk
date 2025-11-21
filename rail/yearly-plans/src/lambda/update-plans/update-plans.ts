@@ -1,13 +1,13 @@
+import { Ajv } from "Ajv";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import addFormats from "ajv-formats";
 import { YearlyPlansEnvKeys } from "../../keys.js";
+import { schema } from "../../model/schema.js";
 import { fetchData } from "../../service/yearly-plans-service.js";
 import { uploadDataToS3 } from "../../util/s3-util.js";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { Ajv } from "Ajv";
-import { schema } from "../../model/schema.js";
-import addFormats from "ajv-formats";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 interface YearlyPlansSecret extends GenericSecret {
   readonly url: string;

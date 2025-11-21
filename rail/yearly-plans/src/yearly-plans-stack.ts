@@ -1,9 +1,9 @@
+import { grantOACRights } from "@digitraffic/common/dist/aws/infra/bucket-policy";
 import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Construct } from "constructs";
 import * as InternalLambdas from "./internal-lambdas.js";
-import { grantOACRights } from "@digitraffic/common/dist/aws/infra/bucket-policy";
 
 export interface YearlyPlansConfiguration extends StackConfiguration {
   readonly yearlyPlansBucketName: string;
