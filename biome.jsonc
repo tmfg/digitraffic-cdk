@@ -12,12 +12,12 @@
       "!common/git-hooks",
       "!common/scripts",
       // This should be covered by biome automatically, but just in case.
-      "!node_modules",
-      "!cdk.out",
-      "!dist",
-      "!build",
-      "!output",
-      "!temp",
+      "!**/node_modules",
+      "!**/cdk.out",
+      "!**/dist",
+      "!**/build",
+      "!**/output",
+      "!**/temp",
       // Work around nested gitignore bugs in biome 2.2.5. They are supposed to work.
       "!common/temp",
       // Don't touch anything under digitraffic-common
