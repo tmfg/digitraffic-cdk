@@ -1,7 +1,7 @@
 import type { Stack } from "aws-cdk-lib";
-import type { Topic } from "aws-cdk-lib/aws-sns";
 import { EventField, Rule } from "aws-cdk-lib/aws-events";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
+import type { Topic } from "aws-cdk-lib/aws-sns";
 import { createMessage, TOPICS } from "./topic-tools.js";
 
 export class KmsMonitoring {

@@ -1,9 +1,9 @@
 import type { Stack } from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
-import type { EcsConfiguration } from "./app-props.js";
-import type { Topic } from "aws-cdk-lib/aws-sns";
 import { Metric } from "aws-cdk-lib/aws-cloudwatch";
+import type { Topic } from "aws-cdk-lib/aws-sns";
 import { createAlarm } from "./alarms.js";
+import type { EcsConfiguration } from "./app-props.js";
 
 export const DEFAULTS = {
   CPU: 80,

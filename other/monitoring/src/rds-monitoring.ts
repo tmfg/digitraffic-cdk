@@ -1,5 +1,8 @@
-import type { DBConfiguration, DBLimits, InstanceLimits } from "./app-props.js";
 import type { Stack } from "aws-cdk-lib";
+import type { Metric } from "aws-cdk-lib/aws-cloudwatch";
+import { ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
+import { EventField, Rule } from "aws-cdk-lib/aws-events";
+import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
 import type { IDatabaseCluster, IDatabaseInstance } from "aws-cdk-lib/aws-rds";
 import {
   CfnEventSubscription,
@@ -8,11 +11,8 @@ import {
   DatabaseInstance,
 } from "aws-cdk-lib/aws-rds";
 import type { Topic } from "aws-cdk-lib/aws-sns";
-import type { Metric } from "aws-cdk-lib/aws-cloudwatch";
-import { ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
 import { createAlarm } from "./alarms.js";
-import { EventField, Rule } from "aws-cdk-lib/aws-events";
-import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
+import type { DBConfiguration, DBLimits, InstanceLimits } from "./app-props.js";
 import { createMessage } from "./topic-tools.js";
 
 export class RdsMonitoring {

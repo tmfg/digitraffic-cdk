@@ -1,9 +1,9 @@
+import type { Stack } from "aws-cdk-lib";
 import { CfnAlarm } from "aws-cdk-lib/aws-cloudwatch";
 import { Rule, RuleTargetInput } from "aws-cdk-lib/aws-events";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
 import type { Topic } from "aws-cdk-lib/aws-sns";
 import type { CloudfrontConfiguration } from "./app-props.js";
-import type { Stack } from "aws-cdk-lib";
 
 export class CloudfrontMonitoring {
   constructor(
