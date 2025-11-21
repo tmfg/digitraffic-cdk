@@ -1,14 +1,11 @@
-import { type Stack } from "aws-cdk-lib";
-import { type Topic } from "aws-cdk-lib/aws-sns";
+import type { Stack } from "aws-cdk-lib";
+import type { Topic } from "aws-cdk-lib/aws-sns";
 import { EventField, Match, Rule } from "aws-cdk-lib/aws-events";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
 import { createMessage, TOPICS } from "./topic-tools.js";
 
 export class IamMonitoring {
-  constructor(
-    stack: Stack,
-    alarmsTopic: Topic,
-  ) {
+  constructor(stack: Stack, alarmsTopic: Topic, accountName: string) {
     // eslint-disable-next-line no-new
     new Rule(stack, "IamRule", {
       eventPattern: {
@@ -29,10 +26,11 @@ export class IamMonitoring {
           message: createMessage(
             "RUNBOOK Y6 - IAM Changes",
             `eventName: ${TOPICS.eventName}
-                     roleName: ${
-              EventField.fromPath("$.detail.requestParameters.roleName")
-            }
+                     roleName: ${EventField.fromPath(
+                       "$.detail.requestParameters.roleName",
+                     )}
                     `,
+            accountName,
           ),
         }),
       ],

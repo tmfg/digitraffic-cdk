@@ -1,4 +1,5 @@
-import { Duration, type Stack } from "aws-cdk-lib";
+import type { Stack } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
 import type { EcsConfiguration } from "./app-props.js";
 import type { Topic } from "aws-cdk-lib/aws-sns";
 import { Metric } from "aws-cdk-lib/aws-cloudwatch";
@@ -38,8 +39,7 @@ export class EcsMonitoring {
           period: Duration.minutes(5),
         });
 
-        const cpuAlarmName =
-          `ECS-${this.stack.stackName}-CPU-${service.serviceName}`;
+        const cpuAlarmName = `ECS-${this.stack.stackName}-CPU-${service.serviceName}`;
 
         createAlarm(
           this.stack,
@@ -62,8 +62,7 @@ export class EcsMonitoring {
           period: Duration.minutes(5),
         });
 
-        const memoryAlarmName =
-          `ECS-${this.stack.stackName}-Memory-${service.serviceName}`;
+        const memoryAlarmName = `ECS-${this.stack.stackName}-Memory-${service.serviceName}`;
 
         createAlarm(
           this.stack,

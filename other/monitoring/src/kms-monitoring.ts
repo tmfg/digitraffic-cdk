@@ -1,14 +1,11 @@
-import { type Stack } from "aws-cdk-lib";
-import { type Topic } from "aws-cdk-lib/aws-sns";
+import type { Stack } from "aws-cdk-lib";
+import type { Topic } from "aws-cdk-lib/aws-sns";
 import { EventField, Rule } from "aws-cdk-lib/aws-events";
 import { SnsTopic } from "aws-cdk-lib/aws-events-targets";
 import { createMessage, TOPICS } from "./topic-tools.js";
 
 export class KmsMonitoring {
-  constructor(
-    stack: Stack,
-    alarmsTopic: Topic,
-  ) {
+  constructor(stack: Stack, alarmsTopic: Topic, accountName: string) {
     const KMS_SOURCE = "aws.kms";
     // eslint-disable-next-line no-new
     new Rule(stack, "KMSDeletionPendingRule", {
@@ -17,9 +14,7 @@ export class KmsMonitoring {
       eventPattern: {
         source: [KMS_SOURCE],
         detail: {
-          eventName: [
-            "ScheduleKeyDeletion",
-          ],
+          eventName: ["ScheduleKeyDeletion"],
         },
       },
       targets: [
@@ -27,9 +22,10 @@ export class KmsMonitoring {
           message: createMessage(
             "RUNBOOK-Y8 KMS Deletion Pending",
             `eventName: ${TOPICS.eventName}
-                     KeyId: ${
-              EventField.fromPath("$.detail.requestParameters.keyId")
-            }`,
+                     KeyId: ${EventField.fromPath(
+                       "$.detail.requestParameters.keyId",
+                     )}`,
+            accountName,
           ),
         }),
       ],
@@ -54,9 +50,10 @@ export class KmsMonitoring {
           message: createMessage(
             "RUNBOOK-Y9 KMS Changes",
             `eventName: ${TOPICS.eventName}
-                     KeyId: ${
-              EventField.fromPath("$.detail.requestParameters.keyId")
-            }`,
+                     KeyId: ${EventField.fromPath(
+                       "$.detail.requestParameters.keyId",
+                     )}`,
+            accountName,
           ),
         }),
       ],

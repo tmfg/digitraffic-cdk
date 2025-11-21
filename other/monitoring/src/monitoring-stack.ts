@@ -67,6 +67,7 @@ export class MonitoringStack extends Stack {
         alarmsTopic,
         configuration.envName,
         configuration.db,
+        configuration.env.accountName,
       );
     }
 
@@ -74,7 +75,7 @@ export class MonitoringStack extends Stack {
       new EcsMonitoring(this, alarmsTopic, configuration.ecs);
     }
 
-    new KmsMonitoring(this, alarmsTopic);
+    new KmsMonitoring(this, alarmsTopic, configuration.env.accountName);
   }
 
   createTopic(topicName: string, email: string): Topic {
@@ -94,9 +95,7 @@ export class MonitoringStack extends Stack {
         ],
         conditions: {
           ArnLike: {
-            "aws:SourceArn": [
-              `arn:aws:*:*:${this.account}:*:*`,
-            ],
+            "aws:SourceArn": [`arn:aws:*:*:${this.account}:*:*`],
           },
           StringEquals: {
             "aws:SourceAccount": this.account,

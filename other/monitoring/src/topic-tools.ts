@@ -7,10 +7,14 @@ export const TOPICS = {
   eventName: EventField.fromPath("$.detail.eventName"),
 } as const;
 
-export function createMessage(title: string, message: string): RuleTargetInput {
+export function createMessage(
+  title: string,
+  message: string,
+  accountName?: string,
+): RuleTargetInput {
   return RuleTargetInput.fromMultilineText(
     `${title}
-                     account: ${TOPICS.account}
+                     account: ${accountName ? accountName : TOPICS.account}
                      region: ${TOPICS.region}
                      principalId: ${TOPICS.principalId}
                      ${message}

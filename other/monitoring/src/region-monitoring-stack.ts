@@ -34,9 +34,13 @@ export class RegionMonitoringStack extends Stack {
     }
 
     if (configuration.route53) {
-      new Route53Monitoring(this, topic, configuration.route53);
+      new Route53Monitoring(
+        this,
+        topic,
+        configuration.route53,
+        configuration.env.accountName,
+      );
     }
-
-    new IamMonitoring(this, topic);
+    new IamMonitoring(this, topic, configuration.env.accountName);
   }
 }
