@@ -7,7 +7,7 @@ import { createMessage, TOPICS } from "./topic-tools.js";
 export class KmsMonitoring {
   constructor(stack: Stack, alarmsTopic: Topic, accountName: string) {
     const KMS_SOURCE = "aws.kms";
-    // eslint-disable-next-line no-new
+
     new Rule(stack, "KMSDeletionPendingRule", {
       ruleName: "kms-deletion-pending",
       description: "Alarm rule for KMS key deletion pending",
@@ -30,7 +30,7 @@ export class KmsMonitoring {
         }),
       ],
     });
-    // eslint-disable-next-line no-new
+
     new Rule(stack, "KMSChangesRule", {
       ruleName: "kms-changes",
       description: "Alarm rule for KMS key changes",

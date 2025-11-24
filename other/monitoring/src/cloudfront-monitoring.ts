@@ -17,7 +17,6 @@ export class CloudfrontMonitoring {
 
       const alarmName = `${distribution.id}-bytes-downloaded`;
 
-      // eslint-disable-next-line no-new
       new CfnAlarm(stack, `${distribution.id}-BytesDownloadedAlarm`, {
         alarmName,
         comparisonOperator: "LessThanLowerOrGreaterThanUpperThreshold",
@@ -57,8 +56,7 @@ export class CloudfrontMonitoring {
 
       // our topic is in another region, so can't put it as alarmAction in CfnAlarm.
       // so we create a rule that listens to this alarm state changes and sends notification to our topic
-      // eslint-disable-next-line no-new
-      new Rule(stack, "Cloudfront-bytes-rule-" + distribution.id, {
+      new Rule(stack, `Cloudfront-bytes-rule-${distribution.id}`, {
         eventPattern: {
           source: ["aws.cloudwatch"],
           detail: {

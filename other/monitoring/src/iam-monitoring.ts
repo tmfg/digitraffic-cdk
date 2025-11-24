@@ -6,7 +6,6 @@ import { createMessage, TOPICS } from "./topic-tools.js";
 
 export class IamMonitoring {
   constructor(stack: Stack, alarmsTopic: Topic, accountName: string) {
-    // eslint-disable-next-line no-new
     new Rule(stack, "IamRule", {
       eventPattern: {
         source: ["aws.iam"],

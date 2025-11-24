@@ -70,7 +70,6 @@ export class RdsMonitoring {
 
     this.createEventSubscriptions();
 
-    // eslint-disable-next-line no-new
     new Rule(this.stack, "RdsOsUpdateRule", {
       eventPattern: {
         source: ["aws.rds"],

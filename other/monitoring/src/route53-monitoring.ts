@@ -15,7 +15,7 @@ export class Route53Monitoring {
     accountName: string,
   ) {
     this.accountName = accountName;
-    // eslint-disable-next-line no-new
+
     new Rule(stack, "Route53Rule", {
       eventPattern: {
         source: ["aws.route53"],
