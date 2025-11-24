@@ -6,7 +6,7 @@ jobs:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
       - name: Git config user
