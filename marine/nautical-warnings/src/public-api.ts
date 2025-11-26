@@ -79,7 +79,12 @@ export class PublicApi {
   }
 
   createEndpoint(stack: DigitrafficStack): void {
-    const lambdaActive = MonitoredDBFunction.create(stack, "get-active");
+    const lambdaActive = MonitoredDBFunction.create(
+      stack,
+      "get-active",
+      undefined,
+      { reservedConcurrentExecutions: 5 },
+    );
     const lambdaArchived = MonitoredDBFunction.create(stack, "get-archived");
 
     const activeIntegration = new DigitrafficIntegration(
