@@ -14,7 +14,6 @@
     "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
     "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22,es2022",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",

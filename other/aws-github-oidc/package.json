@@ -5,7 +5,6 @@
   "scripts": {
     "build": "tsc",
     "cdk": "npx cdk@latest",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "lint": "eslint --cache .",
     "test": "echo no tests for this project",
     "watch": "tsc -w"

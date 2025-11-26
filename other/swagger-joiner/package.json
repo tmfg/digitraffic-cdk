@@ -26,7 +26,6 @@
     "cdk-diff-rail-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh rail-test diff SwaggerJoinerRailBeta",
     "cdk-diff-road-prod": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-prod diff",
     "cdk-diff-road-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-test diff",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "echo 'No canaries'",
     "compile-canaries_": "esbuild src/canaries/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",

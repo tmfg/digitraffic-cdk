@@ -13,7 +13,6 @@
     "cdk-bootstrap-status-prod": "../../scripts/cdk-bootstrap.sh status-prod",
     "cdk-deploy-status-prod": "rushx build &&../../scripts/cdk-diff-and-deploy.sh status-prod deploy StatusStack",
     "cdk-diff-status-prod": "rushx build &&../../scripts/cdk-diff-and-deploy.sh status-prod diff StatusStack",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-canaries": "echo 'No canaries'",
     "compile-canaries_": "esbuild src/canaries/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/lambda --target=node22,es2022 --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --out-extension:.js=.mjs",

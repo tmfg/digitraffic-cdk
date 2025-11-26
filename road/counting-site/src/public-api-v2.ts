@@ -110,6 +110,7 @@ export class PublicApiV2 {
     if (geojsonSchemaWithDataUpdatedTime?.properties === undefined) {
       throw new Error("GeoJSON schema creation failed");
     }
+    // @ts-expect-error (TS4111) Property 'dataUpdatedTime' comes from an index signature, so it must be accessed with ['dataUpdatedTime']
     geojsonSchemaWithDataUpdatedTime.properties.dataUpdatedTime = {
       type: JsonSchemaType.STRING,
       format: "date-time",

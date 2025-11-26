@@ -9,7 +9,6 @@
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node22",
     "cdk": "npx cdk@latest",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22",

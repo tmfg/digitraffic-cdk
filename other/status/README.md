@@ -9,7 +9,6 @@ them.
     rush update
     rushx test
     rushx build
-    rushx ci:eslint-report; open report.html
 
     # Deploy
     rushx cdk-diff-status-prod

@@ -89,13 +89,6 @@
       "shellCommand": "zx common/scripts/unify-deps.mjs"
     },
     {
-      "name": "ci:eslint-report",
-      "commandKind": "bulk",
-      "summary": "Used by the Github Actions to create eslint report.",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
       "name": "common-subtree",
       "commandKind": "global",
       "summary": "Pull common subtree changes from some branch",

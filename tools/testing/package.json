@@ -15,7 +15,6 @@
   "scripts": {
     "build": "heft build --clean",
     "build:watch": "heft build-watch --clean",
-    "ci:eslint-report": "",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },

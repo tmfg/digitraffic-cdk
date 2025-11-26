@@ -10,7 +10,6 @@
     "build:watch": "heft build-watch --clean",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node22",
     "cdk": "npx cdk@latest",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"

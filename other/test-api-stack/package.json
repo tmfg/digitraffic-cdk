@@ -16,7 +16,6 @@
     "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
     "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
     "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
