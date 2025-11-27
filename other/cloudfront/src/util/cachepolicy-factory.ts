@@ -43,7 +43,9 @@ export class CachePolicyFactory {
       minTtl: Duration.seconds(0),
       maxTtl: Duration.seconds(ttl),
       defaultTtl: Duration.seconds(ttl),
-      headerBehavior: CacheHeaderBehavior.allowList(...cacheHeaders),
+      ...(cacheHeaders.length > 0 && {
+        headerBehavior: CacheHeaderBehavior.allowList(...cacheHeaders),
+      }),
       // compression is enabled for CloudFront behaviors by default - enable compression support by default also here
       // enabling compression support for the cache will automatically include "accept-encoding" in the cache key
       enableAcceptEncodingGzip: enableCompression,
