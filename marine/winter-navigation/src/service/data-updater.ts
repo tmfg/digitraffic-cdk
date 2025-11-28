@@ -1,24 +1,24 @@
-import {
-  type DTDatabase,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
-import { type ApiPath, IbnetApi } from "../api/ibnet-api.js";
-import type { ApiMetaData, Deleted } from "../model/api-db-model.js";
-import { setDeleted, type TableName } from "../db/deleted.js";
-import { getDataVersion, updateDataVersion } from "../db/data-version.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import type { ApiPath } from "../api/ibnet-api.js";
+import { IbnetApi } from "../api/ibnet-api.js";
+import { saveAllActivities } from "../db/activities.js";
+import { getDataVersion, updateDataVersion } from "../db/data-version.js";
+import type { TableName } from "../db/deleted.js";
+import { setDeleted } from "../db/deleted.js";
+import { saveAllDirwaypoints, saveAllDirways } from "../db/dirways.js";
+import { saveAllLocations } from "../db/locations.js";
 import {
   saveAllPortSuspensionLocations,
   saveAllPortSuspensions,
 } from "../db/port-suspensions.js";
-import { saveAllLocations } from "../db/locations.js";
-import { saveAllRestrictions } from "../db/restrictions.js";
-import { saveAllVessels } from "../db/vessels.js";
-import { saveAllActivities } from "../db/activities.js";
-import { saveAllSources } from "../db/sources.js";
 import { saveAllQueues } from "../db/queues.js";
-import { saveAllDirwaypoints, saveAllDirways } from "../db/dirways.js";
-import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { saveAllRestrictions } from "../db/restrictions.js";
+import { saveAllSources } from "../db/sources.js";
+import { saveAllVessels } from "../db/vessels.js";
+import type { ApiMetaData, Deleted } from "../model/api-db-model.js";
 
 type SaveFunction<T> = (db: DTDatabase, objects: T[]) => unknown;
 
@@ -93,12 +93,6 @@ export class DataUpdater {
 
     const from = await getDataVersion(db, tableName);
 
-    await LastUpdatedDB.updateUpdatedTimestamp(
-      db,
-      `${tableName.toUpperCase()}_CHECK`,
-      start,
-    );
-
     if (from === to) {
       logger.info({
         method: "DataUpdater.updateObjects",
@@ -110,6 +104,12 @@ export class DataUpdater {
     const objects = await this._api.fetch<T>(apiPath, from, to);
     const deleted: Deleted[] = [];
     const updated: T[] = [];
+
+    await LastUpdatedDB.updateUpdatedTimestamp(
+      db,
+      `${tableName.toUpperCase()}_CHECK`,
+      start,
+    );
 
     objects.forEach((o) => {
       if (o.deleted) {
@@ -129,6 +129,11 @@ export class DataUpdater {
 
     if (deleted.length > 0 || updated.length > 0) {
       await updateDataVersion(db, tableName, to);
+      await LastUpdatedDB.updateUpdatedTimestamp(
+        db,
+        `${tableName.toUpperCase()}`,
+        start,
+      );
     }
 
     logger.info({
