@@ -1,7 +1,8 @@
-import { LambdaIntegration, type Resource } from "aws-cdk-lib/aws-apigateway";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { Resource } from "aws-cdk-lib/aws-apigateway";
+import { LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 
 export class IntegrationApi {
   readonly restApi: DigitrafficRestApi;

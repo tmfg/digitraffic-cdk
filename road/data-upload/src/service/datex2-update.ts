@@ -1,10 +1,10 @@
-import { deleteOldDataMessages, insertData } from "../dao/data.js";
-import { inDatabase } from "@digitraffic/common/dist/database/database";
-import { type Datex2UpdateObject } from "../model/datex2-update-object.js";
-import { SOURCES, TYPES } from "../model/types.js";
-import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
 import { SQS } from "@aws-sdk/client-sqs";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
+import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
+import { deleteOldDataMessages, insertData } from "../dao/data.js";
+import type { Datex2UpdateObject } from "../model/datex2-update-object.js";
 import type { UpdateObject } from "../model/sqs-message-schema.js";
+import { SOURCES, TYPES } from "../model/types.js";
 
 const SQS_URL = getEnvVariableSafe("QUEUE_URL");
 const sqs = new SQS({});
@@ -15,20 +15,20 @@ export async function deleteOldMessages(): Promise<void> {
   });
 }
 
-export async function updateRtti(
-  updateObject: UpdateObject,
-): Promise<void> {
+export async function updateRtti(updateObject: UpdateObject): Promise<void> {
   await inDatabase(async (db) => {
-    return await Promise.all(updateObject.messageVersions.map(async (o) => {
-      return await insertData(
-        db,
-        updateObject.messageId,
-        SOURCES.API,
-        o.typeVersion,
-        TYPES.RTTI_DATEX2_XML,
-        o.messageContent,
-      );
-    }));
+    return await Promise.all(
+      updateObject.messageVersions.map(async (o) => {
+        return await insertData(
+          db,
+          updateObject.messageId,
+          SOURCES.API,
+          o.typeVersion,
+          TYPES.RTTI_DATEX2_XML,
+          o.messageContent,
+        );
+      }),
+    );
   });
 }
 
@@ -37,16 +37,18 @@ export async function updateDatex2(
   messageId: string,
 ): Promise<void> {
   await inDatabase(async (db) => {
-    return await Promise.all(updateObject.datexIIVersions.map(async (o) => {
-      return await insertData(
-        db,
-        messageId,
-        SOURCES.API,
-        o.version,
-        o.type,
-        o.message,
-      );
-    }));
+    return await Promise.all(
+      updateObject.datexIIVersions.map(async (o) => {
+        return await insertData(
+          db,
+          messageId,
+          SOURCES.API,
+          o.version,
+          o.type,
+          o.message,
+        );
+      }),
+    );
   });
 
   if (SQS_URL.result === "ok") {

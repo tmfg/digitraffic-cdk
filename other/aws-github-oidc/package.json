@@ -5,25 +5,24 @@
   "scripts": {
     "build": "tsc",
     "cdk": "npx cdk@latest",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "lint": "eslint --cache .",
     "test": "echo no tests for this project",
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.9.26-1",
-    "aws-cdk-lib": "^2.217.0",
-    "constructs": "~10.4.2",
+    "@digitraffic/common": "2025.11.11-1",
+    "aws-cdk-lib": "^2.225.0",
+    "constructs": "^10.4.3",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "^0.74.2",
-    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@rushstack/heft": "^1.1.5",
+    "@rushstack/heft-jest-plugin": "^1.1.5",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "22.18.6",
+    "@types/node": "^22.19.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "~5.9.3"
   }
 }

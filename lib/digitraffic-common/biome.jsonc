@@ -8,16 +8,12 @@
       "**/*.tsx",
       "**/*.json",
       "**/*.jsonc",
-      "!common/scripts",
-      // This should be covered by biome automatically, but just in case.
-      "!**/node_modules",
-      "!**/cdk.out",
-      "!**/dist",
-      "!**/build",
-      "!**/output",
-      "!**/temp",
-      // Don't touch anything under digitraffic-common
-      "!lib/digitraffic-common"
+      "!node_modules",
+      "!cdk.out",
+      "!dist",
+      "!build",
+      "!output",
+      "!temp"
     ],
     "ignoreUnknown": true
   },
@@ -59,13 +55,8 @@
       }
     },
     {
-      // Allow rush configs to have comments without jsonc extension.
-      "includes": [
-        "rush.json",
-        "common/config/rush/*.json",
-        "**/rig.json",
-        "**/config/*.json"
-      ],
+      // Allow heft configs to have comments without jsonc extension.
+      "includes": ["**/config/*.json", "tsconfig.json"],
       "json": {
         "parser": {
           "allowComments": true
@@ -76,9 +67,7 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    // Biome's implementation for .gitignore is not perfect,
-    // and it is not working as it should with .gitignore.
-    "useIgnoreFile": false,
+    "useIgnoreFile": true,
     "defaultBranch": "master"
   }
 }

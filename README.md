@@ -31,6 +31,7 @@ rush update
 
 ```shell
 rush update
+rush update-autoinstaller --name rush-command-line-tools
 ```
 
 ### Format

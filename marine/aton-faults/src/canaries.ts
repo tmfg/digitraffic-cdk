@@ -1,7 +1,7 @@
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
 import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
-import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
+import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class Canaries {
   constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {

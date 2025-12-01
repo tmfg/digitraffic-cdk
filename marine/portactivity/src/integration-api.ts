@@ -1,20 +1,20 @@
-import type { Model, RestApi } from "aws-cdk-lib/aws-apigateway";
-import { RequestValidator } from "aws-cdk-lib/aws-apigateway";
-import type { Construct } from "constructs";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import type { Queue } from "aws-cdk-lib/aws-sqs";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { attachQueueToApiGatewayResource } from "@digitraffic/common/dist/aws/infra/sqs-integration";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
   addServiceModel,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
+import type { Model, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { RequestValidator } from "aws-cdk-lib/aws-apigateway";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Construct } from "constructs";
 import {
   createTimestampSchema,
   LocationSchema,
   ShipSchema,
 } from "./model/timestamp-schema.js";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export function create(queue: Queue, stack: DigitrafficStack): void {
   const integrationApi = new DigitrafficRestApi(

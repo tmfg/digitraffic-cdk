@@ -1,10 +1,10 @@
-import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
 import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
 import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
-import { Schedule } from "aws-cdk-lib/aws-events";
+import type { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Duration } from "aws-cdk-lib";
+import { Schedule } from "aws-cdk-lib/aws-events";
 
 export class Canaries {
   constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {

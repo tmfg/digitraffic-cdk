@@ -11,7 +11,6 @@
     "cdk": "npx cdk@latest",
     "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy ShiplightTest",
     "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff ShiplightTest",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22",
@@ -21,35 +20,35 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.9.26-1",
-    "aws-cdk-lib": "^2.217.0",
-    "constructs": "~10.4.2",
+    "@digitraffic/common": "2025.11.11-1",
+    "aws-cdk-lib": "^2.225.0",
+    "constructs": "^10.4.3",
     "ky": "^1.11.0",
     "pg-native": "^3.5.2",
-    "pg-promise": "^11.15.0",
+    "pg-promise": "^12.3.0",
     "source-map-support": "^0.5.21",
-    "spex": "^3.4.1",
-    "uuid": "^11.1.0"
+    "spex": "^4.1.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^30.2.0",
-    "@rushstack/heft": "^0.74.2",
-    "@rushstack/heft-jest-plugin": "^0.16.11",
-    "@types/aws-lambda": "8.10.152",
+    "@rushstack/heft": "^1.1.5",
+    "@rushstack/heft-jest-plugin": "^1.1.5",
+    "@types/aws-lambda": "8.10.158",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.18.6",
+    "@types/node": "^22.19.1",
     "@types/xml2js": "0.4.14",
     "aws-sdk": "^2.1692.0",
-    "esbuild": "0.25.10",
+    "esbuild": "0.27.0",
     "jest": "^30.2.0",
     "jest-junit": "^16.0.0",
     "parallelshell": "^3.0.2",
     "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "~5.9.3"
   }
 }

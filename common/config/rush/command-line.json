@@ -56,7 +56,7 @@
     {
       "name": "format:fix-changed",
       "commandKind": "global",
-      "summary": "Runs Biome’s linting and formatting checks only on changed (according to Git) files without modifying files.",
+      "summary": "Runs Biome’s linting and formatting only on changed (according to Git) files fixing them.",
       "autoinstallerName": "rush-command-line-tools",
       "shellCommand": "biome check --write --changed --files-ignore-unknown=true --no-errors-on-unmatched"
     },
@@ -87,13 +87,6 @@
       "summary": "Checks if dependencies are declared correctly",
       "autoinstallerName": "rush-command-line-tools",
       "shellCommand": "zx common/scripts/unify-deps.mjs"
-    },
-    {
-      "name": "ci:eslint-report",
-      "commandKind": "bulk",
-      "summary": "Used by the Github Actions to create eslint report.",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
     },
     {
       "name": "common-subtree",

@@ -1,18 +1,18 @@
 import { defaultLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import {
   add404Support,
   createDefaultPolicyDocument,
-} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
+} from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import type { Stack } from "aws-cdk-lib";
+import type { Resource } from "aws-cdk-lib/aws-apigateway";
 import {
   EndpointType,
   LambdaIntegration,
   MethodLoggingLevel,
-  type Resource,
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import { AssetCode } from "aws-cdk-lib/aws-lambda";

@@ -1,24 +1,19 @@
 import {
-  type Model,
-  PassthroughBehavior,
-  type Resource,
-} from "aws-cdk-lib/aws-apigateway";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
-import {
   DigitrafficMethodResponse,
   MessageModel,
 } from "@digitraffic/common/dist/aws/infra/api/response";
+import { defaultIntegration } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { AtonEnvKeys } from "./keys.js";
+import type { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {
-  MonitoredDBFunction,
-  type MonitoredFunction,
-} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import type { Queue } from "aws-cdk-lib/aws-sqs";
+import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { PassthroughBehavior } from "aws-cdk-lib/aws-apigateway";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import { AtonEnvKeys } from "./keys.js";
 
 export function create(stack: DigitrafficStack, s124Queue: Queue): void {
   const integrationApi = new DigitrafficRestApi(
@@ -56,9 +51,9 @@ function createUploadVoyagePlanHandler(
 ): void {
   const handler = createHandler(stack, s124Queue);
 
-  const resource = integrationApi.root.addResource("s124").addResource(
-    "voyagePlans",
-  );
+  const resource = integrationApi.root
+    .addResource("s124")
+    .addResource("voyagePlans");
   createIntegrationResource(messageResponseModel, resource, handler);
   s124Queue.grantSendMessages(handler);
 

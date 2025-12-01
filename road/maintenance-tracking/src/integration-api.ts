@@ -1,22 +1,22 @@
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
   addDefaultValidator,
   addServiceModel,
 } from "@digitraffic/common/dist/utils/api-model";
-import { type Resource, type RestApi } from "aws-cdk-lib/aws-apigateway";
+import type { Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
 import {
   ManagedPolicy,
   PolicyStatement,
   Role,
   ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
-import { type Queue } from "aws-cdk-lib/aws-sqs";
-import { type Construct } from "constructs";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Construct } from "constructs";
 import { MaintenanceTrackingEnvKeys } from "./keys.js";
-import { type MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
+import type { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
 
 import {
   createSchemaGeometriaSijainti,
@@ -28,6 +28,7 @@ import {
   Tunniste,
   Viivageometriasijainti,
 } from "./model/maintenance-tracking-schema.js";
+
 import apigateway = require("aws-cdk-lib/aws-apigateway");
 
 export function createIntegrationApiAndHandlerLambda(
@@ -44,9 +45,8 @@ export function createIntegrationApiAndHandlerLambda(
 
   addServiceModelToIntegrationApi(integrationApi);
 
-  const apiResource = createUpdateMaintenanceTrackingApiGatewayResource(
-    integrationApi,
-  );
+  const apiResource =
+    createUpdateMaintenanceTrackingApiGatewayResource(integrationApi);
   createUpdateRequestHandlerLambda(
     apiResource,
     queue,
@@ -170,7 +170,7 @@ function createLambdaRoleWithWriteToSqsAndS3Policy(
   const s3PolicyStatement = new PolicyStatement();
   s3PolicyStatement.addActions("s3:PutObject");
   s3PolicyStatement.addActions("s3:PutObjectAcl");
-  s3PolicyStatement.addResources(sqsExtendedMessageBucketArn + "/*");
+  s3PolicyStatement.addResources(`${sqsExtendedMessageBucketArn}/*`);
 
   lambdaRole.addManagedPolicy(
     ManagedPolicy.fromAwsManagedPolicyName(

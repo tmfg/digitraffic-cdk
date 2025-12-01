@@ -11,7 +11,7 @@ export interface MonitoringConfiguration {
   readonly route53?: Route53Configuration;
   readonly cloudfront?: CloudfrontConfiguration;
 
-  readonly env: Environment;
+  readonly env: Environment & { accountName: string };
 }
 
 export interface EcsConfiguration {

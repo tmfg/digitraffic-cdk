@@ -17,7 +17,7 @@
    */
   "nodeSupportedVersionRange": ">=22.0.0 <23.0.0",
   "rushVersion": "5.162.0",
-  "pnpmVersion": "10.21.0",
+  "pnpmVersion": "10.22.0",
   "ensureConsistentVersions": false,
   "repository": {
     "url": "https://github.com/fintraffic-vts/mcp-cdk",
@@ -205,13 +205,8 @@
     {
       "packageName": "yearly-plans",
       "projectFolder": "rail/yearly-plans",
-      "decoupledLocalDependencies": [
-        "@digitraffic/common"
-      ],
-      "tags": [
-        "cdk",
-        "rail"
-      ]
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "rail"]
     },
     // road
     {
@@ -223,13 +218,8 @@
     {
       "packageName": "data-upload",
       "projectFolder": "road/data-upload",
-      "decoupledLocalDependencies": [
-        "@digitraffic/common"
-      ],
-      "tags": [
-        "cdk",
-        "road"
-      ]
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "road"]
     },
     {
       "packageName": "lam-history",

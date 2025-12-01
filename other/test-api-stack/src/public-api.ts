@@ -1,10 +1,10 @@
-import type { Model } from "aws-cdk-lib/aws-apigateway";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import type { Model } from "aws-cdk-lib/aws-apigateway";
 
 export function create(stack: DigitrafficStack): DigitrafficRestApi {
   const publicApi = new DigitrafficRestApi(

@@ -10,21 +10,20 @@
     "build:watch": "heft build-watch --clean",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node22",
     "cdk": "npx cdk@latest",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.9.26-1",
-    "aws-cdk-lib": "^2.217.0",
+    "@digitraffic/common": "2025.11.11-1",
+    "aws-cdk-lib": "^2.225.0",
     "aws-sdk": "^2.1692.0",
-    "constructs": "~10.4.2",
+    "constructs": "^10.4.3",
     "ky": "^1.11.0",
     "pg-native": "^3.5.2",
-    "pg-promise": "^11.15.0",
+    "pg-promise": "^12.3.0",
     "source-map-support": "^0.5.21",
-    "spex": "^3.4.1",
+    "spex": "^4.1.0",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
@@ -32,18 +31,18 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^30.2.0",
-    "@rushstack/heft": "^0.74.2",
-    "@rushstack/heft-jest-plugin": "^0.16.11",
-    "@types/aws-lambda": "8.10.152",
+    "@rushstack/heft": "^1.1.5",
+    "@rushstack/heft-jest-plugin": "^1.1.5",
+    "@types/aws-lambda": "8.10.158",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.18.6",
-    "@types/sinon": "17.0.4",
+    "@types/node": "^22.19.1",
+    "@types/sinon": "21.0.0",
     "@types/source-map-support": "^0.5.10",
     "@types/xml2js": "0.4.14",
-    "esbuild": "0.25.10",
+    "esbuild": "0.27.0",
     "parallelshell": "^3.0.2",
     "querystring": "0.2.1",
-    "typescript": "^5.9.2"
+    "typescript": "~5.9.3"
   }
 }

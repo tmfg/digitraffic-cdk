@@ -18,7 +18,7 @@ jobs:
     steps:
       # 1. Checkout full repo
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0  # fetch full history so all files exist
           ref: ${{ github.ref }} # ensure the branch tip is checked out
@@ -26,7 +26,7 @@ jobs:
       - name: Set Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Setup Biome
         uses: biomejs/setup-biome@v2

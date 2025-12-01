@@ -9,9 +9,9 @@
     "test": ""
   },
   "dependencies": {
-    "@rushstack/heft": "^0.74.5",
-    "@rushstack/heft-jest-plugin": "^0.16.14",
-    "@rushstack/heft-typescript-plugin": "^0.9.14",
-    "typescript": "^5.9.2"
+    "@rushstack/heft": "^1.1.5",
+    "@rushstack/heft-jest-plugin": "^1.1.5",
+    "@rushstack/heft-typescript-plugin": "^1.1.5",
+    "typescript": "~5.9.3"
   }
 }

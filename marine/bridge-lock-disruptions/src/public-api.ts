@@ -1,24 +1,24 @@
-import type { IModel, Resource } from "aws-cdk-lib/aws-apigateway";
-import { default as DisruptionSchema } from "./model/disruption-schema.js";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
   addServiceModel,
   featureSchema,
   geojsonSchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import type { IModel, Resource } from "aws-cdk-lib/aws-apigateway";
+import { default as DisruptionSchema } from "./model/disruption-schema.js";
 
 const BRIDGE_LOCK_DISRUPTION_TAGS_V1 = ["Bridge Lock Disruption V1"];
 
 export class PublicApi {
-  // @ts-ignore
+  // @ts-expect-error
   disruptionsResource: Resource;
 
   constructor(stack: DigitrafficStack) {
@@ -51,7 +51,7 @@ export class PublicApi {
     this.createDisruptionsResource(disruptionsModel, stack);
 
     publicApi.documentResource(
-      // @ts-ignore
+      // @ts-expect-error
       this.disruptionsResource,
       DocumentationPart.method(
         BRIDGE_LOCK_DISRUPTION_TAGS_V1,
