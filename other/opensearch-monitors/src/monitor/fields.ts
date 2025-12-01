@@ -11,7 +11,11 @@ export type DefaultJavaField =
   | "thread_name"
   | "type";
 
-export type DefaultLambdaField = "lambdaName" | "method" | "runtime";
+export type DefaultLambdaField =
+  | "lambdaName"
+  | "method"
+  | "runtime"
+  | "record.status";
 
 // prettier-ignore
 export type AppField =
@@ -46,14 +50,10 @@ export type CloudfrontField =
 export type HttpUserAgentField = "@fields.http_user_agent";
 
 // prettier-ignore
-export type AlertField =
-  | "alert.id"
-  | "alert.correlation_id.keyword";
+export type AlertField = "alert.id" | "alert.correlation_id.keyword";
 
 // prettier-ignore
-export type DefaultPythonField =
-  | "filename.keyword"
-  | "funcName.keyword";
+export type DefaultPythonField = "filename.keyword" | "funcName.keyword";
 
 export type OSLogField =
   | DefaultField
