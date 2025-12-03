@@ -73,7 +73,7 @@ DO_OPERATION=false
 if [[ "${OPERATION}" == "diff" ]]; then
     DO_OPERATION=true
 else
-    read -p "Are you sure you wanna run: npx --yes cdk@latest ${OPERATION} ${STACK}? " -n 1 -r
+    read -p "Are you sure you wanna run: npx --yes cdk@${CDK_VERSION} ${OPERATION} ${STACK}? " -n 1 -r
     echo    # move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
@@ -85,7 +85,7 @@ if [[ "${DO_OPERATION}" == true ]]
 then
   echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo
-  echo "npx --yes cdk@latest ${OPERATION} ${STACK}"
+  echo "npx --yes cdk@${CDK_VERSION} ${OPERATION} ${STACK}"
   echo
 
   if [[ "${OPERATION}" == "diff" ]]

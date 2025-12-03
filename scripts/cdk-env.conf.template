@@ -8,11 +8,14 @@
 # . cdk-env.conf <env>
 # . cdk-env.conf road-test
 
+# https://github.com/aws/aws-cdk/releases
+CDK_VERSION=2.230.0
+
 # Read env
 ENV=${1:-"NONE"}
 
 # Default aws region
-AWS_DEFAULT_REGION=<TODO AWS REGION>
+AWS_DEFAULT_REGION=eu-west-1
 
 # Disable the use of a pager.
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
@@ -84,7 +87,7 @@ case "$ENV" in
   ;;
   (*) echo
       echo "First parameter environment is required."
-      echo "Allowed values are rail-prod, rail-test, marine-prod, marine-test, road-prod, road-test, status-prod, status-test, aviation-prod, aviation-test, mcp-prod, mcp-test"
+      echo "Allowed values are rail-prod, rail-test, marine-prod, marine-test, road-prod, road-test, status-prod, status-test, aviation-prod, aviation-test, catalog-prod, catalog-test, mcp-prod, mcp-test, afir-test, afir-prod"
       echo
   exit 1
   ;;
