@@ -206,10 +206,7 @@ export const monitoredApps: MonitoredApp[] = [
     name: "AFIR",
     hostPart: "https://afir.digitraffic.fi",
     url: "https://afir.digitraffic.fi/swagger/openapi.json",
-    excluded: [
-      // "/api/charging-network/v1/locations/datex2-3.6",
-      // "/api/charging-network/v1/locations/statuses/datex2-3.6",
-    ],
+    excluded: [],
     endpoints: [
       {
         name: "AFIR MQTT",
