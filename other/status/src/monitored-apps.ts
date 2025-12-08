@@ -1,9 +1,10 @@
+import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import type { MonitoredApp } from "./app-props.js";
 import { EndpointHttpMethod, EndpointProtocol } from "./app-props.js";
 
 export const monitoredApps: MonitoredApp[] = [
   {
-    name: "Road",
+    name: TrafficType.ROAD,
     hostPart: "https://tie.digitraffic.fi",
     url: "https://tie.digitraffic.fi/swagger/openapi.json",
     excluded: [
@@ -77,7 +78,7 @@ export const monitoredApps: MonitoredApp[] = [
     ],
   },
   {
-    name: "Marine",
+    name: TrafficType.MARINE,
     hostPart: "https://meri.digitraffic.fi",
     url: "https://meri.digitraffic.fi/swagger/openapi.json",
     excluded: [],
@@ -95,7 +96,7 @@ export const monitoredApps: MonitoredApp[] = [
     ],
   },
   {
-    name: "Rail",
+    name: TrafficType.RAIL,
     hostPart: "https://rata.digitraffic.fi",
     url: "https://rata.digitraffic.fi/swagger/openapi.json",
     excluded: [],
@@ -171,7 +172,7 @@ export const monitoredApps: MonitoredApp[] = [
     ],
   },
   {
-    name: "Parking",
+    name: TrafficType.PARKING,
     hostPart: "https://parking.fintraffic.fi",
     url: "https://parking.fintraffic.fi/v3/api-docs",
     excluded: [],
@@ -189,7 +190,7 @@ export const monitoredApps: MonitoredApp[] = [
     ],
   },
   {
-    name: "Catalog",
+    name: TrafficType.CATALOG,
     hostPart: "https://catalog.digitraffic.fi",
     url: "https://catalog.digitraffic.fi",
     excluded: [],
@@ -203,13 +204,13 @@ export const monitoredApps: MonitoredApp[] = [
     ],
   },
   {
-    name: "AFIR",
+    name: TrafficType.AFIR,
     hostPart: "https://afir.digitraffic.fi",
     url: "https://afir.digitraffic.fi/swagger/openapi.json",
     excluded: [],
     endpoints: [
       {
-        name: "AFIR MQTT",
+        name: "Afir MQTT",
         url: "wss://afir.digitraffic.fi/mqtt",
         protocol: EndpointProtocol.WebSocket,
       },

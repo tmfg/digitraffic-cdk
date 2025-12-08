@@ -1,24 +1,23 @@
+import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { randomString } from "@digitraffic/common/dist/test/testutils";
+import { jest } from "@jest/globals";
+import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import type {
+  NodePingCheck,
+  NodePingCheckPostPutData,
+  NodePingContact,
+  NodePingContactPostPutData,
+  NodePingNotification,
+} from "../../api/nodeping-api.js";
 import {
   NODEPING_DIGITRAFFIC_USER,
   NODEPING_SENT_HEADERS,
   NodePingApi,
-  type NodePingCheck,
-  type NodePingCheckPostPutData,
-  type NodePingContact,
-  type NodePingContactPostPutData,
-  type NodePingNotification,
 } from "../../api/nodeping-api.js";
-import { randomString } from "@digitraffic/common/dist/test/testutils";
-import {
-  EndpointHttpMethod,
-  EndpointProtocol,
-  type MonitoredEndpoint,
-} from "../../app-props.js";
-import { mockSecretHolder, NODEPING_API, setTestEnv } from "../testutils.js";
-import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { MonitoredEndpoint } from "../../app-props.js";
+import { EndpointHttpMethod, EndpointProtocol } from "../../app-props.js";
 import type { UpdateStatusSecret } from "../../secret.js";
-import { jest } from "@jest/globals";
-import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import { mockSecretHolder, NODEPING_API, setTestEnv } from "../testutils.js";
 
 let secretHolder: SecretHolder<UpdateStatusSecret>;
 let nodepingApi: NodePingApi;
@@ -168,8 +167,8 @@ describe("NodePing API test", () => {
         type: "WEBSOCKET",
       },
     } as const satisfies NodePingCheck;
-    // eslint-disable-next-line
-    delete (check.parameters as any).method;
+    // @ts-expect-error: remove readonly
+    delete (check.parameters as unknown).method;
 
     expect(
       api.checkNeedsUpdate(check, {
@@ -228,10 +227,7 @@ describe("NodePing API test", () => {
     const spy = jest
       .spyOn(ky, "get")
       .mockImplementation(
-        (
-          _url: Input,
-          _options: Options | undefined,
-        ): ResponsePromise => {
+        (_url: Input, _options: Options | undefined): ResponsePromise => {
           expect(_url).toEqual(
             `${NODEPING_API}/checks?customerid=${secret.nodePingSubAccountId}`,
           );
@@ -251,10 +247,7 @@ describe("NodePing API test", () => {
     const spy = jest
       .spyOn(ky, "get")
       .mockImplementation(
-        (
-          _url: Input,
-          _options: Options | undefined,
-        ): ResponsePromise => {
+        (_url: Input, _options: Options | undefined): ResponsePromise => {
           expect(_url).toEqual(
             `${NODEPING_API}/contacts?customerid=${secret.nodePingSubAccountId}`,
           );
@@ -288,12 +281,12 @@ describe("NodePing API test", () => {
         (_url: Input, _options?: Options | undefined): ResponsePromise => {
           expect(_url).toEqual(`${NODEPING_API}/contacts`);
 
-          const body: NodePingContactPostPutData = _options
-            ?.json as NodePingContactPostPutData satisfies NodePingContactPostPutData;
+          const body: NodePingContactPostPutData =
+            _options?.json as NodePingContactPostPutData satisfies NodePingContactPostPutData;
 
           expect(body.name).toEqual(nodepingContactName);
           expect(body.custrole).toEqual("notify");
-          expect(body.hasOwnProperty("addresses")).toBe(false); // this is not allowed to be posted
+          expect(Object.hasOwn(body, "addresses")).toBe(false); // this is not allowed to be posted
           expect(body.newaddresses?.length).toBe(1);
 
           const address = body.newaddresses[0];
@@ -302,9 +295,9 @@ describe("NodePing API test", () => {
           );
           expect(address?.type).toEqual("webhook");
           expect(address?.action).toEqual("post");
-          // @ts-ignore
+          // @ts-expect-error
           expect(address?.headers.Authorization).toEqual(`token ${gitHubPat}`);
-          // @ts-ignore
+          // @ts-expect-error
           expect(address?.headers.Accept).toEqual(
             "application/vnd.github+json",
           );
@@ -389,32 +382,31 @@ async function testNodePingChecksDisableall(
 ): Promise<void> {
   const url = `${NODEPING_API}/checks?disableall=${JSON.stringify(disableall)}`;
 
-  const spy = jest
-    .spyOn(ky, "put")
-    .mockImplementation(
-      (async (_url: Input, _options?: Options | undefined) => {
-        expect(_url).toEqual(url);
-        if (fail) {
-          throw new Error("Put failed!");
-        }
+  const spy = jest.spyOn(ky, "put").mockImplementation((async (
+    _url: Input,
+    _options?: Options | undefined,
+  ) => {
+    expect(_url).toEqual(url);
+    if (fail) {
+      throw new Error("Put failed!");
+    }
 
-        await expectTokenAndCustomeridInData(_options?.json);
+    await expectTokenAndCustomeridInData(_options?.json);
 
-        return {
-          status: 200,
-          json: () =>
-            Promise.resolve({
-              disableall: disableall ? 3 : 0,
-              disabled: 0,
-              enabled: disableall ? 0 : 3,
-            }),
-          text: () => Promise.resolve(""),
-          blob: () => Promise.resolve(new Blob([])),
-          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-          formData: () => Promise.resolve(new FormData()),
-        };
-      }) as unknown as (_url: Input, _options?: Options) => ResponsePromise,
-    );
+    return {
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          disableall: disableall ? 3 : 0,
+          disabled: 0,
+          enabled: disableall ? 0 : 3,
+        }),
+      text: () => Promise.resolve(""),
+      blob: () => Promise.resolve(new Blob([])),
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      formData: () => Promise.resolve(new FormData()),
+    };
+  }) as unknown as (_url: Input, _options?: Options) => ResponsePromise);
   const spyDoPut = jest.spyOn(nodepingApi, "doPut");
 
   if (fail) {
@@ -449,62 +441,61 @@ async function testCreateNodepingCheck(
     return { [cid]: { delay: 0, schedule: "All" } };
   });
 
-  const spy = jest
-    .spyOn(ky, "post")
-    .mockImplementation(
-      (async (_url: Input, _options?: Options | undefined) => {
-        expect(_url).toEqual(`${NODEPING_API}/checks`);
+  const spy = jest.spyOn(ky, "post").mockImplementation((async (
+    _url: Input,
+    _options?: Options | undefined,
+  ) => {
+    expect(_url).toEqual(`${NODEPING_API}/checks`);
 
-        const postData = _options?.json as NodePingCheckPostPutData;
+    const postData = _options?.json as NodePingCheckPostPutData;
 
-        console.debug(JSON.stringify(postData));
+    console.debug(JSON.stringify(postData));
 
-        await expectTokenAndCustomeridInData(postData);
+    await expectTokenAndCustomeridInData(postData);
 
-        if (extraData?.protocol) {
-          expect(postData.type).toEqual(
-            extraData.protocol === EndpointProtocol.WebSocket
-              ? "WEBSOCKET"
-              : "HTTPADV",
-          );
-        } else {
-          expect(postData.type).toEqual("HTTPADV");
-        }
+    if (extraData?.protocol) {
+      expect(postData.type).toEqual(
+        extraData.protocol === EndpointProtocol.WebSocket
+          ? "WEBSOCKET"
+          : "HTTPADV",
+      );
+    } else {
+      expect(postData.type).toEqual("HTTPADV");
+    }
 
-        expect(postData.target).toEqual(
-          extraData?.url ? extraData?.url : `${hostPart}${endpoint}`,
-        );
-
-        if (extraData?.method) {
-          expect(postData.method).toEqual(extraData.method);
-        } else if (extraData?.protocol === EndpointProtocol.WebSocket) {
-          expect(postData.method).toBeUndefined();
-        } else {
-          expect(postData.method).toEqual(EndpointHttpMethod.HEAD);
-        }
-
-        if (extraData?.sendData) {
-          expect(postData.postdata).toEqual(extraData?.sendData);
-        }
-
-        expect(postData.label).toEqual(`${appName} ${endpoint}`);
-        expect(postData.interval).toEqual(CHECK_INTERVAL_MIN);
-        expect(postData.threshold).toEqual(CHECK_TIMEOUT_SEC);
-        expect(postData.enabled).toEqual(true);
-        expect(postData.follow).toEqual(true);
-        expect(postData.sendheaders).toEqual(NODEPING_SENT_HEADERS);
-        expect(postData.notifications).toEqual(expectedNotifications);
-
-        return {
-          status: 200,
-          json: () => Promise.resolve({}),
-          text: () => Promise.resolve(""),
-          blob: () => Promise.resolve(new Blob([])),
-          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-          formData: () => Promise.resolve(new FormData()),
-        };
-      }) as unknown as (_url: Input, _options?: Options) => ResponsePromise,
+    expect(postData.target).toEqual(
+      extraData?.url ? extraData?.url : `${hostPart}${endpoint}`,
     );
+
+    if (extraData?.method) {
+      expect(postData.method).toEqual(extraData.method);
+    } else if (extraData?.protocol === EndpointProtocol.WebSocket) {
+      expect(postData.method).toBeUndefined();
+    } else {
+      expect(postData.method).toEqual(EndpointHttpMethod.HEAD);
+    }
+
+    if (extraData?.sendData) {
+      expect(postData.postdata).toEqual(extraData?.sendData);
+    }
+
+    expect(postData.label).toEqual(`${appName} ${endpoint}`);
+    expect(postData.interval).toEqual(CHECK_INTERVAL_MIN);
+    expect(postData.threshold).toEqual(CHECK_TIMEOUT_SEC);
+    expect(postData.enabled).toEqual(true);
+    expect(postData.follow).toEqual(true);
+    expect(postData.sendheaders).toEqual(NODEPING_SENT_HEADERS);
+    expect(postData.notifications).toEqual(expectedNotifications);
+
+    return {
+      status: 200,
+      json: () => Promise.resolve({}),
+      text: () => Promise.resolve(""),
+      blob: () => Promise.resolve(new Blob([])),
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+      formData: () => Promise.resolve(new FormData()),
+    };
+  }) as unknown as (_url: Input, _options?: Options) => ResponsePromise);
 
   await nodepingApi.createNodepingCheck(
     endpoint,
@@ -516,9 +507,10 @@ async function testCreateNodepingCheck(
   expect(spy).toHaveBeenCalledTimes(1);
 }
 
-function makeApi(
-  options?: { timeout?: number; interval?: number },
-): NodePingApi {
+function makeApi(options?: {
+  timeout?: number;
+  interval?: number;
+}): NodePingApi {
   return new NodePingApi(
     secretHolder,
     1000,

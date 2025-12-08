@@ -159,7 +159,7 @@ Manually formatting can be done with the following commands.
                         Runs Biome to check and automatically fix linting and 
                         formatting issues in the specified file.
 
-    biome check [--write] <file-path>
+    biome check --files-ignore-unknown=true --no-errors-on-unmatched [--write] <file-path>
                         If you have installed BiomeJS globally you can run the 
                         above command without npx.
 

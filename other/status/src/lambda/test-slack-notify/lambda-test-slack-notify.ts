@@ -1,6 +1,6 @@
-import type { UpdateStatusSecret } from "../../secret.js";
-import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { SlackApi } from "@digitraffic/common/dist/utils/slack";
+import type { UpdateStatusSecret } from "../../secret.js";
 
 const secretHolder = SecretHolder.create<UpdateStatusSecret>();
 

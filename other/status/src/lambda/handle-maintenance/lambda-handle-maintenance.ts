@@ -1,11 +1,11 @@
-import { handleMaintenance } from "../../service/maintenance-service.js";
-import type { UpdateStatusSecret } from "../../secret.js";
-import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
-import { NodePingApi } from "../../api/nodeping-api.js";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
+import { NodePingApi } from "../../api/nodeping-api.js";
 import { StatusEnvKeys } from "../../keys.js";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { UpdateStatusSecret } from "../../secret.js";
+import { handleMaintenance } from "../../service/maintenance-service.js";
 
 // Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
 const DEFAULT_TIMEOUT_MS = 25000 as const;
@@ -36,20 +36,24 @@ export const handler = async (): Promise<void> => {
   slackNotifyApi = slackNotifyApi
     ? slackNotifyApi
     : new SlackApi(secret.reportUrl);
-  cStateApi = cStateApi ? cStateApi : new CStateStatuspageApi(
-    C_STATE_PAGE_URL,
-    GITHUB_OWNER,
-    GITHUB_REPO,
-    GITHUB_BRANCH,
-    GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE,
-    secretHolder,
-  );
-  nodePingApi = nodePingApi ? nodePingApi : new NodePingApi(
-    secretHolder,
-    DEFAULT_TIMEOUT_MS,
-    checkTimeout,
-    checkInterval,
-  );
+  cStateApi = cStateApi
+    ? cStateApi
+    : new CStateStatuspageApi(
+        C_STATE_PAGE_URL,
+        GITHUB_OWNER,
+        GITHUB_REPO,
+        GITHUB_BRANCH,
+        GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE,
+        secretHolder,
+      );
+  nodePingApi = nodePingApi
+    ? nodePingApi
+    : new NodePingApi(
+        secretHolder,
+        DEFAULT_TIMEOUT_MS,
+        checkTimeout,
+        checkInterval,
+      );
 
   await handleMaintenance(nodePingApi, cStateApi, slackNotifyApi);
 };

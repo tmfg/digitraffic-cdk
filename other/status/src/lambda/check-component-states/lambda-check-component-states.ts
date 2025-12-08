@@ -1,15 +1,13 @@
-import type { UpdateStatusSecret } from "../../secret.js";
-import * as StatusService from "../../service/status-service.js";
-import { NodePingApi } from "../../api/nodeping-api.js";
-import { SlackApi } from "@digitraffic/common/dist/utils/slack";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { StatusEnvKeys } from "../../keys.js";
+import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
-import {
-  logger,
-  type LoggerMethodType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { NodePingApi } from "../../api/nodeping-api.js";
+import { StatusEnvKeys } from "../../keys.js";
+import type { UpdateStatusSecret } from "../../secret.js";
+import * as StatusService from "../../service/status-service.js";
 
 const secretHolder = SecretHolder.create<UpdateStatusSecret>();
 // Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
@@ -38,8 +36,8 @@ export const handler = async (): Promise<void> => {
   const secret = await secretHolder.get();
   init(secret);
 
-  const componentStatuses = await StatusService
-    .getNodePingAndStatuspageComponentNotInSyncStatuses(
+  const componentStatuses =
+    await StatusService.getNodePingAndStatuspageComponentNotInSyncStatuses(
       nodePingApi,
       cStateApi,
     );
@@ -47,9 +45,9 @@ export const handler = async (): Promise<void> => {
   if (componentStatuses.length) {
     logger.info({
       method,
-      message: `Nodeping and statuspage not in sync. Diff: ${
-        JSON.stringify(componentStatuses)
-      }`,
+      message: `Nodeping and statuspage not in sync. Diff: ${JSON.stringify(
+        componentStatuses,
+      )}`,
     });
     const statesText = componentStatuses.join("\n");
     await slackApi.notify(statesText);

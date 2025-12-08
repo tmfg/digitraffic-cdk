@@ -1,23 +1,21 @@
-import {
-  logger,
-  type LoggerMethodType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import _ from "lodash";
+import type {
+  CStateStatuspageApi,
+  CStateSystem,
+} from "../api/cstate-statuspage-api.js";
 import type { DigitrafficApi } from "../api/digitraffic-api.js";
 import type {
   NodePingApi,
   NodePingCheck,
   NodePingContact,
 } from "../api/nodeping-api.js";
-import { type MonitoredApp, type MonitoredEndpoint } from "../app-props.js";
+import type { MonitoredApp, MonitoredEndpoint } from "../app-props.js";
 import type { AppWithEndpoints } from "../model/app-with-endpoints.js";
 import type { UpdateStatusSecret } from "../secret.js";
-import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type {
-  CStateStatuspageApi,
-  CStateSystem,
-} from "../api/cstate-statuspage-api.js";
 import { removeAppAndTrim, removeTrailingSlash } from "./utils.js";
-import _ from "lodash";
 
 const SERVICE = "StatusService" as const;
 const BETA = "beta" as const;
@@ -31,26 +29,20 @@ export async function getNodePingAndStatuspageComponentNotInSyncStatuses(
   const cStateMaintenanceOn = await cStateStatuspageApi.isActiveMaintenances();
 
   const nodePingCheckMap: Record<string, NodePingCheck> = {};
-  nodePingChecks.forEach(
-    (
-      npc,
-    ) => (nodePingCheckMap[
-      convertToCstateNameWithoutApp(npc.label).toLowerCase()
-    ] = npc),
-  );
+  for (const npc of nodePingChecks) {
+    nodePingCheckMap[convertToCstateNameWithoutApp(npc.label).toLowerCase()] =
+      npc;
+  }
 
   const cStateSystemsMap: Record<string, CStateSystem> = {};
-  cStateStatus.systems.forEach(
-    (
-      system,
-    ) => (cStateSystemsMap[convertToCstateNameWithoutApp(system.name)] =
-      system),
-  );
+  for (const system of cStateStatus.systems) {
+    cStateSystemsMap[convertToCstateNameWithoutApp(system.name)] = system;
+  }
 
   const missingCStateSystems = nodePingChecks
     .filter((npc) => !isBeta(npc.label))
-    .filter((npc) =>
-      !(convertToCstateNameWithoutApp(npc.label) in cStateSystemsMap)
+    .filter(
+      (npc) => !(convertToCstateNameWithoutApp(npc.label) in cStateSystemsMap),
     )
     .map((npc) => `${npc.label}: cState Statuspage system missing`);
 
@@ -61,26 +53,27 @@ export async function getNodePingAndStatuspageComponentNotInSyncStatuses(
   const outOfSyncWithCStateStatusPage = cStateMaintenanceOn
     ? []
     : cStateStatus.systems
-      .map((cStateSystem) => {
-        const nodePingCheck =
-          nodePingCheckMap[convertToCstateNameWithoutApp(cStateSystem.name)];
-        if (!nodePingCheck) {
+        .map((cStateSystem) => {
+          const nodePingCheck =
+            nodePingCheckMap[convertToCstateNameWithoutApp(cStateSystem.name)];
+          if (!nodePingCheck) {
+            return null;
+          }
+          if (nodePingCheck.state === 1 && cStateSystem.status === "down") {
+            return `${cStateSystem.name}: NodePing check is UP, cState statuspage component is DOWN`;
+          } else if (
+            nodePingCheck.state === 0 &&
+            cStateSystem.status !== "down"
+          ) {
+            return `${cStateSystem.name}: NodePing check is DOWN, cState statuspage component is UP`;
+          }
           return null;
-        }
-        if (nodePingCheck.state === 1 && cStateSystem.status === "down") {
-          return `${cStateSystem.name}: NodePing check is UP, cState statuspage component is DOWN`;
-        } else if (
-          nodePingCheck.state === 0 && cStateSystem.status !== "down"
-        ) {
-          return `${cStateSystem.name}: NodePing check is DOWN, cState statuspage component is UP`;
-        }
-        return null;
-      })
-      .filter((s): s is string => !!s);
+        })
+        .filter((s): s is string => !!s);
 
-  return missingCStateSystems.concat(missingNodePingChecksVsCState).concat(
-    outOfSyncWithCStateStatusPage,
-  );
+  return missingCStateSystems
+    .concat(missingNodePingChecksVsCState)
+    .concat(outOfSyncWithCStateStatusPage);
 }
 
 /**
@@ -104,9 +97,9 @@ function fillSpacesAndTrim(label: string): string {
   const trimmed = label.trim();
   if (trimmed.includes("-") && trimmed.includes(" ")) {
     // infra-api swagger -> infra-api/swagger
-    return trimmed.replace(new RegExp(" ", "g"), "/");
+    return trimmed.replace(/ /g, "/");
   }
-  return trimmed.replace(new RegExp(" ", "g"), "-");
+  return trimmed.replace(/ /g, "-");
 }
 
 async function updateNodePingChecksForApp(
@@ -134,8 +127,7 @@ async function updateNodePingChecksForApp(
   const contactNames: string[] = contacts.map((c) => c.name);
 
   // GitGub cState actions contact
-  const nodePingContactNameForGitHubActions =
-    `GitHub Actions for status ${gitHubBranch}`;
+  const nodePingContactNameForGitHubActions = `GitHub Actions for status ${gitHubBranch}`;
   if (!contactNames.includes(nodePingContactNameForGitHubActions)) {
     await nodePingApi.createNodepingContactForCState(
       gitHubOwner,
@@ -191,7 +183,7 @@ async function updateNodePingChecksForApp(
   });
   await updateChecks(
     checks.filter((c) =>
-      c.label.toLowerCase().includes(appWithEndpoints.app.toLowerCase())
+      c.label.toLowerCase().includes(appWithEndpoints.app.toLowerCase()),
     ),
     internalContactIds,
     githubActionsContactId,

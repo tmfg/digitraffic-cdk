@@ -1,19 +1,17 @@
-import { emptySecretHolder, getActiveMaintenance } from "../testutils.js";
-import {
-  NodePingApi,
-  type NodePingCheck,
-  type NodePingNotification,
-} from "../../api/nodeping-api.js";
-import * as maintenanceService from "../../service/maintenance-service.js";
-import {
-  type ActiveMaintenance,
-  CStateStatuspageApi,
-} from "../../api/cstate-statuspage-api.js";
-import { SlackApi } from "@digitraffic/common/dist/utils/slack";
-import _ from "lodash";
 import { randomString } from "@digitraffic/common/dist/test/testutils";
-import { EndpointHttpMethod } from "../../app-props.js";
+import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import { jest } from "@jest/globals";
+import _ from "lodash";
+import type { ActiveMaintenance } from "../../api/cstate-statuspage-api.js";
+import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
+import type {
+  NodePingCheck,
+  NodePingNotification,
+} from "../../api/nodeping-api.js";
+import { NodePingApi } from "../../api/nodeping-api.js";
+import { EndpointHttpMethod } from "../../app-props.js";
+import * as maintenanceService from "../../service/maintenance-service.js";
+import { emptySecretHolder, getActiveMaintenance } from "../testutils.js";
 
 type MaintenanceChecksTo = "enabled" | "disabled" | "none";
 
@@ -68,7 +66,8 @@ describe("MaintenanceServiceTest", () => {
     const stubEnableNodePingChecks = jest
       .spyOn(nodePingApi, "enableNodePingChecks")
       .mockReturnValue(Promise.resolve());
-    const stubSlackNotifyApi = jest.spyOn(slackNotifyApi, "notify")
+    const stubSlackNotifyApi = jest
+      .spyOn(slackNotifyApi, "notify")
       .mockReturnValue(Promise.resolve());
 
     await maintenanceService.handleMaintenance(
@@ -97,8 +96,9 @@ describe("MaintenanceServiceTest", () => {
     if (expectMaintenanceChecksTo === "enabled") {
       expect(stubEnableNodePingChecks).toHaveBeenCalledTimes(1);
       expect(stubDisableNodePingChecks).not.toHaveBeenCalled();
-      expect(stubCStateApiTriggerUpdateMaintenanceGithubAction)
-        .toHaveBeenCalledTimes(0);
+      expect(
+        stubCStateApiTriggerUpdateMaintenanceGithubAction,
+      ).toHaveBeenCalledTimes(0);
       expect(stubSlackNotifyApi).toHaveBeenCalledTimes(1);
       expect(stubSlackNotifyApi).toHaveBeenCalledWith(
         expect.stringContaining("Maintenance has ended!"),
@@ -122,12 +122,12 @@ describe("MaintenanceServiceTest", () => {
     } else if (expectMaintenanceChecksTo === "disabled") {
       expect(stubEnableNodePingChecks).not.toHaveBeenCalled();
       expect(stubDisableNodePingChecks).toHaveBeenCalledTimes(1);
-      expect(stubCStateApiTriggerUpdateMaintenanceGithubAction)
-        .toHaveBeenCalledTimes(1);
-      expect(stubCStateApiTriggerUpdateMaintenanceGithubAction)
-        .toHaveBeenCalledWith(
-          cStateApiActiveMaintenance,
-        );
+      expect(
+        stubCStateApiTriggerUpdateMaintenanceGithubAction,
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        stubCStateApiTriggerUpdateMaintenanceGithubAction,
+      ).toHaveBeenCalledWith(cStateApiActiveMaintenance);
       expect(stubSlackNotifyApi).toHaveBeenCalledTimes(1);
       expect(stubSlackNotifyApi).toHaveBeenCalledWith(
         expect.stringContaining("disabled"),

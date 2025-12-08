@@ -3,9 +3,12 @@ import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
-import { Duration, type Stack } from "aws-cdk-lib";
-import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
-import { type ISecret, Secret } from "aws-cdk-lib/aws-secretsmanager";
+import type { Stack } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
+import type { FunctionProps } from "aws-cdk-lib/aws-lambda";
+import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import type { ITopic } from "aws-cdk-lib/aws-sns";
 import type { Props } from "./app-props.js";
 import { StatusEnvKeys } from "./keys.js";
@@ -60,15 +63,15 @@ function createCommonEnv(props: Props): LambdaEnvironment {
   return {
     [StatusEnvKeys.SECRET_ID]: props.secretId,
     [StatusEnvKeys.C_STATE_PAGE_URL]: props.cStatePageUrl,
-    [StatusEnvKeys.CHECK_TIMEOUT_SECONDS]: props.nodePingTimeoutSeconds
-      .toString(),
+    [StatusEnvKeys.CHECK_TIMEOUT_SECONDS]:
+      props.nodePingTimeoutSeconds.toString(),
     [StatusEnvKeys.INTERVAL_MINUTES]: props.nodePingCheckInterval.toString(),
     [StatusEnvKeys.GITHUB_OWNER]: props.gitHubOwner.toString(),
     [StatusEnvKeys.GITHUB_REPO]: props.gitHubRepo.toString(),
     [StatusEnvKeys.GITHUB_BRANCH]: props.gitHubBranch.toString(),
     [StatusEnvKeys.GITHUB_WORKFLOW_FILE]: props.gitHubWorkflowFile.toString(),
-    [StatusEnvKeys.GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE]: props
-      .gitHubUpdateMaintenanceWorkflowFile.toString(),
+    [StatusEnvKeys.GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE]:
+      props.gitHubUpdateMaintenanceWorkflowFile.toString(),
   };
 }
 
@@ -94,6 +97,8 @@ function createUpdateStatusesLambda(
     environment,
     logGroup: logGroup,
     reservedConcurrentExecutions: 1,
+    description:
+      "Updates NodePing checks to correspond OpenAPI Specifications and monitored-apps config",
   };
 
   const lambda = new MonitoredFunction(
@@ -134,6 +139,8 @@ function createHandleMaintenanceLambda(
     environment,
     logGroup: logGroup,
     reservedConcurrentExecutions: 1,
+    description:
+      "Checks StatusPage maintenances and disables NodePing checks if maintenance is active or re-enables checks if maintenance is over",
   };
 
   const lambda = new MonitoredFunction(
@@ -172,6 +179,8 @@ function createCheckComponentStatesLambda(
     environment,
     logGroup: logGroup,
     reservedConcurrentExecutions: 1,
+    description:
+      "Checks current status of StatusPage and NodePing and sends report of differences to Slack",
   };
 
   const lambda = new MonitoredFunction(
@@ -213,6 +222,7 @@ function createTestSlackNotifyLambda(
     environment,
     logGroup: logGroup,
     reservedConcurrentExecutions: 1,
+    description: "Sends test message to Slack",
   };
 
   const lambda = new MonitoredFunction(

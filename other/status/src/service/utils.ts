@@ -5,13 +5,7 @@ import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
  * @param text to remove app name
  */
 export function removeAppAndTrim(text: string): string {
-  for (const appName of [
-    TrafficType.ROAD,
-    TrafficType.MARINE,
-    TrafficType.RAIL,
-    TrafficType.PARKING,
-    TrafficType.CATALOG,
-  ]) {
+  for (const appName of Object.values(TrafficType)) {
     const app = appName.toLowerCase();
     if (
       text.startsWith(`${app}`) ||

@@ -1,3 +1,5 @@
+import type { TrafficType } from "@digitraffic/common/dist/types/traffictype";
+
 export enum EndpointProtocol {
   HTTP,
   WebSocket,
@@ -21,7 +23,7 @@ export interface MonitoredEndpoint {
 }
 
 export interface MonitoredApp {
-  readonly name: string; // e.g. Road
+  readonly name: TrafficType; // e.g. Road
   readonly hostPart: string; // e.g. https://tie.digitraffic.fi
   readonly url: string; // e.g. https://tie.digitraffic.fi/swagger/
   readonly endpoints: MonitoredEndpoint[]; // e.g. [{ name: "Road MQTT", url: "wss://tie.digitraffic.fi/mqtt", protocol: EndpointProtocol.WebSocket }]

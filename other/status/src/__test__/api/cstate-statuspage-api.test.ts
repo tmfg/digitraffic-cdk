@@ -1,22 +1,22 @@
-import {
-  type ActiveMaintenance,
-  CStateStatuspageApi,
-  type GithubActionPostData,
-} from "../../api/cstate-statuspage-api.js";
+import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { expect, jest } from "@jest/globals";
 import { add, sub } from "date-fns";
+import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import type {
+  ActiveMaintenance,
+  GithubActionPostData,
+} from "../../api/cstate-statuspage-api.js";
+import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
+import { StatusEnvKeys } from "../../keys.js";
+import type { UpdateStatusSecret } from "../../secret.js";
 import {
   getActiveMaintenance,
   getCstateIndexJson,
   mockSecretHolder,
   setTestEnv,
 } from "../testutils.js";
-import { expect, jest } from "@jest/globals";
-import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type { UpdateStatusSecret } from "../../secret.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { StatusEnvKeys } from "../../keys.js";
-import ky, { type Input, type Options, type ResponsePromise } from "ky";
 
 let secretHolder: SecretHolder<UpdateStatusSecret>;
 
@@ -38,10 +38,15 @@ describe("CStateApiTest", () => {
   });
 
   test("getStatus - active maintenance, not with NodePing disable", async (): Promise<void> => {
-    await expectMaintenance([{
-      disableNodeping: false,
-      start: getDateInPast(),
-    }], false);
+    await expectMaintenance(
+      [
+        {
+          disableNodeping: false,
+          start: getDateInPast(),
+        },
+      ],
+      false,
+    );
   });
 
   test("getStatus - active maintenance, with NodePing disable", async (): Promise<void> => {
@@ -52,24 +57,39 @@ describe("CStateApiTest", () => {
   });
 
   test("getStatus - future maintenance, not with NodePing disable", async (): Promise<void> => {
-    await expectMaintenance([{
-      disableNodeping: false,
-      start: getDateInFuture(),
-    }], false);
+    await expectMaintenance(
+      [
+        {
+          disableNodeping: false,
+          start: getDateInFuture(),
+        },
+      ],
+      false,
+    );
   });
 
   test("getStatus - future maintenance, with NodePing disable", async (): Promise<void> => {
-    await expectMaintenance([{
-      disableNodeping: true,
-      start: getDateInFuture(),
-    }], false);
+    await expectMaintenance(
+      [
+        {
+          disableNodeping: true,
+          start: getDateInFuture(),
+        },
+      ],
+      false,
+    );
   });
 
   test("getStatus - future maintenance in 1 minute, with NodePing disable should activate", async (): Promise<void> => {
-    await expectMaintenance([{
-      disableNodeping: true,
-      start: getDateInFuture(30),
-    }], true);
+    await expectMaintenance(
+      [
+        {
+          disableNodeping: true,
+          start: getDateInFuture(30),
+        },
+      ],
+      true,
+    );
   });
 
   test("findActiveMaintenance - no maintenances", async (): Promise<void> => {
@@ -77,38 +97,63 @@ describe("CStateApiTest", () => {
   });
 
   test("findActiveMaintenance - active maintenance, not with NodePing disable", async (): Promise<void> => {
-    await expectFindActiveMaintenance([{
-      disableNodeping: false,
-      start: getDateInPast(),
-    }], false);
+    await expectFindActiveMaintenance(
+      [
+        {
+          disableNodeping: false,
+          start: getDateInPast(),
+        },
+      ],
+      false,
+    );
   });
 
   test("findActiveMaintenance - active maintenance, with NodePing disable", async (): Promise<void> => {
-    await expectFindActiveMaintenance([{
-      disableNodeping: true,
-      start: getDateInPast(),
-    }], true);
+    await expectFindActiveMaintenance(
+      [
+        {
+          disableNodeping: true,
+          start: getDateInPast(),
+        },
+      ],
+      true,
+    );
   });
 
   test("findActiveMaintenance - future maintenance, not with NodePing disable", async (): Promise<void> => {
-    await expectFindActiveMaintenance([{
-      disableNodeping: false,
-      start: getDateInFuture(),
-    }], false);
+    await expectFindActiveMaintenance(
+      [
+        {
+          disableNodeping: false,
+          start: getDateInFuture(),
+        },
+      ],
+      false,
+    );
   });
 
   test("findActiveMaintenance - future maintenance, with NodePing disable", async (): Promise<void> => {
-    await expectFindActiveMaintenance([{
-      disableNodeping: true,
-      start: getDateInFuture(),
-    }], false);
+    await expectFindActiveMaintenance(
+      [
+        {
+          disableNodeping: true,
+          start: getDateInFuture(),
+        },
+      ],
+      false,
+    );
   });
 
   test("findActiveMaintenance - future maintenance in 1 minute, with NodePing disable should activate", async () => {
-    await expectFindActiveMaintenance([{
-      disableNodeping: true,
-      start: getDateInFuture(30),
-    }], true);
+    await expectFindActiveMaintenance(
+      [
+        {
+          disableNodeping: true,
+          start: getDateInFuture(30),
+        },
+      ],
+      true,
+    );
   });
 
   test("triggerUpdateMaintenanceGithubAction", async (): Promise<void> => {
@@ -127,10 +172,7 @@ describe("CStateApiTest", () => {
     const spy = jest
       .spyOn(ky, "get")
       .mockImplementation(
-        (
-          _url: Input,
-          _options: Options | undefined,
-        ): ResponsePromise => {
+        (_url: Input, _options: Options | undefined): ResponsePromise => {
           expect(_url).toEqual(
             `${getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL)}/index.json`,
           );
@@ -153,10 +195,7 @@ describe("CStateApiTest", () => {
     const spy = jest
       .spyOn(ky, "get")
       .mockImplementation(
-        (
-          _url: Input,
-          _options: Options | undefined,
-        ): ResponsePromise => {
+        (_url: Input, _options: Options | undefined): ResponsePromise => {
           expect(_url).toEqual(
             `${getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL)}/index.json`,
           );
@@ -168,12 +207,10 @@ describe("CStateApiTest", () => {
       );
     const result = await cStateApi.findActiveMaintenance();
     if (expectMaintenance) {
-      expect(result).toStrictEqual(
-        {
-          issue: indexJson.pinnedIssues[0]!,
-          baseURL: indexJson.baseURL,
-        } satisfies ActiveMaintenance,
-      );
+      expect(result).toStrictEqual({
+        issue: indexJson.pinnedIssues[0]!,
+        baseURL: indexJson.baseURL,
+      } satisfies ActiveMaintenance);
     } else {
       expect(result).toBeUndefined();
     }
@@ -183,11 +220,11 @@ describe("CStateApiTest", () => {
   async function expectTriggerUpdateMaintenanceGithubAction(
     maintenance: ActiveMaintenance,
   ): Promise<void> {
-    const url = `https://api.github.com/repos/${
-      getEnvVariable(StatusEnvKeys.GITHUB_OWNER)
-    }/${getEnvVariable(StatusEnvKeys.GITHUB_REPO)}/actions/workflows/${
-      getEnvVariable(StatusEnvKeys.GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE)
-    }/dispatches` as const;
+    const url = `https://api.github.com/repos/${getEnvVariable(
+      StatusEnvKeys.GITHUB_OWNER,
+    )}/${getEnvVariable(StatusEnvKeys.GITHUB_REPO)}/actions/workflows/${getEnvVariable(
+      StatusEnvKeys.GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE,
+    )}/dispatches` as const;
     const gitHubPat = (await secretHolder.get()).gitHubPat;
     const spy = jest
       .spyOn(ky, "post")
@@ -197,8 +234,8 @@ describe("CStateApiTest", () => {
           if (!_options) {
             throw new Error("_options have to be defined");
           }
-          const data = _options
-            .json as GithubActionPostData satisfies GithubActionPostData;
+          const data =
+            _options.json as GithubActionPostData satisfies GithubActionPostData;
           const headers = _options.headers as Record<string, string>;
           expect(data.ref).toEqual(
             `refs/heads/${getEnvVariable(StatusEnvKeys.GITHUB_BRANCH)}`,
@@ -207,18 +244,19 @@ describe("CStateApiTest", () => {
             getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL),
           );
           expect(data.inputs.permalink).toMatch(
-            `${
-              getEnvVariable(StatusEnvKeys.C_STATE_PAGE_URL)
-            }/issues/digitraffic-maintenance/`,
+            `${getEnvVariable(
+              StatusEnvKeys.C_STATE_PAGE_URL,
+            )}/issues/digitraffic-maintenance/`,
           );
 
-          // eslint-disable-next-line dot-notation
-          expect(headers["Accept"]).toEqual("application/vnd.github+json");
+          // @ts-expect-error: use element access
+          expect(headers.Accept).toEqual("application/vnd.github+json");
           expect(headers["Content-Type"]).toEqual(
             "application/vnd.github+json",
           );
-          // eslint-disable-next-line dot-notation
-          expect(headers["Authorization"]).toEqual(`token ${gitHubPat}`);
+
+          // @ts-expect-error: use element access
+          expect(headers.Authorization).toEqual(`token ${gitHubPat}`);
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({ Status: 204 }),

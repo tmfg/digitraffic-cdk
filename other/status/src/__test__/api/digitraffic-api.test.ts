@@ -1,13 +1,11 @@
-import {
-  EndpointHttpMethod,
-  EndpointProtocol,
-  type MonitoredApp,
-  type MonitoredEndpoint,
-} from "../../app-props.js";
-import { DigitrafficApi, type PathItem } from "../../api/digitraffic-api.js";
-import type { AppWithEndpoints } from "../../model/app-with-endpoints.js";
+import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { jest } from "@jest/globals";
 import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import type { PathItem } from "../../api/digitraffic-api.js";
+import { DigitrafficApi } from "../../api/digitraffic-api.js";
+import type { MonitoredApp, MonitoredEndpoint } from "../../app-props.js";
+import { EndpointHttpMethod, EndpointProtocol } from "../../app-props.js";
+import type { AppWithEndpoints } from "../../model/app-with-endpoints.js";
 
 const SERVER_PORT = 8090;
 const digitrafficApi = new DigitrafficApi();
@@ -44,9 +42,12 @@ describe("DigitrafficApiTest", () => {
   });
 
   test("getAppEndpoints - with extra", async () => {
-    await getAppEndpointsAndExpect([API_1], convertToPathRecords([API_1]), [], [
-      API_2,
-    ]);
+    await getAppEndpointsAndExpect(
+      [API_1],
+      convertToPathRecords([API_1]),
+      [],
+      [API_2],
+    );
   });
 
   test("getAppEndpoints - with required parameters", async () => {
@@ -54,63 +55,70 @@ describe("DigitrafficApiTest", () => {
     // Api 1 has required param so that will be filtered out
     paths[API_1] = {
       get: {
-        parameters: [{
-          name: "param1",
-          required: true,
-          in: "query",
-          schema: {
-            //default: []
+        parameters: [
+          {
+            name: "param1",
+            required: true,
+            in: "query",
+            schema: {
+              //default: []
+            },
           },
-        }],
+        ],
       },
     };
     // Api 2 has array default values for required parameters, so it should be tested with query string
     paths[API_2] = {
       get: {
-        parameters: [{
-          name: "api2param1",
-          required: true,
-          in: "query",
-          schema: {
-            default: ["value1", "value2"],
+        parameters: [
+          {
+            name: "api2param1",
+            required: true,
+            in: "query",
+            schema: {
+              default: ["value1", "value2"],
+            },
           },
-        }],
+        ],
       },
     };
 
     // Api 3 has optional parameters, so it should be tested
     paths[API_3] = {
       get: {
-        parameters: [{
-          name: "api3param1",
-          required: false,
-          in: "query",
-          schema: {},
-        }],
+        parameters: [
+          {
+            name: "api3param1",
+            required: false,
+            in: "query",
+            schema: {},
+          },
+        ],
       },
     };
 
     // Api 4 has default value for required parameter, so it should be tested with query string
     paths[API_4] = {
       get: {
-        parameters: [{
-          name: "api4param1",
-          required: true,
-          in: "query",
-          schema: {
-            default: "value1",
+        parameters: [
+          {
+            name: "api4param1",
+            required: true,
+            in: "query",
+            schema: {
+              default: "value1",
+            },
           },
-        }],
+        ],
       },
     };
 
     const expectApi2WithParams = `${API_2}?api2param1=value1&api2param1=value2`;
     const expectApi4WithParams = `${API_4}?api4param1=value1`;
-    await getAppEndpointsAndExpect([
-      expectApi2WithParams,
-      API_3,
-      expectApi4WithParams,
-    ], paths);
+    await getAppEndpointsAndExpect(
+      [expectApi2WithParams, API_3, expectApi4WithParams],
+      paths,
+    );
   });
 
   async function getAppEndpointsAndExpect(
@@ -131,7 +139,7 @@ describe("DigitrafficApiTest", () => {
     );
 
     const monitoredApp = {
-      name: "Road",
+      name: TrafficType.ROAD,
       hostPart: "https://road",
       url: `http://localhost:${SERVER_PORT}/swagger/openapi.json`,
       excluded,
@@ -141,10 +149,7 @@ describe("DigitrafficApiTest", () => {
     const spy = jest
       .spyOn(ky, "get")
       .mockImplementation(
-        (
-          _url: Input,
-          _options: Options | undefined,
-        ): ResponsePromise => {
+        (_url: Input, _options: Options | undefined): ResponsePromise => {
           expect(_url).toEqual(monitoredApp.url);
           return Promise.resolve({
             status: 200,
@@ -153,14 +158,14 @@ describe("DigitrafficApiTest", () => {
         },
       );
 
-    const appWithEndpoints: AppWithEndpoints = await digitrafficApi
-      .getAppWithEndpoints(monitoredApp);
+    const appWithEndpoints: AppWithEndpoints =
+      await digitrafficApi.getAppWithEndpoints(monitoredApp);
 
     expectBothContainsAll(expectedApis, appWithEndpoints.endpoints);
 
     if (extraEndpoints.length) {
-      const actualExtraEndpoints = appWithEndpoints.extraEndpoints.map((ep) =>
-        ep.url
+      const actualExtraEndpoints = appWithEndpoints.extraEndpoints.map(
+        (ep) => ep.url,
       );
       expectBothContainsAll(extraEndpoints, actualExtraEndpoints);
     }
@@ -173,11 +178,9 @@ describe("DigitrafficApiTest", () => {
     console.debug(`apis: ${JSON.stringify(apis)}`);
 
     for (const api of Object.keys(apis)) {
-      // @ts-ignore
+      // @ts-expect-error
       const pathItem: PathItem = apis[api] satisfies PathItem;
-      console.debug(
-        `pathItem: ${JSON.stringify(pathItem)}`,
-      );
+      console.debug(`pathItem: ${JSON.stringify(pathItem)}`);
       paths[api] = {
         get: {
           ...pathItem.get,

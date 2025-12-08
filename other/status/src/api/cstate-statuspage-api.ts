@@ -1,10 +1,9 @@
-import {
-  logger,
-  type LoggerMethodType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { add, isBefore, parseJSON } from "date-fns";
 import ky, { HTTPError } from "ky";
-import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { UpdateStatusSecret } from "../secret.js";
 
 const STATUS_JSON_PATH = "/index.json" as const;
@@ -15,7 +14,7 @@ const SERVICE = "CStateStatuspageApi" as const;
 export interface CStateSystem extends Record<string, unknown> {
   readonly name: string; // "marine/api/ais/v1/locations",
   readonly description: string; // "Find latest vessel locations by mmsi and optional timestamp interval in milliseconds from Unix epoch.",
-  readonly category: "Road" | "Marine" | "Rail";
+  readonly category: TrafficType;
   readonly status: "ok" | "notice" | "disrupted" | "down";
 }
 
@@ -96,7 +95,7 @@ export class CStateStatuspageApi {
           method,
           message: "Getting cState status done",
           tookMs: Date.now() - start,
-        })
+        }),
       );
   }
 
@@ -117,10 +116,10 @@ export class CStateStatuspageApi {
       const starts = parseJSON(issue.createdAt);
       logger.debug({
         method,
-        message:
-          `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${
-            isBefore(starts, now)
-          } issue: ${issue.permalink}`,
+        message: `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${isBefore(
+          starts,
+          now,
+        )} issue: ${issue.permalink}`,
       });
       if (
         issue.permalink.includes(MAINTENANCE_ISSUE_PATH) &&
@@ -128,8 +127,7 @@ export class CStateStatuspageApi {
       ) {
         logger.info({
           method,
-          message:
-            `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`,
+          message: `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`,
         });
         return true;
       }
@@ -168,10 +166,10 @@ export class CStateStatuspageApi {
       const starts = parseJSON(issue.createdAt);
       logger.debug({
         method,
-        message:
-          `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${
-            isBefore(starts, now)
-          } issue: ${issue.permalink}`,
+        message: `Starts ${starts.toISOString()}, now+1min ${now.toISOString()}, active: ${isBefore(
+          starts,
+          now,
+        )} issue: ${issue.permalink}`,
       });
       if (
         issue.permalink.includes(MAINTENANCE_ISSUE_PATH) &&
@@ -179,8 +177,7 @@ export class CStateStatuspageApi {
       ) {
         logger.info({
           method,
-          message:
-            `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`,
+          message: `Active maintenance found: ${issue.title} ${issue.permalink} starts ${starts.toISOString()}, now ${starts.toISOString()}`,
         });
         return issue;
       }
@@ -245,8 +242,7 @@ export class CStateStatuspageApi {
       let errorMessage = JSON.stringify(error);
       if (error instanceof HTTPError) {
         const serverMessage = await error.response.text();
-        errorMessage =
-          `${error.response.status} ${error.response.statusText} ${serverMessage}`;
+        errorMessage = `${error.response.status} ${error.response.statusText} ${serverMessage}`;
       } else {
         errorMessage = `${errorMessage} Not HTTPError.`;
       }

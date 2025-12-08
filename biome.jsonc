@@ -2,6 +2,7 @@
   "$schema": "common/autoinstallers/rush-command-line-tools/node_modules/@biomejs/biome/configuration_schema.json",
   //"$schema": "https://biomejs.dev/schemas/2.0.0-beta/schema.json",
   "files": {
+    "ignoreUnknown": true,
     "includes": [
       // In a folder with a biome.jsonc that extends this one, that path seen is one
       // starting from that folder. Therefore, these need ot be fairly generic.
@@ -18,10 +19,12 @@
       "!**/build",
       "!**/output",
       "!**/temp",
-      // Don't touch anything under digitraffic-common
+      "!**/lib",
+      // Include root lib folder explicitly
+      "lib/**",
+      // Still exclude digitraffic-common subtree project
       "!lib/digitraffic-common"
-    ],
-    "ignoreUnknown": true
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -71,7 +74,8 @@
         "rush.json",
         "common/config/rush/*.json",
         "**/rig.json",
-        "**/config/*.json"
+        "**/config/*.json",
+        "**/tsconfig-esm.json"
       ],
       "json": {
         "parser": {

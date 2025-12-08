@@ -1,33 +1,30 @@
-import * as StatusService from "../../service/status-service.js";
+import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { randomString } from "@digitraffic/common/dist/test/testutils";
+import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
+import { jest } from "@jest/globals";
+import _ from "lodash";
+import type {
+  CStateStatus,
+  CStateSystem,
+  PinnedIssue,
+} from "../../api/cstate-statuspage-api.js";
+import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
+import { DigitrafficApi } from "../../api/digitraffic-api.js";
+import type { NodePingCheck, NodePingContact } from "../../api/nodeping-api.js";
 import {
   NODEPING_DIGITRAFFIC_USER,
   NodePingApi,
-  type NodePingCheck,
-  type NodePingContact,
 } from "../../api/nodeping-api.js";
-import { randomString } from "@digitraffic/common/dist/test/testutils";
-import {
-  EndpointHttpMethod,
-  type MonitoredApp,
-  type MonitoredEndpoint,
-} from "../../app-props.js";
+import type { MonitoredApp, MonitoredEndpoint } from "../../app-props.js";
+import { EndpointHttpMethod } from "../../app-props.js";
+import type { AppWithEndpoints } from "../../model/app-with-endpoints.js";
+import type { UpdateStatusSecret } from "../../secret.js";
+import * as StatusService from "../../service/status-service.js";
 import {
   emptySecretHolder,
   mockSecretHolder,
   setTestEnv,
 } from "../testutils.js";
-import {
-  type CStateStatus,
-  CStateStatuspageApi,
-  type CStateSystem,
-  type PinnedIssue,
-} from "../../api/cstate-statuspage-api.js";
-import type { AppWithEndpoints } from "../../model/app-with-endpoints.js";
-import { DigitrafficApi } from "../../api/digitraffic-api.js";
-import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type { UpdateStatusSecret } from "../../secret.js";
-import _ from "lodash";
-import { jest } from "@jest/globals";
 
 let cStateApi: CStateStatuspageApi;
 let nodePingApi: NodePingApi;
@@ -45,7 +42,7 @@ const emptyCStateStatus: CStateStatus = {
 const defaultCStateSystem = {
   name: defaultCStateApiLabel,
   status: "ok",
-  category: "Road",
+  category: TrafficType.ROAD,
   description: "",
 } as const satisfies CStateSystem;
 
@@ -74,15 +71,15 @@ describe("StatusServiceTest", () => {
     returnFromCStateStatus: CStateStatus = emptyCStateStatus,
     returnFromNodePing: NodePingCheck[] = [],
   ): Promise<void> {
-    jest.spyOn(nodePingApi, "getNodePingChecks").mockReturnValue(
-      Promise.resolve(returnFromNodePing),
-    );
-    jest.spyOn(cStateApi, "getStatus").mockReturnValue(
-      Promise.resolve(returnFromCStateStatus),
-    );
+    jest
+      .spyOn(nodePingApi, "getNodePingChecks")
+      .mockReturnValue(Promise.resolve(returnFromNodePing));
+    jest
+      .spyOn(cStateApi, "getStatus")
+      .mockReturnValue(Promise.resolve(returnFromCStateStatus));
 
-    const statuses = await StatusService
-      .getNodePingAndStatuspageComponentNotInSyncStatuses(
+    const statuses =
+      await StatusService.getNodePingAndStatuspageComponentNotInSyncStatuses(
         nodePingApi,
         cStateApi,
       );
@@ -91,9 +88,9 @@ describe("StatusServiceTest", () => {
   }
 
   test("getNodePingAndStatuspageComponentStatuses - returns nothing", async () =>
-    await testGetNodePingAndStatuspageComponentNotInSyncStatuses((
-      statuses: string[],
-    ) => expect(statuses.length).toBe(0)));
+    await testGetNodePingAndStatuspageComponentNotInSyncStatuses(
+      (statuses: string[]) => expect(statuses.length).toBe(0),
+    ));
 
   test("getNodePingAndStatuspageComponentStatuses - missing cState component", async () =>
     testGetNodePingAndStatuspageComponentNotInSyncStatuses(
@@ -252,7 +249,7 @@ describe("StatusServiceTest", () => {
     const slackContactId = _.keys(slackContact.addresses)[0]!;
     const ghContactId = _.keys(ghActionsContact.addresses)[0]!;
 
-    const check = makeNodepingCheck("Road", "http://some.url");
+    const check = makeNodepingCheck(TrafficType.ROAD, "http://some.url");
     check.notifications.push(
       { [secret.nodePingContactIdSlack1]: { delay: 0, schedule: "All" } },
       { [ghContactId]: { delay: 0, schedule: "All" } },
@@ -288,8 +285,8 @@ describe("StatusServiceTest", () => {
       "road/api/maintenance/v1/tracking/routes/latest",
     ];
 
-    const check0 = makeNodepingCheck("Road", endpoints[0]!);
-    const check1 = makeNodepingCheck("Road", endpoints[1]!);
+    const check0 = makeNodepingCheck(TrafficType.ROAD, endpoints[0]!);
+    const check1 = makeNodepingCheck(TrafficType.ROAD, endpoints[1]!);
     const checks: NodePingCheck[] = [check0, check1];
 
     const slackContact1 = makeContact(secret.nodePingContactIdSlack1);
@@ -309,7 +306,7 @@ describe("StatusServiceTest", () => {
     );
 
     const app = {
-      name: "Road",
+      name: TrafficType.ROAD,
       hostPart: "https://road",
       url: "https://road/swagger.json",
       endpoints: [] satisfies MonitoredEndpoint[],
@@ -346,7 +343,7 @@ describe("StatusServiceTest", () => {
       "/api/maintenance/v1/tracking/routes/latest",
     ];
 
-    const check0 = makeNodepingCheck("Road", endpoints[0]!, 1000);
+    const check0 = makeNodepingCheck(TrafficType.ROAD, endpoints[0]!, 1000);
     const checks: NodePingCheck[] = [check0];
 
     const slackContact1 = makeContact(secret.nodePingContactIdSlack1);
@@ -365,7 +362,7 @@ describe("StatusServiceTest", () => {
     );
 
     const app = {
-      name: "Road",
+      name: TrafficType.ROAD,
       hostPart: "https://road",
       url: "https://road/swagger.json",
       endpoints: [] satisfies MonitoredEndpoint[],
@@ -473,13 +470,13 @@ function makeContact(contactId: string): NodePingContact {
     name: contactId,
     custrole: "notify",
     addresses: {
-      [contactId]: {},
+      [contactId]: { type: "email", address: "foo@bar" },
     },
   };
 }
 
 function makeNodepingCheck(
-  category: "Road" | "Marine" | "Rail",
+  category: TrafficType,
   url: string,
   timeout: number = 10,
 ): NodePingCheck {

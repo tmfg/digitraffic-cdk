@@ -1,13 +1,14 @@
-import { Stack, type StackProps } from "aws-cdk-lib";
-import type { Construct } from "constructs";
-import type { Props } from "./app-props.js";
-import * as InternalLambdas from "./internal-lambdas.js";
-import { Topic } from "aws-cdk-lib/aws-sns";
-import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import {
   SSM_KEY_ALARM_TOPIC,
   SSM_KEY_WARNING_TOPIC,
 } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { StackProps } from "aws-cdk-lib";
+import { Stack } from "aws-cdk-lib";
+import { Topic } from "aws-cdk-lib/aws-sns";
+import { StringParameter } from "aws-cdk-lib/aws-ssm";
+import type { Construct } from "constructs";
+import type { Props } from "./app-props.js";
+import * as InternalLambdas from "./internal-lambdas.js";
 
 export class StatusStack extends Stack {
   constructor(
@@ -34,8 +35,7 @@ export class StatusStack extends Stack {
         this,
         "WarningTopicParam",
         SSM_KEY_WARNING_TOPIC,
-      )
-        .stringValue,
+      ).stringValue,
     );
 
     InternalLambdas.create(this, alarmTopic, warningTopic, appProps);

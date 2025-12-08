@@ -1,18 +1,14 @@
-import {
-  EndpointHttpMethod,
-  EndpointProtocol,
-  type MonitoredEndpoint,
-} from "../app-props.js";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import {
-  logger,
-  type LoggerMethodType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { UpdateStatusSecret } from "../secret.js";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { convertToError, type ErrorOrHTTPError } from "./api-tools.js";
-import _ from "lodash";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky from "ky";
+import _ from "lodash";
+import type { MonitoredEndpoint } from "../app-props.js";
+import { EndpointHttpMethod, EndpointProtocol } from "../app-props.js";
+import type { UpdateStatusSecret } from "../secret.js";
+import type { ErrorOrHTTPError } from "./api-tools.js";
+import { convertToError } from "./api-tools.js";
 
 const SERVICE = "NodePingApi" as const;
 
@@ -55,7 +51,10 @@ export interface NodePingNotification {
  * This has only a subset of all the fields of NodePing Contact
  * @see https://nodeping.com/docs-api-contacts.html
  */
-export interface NodePingContactAddress {}
+export interface NodePingContactAddress {
+  address: string;
+  type?: "email" | "sms" | "webhook" | string; // NodePing has many types; allow string fallback
+}
 
 /**
  * This has only a subset of all the fields of NodePing Contact
@@ -156,17 +155,14 @@ export class NodePingApi {
     };
 
     return ky
-      .post(
-        url,
-        {
-          json: {
-            ...data,
-            token: secret.nodePingToken,
-            customerid: secret.nodePingSubAccountId,
-          } satisfies NodePingCheckPostPutAuthData & DATA,
-          ...config,
-        },
-      )
+      .post(url, {
+        json: {
+          ...data,
+          token: secret.nodePingToken,
+          customerid: secret.nodePingSubAccountId,
+        } satisfies NodePingCheckPostPutAuthData & DATA,
+        ...config,
+      })
       .catch(async (error: ErrorOrHTTPError) => {
         throw await convertToError(error);
       })
@@ -181,17 +177,14 @@ export class NodePingApi {
       timeout: this.requestTimeoutMs,
     };
     return ky
-      .put<void>(
-        url,
-        {
-          json: {
-            ...data,
-            token: secret.nodePingToken,
-            customerid: secret.nodePingSubAccountId,
-          } satisfies NodePingCheckPostPutAuthData & DATA,
-          ...config,
-        },
-      )
+      .put<void>(url, {
+        json: {
+          ...data,
+          token: secret.nodePingToken,
+          customerid: secret.nodePingSubAccountId,
+        } satisfies NodePingCheckPostPutAuthData & DATA,
+        ...config,
+      })
       .catch(async (error: ErrorOrHTTPError) => {
         throw await convertToError(error);
       })
@@ -210,9 +203,9 @@ export class NodePingApi {
     const url = `${this.nodePingApi}/contacts`;
     return this.doGet<Record<string, NodePingContact>>(url)
       .catch((reason) => {
-        const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(reason)
-        }`;
+        const errorMessage = `${message} failed with reason: ${JSON.stringify(
+          reason,
+        )}`;
         logger.error({
           method,
           message: errorMessage,
@@ -225,7 +218,7 @@ export class NodePingApi {
           method: method,
           message: `${message} done`,
           tookMs: Date.now() - start,
-        })
+        }),
       );
   }
 
@@ -251,8 +244,7 @@ export class NodePingApi {
     const GITHUB_API =
       `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflowFile}/dispatches` as const;
 
-    const message =
-      `Create contact ${nodepingContactName} for cState GitHub Action for branch ${branch}`;
+    const message = `Create contact ${nodepingContactName} for cState GitHub Action for branch ${branch}`;
     logger.info({
       method,
       message,
@@ -282,9 +274,9 @@ export class NodePingApi {
 
     return this.doPost<NodePingContactPostPutData>(url, data)
       .catch((reason) => {
-        const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(reason)
-        }`;
+        const errorMessage = `${message} failed with reason: ${JSON.stringify(
+          reason,
+        )}`;
         logger.error({
           method,
           message: errorMessage,
@@ -298,7 +290,7 @@ export class NodePingApi {
           message: `${message} done`,
           tookMs: Date.now() - start,
           customUrl: GITHUB_API,
-        })
+        }),
       );
   }
 
@@ -314,9 +306,9 @@ export class NodePingApi {
     const url = `${this.nodePingApi}/checks`;
     return this.doGet<Record<string, NodePingCheck>>(`${url}`)
       .catch((reason) => {
-        const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(reason)
-        }`;
+        const errorMessage = `${message} failed with reason: ${JSON.stringify(
+          reason,
+        )}`;
         logger.error({
           method,
           message: errorMessage,
@@ -329,7 +321,7 @@ export class NodePingApi {
           method,
           message: `${message} done`,
           tookMs: Date.now() - start,
-        })
+        }),
       );
   }
 
@@ -361,9 +353,10 @@ export class NodePingApi {
 
     const checkMethod = extraData?.method ?? EndpointHttpMethod.HEAD;
 
-    const type = extraData?.protocol === EndpointProtocol.WebSocket
-      ? "WEBSOCKET"
-      : "HTTPADV";
+    const type =
+      extraData?.protocol === EndpointProtocol.WebSocket
+        ? "WEBSOCKET"
+        : "HTTPADV";
     const data: NodePingCheckPostPutData = {
       label: endpoint.includes(appName) ? endpoint : `${appName} ${endpoint}`,
       type,
@@ -396,9 +389,9 @@ export class NodePingApi {
     const url = `${this.nodePingApi}/checks`;
     return this.doPost<NodePingCheckPostPutData>(url, data)
       .catch((reason) => {
-        const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(reason)
-        }`;
+        const errorMessage = `${message} failed with reason: ${JSON.stringify(
+          reason,
+        )}`;
         logger.error({
           method,
           message: errorMessage,
@@ -410,7 +403,7 @@ export class NodePingApi {
           method,
           message: `${message} done`,
           tookMs: Date.now() - start,
-        })
+        }),
       );
   }
 
@@ -428,9 +421,10 @@ export class NodePingApi {
     const checkMethod = extraData?.method ?? EndpointHttpMethod.HEAD;
     const data: NodePingCheckPutData = {
       id,
-      type: extraData?.protocol === EndpointProtocol.WebSocket
-        ? "WEBSOCKET"
-        : "HTTPADV",
+      type:
+        extraData?.protocol === EndpointProtocol.WebSocket
+          ? "WEBSOCKET"
+          : "HTTPADV",
       target: extraData?.url ?? currentTarget,
       threshold: this.checkTimeoutSeconds,
       method: checkMethod,
@@ -450,11 +444,10 @@ export class NodePingApi {
       data.regex = extraData.regex ?? false;
     }
 
-    const message = `Update NodePing check ${checkLabel} id ${id}, properties ${
-      JSON.stringify(
+    const message =
+      `Update NodePing check ${checkLabel} id ${id}, properties ${JSON.stringify(
         data,
-      )
-    }` as const;
+      )}` as const;
 
     logger.info({
       method,
@@ -464,9 +457,9 @@ export class NodePingApi {
     const url = `${this.nodePingApi}/checks`;
     return this.doPut<NodePingCheckPutData>(url, data)
       .catch((reason) => {
-        const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(reason)
-        }`;
+        const errorMessage = `${message} failed with reason: ${JSON.stringify(
+          reason,
+        )}`;
         logger.error({
           method,
           message: errorMessage,
@@ -478,7 +471,7 @@ export class NodePingApi {
           method,
           message: `${message} done`,
           tookMs: Date.now() - start,
-        })
+        }),
       );
   }
 
@@ -498,28 +491,26 @@ export class NodePingApi {
     ) {
       logger.info({
         method,
-        message:
-          `${messagePrefix} timeout ${check.parameters.threshold} different than default ${this.checkTimeoutSeconds}`,
+        message: `${messagePrefix} timeout ${check.parameters.threshold} different than default ${this.checkTimeoutSeconds}`,
       });
       needsUpdate = true;
     }
 
     if (
-      this.checkIntervalMinutes && this.checkIntervalMinutes !== check.interval
+      this.checkIntervalMinutes &&
+      this.checkIntervalMinutes !== check.interval
     ) {
       logger.info({
         method,
-        message:
-          `${messagePrefix} interval ${check.interval} different than default ${this.checkIntervalMinutes}`,
+        message: `${messagePrefix} interval ${check.interval} different than default ${this.checkIntervalMinutes}`,
       });
       needsUpdate = true;
     }
 
     if (check.type.toUpperCase() === "HTTPADV") {
-      const digitrafficUser = Object.entries(check.parameters.sendheaders ?? {})
-        .find(
-          (e) => e[0].toLowerCase() === "digitraffic-user",
-        )?.[1];
+      const digitrafficUser = Object.entries(
+        check.parameters.sendheaders ?? {},
+      ).find((e) => e[0].toLowerCase() === "digitraffic-user")?.[1];
       if (digitrafficUser !== NODEPING_DIGITRAFFIC_USER) {
         logger.info({
           method,
@@ -529,8 +520,8 @@ export class NodePingApi {
       }
     }
 
-    const checkMethod = correspondingExtraEndpoint?.method ??
-      EndpointHttpMethod.HEAD;
+    const checkMethod =
+      correspondingExtraEndpoint?.method ?? EndpointHttpMethod.HEAD;
     // In case of Websocket method is not relevant
     if (
       correspondingExtraEndpoint?.protocol !== EndpointProtocol.WebSocket &&
@@ -538,8 +529,7 @@ export class NodePingApi {
     ) {
       logger.info({
         method,
-        message:
-          `${messagePrefix} method was not ${EndpointHttpMethod.HEAD}, instead: ${check.parameters.method}`,
+        message: `${messagePrefix} method was not ${EndpointHttpMethod.HEAD}, instead: ${check.parameters.method}`,
       });
       needsUpdate = true;
     }
@@ -550,8 +540,7 @@ export class NodePingApi {
     ) {
       logger.info({
         method,
-        message:
-          `${messagePrefix} url was not ${correspondingExtraEndpoint?.url}, instead: ${check.parameters.target}`,
+        message: `${messagePrefix} url was not ${correspondingExtraEndpoint?.url}, instead: ${check.parameters.target}`,
       });
       needsUpdate = true;
     }
@@ -565,11 +554,9 @@ export class NodePingApi {
       needsUpdate = true;
       logger.info({
         method,
-        message: `${messagePrefix} current contacts ${
-          JSON.stringify(
-            currentContactIds,
-          )
-        } needs to be updated to ${JSON.stringify(contactIds)}`,
+        message: `${messagePrefix} current contacts ${JSON.stringify(
+          currentContactIds,
+        )} needs to be updated to ${JSON.stringify(contactIds)}`,
       });
     }
 
@@ -595,24 +582,24 @@ export class NodePingApi {
   private async setNodePingCheckDisabledTo(disabled: boolean): Promise<void> {
     const method =
       `${SERVICE}.setNodePingCheckDisabledTo` as const satisfies LoggerMethodType;
-    const message = `Set NodePing checks disabled to ${
-      JSON.stringify(disabled)
-    }`;
+    const message = `Set NodePing checks disabled to ${JSON.stringify(
+      disabled,
+    )}`;
     const start = Date.now();
     logger.info({
       method: method,
       message,
     });
 
-    const url = `${this.nodePingApi}/checks?disableall=${
-      JSON.stringify(disabled)
-    }` as const;
+    const url = `${this.nodePingApi}/checks?disableall=${JSON.stringify(
+      disabled,
+    )}` as const;
 
     return this.doPut(url, {})
       .catch((reason) => {
-        const errorMessage = `${message} failed with reason: ${
-          JSON.stringify(reason)
-        }`;
+        const errorMessage = `${message} failed with reason: ${JSON.stringify(
+          reason,
+        )}`;
         logger.error({
           method,
           message: errorMessage,
@@ -631,7 +618,7 @@ export class NodePingApi {
           method: method,
           message: `${message} done`,
           tookMs: Date.now() - start,
-        })
+        }),
       );
   }
 
@@ -641,12 +628,6 @@ export class NodePingApi {
 
   async disableNodePingChecks(): Promise<void> {
     await this.setNodePingCheckDisabledTo(true);
-  }
-
-  private getValidateStatusFn(): (status: number) => boolean {
-    return function (status: number): boolean {
-      return status === 200;
-    };
   }
 
   private toBase64(body: string): string {

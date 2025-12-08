@@ -1,15 +1,16 @@
-import type { UpdateStatusSecret } from "../secret.js";
+import { TZDate } from "@date-fns/tz";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
+import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { jest } from "@jest/globals";
+import { format } from "date-fns";
 import type {
   ActiveMaintenance,
   CStateStatus,
   PinnedIssue,
 } from "../api/cstate-statuspage-api.js";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { jest } from "@jest/globals";
 import { StatusEnvKeys } from "../keys.js";
-import { format } from "date-fns";
-import { TZDate } from "@date-fns/tz";
+import type { UpdateStatusSecret } from "../secret.js";
 
 const SERVER_PORT = 8091 as const;
 export const C_STATE_PAGE_URL = `http://localhost:${SERVER_PORT}`;
@@ -58,9 +59,9 @@ export const DEFAULT_SECRET_VALUE = {
 export function mockSecretHolder(
   secretValue: UpdateStatusSecret = DEFAULT_SECRET_VALUE,
 ): SecretHolder<UpdateStatusSecret> {
-  jest.spyOn(SecretHolder.prototype, "get").mockReturnValue(
-    Promise.resolve(secretValue),
-  );
+  jest
+    .spyOn(SecretHolder.prototype, "get")
+    .mockReturnValue(Promise.resolve(secretValue));
   return SecretHolder.create<UpdateStatusSecret>();
 }
 
@@ -120,14 +121,14 @@ export function getCstateIndexJson(
         name: "marine/api/ais/v1/locations",
         description:
           "Find latest vessel locations by mmsi and optional timestamp interval in milliseconds from Unix epoch.",
-        category: "Marine",
+        category: TrafficType.MARINE,
         status: "ok",
         unresolvedIssues: [],
       },
       {
         name: "marine/api/ais/v1/vessels",
         description: "Return latest vessel metadata for all known vessels.",
-        category: "Marine",
+        category: TrafficType.MARINE,
         status: "ok",
         unresolvedIssues: [],
       },
