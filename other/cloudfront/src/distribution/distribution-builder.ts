@@ -1,9 +1,9 @@
 import type { WafRules } from "../acl/waf-rules.js";
-import type { CloudfrontCdkStack2 } from "../cloudfront-cdk-stack2.js";
+import type { CloudfrontCdkStack } from "../cloudfront-cdk-stack.js";
 import type { Behavior } from "./behavior.js";
 
 export class DistributionBuilder {
-  private readonly _stack: CloudfrontCdkStack2;
+  private readonly _stack: CloudfrontCdkStack;
 
   readonly name: string;
   readonly certificate: string;
@@ -21,7 +21,7 @@ export class DistributionBuilder {
   readonly vpcOrigins: Record<string, string> = {};
 
   public constructor(
-    stack: CloudfrontCdkStack2,
+    stack: CloudfrontCdkStack,
     name: string,
     certificate: string,
   ) {
@@ -44,7 +44,7 @@ export class DistributionBuilder {
     throw new Error("No default behavior defined for " + this.name);
   }
 
-  public build(): CloudfrontCdkStack2 {
+  public build(): CloudfrontCdkStack {
     return this._stack;
   }
 
