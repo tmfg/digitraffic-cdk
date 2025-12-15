@@ -17,19 +17,24 @@ export async function deleteOldMessages(): Promise<void> {
 
 export async function updateRtti(updateObject: UpdateObject): Promise<void> {
   await inDatabase(async (db) => {
-    return await Promise.all(
-      updateObject.messageVersions.map(async (o) => {
-        return await insertData(
-          db,
-          updateObject.messageId,
-          SOURCES.API,
-          o.typeVersion,
-          TYPES.RTTI_DATEX2_XML,
-          o.messageContent,
-        );
-      }),
-    );
+    return await Promise.all(updateObject.messageVersions.map(async (o) => {
+      return await insertData(
+        db,
+        updateObject.messageId,
+        SOURCES.TOPIC,
+        o.typeVersion,
+        TYPES.RTTI_DATEX2_XML,
+        o.messageContent,
+      );
+    }));
   });
+
+  if (SQS_URL.result === "ok") {
+    await sqs.sendMessage({
+      MessageBody: JSON.stringify({}), // no data for event, just trigger
+      QueueUrl: SQS_URL.value,
+    });
+  }
 }
 
 export async function updateDatex2(

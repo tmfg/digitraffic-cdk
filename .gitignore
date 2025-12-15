@@ -61,7 +61,7 @@
 !rail/
 !rail/*/
 !road/
-!road/*/*
+!road/*/
 !template/
 !template/esm/
 

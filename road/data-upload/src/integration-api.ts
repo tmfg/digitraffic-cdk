@@ -1,4 +1,4 @@
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import type { Resource } from "aws-cdk-lib/aws-apigateway";
@@ -30,19 +30,10 @@ export class IntegrationApi {
   }
 
   createDatex2V1Handler(stack: DigitrafficStack, d2Queue: Queue): void {
-    const environment = {
-      ...stack.createLambdaEnvironment(),
-      QUEUE_URL: d2Queue.queueUrl,
-    };
-
-    const uploadDatexV1Handler = MonitoredDBFunction.create(
-      stack,
-      "upload-datex2",
-      environment,
-      {
-        memorySize: 256,
-      },
-    );
+    const uploadDatexV1Handler = FunctionBuilder.create(stack, "upload-datex2")
+      .withEnvironment({QUEUE_URL: d2Queue.queueUrl})
+      .withMemorySize(256)
+      .build();
 
     this.uploadDatex2Resource.addMethod(
       "PUT",

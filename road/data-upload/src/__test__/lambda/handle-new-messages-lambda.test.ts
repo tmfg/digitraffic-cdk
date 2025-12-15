@@ -12,14 +12,14 @@ import { TEST_DATEX2 } from "../service/datex2_223_files.js";
 
 async function getResponseFromLambda(): Promise<void> {
   const { handler } = await import(
-    "../../lambda/handle-variable-signs/handle-variable-signs.js"
+    "../../lambda/handle-new-messages/handle-new-messages.js"
   );
 
   await handler();
 }
 
 describe(
-  "handle-variable-signs-lambda-test",
+  "handle-new-messages-lambda-test",
   dbTestBase((db: DTDatabase) => {
     jest.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
 
@@ -27,7 +27,7 @@ describe(
       await getResponseFromLambda();
     });
 
-    test("handle one item", async () => {
+    test("handle one vs", async () => {
       await insertData(
         db,
         "test123",

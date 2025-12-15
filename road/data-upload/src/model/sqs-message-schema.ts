@@ -2,11 +2,11 @@ import z from "zod/v4";
 
 const messageVersionSchema = z.object({
   messageContent: z.string(),
-  messageType: z.enum(["datex2"]),
+  messageType: z.enum(["DATEX2"]),
   typeVersion: z.string(),
 }).strict();
 
-const messageSchema = z.object({
+export const messageSchema = z.object({
   messageId: z.string(),
   date: z.coerce.date(),
   messageVersions: z.array(messageVersionSchema),

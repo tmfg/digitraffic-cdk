@@ -1,5 +1,6 @@
 export const SOURCES = {
   API: "API",
+  TOPIC: "TOPIC",
 } as const;
 
 export const TYPES = {
