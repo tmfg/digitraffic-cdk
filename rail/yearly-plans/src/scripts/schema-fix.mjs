@@ -35,8 +35,14 @@ for (const defName in cleanedSchema.definitions) {
   if (definition.properties) {
     const requiredFields = new Set(definition.required || []);
     for (const propName in definition.properties) {
+      const prop = definition.properties[propName];
+      
+      // Remove nullable flag (not part of JSON Schema Draft-07)
+      if (prop.nullable !== undefined) {
+        delete prop.nullable;
+      }
+      
       if (!requiredFields.has(propName)) {
-        const prop = definition.properties[propName];
         // If it has a $ref, wrap it in anyOf with null
         if (prop.$ref) {
           definition.properties[propName] = {

@@ -206,12 +206,12 @@ export const schema = {
     },
     YearlyPlanComputedDataDto: {
       description:
-        'A collection of computed data related to the yearly plan version. This data is computed by the SUPA\nservice based on the content of the yearly plan version and Infra-API (Trakedia) data.\n\nBased on the location information specified by the user for the yearly plan version, the SUPA service \ngenerates additional "computed" location information. Computed location information means in practice:\n\n* Various areas / infra objects that the user-specified precise location information for the yearly plan overlaps\n* Combined geometry (map/diagram) of the user-specified precise location information for the yearly plan\n* Railway kilometer interval set covered by the user-specified precise location information for the yearly plan\n',
+        'A collection of computed data related to the yearly plan version. This data is computed by the SUPA\nservice based on the content of the yearly plan version and Infra API (Trakedia) data.\n\nBased on the location information specified by the user for the yearly plan version, the SUPA service \ngenerates additional "computed" location information. Computed location information means in practice:\n\n* Various areas / infra objects that the user-specified precise location information for the yearly plan overlaps\n* Combined geometry (map/diagram) of the user-specified precise location information for the yearly plan\n* Railway kilometer interval set covered by the user-specified precise location information for the yearly plan\n',
       type: "object",
       properties: {
         trackOids: {
           description:
-            "The computed tracks (their Infra-API OIDs) for the specified yearly plan version (the tracks \nthat the user-specified location information for the yearly plan version fully or partially overlaps)\n",
+            "The computed tracks (their Infra API OIDs) for the specified yearly plan version (the tracks \nthat the user-specified location information for the yearly plan version fully or partially overlaps)\n",
           type: "array",
           items: {
             type: "string",
@@ -220,7 +220,7 @@ export const schema = {
         },
         trafficManagementTrackOids: {
           description:
-            "The computed traffic management tracks (their Infra-API OIDs) for the specified yearly plan version\n(the traffic management tracks that the user-specified location information for the yearly plan \nversion fully or partially overlaps)\n",
+            "The computed traffic management tracks (their Infra API OIDs) for the specified yearly plan version\n(the traffic management tracks that the user-specified location information for the yearly plan \nversion fully or partially overlaps)\n",
           type: "array",
           items: {
             type: "string",
@@ -229,7 +229,7 @@ export const schema = {
         },
         stationOids: {
           description:
-            "The computed stations (their Infra-API OIDs) for the specified yearly plan version (the stations \nthat the user-specified location information for the yearly plan version fully or partially overlaps)\n",
+            "The computed stations (their Infra API OIDs) for the specified yearly plan version (the stations \nthat the user-specified location information for the yearly plan version fully or partially overlaps)\n",
           type: "array",
           items: {
             type: "string",
@@ -238,7 +238,7 @@ export const schema = {
         },
         stationIntervalOids: {
           description:
-            "The computed station intervals (their Infra-API OIDs) for the specified yearly plan version (the \nstations that the user-specified location information for the yearly plan version fully or partially\noverlaps)\n",
+            "The computed station intervals (their Infra API OIDs) for the specified yearly plan version (the \nstations that the user-specified location information for the yearly plan version fully or partially\noverlaps)\n",
           type: "array",
           items: {
             type: "string",
@@ -247,7 +247,7 @@ export const schema = {
         },
         trafficControlSectorOids: {
           description:
-            "The computed traffic planning control areas (their Infra-API OIDs) for the specified yearly plan \nversion (the traffic planning control areas that the user-specified location information for the\nyearly plan version fully or partially overlaps)\n",
+            "The computed traffic planning control areas (their Infra API OIDs) for the specified yearly plan \nversion (the traffic planning control areas that the user-specified location information for the\nyearly plan version fully or partially overlaps)\n",
           type: "array",
           items: {
             type: "string",
@@ -256,7 +256,7 @@ export const schema = {
         },
         trafficPlanningAreaOids: {
           description:
-            "The computed traffic planning areas (their Infra-API OIDs) for the specified yearly plan version \n(the traffic planning areas that the user-specified location information for the yearly plan version\nfully or partially overlaps)\n",
+            "The computed traffic planning areas (their Infra API OIDs) for the specified yearly plan version \n(the traffic planning areas that the user-specified location information for the yearly plan version\nfully or partially overlaps)\n",
           type: "array",
           items: {
             type: "string",
@@ -265,7 +265,7 @@ export const schema = {
         },
         accountingRailwaySectionOids: {
           description:
-            "The computed accounting railway sections (their Infra-API OIDs) for the specified yearly plan \nversion (the accounting railway sections that the user-specified location information for the yearly\nplan version fully or partially overlaps)\n",
+            "The computed accounting railway sections (their Infra API OIDs) for the specified yearly plan \nversion (the accounting railway sections that the user-specified location information for the yearly\nplan version fully or partially overlaps)\n",
           type: "array",
           items: {
             type: "string",
@@ -330,10 +330,6 @@ export const schema = {
           description:
             "Creation time as an ISO instant string. Example value: 2024-12-03T10:15:30Z\n",
           type: "string",
-          format: "date-time",
-        },
-        infraTargetTime: {
-          type: ["string", "null"],
           format: "date-time",
         },
         name: {
