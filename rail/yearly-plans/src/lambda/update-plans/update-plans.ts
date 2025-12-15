@@ -26,13 +26,15 @@ const projectPlansBucketName = getEnvVariable(
 const ajv = new Ajv({ strict: false, allErrors: true });
 addFormats.default(ajv);
 ajv.addSchema(schema, "openapi");
+
 // allow custom format "partial-time" used in the schema
 ajv.addFormat("partial-time", /^\d{2}:\d{2}$/);
+
 const validateYearlyPlans = ajv.compile({
-  $ref: "openapi#/components/schemas/YearlyPlanListRedactedDto",
+  $ref: "openapi#/definitions/YearlyPlanListRedactedDto",
 });
 const validateProjectPlans = ajv.compile({
-  $ref: "openapi#/components/schemas/ProjectPlanListRedactedDto",
+  $ref: "openapi#/definitions/ProjectPlanListRedactedDto",
 });
 
 export const handler = async (): Promise<void> => {
