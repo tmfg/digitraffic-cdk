@@ -1,8 +1,8 @@
-import { Ajv } from "Ajv";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { Ajv } from "ajv";
 import addFormats from "ajv-formats";
 import { YearlyPlansEnvKeys } from "../../keys.js";
 import { schema } from "../../model/schema.js";
