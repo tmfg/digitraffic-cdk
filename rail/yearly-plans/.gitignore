@@ -13,3 +13,6 @@
 !/src/**/
 !/src/**/*.ts
 /src/bin
+
+!/src/scripts
+!/src/scripts/*.mjs
