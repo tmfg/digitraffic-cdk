@@ -1,7 +1,14 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/"
+    directories: 
+      - "/marine/*"
+      - "/road/*"
+      - "/rail/*"
+      - "/aviation/*"
+      - "/other/*"
+      - "/template"
+      - "/tools/*"
     schedule:
       interval: "daily"
     cooldown:
