@@ -19,6 +19,9 @@
 
 !/digitraffic-figures/
 !/digitraffic-figures/**/
+!/digitraffic-figures/scripts/
+!/digitraffic-figures/scripts/**.py
+!/digitraffic-figures/scripts/**.txt
 !/digitraffic-figures/dbfigures/sql
 !/digitraffic-figures/app.py
 !/digitraffic-figures/digitraffic_figures/

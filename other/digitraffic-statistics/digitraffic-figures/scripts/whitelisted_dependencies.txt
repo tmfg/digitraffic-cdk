@@ -1,0 +1,9 @@
+# Whitelisted Dependencies
+#
+# Add package-version pairs that should be excluded from dependency age checks.
+# Format: package==version (one per line)
+# Lines starting with # are treated as comments
+#
+# Example:
+# certifi==2025.11.12
+# requests==2.31.0
