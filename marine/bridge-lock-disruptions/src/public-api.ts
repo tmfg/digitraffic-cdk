@@ -67,7 +67,7 @@ export class PublicApi {
   ): void {
     const getDisruptionsLambda = FunctionBuilder.create(stack, "get-disruptions")
       .withMemorySize(256)
-      .withReservedConcurrentExecutions(3)
+      .withReservedConcurrentExecutions(4)
       .build();
 
     const getDisruptionsIntegration = new DigitrafficIntegration(
