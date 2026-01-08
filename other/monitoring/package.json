@@ -17,19 +17,19 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.11.11-1",
-    "aws-cdk-lib": "^2.225.0",
-    "constructs": "^10.4.3"
+    "aws-cdk-lib": "^2.233.0",
+    "constructs": "^10.4.4"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^30.2.0",
-    "@rushstack/heft": "^1.1.5",
-    "@rushstack/heft-jest-plugin": "^1.1.5",
-    "@types/aws-lambda": "8.10.158",
+    "@rushstack/heft": "^1.1.7",
+    "@rushstack/heft-jest-plugin": "^1.1.7",
+    "@types/aws-lambda": "8.10.159",
     "@types/heft-jest": "1.0.6",
     "@types/node": "^22.19.1",
-    "esbuild": "0.27.0",
+    "esbuild": "0.27.2",
     "jest": "^30.2.0",
     "parallelshell": "^3.0.2",
     "ts-node": "^10.9.2",

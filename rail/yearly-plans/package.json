@@ -21,22 +21,22 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "archiver": "^7.0.1",
-    "aws-cdk-lib": "~2.222.0",
-    "constructs": "~10.4.2",
-    "ky": "~1.14.0"
+    "aws-cdk-lib": "^2.233.0",
+    "constructs": "^10.4.4",
+    "ky": "^1.14.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "^30.0.5",
-    "@rushstack/heft": "^0.74.2",
-    "@rushstack/heft-jest-plugin": "^0.16.11",
+    "@rushstack/heft": "^1.1.7",
+    "@rushstack/heft-jest-plugin": "^1.1.7",
     "@types/archiver": "^7.0.0",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/node": "22.15.2",
-    "esbuild": "0.25.9",
+    "esbuild": "0.27.2",
     "typescript": "^5.9.2"
   }
 }

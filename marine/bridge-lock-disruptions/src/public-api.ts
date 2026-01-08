@@ -1,7 +1,7 @@
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
@@ -65,10 +65,11 @@ export class PublicApi {
     disruptionsJsonModel: IModel,
     stack: DigitrafficStack,
   ): void {
-    const getDisruptionsLambda = MonitoredDBFunction.create(
-      stack,
-      "get-disruptions",
-    );
+    const getDisruptionsLambda = FunctionBuilder.create(stack, "get-disruptions")
+      .withMemorySize(256)
+      .withReservedConcurrentExecutions(3)
+      .build();
+
     const getDisruptionsIntegration = new DigitrafficIntegration(
       getDisruptionsLambda,
       MediaType.APPLICATION_JSON,

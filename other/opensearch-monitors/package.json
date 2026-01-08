@@ -27,17 +27,17 @@
     "@smithy/node-http-handler": "~4.4.5",
     "@smithy/protocol-http": "~5.3.5",
     "@smithy/signature-v4": "~5.3.5",
-    "aws-cdk-lib": "^2.225.0",
-    "constructs": "^10.4.3"
+    "aws-cdk-lib": "^2.233.0",
+    "constructs": "^10.4.4"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "^1.1.5",
-    "@rushstack/heft-jest-plugin": "^1.1.5",
+    "@rushstack/heft": "^1.1.7",
+    "@rushstack/heft-jest-plugin": "^1.1.7",
     "@types/heft-jest": "1.0.6",
     "@types/node": "^22.19.1",
-    "esbuild": "0.27.0",
+    "esbuild": "0.27.2",
     "typescript": "~5.9.3"
   }
 }

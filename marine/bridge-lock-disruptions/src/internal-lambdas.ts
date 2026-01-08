@@ -1,23 +1,18 @@
-import {
-  MonitoredDBFunction,
-  type MonitoredFunction,
-} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import type { IFunction } from "aws-cdk-lib/aws-lambda";
+import { Duration } from "aws-cdk-lib";
 
-export function create(stack: DigitrafficStack): MonitoredFunction {
+export function create(stack: DigitrafficStack): IFunction {
   const environment = stack.createDefaultLambdaEnvironment(
     "BridgeLockDisruption",
   );
 
-  const updateDisruptionsLambda = MonitoredDBFunction.create(
-    stack,
-    "update-disruptions",
-    environment,
-    {
-      timeout: 10,
-    },
-  );
+  const updateDisruptionsLambda = FunctionBuilder.create(stack, "update-disruptions")
+    .withEnvironment(environment)
+    .withTimeout(Duration.seconds(10))
+    .build();
 
   Scheduler.everyMinutes(
     stack,

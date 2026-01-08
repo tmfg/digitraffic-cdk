@@ -19,19 +19,19 @@
     "watch": "heft build-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.11.11-1",
-    "aws-cdk-lib": "^2.225.0",
-    "aws-sdk": "^2.1692.0",
-    "constructs": "^10.4.3",
-    "date-fns": "~4.1.0",
-    "geojson-validation": "^1.0.2",
-    "ky": "^1.11.0",
-    "parse-link-header": "^2.0.0",
-    "pg-native": "^3.5.2",
-    "pg-promise": "^12.3.0",
-    "spex": "^4.1.0",
-    "wkx": "^0.5.0",
-    "xml2js": "^0.6.2"
+    "@digitraffic/common": "2025.12.15-5",
+    "aws-cdk-lib": "2.233.0",
+    "aws-sdk": "2.1693.0",
+    "constructs": "10.4.4",
+    "date-fns": "4.1.0",
+    "geojson-validation": "1.0.2",
+    "ky": "1.14.2",
+    "parse-link-header": "2.0.0",
+    "pg-native": "3.5.2",
+    "pg-promise": "12.3.0",
+    "spex": "4.1.0",
+    "wkx": "0.5.0",
+    "xml2js": "0.6.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
