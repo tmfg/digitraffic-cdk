@@ -17,27 +17,27 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.11.11-1",
-    "aws-cdk-lib": "^2.225.0",
-    "constructs": "^10.4.3",
-    "es-toolkit": "1.39.10",
-    "ky": "^1.8.2",
-    "pg-native": "^3.5.2",
-    "pg-promise": "^12.3.0",
-    "zod": "4.1.12"
+    "aws-cdk-lib": "2.234.0",
+    "constructs": "10.4.4",
+    "es-toolkit": "1.43.0",
+    "ky": "1.14.2",
+    "pg-native": "3.5.2",
+    "pg-promise": "12.3.0",
+    "zod": "4.3.5"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "^30.0.5",
-    "@rushstack/heft": "^1.1.5",
-    "@rushstack/heft-jest-plugin": "^1.1.5",
-    "@types/geojson": "^7946.0.16",
+    "@jest/globals": "30.0.5",
+    "@rushstack/heft": "1.1.7",
+    "@rushstack/heft-jest-plugin": "1.1.7",
+    "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "^22.19.1",
+    "@types/node": "22.19.3",
     "date-fns": "4.1.0",
-    "esbuild": "0.27.0",
-    "typescript": "~5.9.3"
+    "esbuild": "0.27.2",
+    "typescript": "5.9.3"
   }
 }

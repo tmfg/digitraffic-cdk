@@ -16,27 +16,27 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.700.0",
+    "@aws-sdk/client-s3": "3.965.0",
     "@digitraffic/common": "2025.11.11-1",
-    "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1",
-    "archiver": "^7.0.1",
-    "aws-cdk-lib": "^2.233.0",
-    "constructs": "^10.4.4",
-    "ky": "^1.14.1"
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "archiver": "7.0.1",
+    "aws-cdk-lib": "2.234.0",
+    "constructs": "10.4.4",
+    "ky": "1.14.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "^30.0.5",
-    "@rushstack/heft": "^1.1.7",
-    "@rushstack/heft-jest-plugin": "^1.1.7",
-    "@types/archiver": "^7.0.0",
+    "@jest/globals": "30.0.5",
+    "@rushstack/heft": "1.1.7",
+    "@rushstack/heft-jest-plugin": "1.1.7",
+    "@types/archiver": "7.0.0",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.15.2",
+    "@types/node": "22.19.3",
     "esbuild": "0.27.2",
-    "typescript": "^5.9.2"
+    "typescript": "5.9.2"
   }
 }

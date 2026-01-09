@@ -20,24 +20,24 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "@aws-crypto/sha256-browser": "^5.2.0",
-    "@aws-sdk/client-sts": "^3.933.0",
-    "@aws-sdk/types": "^3.930.0",
+    "@aws-crypto/sha256-browser": "5.2.0",
+    "@aws-sdk/client-sts": "3.965.0",
+    "@aws-sdk/types": "3.965.0",
     "@digitraffic/common": "2025.11.11-1",
-    "@smithy/node-http-handler": "~4.4.5",
-    "@smithy/protocol-http": "~5.3.5",
-    "@smithy/signature-v4": "~5.3.5",
-    "aws-cdk-lib": "^2.233.0",
-    "constructs": "^10.4.4"
+    "@smithy/node-http-handler": "4.4.7",
+    "@smithy/protocol-http": "5.3.7",
+    "@smithy/signature-v4": "5.3.7",
+    "aws-cdk-lib": "2.234.0",
+    "constructs": "10.4.4"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "^1.1.7",
-    "@rushstack/heft-jest-plugin": "^1.1.7",
+    "@rushstack/heft": "1.1.7",
+    "@rushstack/heft-jest-plugin": "1.1.7",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "^22.19.1",
+    "@types/node": "22.19.3",
     "esbuild": "0.27.2",
-    "typescript": "~5.9.3"
+    "typescript": "5.9.3"
   }
 }

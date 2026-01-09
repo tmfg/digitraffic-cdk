@@ -21,27 +21,27 @@
   },
   "dependencies": {
     "@digitraffic/common": "2025.11.11-1",
-    "aws-cdk-lib": "^2.225.0",
-    "constructs": "^10.4.3",
-    "ky": "^1.11.0"
+    "aws-cdk-lib": "2.234.0",
+    "constructs": "10.4.4",
+    "ky": "1.14.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "^30.2.0",
-    "@rushstack/heft": "^1.1.5",
-    "@rushstack/heft-jest-plugin": "^1.1.5",
-    "@types/aws-lambda": "8.10.158",
+    "@jest/globals": "30.2.0",
+    "@rushstack/heft": "1.1.7",
+    "@rushstack/heft-jest-plugin": "1.1.7",
+    "@types/aws-lambda": "8.10.159",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "^22.19.1",
-    "aws-lambda": "^1.0.7",
-    "esbuild": "0.27.0",
-    "jest": "^30.2.0",
-    "jest-junit": "^16.0.0",
-    "parallelshell": "^3.0.2",
-    "ts-jest": "^29.4.4",
-    "typescript": "~5.9.3"
+    "@types/node": "22.19.3",
+    "aws-lambda": "1.0.7",
+    "esbuild": "0.27.2",
+    "jest": "30.2.0",
+    "jest-junit": "16.0.0",
+    "parallelshell": "3.0.2",
+    "ts-jest": "29.4.6",
+    "typescript": "5.9.3"
   }
 }

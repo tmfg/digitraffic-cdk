@@ -11,7 +11,7 @@
   "dependencies": {
     "@rushstack/heft": "^1.1.7",
     "@rushstack/heft-jest-plugin": "^1.1.7",
-    "@rushstack/heft-typescript-plugin": "^1.1.5",
+    "@rushstack/heft-typescript-plugin": "^1.1.7",
     "typescript": "~5.9.3"
   }
 }

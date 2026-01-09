@@ -19,21 +19,21 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
   },
   "dependencies": {
-    "madge": "^8.0.0"
+    "madge": "8.0.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@digitraffic/common": "2025.11.11-1",
-    "@jest/globals": "^30.2.0",
-    "@rushstack/heft": "^1.1.7",
-    "@rushstack/heft-jest-plugin": "^1.1.7",
+    "@jest/globals": "30.2.0",
+    "@rushstack/heft": "1.1.7",
+    "@rushstack/heft-jest-plugin": "1.1.7",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/madge": "5.0.3",
-    "@types/node": "^22.19.1",
+    "@types/node": "22.19.3",
     "esbuild": "0.27.2",
-    "rollup": "~4.53.2",
-    "typescript": "~5.9.3"
+    "rollup": "4.55.1",
+    "typescript": "5.9.3"
   }
 }

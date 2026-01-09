@@ -13,18 +13,18 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.233.0",
-    "constructs": "^10.4.4"
+    "aws-cdk-lib": "2.234.0",
+    "constructs": "10.4.4"
   },
   "devDependencies": {
     "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "^1.1.7",
-    "@rushstack/heft-jest-plugin": "^1.1.7",
+    "@rushstack/heft": "1.1.7",
+    "@rushstack/heft-jest-plugin": "1.1.7",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "^22.19.1",
-    "ts-node": "^10.9.2",
-    "typescript": "~5.9.3"
+    "@types/node": "22.19.3",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3"
   },
   "externals": [
     "aws-sdk"
