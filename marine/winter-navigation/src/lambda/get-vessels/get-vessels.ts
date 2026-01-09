@@ -4,6 +4,10 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { getVessel, getVessels } from "../../service/vessel-service.js";
 import { z, ZodError } from "zod";
+import {
+  zStringToNumber,
+  zStringToDate,
+} from "@digitraffic/common/dist/utils/zod-utils";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -13,28 +17,10 @@ const MAX_PAYLOAD_BODY_SIZE_BYTES = 4.5 * 1024 * 1024;
 const GetVesselSchema = z
   .object({
     // path parameter
-    vesselId: z
-      .string()
-      .transform(Number)
-      .refine((vesselId) => !Number.isNaN(vesselId), {
-        message: "Invalid vessel ID format",
-      })
-      .optional(),
+    vesselId: zStringToNumber("Invalid vessel ID format").optional(),
     // query parameters
-    activeFrom: z
-      .string()
-      .transform((val) => (val ? new Date(val) : undefined))
-      .refine((date) => !date || !Number.isNaN(date.getTime()), {
-        message: "Invalid date format",
-      })
-      .optional(),
-    activeTo: z
-      .string()
-      .transform((val) => (val ? new Date(val) : undefined))
-      .refine((date) => !date || !Number.isNaN(date.getTime()), {
-        message: "Invalid date format",
-      })
-      .optional(),
+    activeFrom: zStringToDate().optional(),
+    activeTo: zStringToDate().optional(),
   })
   .strict();
 
