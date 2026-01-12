@@ -4,21 +4,25 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { getVessel, getVessels } from "../../service/vessel-service.js";
 import { z, ZodError } from "zod";
+import {
+  zStringToNumber,
+  zStringToDate,
+} from "@digitraffic/common/dist/utils/zod-utils";
 
 const proxyHolder = ProxyHolder.create();
 
 // the total payload size limit is 6291556 bytes, but there will be other data in the payload in addition to the body
 const MAX_PAYLOAD_BODY_SIZE_BYTES = 4.5 * 1024 * 1024;
 
-const GetVesselSchema = z.object({
-  // path parameter
-  "vesselId": z.string().transform(Number).optional(),
-  // query parameters absent from original request appear as empty strings in Lambda event
-  "activeFrom": z.string().transform((val) => val ? new Date(val) : undefined)
-    .optional(),
-  "activeTo": z.string().transform((val) => val ? new Date(val) : undefined)
-    .optional(),
-}).strict();
+const GetVesselSchema = z
+  .object({
+    // path parameter
+    vesselId: zStringToNumber("Invalid vessel ID format").optional(),
+    // query parameters
+    activeFrom: zStringToDate().optional(),
+    activeTo: zStringToDate().optional(),
+  })
+  .strict();
 
 export type GetVesselEvent = z.input<typeof GetVesselSchema>;
 
@@ -26,17 +30,23 @@ export const handler = async (
   event: GetVesselEvent,
 ): Promise<LambdaResponse> => {
   const start = Date.now();
-
   try {
-    const getVesselEvent = GetVesselSchema.parse(event);
+    const getVesselEvent = GetVesselSchema.safeParse(event);
+
+    if (!getVesselEvent.success) {
+      return LambdaResponse.badRequest(
+        JSON.stringify(z.flattenError(getVesselEvent.error).fieldErrors),
+      );
+    }
+
     await proxyHolder.setCredentials();
 
     // get single vessel
-    if (getVesselEvent.vesselId) {
+    if (getVesselEvent.data.vesselId) {
       const [vessel, lastUpdated] = await getVessel(
-        getVesselEvent.vesselId,
-        getVesselEvent.activeFrom,
-        getVesselEvent.activeTo,
+        getVesselEvent.data.vesselId,
+        getVesselEvent.data.activeFrom,
+        getVesselEvent.data.activeTo,
       );
 
       if (!vessel) {
@@ -50,8 +60,8 @@ export const handler = async (
 
     // get all vessels
     const [vessels, lastUpdated] = await getVessels(
-      getVesselEvent.activeFrom,
-      getVesselEvent.activeTo,
+      getVesselEvent.data.activeFrom,
+      getVesselEvent.data.activeTo,
     );
 
     const responseBody = JSON.stringify(vessels);
@@ -60,8 +70,7 @@ export const handler = async (
     if (payloadSizeBytes > MAX_PAYLOAD_BODY_SIZE_BYTES) {
       logger.warn({
         method: "GetVessels.handler",
-        message:
-          `Response payload is too large with parameters ${getVesselEvent.activeFrom?.toISOString()} and ${getVesselEvent.activeTo?.toISOString()}`,
+        message: `Response payload is too large with parameters ${getVesselEvent.data.activeFrom?.toISOString()} and ${getVesselEvent.data.activeTo?.toISOString()}`,
         customBytes: payloadSizeBytes,
         customLimit: MAX_PAYLOAD_BODY_SIZE_BYTES,
       });
