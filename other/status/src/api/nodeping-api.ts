@@ -47,6 +47,12 @@ export interface NodePingNotification {
   };
 }
 
+interface NodePingDisableAllChecksResponse {
+  enabled: number;
+  disabled: number;
+  disableall: number;
+}
+
 /**
  * This has only a subset of all the fields of NodePing Contact
  * @see https://nodeping.com/docs-api-contacts.html
@@ -170,7 +176,7 @@ export class NodePingApi {
   }
 
   // update
-  async doPut<DATA>(url: string, data: DATA): Promise<void> {
+  async doPut<DATA, RESPONSE>(url: string, data: DATA): Promise<RESPONSE> {
     const secret = await this.secretHolder.get();
     const config = {
       headers: { "Content-type": MediaType.APPLICATION_JSON },
@@ -188,7 +194,7 @@ export class NodePingApi {
       .catch(async (error: ErrorOrHTTPError) => {
         throw await convertToError(error);
       })
-      .then((response) => response.json());
+      .then((response) => response.json() as Promise<RESPONSE>);
   }
 
   async getNodepingContacts(): Promise<NodePingContact[]> {
@@ -413,7 +419,7 @@ export class NodePingApi {
     contactIds: string[],
     checkLabel: string,
     extraData?: MonitoredEndpoint,
-  ): Promise<void> {
+  ): Promise<NodePingCheck> {
     const method =
       `${SERVICE}.updateNodepingCheck` as const satisfies LoggerMethodType;
     const start = Date.now();
@@ -455,7 +461,7 @@ export class NodePingApi {
     });
 
     const url = `${this.nodePingApi}/checks`;
-    return this.doPut<NodePingCheckPutData>(url, data)
+    return this.doPut<NodePingCheckPutData, NodePingCheck>(url, data)
       .catch((reason) => {
         const errorMessage = `${message} failed with reason: ${JSON.stringify(
           reason,
@@ -595,7 +601,10 @@ export class NodePingApi {
       disabled,
     )}` as const;
 
-    return this.doPut(url, {})
+    const response: NodePingDisableAllChecksResponse = await this.doPut<
+      {},
+      NodePingDisableAllChecksResponse
+    >(url, {})
       .catch((reason) => {
         const errorMessage = `${message} failed with reason: ${JSON.stringify(
           reason,
@@ -606,20 +615,55 @@ export class NodePingApi {
         });
         throw new Error(`${method} ${errorMessage}`);
       })
-      .then((result): void => {
+      .then((result): NodePingDisableAllChecksResponse => {
         logger.info({
           method,
           message: `Update result ${JSON.stringify(result)}`,
         });
-        return;
-      })
-      .finally(() =>
-        logger.info({
-          method: method,
-          message: `${message} done`,
-          tookMs: Date.now() - start,
-        }),
+        return result;
+      });
+
+    logger.info({
+      method,
+      message: `Update all result ${JSON.stringify(response)}`,
+    });
+
+    // If any check is still disabled, try to enable it individually
+    if (!disabled && response.disabled > 0) {
+      logger.warn({
+        method,
+        message: `Some checks still disabled, retrying individually`,
+      });
+
+      // Here you need the IDs of all checks. Fetch them from NodePing API first
+      const allChecks = await this.doGet<Record<string, NodePingCheck>>(
+        `${this.nodePingApi}/checks`,
       );
+      for (const id of Object.keys(allChecks)) {
+        const check = allChecks[id];
+        if (check && check.enable !== "active") {
+          const response = await this.doPut<
+            { enabled: boolean },
+            NodePingCheck
+          >(
+            `${this.nodePingApi}/checks/${id}`, // This is same as ${check._id}
+            { enabled: true },
+          );
+          logger.info({
+            method,
+            message: `Re-enabled check ${check.label}, id: ${id}, state: ${response.state}`,
+          });
+        }
+      }
+    }
+
+    logger.info({
+      method: method,
+      message: `${message} done`,
+      tookMs: Date.now() - start,
+    });
+
+    return;
   }
 
   async enableNodePingChecks(): Promise<void> {

@@ -262,7 +262,7 @@ describe("StatusServiceTest", () => {
 
     const nodePingApiUpdateSpy = jest
       .spyOn(nodePingApi, "updateNodepingCheck")
-      .mockReturnValue(Promise.resolve());
+      .mockReturnValue(Promise.resolve({} as unknown as NodePingCheck));
 
     await StatusService.updateChecks(
       checks,
@@ -430,7 +430,7 @@ async function callWithStubsAndVerifyUpdateComponentsAndChecksForApp(
     .mockReturnValue(Promise.resolve());
   const updateNodepingCheckStub = jest
     .spyOn(nodePingApi, "updateNodepingCheck")
-    .mockReturnValue(Promise.resolve());
+    .mockReturnValue(Promise.resolve({} as unknown as NodePingCheck));
 
   await StatusService.updateComponentsAndChecks(
     [app],
