@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "cdk": "npx cdk@latest",
+    "cdk": "cdk",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "synth-sam": "cdk synth --no-staging > template.yaml",
@@ -23,6 +23,7 @@
     "@rushstack/heft-jest-plugin": "1.1.7",
     "@types/heft-jest": "1.0.6",
     "@types/node": "22.19.3",
+    "aws-cdk": "2.1100.2",
     "ts-node": "10.9.2",
     "typescript": "5.9.3"
   },

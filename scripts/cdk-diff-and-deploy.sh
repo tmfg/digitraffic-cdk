@@ -91,9 +91,9 @@ then
   if [[ "${OPERATION}" == "diff" ]]
   then
       CDK_OUT=/tmp/cdk-out-${STACK}
-      # npx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
+      # rushx cdk ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
       # Use script too capture command output and save it to file
-      script ${CDK_OUT}.txt npx --yes cdk@latest  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+      script ${CDK_OUT}.txt rushx cdk  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
 
       read -p "Do you wanna see formatted diff in browser? " -n 1 -r
       echo    # move to a new line
@@ -108,7 +108,7 @@ then
         diff -u -U 1000000 ${CDK_OUT}-old.txt ${CDK_OUT}-new.txt | npx --yes diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
       fi
     else
-        npx --yes cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+        rushx cdk ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
     fi
 fi
 

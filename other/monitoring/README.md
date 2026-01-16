@@ -53,8 +53,8 @@ i.e.
 
 ```
 export AWS_PROFILE=<profile-name>
-npx cdk@latest bootstrap aws://<accountnum>/eu-west-1
-npx cdk@latest bootstrap aws://<accountnum>/us-east-1
+cdk bootstrap aws://<accountnum>/eu-west-1
+cdk bootstrap aws://<accountnum>/us-east-1
 ```
 
 And diff / deploy

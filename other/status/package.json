@@ -9,7 +9,7 @@
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --format=esm --platform=node src/lambda/**/*.ts --outdir=dist/lambda --target=node22,es2022",
-    "cdk": "npx cdk@latest",
+    "cdk": "cdk",
     "cdk-bootstrap-status-prod": "../../scripts/cdk-bootstrap.sh status-prod",
     "cdk-deploy-status-prod": "rushx build &&../../scripts/cdk-diff-and-deploy.sh status-prod deploy StatusStack",
     "cdk-diff-status-prod": "rushx build &&../../scripts/cdk-diff-and-deploy.sh status-prod diff StatusStack",
@@ -43,6 +43,7 @@
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.21",
     "@types/node": "22.19.3",
+    "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"
   }

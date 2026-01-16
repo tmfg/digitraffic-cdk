@@ -10,23 +10,23 @@ What you need before installing?
 
 Build
 
-    pnpm run build
+    rushx build
 
-Now you can deploy cloudfrontrun with:
+Now you can deploy cloudfront with:
 
-    pnpm dlx cdk@latest deploy
+    rushx cdk deploy
 
 There is also commands like
 
-    pnpm run cdk-diff-marine-test
-    pnpm run cdk-diff-marine-prod
-    pnpm run cdk-diff-road-test
-    pnpm run cdk-diff-road-prod
+    rushx cdk-diff-marine-test
+    rushx cdk-diff-marine-prod
+    rushx cdk-diff-road-test
+    rushx cdk-diff-road-prod
 
-    pnpm run cdk-deploy-marine-test
-    pnpm run cdk-deploy-marine-prod
-    pnpm run cdk-deploy-road-test
-    pnpm run cdk-deploy-road-prod
+    rushx cdk-deploy-marine-test
+    rushx cdk-deploy-marine-prod
+    rushx cdk-deploy-road-test
+    rushx cdk-deploy-road-prod
 
 And after that?
 

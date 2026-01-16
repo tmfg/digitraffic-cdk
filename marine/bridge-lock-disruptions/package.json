@@ -8,7 +8,7 @@
     "build": "heft build --clean && npm run postbuild",
     "postbuild": "npm run compile-lambdas",
     "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=lib/lambda --external:aws-sdk --target=node22",
-    "cdk": "npx cdk@latest",
+    "cdk": "cdk",
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy",
     "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
     "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
@@ -48,6 +48,7 @@
     "@types/sinon": "21.0.0",
     "@types/source-map-support": "0.5.10",
     "@types/xml2js": "0.4.14",
+    "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",
     "parallelshell": "3.0.2",
     "typescript": "5.9.3"

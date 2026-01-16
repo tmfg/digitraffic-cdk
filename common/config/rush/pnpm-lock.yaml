@@ -373,6 +373,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -470,6 +473,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -534,6 +540,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -619,6 +628,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -704,6 +716,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -828,6 +843,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -910,6 +928,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       aws-sdk:
         specifier: 2.1693.0
         version: 2.1693.0
@@ -989,6 +1010,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1050,6 +1074,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       aws-lambda:
         specifier: 1.0.7
         version: 1.0.7
@@ -1129,6 +1156,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       date-fns:
         specifier: 4.1.0
         version: 4.1.0
@@ -1172,6 +1202,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@types/node@22.19.3)(typescript@5.9.3)
@@ -1242,6 +1275,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1312,6 +1348,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1355,6 +1394,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1419,6 +1461,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1504,6 +1549,9 @@ importers:
       '@types/sinon':
         specifier: 21.0.0
         version: 21.0.0
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       dotenv:
         specifier: 17.2.3
         version: 17.2.3
@@ -1559,6 +1607,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@types/node@22.19.3)(typescript@5.9.3)
@@ -1629,6 +1680,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1693,6 +1747,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1745,6 +1802,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1836,6 +1896,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1885,6 +1948,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1952,6 +2018,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2034,6 +2103,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2128,6 +2200,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2201,6 +2276,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2283,6 +2361,9 @@ importers:
       '@types/sinon':
         specifier: 21.0.0
         version: 21.0.0
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2362,6 +2443,9 @@ importers:
       '@types/node':
         specifier: 22.19.2
         version: 22.19.2
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2444,6 +2528,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2514,6 +2601,9 @@ importers:
       '@types/xml2js':
         specifier: 0.4.14
         version: 0.4.14
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -2569,6 +2659,9 @@ importers:
       '@types/node':
         specifier: 22.19.3
         version: 22.19.3
+      aws-cdk:
+        specifier: 2.1100.2
+        version: 2.1100.2
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -4982,6 +5075,11 @@ packages:
       - yaml
       - mime-types
 
+  aws-cdk@2.1100.2:
+    resolution: {integrity: sha512-PK80VEunZGpGW3+66EbPUpoKZKxsK7/BBR3X2qqtgk5wrSVJn+rq3Rwlih5lCD223rpf2RXAnC5weGHdEtgSuA==}
+    engines: {node: '>= 18.0.0'}
+    hasBin: true
+
   aws-lambda@1.0.7:
     resolution: {integrity: sha512-9GNFMRrEMG5y3Jvv+V4azWvc+qNWdWLTjDdhf/zgMlz8haaaLWv0xeAIWxz9PuWUBawsVxy0zZotjCdR3Xq+2w==}
     hasBin: true
@@ -5649,6 +5747,11 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
+
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -12024,6 +12127,10 @@ snapshots:
       '@aws-cdk/cloud-assembly-schema': 48.20.0
       constructs: 10.4.4
 
+  aws-cdk@2.1100.2:
+    optionalDependencies:
+      fsevents: 2.3.2
+
   aws-lambda@1.0.7:
     dependencies:
       aws-sdk: 2.1693.0
@@ -12756,6 +12863,9 @@ snapshots:
       universalify: 2.0.1
 
   fs.realpath@1.0.0: {}
+
+  fsevents@2.3.2:
+    optional: true
 
   fsevents@2.3.3:
     optional: true
