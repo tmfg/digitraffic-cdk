@@ -106,6 +106,12 @@
       "tags": ["cdk", "marine"]
     },
     {
+      "packageName": "port-call",
+      "projectFolder": "marine/port-call",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "marine"]
+    },
+    {
       "packageName": "shiplight",
       "projectFolder": "marine/shiplight",
       "decoupledLocalDependencies": ["@digitraffic/common"],
