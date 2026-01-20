@@ -18,19 +18,13 @@ const EFFECT_DENY = "Deny";
 
 const KEY_COGNITO_GROUPS = "cognito:groups";
 
-export const handler: (
+export const handler = async (
   event: APIGatewayRequestAuthorizerEvent,
-  context: Context,
-  callback: Callback<APIGatewayAuthorizerResult>,
-) => Promise<void> = async function (
-  event: APIGatewayRequestAuthorizerEvent,
-  _context: Context,
-  callback: Callback<APIGatewayAuthorizerResult>,
-) {
+): Promise<APIGatewayAuthorizerResult> => {
   const result = parseAuthentication(event.headers);
 
   if (!result) {
-    callback("Unauthorized");
+    throw new Error("Unauthorized");
   } else {
     const group = getGroupFromPath(event.path);
     const policy = await generatePolicy(
@@ -42,7 +36,7 @@ export const handler: (
 
     logger.debug(policy);
 
-    callback(null, policy);
+    return policy;
   }
 };
 
@@ -56,9 +50,9 @@ function parseAuthentication(
   } else {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
     const encodedCreds = headers["authorization"].split(" ")[1]!;
-    const plainCreds = Buffer.from(encodedCreds, "base64").toString().split(
-      ":",
-    );
+    const plainCreds = Buffer.from(encodedCreds, "base64")
+      .toString()
+      .split(":");
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return [plainCreds[0]!, plainCreds[1]!];
