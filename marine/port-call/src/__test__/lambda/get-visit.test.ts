@@ -8,6 +8,7 @@ import { ExpectResponse } from "@digitraffic-cdk/testing";
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { updateAndExpect } from "../service/visits-service.test.js";
 import { createTestVisit } from "../testdata.js";
+import type { VisitResponse } from "../../model/visit-schema.js";
 
 // eslint-disable-next-line dot-notation
 process.env["SECRET_ID"] = "";
@@ -33,24 +34,24 @@ describe(
 
     test("one visit", async () => {
       const testVisit = createTestVisit();
-      await updateAndExpect([testVisit], 1);
+      await updateAndExpect([testVisit], 1, 0, 1);
       await assertVisitCount(db, 1);
 
       const response = await getResponseFromLambda(testVisit.visitId);
       ExpectResponse.ok(response).expectJson({
-        "ata": null,
-        "atd": null,
+        "ata": undefined,
+        "atd": undefined,
         "eta": testVisit.portCall.voyageInformation.estimatedArrivalDateTime
           .toISOString(),
         "etd": testVisit.portCall.voyageInformation.estimatedDepartureDateTime!
           .toISOString(),
-        "port_locode": testVisit.portCall.voyageInformation.portIdentification,
+        "portLocode": testVisit.portCall.voyageInformation.portIdentification,
         "status": testVisit.portCall.portCallStatus.status,
-        "update_time": testVisit.latestUpdateTime.toISOString(),
-        "vessel_id": testVisit.portCall.vesselInformation.identification,
-        "vessel_name": testVisit.portCall.vesselInformation.name,
-        "visit_id": testVisit.visitId,
-      });
+        "updateTime": testVisit.latestUpdateTime.toISOString(),
+        "vesselId": testVisit.portCall.vesselInformation.identification,
+        "vesselName": testVisit.portCall.vesselInformation.name,
+        "visitId": testVisit.visitId,
+      } satisfies VisitResponse);
     });
   }),
 );

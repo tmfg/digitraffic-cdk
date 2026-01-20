@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VISIT_STATUS_VALUES } from "./visit-schema.js";
 
 export const nemoVisitSchema = z.object({
   visitId: z.string().max(35),
@@ -58,12 +59,7 @@ export const nemoVisitSchema = z.object({
       portCallStatus: z
         .object({
           status: z
-            .enum([
-              "Expected to Arrive",
-              "Arrived",
-              "Departed",
-              "Cancelled",
-            ])
+            .enum(VISIT_STATUS_VALUES)
             .describe("Satamakäynnin tila "),
         })
         .strict(),

@@ -14,7 +14,7 @@ export class ExpectResponse {
 
   static notFound(
     response: LambdaResponse,
-    body: string = "Not found",
+    body: string = "Not Found",
   ): ExpectResponse {
     return new ExpectResponse(response)
       .expectStatus(404)

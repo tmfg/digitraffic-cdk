@@ -1,13 +1,14 @@
 import type { DigitrafficStack } from "@digitraffic/common";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
-import type { Resource } from "aws-cdk-lib/aws-apigateway";
+import type { JsonSchema, Resource } from "aws-cdk-lib/aws-apigateway";
 import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
-import { visitSchema } from "./model/visit-schema.js";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
+import { visitResponseSchema } from "./model/visit-schema.js";
+import z from "zod";
 
 const PORT_CALL_TAG_V2 = ["Port Call V2"];
 
@@ -42,11 +43,13 @@ export class PublicApi {
   }
 
   createVisitEndpoint(stack: DigitrafficStack, visitResource: Resource): void {
-    const visitsLambda = MonitoredDBFunction.create(stack, "get-visits");
+    const visitsLambda = FunctionBuilder.create(stack, "get-visits").build();
     const visitModel = addServiceModel(
       "VisitModel",
       this.publicApi,
-      visitSchema,
+      z.toJSONSchema(visitResponseSchema, {
+        target: "draft-4",
+      }) as JsonSchema
     );
     const visitsIntegration = new DigitrafficIntegration(visitsLambda)
       .passAllQueryParameters()
@@ -55,6 +58,10 @@ export class PublicApi {
     ["GET", "HEAD"].forEach((httpMethod) => {
       visitResource.addMethod(httpMethod, visitsIntegration, {
         apiKeyRequired: true,
+        requestParameters: {
+          "method.request.querystring.from": false,
+          "method.request.querystring.to": false,
+        },
         methodResponses: [
           DigitrafficMethodResponse.response200(
             visitModel,

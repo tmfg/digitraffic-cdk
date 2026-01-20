@@ -8,15 +8,17 @@ import type { NemoResponse } from "../../model/nemo.js";
 
 export async function updateAndExpect(
   response: NemoResponse,
-  expectInserted: number = 0,
-  expectUpdated: number = 0,
+  expectInserted: number,
+  expectUpdated: number,
+  expectItems: number
 ): Promise<void> {
   jest.spyOn(NemoApi.prototype, "getVisits").mockResolvedValue(response);
 
-  const updated = await updateVisits("", "", "");
+  const updated = await updateVisits("", "", "", 0);
 
   expect(updated.inserted).toBe(expectInserted);
   expect(updated.updated).toBe(expectUpdated);
+  expect(updated.items).toBe(expectItems);
 }
 
 const TEST_RESPONSE = [{
@@ -61,37 +63,37 @@ describe(
   "visit-service-tests",
   dbTestBase((db: DTDatabase) => {
     test("update visits - no new visits", async () => {
-      await updateAndExpect([]);
+      await updateAndExpect([], 0, 0, 0);
       await assertVisitCount(db, 0);
     });
 
     test("update visits - one new visit", async () => {
-      await updateAndExpect([createTestVisit()], 1);
+      await updateAndExpect([createTestVisit()], 1, 0, 1);
       await assertVisitCount(db, 1);
     });
 
     test("update visits - new visit then update", async () => {
-      await updateAndExpect([createTestVisit("ID", "P1")], 1, 0);
+      await updateAndExpect([createTestVisit("ID", "P1")], 1, 0, 1);
       await assertVisitCount(db, 1);
 
-      await updateAndExpect([createTestVisit("ID", "P2")], 0, 1);
+      await updateAndExpect([createTestVisit("ID", "P2")], 0, 1, 1);
       await assertVisitCount(db, 1);
     });
 
     test("update visits - new visit then update but no change", async () => {
       const testVisit = createTestVisit("ID", "P1");
-      await updateAndExpect([testVisit], 1, 0);
+      await updateAndExpect([testVisit], 1, 0, 1);
       await assertVisitCount(db, 1);
 
-      await updateAndExpect([testVisit], 0, 0);
+      await updateAndExpect([testVisit], 0, 0, 1);
       await assertVisitCount(db, 1);
     });
 
     test("update visits - from test response", async () => {
-      await updateAndExpect(TEST_RESPONSE, 2, 0);
+      await updateAndExpect(TEST_RESPONSE, 2, 0, 2);
       await assertVisitCount(db, 2);
 
-      await updateAndExpect(TEST_RESPONSE, 0, 0);
+      await updateAndExpect(TEST_RESPONSE, 0, 0, 2);
       await assertVisitCount(db, 2);
     });
   }),

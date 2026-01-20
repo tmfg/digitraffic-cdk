@@ -1,6 +1,6 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { LambdaResponse, LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { getVisit } from "../../service/visit-service.js";
 
@@ -19,16 +19,16 @@ export const handler = async (
     const [visit, lastUpdated] = await getVisit(event.visitId);
 
     if (!visit) {
-      return LambdaResponse.notFound();
+      return LambdaResponseBuilder.notFound();
     }
 
     return lastUpdated
-      ? LambdaResponse.okJson(visit).withTimestamp(lastUpdated)
-      : LambdaResponse.okJson(visit);
+      ? LambdaResponseBuilder.create(visit).withTimestamp(lastUpdated).build()
+      : LambdaResponseBuilder.create(visit).build();
   } catch (error) {
     logException(logger, error, true);
 
-    return LambdaResponse.internalError();
+    return LambdaResponseBuilder.internalError();
   } finally {
     logger.info({
       method: "GetVisit.handler",
