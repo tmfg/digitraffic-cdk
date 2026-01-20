@@ -6,12 +6,10 @@ import {
 } from "@digitraffic/common/dist/utils/utils";
 import type {
   CloudFrontRequest,
-  CloudFrontRequestCallback,
   CloudFrontRequestEvent,
   CloudFrontRequestHandler,
   CloudFrontRequestResult,
   CloudFrontResultResponse,
-  Context,
 } from "aws-lambda";
 
 import queryStringHelper, {
@@ -35,19 +33,15 @@ export const PATHS = {
 
 export const handler: CloudFrontRequestHandler = async (
   event: CloudFrontRequestEvent,
-  _: Context,
-  callback: CloudFrontRequestCallback,
 ): Promise<CloudFrontRequestResult> => {
   const records = event.Records;
   if (records) {
     const record = records[0];
     if (!record) {
-      const err = createAndLogError(
+      throw createAndLogError(
         "lambda-lam-redirect.handler",
         "Records did not have a record",
       );
-      callback(err);
-      throw err;
     }
     const request: CloudFrontRequest = record.cf.request;
 
@@ -138,10 +132,12 @@ export const handler: CloudFrontRequestHandler = async (
 
       // host is not allowed in CF custom headers
       // eslint-disable-next-line dot-notation
-      request.headers["host"] = [{
-        key: "host",
-        value: secret.snowflakeDomain,
-      }];
+      request.headers["host"] = [
+        {
+          key: "host",
+          value: secret.snowflakeDomain,
+        },
+      ];
 
       request.uri = getApiPath(request.querystring);
       request.querystring = newQuery;
@@ -193,7 +189,6 @@ export const handler: CloudFrontRequestHandler = async (
         // @ts-ignore
         customLocation: JSON.stringify(redirectResponse?.headers?.location),
       });
-      callback(null, redirectResponse);
       return redirectResponse;
       // This is for the webpage and it's resources
     } else if (request.uri.includes("/ui/tms/history/")) {
@@ -220,15 +215,12 @@ export const handler: CloudFrontRequestHandler = async (
       message: `Return request ${JSON.stringify(request)}`,
     });
 
-    callback(null, request);
     return request;
   } else {
-    const err = createAndLogError(
+    throw createAndLogError(
       "lambda-lam-redirect.handler",
       "Event did not have records",
     );
-    callback(err);
-    throw err;
   }
 };
 
@@ -286,14 +278,16 @@ function parseQuery(query: string): string {
   const q = queryStringHelper.parse(query) as QueryParams;
 
   if (
-    !q.api || !q.tyyppi || (!q.piste && !q.pistejoukko) || (!q.pvm && !q.viikko)
+    !q.api ||
+    !q.tyyppi ||
+    (!q.piste && !q.pistejoukko) ||
+    (!q.pvm && !q.viikko)
   ) {
     logger.warn({
       method: "lambda-lam-redirect.parseQuery",
-      message:
-        `invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${
-          JSON.stringify(q)
-        }`,
+      message: `invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${JSON.stringify(
+        q,
+      )}`,
     });
     return "";
   }

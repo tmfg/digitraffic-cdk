@@ -19,22 +19,16 @@ const sslProtocols = ["TLSv1", "TLSv1.1"];
     https://origin-address/C123.jpg -> no changes, send request to that origin
     https://origin-address/C123.jpg?versionId=123 -> send request to new origin http://DOMAIN_NAME/C123.jpg?versionId=123
  */
-export const handler: CloudFrontRequestHandler = (
-  event,
-  _context,
-  callback,
-) => {
+export const handler: CloudFrontRequestHandler = async (event) => {
   const records = event.Records;
 
   if (records) {
     const record = records[0];
     if (!record) {
-      const err = createAndLogError(
+      throw createAndLogError(
         "lambda-redirect.handler",
         "Records did not have a record",
       );
-      callback(err);
-      throw err;
     }
 
     const request: CloudFrontRequest = record.cf.request;
@@ -60,13 +54,11 @@ export const handler: CloudFrontRequestHandler = (
     }
 
     // If nothing matches, return request unchanged
-    callback(null, request);
+    return request;
   } else {
-    const err = createAndLogError(
+    throw createAndLogError(
       "lambda-redirect.handler",
       "Event did not have records",
     );
-    callback(err);
-    throw err;
   }
 };
