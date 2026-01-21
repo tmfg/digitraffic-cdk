@@ -9,7 +9,6 @@ import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-r
 import { updateAndExpect } from "../service/visits-service.test.js";
 import { createTestVisit } from "../testdata.js";
 import { addHours } from "date-fns";
-import type { NemoVisit } from "../../model/nemo.js";
 import type { VisitResponse } from "../../model/visit-schema.js";
 
 // eslint-disable-next-line dot-notation
@@ -35,12 +34,12 @@ describe(
 
       ExpectResponse.ok(response).expectJson([]);
     });
-    /*
-        test("invalid parameter", async () => {
-            const response = await getResponseFromLambda({answer: "42"});
+    
+    test("invalid parameter", async () => {
+        const response = await getResponseFromLambda({answer: "42"});
 
-            ExpectResponse.badRequest(response);
-        });        */
+        ExpectResponse.badRequest(response);
+    });
 
     test("one visit", async () => {
       const testVisit = createTestVisit();
