@@ -16,19 +16,19 @@ export const TEST_DATEX2_SITUATION_PUBLICATION =
 	xmlns:vms="http://datex2.eu/schema/3/vms"
 	xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
 	xmlns:sit="http://datex2.eu/schema/3/situation">
-	<publicationTime>2025-10-17T08:15:52.992Z</publicationTime>
-	<publicationCreator>
-		<country>FI</country>
-		<nationalIdentifier>FTA</nationalIdentifier>
-	</publicationCreator>
-	<situation id="KRM123456">
+	<com:publicationTime>2025-10-17T08:15:52.992Z</com:publicationTime>
+	<com:publicationCreator>
+		<com:country>FI</com:country>
+		<com:nationalIdentifier>FTA</com:nationalIdentifier>
+	</com:publicationCreator>
+	<sit:situation id="KRM123456">
 		<overallSeverity>high</overallSeverity>
 		<situationVersionTime>2024-12-03T16:01:13.526Z</situationVersionTime>
 		<headerInformation>
 			<confidentiality>noRestriction</confidentiality>
 			<informationStatus>real</informationStatus>
 		</headerInformation>
-		<situationRecord xsi:type="sit:SpeedManagement" id="KRM123456" version="123"
+		<sit:situationRecord xsi:type="sit:SpeedManagement" id="KRM123456" version="123"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<situationRecordCreationTime>2024-12-03T16:01:13.526Z</situationRecordCreationTime>
 			<situationRecordObservationTime>2024-12-03T16:01:13.526Z</situationRecordObservationTime>
@@ -36,12 +36,12 @@ export const TEST_DATEX2_SITUATION_PUBLICATION =
 			<confidentialityOverride>noRestriction</confidentialityOverride>
 			<probabilityOfOccurrence>certain</probabilityOfOccurrence>
 			<severity>high</severity>
-			<validity>
-				<validityStatus>active</validityStatus>
-				<validityTimeSpecification>
-					<overallStartTime>2024-12-03T16:01:13.526Z</overallStartTime>
-				</validityTimeSpecification>
-			</validity>
+			<sit:validity>
+				<com:validityStatus>active</com:validityStatus>
+				<com:validityTimeSpecification>
+					<com:overallStartTime>2024-12-03T16:01:13.526Z</com:overallStartTime>
+				</com:validityTimeSpecification>
+			</sit:validity>
 			<locationReference xsi:type="PointLocation">
 				<pointByCoordinates>
 					<pointCoordinates>
@@ -54,9 +54,50 @@ export const TEST_DATEX2_SITUATION_PUBLICATION =
 			<complianceOption>mandatory</complianceOption>
 			<automaticallyInitiated>true</automaticallyInitiated>
 			<speedManagementType>speedRestrictionInOperation</speedManagementType>
-		</situationRecord>
-	</situation>
+		</sit:situationRecord>
+	</sit:situation>
 </sit:situationPublication>`;
+
+export const TEST_DATEX2_SITUATION =
+  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <d2:payload xsi:type="sit:SituationPublication">
+  	<com:publicationTime>2025-10-17T08:15:52.992Z</com:publicationTime>
+	<sit:situation id="KRM123456">
+		<overallSeverity>high</overallSeverity>
+		<situationVersionTime>2024-12-03T16:01:13.526Z</situationVersionTime>
+		<headerInformation>
+			<confidentiality>noRestriction</confidentiality>
+			<informationStatus>real</informationStatus>
+		</headerInformation>
+		<sit:situationRecord xsi:type="sit:SpeedManagement" id="KRM123456" version="123"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			<situationRecordCreationTime>2024-12-03T16:01:13.526Z</situationRecordCreationTime>
+			<situationRecordObservationTime>2024-12-03T16:01:13.526Z</situationRecordObservationTime>
+			<situationRecordVersionTime>2024-12-03T16:01:13.526Z</situationRecordVersionTime>
+			<confidentialityOverride>noRestriction</confidentialityOverride>
+			<probabilityOfOccurrence>certain</probabilityOfOccurrence>
+			<severity>high</severity>
+			<sit:validity>
+				<com:validityStatus>active</com:validityStatus>
+				<com:validityTimeSpecification>
+					<com:overallStartTime>2024-12-03T16:01:13.526Z</com:overallStartTime>
+				</com:validityTimeSpecification>
+			</sit:validity>
+			<locationReference xsi:type="PointLocation">
+				<pointByCoordinates>
+					<pointCoordinates>
+						<latitude>123.0</latitude>
+						<longitude>456.0</longitude>
+					</pointCoordinates>
+				</pointByCoordinates>
+			</locationReference>
+			<actionOrigin>internal</actionOrigin>
+			<complianceOption>mandatory</complianceOption>
+			<automaticallyInitiated>true</automaticallyInitiated>
+			<speedManagementType>speedRestrictionInOperation</speedManagementType>
+		</sit:situationRecord>
+	</sit:situation>
+</d2:payload>`;
 
 export const TEST_DATEX2_VMSPUBLICATION_1 =
   `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -86,10 +127,10 @@ export const TEST_DATEX2_VMSPUBLICATION_1 =
 		<confidentiality>noRestriction</confidentiality>
 		<informationStatus>real</informationStatus>
 	</headerInformation>
-	<vmsControllerStatus>
-		<vmsControllerReference id="VME038713"/>
-		<statusUpdateTime>2025-10-20T05:11:10.570Z</statusUpdateTime>
-		<vmsStatus vmsIndex="0">
+	<vms:vmsControllerStatus>
+		<vms:vmsControllerReference id="VME038713"/>
+		<vms:statusUpdateTime>2025-10-20T05:11:10.570Z</vms:statusUpdateTime>
+		<vms:vmsStatus vmsIndex="0">
 			<vmsStatus>
 				<statusUpdateTime>2025-10-20T05:10:23.783Z</statusUpdateTime>
 				<vmsMessage messageIndex="0">
@@ -105,8 +146,8 @@ export const TEST_DATEX2_VMSPUBLICATION_1 =
 					</coordinatesForDisplay>
 				</vmsLocationOverride>
 			</vmsStatus>
-		</vmsStatus>
-	</vmsControllerStatus>
+		</vms:vmsStatus>
+	</vms:vmsControllerStatus>
 </d2:payload>
 `;
 

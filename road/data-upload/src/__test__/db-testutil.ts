@@ -29,6 +29,17 @@ export async function assertDataCount(
   expect(dataCount.count).toEqual(expectedCount);
 }
 
+export async function assertRttiDatex2Count(
+  db: DTDatabase,
+  expectedCount: number,
+): Promise<void> {
+  const sql =
+    "select count(*) as count from datex2_rtti";
+  const dataCount: Countable = await db.one(sql);
+
+  expect(dataCount.count).toEqual(expectedCount);
+}
+
 export async function assertVsDatex2Count(
   db: DTDatabase,
   expectedCount: number,

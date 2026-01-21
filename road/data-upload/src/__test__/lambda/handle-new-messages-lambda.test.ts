@@ -1,6 +1,7 @@
 import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
   assertDataCount,
+  assertRttiDatex2Count,
   assertVsDatex2Count,
   dbTestBase,
 } from "../db-testutil.js";
@@ -9,6 +10,7 @@ import { jest } from "@jest/globals";
 import { insertData } from "../../dao/data.js";
 import { Datex2Version, SOURCES, TYPES } from "../../model/types.js";
 import { TEST_DATEX2 } from "../service/datex2_223_files.js";
+import { TEST_DATEX2_SITUATION } from "../service/datex2_35_files.js";
 
 async function getResponseFromLambda(): Promise<void> {
   const { handler } = await import(
@@ -26,6 +28,23 @@ describe(
     test("nothing to handle", async () => {
       await getResponseFromLambda();
     });
+
+    test("handle one rtti", async () => {
+      await insertData(
+        db,
+        "test124",
+        SOURCES.TOPIC,
+        "3.5",
+        TYPES.RTTI_DATEX2_XML,
+        TEST_DATEX2_SITUATION,
+      );
+      await assertDataCount(db, 1, "NEW");
+
+      await getResponseFromLambda();
+      await assertDataCount(db, 1, "PROCESSED");
+      await assertRttiDatex2Count(db, 1);
+    });
+
 
     test("handle one vs", async () => {
       await insertData(
