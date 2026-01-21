@@ -69,10 +69,17 @@ export const schema = {
         railway: {
           description:
             "If the track kilometer interval has been limited, the name/identifier of the railway to which the \nlimitation applies. The track must have a railway kilometer interval on the railway. Specifies the \nrailway that possible railway kilometer locations given as limit values concern, or the railway \nbased on which a kilometer location is selected from the railway intervals of possible elements used\nas limits. If railway information has not been defined, the track is a part of the yearly plan \nlocation in its entirety.\n",
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         startLimit: {
-          anyOf: [
+          oneOf: [
             {
               $ref: "#/definitions/TrackLimitDto",
             },
@@ -82,7 +89,7 @@ export const schema = {
           ],
         },
         endLimit: {
-          anyOf: [
+          oneOf: [
             {
               $ref: "#/definitions/TrackLimitDto",
             },
@@ -96,6 +103,57 @@ export const schema = {
         },
       },
       required: ["trackOid"],
+    },
+    LinkedAnnouncementOrPlanDto: {
+      description:
+        "Linkage of a yearly plan either to a preliminary announcement or a preliminary plan\n",
+      type: "object",
+      properties: {
+        linkedAnnouncementWithPlans: {
+          description:
+            "Linkage of a yearly plan to a preliminary announcement and its possible related preliminary plans\n",
+          oneOf: [
+            {
+              $ref: "#/definitions/LinkedAnnouncementWithPlansDto",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        linkedPreliminaryPlanOid: {
+          description:
+            "Linkage of a yearly plan directly to a preliminary plan. The OID in this field may refer to a \nspecific preliminary plan with an identifier from different systems (RUMA, JETI/ETJ2) depending on \nthe situation.\n",
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+      },
+    },
+    LinkedAnnouncementWithPlansDto: {
+      description:
+        "Linkage of a yearly plan to a preliminary announcement and possible preliminary plans further linked to\nthe preliminary announcement.\n",
+      type: "object",
+      properties: {
+        preliminaryAnnouncementOid: {
+          description: "Identifier of the preliminary announcement",
+          type: "string",
+        },
+        preliminaryPlanOids: {
+          description:
+            "Preliminary plans linked to the announcement. An OID in this field may refer to a specific \npreliminary plan with an identifier from different systems (RUMA, JETI/ETJ2) depending on the \nsituation.\n",
+          type: "array",
+          items: {
+            type: "string",
+          },
+        },
+      },
+      required: ["preliminaryAnnouncementOid", "preliminaryPlanOids"],
     },
     LocationDto: {
       description:
@@ -181,16 +239,41 @@ export const schema = {
       },
       required: ["end", "railway", "start"],
     },
+    SpeedLimitLocationDto: {
+      description:
+        "The location information of the yearly plan version specified by the user. The location selections made\nby the user are stored in SUPA as references (OID values) to the corresponding infra data (Trakedia) \nobjects and, in the case of limited tracks, additional track limit information.\n",
+      type: "object",
+      properties: {
+        infraInfo: {
+          $ref: "#/definitions/InfraInfoDto",
+        },
+        limitedTracks: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/LimitedTrackDto",
+          },
+          uniqueItems: true,
+        },
+      },
+      required: ["infraInfo", "limitedTracks"],
+    },
     TrackLimitDto: {
       description:
         "A limit that limits track railway kilometer interval. The limit can be either a railway kilometer\nlocation or a reference to an infra data object (element) on the track. Requires that the railway \ninformation has been specified as well.\n",
       type: "object",
       properties: {
         infraElementOid: {
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         kmLocation: {
-          anyOf: [
+          oneOf: [
             {
               $ref: "#/definitions/KmLocationDto",
             },
@@ -283,22 +366,50 @@ export const schema = {
         mapGeometry: {
           description:
             "The computed map geometry for the specified yearly plan version (the combined map geometry of \nthe user-specified location information for the yearly plan version). Returned in Well-known text \n(WKT) format using the requested coordinate system (default: EPSG:3067).\n",
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         diagramGeometry: {
           description:
             "The computed diagram geometry for the specified yearly plan version (the combined diagram geometry of \nthe user-specified location information for the yearly plan version). Returned in Well-known text \n(WKT) format using the requested coordinate system (default: EPSG:3067).\n",
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         mapGeometryCentroid: {
           description:
             "The computed map geometry centroid for the specified yearly plan version (the centroid of the \ncombined map geometry of the user-specified location information for the yearly plan version). \nReturned in Well-known text (WKT) format using the requested coordinate system (default: EPSG:3067).\n",
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         diagramGeometryCentroid: {
           description:
             "The computed diagram geometry centroid for the specified yearly plan version (the centroid of the \ncombined diagram geometry of the user-specified location information for the yearly plan version). \nReturned in Well-known text (WKT) format using the requested coordinate system (default: EPSG:3067).\n",
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
       },
       required: [
@@ -335,25 +446,56 @@ export const schema = {
         name: {
           type: "string",
         },
+        description: {
+          type: "string",
+        },
         projectPlanOid: {
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         startDate: {
           description:
             'See the corresponding field description for class  \n<a href="#model-YearlyPlanVersionContentRedactedDto">YearlyPlanVersionContentRedactedDto</a>\n',
-          type: ["string", "null"],
-          format: "date",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         endDate: {
           description:
             'See the corresponding field description for class  \n<a href="#model-YearlyPlanVersionContentRedactedDto">YearlyPlanVersionContentRedactedDto</a>\n',
-          type: ["string", "null"],
-          format: "date",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         dateTz: {
           description:
             'See the corresponding field description for class  \n<a href="#model-YearlyPlanVersionContentRedactedDto">YearlyPlanVersionContentRedactedDto</a>\n',
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         timeslots: {
           description:
@@ -363,13 +505,95 @@ export const schema = {
             $ref: "#/definitions/YearlyPlanTimeslotRevisedDto",
           },
         },
+        realizationStatus: {
+          description:
+            'The realization status of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/realizationStatuses">/b/1/yearly-plan/meta/realizationStatuses</a>\n',
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        assetClass: {
+          description:
+            'The asset class of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/assetClasses">/b/1/yearly-plan/meta/assetClasses</a>\n',
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        requiredRailwayCapacity: {
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        railwayCapacityTiming: {
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        railwayInfraChanges: {
+          description:
+            'The railway infrastructure changes of the yearly plan. Possible values are listed by the metadata \nendpoint <a href="#operation/railwayInfraChanges">/b/1/yearly-plan/meta/railwayInfraChanges</a>\n',
+          type: "array",
+          items: {
+            type: "string",
+          },
+        },
         trafficDisruption: {
           description:
             'The traffic disruption level of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/trafficDisruptions">/b/1/yearly-plan/meta/trafficDisruptions</a>\n',
           type: "string",
         },
+        trafficRestrictions: {
+          description:
+            'The traffic restrictions of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/trafficRestrictions">/b/1/yearly-plan/meta/trafficRestrictions</a>\n',
+          type: "array",
+          items: {
+            type: "string",
+          },
+        },
+        trafficRestrictionDescription: {
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        linkedAnnouncementsAndPlans: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/LinkedAnnouncementOrPlanDto",
+          },
+        },
+        speedLimits: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/YearlyPlanSpeedLimitRedactedDto",
+          },
+        },
         location: {
-          anyOf: [
+          oneOf: [
             {
               $ref: "#/definitions/LocationDto",
             },
@@ -379,7 +603,7 @@ export const schema = {
           ],
         },
         computedData: {
-          anyOf: [
+          oneOf: [
             {
               $ref: "#/definitions/YearlyPlanComputedDataDto",
             },
@@ -390,11 +614,16 @@ export const schema = {
         },
       },
       required: [
+        "description",
         "displayId",
+        "linkedAnnouncementsAndPlans",
         "name",
         "oid",
+        "railwayInfraChanges",
+        "speedLimits",
         "timeslots",
         "trafficDisruption",
+        "trafficRestrictions",
         "versionCreateTime",
         "versionNumber",
       ],
@@ -452,7 +681,14 @@ export const schema = {
         tzName: {
           description:
             "The IANA timezone name of the timezone of the date and time fields. E.g. Europe/Helsinki.\n",
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         duration: {
           description:
@@ -472,8 +708,15 @@ export const schema = {
         repetition: {
           description:
             "Defines the week-level repetition pattern of the timeslot. Week calculation starts from the week\nof the date defined by the 'firstOccurrenceDate' field.\n",
-          type: ["string", "null"],
-          enum: ["EVERY_WEEK", "EVERY_OTHER_WEEK", "EVERY_FOURTH_WEEK"],
+          oneOf: [
+            {
+              type: "string",
+              enum: ["EVERY_WEEK", "EVERY_OTHER_WEEK", "EVERY_FOURTH_WEEK"],
+            },
+            {
+              type: "null",
+            },
+          ],
         },
       },
       required: [
@@ -497,11 +740,81 @@ export const schema = {
         end: {
           description:
             "The end instant (date and time) of the timeslot. Specified as an ISO instant string. Example value:\n2024-12-03T10:15:30Z. If left out, the timeslot extends to \"eternity\" starting from the 'start' \ninstant.\n",
-          type: ["string", "null"],
-          format: "date-time",
+          oneOf: [
+            {
+              type: "string",
+              format: "date-time",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
       },
       required: ["start"],
+    },
+    YearlyPlanSpeedLimitRedactedDto: {
+      type: "object",
+      properties: {
+        startTime: {
+          oneOf: [
+            {
+              type: "string",
+              format: "date-time",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        endTime: {
+          oneOf: [
+            {
+              type: "string",
+              format: "date-time",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        direction: {
+          oneOf: [
+            {
+              type: "string",
+              enum: ["UP", "DOWN", "BOTH"],
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        speedLimit: {
+          type: "integer",
+          format: "int32",
+        },
+        description: {
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        location: {
+          oneOf: [
+            {
+              $ref: "#/definitions/SpeedLimitLocationDto",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+      },
+      required: ["speedLimit"],
     },
     YearlyPlanTimeslotRevisedDto: {
       description:
@@ -509,7 +822,8 @@ export const schema = {
       type: "object",
       properties: {
         single: {
-          anyOf: [
+          description: "Single timeslot definition",
+          oneOf: [
             {
               $ref: "#/definitions/YearlyPlanSingleTimeslotDto",
             },
@@ -519,7 +833,8 @@ export const schema = {
           ],
         },
         repeating: {
-          anyOf: [
+          description: "Repeating timeslot definition",
+          oneOf: [
             {
               $ref: "#/definitions/YearlyPlanRepeatingTimeslotDto",
             },
@@ -529,63 +844,6 @@ export const schema = {
           ],
         },
       },
-    },
-    LinkedAnnouncementOrPlanDto: {
-      description:
-        "Linkage of a yearly plan either to a preliminary announcement or a preliminary plan\n",
-      type: "object",
-      properties: {
-        linkedAnnouncementWithPlans: {
-          anyOf: [
-            {
-              $ref: "#/definitions/LinkedAnnouncementWithPlansDto",
-            },
-            {
-              type: "null",
-            },
-          ],
-        },
-        linkedPreliminaryPlanOid: {
-          description:
-            "Linkage of a yearly plan directly to a preliminary plan",
-          type: ["string", "null"],
-        },
-      },
-    },
-    LinkedAnnouncementWithPlansDto: {
-      description:
-        "Linkage of a yearly plan to a preliminary announcement. The announcement itself may then be linked\nto one or more preliminary plans.\n",
-      type: "object",
-      properties: {
-        preliminaryAnnouncementOid: {
-          type: "string",
-        },
-        preliminaryPlanOids: {
-          type: "array",
-          items: {
-            type: "string",
-          },
-        },
-      },
-      required: ["preliminaryAnnouncementOid", "preliminaryPlanOids"],
-    },
-    SpeedLimitLocationDto: {
-      description:
-        "The location information of the yearly plan version specified by the user. The location selections made\nby the user are stored in SUPA as references (OID values) to the corresponding infra data (Trakedia) \nobjects and, in the case of limited tracks, additional track limit information.\n",
-      type: "object",
-      properties: {
-        infraInfo: {
-          $ref: "#/definitions/InfraInfoDto",
-        },
-        limitedTracks: {
-          type: "array",
-          items: {
-            $ref: "#/definitions/LimitedTrackDto",
-          },
-          uniqueItems: true,
-        },
-      },
-      required: ["infraInfo", "limitedTracks"],
     },
     YearlyPlanRedactedDto: {
       description:
@@ -612,43 +870,6 @@ export const schema = {
       },
       required: ["createTime", "displayId", "latestVersion", "oid"],
     },
-    YearlyPlanSpeedLimitRedactedDto: {
-      type: "object",
-      properties: {
-        startTime: {
-          type: ["string", "null"],
-          format: "date-time",
-        },
-        endTime: {
-          type: ["string", "null"],
-          format: "date-time",
-        },
-        direction: {
-          type: ["string", "null"],
-          enum: ["UP", "DOWN", "BOTH"],
-        },
-        speedLimit: {
-          type: "integer",
-          format: "int32",
-        },
-        description: {
-          type: ["string", "null"],
-          maxLength: 2000,
-          minLength: 0,
-        },
-        location: {
-          anyOf: [
-            {
-              $ref: "#/definitions/SpeedLimitLocationDto",
-            },
-            {
-              type: "null",
-            },
-          ],
-        },
-      },
-      required: ["speedLimit"],
-    },
     YearlyPlanVersionContentRedactedDto: {
       description: "The actual content of a yearly plan version",
       type: "object",
@@ -659,6 +880,56 @@ export const schema = {
         description: {
           type: "string",
         },
+        projectPlanOid: {
+          description:
+            'If the yearly plan "belongs" to a project plan, the OID of that project plan. A yearly plan can \nbelong to at most one project plan at a time.\n',
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        startDate: {
+          description:
+            "High-level (preliminary) start date for the yearly plan. A local date in ISO format, \nexample value: 2024-03-26.\n",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        endDate: {
+          description:
+            "High-level (preliminary) end date for the yearly plan. A local date in ISO format, example value:\n2024-03-26. If left out, and 'startDate' is given, the high-level timespan of the yearly plan \nextends to \"eternity\" starting from 'startDate'. If defined, also 'startDate' must be defined.\n",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
+        dateTz: {
+          description:
+            'The IANA timezone name of start and end dates to allow the comparison of the yearly plan high-level\ntimespan to intervals/instants. If left undefined and start date is defined, defaults to \n"Europe/Helsinki".\n',
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
+        },
         timeslots: {
           description: "More detailed time information for the yearly plan",
           type: "array",
@@ -666,40 +937,53 @@ export const schema = {
             $ref: "#/definitions/YearlyPlanTimeslotRevisedDto",
           },
         },
-        startDate: {
+        realizationStatus: {
           description:
-            "High-level (preliminary) start date for the yearly plan. A local date in ISO format, \nexample value: 2024-03-26.\n",
-          type: ["string", "null"],
-          format: "date",
+            'The realization status of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/realizationStatuses">/b/1/yearly-plan/meta/realizationStatuses</a>\n',
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
-        endDate: {
+        assetClass: {
           description:
-            "High-level (preliminary) end date for the yearly plan. A local date in ISO format, example value:\n2024-03-26. If left out, and 'startDate' is given, the high-level timespan of the yearly plan \nextends to \"eternity\" starting from 'startDate'. If defined, also 'startDate' must be defined.\n",
-          type: ["string", "null"],
-          format: "date",
-        },
-        dateTz: {
-          description:
-            'The IANA timezone name of start and end dates to allow the comparison of the yearly plan high-level\ntimespan to intervals/instants. If left undefined and start date is defined, defaults to \n"Europe/Helsinki".\n',
-          type: ["string", "null"],
+            'The asset class of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/assetClasses">/b/1/yearly-plan/meta/assetClasses</a>\n',
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         requiredRailwayCapacity: {
           description:
             "Preliminary railway capacity needs of the yearly plan (area and timeslots, free-formatted textual\ndescription)\n",
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         railwayCapacityTiming: {
           description:
             "Preliminary timing of the yearly plan's capacity needs (free-formatted textual description)\n",
-          type: ["string", "null"],
-        },
-        trafficRestrictions: {
-          description:
-            'The traffic restrictions of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/trafficRestrictions">/b/1/yearly-plan/meta/trafficRestrictions</a>\n',
-          type: "array",
-          items: {
-            type: "string",
-          },
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         railwayInfraChanges: {
           description:
@@ -714,21 +998,25 @@ export const schema = {
             'The traffic disruption level of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/trafficDisruptions">/b/1/yearly-plan/meta/trafficDisruptions</a>\n',
           type: "string",
         },
-        speedLimits: {
+        trafficRestrictions: {
+          description:
+            'The traffic restrictions of the yearly plan. Possible values are listed by the metadata endpoint\n<a href="#operation/trafficRestrictions">/b/1/yearly-plan/meta/trafficRestrictions</a>\n',
           type: "array",
           items: {
-            $ref: "#/definitions/YearlyPlanSpeedLimitRedactedDto",
+            type: "string",
           },
         },
         trafficRestrictionDescription: {
           description:
             "Free formatted description of the traffic restrictions caused",
-          type: ["string", "null"],
-        },
-        projectPlanOid: {
-          description:
-            'If the yearly plan "belongs" to a project plan, the OID of that project plan. A yearly plan can \nbelong to at most one project plan at a time.\n',
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         linkedAnnouncementsAndPlans: {
           type: "array",
@@ -736,8 +1024,14 @@ export const schema = {
             $ref: "#/definitions/LinkedAnnouncementOrPlanDto",
           },
         },
+        speedLimits: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/YearlyPlanSpeedLimitRedactedDto",
+          },
+        },
         location: {
-          anyOf: [
+          oneOf: [
             {
               $ref: "#/definitions/LocationDto",
             },
@@ -747,7 +1041,7 @@ export const schema = {
           ],
         },
         computedData: {
-          anyOf: [
+          oneOf: [
             {
               $ref: "#/definitions/YearlyPlanComputedDataDto",
             },
@@ -839,33 +1133,66 @@ export const schema = {
           type: "string",
           format: "date-time",
         },
+        name: {
+          type: "string",
+        },
+        description: {
+          type: "string",
+        },
         startDate: {
           description:
             'See the corresponding field description for class  \n<a href="#model-ProjectPlanVersionContentRedactedDto">ProjectPlanVersionContentRedactedDto</a>\n',
-          type: ["string", "null"],
-          format: "date",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         endDate: {
           description:
             'See the corresponding field description for class  \n<a href="#model-ProjectPlanVersionContentRedactedDto">ProjectPlanVersionContentRedactedDto</a>\n',
-          type: ["string", "null"],
-          format: "date",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         dateTz: {
           description:
             'See the corresponding field description for class  \n<a href="#model-ProjectPlanVersionContentRedactedDto">ProjectPlanVersionContentRedactedDto</a>\n',
-          type: ["string", "null"],
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
-        name: {
-          type: "string",
+        yearlyPlanOids: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+          uniqueItems: true,
         },
       },
       required: [
+        "description",
         "displayId",
         "name",
         "oid",
         "versionCreateTime",
         "versionNumber",
+        "yearlyPlanOids",
       ],
     },
     ProjectPlanListItemRedactedDto: {
@@ -927,32 +1254,47 @@ export const schema = {
       properties: {
         name: {
           type: "string",
-          maxLength: 200,
-          minLength: 0,
         },
         description: {
           type: "string",
-          maxLength: 2000,
-          minLength: 0,
         },
         startDate: {
           description:
             "Approximate start date for the project. A local date in ISO format, example value: 2024-03-26.\n",
-          type: ["string", "null"],
-          format: "date",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         endDate: {
           description:
             "Approximate end date for the project. A local date in ISO format, example value: 2024-03-26.\nIf not defined, and 'startDate' is given, the high-level timespan of the project plan extends to\n\"eternity\" starting from 'startDate'. If defined, also 'startDate' must be defined.\n",
-          type: ["string", "null"],
-          format: "date",
+          oneOf: [
+            {
+              type: "string",
+              format: "date",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         dateTz: {
           description:
             'The IANA timezone name of start and end dates to allow the comparison of the project plan high-level\ntimespan to intervals/instants. If left undefined and start date is defined, defaults to \n"Europe/Helsinki".\n',
-          type: ["string", "null"],
-          maxLength: 200,
-          minLength: 0,
+          oneOf: [
+            {
+              type: "string",
+            },
+            {
+              type: "null",
+            },
+          ],
         },
         yearlyPlanOids: {
           description:
