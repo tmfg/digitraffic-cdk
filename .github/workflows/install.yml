@@ -126,10 +126,12 @@ jobs:
             node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
 
       - name: Generate SBOM
+        if: github.event.inputs.command == 'deploy'
         run: |
           node common/scripts/install-run-rush.js generate-sbom --only ${{ github.event.inputs.application }}
 
       - name: Configure AWS credentials for SBOM
+        if: github.event.inputs.command == 'deploy'
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.SBOM_AWS_ROLE }}
@@ -137,6 +139,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload SBOM
+        if: github.event.inputs.command == 'deploy'
         run: |
           aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
 
