@@ -65,10 +65,10 @@ jobs:
           ref: ${{ inputs.config-repo-branch }}
           path: digitraffic-ci
 
-      - name: Setup Node.js 24
+      - name: Setup Node.js 22
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 22
 
       - name: Setup pnpm 10
         uses: pnpm/action-setup@v4
@@ -111,13 +111,6 @@ jobs:
           role-session-name: gh-actions-upload-sbom-${{ github.event.inputs.application }}-${{ github.event.inputs.env }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Upload charging-network SBOM
-        if: github.event.inputs.install_afir == 'true'
+      - name: Upload SBOM
         run: |
           aws s3 cp afir/charging-network/sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env]['charging-network'] }}/${{ github.run_id }}-${{ github.sha }}.json
-
-      - name: Upload Mosquitto SBOM
-        if: github.event.inputs.install_mqtt == 'true'
-        run: |
-          aws s3 cp mosquitto-sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env]['mosquitto'] }}/${{ github.run_id }}-${{ github.sha }}.json
-
