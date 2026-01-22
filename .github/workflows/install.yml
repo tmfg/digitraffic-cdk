@@ -21,8 +21,8 @@ on:
         required: true
         type: choice
         options: 
-          - "other/digitraffic-statistics"
-          - "marine/aton-faults"
+          - "digitraffic-statistics"
+          - "aton-faults"
       deploy_all_changes:
         description: "Deploy all changes in CDK stacks (otherwise just ECS image tag changes are deployed)"
         required: true
@@ -89,21 +89,14 @@ jobs:
             if [ $ENV == "prod" ]; then export STACK=ChargingNetworkAfirProd; else export STACK=ChargingNetworkAfirTest; fi;
             if [ $DEPLOY_ALL_CHANGES == "true" ]; then export CDK_COMMAND=deploy; else export CDK_COMMAND=diff; fi;
 
-            # cd to correct application directory
-            cd ${{ github.event.inputs.application }}
-
-            # install and build
-            node ../../common/scripts/install-run-rush.js install
-            node ../../common/scripts/install-run-rushx.js build
+            node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
 
             # and the deploy
             # pnpm cdk deploy $STACK?
 
       - name: Generate SBOM
         run: |
-          cd $$ {{ github.event.inputs.application }}
-
-          pnpm generate-sbom
+          node common/scripts/install-run-rush-pnpm.js generate-sbom -I ${{ github.event.inputs.application }}
 
       - name: Configure AWS credentials for SBOM
         uses: aws-actions/configure-aws-credentials@v5
