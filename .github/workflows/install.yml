@@ -1,4 +1,4 @@
-name: Deploy from other repo
+name: Build, install and deploy to AWS
 on:
   workflow_dispatch:
 
