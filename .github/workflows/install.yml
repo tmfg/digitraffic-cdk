@@ -51,14 +51,13 @@ jobs:
         run: |
             export DOMAIN=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].domain }}
             export STACK=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].stack }}
-            export DIRECTORY=$(DOMAIN)/${{ github.event.inputs.application }}
+            export DIRECTORY=$DOMAIN/${{ github.event.inputs.application }}
 
             echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
             echo "stack=$STACK" >> $GITHUB_OUTPUT
             echo "directory=$DIRECTORY" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
-        if: 1 == 2
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ fromJson(secrets.INSTALL_CONFIG).roles[github.event.inputs.env][steps.environment.outputs.domain] }}
@@ -90,15 +89,19 @@ jobs:
 
       - name: Copy config
         run: |
-          cp -r digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-${{ steps.environment.outputs.domain }}.ts 
-          cp -r digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/${{ github.event.inputs.application}}/* ${{ steps.environment.outputs.directory }}/src/bin/
+          ls -lha
+
+          mkdir ${{ steps.environment.outputs.directory }}/src/bin
+
+          cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-${{ steps.environment.outputs.domain }}.ts 
+          cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/${{ github.event.inputs.application}}/* ${{ steps.environment.outputs.directory }}/src/bin/
 
       - name: Diff and deploy
         env:
           ENV: ${{ github.event.inputs.env }}
           STACK: ${{ steps.environment.outputs.stack }}
         run: |                  
-            if [ $ENV == "prod" ]; then export STACK_NAME=$(STACK)Prod; else export STACK_NAME=$(STACK)Test; fi;
+            if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
             node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
 
