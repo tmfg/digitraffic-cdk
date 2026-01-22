@@ -90,7 +90,7 @@ jobs:
             if [ $DEPLOY_ALL_CHANGES == "true" ]; then export CDK_COMMAND=deploy; else export CDK_COMMAND=diff; fi;
 
             # cd to correct application directory
-            cd $$ {{ github.event.inputs.application }}
+            cd ${{ github.event.inputs.application }}
 
             # install and build
             node ../../common/scripts/install-run-rush.js install
