@@ -1,16 +1,16 @@
+import type { ReceiveMessageCommandOutput } from "@aws-sdk/client-sqs";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { type SQSEvent } from "aws-lambda";
-import { type ReceiveMessageCommandOutput } from "@aws-sdk/client-sqs";
+import type { SQSEvent } from "aws-lambda";
+import type { ExtendedSqsClient } from "sqs-extended-client";
 import { MaintenanceTrackingEnvKeys } from "../../keys.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { type ExtendedSqsClient } from "sqs-extended-client";
 import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
+import { handleMessage } from "../../service/maintenance-tracking.js";
 import {
   createExtendedSqsClient,
   createSqsReceiveMessageCommandOutput,
 } from "../../service/sqs-big-payload.js";
-import { handleMessage } from "../../service/maintenance-tracking.js";
 import { getErrorMessage } from "../../util/util.js";
 
 const sqsExtendedClient = createExtendedSqsClient();
@@ -48,11 +48,10 @@ export function handlerFn(
     const region = getEnvVariable("AWS_REGION");
     logger.info({
       method,
-      message:
-        `Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`,
+      message: `Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`,
     });
 
-    logger.debug("LENGHT: " + event.Records.length);
+    logger.debug(`LENGHT: ${event.Records.length}`);
     if (!event.Records.length) {
       return Promise.reject("SQSEvent records was empty.");
     }

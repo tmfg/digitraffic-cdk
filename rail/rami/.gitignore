@@ -1,14 +1,16 @@
 *
-!.gitignore
-!cdk.json
-!package.json
-!tscconfig.json
 
-!config/
-!config/*.json
+!/.gitignore
+!/cdk.json
+!/package.json
+!/tscconfig.json
+!/esbuild.ts
 
-!src/
-!src/**/
-!src/**/*.ts
-!src/**/model/**/*.json
+!/config/
+!/config/*.json
+
+!/src/
+!/src/**/
+!/src/**/*.ts
+!/src/**/model/**/*.json
 /src/bin

@@ -5,18 +5,19 @@
   "type": "module",
   "scripts": {
     "build": "heft build --clean && npm run build:bundle",
-    "build:bundle": "npm run compile-lambda",
+    "build:bundle": "npm run compile-lambdas",
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "cdk": "cdk",
-    "compile-lambda": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda/update-plans --target=node22,es2022",
+    "compile-lambdas": "node lib/esbuild.js",
+    "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda/update-plans --target=node22,es2022",
     "convert-schema": "node src/scripts/schema-fix.mjs",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.965.0",
-    "@digitraffic/common": "2025.11.11-1",
+    "@digitraffic/common": "2026.1.15-2-node24",
     "ajv": "8.17.1",
     "ajv-formats": "3.0.1",
     "archiver": "7.0.1",
@@ -25,7 +26,8 @@
     "ky": "1.14.2"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.0.5",
@@ -34,7 +36,7 @@
     "@types/archiver": "7.0.0",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",
     "typescript": "5.9.2"

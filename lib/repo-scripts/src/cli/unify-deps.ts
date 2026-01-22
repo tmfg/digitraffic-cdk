@@ -1,6 +1,6 @@
 #!/usr/bin/env zx --quiet
 
-import { $, chalk, question } from "zx";
+import {$, chalk, question} from "zx";
 import _ from "lodash";
 import fs from "fs-extra";
 import async from "async";
@@ -118,9 +118,8 @@ function updateVersions(
         packageJsonKey,
       )
     ) {
-      const dependencyRecord = value;
       return _.mapValues(
-        dependencyRecord,
+        value,
         (version: string, dependencyName: string) => {
           const newDependency = dependencies[dependencyName];
 

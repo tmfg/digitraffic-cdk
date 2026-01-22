@@ -23,10 +23,10 @@ jobs:
           fetch-depth: 0  # fetch full history so all files exist
           ref: ${{ github.ref }} # ensure the branch tip is checked out
 
-      - name: Set Node.js
+      - name: Set Node.js 24
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
@@ -72,7 +72,7 @@ jobs:
 
           // Icons used in the report for each severity level
           const levelIcon = {
-            notice: 'ℹ️',
+            notice: '📌',
             warning: '⚠️',
             error: '❌'
           };
@@ -138,13 +138,13 @@ jobs:
             const rootAnnos = subs.flatMap(sub => grouped[root][sub]);
             const rootCounts = countLevels(rootAnnos);
 
-            summary += `**<a href="#${ghPrefix}${root}">${root}</a>** — ❌ ${rootCounts.error} ⚠️ ${rootCounts.warning} ℹ️ ${rootCounts.notice}\n`;
+            summary += `**<a href="#${ghPrefix}${root}">${root}</a>** — ❌ ${rootCounts.error} ⚠️ ${rootCounts.warning} 📌 ${rootCounts.notice}\n`;
 
             // Subdirectory counts (one line each)
             for (const sub of subs) {
               const c = countLevels(grouped[root][sub]);
               const subId = sub.replace(/\//g, '-'); // safe anchor ID
-              summary += `&nbsp;&nbsp;• <a href="#${ghPrefix}${subId}">${sub}</a> — ❌ ${c.error} ⚠️ ${c.warning} ℹ️ ${c.notice}\n`;
+              summary += `&nbsp;&nbsp;• <a href="#${ghPrefix}${subId}">${sub}</a> — ❌ ${c.error} ⚠️ ${c.warning} 📌 ${c.notice}\n`;
             }
           }
 
@@ -154,7 +154,7 @@ jobs:
           let md = summary;
 
           md += `# Detailed Biome Report\n\n`;
-          md += `**Legend**\n- ℹ️ Notice\n- ⚠️ Warning\n- ❌ Error\n\n---\n`;
+          md += `**Legend**\n- 📌 Notice\n- ⚠️ Warning\n- ❌ Error\n\n---\n`;
 
           for (const root of ROOT_DIRS) {
             const rootId = `user-content-${root}`;

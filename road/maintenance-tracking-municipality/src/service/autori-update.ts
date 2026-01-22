@@ -1,34 +1,34 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
-  type DTDatabase,
   inDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
+import type { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
-import { type Position } from "geojson";
-import { type GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { add } from "date-fns/add";
-import { type AutoriApi } from "../api/autori.js";
+import type { Position } from "geojson";
+import type { AutoriApi } from "../api/autori.js";
 import * as DataDb from "../dao/data.js";
-import {
-  type ApiContractData,
-  type ApiOperationData,
-  type ApiRouteData,
+import type {
+  ApiContractData,
+  ApiOperationData,
+  ApiRouteData,
 } from "../model/autori-api-data.js";
-import {
-  type DbDomainContract,
-  type DbDomainTaskMapping,
-  type DbLatestTracking,
-  type DbMaintenanceTracking,
-  type DbNumberId,
-  type DbTextId,
-  type DbWorkMachine,
+import type {
+  DbDomainContract,
+  DbDomainTaskMapping,
+  DbLatestTracking,
+  DbMaintenanceTracking,
+  DbNumberId,
+  DbTextId,
+  DbWorkMachine,
 } from "../model/db-data.js";
 import { TrackingSaveResult } from "../model/tracking-save-result.js";
 import * as AutoriUtils from "./autori-utils.js";
 import * as CommonUpdateService from "./common-update.js";
-import * as Utils from "./utils.js";
 import logger from "./maintenance-logger.js";
+import * as Utils from "./utils.js";
 
 const service = "AutoriUpdate";
 export class AutoriUpdate {
@@ -71,14 +71,10 @@ export class AutoriUpdate {
    * @return inserted count
    */
   async updateTaskMappingsForDomain(domainName: string): Promise<number> {
-    const method: `${string}.${string}` =
-      `${service}.updateTaskMappingsForDomain`;
+    const method: `${string}.${string}` = `${service}.updateTaskMappingsForDomain`;
     const apiOperations: ApiOperationData[] = await this.api.getOperations();
-    const taskMappings: DbDomainTaskMapping[] = AutoriUtils
-      .createDbDomainTaskMappings(
-        apiOperations,
-        domainName,
-      );
+    const taskMappings: DbDomainTaskMapping[] =
+      AutoriUtils.createDbDomainTaskMappings(apiOperations, domainName);
 
     const dbIds: (DbTextId | undefined)[] = await inDatabase(
       (db: DTDatabase) => {
@@ -119,16 +115,14 @@ export class AutoriUpdate {
 
       return Promise.allSettled(
         contracts.map((contract: DbDomainContract) => {
-          const start = AutoriUtils.resolveNextStartTimeForDataFromApi(
-            contract,
-          );
+          const start =
+            AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
           return this.updateContractTrackings(contract, taskMappings, start);
         }),
       )
         .then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
-          const summedResult = CommonUpdateService.sumResultsFromPromises(
-            results,
-          );
+          const summedResult =
+            CommonUpdateService.sumResultsFromPromises(results);
           logger.info({
             method,
             customDomain: domainName,
@@ -175,8 +169,7 @@ export class AutoriUpdate {
     const method: `${string}.${string}` = `${service}.updateContractTrackings`;
     logger.info({
       method,
-      message:
-        `getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`,
+      message: `getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`,
       customDomain: contract.domain,
       customContract: contract.contract,
     });
@@ -192,7 +185,7 @@ export class AutoriUpdate {
           taskMappings,
           apiDataUpdatedFrom,
           apiRouteData,
-        )
+        ),
       )
       .catch((error: Error) => {
         logger.error({ method, error });
@@ -214,14 +207,12 @@ export class AutoriUpdate {
     apiDataUpdatedFrom: Date,
     originalRouteData: ApiRouteData[],
   ): Promise<TrackingSaveResult> {
-    const method: `${string}.${string}` =
-      `${service}.saveContractRouteDataAsTrackings`;
+    const method: `${string}.${string}` = `${service}.saveContractRouteDataAsTrackings`;
 
     const start = Date.now();
 
-    const fixedRouteData: ApiRouteData[] = AutoriUtils.fixApiRouteDatas(
-      originalRouteData,
-    );
+    const fixedRouteData: ApiRouteData[] =
+      AutoriUtils.fixApiRouteDatas(originalRouteData);
 
     if (fixedRouteData.length === 0) {
       logger.info({
@@ -254,8 +245,8 @@ export class AutoriUpdate {
             routeData.operations,
             taskMappings,
           );
-          const tracking: DbMaintenanceTracking | undefined = AutoriUtils
-            .createDbMaintenanceTracking(
+          const tracking: DbMaintenanceTracking | undefined =
+            AutoriUtils.createDbMaintenanceTracking(
               machineId.id,
               routeData,
               contract,
@@ -264,15 +255,15 @@ export class AutoriUpdate {
 
           const saveResult: TrackingSaveResult = tracking
             ? await this.saveMaintenanceTrackingAndUpdatePrevious(
-              db,
-              tracking,
-              contract,
-              machineId,
-              messageSizeBytes,
-              CommonDateUtils.dateFromIsoString(
-                routeData.updated ?? routeData.endTime,
-              ),
-            )
+                db,
+                tracking,
+                contract,
+                machineId,
+                messageSizeBytes,
+                CommonDateUtils.dateFromIsoString(
+                  routeData.updated ?? routeData.endTime,
+                ),
+              )
             : TrackingSaveResult.createSaved(messageSizeBytes, 0);
           saveResults.push(saveResult);
         } catch (error) {
@@ -310,10 +301,9 @@ export class AutoriUpdate {
     lastUpdated: Date,
   ): Promise<TrackingSaveResult> {
     const start = Date.now();
-    const method: `${string}.${string}` =
-      `${service}.saveMaintenanceTrackingAndUpdatePrevious`;
-    const previous: DbLatestTracking | undefined = await DataDb
-      .findLatestNotFinishedTrackingForWorkMachine(
+    const method: `${string}.${string}` = `${service}.saveMaintenanceTrackingAndUpdatePrevious`;
+    const previous: DbLatestTracking | undefined =
+      await DataDb.findLatestNotFinishedTrackingForWorkMachine(
         db,
         contract.domain,
         machineId.id,
@@ -323,9 +313,8 @@ export class AutoriUpdate {
     //     logger.info(`DEBUG previous: ${JSON.stringify(previous)}\nnext: ${JSON.stringify(tracking)}`);
     // }
 
-    const trackingStartPosition: Position = Utils.getTrackingStartPoint(
-      tracking,
-    );
+    const trackingStartPosition: Position =
+      Utils.getTrackingStartPoint(tracking);
     if (
       previous &&
       AutoriUtils.isExtendingPreviousTracking(

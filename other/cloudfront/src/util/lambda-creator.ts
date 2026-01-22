@@ -1,14 +1,14 @@
-import { Duration, type Stack } from "aws-cdk-lib";
+import fs from "node:fs";
+import { Duration } from "aws-cdk-lib";
 import type { Role } from "aws-cdk-lib/aws-iam";
+import type { Version } from "aws-cdk-lib/aws-lambda";
 import {
   Function as AWSFunction,
   InlineCode,
   Runtime,
-  type Version,
 } from "aws-cdk-lib/aws-lambda";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import type { Construct } from "constructs";
-import fs from "node:fs";
 
 export enum LambdaType {
   WEATHERCAM_REDIRECT,
@@ -138,7 +138,7 @@ export function createFunction(
   functionBody: string,
 ): AWSFunction {
   return new AWSFunction(scope, functionName, {
-    runtime: Runtime.NODEJS_22_X,
+    runtime: Runtime.NODEJS_24_X,
     memorySize: 128,
     code: new InlineCode(functionBody),
     handler: "index.handler",

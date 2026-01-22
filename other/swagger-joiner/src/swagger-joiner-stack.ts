@@ -1,18 +1,14 @@
-import type { Props } from "./app-props.js";
-import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
-import * as InternalLambdas from "./internal-lambdas.js";
-import { BlockPublicAccess, Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
-import {
-  CanonicalUserPrincipal,
-  Effect,
-  PolicyStatement,
-} from "aws-cdk-lib/aws-iam";
-import { type Construct } from "constructs";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
   grantOACRights,
   grantOAIRights,
 } from "@digitraffic/common/dist/aws/infra/bucket-policy";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { BlockPublicAccess, Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
+import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
+import type { Construct } from "constructs";
+import type { Props } from "./app-props.js";
+import * as InternalLambdas from "./internal-lambdas.js";
 
 export class SwaggerJoinerStack extends DigitrafficStack {
   constructor(scope: Construct, id: string, swaggerJoinerProps: Props) {

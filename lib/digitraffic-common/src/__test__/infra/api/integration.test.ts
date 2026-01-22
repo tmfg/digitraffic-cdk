@@ -70,7 +70,7 @@ describe("integration tests", () => {
     const stack = new Stack(app);
 
     const f = new LambdaFunction(stack, "id", {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       code: Code.fromInline("placeholder"),
       handler: "handler",
     });

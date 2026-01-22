@@ -20,7 +20,7 @@
     "zx": "8.8.5"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rollup/plugin-commonjs": "29.0.0",
     "@rollup/plugin-json": "6.1.0",
@@ -34,7 +34,7 @@
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.21",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "async": "3.2.6",
     "lodash": "4.17.21",
     "rollup": "4.55.1",

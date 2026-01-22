@@ -1,12 +1,12 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import {
   BAD_REQUEST_MESSAGE,
   ERROR_MESSAGE,
 } from "@digitraffic/common/dist/aws/types/errors";
 import type * as SSE from "../../generated/tlsc-sse-reports-schema.d.ts";
-import * as SseUpdateService from "../../service/sse-update-service.js";
 import type { SseSaveResult } from "../../service/sse-update-service.js";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import * as SseUpdateService from "../../service/sse-update-service.js";
 
 const rdsHolder = RdsHolder.create();
 

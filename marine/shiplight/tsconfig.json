@@ -1,3 +1,8 @@
 {
-  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json"
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022"
+  }
 }

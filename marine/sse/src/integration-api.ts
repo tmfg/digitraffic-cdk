@@ -7,9 +7,7 @@ import {
   getResponse,
   RESPONSE_200_OK,
 } from "@digitraffic/common/dist/aws/infra/api/responses";
-import { databaseFunctionProps } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
@@ -28,6 +26,7 @@ import type {
   Resource,
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
+import type { Function as AwsFunction } from "aws-cdk-lib/aws-lambda";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import * as ApiResponseSchema from "./model/api-response-schema.js";
 import * as SseSchema from "./model/sse-schema.js";
@@ -103,32 +102,15 @@ function createUpdateRequestHandlerLambda(
   okResponseModel: IModel,
   errorResponseModel: IModel,
   stack: DigitrafficStack,
-): MonitoredFunction {
-  const lambdaFunctionName = "SSE-UpdateSseData";
+): AwsFunction {
   const environment = stack.createDefaultLambdaEnvironment("SSE");
-  const logGroup = createLambdaLogGroup({
-    stack,
-    functionName: lambdaFunctionName,
-  });
+  const updateSseDataLambda = FunctionBuilder.create(stack, "update-sse-data")
+    .singleLambda()
+    .withMemorySize(256)
+    .withReservedConcurrentExecutions(1)
+    .withEnvironment(environment)
+    .build();
 
-  const updateSseDataLambda = MonitoredFunction.create(
-    stack,
-    lambdaFunctionName,
-    databaseFunctionProps(
-      stack,
-      environment,
-      lambdaFunctionName,
-      "lambda-update-sse-data",
-      logGroup,
-      {
-        singleLambda: true,
-        reservedConcurrentExecutions: 10,
-        memorySize: 256,
-      },
-    ),
-  );
-
-  // eslint-disable-next-line deprecation/deprecation
   const lambdaIntegration = defaultIntegration(updateSseDataLambda, {
     responses: [
       getResponse(RESPONSE_200_OK),

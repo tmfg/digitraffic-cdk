@@ -35,7 +35,7 @@ const excludeTerser = [
 ];
 
 export default inputs.map((input) => {
-  const isOutputEsm = false; // moduleJs.some((esm) => input.includes(esm))
+  const isOutputEsm = true; // moduleJs.some((esm) => input.includes(esm))
   const outputFile = isOutputEsm
     ? input.replace("src/", `${outputDir}/`).replace("ts", "mjs")
     : input.replace("src/", `${outputDir}/`).replace("ts", "cjs");
@@ -61,6 +61,7 @@ export default inputs.map((input) => {
       inlineDynamicImports: true,
       file: outputFile,
       format: isOutputEsm ? "es" : "cjs",
+      sourcemap: true,
     },
     input,
     plugins,

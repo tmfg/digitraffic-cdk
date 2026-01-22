@@ -4,20 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "heft build --clean && npm run postbuild",
-    "postbuild": "npm run compile-lambdas",
+    "build": "heft build --clean && npm run compile-lambdas",
     "cdk": "cdk",
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy",
     "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
     "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
     "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
-    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
+    "compile-lambdas": "node lib/esbuild.js",
+    "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "watch": "heft build-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.12.15-5",
+    "@digitraffic/common": "2026.1.15-2-node24",
     "aws-cdk-lib": "2.234.0",
     "aws-sdk": "^2.1693.0",
     "constructs": "10.4.4",
@@ -32,7 +32,8 @@
     "xml2js": "0.6.2"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
@@ -42,7 +43,7 @@
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "@types/sinon": "21.0.0",
     "@types/source-map-support": "0.5.10",
     "@types/xml2js": "0.4.14",

@@ -1,10 +1,10 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { LamHistoryEnvKeys } from "../../keys.js";
 
 import type { TmsHistorySecret } from "../../model/tms-history-secret.js";
 import { handleMetadataUpdate } from "../../service/update.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const bucketName = getEnvVariable(LamHistoryEnvKeys.BUCKET_NAME);
 const secretHolder = SecretHolder.create<TmsHistorySecret>("tms-history");

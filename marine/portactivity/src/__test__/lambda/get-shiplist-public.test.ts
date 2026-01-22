@@ -1,11 +1,9 @@
-import { dbTestBase, mockSecrets } from "../db-testutil.js";
+import type { APIGatewayProxyEventSubset } from "@digitraffic/common/dist/aws/types/lambda-proxy-types";
+import { jest } from "@jest/globals";
+import type { APIGatewayProxyResult } from "aws-lambda";
 import type { ShiplistSecret } from "../../lambda/get-shiplist-public/get-shiplist-public.js";
 import { handler } from "../../lambda/get-shiplist-public/get-shiplist-public.js";
-import type {
-  ProxyLambdaRequest,
-  ProxyLambdaResponse,
-} from "@digitraffic/common/dist/aws/types/proxytypes";
-import { jest } from "@jest/globals";
+import { dbTestBase, mockSecrets } from "../db-testutil.js";
 
 const AUTH = "test";
 
@@ -21,9 +19,10 @@ describe(
       mockSecrets(secret);
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async function getResponse(request: any): Promise<ProxyLambdaResponse> {
-      return await handler(request as ProxyLambdaRequest);
+    async function getResponse(
+      request: unknown,
+    ): Promise<APIGatewayProxyResult> {
+      return await handler(request as APIGatewayProxyEventSubset);
     }
 
     test("no auth - 401", async () => {
@@ -34,7 +33,7 @@ describe(
 
     test("invalid auth - 403", async () => {
       const response = await getResponse({
-        queryStringParameters: { auth: AUTH + "foo" },
+        queryStringParameters: { auth: `${AUTH}foo` },
       });
 
       expect(response.statusCode).toBe(403);

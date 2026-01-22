@@ -1,4 +1,6 @@
-import { App, Duration, Stack, type StackProps } from "aws-cdk-lib";
+import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
+import type { App, StackProps } from "aws-cdk-lib";
+import { Duration, Stack } from "aws-cdk-lib";
 import { Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import * as events from "aws-cdk-lib/aws-events";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
@@ -11,13 +13,12 @@ import {
   Role,
   ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
+import type { FunctionProps } from "aws-cdk-lib/aws-lambda";
 import {
   AssetCode,
-  Function,
-  type FunctionProps,
+  Function as AwsFunction,
   Runtime,
 } from "aws-cdk-lib/aws-lambda";
-import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { transportType } from "./constants.js";
 
@@ -56,8 +57,8 @@ export class OsKeyFiguresStack extends Stack {
       osKeyFiguresProps,
       vpc,
     );
-    const createKeyFigureVisualizationsLambdaSg = this
-      .createVisualizationsLambda(osKeyFiguresProps, vpc);
+    const createKeyFigureVisualizationsLambdaSg =
+      this.createVisualizationsLambda(osKeyFiguresProps, vpc);
 
     const rdsSg = SecurityGroup.fromSecurityGroupId(
       this,
@@ -95,7 +96,7 @@ export class OsKeyFiguresStack extends Stack {
       new PolicyStatement({
         actions: ["s3:GetObject"],
         principals: [new AnyPrincipal()],
-        resources: [htmlBucket.bucketArn + "/*"],
+        resources: [`${htmlBucket.bucketArn}/*`],
         conditions: {
           IpAddress: {
             "aws:SourceIp": osKeyFiguresProps.allowedIpAddresses,
@@ -107,7 +108,7 @@ export class OsKeyFiguresStack extends Stack {
     lambdaRole.addToPolicy(
       new PolicyStatement({
         actions: ["s3:PutObject", "s3:PutObjectAcl"],
-        resources: ["*", htmlBucket.bucketArn + "/*"],
+        resources: ["*", `${htmlBucket.bucketArn}/*`],
       }),
     );
 
@@ -128,7 +129,7 @@ export class OsKeyFiguresStack extends Stack {
       functionName: functionName,
       code: new AssetCode("dist/lambda"),
       handler: "create-visualizations.handler",
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       timeout: Duration.minutes(15),
       logGroup: logGroup,
       vpc: vpc,
@@ -143,7 +144,7 @@ export class OsKeyFiguresStack extends Stack {
         BUCKET_NAME: osKeyFiguresProps.visualizationsBucketName,
       },
     };
-    const createKeyFigureVisualizationsLambda = new Function(
+    const createKeyFigureVisualizationsLambda = new AwsFunction(
       this,
       functionName,
       lambdaConf,
@@ -195,7 +196,7 @@ export class OsKeyFiguresStack extends Stack {
       functionName: functionName,
       code: new AssetCode("dist/lambda"),
       handler: "collect-os-key-figures.handler",
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       timeout: Duration.minutes(15),
       logGroup: logGroup,
       vpc: vpc,
@@ -216,7 +217,7 @@ export class OsKeyFiguresStack extends Stack {
       },
     };
 
-    const collectOsKeyFiguresLambda = new Function(
+    const collectOsKeyFiguresLambda = new AwsFunction(
       this,
       functionName,
       lambdaConf,

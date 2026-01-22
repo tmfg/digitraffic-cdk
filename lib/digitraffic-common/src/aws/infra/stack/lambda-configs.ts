@@ -54,7 +54,7 @@ export function lambdaFunctionProps(
   config?: Partial<FunctionParameters>,
 ): FunctionProps {
   return {
-    runtime: config?.runtime ?? Runtime.NODEJS_22_X,
+    runtime: config?.runtime ?? Runtime.NODEJS_24_X,
     architecture: config?.architecture ?? Architecture.ARM_64,
     memorySize: config?.memorySize ?? 128,
     functionName: lambdaName,
@@ -83,7 +83,7 @@ export function defaultLambdaConfiguration(
   config: FunctionParameters,
 ): FunctionProps {
   const props: FunctionProps = {
-    runtime: Runtime.NODEJS_22_X,
+    runtime: Runtime.NODEJS_24_X,
     memorySize: config.memorySize ?? 128,
     functionName: config.functionName,
     handler: config.handler,

@@ -1,11 +1,11 @@
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { parseISO } from "date-fns";
-import {
-  type ApiDevice,
-  type ApiWorkeventDevice,
+import ky, { HTTPError } from "ky";
+import type {
+  ApiDevice,
+  ApiWorkeventDevice,
 } from "../model/paikannin-api-data.js";
 import logger from "../service/maintenance-logger.js";
-import ky, { HTTPError } from "ky";
 
 const URL_DEVICES = "/public/api/devices/all";
 const URL_WORKEVENTS = "/public/api/devices/workevents/alldevices";
@@ -56,7 +56,8 @@ export class PaikanninApi {
       })
       .catch(async (error: Error | HTTPError) => {
         const isHTTPError = error instanceof HTTPError;
-        const message = `method=${method} message=${callerMethod} ` +
+        const message =
+          `method=${method} message=${callerMethod} ` +
           (isHTTPError
             ? `GET failed with message: ${error.message}`
             : `GET failed outside ky with message ${error.message}`);

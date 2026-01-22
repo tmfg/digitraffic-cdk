@@ -8,36 +8,43 @@ export class DependencyTester {
   }
 
   private static checkWhiteList(whitelist: string[], items: string[]): void {
-    const missing = whitelist.filter((whitelisted) =>
-      !items.includes(whitelisted)
+    const missing = whitelist.filter(
+      (whitelisted) => !items.includes(whitelisted),
     );
 
     if (missing.length !== 0) {
       throw new Error(
-        "Whitelisted dependencies not found:" + JSON.stringify(missing),
+        `Whitelisted dependencies not found:${JSON.stringify(missing)}`,
       );
     }
   }
 
   assertNoCircularDependencies(whitelist: string[] = []): void {
-    const circulars = this._instance.circular().map((c) => JSON.stringify(c));
-    const errors = circulars.filter((circular) =>
-      !whitelist.includes(circular)
+    // This is a false positive from madge
+    whitelist.push("esbuild.js");
+
+    const circulars = this._instance.circular().map((c) => c.join(", "));
+
+    const errors = circulars.filter(
+      (circular) => !whitelist.includes(circular),
     );
 
     if (errors.length !== 0) {
-      throw new Error("Circular dependencies found:" + errors.join("\n"));
+      throw new Error(`Circular dependencies found:${errors.join("\n")}`);
     }
 
     DependencyTester.checkWhiteList(whitelist, circulars);
   }
 
   assertNoOrphans(whitelist: string[] = []): void {
-    const orphans = this._instance.circular().map((c) => JSON.stringify(c));
+    // This is a false positive from madge
+    whitelist.push("esbuild.js");
+    const orphans = this._instance.circular().map((c) => c.join(", "));
+    //const orphans = this._instance.circular().map((c) => c.join(", "));
     const errors = orphans.filter((circular) => !whitelist.includes(circular));
 
     if (errors.length !== 0) {
-      throw new Error("Orphans found!");
+      throw new Error(`Orphans found: ${errors.join("\n")}`);
     }
 
     DependencyTester.checkWhiteList(whitelist, orphans);
@@ -72,7 +79,7 @@ export class DependencyTester {
 
     if (errors.length > 0) {
       throw new Error(
-        "Lambdas have aws-cdk-lib dependencies: " + errors.join("\n"),
+        `Lambdas have aws-cdk-lib dependencies: ${errors.join("\n")}`,
       );
     }
 

@@ -13,16 +13,16 @@ jest.unstable_mockModule("../../../service/sse-update-service.js", () => {
 });
 
 import { readFileSync } from "node:fs";
-import type { TheSSEReportRootSchema } from "../../../generated/tlsc-sse-reports-schema.d.ts";
 import { jest } from "@jest/globals";
+import type { TheSSEReportRootSchema } from "../../../generated/tlsc-sse-reports-schema.d.ts";
 
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys: Indexed access
 process.env["SECRET_ID"] = "Testi";
 
 const DbTestutil = await import("../../db-testutil.js");
 const { saveSseData } = await import("../../../service/sse-update-service.js");
 const LambdaUpdateSseData = await import(
-  "../../../lambda/update-sse-data/lambda-update-sse-data.js"
+  "../../../lambda/update-sse-data/update-sse-data.js"
 );
 const rdsHolder = await import(
   "@digitraffic/common/dist/aws/runtime/secrets/rds-holder"
@@ -36,7 +36,7 @@ describe(
     });
 
     beforeEach(() => {
-      // eslint-disable-next-line dot-notation
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
       process.env["SECRET_ID"] = "Testi";
     });
 
@@ -49,9 +49,9 @@ describe(
 
       const retVal = { saved: 3, errors: 0 };
 
-      jest.spyOn(RdsHolder.prototype, "setCredentials").mockImplementationOnce(
-        () => Promise.resolve(),
-      );
+      jest
+        .spyOn(RdsHolder.prototype, "setCredentials")
+        .mockImplementationOnce(() => Promise.resolve());
 
       await expect(LambdaUpdateSseData.handler(data)).resolves.toStrictEqual(
         retVal,

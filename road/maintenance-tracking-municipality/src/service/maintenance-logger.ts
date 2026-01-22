@@ -1,8 +1,6 @@
+import type { LoggableType } from "@digitraffic/common/dist/aws/runtime/dt-logger";
+import { DtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger";
 import { logger as dtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import {
-  DtLogger,
-  type LoggableType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger";
 
 export interface MaintenanceLoggableType extends LoggableType {
   customSizeBytes?: number;

@@ -1,12 +1,12 @@
 {
-  "name": "@digitraffic-cdk/digitraffic-cdk-rig",
+  "name": "@digitraffic-cdk/cdk-rig",
   "version": "1.0.0",
   "private": true,
   "description": "digitraffic-cdk rig package",
   "type": "module",
   "scripts": {
-    "build": "",
-    "test": ""
+    "build": "echo 'No build implemented'",
+    "test": "echo 'No tests implemented'"
   },
   "dependencies": {
     "@rushstack/heft": "^1.1.7",

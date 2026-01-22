@@ -6,7 +6,8 @@ jobs:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - name: Fetch repo
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
       - name: Git config user
@@ -14,9 +15,10 @@ jobs:
         with:
           name: digitraffic-ci
           email: digitraffic@solita.fi
-      - uses: actions/setup-node@v6
+      - name: Install Node 24
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
       #- name: Check rush.json and dependabot.yml
       #  run: python scripts/check-dependabot-projects.py
       - name: Cache pnpm store cache

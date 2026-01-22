@@ -3,6 +3,7 @@
 !cdk.json
 !package.json
 !tsconfig.json
+!/esbuild.ts
 
 !/config/
 !/config/*.json
@@ -10,3 +11,4 @@
 !/src/**/
 !/src/**/*.ts
 /src/bin
+

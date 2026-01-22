@@ -1,21 +1,21 @@
-import {
-  type DTDatabase,
-  type DTTransaction,
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type {
+  DTDatabase,
+  DTTransaction,
 } from "@digitraffic/common/dist/database/database";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
-import { type Position } from "geojson";
+import type { Position } from "geojson";
 import { default as pgPromise } from "pg-promise";
 import { COORDINATE_PRECISION } from "../constants.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-import {
-  type DbDomainContract,
-  type DbDomainTaskMapping,
-  type DbLatestTracking,
-  type DbMaintenanceTracking,
-  type DbNumberId,
-  type DbTextId,
-  type DbWorkMachine,
+import type {
+  DbDomainContract,
+  DbDomainTaskMapping,
+  DbLatestTracking,
+  DbMaintenanceTracking,
+  DbNumberId,
+  DbTextId,
+  DbWorkMachine,
 } from "../model/db-data.js";
 
 const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN = new pgPromise.PreparedStatement({
@@ -44,11 +44,10 @@ export async function upsertDomain(
   }
 }
 
-const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT = new pgPromise
-  .PreparedStatement({
-  name: "UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT",
-  text:
-    `INSERT INTO maintenance_tracking_domain_contract(domain, contract, name, start_date, end_date, data_last_updated)
+const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT =
+  new pgPromise.PreparedStatement({
+    name: "UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT",
+    text: `INSERT INTO maintenance_tracking_domain_contract(domain, contract, name, start_date, end_date, data_last_updated)
            VALUES ($1, $2, $3, $4, $5, $6)
            ON CONFLICT(domain, contract)
            DO
@@ -57,7 +56,7 @@ const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT = new pgPromise
               OR maintenance_tracking_domain_contract.start_date <> excluded.start_date
               OR maintenance_tracking_domain_contract.end_date <> excluded.end_date
            RETURNING contract`,
-});
+  });
 
 export function upsertContract(
   db: DTDatabase,
@@ -95,7 +94,7 @@ export function upsertContracts(
       return t
         .batch(dbContracts.map(upsertContractFn))
         .then((result) =>
-          result.map((value) => (value === null ? undefined : value))
+          result.map((value) => (value === null ? undefined : value)),
         );
     });
   } catch (e) {
@@ -127,11 +126,7 @@ export async function updateContractLastUpdated(
   try {
     await db.none(
       PS_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED,
-      [
-        domain,
-        contract,
-        lastUpdated,
-      ],
+      [domain, contract, lastUpdated],
     );
   } catch (e) {
     logger.error({
@@ -143,16 +138,15 @@ export async function updateContractLastUpdated(
   }
 }
 
-const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING = new pgPromise
-  .PreparedStatement({
-  name: "UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING",
-  text:
-    `INSERT INTO maintenance_tracking_domain_task_mapping (name, original_id, domain, ignore, info)
+const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING =
+  new pgPromise.PreparedStatement({
+    name: "UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING",
+    text: `INSERT INTO maintenance_tracking_domain_task_mapping (name, original_id, domain, ignore, info)
            VALUES ($1, $2, $3, $4, 'TODO: Auto generated')
            ON CONFLICT(domain, original_id)
            DO NOTHING
            RETURNING original_id`,
-});
+  });
 
 export function upsertTaskMappings(
   db: DTDatabase,
@@ -178,11 +172,11 @@ export function upsertTaskMappings(
   });
 }
 
-const PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED = new pgPromise
-  .PreparedStatement({
-  name: "PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED",
-  // line_string => takes either previous value and append to it or if previous value is null, then take the last_point and append to it
-  text: `
+const PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED =
+  new pgPromise.PreparedStatement({
+    name: "PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED",
+    // line_string => takes either previous value and append to it or if previous value is null, then take the last_point and append to it
+    text: `
 WITH geometry AS (
     SELECT ST_MakeLine(geometry, ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84}))) AS geometry,
            $1::bigint as id
@@ -215,7 +209,7 @@ SET finished = true,
 FROM finalGeometry 
 WHERE tgt.finished = false
  AND tgt.id = finalGeometry.id`,
-});
+  });
 
 export async function appendMaintenanceTrackingEndPointAndMarkFinished(
   db: DTDatabase | DTTransaction,
@@ -340,7 +334,8 @@ export async function insertMaintenanceTracking(
     });
 
   const insertHarjaTask = async (harjaTask: string): Promise<void> => {
-    await tx.none(PS_INSERT_MAINTENANCE_TRACKING_TASK, [mtId.id, harjaTask])
+    await tx
+      .none(PS_INSERT_MAINTENANCE_TRACKING_TASK, [mtId.id, harjaTask])
       .catch((error: Error) => {
         logger.error({
           method: "Data.upsertMaintenanceTracking",
@@ -353,16 +348,15 @@ export async function insertMaintenanceTracking(
   return tx.batch(tracking.tasks.map(insertHarjaTask)).then(() => mtId);
 }
 
-const PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE = new pgPromise
-  .PreparedStatement({
-  name: "PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE",
-  text:
-    `INSERT INTO maintenance_tracking_work_machine(id, harja_id, harja_urakka_id, type)
+const PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE =
+  new pgPromise.PreparedStatement({
+    name: "PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE",
+    text: `INSERT INTO maintenance_tracking_work_machine(id, harja_id, harja_urakka_id, type)
            VALUES (NEXTVAL('seq_maintenance_tracking_work_machine'), $1, $2, $3)
            ON CONFLICT(harja_id, harja_urakka_id) do 
            UPDATE SET type = $3
            RETURNING id`,
-});
+  });
 
 export function upsertWorkMachine(
   db: DTTransaction,

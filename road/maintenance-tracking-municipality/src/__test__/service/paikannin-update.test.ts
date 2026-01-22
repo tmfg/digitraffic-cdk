@@ -1,22 +1,23 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import { fail } from "node:assert";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { fail } from "assert";
-import { type Position } from "geojson";
+import { jest } from "@jest/globals";
 import { sub } from "date-fns/sub";
+import type { Position } from "geojson";
 import { PaikanninApi } from "../../api/paikannin.js";
 import { PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M } from "../../constants.js";
 import * as DataDb from "../../dao/data.js";
-import {
-  type DbDomainContract,
-  type DbDomainTaskMapping,
-  type DbMaintenanceTracking,
+import type {
+  DbDomainContract,
+  DbDomainTaskMapping,
+  DbMaintenanceTracking,
 } from "../../model/db-data.js";
-import {
-  type ApiDevice,
-  type ApiIoChannel,
-  type ApiWorkeventDevice,
+import type {
+  ApiDevice,
+  ApiIoChannel,
+  ApiWorkeventDevice,
 } from "../../model/paikannin-api-data.js";
 import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
 import { PaikanninUpdate } from "../../service/paikannin-update.js";
@@ -50,7 +51,6 @@ import {
   createZigZagCoordinates,
   getRandompId,
 } from "../testutil.js";
-import { jest } from "@jest/globals";
 
 const paikanninUpdateService = createPaikanninUpdateService();
 
@@ -111,21 +111,24 @@ describe(
       );
       expect(mappings.length).toEqual(3);
 
-      const operationNames: string[] = mappings.map((value) =>
-        value.original_id
+      const operationNames: string[] = mappings.map(
+        (value) => value.original_id,
       );
       expect(operationNames.includes(PAIKANNIN_OPERATION_SALTING.name)).toEqual(
         true,
       );
-      expect(operationNames.includes(PAIKANNIN_OPERATION_BRUSHING.name))
-        .toEqual(true);
+      expect(
+        operationNames.includes(PAIKANNIN_OPERATION_BRUSHING.name),
+      ).toEqual(true);
       expect(operationNames.includes(PAIKANNIN_OPERATION_PAVING.name)).toEqual(
         true,
       );
-      mappings.forEach((value) => expect(value.ignore).toEqual(true));
-      mappings.forEach((value) =>
-        expect(value.name).toEqual(UNKNOWN_TASK_NAME)
-      );
+      for (const value of mappings) {
+        expect(value.ignore).toEqual(true);
+      }
+      for (const value of mappings) {
+        expect(value.name).toEqual(UNKNOWN_TASK_NAME);
+      }
     });
 
     test("updateTrackings", async () => {
@@ -238,12 +241,12 @@ describe(
       expect(trackings[0]?.geometry).toEqual(trackings[0]?.last_point);
 
       Asserter.assertToBeCloseTo(
-        trackings[0]?.last_point.coordinates[0]!,
+        trackings[0]?.last_point.coordinates[0] ?? -1,
         POINT_START[0]!,
         0.000001,
       );
       Asserter.assertToBeCloseTo(
-        trackings[0]?.last_point.coordinates[1]!,
+        trackings[0]?.last_point.coordinates[1] ?? -1,
         POINT_START[1]!,
         0.000001,
       );
@@ -279,9 +282,7 @@ describe(
         1,
         end,
         ln,
-        [
-          PAIKANNIN_OPERATION_BRUSHING,
-        ],
+        [PAIKANNIN_OPERATION_BRUSHING],
       );
 
       mockGetWorkEventsApiResponse([route]);
@@ -370,17 +371,17 @@ describe(
     });
 
     function mockGetDevicesApiResponse(response: ApiDevice[]): void {
-      jest.spyOn(PaikanninApi.prototype, "getDevices").mockReturnValueOnce(
-        Promise.resolve(response),
-      );
+      jest
+        .spyOn(PaikanninApi.prototype, "getDevices")
+        .mockReturnValueOnce(Promise.resolve(response));
     }
 
     function mockGetWorkEventsApiResponse(
       response: ApiWorkeventDevice[],
     ): void {
-      jest.spyOn(PaikanninApi.prototype, "getWorkEvents").mockReturnValueOnce(
-        Promise.resolve(response),
-      );
+      jest
+        .spyOn(PaikanninApi.prototype, "getWorkEvents")
+        .mockReturnValueOnce(Promise.resolve(response));
     }
 
     function createDevice(ioChannels: ApiIoChannel[]): ApiDevice {

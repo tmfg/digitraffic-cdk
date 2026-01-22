@@ -1,7 +1,7 @@
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
-import { type Position } from "geojson";
-import { type DbMaintenanceTracking } from "../../model/db-data.js";
+import type { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import type { Position } from "geojson";
+import type { DbMaintenanceTracking } from "../../model/db-data.js";
 import * as Utils from "../../service/utils.js";
 import { createGeoJSONPoint, createLineStringGeometry } from "../testutil.js";
 

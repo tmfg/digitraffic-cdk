@@ -1,11 +1,11 @@
 import { randomString } from "@digitraffic/common/dist/test/testutils";
-import { type Feature, type Geometry } from "geojson";
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
-import {
-  type ApiContractData,
-  type ApiOperationData,
-  type ApiRouteData,
+import type { Feature, Geometry } from "geojson";
+import type {
+  ApiContractData,
+  ApiOperationData,
+  ApiRouteData,
 } from "../model/autori-api-data.js";
 import {
   AUTORI_OPERATION_BRUSHING,

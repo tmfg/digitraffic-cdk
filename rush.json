@@ -15,12 +15,12 @@
    * path segment in the "$schema" field for all your Rush config files.  This will ensure
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
-  "nodeSupportedVersionRange": ">=22.0.0 <23.0.0",
+  "nodeSupportedVersionRange": ">=24.0.0 <25.0.0",
   "rushVersion": "5.165.0",
   "pnpmVersion": "10.27.0",
   "ensureConsistentVersions": false,
   "repository": {
-    "url": "https://github.com/fintraffic-vts/mcp-cdk",
+    "url": "https://github.com/tmfg/digitraffic-cdk",
     "defaultBranch": "master",
     "defaultRemote": "origin"
   },
@@ -259,6 +259,11 @@
     },
     // internal / tools
     {
+      "packageName": "@digitraffic-cdk/esbuild",
+      "projectFolder": "tools/esbuild",
+      "tags": ["internal"]
+    },
+    {
       "packageName": "@digitraffic-cdk/esm-template",
       "projectFolder": "template/esm",
       "tags": ["internal"]
@@ -270,7 +275,7 @@
     },
 
     {
-      "packageName": "@digitraffic-cdk/digitraffic-cdk-rig",
+      "packageName": "@digitraffic-cdk/cdk-rig",
       "projectFolder": "tools/rig",
       "tags": ["internal"]
     },

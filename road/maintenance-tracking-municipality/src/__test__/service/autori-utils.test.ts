@@ -1,21 +1,21 @@
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
-import { type LineString, type Point } from "geojson";
-import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import type { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
+import type { LineString, Point } from "geojson";
 import {
   AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
   AUTORI_MAX_MINUTES_TO_HISTORY,
   AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S,
 } from "../../constants.js";
-import {
-  type ApiContractData,
-  type ApiRouteData,
+import type {
+  ApiContractData,
+  ApiRouteData,
 } from "../../model/autori-api-data.js";
-import {
-  type DbDomainTaskMapping,
-  type DbMaintenanceTracking,
-  type DbWorkMachine,
+import type {
+  DbDomainTaskMapping,
+  DbMaintenanceTracking,
+  DbWorkMachine,
 } from "../../model/db-data.js";
 import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
 import * as AutoriUtils from "../../service/autori-utils.js";
@@ -82,15 +82,11 @@ describe("autori-utils-service-test", () => {
     expect(
       (fixedRoute[0]?.geography?.features[0]?.geometry as LineString)
         .coordinates.length,
-    ).toEqual(
-      10,
-    );
+    ).toEqual(10);
     expect(
       (fixedRoute[1]?.geography?.features[0]?.geometry as LineString)
         .coordinates.length,
-    ).toEqual(
-      15,
-    );
+    ).toEqual(15);
   });
 
   test("fixApiRouteData single", () => {
@@ -110,9 +106,7 @@ describe("autori-utils-service-test", () => {
     expect(
       (fixedRoute[0]?.geography?.features[0]?.geometry as LineString)
         .coordinates.length,
-    ).toEqual(
-      10,
-    );
+    ).toEqual(10);
   });
 
   test("fixApiRouteData empty", () => {
@@ -300,8 +294,8 @@ describe("autori-utils-service-test", () => {
       geometry,
     ]);
     const dbContract = createDbDomainContract("contract-1", DOMAIN_1);
-    const tracking: DbMaintenanceTracking | undefined = AutoriUtils
-      .createDbMaintenanceTracking(
+    const tracking: DbMaintenanceTracking | undefined =
+      AutoriUtils.createDbMaintenanceTracking(
         workMachineId,
         route,
         dbContract,
@@ -309,13 +303,12 @@ describe("autori-utils-service-test", () => {
       );
 
     // Expect all geometries to be found
-    expect((tracking?.geometry as GeoJsonLineString).coordinates.length)
-      .toEqual(
-        geometry.coordinates.length,
-      ); // same as geometries count
+    expect(
+      (tracking?.geometry as GeoJsonLineString).coordinates.length,
+    ).toEqual(geometry.coordinates.length); // same as geometries count
 
     const ls = tracking?.geometry as GeoJsonLineString;
-    // @ts-ignore
+    // @ts-expect-error
     expect(ls.coordinates[0][1]).toEqual(geometry.coordinates[0][1]);
     console.info(`Found ${JSON.stringify(ls)}`);
     expect(tracking?.start_time).toEqual(
@@ -332,13 +325,8 @@ describe("autori-utils-service-test", () => {
       createLineStringGeometries(2, 5),
     );
     const dbContract = createDbDomainContract("contract-1", DOMAIN_1);
-    const tracking: DbMaintenanceTracking | undefined = AutoriUtils
-      .createDbMaintenanceTracking(
-        1,
-        route,
-        dbContract,
-        [],
-      );
+    const tracking: DbMaintenanceTracking | undefined =
+      AutoriUtils.createDbMaintenanceTracking(1, route, dbContract, []);
 
     expect(tracking).toBeUndefined();
   });
@@ -351,8 +339,8 @@ describe("autori-utils-service-test", () => {
       ),
       AutoriTestutils.createApiOperationData(AUTORI_OPERATION_PAVING, DOMAIN_1),
     ];
-    const mappings: DbDomainTaskMapping[] = AutoriUtils
-      .createDbDomainTaskMappings(operations, DOMAIN_1);
+    const mappings: DbDomainTaskMapping[] =
+      AutoriUtils.createDbDomainTaskMappings(operations, DOMAIN_1);
 
     expect(mappings.length).toEqual(2);
     mappings.forEach((mapping, index) => {

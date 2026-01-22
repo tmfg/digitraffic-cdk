@@ -1,6 +1,7 @@
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { Function as AwsFunction } from "aws-cdk-lib/aws-lambda";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
 import { LamHistoryEnvKeys } from "./keys.js";
 
@@ -22,13 +23,13 @@ export class InternalLambdas {
 function createDataUpdateLambda(
   stack: DigitrafficStack,
   bucketName: string,
-): MonitoredFunction {
+): AwsFunction {
   const environment = stack.createLambdaEnvironment();
   environment[LamHistoryEnvKeys.BUCKET_NAME] = bucketName;
 
-  return MonitoredFunction.createV2(stack, "update-lam-stations", environment, {
-    singleLambda: true,
-    memorySize: 128,
-    reservedConcurrentExecutions: 10,
-  });
+  return FunctionBuilder.create(stack, "update-lam-stations")
+    .singleLambda()
+    .withoutDatabaseAccess()
+    .withEnvironment(environment)
+    .build();
 }

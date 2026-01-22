@@ -1,39 +1,37 @@
-import {
-  type DTDatabase,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
+import type { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as Geometry from "@digitraffic/common/dist/utils/geometry";
-import { type GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
-import { type Position } from "geojson";
 import { sub } from "date-fns/sub";
-import { type PaikanninApi } from "../api/paikannin.js";
+import type { Position } from "geojson";
+import type { PaikanninApi } from "../api/paikannin.js";
 import {
   PAIKANNIN_MAX_MINUTES_TO_HISTORY,
   PAIKANNIN_MIN_MINUTES_FROM_PRESENT,
 } from "../constants.js";
 import * as DataDb from "../dao/data.js";
-import {
-  type DbDomainContract,
-  type DbDomainTaskMapping,
-  type DbLatestTracking,
-  type DbMaintenanceTracking,
-  type DbTextId,
-  type DbWorkMachine,
+import type {
+  DbDomainContract,
+  DbDomainTaskMapping,
+  DbLatestTracking,
+  DbMaintenanceTracking,
+  DbTextId,
+  DbWorkMachine,
 } from "../model/db-data.js";
-import {
-  type ApiDevice,
-  type ApiWorkevent,
-  type ApiWorkeventDevice,
+import type {
+  ApiDevice,
+  ApiWorkevent,
+  ApiWorkeventDevice,
 } from "../model/paikannin-api-data.js";
 import {
   TrackingSaveResult,
   UNKNOWN_TASK_NAME,
 } from "../model/tracking-save-result.js";
 import * as CommonUpdateService from "./common-update.js";
+import logger from "./maintenance-logger.js";
 import * as PaikanninUtils from "./paikannin-utils.js";
 import * as Utils from "./utils.js";
-import logger from "./maintenance-logger.js";
 
 export class PaikanninUpdate {
   readonly api: PaikanninApi;
@@ -65,20 +63,20 @@ export class PaikanninUpdate {
   async updateTaskMappingsForDomain(domainName: string): Promise<number> {
     // api
     const devices: ApiDevice[] = await this.api.getDevices();
-    const allIoChannels: string[] = devices.flatMap((d) => d.ioChannels).map((
-      c,
-    ) => c.name.trim());
+    const allIoChannels: string[] = devices
+      .flatMap((d) => d.ioChannels)
+      .map((c) => c.name.trim());
     const uniqueIoChannels: string[] = [...new Set(allIoChannels)];
 
-    const taskMappings: DbDomainTaskMapping[] = uniqueIoChannels.map((
-      task,
-    ) => ({
-      name: UNKNOWN_TASK_NAME,
-      domain: domainName,
+    const taskMappings: DbDomainTaskMapping[] = uniqueIoChannels.map(
+      (task) => ({
+        name: UNKNOWN_TASK_NAME,
+        domain: domainName,
 
-      original_id: task,
-      ignore: true,
-    }));
+        original_id: task,
+        ignore: true,
+      }),
+    );
     return inDatabase((db) => {
       return DataDb.upsertTaskMappings(db, taskMappings);
     }).then((values) => {
@@ -108,11 +106,8 @@ export class PaikanninUpdate {
     const method = "PaikanninUpdate.updateTrackingsForDomain";
     try {
       return await inDatabase(async (db: DTDatabase) => {
-        const contract: DbDomainContract | undefined = await DataDb
-          .getContractWithSource(
-            db,
-            domainName,
-          );
+        const contract: DbDomainContract | undefined =
+          await DataDb.getContractWithSource(db, domainName);
 
         if (!contract) {
           logger.info({
@@ -143,14 +138,11 @@ export class PaikanninUpdate {
           endTime,
         );
 
-        const taskMappings: DbDomainTaskMapping[] = await DataDb
-          .getTaskMappings(db, domainName);
+        const taskMappings: DbDomainTaskMapping[] =
+          await DataDb.getTaskMappings(db, domainName);
 
-        const eventsWithMappedTasks: ApiWorkeventDevice[] = PaikanninUtils
-          .filterEventsWithoutTasks(
-            events,
-            taskMappings,
-          );
+        const eventsWithMappedTasks: ApiWorkeventDevice[] =
+          PaikanninUtils.filterEventsWithoutTasks(events, taskMappings);
 
         return Promise.allSettled(
           eventsWithMappedTasks.map((device: ApiWorkeventDevice) => {
@@ -163,9 +155,8 @@ export class PaikanninUpdate {
           }),
         )
           .then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
-            const summedResult = CommonUpdateService.sumResultsFromPromises(
-              results,
-            );
+            const summedResult =
+              CommonUpdateService.sumResultsFromPromises(results);
             logger.info({
               method,
               message: `finished`,
@@ -217,8 +208,7 @@ export class PaikanninUpdate {
     } else {
       logger.info({
         method: "PaikanninUpdate.updateApiWorkeventDeviceTrackings",
-        message:
-          `machineHarjaId=${device.deviceId} device.workEvents count=${device.workEvents.length}`,
+        message: `machineHarjaId=${device.deviceId} device.workEvents count=${device.workEvents.length}`,
         customDomain: contract.domain,
         customContract: contract.contract,
       });
@@ -234,14 +224,14 @@ export class PaikanninUpdate {
       return DataDb.upsertWorkMachine(tx, workMachine);
     });
     // Get latest tracking for workMachine to extend the tracking and get end_time of it
-    const latest: DbLatestTracking | undefined = await DataDb
-      .findLatestNotFinishedTrackingForWorkMachine(
+    const latest: DbLatestTracking | undefined =
+      await DataDb.findLatestNotFinishedTrackingForWorkMachine(
         db,
         contract.domain,
         machineId.id,
       );
-    const result: ApiWorkevent[][] = PaikanninUtils
-      .groupEventsToIndividualTrackings(
+    const result: ApiWorkevent[][] =
+      PaikanninUtils.groupEventsToIndividualTrackings(
         device.workEvents,
         latest?.end_time,
       );
@@ -269,7 +259,7 @@ export class PaikanninUpdate {
 
     // mark last tracking as not finished as next fetch of the api data can continue it
     if (maintenanceTrackings.length > 0) {
-      // @ts-ignore
+      // @ts-expect-error
       maintenanceTrackings[maintenanceTrackings.length - 1].finished = false;
     }
 
@@ -278,23 +268,20 @@ export class PaikanninUpdate {
       contract,
       maintenanceTrackings,
       latest,
-    ).then(
-      (saveResult) => {
-        const summedResult = new TrackingSaveResult(
-          Utils.countEstimatedSizeOfMessage(result),
-          saveResult.saved,
-          saveResult.errors,
-        );
-        logger.info({
-          method: "PaikanninUpdate.updateApiWorkeventDeviceTrackings",
-          message:
-            `domain=${contract.domain} workMachineId=${machineId.id} machineHarjaId=${workMachine.harjaId} errors=${summedResult.errors}`,
-          tookMs: Date.now() - timerStart,
-          customCount: summedResult.saved,
-        });
-        return summedResult;
-      },
-    );
+    ).then((saveResult) => {
+      const summedResult = new TrackingSaveResult(
+        Utils.countEstimatedSizeOfMessage(result),
+        saveResult.saved,
+        saveResult.errors,
+      );
+      logger.info({
+        method: "PaikanninUpdate.updateApiWorkeventDeviceTrackings",
+        message: `domain=${contract.domain} workMachineId=${machineId.id} machineHarjaId=${workMachine.harjaId} errors=${summedResult.errors}`,
+        tookMs: Date.now() - timerStart,
+        customCount: summedResult.saved,
+      });
+      return summedResult;
+    });
   }
 
   saveMaintenanceTrackings(
@@ -314,11 +301,11 @@ export class PaikanninUpdate {
         // If first new tracking is extending latest tracking in db -> update latest in db also with
         // new end point and time
         if (latest && !latest.finished && maintenanceTrackings.length > 0) {
-          const previousEndPosition =
-            (JSON.parse(latest.last_point) as GeoJsonPoint).coordinates;
-          const nextStartPosition: Position = Utils.getTrackingStartPoint(
-            nextTracking,
-          );
+          const previousEndPosition = (
+            JSON.parse(latest.last_point) as GeoJsonPoint
+          ).coordinates;
+          const nextStartPosition: Position =
+            Utils.getTrackingStartPoint(nextTracking);
           if (
             PaikanninUtils.isExtendingPreviousTracking(
               previousEndPosition,
@@ -378,9 +365,8 @@ export class PaikanninUpdate {
           }),
         )
           .then(async (results: PromiseSettledResult<TrackingSaveResult>[]) => {
-            const summedResult = CommonUpdateService.sumResultsFromPromises(
-              results,
-            );
+            const summedResult =
+              CommonUpdateService.sumResultsFromPromises(results);
             await DataDb.updateContractLastUpdated(
               tx,
               contract.domain,

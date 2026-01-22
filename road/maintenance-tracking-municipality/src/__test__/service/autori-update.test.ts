@@ -1,14 +1,14 @@
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
-import { type GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
-import { type Position } from "geojson";
+import type { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import { jest } from "@jest/globals";
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
+import type { Position } from "geojson";
 import { AutoriApi } from "../../api/autori.js";
 import {
   AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
@@ -20,9 +20,9 @@ import type {
   ApiOperationData,
   ApiRouteData,
 } from "../../model/autori-api-data.js";
-import {
-  type DbDomainContract,
-  type DbDomainTaskMapping,
+import type {
+  DbDomainContract,
+  DbDomainTaskMapping,
 } from "../../model/db-data.js";
 import { UNKNOWN_TASK_NAME } from "../../model/tracking-save-result.js";
 import { AutoriUpdate } from "../../service/autori-update.js";
@@ -53,8 +53,6 @@ import {
   createLineStringGeometries,
   createZigZagCoordinates,
 } from "../testutil.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { jest } from "@jest/globals";
 
 const autoriUpdateService = createAutoriUpdateService();
 
@@ -182,15 +180,11 @@ describe(
       expect(
         taskMappings1.find((t) => t.original_id === AUTORI_OPERATION_BRUSHING)
           ?.domain,
-      ).toEqual(
-        DOMAIN_1,
-      );
+      ).toEqual(DOMAIN_1);
       expect(
         taskMappings1.find((t) => t.original_id === AUTORI_OPERATION_PAVING)
           ?.domain,
-      ).toEqual(
-        DOMAIN_1,
-      );
+      ).toEqual(DOMAIN_1);
     });
 
     test("updateTasks existing not changed", async () => {
@@ -333,11 +327,11 @@ describe(
       const updateTime = Date.now();
       const trackings = await findAllTrackings(db, DOMAIN_1);
       expect(trackings.length).toEqual(2);
-      const olderTracking = trackings.find((t) =>
-        t.message_original_id === route2d.id
+      const olderTracking = trackings.find(
+        (t) => t.message_original_id === route2d.id,
       );
-      const latestTracking = trackings.find((t) =>
-        t.message_original_id === route1d.id
+      const latestTracking = trackings.find(
+        (t) => t.message_original_id === route1d.id,
       );
 
       expect(olderTracking?.tasks.length).toEqual(1);
@@ -507,22 +501,21 @@ describe(
     });
 
     function mockGetOperationsApiResponse(response: ApiOperationData[]): void {
-      jest.spyOn(AutoriApi.prototype, "getOperations").mockReturnValueOnce(
-        Promise.resolve(response),
-      );
+      jest
+        .spyOn(AutoriApi.prototype, "getOperations")
+        .mockReturnValueOnce(Promise.resolve(response));
     }
 
     function mockGetContractsApiResponse(response: ApiContractData[]): void {
-      jest.spyOn(AutoriApi.prototype, "getContracts").mockReturnValueOnce(
-        Promise.resolve(response),
-      );
+      jest
+        .spyOn(AutoriApi.prototype, "getContracts")
+        .mockReturnValueOnce(Promise.resolve(response));
     }
 
     function mockGetWorkEventsApiResponse(response: ApiRouteData[]): void {
-      jest.spyOn(AutoriApi.prototype, "getNextRouteDataForContract")
-        .mockReturnValueOnce(
-          Promise.resolve(response),
-        );
+      jest
+        .spyOn(AutoriApi.prototype, "getNextRouteDataForContract")
+        .mockReturnValueOnce(Promise.resolve(response));
     }
   }),
 );

@@ -1,3 +1,14 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { add } from "date-fns/add";
+import type { Point } from "geojson";
+import * as DataDb from "../../dao/data.js";
+import type {
+  DbMaintenanceTracking,
+  DbNumberId,
+  DbWorkMachine,
+} from "../../model/db-data.js";
+import * as AutoriUtils from "../../service/autori-utils.js";
 import {
   dbTestBase,
   findAllTrackings,
@@ -6,16 +17,6 @@ import {
   insertDomain,
   truncate,
 } from "../db-testutil.js";
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { add } from "date-fns/add";
-import * as DataDb from "../../dao/data.js";
-import {
-  type DbMaintenanceTracking,
-  type DbNumberId,
-  type DbWorkMachine,
-} from "../../model/db-data.js";
-import * as TestUtils from "../testutil.js";
-import { type Point } from "geojson";
 import {
   CONTRACT_ID,
   DOMAIN_1,
@@ -25,8 +26,7 @@ import {
   SOURCE_1,
   VEHICLE_TYPE,
 } from "../testconstants.js";
-import * as AutoriUtils from "../../service/autori-utils.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import * as TestUtils from "../testutil.js";
 
 let WORKMACHINE_ID: DbNumberId;
 const CONTRACT = TestUtils.createDbDomainContract("contract-1", DOMAIN_1);
@@ -61,8 +61,8 @@ describe(
       const endTime = add(new Date(), { minutes: 2 });
       const lastPoint: Point = TestUtils.createGeoJSONPoint(POINT_START);
 
-      const trackingOlder: DbMaintenanceTracking = TestUtils
-        .createDbMaintenanceTracking(
+      const trackingOlder: DbMaintenanceTracking =
+        TestUtils.createDbMaintenanceTracking(
           CONTRACT,
           WORKMACHINE_ID.id,
           startTime,
@@ -71,8 +71,8 @@ describe(
           lastPoint,
           lastPoint,
         );
-      const tracking: DbMaintenanceTracking = TestUtils
-        .createDbMaintenanceTracking(
+      const tracking: DbMaintenanceTracking =
+        TestUtils.createDbMaintenanceTracking(
           CONTRACT,
           WORKMACHINE_ID.id,
           startTime,
@@ -103,8 +103,8 @@ describe(
       const endTime = add(startTime, { minutes: 2 });
       const lastPoint: Point = TestUtils.createGeoJSONPoint(POINT_START);
 
-      const trackingOlder: DbMaintenanceTracking = TestUtils
-        .createDbMaintenanceTracking(
+      const trackingOlder: DbMaintenanceTracking =
+        TestUtils.createDbMaintenanceTracking(
           CONTRACT,
           WORKMACHINE_ID.id,
           startTime,
@@ -113,8 +113,8 @@ describe(
           lastPoint,
           lastPoint,
         );
-      const trackingFinished: DbMaintenanceTracking = TestUtils
-        .createDbMaintenanceTracking(
+      const trackingFinished: DbMaintenanceTracking =
+        TestUtils.createDbMaintenanceTracking(
           CONTRACT,
           WORKMACHINE_ID.id,
           startTime,
@@ -147,8 +147,8 @@ describe(
       const endTime = add(startTime, { minutes: 2 });
       const lastPoint: Point = TestUtils.createGeoJSONPoint(POINT_START);
 
-      const trackingFinished: DbMaintenanceTracking = TestUtils
-        .createDbMaintenanceTracking(
+      const trackingFinished: DbMaintenanceTracking =
+        TestUtils.createDbMaintenanceTracking(
           CONTRACT,
           WORKMACHINE_ID.id,
           startTime,
@@ -173,8 +173,8 @@ describe(
 
     test("markMaintenanceTrackingFinished", async () => {
       await initData();
-      const tracking1: DbMaintenanceTracking = TestUtils
-        .createDbMaintenanceTracking(
+      const tracking1: DbMaintenanceTracking =
+        TestUtils.createDbMaintenanceTracking(
           CONTRACT,
           WORKMACHINE_ID.id,
           TestUtils.dateInPastMinutes(5),
@@ -183,8 +183,8 @@ describe(
           TestUtils.createGeoJSONPoint(POINT_START),
           TestUtils.createGeoJSONPoint(POINT_START),
         );
-      const tracking2: DbMaintenanceTracking = TestUtils
-        .createDbMaintenanceTracking(
+      const tracking2: DbMaintenanceTracking =
+        TestUtils.createDbMaintenanceTracking(
           CONTRACT,
           WORKMACHINE_ID.id,
           TestUtils.dateInPastMinutes(5),
@@ -205,10 +205,12 @@ describe(
       const trackings = await findAllTrackings(db, CONTRACT.domain);
 
       expect(trackings.length).toEqual(2);
-      expect(trackings.find((value) => value.id === finishedId)?.finished)
-        .toEqual(true);
-      expect(trackings.find((value) => value.id !== finishedId)?.finished)
-        .toEqual(false);
+      expect(
+        trackings.find((value) => value.id === finishedId)?.finished,
+      ).toEqual(true);
+      expect(
+        trackings.find((value) => value.id !== finishedId)?.finished,
+      ).toEqual(false);
     });
 
     test("upsertDomain", async () => {

@@ -1,10 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "lib": ["es2022"],
+    "lib": ["es2024"],
     "types": ["heft-jest", "node"],
-    "module": "node16",
-    "target": "es2022",
+    "module": "NodeNext",
+    "target": "ES2024",
     "outDir": "../../../../lib",
     "declaration": true,
     "sourceMap": true,
@@ -12,7 +12,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "NodeNext",
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     "exactOptionalPropertyTypes": false,
@@ -24,9 +24,8 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    // Enable when migrating to 5.0
-    // "verbatimModuleSyntax": true,
-    "checkJs": true,
+    "checkJs": false,
+    "allowJs": false,
     "verbatimModuleSyntax": true
   },
   "exclude": [

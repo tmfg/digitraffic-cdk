@@ -1,14 +1,14 @@
+import { URLSearchParams } from "node:url";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import {
-  type ApiContractData,
-  type ApiOperationData,
-  type ApiRouteData,
-} from "../model/autori-api-data.js";
-import { type DbDomainContract } from "../model/db-data.js";
-import { type MaintenanceTrackingAutoriSecret } from "../model/maintenance-tracking-municipality-secret.js";
-import { URLSearchParams } from "url";
-import logger from "../service/maintenance-logger.js";
 import ky, { HTTPError } from "ky";
+import type {
+  ApiContractData,
+  ApiOperationData,
+  ApiRouteData,
+} from "../model/autori-api-data.js";
+import type { DbDomainContract } from "../model/db-data.js";
+import type { MaintenanceTrackingAutoriSecret } from "../model/maintenance-tracking-municipality-secret.js";
+import logger from "../service/maintenance-logger.js";
 
 export const PATH_SUFFIX_CONTRACTS = "contracts";
 export const PATH_SUFFIX_ROUTE = "route";
@@ -26,8 +26,7 @@ class OAuthTokenResponse {
     this.expires_in = expires_in;
     this.access_token = access_token;
     this.expires = new Date(
-      new Date().getTime() +
-        (expires_in * 1000 - O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS),
+      Date.now() + (expires_in * 1000 - O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS),
     );
     logger.info({
       method: "OAuthTokenResponse.constructor",
@@ -40,7 +39,8 @@ class OAuthTokenResponse {
     partialToken: Partial<OAuthTokenResponse>,
   ): OAuthTokenResponse | undefined {
     if (
-      partialToken.token_type && partialToken.expires_in &&
+      partialToken.token_type &&
+      partialToken.expires_in &&
       partialToken.access_token
     ) {
       return new OAuthTokenResponse(
@@ -60,18 +60,12 @@ class OAuthTokenResponse {
   isActive(): boolean {
     logger.debug({
       method: "OAuthTokenResponse.isActive",
-      customResult: `expires=${this.expires.toISOString()} > now=${
-        new Date().toISOString()
-      } : ${
-        JSON.stringify(
-          this.expires.getTime() > Date.now(),
-        )
-      }`,
-      customResultCalculation: `${this.expires.getTime()} > ${Date.now()} : ${
-        JSON.stringify(
-          this.expires.getTime() > Date.now(),
-        )
-      }`,
+      customResult: `expires=${this.expires.toISOString()} > now=${new Date().toISOString()} : ${JSON.stringify(
+        this.expires.getTime() > Date.now(),
+      )}`,
+      customResultCalculation: `${this.expires.getTime()} > ${Date.now()} : ${JSON.stringify(
+        this.expires.getTime() > Date.now(),
+      )}`,
     });
     return this.expires.getTime() > Date.now();
   }
@@ -101,8 +95,7 @@ export class AutoriApi {
   ): Promise<T> {
     const start = Date.now();
     // https://<server>/api/<productId>/<action>
-    const serverUrl =
-      `${this.secret.url}/api/${this.secret.productId}/${pathSuffix}`;
+    const serverUrl = `${this.secret.url}/api/${this.secret.productId}/${pathSuffix}`;
     const method = "AutoriApi.getFromServer";
     logger.info({
       method,
@@ -124,7 +117,8 @@ export class AutoriApi {
       })
       .catch(async (error: Error | HTTPError) => {
         const isHTTPError = error instanceof HTTPError;
-        const message = `method=${method} message=${callerMethod} ` +
+        const message =
+          `method=${method} message=${callerMethod} ` +
           (isHTTPError
             ? `GET failed with message: ${error.message}`
             : `GET failed outside ky with message ${error.message}`);
@@ -188,8 +182,7 @@ export class AutoriApi {
       (error: Error) => {
         logger.error({
           method: "AutoriApi.getNextRouteDataForContract",
-          message:
-            `startTime=${from.toISOString()} endTime=${to.toISOString()}`,
+          message: `startTime=${from.toISOString()} endTime=${to.toISOString()}`,
           customDomain: contract.domain,
           customContract: contract.contract,
           error,
@@ -209,13 +202,13 @@ export class AutoriApi {
     from: Date,
     to: Date,
   ): Promise<ApiRouteData[]> {
-    const fromString = from.toISOString(); // With milliseconds Z-time
-    const toString = to.toISOString();
+    const fromAsString = from.toISOString(); // With milliseconds Z-time
+    const toAsString = to.toISOString();
     const start = Date.now();
 
     return this.getFromServer<ApiRouteData[]>(
       `getRouteDataForContract`,
-      `${PATH_SUFFIX_ROUTE}?contract=${contract.contract}&changedStart=${fromString}&changedEnd=${toString}`,
+      `${PATH_SUFFIX_ROUTE}?contract=${contract.contract}&changedStart=${fromAsString}&changedEnd=${toAsString}`,
     )
       .then((routeData) => {
         return routeData;
@@ -223,7 +216,7 @@ export class AutoriApi {
       .catch((error: Error) => {
         logger.error({
           method: "AutoriApi.getRouteDataForContract",
-          message: `startTime=${fromString} endTime=${toString}`,
+          message: `startTime=${fromAsString} endTime=${toAsString}`,
           customDomain: contract.domain,
           customContract: contract.contract,
           error,
@@ -233,7 +226,7 @@ export class AutoriApi {
       .finally(() => {
         logger.info({
           method: "AutoriApi.getRouteDataForContract",
-          message: `startTime=${fromString} endTime=${toString}`,
+          message: `startTime=${fromAsString} endTime=${toAsString}`,
           customDomain: contract.domain,
           customContract: contract.contract,
           tookMs: Date.now() - start,
@@ -254,8 +247,7 @@ export class AutoriApi {
     if (this.oAuthResponse?.isActive()) {
       logger.debug({
         method,
-        message:
-          `get from cache expires ${this.oAuthResponse.expires.toISOString()} (safety margin ${O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS} ms)`,
+        message: `get from cache expires ${this.oAuthResponse.expires.toISOString()} (safety margin ${O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS} ms)`,
       });
       return Promise.resolve(this.oAuthResponse);
     }
@@ -271,15 +263,12 @@ export class AutoriApi {
 
     const url = this.secret.oAuthTokenEndpoint;
     return ky
-      .post<Partial<OAuthTokenResponse>>(
-        url,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams(postData).toString(),
+      .post<Partial<OAuthTokenResponse>>(url, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-      )
+        body: new URLSearchParams(postData).toString(),
+      })
       .then(async (response) => {
         this.oAuthResponse = OAuthTokenResponse.createFromAuthResponse(
           await response.json(),
@@ -289,8 +278,7 @@ export class AutoriApi {
         }
         logger.info({
           method,
-          message:
-            `new token expires in ${this.oAuthResponse.expires_in} s and calculated limit is ${this.oAuthResponse.expires.toISOString()}`,
+          message: `new token expires in ${this.oAuthResponse.expires_in} s and calculated limit is ${this.oAuthResponse.expires.toISOString()}`,
         });
         return this.oAuthResponse;
       })

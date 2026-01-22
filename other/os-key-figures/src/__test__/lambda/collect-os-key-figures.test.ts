@@ -12,7 +12,7 @@ test("getPaths throws HttpError with statuscode 403", async () => {
     .then(() => {
       fail("Should throw HTTPError");
     })
-    .catch((error: any) => {
+    .catch((_error: unknown) => {
       //expect(error.constructor.name).toBe("HTTPError");
     });
 });

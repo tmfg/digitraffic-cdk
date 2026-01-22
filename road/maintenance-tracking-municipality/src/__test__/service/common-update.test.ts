@@ -1,4 +1,4 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
   dbTestBase,
   getDomain,

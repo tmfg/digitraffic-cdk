@@ -8,27 +8,22 @@ export class ExpectResponse {
   }
 
   static ok(response: LambdaResponse): ExpectResponse {
-    return new ExpectResponse(response)
-      .expectStatus(200);
+    return new ExpectResponse(response).expectStatus(200);
   }
 
   static notFound(
     response: LambdaResponse,
     body: string = "Not Found",
   ): ExpectResponse {
-    return new ExpectResponse(response)
-      .expectStatus(404)
-      .expectBody(body);
+    return new ExpectResponse(response).expectStatus(404).expectBody(body);
   }
 
   static badRequest(response: LambdaResponse): ExpectResponse {
-    return new ExpectResponse(response)
-      .expectStatus(400);
+    return new ExpectResponse(response).expectStatus(400);
   }
 
   static internalError(response: LambdaResponse): ExpectResponse {
-    return new ExpectResponse(response)
-      .expectStatus(500);
+    return new ExpectResponse(response).expectStatus(500);
   }
 
   expectStatus(expected: number): this {

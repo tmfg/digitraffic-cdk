@@ -41,7 +41,7 @@ function createFetchYearlyPlansLambda(
       reservedConcurrentExecutions: 1,
       timeout: 300,
       memorySize: 512,
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
     },
   );
 

@@ -1,12 +1,12 @@
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { type APIGatewayEvent } from "aws-lambda";
-import { MaintenanceTrackingEnvKeys } from "../../keys.js";
-import { type TyokoneenseurannanKirjaus } from "../../model/models.js";
-import { getErrorMessage } from "../../util/util.js";
-import { type ExtendedSqsClient } from "sqs-extended-client";
-import { type SendMessageCommandInput } from "@aws-sdk/client-sqs";
+import type { SendMessageCommandInput } from "@aws-sdk/client-sqs";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import type { APIGatewayEvent } from "aws-lambda";
+import type { ExtendedSqsClient } from "sqs-extended-client";
+import { MaintenanceTrackingEnvKeys } from "../../keys.js";
+import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
 import { createExtendedSqsClient } from "../../service/sqs-big-payload.js";
+import { getErrorMessage } from "../../util/util.js";
 
 const sqsQueueUrl = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL);
 const region = getEnvVariable("AWS_REGION");
@@ -28,8 +28,7 @@ export function handlerFn(
     const start = Date.now();
     logger.info({
       method,
-      message:
-        `bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl} and region: ${region} apiGWRequest type: ${typeof apiGWRequest}`,
+      message: `bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl} and region: ${region} apiGWRequest type: ${typeof apiGWRequest}`,
     });
     if (!apiGWRequest.body) {
       logger.info({
@@ -63,7 +62,7 @@ export function handlerFn(
       });
       return Promise.resolve(ok());
     } catch (e) {
-      logger.debug("maybeError: " + JSON.stringify(e));
+      logger.debug(`maybeError: ${JSON.stringify(e)}`);
       const error = getErrorMessage(e);
       logger.error({
         method,

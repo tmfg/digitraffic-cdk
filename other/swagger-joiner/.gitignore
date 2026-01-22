@@ -5,6 +5,7 @@
 !/*.json
 !/*.md
 !/*.sh
+!/esbuild.ts
 
 !/resources/
 !/resources/*.png
@@ -20,3 +21,4 @@
 !/src/**/
 !/src/**/*.ts
 /src/bin
+

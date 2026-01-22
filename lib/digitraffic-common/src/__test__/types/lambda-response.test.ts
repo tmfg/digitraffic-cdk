@@ -82,13 +82,13 @@ describe("lambda-response", () => {
   test("notFound", () => {
     const response = LambdaResponse.notFound();
 
-    assertBinary(response, "Not found", 404);
+    assertBinary(response, "Not Found", 404);
   });
 
   test("internalError", () => {
     const response = LambdaResponse.internalError();
 
-    assertBinary(response, "Internal error", 500);
+    assertBinary(response, "Internal Error", 500);
   });
 
   test("notImplemented", () => {

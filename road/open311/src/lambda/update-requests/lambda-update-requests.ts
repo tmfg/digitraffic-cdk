@@ -1,17 +1,16 @@
-import type { APIGatewayEvent } from "aws-lambda";
+import { LambdaProxyResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-proxy-types";
+import type { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 import type {
   ServiceRequestWithExtensions,
   ServiceRequestWithExtensionsDto,
 } from "../../model/service-request.js";
 import * as RequestsService from "../../service/requests.js";
-import { invalidRequest } from "../../http-util.js";
-import type { ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 
 export const handler = async (
   event: APIGatewayEvent,
-): Promise<ProxyLambdaResponse> => {
+): Promise<APIGatewayProxyResult> => {
   if (!event.body) {
-    return invalidRequest();
+    return LambdaProxyResponseBuilder.badRequest();
   }
 
   const obj = JSON.parse(
@@ -22,7 +21,7 @@ export const handler = async (
     : [obj];
 
   if (serviceRequests.length === 0) {
-    return invalidRequest();
+    return LambdaProxyResponseBuilder.badRequest();
   }
 
   await RequestsService.update(

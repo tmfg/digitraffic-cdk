@@ -1,9 +1,7 @@
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type {
-  ProxyLambdaRequest,
-  ProxyLambdaResponse,
-} from "@digitraffic/common/dist/aws/types/proxytypes";
+import type { APIGatewayProxyEventSubset } from "@digitraffic/common/dist/aws/types/lambda-proxy-types";
+import type { APIGatewayProxyResult } from "aws-lambda";
 import ky from "ky";
 
 interface VoyagePlanSecret extends GenericSecret {
@@ -14,13 +12,13 @@ interface VoyagePlanSecret extends GenericSecret {
 const secretHolder = SecretHolder.create<VoyagePlanSecret>();
 
 export function handler(
-  event: ProxyLambdaRequest,
-): Promise<ProxyLambdaResponse> {
+  event: APIGatewayProxyEventSubset,
+): Promise<APIGatewayProxyResult> {
   return secretHolder.get().then(async (secret: VoyagePlanSecret) => {
-    // eslint-disable-next-line dot-notation
     if (
-      event.queryStringParameters["auth"] !==
-        secret["vpgw.schedulesAccessToken"]
+      // biome-ignore lint/complexity/useLiteralKeys: comes from indexed access
+      event.queryStringParameters?.["auth"] !==
+      secret["vpgw.schedulesAccessToken"]
     ) {
       return {
         statusCode: 403,
@@ -29,12 +27,12 @@ export function handler(
     }
 
     let url = secret["vpgw.schedulesUrl"];
-    // eslint-disable-next-line dot-notation
+    // biome-ignore lint/complexity/useLiteralKeys: comes from indexed access
     if (event.queryStringParameters["direction"]) {
-      // eslint-disable-next-line dot-notation
+      // biome-ignore lint/complexity/useLiteralKeys: comes from indexed access
       if (["east", "west"].includes(event.queryStringParameters["direction"])) {
-        // eslint-disable-next-line dot-notation
-        url += "/" + event.queryStringParameters["direction"];
+        // biome-ignore lint/complexity/useLiteralKeys: comes from indexed access
+        url += `/${event.queryStringParameters["direction"]}`;
       } else {
         return {
           statusCode: 400,
@@ -43,7 +41,7 @@ export function handler(
       }
     }
 
-    // eslint-disable-next-line dot-notation
+    // biome-ignore lint/complexity/useLiteralKeys: comes from indexed access
     const calculated = event.queryStringParameters["calculated"] === "true";
     if (calculated) {
       url += "/calculated";
@@ -69,10 +67,10 @@ export function handler(
 
 function handleQueryParam(
   param: string,
-  queryParams: Record<string, string>,
+  queryParams: Record<string, string | undefined>,
   params: string[],
 ): void {
-  if (queryParams[param]) {
+  if (queryParams[param] !== undefined) {
     params.push(`${param}=${queryParams[param]}`);
   }
 }
