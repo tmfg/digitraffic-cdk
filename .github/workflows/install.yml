@@ -17,7 +17,7 @@ on:
         required: true
         default: "master"
       application:
-        description: "Application to install (afir/mqtt/both)"
+        description: "Application to install"
         required: true
         type: choice
         options: 

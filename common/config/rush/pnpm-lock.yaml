@@ -1489,6 +1489,9 @@ importers:
       aws-cdk:
         specifier: 2.1100.2
         version: 2.1100.2
+      cdk-ecr-deployment:
+        specifier: 4.0.6
+        version: 4.0.6(aws-cdk-lib@2.234.0(constructs@10.4.4))(constructs@10.4.4)
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -5523,6 +5526,12 @@ packages:
 
   caniuse-lite@1.0.30001754:
     resolution: {integrity: sha512-x6OeBXueoAceOmotzx3PO4Zpt4rzpeIFsSr6AAePTZxSkXiYDUmpypEl7e2+8NCd9bD7bXjqyef8CJYPC1jfxg==}
+
+  cdk-ecr-deployment@4.0.6:
+    resolution: {integrity: sha512-FBf0rFt1QReeRWL0am6T+e5SsZQaB1RxHmmMMBrzxi6RG2Wy+L8FnjGkWFYoND5q5K4mrAZqdL57HaLTYiHzEg==}
+    peerDependencies:
+      aws-cdk-lib: ^2.80.0
+      constructs: ^10.0.5
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -13036,6 +13045,11 @@ snapshots:
   camelcase@6.3.0: {}
 
   caniuse-lite@1.0.30001754: {}
+
+  cdk-ecr-deployment@4.0.6(aws-cdk-lib@2.234.0(constructs@10.4.4))(constructs@10.4.4):
+    dependencies:
+      aws-cdk-lib: 2.234.0(constructs@10.4.4)
+      constructs: 10.4.4
 
   chalk@4.1.2:
     dependencies:
