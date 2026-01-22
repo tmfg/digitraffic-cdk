@@ -6,7 +6,10 @@ on:
       env:
         description: "Environment"
         required: true
-        type: environment
+        type: choice
+        options:
+          - "prod"
+          - "test"
         default: "test"
       ref:
         description: "Branch/tag/SHA of digitraffic-cdk-private"
@@ -23,11 +26,6 @@ on:
         options: 
           - "digitraffic-statistics"
           - "aton-faults"
-      deploy_all_changes:
-        description: "Deploy all changes in CDK stacks (otherwise just ECS image tag changes are deployed)"
-        required: true
-        type: boolean
-        default: false
 
 jobs:
   build_and_deploy:
@@ -40,11 +38,30 @@ jobs:
     environment: ${{ github.event.inputs.env }}
 
     steps:
+      - name: Checkout CI-repo
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ secrets.CONFIG_REPO_NAME }}
+          ssh-key: ${{ secrets.CONFIG_REPO_SSH_KEY }}
+          ref: ${{ inputs.config-repo-branch }}
+          path: digitraffic-ci
+
+      - name: Set environment variables
+        id: environment
+        run: |
+            export DOMAIN=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].domain }}
+            export STACK=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].stack }}
+            export DIRECTORY=$(DOMAIN)/${{ github.event.inputs.application }}
+
+            echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
+            echo "stack=$STACK" >> $GITHUB_OUTPUT
+            echo "directory=$DIRECTORY" >> $GITHUB_OUTPUT
+
       - name: Configure AWS credentials
         if: 1 == 2
         uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-to-assume: ${{ fromJson(secrets.INSTALL_CONFIG).roles[github.event.inputs.env][steps.environment.outputs.domain] }}
           role-session-name: gh-actions-install-images-${{ github.event.inputs.env }}
           aws-region: ${{ secrets.AWS_REGION }}
           
@@ -57,14 +74,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.ref }}
-
-      - name: Checkout CI-repo
-        uses: actions/checkout@v6
-        with:
-          repository: ${{ secrets.CONFIG_REPO_NAME }}
-          ssh-key: ${{ secrets.CONFIG_REPO_SSH_KEY }}
-          ref: ${{ inputs.config-repo-branch }}
-          path: digitraffic-ci
 
       - name: Setup Node.js 24
         uses: actions/setup-node@v6
@@ -79,20 +88,23 @@ jobs:
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
 
+      - name: Copy config
+        run: |
+          cp -r digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-${{ steps.environment.outputs.domain }}.ts 
+          cp -r digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/${{ github.event.inputs.application}}/* ${{ steps.environment.outputs.directory }}/src/bin/
+
       - name: Diff and deploy
         env:
-          DEPLOY_ALL_CHANGES: ${{ github.event.inputs.deploy_all_changes }}
-          # the value of AWS_PROFILE is only used by the stack code, local AWS profile configurations are not being set up
-          AWS_PROFILE: ${{ secrets.AWS_PROFILE }}
           ENV: ${{ github.event.inputs.env }}
+          STACK: ${{ steps.environment.outputs.stack }}
         run: |                  
-            if [ $ENV == "prod" ]; then export STACK=ChargingNetworkAfirProd; else export STACK=ChargingNetworkAfirTest; fi;
-            if [ $DEPLOY_ALL_CHANGES == "true" ]; then export CDK_COMMAND=deploy; else export CDK_COMMAND=diff; fi;
-
+            if [ $ENV == "prod" ]; then export STACK_NAME=$(STACK)Prod; else export STACK_NAME=$(STACK)Test; fi;
+ 
             node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
 
+            cd ${{ steps.environment.outputs.directory }}
             # and the deploy
-            # pnpm cdk deploy $STACK?
+            node ../../common/scripts/install-run-rush-pnpm.js cdk deploy $STACK_NAME
 
       - name: Generate SBOM
         run: |
@@ -107,4 +119,14 @@ jobs:
 
       - name: Upload SBOM
         run: |
-          aws s3 cp afir/charging-network/sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env]['charging-network'] }}/${{ github.run_id }}-${{ github.sha }}.json
+          aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
+
+      - name: Notify Slack
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: FAILED ${{ github.event.inputs.application }} install on ${{ github.event.inputs.env }}
+          fields: repo, job, took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
