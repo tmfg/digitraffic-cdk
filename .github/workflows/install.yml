@@ -89,11 +89,9 @@ jobs:
 
       - name: Copy config
         run: |
-          ls -lha
-
           mkdir ${{ steps.environment.outputs.directory }}/src/bin
 
-          if [ ${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].allConfigs }} == "true" ]; then
+          if [ "${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].allConfigs }}" == "true" ]; then
               cp digitraffic-ci/aws/cdk/marine/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-marine.ts 
               cp digitraffic-ci/aws/cdk/road/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-road.ts 
               cp digitraffic-ci/aws/cdk/rail/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-rail.ts 
