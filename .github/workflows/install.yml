@@ -19,6 +19,15 @@ on:
         description: "Branch or tag of CI-repo"
         required: true
         default: "master"
+      command:
+        description: "Command for cdk"
+        required: true
+        type: choice
+        options: 
+          - "deploy"
+          - "diff"
+        default: "deploy"
+
       application:
         description: "Application to install"
         required: true
@@ -113,8 +122,8 @@ jobs:
             node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
 
             cd ${{ steps.environment.outputs.directory }}
-            # and the deploy
-            node ../../common/scripts/install-run-rush-pnpm.js cdk diff $STACK_NAME
+            # and the run command
+            node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
 
       - name: Generate SBOM
         run: |
