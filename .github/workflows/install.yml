@@ -97,7 +97,8 @@ jobs:
               cp digitraffic-ci/aws/cdk/rail/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-rail.ts 
               cp digitraffic-ci/aws/cdk/aviation/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-aviation.ts 
           else
-              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/
+              # file might not exist, so skipping errors 
+              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/ || true
           fi
 
           cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/${{ github.event.inputs.application}}/* ${{ steps.environment.outputs.directory }}/src/bin/
@@ -113,7 +114,7 @@ jobs:
 
             cd ${{ steps.environment.outputs.directory }}
             # and the deploy
-            node ../../common/scripts/install-run-rush-pnpm.js cdk deploy $STACK_NAME
+            node ../../common/scripts/install-run-rush-pnpm.js cdk diff $STACK_NAME
 
       - name: Generate SBOM
         run: |
