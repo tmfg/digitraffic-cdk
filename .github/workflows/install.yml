@@ -38,6 +38,10 @@ jobs:
     environment: ${{ github.event.inputs.env }}
 
     steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
       - name: Checkout CI-repo
         uses: actions/checkout@v6
         with:
@@ -61,7 +65,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ fromJson(secrets.INSTALL_CONFIG).roles[github.event.inputs.env][steps.environment.outputs.domain] }}
-          role-session-name: gh-actions-install-images-${{ github.event.inputs.env }}
+          role-session-name: gh-actions-install-${{ github.event.inputs.env }}
           aws-region: ${{ secrets.AWS_REGION }}
           
       - name: Set up QEMU
@@ -69,10 +73,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.inputs.ref }}
 
       - name: Setup Node.js 24
         uses: actions/setup-node@v6
