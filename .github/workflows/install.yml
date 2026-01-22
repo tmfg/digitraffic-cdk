@@ -41,6 +41,7 @@ jobs:
 
     steps:
       - name: Configure AWS credentials
+        if: 1 == 2
         uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
