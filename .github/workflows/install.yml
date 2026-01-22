@@ -66,10 +66,10 @@ jobs:
           ref: ${{ inputs.config-repo-branch }}
           path: digitraffic-ci
 
-      - name: Setup Node.js 22
+      - name: Setup Node.js 24
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Setup pnpm 10
         uses: pnpm/action-setup@v4
