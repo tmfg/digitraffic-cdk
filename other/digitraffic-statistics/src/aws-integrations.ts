@@ -12,6 +12,7 @@ import { Repository } from "aws-cdk-lib/aws-ecr";
 import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import { DockerImageName, ECRDeployment } from "cdk-ecr-deployment";
 import { DockerImageCode } from "aws-cdk-lib/aws-lambda";
+import { CfnOutput } from "aws-cdk-lib/core";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -70,13 +71,19 @@ export class StatisticsIntegrations {
 stack: DigitrafficStatisticsStack, vpc: IVpc, sg: SecurityGroup, repository: Repository,
   ): LambdaIntegration {
     const image = new DockerImageAsset(stack, "FiguresImage", {
+      assetName: "digitraffic-figures-image",
       directory: path.join(__dirname, "../digitraffic-figures/"),      
     });
 
+    const imageUrl = `${repository.repositoryUri}:latest`;
+
     const ecrDeployment = new ECRDeployment(stack, "FiguresECRDeployment", {
       src: new DockerImageName(image.imageUri),
-      dest: new DockerImageName(`${repository.repositoryUri}:latest`),
+      dest: new DockerImageName(imageUrl),
     });
+
+    // create image url output
+    new CfnOutput(stack, "ImageUrl", { value: imageUrl });
 
     ecrDeployment.node.addDependency(image);
 
