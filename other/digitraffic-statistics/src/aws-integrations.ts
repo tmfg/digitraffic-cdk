@@ -8,6 +8,10 @@ import { Duration } from "aws-cdk-lib";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { type IVpc, Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import { fileURLToPath } from "url";
+import { Repository } from "aws-cdk-lib/aws-ecr";
+import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
+import { DockerImageName, ECRDeployment } from "cdk-ecr-deployment";
+import { DockerImageCode } from "aws-cdk-lib/aws-lambda";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -33,6 +37,8 @@ export class StatisticsIntegrations {
 
     this.createDbAccessIngressRule(stack, digitrafficMonthlySg);
 
+    const repository = new Repository(stack, "digitraffic-figures-repo");
+
     this.apiStatisticsS3Integration = this.createApiStatisticsS3Integration(
       stack,
     );
@@ -41,6 +47,7 @@ export class StatisticsIntegrations {
         stack,
         vpc,
         digitrafficMonthlySg,
+        repository
       );
   }
 
@@ -60,20 +67,30 @@ export class StatisticsIntegrations {
   }
 
   private createDigitrafficMonthlyLambdaIntegration(
-    stack: DigitrafficStatisticsStack,
-    vpc: IVpc,
-    sg: SecurityGroup,
+stack: DigitrafficStatisticsStack, vpc: IVpc, sg: SecurityGroup, repository: Repository,
   ): LambdaIntegration {
+    const image = new DockerImageAsset(stack, "FiguresImage", {
+      directory: path.join(__dirname, "../digitraffic-figures/"),      
+    });
+
+    const ecrDeployment = new ECRDeployment(stack, "FiguresECRDeployment", {
+      src: new DockerImageName(image.imageUri),
+      dest: new DockerImageName(`${repository.repositoryUri}:latest`),
+    });
+
+    ecrDeployment.node.addDependency(image);
+
+    const code = DockerImageCode.fromEcr(repository, {
+      tagOrDigest: "latest"
+    });
+
     const digitrafficMonthlyFunction = new lambda.DockerImageFunction(
       stack,
       "digitraffic-monthly",
       {
         functionName: "digitraffic-monthly",
-        code: lambda.DockerImageCode.fromImageAsset(
-          path.join(__dirname, "../digitraffic-figures/"),
-          {},
-        ),
-        vpc: vpc,
+        code,
+        vpc,
         securityGroups: [sg],
         role: this.createDigitrafficMonthlyLambdaRole(stack),
         architecture: lambda.Architecture.ARM_64,
@@ -82,6 +99,8 @@ export class StatisticsIntegrations {
         environment: stack.statisticsProps.figuresLambdaEnv,
       },
     );
+
+    digitrafficMonthlyFunction.node.addDependency(ecrDeployment);
 
     return new LambdaIntegration(digitrafficMonthlyFunction, {
       proxy: true,
