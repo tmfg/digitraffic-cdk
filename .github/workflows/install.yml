@@ -96,7 +96,7 @@ jobs:
 
       - name: Generate SBOM
         run: |
-          node common/scripts/install-run-rush-pnpm.js generate-sbom -I ${{ github.event.inputs.application }}
+          node common/scripts/install-run-rush.js generate-sbom --only ${{ github.event.inputs.application }}
 
       - name: Configure AWS credentials for SBOM
         uses: aws-actions/configure-aws-credentials@v5
