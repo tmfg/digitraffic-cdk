@@ -35,6 +35,7 @@ on:
         options: 
           - "digitraffic-statistics"
           - "aton-faults"
+          - "counting-site"
 
 jobs:
   build_and_deploy:
@@ -47,6 +48,12 @@ jobs:
     environment: ${{ github.event.inputs.env }}
 
     steps:
+      - name: Summary
+        run: |
+          echo '### Deploying ${{ github.event.inputs.application }} to ${{ github.event.inputs.env }}! 🚀' >> $GITHUB_STEP_SUMMARY
+          echo 'Using ref ${{ github.event.inputs.ref }}' >> $GITHUB_STEP_SUMMARY
+          echo 'Using ci ${{ github.event.inputs.config-repo-branch }}' >> $GITHUB_STEP_SUMMARY
+
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.ref }}
