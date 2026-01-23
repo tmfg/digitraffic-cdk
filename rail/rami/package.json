@@ -51,7 +51,7 @@
     "@types/node": "24.10.4",
     "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",
-    "lodash-es": "4.17.22",
+    "lodash-es": "4.17.23",
     "parallelshell": "3.0.2",
     "typescript": "5.9.3"
   }
