@@ -15,10 +15,25 @@ export interface AwsGithubProps {
     readonly updateSwaggerForTrafficType?: TrafficType;
     readonly shortName: string;
     readonly repo: string;
-    readonly environment: string;
+    readonly environment?: string; // if missing, applies to all environments
     readonly allowedActions: string[];
     readonly additionalPolicies?: PolicyStatement[];
   }[];
+}
+
+function createStringLikeCondition(
+  repo: string,
+  environment?: string,
+): { [key: string]: string } {
+  if (environment) {  
+    return {
+      "token.actions.githubusercontent.com:sub": `repo:tmfg/${repo}:environment:${environment}`,
+    };
+  }
+
+  return {
+    "token.actions.githubusercontent.com:sub": `repo:tmfg/${repo}:*`,
+  };
 }
 
 export class AwsGithubOidcStack extends Stack {
@@ -40,18 +55,11 @@ export class AwsGithubOidcStack extends Stack {
     });
 
     props.roles.forEach((role) => {
-      const envCapitalized = role.environment.replace(
-        /^\w/,
-        (c) => c.toUpperCase(),
-      );
       const createdRole = new Role(this, `${role.shortName}-OIDCRole`, {
         assumedBy: new WebIdentityPrincipal(
           `arn:aws:iam::${this.account}:oidc-provider/token.actions.githubusercontent.com`,
           {
-            StringLike: {
-              "token.actions.githubusercontent.com:sub":
-                `repo:tmfg/${role.repo}:environment:${role.environment}`,
-            },
+            StringLike: createStringLikeCondition(role.repo, role.environment)
           },
         ),
         roleName: `${role.shortName}-GitHub-OIDC-Role`,
@@ -74,6 +82,10 @@ export class AwsGithubOidcStack extends Stack {
         });
       }
       if (role.updateSwaggerForTrafficType) {
+        const envCapitalized = role.environment?.replace(
+        /^\w/,
+        (c) => c.toUpperCase(),
+      );
         const updateApiDocsFunctionName =
           `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateApiDocumentation`;
         const updateSwaggerDocsFunctionName =
