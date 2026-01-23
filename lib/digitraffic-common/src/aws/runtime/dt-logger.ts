@@ -1,5 +1,5 @@
 import type { Writable } from "node:stream";
-import { lowerFirst, mapKeys } from "lodash-es";
+import { lowerFirst, mapKeys } from "es-toolkit";
 import { getEnvVariableOrElse } from "../../utils/utils.js";
 
 /** Logging level */

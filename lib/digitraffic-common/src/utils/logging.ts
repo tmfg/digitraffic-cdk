@@ -66,3 +66,40 @@ export function logException(
     stack,
   });
 }
+
+/**
+ * Truncate string at the end if it exceeds max length.
+ * @param str
+ * @param max
+ */
+export function truncateEnd(str: string, max = 1000): string {
+  if (!str) {
+    return "";
+  }
+
+  const truncate = str.length - max;
+  const markerLen = `[TRUNCATED ${truncate} CHARS]`.length;
+  if (str.length <= max || truncate <= markerLen) {
+    return str;
+  }
+
+  return `${str.slice(0, max).trim()} [TRUNCATED ${str.length - max} CHARS]`;
+}
+
+/**
+ * Truncate string in the middle if it exceeds max length.
+ * @param str
+ * @param max
+ */
+export function truncateMiddle(str: string, max = 1000): string {
+  if (!str) {
+    return "";
+  }
+  const truncate = str.length - max;
+  const markerLen = `[TRUNCATED ${truncate} CHARS]`.length;
+  if (str.length <= max || truncate <= markerLen) {
+    return str;
+  }
+  const half = Math.floor(max / 2);
+  return `${str.slice(0, half).trim()} [TRUNCATED ${str.length - max} CHARS] ${str.slice(str.length - half).trim()}`;
+}

@@ -1,16 +1,21 @@
-import { LambdaResponse } from "../../aws/types/lambda-response.js";
+import {
+  LambdaResponse,
+  LambdaResponseBuilder,
+} from "../../aws/types/lambda-response.js";
+import { decodeBase64ToUtf8 } from "../../utils/base64.js";
+
+export const TEST_MESSAGE = "HELLO";
+export const TEST_COUNT = 12;
+export const TEST_FILENAME = "file.txt";
+export const TEST_TIMESTAMP = new Date();
+export const TEST_TIMESTAMP_STR = TEST_TIMESTAMP.toISOString();
+
+export const TEST_JSON = {
+  message: TEST_MESSAGE,
+  count: TEST_COUNT,
+};
 
 describe("lambda-response", () => {
-  const TEST_MESSAGE = "HELLO";
-  const TEST_COUNT = 12;
-  const TEST_FILENAME = "file.txt";
-  const TEST_TIMESTAMP = new Date();
-
-  const TEST_JSON = {
-    message: TEST_MESSAGE,
-    count: TEST_COUNT,
-  };
-
   function assertJson<T>(
     response: LambdaResponse,
     expectedJson: T,
@@ -18,9 +23,7 @@ describe("lambda-response", () => {
     expectedFilename?: string,
     expectedTimestamp?: Date,
   ): void {
-    const body = JSON.parse(
-      Buffer.from(response.body, "base64").toString(),
-    ) as unknown;
+    const body = JSON.parse(decodeBase64ToUtf8(response.body)) as unknown;
 
     expect(body).toEqual(expectedJson);
     expect(response.status).toEqual(expectedStatus);
@@ -35,7 +38,7 @@ describe("lambda-response", () => {
     expectedFilename?: string,
     expectedTimestamp?: Date,
   ): void {
-    const body = Buffer.from(response.body, "base64").toString();
+    const body = decodeBase64ToUtf8(response.body);
 
     expect(body).toEqual(expectedString);
     expect(response.status).toEqual(expectedStatus);
@@ -94,6 +97,22 @@ describe("lambda-response", () => {
   test("notImplemented", () => {
     const response = LambdaResponse.notImplemented();
 
-    assertBinary(response, "Not implemented", 501);
+    assertBinary(response, "Not Implemented", 501);
+  });
+
+  // Builder
+  test("Builder - okJson - without fileName", () => {
+    const response = LambdaResponseBuilder.create().withBody(TEST_JSON).build();
+
+    assertJson(response, TEST_JSON, 200);
+  });
+
+  test("Builder - okJson - with fileName", () => {
+    const response = LambdaResponseBuilder.create()
+      .withBody(TEST_JSON)
+      .withFileName(TEST_FILENAME)
+      .build();
+
+    assertJson(response, TEST_JSON, 200, TEST_FILENAME);
   });
 });

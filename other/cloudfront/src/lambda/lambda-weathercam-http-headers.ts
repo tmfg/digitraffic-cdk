@@ -1,8 +1,8 @@
+import type { CloudFrontResponseHandler } from "aws-lambda";
 import {
   addWeathercamImageLastModifiedHeaderFromXAmzMeta,
   createAndLogError,
 } from "./header-util.js";
-import type { CloudFrontResponseHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
@@ -32,7 +32,7 @@ export const handler: CloudFrontResponseHandler = async (event) => {
 
     return response;
   } else {
-    return createAndLogError(
+    throw createAndLogError(
       "lambda-weathercam-http-headers.handler",
       "Event did not have records",
     );

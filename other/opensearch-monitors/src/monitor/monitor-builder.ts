@@ -1,3 +1,4 @@
+import type { AggregateFilter, TermsAggregate } from "./aggregates.js";
 import type { OSLogField } from "./fields.js";
 import type { OSMonitor } from "./monitor.js";
 import type {
@@ -17,17 +18,14 @@ import type {
   Sort,
   WildcardQuery,
 } from "./queries.js";
+import type { OSTrigger } from "./triggers.js";
 import {
-  type OSTrigger,
   triggerAlways,
   triggerWhenAggregationBucketsFound,
   triggerWhenLineCountOutside,
   triggerWhenLinesFound,
   triggerWhenSumOutside,
 } from "./triggers.js";
-import type { AggregateFilter, TermsAggregate } from "./aggregates.js";
-
-export const RUNBOOK_SEARCH_TERM = "SEARCH_TERM" as const;
 
 export type OsDomain =
   | "marine"
@@ -68,10 +66,7 @@ export function matchPhrase(
   return { match_phrase: { [field]: { query } } };
 }
 
-export function matchPrefix(
-  field: OSLogField,
-  query: string,
-): PrefixQuery {
+export function matchPrefix(field: OSLogField, query: string): PrefixQuery {
   return { prefix: { [field]: query } };
 }
 
@@ -104,7 +99,11 @@ export function matchRegExpPhrase(
 
 export function aggregateTerms(
   field: OSLogField,
-  { name, bucketFilter, innerAggregate }: {
+  {
+    name,
+    bucketFilter,
+    innerAggregate,
+  }: {
     name?: string;
     bucketFilter?: AggregateFilter;
     innerAggregate?: TermsAggregate;
@@ -210,8 +209,7 @@ export class OsMonitorBuilder {
 
   constructor(name: string, config: MonitorConfig) {
     this.config = config;
-    this.name =
-      `${config.domain.toUpperCase()} ${config.env.toUpperCase()} ${name}`;
+    this.name = `${config.domain.toUpperCase()} ${config.env.toUpperCase()} ${name}`;
     this.cron = config.cron;
     this.index = config.index;
     this.messageSubject = config.messageSubject;
@@ -353,11 +351,11 @@ export class OsMonitorBuilder {
 
   sum(field: string, betweenLower: number, betweenUpper: number): this {
     this.aggs[`sum_${field}`] = {
-      "scripted_metric": {
-        "init_script": "state.responses = ['total': 0L]",
-        "map_script": "state.responses.total+= doc['bytes'].value",
-        "combine_script": "state.responses",
-        "reduce_script":
+      scripted_metric: {
+        init_script: "state.responses = ['total': 0L]",
+        map_script: "state.responses.total+= doc['bytes'].value",
+        combine_script: "state.responses",
+        reduce_script:
           "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));",
       },
     };

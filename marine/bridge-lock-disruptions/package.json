@@ -17,7 +17,7 @@
     "watch": "heft build-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.1.15-2-node24",
+    "@digitraffic/common": "2026.1.23-1",
     "aws-cdk-lib": "2.234.0",
     "aws-sdk": "^2.1693.0",
     "constructs": "10.4.4",

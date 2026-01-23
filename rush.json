@@ -53,18 +53,6 @@
     "postRushBuild": []
   },
   "projects": [
-    // aviation
-    {
-      "packageName": "aviation-data",
-      "projectFolder": "aviation/aviation-data",
-      "decoupledLocalDependencies": [
-        "@digitraffic/common"
-      ],
-      "tags": [
-        "cdk",
-        "aviation"
-      ]
-    },
     // libraries
     {
       "packageName": "@digitraffic/common",
@@ -74,6 +62,13 @@
       "tags": [
         "library"
       ]
+    },
+    // aviation
+    {
+      "packageName": "aviation-data",
+      "projectFolder": "aviation/aviation-data",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "aviation"]
     },
     // marine
     {
@@ -154,15 +149,10 @@
       ]
     },
     {
-      "packageName": "sse-sea-state-estimate",
-      "projectFolder": "marine/sse",
-      "decoupledLocalDependencies": [
-        "@digitraffic/common"
-      ],
-      "tags": [
-        "cdk",
-        "marine"
-      ]
+      "packageName": "sea-state-estimate",
+      "projectFolder": "marine/sea-state-estimate",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "marine"]
     },
     {
       "packageName": "winter-navigation",
@@ -188,7 +178,7 @@
     },
     // other
     {
-      "packageName": "digitraffic-aws-github-oidc",
+      "packageName": "aws-github-oidc",
       "projectFolder": "other/aws-github-oidc",
       "decoupledLocalDependencies": [
         "@digitraffic/common"
@@ -254,7 +244,7 @@
       ]
     },
     {
-      "packageName": "patchmanager-cdk",
+      "packageName": "patchmanager",
       "projectFolder": "other/patchmanager",
       "tags": [
         "cdk",
@@ -262,7 +252,7 @@
       ]
     },
     {
-      "packageName": "status-cdk",
+      "packageName": "status",
       "projectFolder": "other/status",
       "decoupledLocalDependencies": [
         "@digitraffic/common"
@@ -296,15 +286,10 @@
     },
     // rail
     {
-      "packageName": "rail-rata-cdk",
-      "projectFolder": "rail/rata",
-      "decoupledLocalDependencies": [
-        "@digitraffic/common"
-      ],
-      "tags": [
-        "cdk",
-        "rail"
-      ]
+      "packageName": "rail-infra",
+      "projectFolder": "rail/rail-infra",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "rail"]
     },
     {
       "packageName": "rami",
@@ -385,7 +370,7 @@
       ]
     },
     {
-      "packageName": "open311-cdk",
+      "packageName": "open311",
       "projectFolder": "road/open311",
       "decoupledLocalDependencies": [
         "@digitraffic/common"

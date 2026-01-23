@@ -1,5 +1,5 @@
 {
-  "name": "status-cdk",
+  "name": "status",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,12 +17,12 @@
     "compile-lambdas": "node lib/esbuild.js",
     "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/lambda --target=node22,es2022 --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --out-extension:.js=.mjs",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test-build": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean",
+    "test-build": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle"
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "3.965.0",
-    "@digitraffic/common": "2026.1.15-2-node24",
+    "@digitraffic/common": "2026.1.23-1",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",
     "date-fns": "4.1.0",
@@ -35,6 +35,7 @@
     "@date-fns/tz": "1.4.1",
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.7",

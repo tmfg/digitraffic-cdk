@@ -9,52 +9,72 @@ import {
 } from "./request-util.js";
 import { expectResponse } from "./response-util.js";
 
+function isCloudFrontResultResponse(
+  obj: unknown,
+): obj is import("aws-lambda").CloudFrontResultResponse {
+  return obj !== null && typeof obj === "object" && "status" in obj;
+}
+
 test("GET request without header", async () => {
-  const cb = await requestHandlerCall(handler, {
+  const result = await requestHandlerCall(handler, {
     method: "GET",
     headers: {},
   });
-
-  expectResponse(cb, {
-    response: NOT_ACCEPTABLE,
-  });
+  if (isCloudFrontResultResponse(result)) {
+    expectResponse(result, {
+      response: NOT_ACCEPTABLE,
+    });
+  } else {
+    throw new Error("Expected a CloudFrontResultResponse");
+  }
 });
 
 test("OPTIONS request", async () => {
-  const cb = await requestHandlerCall(handler, {
+  const result = await requestHandlerCall(handler, {
     method: "OPTIONS",
     headers: {},
   });
-
-  expectResponse(cb, {
-    status: "204",
-    headers: {
-      "access-control-max-age": "86400",
-    },
-  });
+  if (isCloudFrontResultResponse(result)) {
+    expectResponse(result, {
+      status: "204",
+      headers: {
+        "access-control-max-age": "86400",
+      },
+    });
+  } else {
+    throw new Error("Expected a CloudFrontResultResponse");
+  }
 });
 
 test("GET request with wrong header", async () => {
-  const cb = await requestHandlerCall(handler, {
+  const result = await requestHandlerCall(handler, {
     method: "GET",
     headers: headersWithAcceptEncoding("br"),
   });
-
-  expectResponse(cb, {
-    status: "406",
-  });
+  if (isCloudFrontResultResponse(result)) {
+    expectResponse(result, {
+      status: "406",
+    });
+  } else {
+    throw new Error("Expected a CloudFrontResultResponse");
+  }
 });
 
 test("GET request with correct header", async () => {
-  const cb = await requestHandlerCall(handler, {
+  const result = await requestHandlerCall(handler, {
     method: "GET",
+    uri: "/test-uri", // Ensure uri is present for CloudFrontRequest
     headers: headersWithAcceptEncoding("gzip"),
   });
-
-  expectRequest(cb, {
-    method: "GET",
-    headers: {
-      "accept-encoding": "gzip",
-    },
-  });
+  if (!isCloudFrontResultResponse(result)) {
+    expectRequest(result, {
+      method: "GET",
+      uri: "/test-uri",
+      headers: {
+        "accept-encoding": "gzip",
+      },
+    });
+  } else {
+    throw new Error("Expected a CloudFrontRequest");
+  }
 });

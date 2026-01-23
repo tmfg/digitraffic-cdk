@@ -37,8 +37,8 @@ const excludeTerser = [
 export default inputs.map((input) => {
   const isOutputEsm = true; // moduleJs.some((esm) => input.includes(esm))
   const outputFile = isOutputEsm
-    ? input.replace("src/", `${outputDir}/`).replace("ts", "mjs")
-    : input.replace("src/", `${outputDir}/`).replace("ts", "cjs");
+    ? input.replace("src/", `${outputDir}/`).replace(/\.ts$/, ".mjs")
+    : input.replace("src/", `${outputDir}/`).replace(/\.ts$/, ".cjs");
 
   const outputFileDirectories = input.replace("src/", `${outputDir}/`).split(
     "/",

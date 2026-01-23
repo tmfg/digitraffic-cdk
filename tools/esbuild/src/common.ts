@@ -9,6 +9,15 @@ const commonjsRequireBanner = `
 import {createRequire} from 'module'
 const require = createRequire(import.meta.url)
 `;
+const DEFAULT_BANNED_DEPENDENCY_LIB_PREFIXES = [
+  "@aws-sdk/",
+  "aws-sdk",
+  "aws-lambda",
+  "aws-cdk-lib",
+  "pg-native",
+];
+
+const DEFAULT_LAMBDA_MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB uncompressed
 
 export async function createEsbuildConfig(): Promise<BuildOptions> {
   const lambdas = await globby("src/lambda/**/*.ts");
@@ -22,8 +31,8 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
       ? `${distLambda}/${basename(lambdas[0]).slice(0, -3)}`
       : distLambda;
 
-  console.debug(`Lambdas (${lambdas.length}):\n${lambdas.join("\n")}`);
-  console.debug(`esbuild outdir: ${outdir}`);
+  console.log(`Lambdas (${lambdas.length}):\n${lambdas.join("\n")}\n`);
+  console.log(`Esbuild outdir: ${outdir}\n`);
 
   return {
     entryPoints: lambdas,
@@ -41,17 +50,30 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
   };
 }
 
-export async function saveMetadata(result: BuildResult) {
+/**
+ * Saves esbuild build result metadata to meta.json files alongside each output,
+ * and performs analysis on dependencies and bundle sizes.
+ * @param result
+ * @param overides
+ * e.g. for <code>afir/charging-network/src/lambda/api/charging-network/v1/locations/datex2-36/datex2-36.ts</code>
+ *  {
+ *    lambdaSizeOverrides: { "api/charging-network/v1/locations/datex2-36/datex2-36": 10 * 1024 * 1024 },
+ *    whitelistedLibDependencyPrefixes: ["@aws-sdk/client-s3"]
+ *  }
+ */
+export async function saveMetadataAndAnalyze(
+  result: BuildResult,
+  overides?: {
+    lambdaSizeOverrides?: Record<string, number>;
+    whitelistedLibDependencyPrefixes?: string[];
+  },
+) {
   if (!result.metafile) {
-    // console.info(
-    //   `No metafile available to save result: ${JSON.stringify(result)}`,
-    // );
-    // return;
     throw new Error(
       `No metafile available in build result: ${JSON.stringify(result)}`,
     );
   }
-  //console.debug(JSON.stringify(result));
+
   for (const [output, data] of Object.entries(result.metafile.outputs)) {
     const dir = dirname(output);
     await writeFile(
@@ -65,10 +87,9 @@ export async function saveMetadata(result: BuildResult) {
     );
   }
 
-  await analyzeMetadata(result);
+  analyzeMetadata(result, overides?.whitelistedLibDependencyPrefixes);
+  analyzeBundleSizes(result, overides?.lambdaSizeOverrides);
 }
-
-const DEFAULT_POLICY = ["@aws-sdk/", "aws-sdk", "aws-cdk-lib", "pg-native"];
 
 /**
  * Analyzes an esbuild build result metafile for forbidden runtime dependencies.
@@ -91,10 +112,7 @@ const DEFAULT_POLICY = ["@aws-sdk/", "aws-sdk", "aws-cdk-lib", "pg-native"];
  *   - `result.metafile` is missing
  *   - A forbidden package is detected outside the whitelist
  */
-export async function analyzeMetadata(
-  result: BuildResult,
-  whitelist?: string[],
-) {
+export function analyzeMetadata(result: BuildResult, whitelist?: string[]) {
   if (!result.metafile) {
     throw new Error(
       `No metafile available in build result: ${JSON.stringify(result)}`,
@@ -103,45 +121,107 @@ export async function analyzeMetadata(
 
   // Track which whitelist packages are actually found
   const foundWhitelist = new Set<string>();
+  const errors: string[] = [];
 
-  for (const [input, meta] of Object.entries(result.metafile.inputs)) {
-    // Ignore type-only or unused files
-    if (meta.bytes === 0) {
-      continue;
-    }
-    const pkg = extractPackageName(input);
-    if (!pkg) continue;
+  // Iterate per Lambda bundle (output)
+  for (const [output, outputMeta] of Object.entries(result.metafile.outputs)) {
+    // Only JS outputs
+    if (!output.endsWith(".mjs") && !output.endsWith(".js")) continue;
 
-    // Skip packages in whitelist
-    if (whitelist?.some((allowed) => pkg.startsWith(allowed))) {
-      console.warn("Whitelisted package:", pkg, "in", input);
-      foundWhitelist.add(pkg);
-      continue;
-    }
+    for (const [input, inputMeta] of Object.entries(outputMeta.inputs)) {
+      // Skip inputs that are not actually included in the bundle
+      if (inputMeta.bytesInOutput === 0) continue;
 
-    // Check against all banned prefixes
-    for (const bannedPrefix of DEFAULT_POLICY) {
-      if (pkg.startsWith(bannedPrefix)) {
-        throw new Error(
-          `Forbidden runtime dependency: ${pkg} found in ${input}`,
-        );
+      const pkg = extractPackageName(input);
+      if (!pkg) continue;
+
+      // Whitelist handling
+      if (whitelist?.some((allowed) => pkg.startsWith(allowed))) {
+        foundWhitelist.add(pkg);
+        continue;
+      }
+
+      // Check against banned prefixes
+      for (const bannedPrefix of DEFAULT_BANNED_DEPENDENCY_LIB_PREFIXES) {
+        if (pkg.startsWith(bannedPrefix)) {
+          errors.push(
+            `Lambda ${output} bundles forbidden dependency: ${pkg} (from ${input})`,
+          );
+        }
       }
     }
+  }
 
-    // Fail if any whitelist package was not found
-    if (whitelist) {
-      const missing = whitelist.filter(
-        (allowed) =>
-          ![...foundWhitelist].some((found) => found.startsWith(allowed)),
+  // Fail if any whitelist package was not found
+  if (whitelist) {
+    const missing = whitelist.filter(
+      (allowed) =>
+        ![...foundWhitelist].some((found) => found.startsWith(allowed)),
+    );
+    if (missing.length > 0) {
+      errors.push(
+        `Whitelisted package(s) not found in any Lambda: ${missing.join(", ")}`,
       );
-      if (missing.length > 0) {
-        throw new Error(
-          `Whitelisted package(s) not found in any dependency: ${missing.join(
-            ", ",
-          )}`,
-        );
-      }
     }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Dependency policy violations:\n${errors.join("\n")}`);
+  }
+}
+
+/**
+ * Extracts the lambda name from an esbuild output path.
+ *
+ * @param outputPath E.g. <code>dist/lambda/api/charging-network/v1/locations/datex2-36/datex2-36.mjs</code>
+ * @returns The lambda path <code>api/charging-network/v1/locations/datex2-36/datex2-36</code>
+ * If the outputPath does not start with the expected dist/lambda prefix,
+ * it is returned unchanged.
+ */
+function getLambdaPathFromOutput(outputPath: string): string {
+  if (!outputPath.startsWith(distLambda)) {
+    return outputPath;
+  }
+
+  return outputPath
+    .slice(distLambda.length + 1)
+    .replace(/\.mjs$/, "")
+    .replace(/\.js$/, "");
+}
+
+export function analyzeBundleSizes(
+  result: BuildResult,
+  lambdaSizeOverrides?: Record<string, number>,
+) {
+  if (!result.metafile) {
+    throw new Error("No metafile available for size analysis");
+  }
+
+  const errors: string[] = [];
+
+  console.log("Lambda bundle sizes:");
+  for (const [output, meta] of Object.entries(result.metafile.outputs)) {
+    // Only JS outputs
+    if (!output.endsWith(".mjs") && !output.endsWith(".js")) {
+      continue;
+    }
+    const lambdaPath = getLambdaPathFromOutput(output);
+
+    const size = meta.bytes;
+    const limit =
+      lambdaSizeOverrides?.[lambdaPath] ?? DEFAULT_LAMBDA_MAX_SIZE_BYTES;
+    console[size > limit ? "error" : "log"](
+      `${lambdaPath} is \t\t${formatBytes(size)} (limit ${formatBytes(limit)})`,
+    );
+    if (size > limit) {
+      errors.push(
+        `${output} is ${formatBytes(size)} (limit ${formatBytes(limit)})`,
+      );
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Lambda bundle size limit exceeded:\n${errors.join("\n")}`);
   }
 }
 
@@ -190,4 +270,10 @@ function extractPackageName(inputPath: string): string | null {
   }
 
   return null;
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
 }

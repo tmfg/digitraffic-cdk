@@ -10,8 +10,7 @@ do update set
     version = $2,
     modified = now()`;
 
-const SQL_GET_DATA_VERSION =
-  `select version from wn_data_version where table_name = $1`;
+const SQL_GET_DATA_VERSION = `select version from wn_data_version where table_name = $1`;
 
 const PS_UPDATE_DATA_VERSION = new pgPromise.PreparedStatement({
   name: "update-data-version",
@@ -39,11 +38,13 @@ export async function getDataVersion(
   db: DTDatabase,
   tableName: TableName,
 ): Promise<number> {
-  return await db.oneOrNone(
-    PS_GET_DATA_VERSION,
-    [tableName],
-    (row: Versionable) => {
-      return row?.version;
-    },
-  ) ?? 0;
+  return (
+    (await db.oneOrNone(
+      PS_GET_DATA_VERSION,
+      [tableName],
+      (row: Versionable) => {
+        return row?.version;
+      },
+    )) ?? -1
+  );
 }
