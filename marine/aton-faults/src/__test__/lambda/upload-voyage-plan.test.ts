@@ -2,13 +2,7 @@
 process.env["SECRET_ID"] = "";
 
 import { AtonEnvKeys } from "../../keys.js";
-import {
-  dbTestBase,
-  insert,
-  insertActiveWarnings,
-  TEST_ACTIVE_WARNINGS_VALID,
-  TEST_ATON_SECRET,
-} from "../db-testutil.js";
+import { dbTestBase, insert, TEST_ATON_SECRET } from "../db-testutil.js";
 import { newFaultWithGeometry, voyagePlan } from "../testdata.js";
 import { BAD_REQUEST_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
 import type { UploadVoyagePlanEvent } from "../../model/upload-voyageplan-event.js";
@@ -36,19 +30,6 @@ describe(
       const fault2 = newFaultWithGeometry(60.285817, 27.32166);
 
       await insert(db, [fault1, fault2]);
-      const uploadEvent: UploadVoyagePlanEvent = {
-        voyagePlan,
-        callbackEndpoint: "some-endpoint",
-      };
-
-      await handler(uploadEvent);
-
-      expect(sendStub).toHaveBeenCalledTimes(2);
-    });
-
-    test("publishes to SNS per warning id", async () => {
-      await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
-
       const uploadEvent: UploadVoyagePlanEvent = {
         voyagePlan,
         callbackEndpoint: "some-endpoint",

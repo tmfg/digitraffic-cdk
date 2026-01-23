@@ -40,7 +40,7 @@ async function getVisService(): Promise<VisService> {
 export function handlerFn(
   sqs: SQS,
 ): (event: UploadVoyagePlanEvent) => Promise<void> {
-  return async function (event: UploadVoyagePlanEvent): Promise<void> {
+  return async (event: UploadVoyagePlanEvent): Promise<void> => {
     if (!visService) {
       const service = await getVisService();
       if (!visService) visService = service;

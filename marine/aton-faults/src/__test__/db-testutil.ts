@@ -3,7 +3,6 @@ import {
   assertCount,
   dbTestBase as commonDbTestBase,
 } from "@digitraffic/common/dist/test/db-testutils";
-import { JSON_CACHE_KEY } from "@digitraffic/common/dist/database/cached";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as xsdValidator from "xsd-schema-validator";
 import type { AtonSecret } from "../model/secret.js";
@@ -365,17 +364,4 @@ export async function insert(db: DTDatabase, faults: DbFault[]): Promise<void> {
       }),
     );
   });
-}
-
-export async function insertActiveWarnings<T>(
-  db: DTDatabase,
-  value: T,
-): Promise<void> {
-  await db.none(
-    "insert into cached_json(cache_id, content, last_updated) values ($1, $2, now())",
-    [
-      JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE,
-      value,
-    ],
-  );
 }

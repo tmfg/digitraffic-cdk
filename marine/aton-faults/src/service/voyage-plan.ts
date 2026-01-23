@@ -3,10 +3,8 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import * as FaultsService from "./faults.js";
 import * as WarningsService from "./warnings.js";
 import type { SendMessageCommandOutput, SQS } from "@aws-sdk/client-sqs";
-import {
-  S124Type,
-  type SendS124Event,
-} from "../model/upload-voyageplan-event.js";
+import type { SendS124Event } from "../model/upload-voyageplan-event.js";
+import { S124Type } from "../model/upload-voyageplan-event.js";
 export class VoyagePlanService {
   private readonly sqs: SQS;
   private readonly callbackEndpoint: string;
@@ -47,9 +45,9 @@ export class VoyagePlanService {
   private async sendWarningsForVoyagePlan(
     voyagePlan: RtzVoyagePlan,
   ): Promise<void> {
-    const warnings = await WarningsService.findWarningsForVoyagePlan(
-      voyagePlan,
-    );
+    // nautical-warnings data no longer maintained by Digitraffic
+    const warnings =
+      await WarningsService.findWarningsForVoyagePlan(voyagePlan);
 
     if (warnings?.features) {
       logger.info({
@@ -71,10 +69,9 @@ export class VoyagePlanService {
     QueueUrl: string,
     event: SendS124Event,
   ): Promise<SendMessageCommandOutput> {
-    return this.sqs
-      .sendMessage({
-        MessageBody: JSON.stringify(event),
-        QueueUrl,
-      });
+    return this.sqs.sendMessage({
+      MessageBody: JSON.stringify(event),
+      QueueUrl,
+    });
   }
 }
