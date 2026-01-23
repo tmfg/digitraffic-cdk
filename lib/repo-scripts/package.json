@@ -33,10 +33,10 @@
     "@types/fs-extra": "11.0.4",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/lodash": "4.17.21",
+    "@types/lodash": "4.17.23",
     "@types/node": "24.10.4",
     "async": "3.2.6",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "rollup": "4.55.1",
     "typescript": "5.9.3"
   }

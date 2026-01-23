@@ -42,11 +42,11 @@
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/lodash": "4.17.21",
+    "@types/lodash": "4.17.23",
     "@types/node": "22.19.2",
     "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "typescript": "5.9.3"
   }
 }
