@@ -216,7 +216,7 @@
     },
     // road
     {
-      "packageName": "counting-sites",
+      "packageName": "counting-site",
       "projectFolder": "road/counting-site",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "road"]
