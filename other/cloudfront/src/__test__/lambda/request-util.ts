@@ -1,5 +1,4 @@
 import type {
-  Callback,
   CloudFrontHeaders,
   CloudFrontRequest,
   CloudFrontRequestEvent,
@@ -7,7 +6,6 @@ import type {
   CloudFrontRequestResult,
   Context,
 } from "aws-lambda";
-import { jest } from "@jest/globals";
 import type { CloudfrontEvent } from "../../lambda/function-events.js";
 
 export function createCloudfrontEvent(
@@ -26,27 +24,30 @@ export function createCloudfrontEvent(
   };
 }
 
-export type MockedRequest = jest.MockedFunction<
-  (...args: unknown[]) => unknown
->;
-
 export async function requestHandlerCall(
   handler: CloudFrontRequestHandler,
   request: Partial<CloudFrontRequest>,
-): Promise<MockedRequest> {
+): Promise<CloudFrontRequestResult | undefined> {
   const context = {} as unknown as Context;
-  const callback = jest.fn() as Callback<CloudFrontRequestResult>;
   const event = {
-    Records: [{
-      cf: {
-        request,
+    Records: [
+      {
+        cf: {
+          request,
+        },
       },
-    }],
+    ],
   } as unknown as CloudFrontRequestEvent;
 
-  await handler(event, context, callback);
-
-  return callback;
+  // Call the handler as an async function and return the result
+  // Handler may return void or CloudFrontRequestResult
+  const result = await (
+    handler as unknown as (
+      event: CloudFrontRequestEvent,
+      context: Context,
+    ) => Promise<CloudFrontRequestResult | void>
+  )(event, context);
+  return result as CloudFrontRequestResult | undefined;
 }
 
 export function createHeader(key: string, value: string): CloudFrontHeaders {
@@ -67,45 +68,52 @@ export interface ExpectedRequest {
   readonly headers?: Record<string, string | false>;
 }
 
+function isCloudFrontRequest(obj: unknown): obj is CloudFrontRequest {
+  if (!obj || typeof obj !== "object") return false;
+  // CloudFrontRequest should always have method, uri, and headers
+  return (
+    typeof (obj as CloudFrontRequest).method === "string" &&
+    typeof (obj as CloudFrontRequest).uri === "string" &&
+    typeof (obj as CloudFrontRequest).headers === "object"
+  );
+}
+
 export function expectRequest(
-  cb: MockedRequest,
+  result: CloudFrontRequestResult | undefined,
   expected: ExpectedRequest,
 ): void {
-  expect(cb).toHaveBeenCalledTimes(1);
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  expect(cb.mock.calls[0][1].method).toEqual(expected.method);
+  expect(result).toBeDefined();
+  if (!result) return;
+  if (!isCloudFrontRequest(result)) {
+    throw new Error(
+      "Result is not a CloudFrontRequest. Got: " + JSON.stringify(result),
+    );
+  }
+  expect(result.method).toEqual(expected.method);
 
   if (expected.uri) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1].uri).toEqual(expected.uri);
+    expect(result.uri).toEqual(expected.uri);
   }
 
   if (expected.querystring) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1].querystring).toEqual(expected.querystring);
+    expect(result.querystring).toEqual(expected.querystring);
   }
 
   if (expected.origin !== undefined && expected.origin === false) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1].origin).not.toBeDefined();
+    expect(result.origin).not.toBeDefined();
   }
   if (expected.origin !== undefined && expected.origin === true) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1].origin).toBeDefined();
+    expect(result.origin).toBeDefined();
   }
 
   if (expected.headers) {
-    Object.entries(expected.headers).forEach(([header, expected]) => {
-      if (expected) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(cb.mock.calls[0][1].headers[header.toLowerCase()]).toEqual(
-          createHeader(header, expected)[header],
+    Object.entries(expected.headers).forEach(([header, expectedValue]) => {
+      if (expectedValue) {
+        expect(result.headers?.[header.toLowerCase()]).toEqual(
+          createHeader(header, expectedValue)[header],
         );
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(cb.mock.calls[0][1].headers[header.toLowerCase()]).not
-          .toBeDefined();
+        expect(result.headers?.[header.toLowerCase()]).not.toBeDefined();
       }
     });
   }

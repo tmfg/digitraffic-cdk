@@ -14,13 +14,14 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.1.15-2-node24",
+    "@digitraffic/common": "2026.1.23-1",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.7",

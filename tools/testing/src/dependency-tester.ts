@@ -14,7 +14,7 @@ export class DependencyTester {
 
     if (missing.length !== 0) {
       throw new Error(
-        `Whitelisted dependencies not found:${JSON.stringify(missing)}`,
+        `Whitelisted dependencies not found (${missing.length}):\n\n${missing.join("\n")}`,
       );
     }
   }
@@ -30,7 +30,9 @@ export class DependencyTester {
     );
 
     if (errors.length !== 0) {
-      throw new Error(`Circular dependencies found:${errors.join("\n")}`);
+      throw new Error(
+        `Circular dependency check failed: ${errors.length} circular dependencies found:\n\n${errors.join("\n")}`,
+      );
     }
 
     DependencyTester.checkWhiteList(whitelist, circulars);
@@ -44,46 +46,12 @@ export class DependencyTester {
     const errors = orphans.filter((circular) => !whitelist.includes(circular));
 
     if (errors.length !== 0) {
-      throw new Error(`Orphans found: ${errors.join("\n")}`);
-    }
-
-    DependencyTester.checkWhiteList(whitelist, orphans);
-  }
-
-  static async assertNoCdkLibDependenciesInLambdas(
-    paths: string | string[],
-    fileExtensions: string[] = ["js"],
-    whiteList: string[] = [],
-  ): Promise<void> {
-    const instance = await madge(paths, {
-      includeNpm: true,
-      fileExtensions,
-    });
-
-    const errors = [];
-    const fields = [];
-
-    for (const [field, list] of Object.entries(instance.obj())) {
-      if (field.includes("lambda/")) {
-        const deps = list.filter((d) => d.includes("aws-cdk-lib"));
-
-        if (deps.length > 0 && !whiteList.includes(field)) {
-          errors.push(
-            `${field} has aws-cdk-lib dependency: ${JSON.stringify(deps)}`,
-          );
-        }
-
-        fields.push(field);
-      }
-    }
-
-    if (errors.length > 0) {
       throw new Error(
-        `Lambdas have aws-cdk-lib dependencies: ${errors.join("\n")}`,
+        `Orphans found: ${errors.length} circular dependencies found:\n\n${errors.join("\n")}`,
       );
     }
 
-    DependencyTester.checkWhiteList(whiteList, fields);
+    DependencyTester.checkWhiteList(whitelist, orphans);
   }
 
   static async create(

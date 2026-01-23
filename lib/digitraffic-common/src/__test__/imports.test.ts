@@ -309,8 +309,8 @@ test("canaryKeys import ok?", () => {
   return expect(canaryKeys).resolves.toBeDefined();
 });
 
-test("proxytypes import ok?", () => {
-  const proxytypes = import("../aws/types/proxytypes.js");
+test("lambda-proxy-types import ok?", () => {
+  const proxytypes = import("../aws/types/lambda-proxy-types.js");
   return expect(proxytypes).resolves.toBeDefined();
 });
 

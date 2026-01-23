@@ -53,13 +53,6 @@
     "postRushBuild": []
   },
   "projects": [
-    // aviation
-    {
-      "packageName": "aviation-data",
-      "projectFolder": "aviation/aviation-data",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "aviation"]
-    },
     // libraries
     {
       "packageName": "@digitraffic/common",
@@ -67,6 +60,13 @@
       "versionPolicyName": "DigitrafficCommon",
       "decoupledLocalDependencies": [],
       "tags": ["library"]
+    },
+    // aviation
+    {
+      "packageName": "aviation-data",
+      "projectFolder": "aviation/aviation-data",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "aviation"]
     },
     // marine
     {
@@ -118,8 +118,8 @@
       "tags": ["cdk", "marine"]
     },
     {
-      "packageName": "sse-sea-state-estimate",
-      "projectFolder": "marine/sse",
+      "packageName": "sea-state-estimate",
+      "projectFolder": "marine/sea-state-estimate",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "marine"]
     },
@@ -137,7 +137,7 @@
     },
     // other
     {
-      "packageName": "digitraffic-aws-github-oidc",
+      "packageName": "aws-github-oidc",
       "projectFolder": "other/aws-github-oidc",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "other"]
@@ -173,12 +173,12 @@
       "tags": ["cdk", "other"]
     },
     {
-      "packageName": "patchmanager-cdk",
+      "packageName": "patchmanager",
       "projectFolder": "other/patchmanager",
       "tags": ["cdk", "other"]
     },
     {
-      "packageName": "status-cdk",
+      "packageName": "status",
       "projectFolder": "other/status",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "other"]
@@ -197,8 +197,8 @@
     },
     // rail
     {
-      "packageName": "rail-rata-cdk",
-      "projectFolder": "rail/rata",
+      "packageName": "rail-infra",
+      "projectFolder": "rail/rail-infra",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "rail"]
     },
@@ -246,7 +246,7 @@
       "tags": ["cdk", "road"]
     },
     {
-      "packageName": "open311-cdk",
+      "packageName": "open311",
       "projectFolder": "road/open311",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "road"]
@@ -273,7 +273,6 @@
       "projectFolder": "lib/repo-scripts",
       "tags": ["internal"]
     },
-
     {
       "packageName": "@digitraffic-cdk/cdk-rig",
       "projectFolder": "tools/rig",

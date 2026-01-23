@@ -14,6 +14,9 @@ export type DBLambdaEnvironment = LambdaEnvironment & {
   DB_APPLICATION: string;
 };
 
+/**
+ * @deprecated use dt-function.ts: FunctionBuilder
+ */
 export function databaseFunctionProps(
   stack: DigitrafficStack,
   environment: LambdaEnvironment,
@@ -45,6 +48,9 @@ export function databaseFunctionProps(
   };
 }
 
+/**
+ * @deprecated use dt-function.ts: FunctionBuilder
+ */
 export function lambdaFunctionProps(
   _: DigitrafficStack,
   environment: LambdaEnvironment,

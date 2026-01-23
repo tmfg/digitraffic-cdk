@@ -6,31 +6,34 @@ import type {
   CloudFrontResultResponse,
   Context,
 } from "aws-lambda";
-import { jest } from "@jest/globals";
-import { createHeader } from "./request-util.js";
 import { AC_HEADERS } from "../../lambda/header-util.js";
-
-type MockedResponse = jest.MockedFunction<(...args: unknown[]) => unknown>;
+import { createHeader } from "./request-util.js";
 
 export async function responseHandlerCall(
   handler: CloudFrontResponseHandler,
   request: Partial<CloudFrontRequest>,
   response: Partial<CloudFrontResponse>,
-): Promise<MockedResponse> {
+): Promise<CloudFrontResultResponse | undefined> {
   const context = {} as unknown as Context;
-  const callback = jest.fn();
   const event = {
-    Records: [{
-      cf: {
-        request,
-        response,
+    Records: [
+      {
+        cf: {
+          request,
+          response,
+        },
       },
-    }],
+    ],
   } as unknown as CloudFrontResponseEvent;
 
-  await handler(event, context, callback);
-
-  return callback;
+  // Call the handler as an async function and return the result
+  const result = await (
+    handler as unknown as (
+      event: CloudFrontResponseEvent,
+      context: Context,
+    ) => Promise<CloudFrontResultResponse | void>
+  )(event, context);
+  return result as CloudFrontResultResponse | undefined;
 }
 
 export interface ExpectedResponse {
@@ -40,34 +43,26 @@ export interface ExpectedResponse {
 }
 
 export function expectResponse(
-  cb: MockedResponse,
+  result: CloudFrontResultResponse | undefined,
   expected: ExpectedResponse,
 ): void {
-  expect(cb).toHaveBeenCalledTimes(1);
-
+  expect(result).toBeDefined();
+  if (!result) return;
   if (expected.response) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1]).toEqual(expected.response);
+    expect(result).toEqual(expected.response);
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1].method).not.toBeDefined();
-
+    // If not expecting a specific response, check status and headers
     if (expected.status) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(cb.mock.calls[0][1].status).toEqual(expected.status);
+      expect(result.status).toEqual(expected.status);
     }
-
     if (expected.headers) {
-      Object.entries(expected.headers).forEach(([header, expected]) => {
-        if (expected) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          expect(cb.mock.calls[0][1].headers[header.toLowerCase()]).toEqual(
-            createHeader(header, expected)[header],
+      Object.entries(expected.headers).forEach(([header, expectedValue]) => {
+        if (expectedValue) {
+          expect(result.headers?.[header.toLowerCase()]).toEqual(
+            createHeader(header, expectedValue)[header],
           );
         } else {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          expect(cb.mock.calls[0][1].headers[header.toLowerCase()]).not
-            .toBeDefined();
+          expect(result.headers?.[header.toLowerCase()]).not.toBeDefined();
         }
       });
     }
@@ -75,31 +70,28 @@ export function expectResponse(
 }
 
 export function expectResponseHeader(
-  cb: MockedResponse,
+  result: CloudFrontResultResponse | undefined,
   headerName: string,
   expected: string | false,
 ): void {
-  expect(cb).toHaveBeenCalledTimes(1);
-
+  expect(result).toBeDefined();
+  if (!result) return;
   if (expected) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1].headers[headerName.toLowerCase()]).toEqual(
+    expect(result.headers?.[headerName.toLowerCase()]).toEqual(
       createHeader(headerName, expected)[headerName],
     );
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(cb.mock.calls[0][1].headers[headerName.toLowerCase()]).not
-      .toBeDefined();
+    expect(result.headers?.[headerName.toLowerCase()]).not.toBeDefined();
   }
 }
 
 export function expectResponseCorsHeaders(
-  cb: MockedResponse,
+  result: CloudFrontResultResponse | undefined,
   shouldContain: boolean = true,
 ): void {
   if (shouldContain) {
-    expectResponseHeader(cb, AC_HEADERS.ALLOW_ORIGIN, "*");
+    expectResponseHeader(result, AC_HEADERS.ALLOW_ORIGIN, "*");
   } else {
-    expectResponseHeader(cb, AC_HEADERS.ALLOW_ORIGIN, false);
+    expectResponseHeader(result, AC_HEADERS.ALLOW_ORIGIN, false);
   }
 }

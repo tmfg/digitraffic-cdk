@@ -1,15 +1,15 @@
 {
-  "name": "digitraffic-aws-github-oidc",
+  "name": "aws-github-oidc",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "cdk": "cdk",
-    "test": "echo no tests for this project",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.1.15-2-node24",
+    "@digitraffic/common": "2026.1.23-1",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",
     "source-map-support": "0.5.21"
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.1.7",
     "@rushstack/heft-jest-plugin": "1.1.7",
