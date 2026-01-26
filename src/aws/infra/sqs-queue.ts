@@ -99,7 +99,7 @@ export const DigitrafficDLQueue = {
     });
 
     const lambda = MonitoredFunction.create(stack, dlqFunctionName, {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       logGroup: dlqLogGroup,
       functionName: dlqFunctionName,
       code: getDlqCode(dlqBucket.bucketName),

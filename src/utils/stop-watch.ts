@@ -103,7 +103,7 @@ export class StopWatch {
   }
 
   /**
-   * If task is runing, records does not include duration of current period.
+   * If task is running, records does not include duration of current period.
    * @param taskName
    */
   getTask(taskName: string): ReadonlyTaskRecord | undefined {
@@ -111,7 +111,7 @@ export class StopWatch {
   }
 
   /**
-   * If task is runing, records does not include duration of current period.
+   * If task is running, records does not include duration of current period.
    */
   getTasks(): ReadonlyTaskRecord[] {
     return Array.from(this.tasks.values()).filter(
@@ -133,7 +133,7 @@ export class StopWatch {
   }
 
   /**
-   * Logs all tasks and their durations. If their is also default task, logs that too with <code>task: method</code>.
+   * Logs all tasks and their durations. If there is also default task, logs that too with <code>task: method</code>.
    * @param method
    * @param level
    */

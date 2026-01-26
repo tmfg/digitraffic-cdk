@@ -26,18 +26,19 @@ And then run again the setup.
 Use `pnpm` to build the code i.e.
 
     pnpm install
-    pnpm build
-    pnpm test
-    pnpm test --test-path-pattern 'dt-logger.test'
-    pnpm test:watch
-    pnpm test:watch --test-path-pattern 'dt-logger.test'
+    pnpm run build
+    pnpm run test
+    pnpm run test --test-path-pattern 'dt-logger.test'
+    pnpm run test:watch
+    pnpm run test:watch --test-path-pattern 'dt-logger.test'
 
 Format code
 
-    pnpm format:check # Checks all files
-    pnpm format:check-staged # Checks stagged files
-    pnpm format:fix # Format all files
-    pnpm format:fix-staged # Formats stagged files
+    pnpm run format:package-json # Format package.json
+    pnpm run format:check # Checks all files
+    pnpm run format:check-staged # Checks stagged files
+    pnpm run format:fix # Format all files
+    pnpm run format:fix-staged # Formats stagged files
 
 ## Update deps
 
@@ -107,15 +108,17 @@ Aspects.of(this).add(StackCheckingAspect.create(this));
 Any resource can be whitelisted by giving it as a parameter or in the
 StackConfiguration
 
-### MonitoredFunction
+### FunctionBuilder
 
-MonitoredFunction extends Function with alarms on memory usage and timeouts.
+FunctionBuilder allows you to make lambdas with alarms on memory usage and timeouts.
 
-If you need database access in your Function, you can use MonitoredDBFunction.
-Creating a Function with it is this easy:
+By default, the created function has access to database, but this can of course be controlled.
 
+Creating lambda is easy:
 ```
-const lambda = MonitoredDBFunction.create(stack, 'get-metadata');
+const lambda = FunctionBuilder.create(stack, "get-metadata")
+  .withTimeout(Duration.seconds(2))
+  .build();
 ```
 
 See the documentation for more information.

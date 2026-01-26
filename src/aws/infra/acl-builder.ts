@@ -1,6 +1,6 @@
 import { CfnIPSet, CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import type { Construct } from "constructs";
-import { concat, range, zipWith } from "lodash-es";
+import { range, zipWith } from "es-toolkit";
 import { logger } from "../runtime/dt-logger-default.js";
 
 interface RuleProperty {
@@ -374,14 +374,14 @@ export class AclBuilder {
       ...rule,
       priority,
     });
-    const rules: CfnWebACL.RuleProperty[] = concat(
-      zipWith(this._countRules, range(this._countRules.length), addPriority),
-      zipWith(
+    const rules: CfnWebACL.RuleProperty[] = [
+      ...zipWith(this._countRules, range(this._countRules.length), addPriority),
+      ...zipWith(
         this._blockRules,
         range(this._blockRules.length).map((n) => n + this._countRules.length),
         addPriority,
       ),
-    );
+    ];
 
     if (rules.length === 0) {
       throw new Error("No rules defined for WebACL");

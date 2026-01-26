@@ -1,19 +1,13 @@
-import {
-  LambdaResponse,
-  LambdaResponseBuilder,
-} from "../../aws/types/lambda-response.js";
+import type { LambdaResponse } from "../../aws/types/lambda-response.js";
+import { LambdaResponseBuilder } from "../../aws/types/lambda-response.js";
 import { decodeBase64ToUtf8 } from "../../utils/base64.js";
-
-export const TEST_MESSAGE = "HELLO";
-export const TEST_COUNT = 12;
-export const TEST_FILENAME = "file.txt";
-export const TEST_TIMESTAMP = new Date();
-export const TEST_TIMESTAMP_STR = TEST_TIMESTAMP.toISOString();
-
-export const TEST_JSON = {
-  message: TEST_MESSAGE,
-  count: TEST_COUNT,
-};
+import {
+  TEST_FILENAME,
+  TEST_JSON,
+  TEST_MESSAGE,
+  TEST_TIMESTAMP,
+  TEST_TIMESTAMP_STR,
+} from "./lambda-response.test.js";
 
 describe("lambda-response", () => {
   function assertJson<T>(
@@ -47,55 +41,78 @@ describe("lambda-response", () => {
   }
 
   test("okJson - without fileName", () => {
-    const response = LambdaResponse.okJson(TEST_JSON);
+    const response = LambdaResponseBuilder.create(TEST_JSON).build();
 
     assertJson(response, TEST_JSON, 200);
   });
 
   test("okJson - with fileName", () => {
-    const response = LambdaResponse.okJson(TEST_JSON, TEST_FILENAME);
+    const response = LambdaResponseBuilder.create(TEST_JSON)
+      .withFileName(TEST_FILENAME)
+      .build();
 
     assertJson(response, TEST_JSON, 200, TEST_FILENAME);
   });
 
   test("okJson - with fileName and timestamp", () => {
-    const response = LambdaResponse.okJson(
-      TEST_JSON,
-      TEST_FILENAME,
-    ).withTimestamp(TEST_TIMESTAMP);
+    const responseWithTimestampDate = LambdaResponseBuilder.create()
+      .withBody(TEST_JSON)
+      .withFileName(TEST_FILENAME)
+      .withTimestamp(TEST_TIMESTAMP)
+      .build();
 
-    assertJson(response, TEST_JSON, 200, TEST_FILENAME, TEST_TIMESTAMP);
+    const responseWithTimestampString = LambdaResponseBuilder.create()
+      .withBody(TEST_JSON)
+      .withFileName(TEST_FILENAME)
+      .withTimestamp(TEST_TIMESTAMP_STR)
+      .build();
+
+    assertJson(
+      responseWithTimestampDate,
+      TEST_JSON,
+      200,
+      TEST_FILENAME,
+      TEST_TIMESTAMP,
+    );
+    assertJson(
+      responseWithTimestampString,
+      TEST_JSON,
+      200,
+      TEST_FILENAME,
+      TEST_TIMESTAMP,
+    );
   });
 
   test("okBinary - with fileName and timestamp", () => {
-    const response = LambdaResponse.okBinary(
-      Buffer.from(TEST_MESSAGE).toString("base64"),
-      TEST_FILENAME,
-    ).withTimestamp(TEST_TIMESTAMP);
+    const response = LambdaResponseBuilder.create()
+      .withBody(TEST_MESSAGE)
+      .withFileName(TEST_FILENAME)
+      .withTimestamp(TEST_TIMESTAMP)
+      .build();
 
     assertBinary(response, TEST_MESSAGE, 200, TEST_FILENAME, TEST_TIMESTAMP);
   });
 
   test("badRequest", () => {
-    const response = LambdaResponse.badRequest(TEST_MESSAGE);
+    const response = LambdaResponseBuilder.badRequest(TEST_MESSAGE);
 
     assertBinary(response, TEST_MESSAGE, 400);
   });
 
   test("notFound", () => {
-    const response = LambdaResponse.notFound();
+    const response = LambdaResponseBuilder.notFound();
 
     assertBinary(response, "Not Found", 404);
   });
 
   test("internalError", () => {
-    const response = LambdaResponse.internalError();
+    const response = LambdaResponseBuilder.internalError();
 
     assertBinary(response, "Internal Error", 500);
   });
 
   test("notImplemented", () => {
-    const response = LambdaResponse.notImplemented();
+    const response = LambdaResponseBuilder.notImplemented();
 
     assertBinary(response, "Not Implemented", 501);
   });
