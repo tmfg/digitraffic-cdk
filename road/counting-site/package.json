@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@date-fns/tz": "1.4.1",
-    "@digitraffic/common": "2026.1.23-1",
+    "@digitraffic/common": "2026.1.26-1",
     "@std/csv": "npm:@jsr/std__csv@1.0.6",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",

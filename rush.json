@@ -270,7 +270,7 @@
     },
     {
       "packageName": "@digitraffic-cdk/repo-scripts",
-      "projectFolder": "lib/repo-scripts",
+      "projectFolder": "tools/repo-scripts",
       "tags": ["internal"]
     },
     {

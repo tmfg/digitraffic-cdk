@@ -11,6 +11,7 @@
       "**/*.json",
       "**/*.jsonc",
       "**/*.html",
+      // Rush managed
       "!common/scripts",
       // This should be covered by biome automatically, but just in case.
       "!**/node_modules",
@@ -19,10 +20,12 @@
       "!**/build",
       "!**/output",
       "!**/temp",
-      "!**/lib",
-      // Include root lib folder explicitly
-      "lib/**",
-      // Still exclude digitraffic-common subtree project
+      // Exclude projects lib folders
+      "!aviation/**/lib",
+      "!marine/**/lib",
+      "!rail/**/lib",
+      "!road/**/lib",
+      // Exclude digitraffic-common subtree project
       "!lib/digitraffic-common"
     ]
   },

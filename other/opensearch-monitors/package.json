@@ -23,7 +23,7 @@
     "@aws-crypto/sha256-browser": "5.2.0",
     "@aws-sdk/client-sts": "3.965.0",
     "@aws-sdk/types": "3.965.0",
-    "@digitraffic/common": "2026.1.23-1",
+    "@digitraffic/common": "2026.1.26-1",
     "@smithy/node-http-handler": "4.4.7",
     "@smithy/protocol-http": "5.3.7",
     "@smithy/signature-v4": "5.3.7",
