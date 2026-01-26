@@ -15,9 +15,8 @@
     "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22",
     "compile-lambdas": "node lib/esbuild.js",
-    "generate-sbom-cyclonedx": "npx cyclonedx-npm --output-file sbom.json --no-workspaces --gather-license-texts --ignore-npm-errors --omit dev || true",
-    "synth-sam": "cdk synth --no-staging > template.yaml",
     "generate-sbom": "cdxgen -t rush -o sbom.json --json-pretty || true",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean",
     "test_errors": "rushx test 2>&1 | grep 'FAIL'"
@@ -45,7 +44,6 @@
   },
   "devDependencies": {
     "@cyclonedx/cdxgen": "12.0.0",
-    "@cyclonedx/cyclonedx-npm": "4.1.2",
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
