@@ -1,4 +1,4 @@
-import type { Feature, Geometry } from "geojson";
+import type { Feature, FeatureCollection, Geometry } from "geojson";
 
 export interface DbFault {
   readonly id: number;
@@ -27,6 +27,8 @@ export enum FaultState {
   Peruttu = "Peruttu",
   Korjattu = "Korjattu",
   Aiheeton = "Aiheeton",
+  Registrerad = "Registrerad",
+  Registered = "Registered",
 }
 
 export interface AtonProperties {
@@ -52,3 +54,18 @@ export interface AtonProperties {
 }
 
 export type FaultFeature = Feature<Geometry, AtonProperties>;
+
+// incomplete
+export interface FaultPublicApiFeatureProperties {
+  readonly id: number;
+  readonly state: FaultState;
+}
+
+export type FaultPublicApiFeature = Feature<
+  Geometry,
+  FaultPublicApiFeatureProperties
+>;
+export type FaultPublicApiFeatureCollection = FeatureCollection<
+  Geometry,
+  FaultPublicApiFeatureProperties
+>;
