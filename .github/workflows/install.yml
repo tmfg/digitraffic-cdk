@@ -131,12 +131,6 @@ jobs:
             cd ${{ steps.environment.outputs.directory }}
             # and the run command
             node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
-
-      - name: Generate SBOM
-        if: github.event.inputs.command == 'deploy'
-        run: |
-          node common/scripts/install-run-rush.js generate-sbom --only ${{ github.event.inputs.application }}
-
       - name: Configure AWS credentials for SBOM
         if: github.event.inputs.command == 'deploy'
         uses: aws-actions/configure-aws-credentials@v5
