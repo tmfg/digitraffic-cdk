@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { basename, dirname } from "node:path";
 import type { BuildOptions, BuildResult } from "esbuild";
 import { globby } from "globby";
+import { cyclonedxEsbuildPlugin, type CycloneDxEsbuildPluginOptions } from "@cyclonedx/cyclonedx-esbuild";
 
 const distLambda = "dist/lambda";
 
@@ -18,6 +19,11 @@ const DEFAULT_BANNED_DEPENDENCY_LIB_PREFIXES = [
 ];
 
 const DEFAULT_LAMBDA_MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB uncompressed
+
+const cyclonedxEsbuildPluginOptions: CycloneDxEsbuildPluginOptions = {
+  specVersion: "1.6",
+  outputFile: "../../sbom.json"
+}
 
 export async function createEsbuildConfig(): Promise<BuildOptions> {
   const lambdas = await globby("src/lambda/**/*.ts");
@@ -47,6 +53,7 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
     format: "esm",
     outExtension: { ".js": ".mjs" },
     banner: { js: commonjsRequireBanner },
+    plugins: [cyclonedxEsbuildPlugin(cyclonedxEsbuildPluginOptions)]
   };
 }
 
