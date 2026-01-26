@@ -1,10 +1,10 @@
+import fs from "node:fs";
 import {
   Function as CloudfrontFunction,
   FunctionCode,
   FunctionRuntime,
 } from "aws-cdk-lib/aws-cloudfront";
 import type { Construct } from "constructs";
-import fs from "node:fs";
 
 export enum FunctionType {
   INDEX_HTML,
@@ -34,8 +34,10 @@ export function createRedirectFunction(
   scope: Construct,
   redirectUrl: string,
 ): CloudfrontFunction {
-  const body = readFunctionBody("dist/lambda/function-redirect.cjs")
-    .replace(/EXT_REDIRECT_URL/gi, redirectUrl);
+  const body = readFunctionBody("dist/lambda/function-redirect.cjs").replace(
+    /EXT_REDIRECT_URL/gi,
+    redirectUrl,
+  );
 
   return createCloudfrontFunction(scope, "redirect-function", body);
 }
@@ -44,8 +46,10 @@ export function createPathRewriteFunction(
   scope: Construct,
   pathRemoveCount: number,
 ): CloudfrontFunction {
-  const body = readFunctionBody("dist/lambda/function-rewrite-uri.cjs")
-    .replace(/EXT_PATHS_TO_REMOVE/gi, pathRemoveCount.toString());
+  const body = readFunctionBody("dist/lambda/function-rewrite-uri.cjs").replace(
+    /EXT_PATHS_TO_REMOVE/gi,
+    pathRemoveCount.toString(),
+  );
 
   return createCloudfrontFunction(
     scope,
