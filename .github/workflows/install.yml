@@ -144,7 +144,7 @@ jobs:
         run: |
             mkdir $BIN_DIR
 
-            if [ "${{ fromJson(steps.environment.outputs.install_config).allConfigs }}" == "true" ]; then
+            if [ "${{ steps.environment.outputs.install_config.allConfigs }}" == "true" ]; then
               cp digitraffic-ci/aws/cdk/marine/config.ts $BIN_DIR/config-marine.ts 
               cp digitraffic-ci/aws/cdk/road/config.ts $BIN_DIR/config-road.ts 
               cp digitraffic-ci/aws/cdk/rail/config.ts $BIN_DIR/config-rail.ts 
@@ -165,7 +165,7 @@ jobs:
             if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
             # skip environment suffix on stack name if configured
-            if [ "true" == "${{ fromJson(steps.environment.outputs.install_config.skipEnvironmentOnStackName) }}" ]; then
+            if [ "true" == "${{ steps.environment.outputs.install_config.skipEnvironmentOnStackName }}" ]; then
                 export STACK_NAME=${STACK}
             fi;
 
