@@ -107,7 +107,7 @@ jobs:
       - name: Read SBOM config
         id: sbom-config
         run: |
-            echo "sbom_config<<EOF" >> $GITHUB_OUTPUT
+            echo "config<<EOF" >> $GITHUB_OUTPUT
             cat digitraffic-ci/aws/sbom/${{ steps.environment.outputs.domain }}.json >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
 
@@ -200,7 +200,7 @@ jobs:
         if: github.event.inputs.command == 'deploy'
         uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: ${{ fromJson(steps.sbom_config.outputs.config).sbomUploadRoleArn }}
+          role-to-assume: ${{ fromJson(steps.sbom-config.outputs.config).sbomUploadRoleArn }}
           role-session-name: gh-actions-upload-sbom-${{ github.event.inputs.application }}-${{ github.event.inputs.env }}
           aws-region: ${{ secrets.AWS_REGION }}
 
@@ -208,7 +208,7 @@ jobs:
         if: github.event.inputs.command == 'deploy'
         run: |
           aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json \
-            s3://${{ fromJson(steps.install_config.outputs.config).bucketArn }}/${{ fromJson(steps.environment.outputs.sbom_config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
+            s3://${{ fromJson(steps.install_config.outputs.config).bucketArn }}/${{ fromJson(steps.environment.outputs.sbom-config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
 
       - name: Notify Slack
         if: failure()
