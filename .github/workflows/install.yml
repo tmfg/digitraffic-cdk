@@ -50,7 +50,7 @@ jobs:
     steps:
       - name: Summary
         run: |
-          echo '### Deploying ${{ github.event.inputs.application }} to ${{ github.event.inputs.env }}! 🚀' >> $GITHUB_STEP_SUMMARY
+          echo '### Running ${{ github.event.inputs.command }} ${{ github.event.inputs.application }} to ${{ github.event.inputs.env }}! 🚀' >> $GITHUB_STEP_SUMMARY
           echo 'Using ref ${{ github.event.inputs.ref }}' >> $GITHUB_STEP_SUMMARY
           echo 'Using ci ${{ github.event.inputs.config-repo-branch }}' >> $GITHUB_STEP_SUMMARY
 
@@ -80,6 +80,7 @@ jobs:
 
             echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
             echo "stack=$STACK" >> $GITHUB_OUTPUT
+            echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
             echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
@@ -119,10 +120,10 @@ jobs:
               cp digitraffic-ci/aws/cdk/aviation/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-aviation.ts 
           else
               # file might not exist, so skipping errors 
-              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/ || true
+              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/ || true
           fi
 
-          cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.domain }}/${{ github.event.inputs.application}}/* ${{ steps.environment.outputs.directory }}/src/bin/
+          cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* ${{ steps.environment.outputs.directory }}/src/bin/
 
       - name: Diff and deploy
         env:
