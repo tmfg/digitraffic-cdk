@@ -206,11 +206,9 @@ jobs:
 
       - name: Upload SBOM
         if: github.event.inputs.command == 'deploy'
-        run: |
-          ls -lha ${{ steps.environment.outputs.directory }}
-          
+        run: |          
           aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json \
-            s3://${{ steps.install_config.outputs.config.bucketArn }}/${{ fromJson(steps.sbom-config.outputs.config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
+            s3://${{ fromJson(steps.sbom-config.outputs.config).bucketArn }}/${{ fromJson(steps.sbom-config.outputs.config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
 
       - name: Notify Slack
         if: failure()
