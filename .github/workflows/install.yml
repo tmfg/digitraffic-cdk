@@ -35,6 +35,13 @@ on:
         options: 
           - "digitraffic-statistics"
           - "aton-faults"
+          - "bridge-lock-disruptions"
+          - "marinecam"
+          - "port-call"
+          - "port-activity"
+          - "sea-state-estimate"
+          - "shiplight"
+          - "winter-navigation"
           - "counting-site"
 
 jobs:
@@ -149,7 +156,8 @@ jobs:
               IMAGE_URL = $(aws cloudformation describe-stacks \
                 --region ${{ secrets.AWS_REGION }} \
                 --stack-name $STACK_NAME \
-                --query "Stacks[0].Outputs[?OutputKey=='ImageUrl'].OutputValue" --output text")
+                --query "Stacks[0].Outputs[?OutputKey=='ImageUrl'].OutputValue" \
+                --output text)
 
               echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
             fi;
