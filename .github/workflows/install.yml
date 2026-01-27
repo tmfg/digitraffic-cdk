@@ -132,6 +132,11 @@ jobs:
         run: |                  
             if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
+            # skip environment suffix on stack name if configured
+            if [ "true" == "${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].skipEnvironmentOnStackName }}" ]; then
+                export STACK_NAME=${STACK}
+            fi;
+
             node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
 
             cd ${{ steps.environment.outputs.directory }}
