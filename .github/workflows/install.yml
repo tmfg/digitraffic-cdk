@@ -71,11 +71,16 @@ jobs:
         run: |
             export DOMAIN=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].domain }}
             export STACK=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].stack }}
-            export DIRECTORY=$DOMAIN/${{ github.event.inputs.application }}
+            export DIRECTORY=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].directory }}
+
+            # by default, directory is same as domain
+            if [ "$DIRECTORY" == "" ]; then
+                export DIRECTORY=$DOMAIN
+            fi
 
             echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
             echo "stack=$STACK" >> $GITHUB_OUTPUT
-            echo "directory=$DIRECTORY" >> $GITHUB_OUTPUT
+            echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
