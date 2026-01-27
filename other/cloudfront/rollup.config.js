@@ -35,7 +35,7 @@ const excludeTerser = [
 ];
 
 export default inputs.map((input) => {
-  const isOutputEsm = true; // moduleJs.some((esm) => input.includes(esm))
+  const isOutputEsm = false; // Changed to false - output CommonJS for CloudFront compatibility
   const outputFile = isOutputEsm
     ? input.replace("src/", `${outputDir}/`).replace(/\.ts$/, ".mjs")
     : input.replace("src/", `${outputDir}/`).replace(/\.ts$/, ".cjs");

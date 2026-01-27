@@ -94,12 +94,6 @@
       "tags": ["cdk", "marine"]
     },
     {
-      "packageName": "nautical-warnings",
-      "projectFolder": "marine/nautical-warnings",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "marine"]
-    },
-    {
       "packageName": "portactivity",
       "projectFolder": "marine/portactivity",
       "decoupledLocalDependencies": ["@digitraffic/common"],

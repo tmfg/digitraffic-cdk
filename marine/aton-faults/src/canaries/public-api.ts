@@ -1,12 +1,12 @@
+import assert from "node:assert";
 import {
   ResponseChecker,
   UrlChecker,
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
-import assert from "assert";
 import type {
-  WarningFeature,
-  WarningFeatureCollection,
-} from "../model/warnings.js";
+  FaultPublicApiFeature,
+  FaultPublicApiFeatureCollection,
+} from "../model/fault.js";
 
 const API_PATH = "/prod/api/aton/v1/faults";
 
@@ -16,11 +16,11 @@ export const handler = async (): Promise<string> => {
 
   await checker.expect200(
     API_PATH + "?language=fi",
-    rs.checkJson((json: WarningFeatureCollection) => {
+    rs.checkJson((json: FaultPublicApiFeatureCollection) => {
       assert.ok(json.features.length > 10);
       assert.ok(
-        json.features.some((f: WarningFeature) =>
-          f.properties.state === "Kirjattu"
+        json.features.some(
+          (f: FaultPublicApiFeature) => f.properties.state === "Kirjattu",
         ),
       );
     }),
@@ -28,11 +28,11 @@ export const handler = async (): Promise<string> => {
 
   await checker.expect200(
     API_PATH + "?language=sv",
-    rs.checkJson((json: WarningFeatureCollection) => {
+    rs.checkJson((json: FaultPublicApiFeatureCollection) => {
       assert.ok(json.features.length > 10);
       assert.ok(
-        json.features.some((f: WarningFeature) =>
-          f.properties.state === "Registrerad"
+        json.features.some(
+          (f: FaultPublicApiFeature) => f.properties.state === "Registrerad",
         ),
       );
     }),
@@ -41,11 +41,11 @@ export const handler = async (): Promise<string> => {
   // unknown locale ge -> english is used
   await checker.expect200(
     API_PATH + "?language=ge",
-    rs.checkJson((json: WarningFeatureCollection) => {
+    rs.checkJson((json: FaultPublicApiFeatureCollection) => {
       assert.ok(json.features.length > 10);
       assert.ok(
-        json.features.some((f: WarningFeature) =>
-          f.properties.state === "Registered"
+        json.features.some(
+          (f: FaultPublicApiFeature) => f.properties.state === "Registered",
         ),
       );
     }),
