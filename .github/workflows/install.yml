@@ -138,27 +138,29 @@ jobs:
         run: node common/scripts/install-run-rush.js install
 
       - name: Copy config
+        env:
+          BIN_DIR: ${{ steps.environment.outputs.directory }}/src/bin
         run: |
-          mkdir ${{ steps.environment.outputs.directory }}/src/bin
+            mkdir $BIN_DIR
 
-          if [ "${{ fromJson(steps.environment.outputs.install_config).allConfigs }}" == "true" ]; then
-              cp digitraffic-ci/aws/cdk/marine/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-marine.ts 
-              cp digitraffic-ci/aws/cdk/road/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-road.ts 
-              cp digitraffic-ci/aws/cdk/rail/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-rail.ts 
-              cp digitraffic-ci/aws/cdk/aviation/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-aviation.ts 
-          else
+            if [ "${{ fromJson(steps.environment.outputs.install_config).allConfigs }}" == "true" ]; then
+              cp digitraffic-ci/aws/cdk/marine/config.ts $BIN_DIR/config-marine.ts 
+              cp digitraffic-ci/aws/cdk/road/config.ts $BIN_DIR/config-road.ts 
+              cp digitraffic-ci/aws/cdk/rail/config.ts $BIN_DIR/config-rail.ts 
+              cp digitraffic-ci/aws/cdk/aviation/config.ts $BIN_DIR/config-aviation.ts 
+            else
               # file might not exist, so skipping errors 
-              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts ${{ steps.environment.outputs.directory }}/src/bin/ || true
-          fi
+              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts $BIN_DIR/ || true
+            fi
 
-          cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* ${{ steps.environment.outputs.directory }}/src/bin/
+            cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* $BIN_DIR/
 
       - name: Diff and deploy
         id: deploy
         env:
           ENV: ${{ github.event.inputs.env }}
           STACK: ${{ steps.environment.outputs.stack }}
-        run: |                  
+        run: |
             if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
             # skip environment suffix on stack name if configured
