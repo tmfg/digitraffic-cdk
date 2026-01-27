@@ -73,28 +73,42 @@ jobs:
           ref: ${{ inputs.config-repo-branch }}
           path: digitraffic-ci
 
+      - name: Read install config
+        id: install-config
+        run: |
+            export CONFIG="$(cat digitraffic-ci/aws/cdk/install-config.json)"
+            echo "config=$CONFIG" >> $GITHUB_OUTPUT            
+
       - name: Set environment variables
         id: environment
         run: |
-            export DOMAIN=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].domain }}
-            export STACK=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].stack }}
-            export DIRECTORY=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].directory }}
+            export INSTALL_CONFIG=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}
+            export DOMAIN=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].domain }}
+            export STACK=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}
+            export DIRECTORY=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].directory }}            
 
             # by default, directory is same as domain
             if [ "$DIRECTORY" == "" ]; then
                 export DIRECTORY=$DOMAIN
             fi
 
+            echo "install_config=$INSTALL_CONFIG" >> $GITHUB_OUTPUT
             echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
             echo "stack=$STACK" >> $GITHUB_OUTPUT
             echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
             echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
-            echo "generateSbom=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
+            echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
+
+      - name: Read SBOM config
+        id: sbom-config
+        run: |
+            export SBOM_CONFIG="$(cat digitraffic-ci/aws/sbom/${{ steps.environment.outputs.domain }}.json)"
+            echo "sbom_config=$SBOM_CONFIG" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: ${{ fromJson(secrets.INSTALL_CONFIG).roles[github.event.inputs.env][steps.environment.outputs.domain] }}
+          role-to-assume: ${{ fromJson(steps.install-config.outputs.config).roles[github.event.inputs.env][steps.environment.outputs.domain] }}
           role-session-name: gh-actions-install-${{ github.event.inputs.env }}
           aws-region: ${{ secrets.AWS_REGION }}
           
@@ -121,7 +135,7 @@ jobs:
         run: |
           mkdir ${{ steps.environment.outputs.directory }}/src/bin
 
-          if [ "${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].allConfigs }}" == "true" ]; then
+          if [ "${{ fromJson(steps.environment.outputs.install_config).allConfigs }}" == "true" ]; then
               cp digitraffic-ci/aws/cdk/marine/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-marine.ts 
               cp digitraffic-ci/aws/cdk/road/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-road.ts 
               cp digitraffic-ci/aws/cdk/rail/config.ts ${{ steps.environment.outputs.directory }}/src/bin/config-rail.ts 
@@ -142,7 +156,7 @@ jobs:
             if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
             # skip environment suffix on stack name if configured
-            if [ "true" == "${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].skipEnvironmentOnStackName }}" ]; then
+            if [ "true" == "${{ fromJson(steps.environment.outputs.install_config.skipEnvironmentOnStackName }}" ]; then
                 export STACK_NAME=${STACK}
             fi;
 
@@ -152,7 +166,7 @@ jobs:
             # and the run command
             node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
 
-            if [ "${{ steps.environment.outputs.generateSbom }}" == "true" ] && [ "${{ github.event.inputs.command }}" == "deploy" ]; then
+            if [ "${{ steps.environment.outputs.generate_sbom }}" == "true" ] && [ "${{ github.event.inputs.command }}" == "deploy" ]; then
               export IMAGE_URL=$(aws cloudformation describe-stacks \
                 --region ${{ secrets.AWS_REGION }} \
                 --stack-name $STACK_NAME \
@@ -163,7 +177,7 @@ jobs:
             fi;
 
       - name: Generate SBOM
-        if: github.event.inputs.command == 'deploy' && steps.environment.outputs.generateSbom == 'true'
+        if: github.event.inputs.command == 'deploy' && steps.environment.outputs.generate_sbom == 'true'
         uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: image
@@ -184,7 +198,7 @@ jobs:
       - name: Upload SBOM
         if: github.event.inputs.command == 'deploy'
         run: |
-          aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
+          aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(steps.environment.outputs.sbom_config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
 
       - name: Notify Slack
         if: failure()
