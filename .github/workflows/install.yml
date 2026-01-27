@@ -170,9 +170,8 @@ jobs:
           image-ref: ${{ steps.deploy.outputs.IMAGE_URL }}
           format: cyclonedx
           scanners: vuln,license
-          debug-mode: true
           version: latest
-          output: sbom.json
+          output: ${{ steps.environment.outputs.directory }}/sbom.json
 
       - name: Configure AWS credentials for SBOM
         if: github.event.inputs.command == 'deploy'
