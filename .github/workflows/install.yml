@@ -82,7 +82,7 @@ jobs:
             echo "stack=$STACK" >> $GITHUB_OUTPUT
             echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
             echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
-            echo "generateSbom=${{ fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env][github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
+            echo "generateSbom=${{ fromJson(secrets.INSTALL_CONFIG).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
