@@ -156,7 +156,7 @@ jobs:
             if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
             # skip environment suffix on stack name if configured
-            if [ "true" == "${{ fromJson(steps.environment.outputs.install_config.skipEnvironmentOnStackName }}" ]; then
+            if [ "true" == "${{ fromJson(steps.environment.outputs.install_config.skipEnvironmentOnStackName) }}" ]; then
                 export STACK_NAME=${STACK}
             fi;
 
