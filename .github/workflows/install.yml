@@ -142,6 +142,13 @@ jobs:
             cd ${{ steps.environment.outputs.directory }}
             # and the run command
             node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
+
+      - name: Generate SBOM
+        if: github.event.inputs.command == 'deploy' && fromJson(secrets.SBOM_PROJECT_KEYS)[github.event.inputs.env][github.event.inputs.application].runGenerateSbom == 'true'
+        run: |
+          # usually esbuild generates SBOMs during build, but for some projects we need to run it separately
+          node common/scripts/install-run-rush.js generate-sbom --only ${{ github.event.inputs.application }}
+
       - name: Configure AWS credentials for SBOM
         if: github.event.inputs.command == 'deploy'
         uses: aws-actions/configure-aws-credentials@v5
