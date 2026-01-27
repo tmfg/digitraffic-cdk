@@ -207,7 +207,7 @@ jobs:
       - name: Upload SBOM
         if: github.event.inputs.command == 'deploy'
         run: |
-          aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json \
+          aws s3 cp sbom.json \
             s3://${{ steps.install_config.outputs.config.bucketArn }}/${{ fromJson(steps.sbom-config.outputs.config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
 
       - name: Notify Slack
