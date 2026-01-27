@@ -145,7 +145,7 @@ jobs:
             # and the run command
             node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
 
-            if [ "${{ steps.environement.outputs.generateSbom }}" == "true" ] && [ "${{ github.event.inputs.command }}" == "deploy" ]; then
+            if [ "${{ steps.environment.outputs.generateSbom }}" == "true" ] && [ "${{ github.event.inputs.command }}" == "deploy" ]; then
               IMAGE_URL = $(aws cloudformation describe-stacks \
                 --region ${{ secrets.AWS_REGION }} \
                 --stack-name $STACK_NAME \
@@ -153,7 +153,7 @@ jobs:
 
               echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
             fi;
-          env:
+        env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
       - name: Generate SBOM
