@@ -138,6 +138,7 @@ jobs:
         run: node common/scripts/install-run-rush.js install
 
       - name: Copy config
+        id: copy-config
         env:
           BIN_DIR: ${{ steps.environment.outputs.directory }}/src/bin
         run: |
@@ -151,7 +152,7 @@ jobs:
             else
               # file might not exist, so skipping errors 
               cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts $BIN_DIR/ || true
-            fi
+            fi;
 
             cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* $BIN_DIR/
 
