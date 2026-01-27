@@ -197,14 +197,15 @@ jobs:
         if: github.event.inputs.command == 'deploy'
         uses: aws-actions/configure-aws-credentials@v5
         with:
-          role-to-assume: ${{ secrets.SBOM_AWS_ROLE }}
+          role-to-assume: ${{ fromJson(steps.sbom_config.outputs.config).sbomUploadRoleArn }}
           role-session-name: gh-actions-upload-sbom-${{ github.event.inputs.application }}-${{ github.event.inputs.env }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload SBOM
         if: github.event.inputs.command == 'deploy'
         run: |
-          aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json s3://${{ secrets.SBOM_BUCKET }}/${{ fromJson(steps.environment.outputs.sbom_config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
+          aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json \
+            s3://${{ fromJson(steps.install_config.outputs.config).bucketArn }}/${{ fromJson(steps.environment.outputs.sbom_config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
 
       - name: Notify Slack
         if: failure()
