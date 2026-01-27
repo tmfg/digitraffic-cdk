@@ -76,8 +76,9 @@ jobs:
       - name: Read install config
         id: install-config
         run: |
-            export CONFIG="$(cat digitraffic-ci/aws/cdk/install-config.json)"
-            echo "config=$CONFIG" >> $GITHUB_OUTPUT            
+            echo "config<<EOF" >> $GITHUB_OUTPUT
+            cat digitraffic-ci/aws/cdk/install-config.json >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Set environment variables
         id: environment
@@ -92,7 +93,11 @@ jobs:
                 export DIRECTORY=$DOMAIN
             fi
 
-            echo "install_config=$INSTALL_CONFIG" >> $GITHUB_OUTPUT
+            # handle multiline output
+            echo "install_config<<EOF" >> $GITHUB_OUTPUT
+            echo $INSTALL_CONFIG >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
             echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
             echo "stack=$STACK" >> $GITHUB_OUTPUT
             echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
@@ -102,8 +107,9 @@ jobs:
       - name: Read SBOM config
         id: sbom-config
         run: |
-            export SBOM_CONFIG="$(cat digitraffic-ci/aws/sbom/${{ steps.environment.outputs.domain }}.json)"
-            echo "sbom_config=$SBOM_CONFIG" >> $GITHUB_OUTPUT
+            echo "sbom_config<<EOF" >> $GITHUB_OUTPUT
+            cat digitraffic-ci/aws/sbom/${{ steps.environment.outputs.domain }}.json >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5
