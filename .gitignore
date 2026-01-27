@@ -27,11 +27,9 @@
 !/common/
 !/common/*
 
-# digitraffic-common and repo-scripts
+# digitraffic-common
 !/lib/
 !/lib/*/
-!/lib/repo-scripts/*
-!/lib/repo-scripts/**/*
 
 # Helpper scripts
 !/scripts/

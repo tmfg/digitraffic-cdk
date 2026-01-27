@@ -1,9 +1,9 @@
 #!/usr/bin/env zx --quiet
 
-import {$, chalk, question} from "zx";
-import _ from "lodash";
-import fs from "fs-extra";
 import async from "async";
+import fs from "fs-extra";
+import { chain, head, mapValues, trimStart } from "lodash";
+import { $, chalk, question } from "zx";
 
 interface RushVersion {
   version: string;
@@ -51,7 +51,7 @@ interface PackageJson {
 async function askVersion(check: RushCheck): Promise<DependencyVersion> {
   console.log(`Dependency: ${chalk.blue(check.dependencyName)}`);
 
-  const versions = _.chain(check.versions)
+  const versions = chain(check.versions)
     .sortBy(({ version }) => version)
     .reverse()
     .value();
@@ -71,17 +71,15 @@ async function askVersion(check: RushCheck): Promise<DependencyVersion> {
 
   if (check.dependencyName.includes("@types/")) {
     // strip ^ and ~ from @types/ dependencies
-    left.version = _.trimStart(left.version, "^~");
+    left.version = trimStart(left.version, "^~");
   }
 
   let version = await question(
-    `Which version to use (${chalk.green(left.version)}/${
-      chalk.yellow(right.version)
-    })? (${
-      chalk.green(
-        "[left]",
-      )
-    }/${chalk.yellow("(r)ight")}/(s)kip/somethingelse): `,
+    `Which version to use (${chalk.green(left.version)}/${chalk.yellow(
+      right.version,
+    )})? (${chalk.green(
+      "[left]",
+    )}/${chalk.yellow("(r)ight")}/(s)kip/somethingelse): `,
   );
 
   const answer = version.toLowerCase();
@@ -102,9 +100,9 @@ async function askVersion(check: RushCheck): Promise<DependencyVersion> {
 function groupByDependency(
   dependencyVersions: DependencyVersion[],
 ): Dependencies {
-  return _.chain(dependencyVersions)
+  return chain(dependencyVersions)
     .groupBy("dependencyName")
-    .mapValues((items) => _.head(items))
+    .mapValues((items) => head(items))
     .value();
 }
 
@@ -112,24 +110,21 @@ function updateVersions(
   dependencies: Dependencies,
   packageJson: PackageJson,
 ): PackageJson {
-  return _.mapValues(packageJson, (value, packageJsonKey) => {
+  return mapValues(packageJson, (value, packageJsonKey) => {
     if (
       ["dependencies", "devDependencies", "peerDependencies"].includes(
         packageJsonKey,
       )
     ) {
-      return _.mapValues(
-        value,
-        (version: string, dependencyName: string) => {
-          const newDependency = dependencies[dependencyName];
+      return mapValues(value, (version: string, dependencyName: string) => {
+        const newDependency = dependencies[dependencyName];
 
-          if (!newDependency || version.includes("workspace")) {
-            return version;
-          }
+        if (!newDependency || version.includes("workspace")) {
+          return version;
+        }
 
-          return newDependency.version;
-        },
-      );
+        return newDependency.version;
+      });
     }
     return value;
   }) as PackageJson;
@@ -149,8 +144,9 @@ async function main(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     async (project) => {
       const packageJsonPath = `${project.fullPath}/package.json`;
-      const packageJson =
-        (await fs.readJson(packageJsonPath)) as unknown as PackageJson;
+      const packageJson = (await fs.readJson(
+        packageJsonPath,
+      )) as unknown as PackageJson;
       const updated = updateVersions(dependencies, packageJson);
       const output = `${JSON.stringify(updated, null, 2)}\n`;
       await fs.writeFile(packageJsonPath, output);

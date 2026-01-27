@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { globby } from "globby";
-import fs from "fs-extra";
 import chalk from "chalk";
+import fs from "fs-extra";
+import { globby } from "globby";
 
 interface PackageJson {
   dependencies: Record<string, string>;
@@ -39,11 +39,13 @@ async function run(): Promise<void> {
   const results = dependencies.filter(({ items }) => items.length !== 0);
   results.forEach(({ project, items }) => {
     console.log(
-      `Project: ${
-        chalk.bold(project)
-      } has declared following as dependency instead of devDependency:`,
+      `Project: ${chalk.bold(
+        project,
+      )} has declared following as dependency instead of devDependency:`,
     );
-    items.forEach(([key]) => console.log(`- ${key}`));
+    for (const [key] of items) {
+      console.log(`- ${key}`);
+    }
   });
 
   if (results.length > 0) {

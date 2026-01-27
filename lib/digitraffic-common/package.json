@@ -1,6 +1,6 @@
 {
   "name": "@digitraffic/common",
-  "version": "2026.1.23-1",
+  "version": "2026.1.26-1",
   "private": false,
   "description": "",
   "repository": {
@@ -157,7 +157,7 @@
     "jest-junit": "16.0.0",
     "ky": "1.14.2",
     "lefthook": "2.0.13",
-    "lodash-es": "4.17.22",
+    "lodash-es": "4.17.23",
     "madge": "8.0.0",
     "pg-native": "3.5.2",
     "pg-promise": "12.3.0",
@@ -184,7 +184,7 @@
     "es-toolkit": "1.43.0",
     "geojson-validation": "1.0.2",
     "ky": "1.14.2",
-    "lodash-es": "4.17.22",
+    "lodash-es": "4.17.23",
     "pg-native": "3.5.2",
     "pg-promise": "12.3.0",
     "zod": "4.3.5"

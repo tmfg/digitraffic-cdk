@@ -23,7 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.965.0",
     "@aws-sdk/client-sqs": "3.965.0",
-    "@digitraffic/common": "2026.1.23-1",
+    "@digitraffic/common": "2026.1.26-1",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",
     "date-fns": "4.1.0",
