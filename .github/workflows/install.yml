@@ -43,6 +43,11 @@ on:
           - "shiplight"
           - "winter-navigation"
           - "counting-site"
+          - "data-upload"
+          - "lam-history"
+          - "maintenance-tracking"
+          - "maintenance-tracking-municipality"
+          - "variable-signs"
 
 jobs:
   build_and_deploy:
