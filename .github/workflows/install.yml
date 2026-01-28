@@ -37,7 +37,7 @@ on:
           - "aton-faults"
           - "bridge-lock-disruptions"
           - "marinecam"
-          - "port-call"
+          - "portcall"
           - "port-activity"
           - "sea-state-estimate"
           - "shiplight"
