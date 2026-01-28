@@ -82,10 +82,10 @@ jobs:
 
       - name: Set environment variables for ${{ github.event.inputs.application }}
         id: environment
+        env:
+          INSTALL_CONFIG: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}
+          DOMAIN: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].domain }}
         run: |
-            export INSTALL_CONFIG=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}
-            export DOMAIN=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].domain }}
-            export STACK=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}
             export DIRECTORY=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].directory }}            
             
             if [ "$INSTALL_CONFIG" == "" ]; then
@@ -98,7 +98,7 @@ jobs:
             # by default, directory is same as domain
             if [ "$DIRECTORY" == "" ]; then
                 export DIRECTORY=$DOMAIN
-            fi
+            fi;
 
             # handle multiline output
             echo "install_config<<EOF" >> $GITHUB_OUTPUT
@@ -106,7 +106,7 @@ jobs:
             echo "EOF" >> $GITHUB_OUTPUT
 
             echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
-            echo "stack=$STACK" >> $GITHUB_OUTPUT
+            echo "stack=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}" >> $GITHUB_OUTPUT
             echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
             echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
             echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
