@@ -82,11 +82,6 @@ jobs:
 
       - name: Set environment variables for ${{ github.event.inputs.application }}
         id: environment
-        env:
-          INSTALL_CONFIG: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}
-          DOMAIN: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].domain }}
-          STACK: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}
-          DIRECTORY: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].directory }}
         run: |
             echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
             echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
