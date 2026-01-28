@@ -6,6 +6,7 @@
 !/.github/workflows/**/**.yml
 !/.github/CODEOWNERS
 !/.github/dependabot.yml
+!/.github/trufflehog-exclude.txt
 
 !/.editorconfig
 !/.git-blame-ignore-revs
