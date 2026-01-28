@@ -88,28 +88,10 @@ jobs:
           STACK: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}
           DIRECTORY: ${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].directory }}
         run: |
-            if [ "$INSTALL_CONFIG" == "" ]; then
-              echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
-              echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
+            echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
+            echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
 
-              exit 1
-            fi;
-
-            # by default, directory is same as domain
-            if [ "$DIRECTORY" == "" ]; then
-                export DIRECTORY=$DOMAIN
-            fi;
-
-            # handle multiline output
-            echo "install_config<<EOF" >> $GITHUB_OUTPUT
-            echo $INSTALL_CONFIG >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-
-            echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
-            echo "stack=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}" >> $GITHUB_OUTPUT
-            echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
-            echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
-            echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
+            exit 1
 
       - name: Read SBOM config
         id: sbom-config
