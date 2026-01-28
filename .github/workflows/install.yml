@@ -80,17 +80,38 @@ jobs:
             cat digitraffic-ci/aws/cdk/install-config.json >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Check config exists for ${{ github.event.inputs.application }}
+        run: |
+            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}"
+            if [ "$INSTALL_CONFIG" == "" ]; then
+              echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
+              echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
+
+              exit 1
+            fi;
+
       - name: Set environment variables for ${{ github.event.inputs.application }}
         id: environment
         run: |
-            echo Config ${{ steps.install-config.outputs.config }}
+            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}"
+            export DOMAIN="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].domain }}"
+            export DIRECTORY="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].directory }}"
 
-            export INSTALL_CONFIG=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}
+            # by default, directory is same as domain
+            if [ "$DIRECTORY" == "" ]; then
+                export DIRECTORY=$DOMAIN
+            fi;
 
-            echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
-            echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
+            # handle multiline output
+            echo "install_config<<EOF" >> $GITHUB_OUTPUT
+            echo $INSTALL_CONFIG >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
 
-            exit 1
+            echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
+            echo "stack=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}" >> $GITHUB_OUTPUT
+            echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
+            echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
+            echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
 
       - name: Read SBOM config
         id: sbom-config
