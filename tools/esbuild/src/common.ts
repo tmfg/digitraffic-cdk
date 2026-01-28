@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { basename, dirname } from "node:path";
 import type { BuildOptions, BuildResult } from "esbuild";
 import { globby } from "globby";
-import { cyclonedxEsbuildPlugin, type CycloneDxEsbuildPluginOptions } from "@cyclonedx/cyclonedx-esbuild";
+import { cyclonedxEsbuildPlugin } from "@cyclonedx/cyclonedx-esbuild";
 
 const distLambda = "dist/lambda";
 
