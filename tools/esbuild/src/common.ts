@@ -20,11 +20,6 @@ const DEFAULT_BANNED_DEPENDENCY_LIB_PREFIXES = [
 
 const DEFAULT_LAMBDA_MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB uncompressed
 
-const cyclonedxEsbuildPluginOptions: CycloneDxEsbuildPluginOptions = {
-  specVersion: "1.6",
-  outputFile: "../../sbom.json"
-}
-
 export async function createEsbuildConfig(): Promise<BuildOptions> {
   const lambdas = await globby("src/lambda/**/*.ts");
 
@@ -40,6 +35,10 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
   console.log(`Lambdas (${lambdas.length}):\n${lambdas.join("\n")}\n`);
   console.log(`Esbuild outdir: ${outdir}\n`);
 
+  const outputFile = lambdas.length === 1
+    ? "../../../sbom.json"
+    : "../../sbom.json";
+
   return {
     entryPoints: lambdas,
     logLevel: "warning",
@@ -53,7 +52,10 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
     format: "esm",
     outExtension: { ".js": ".mjs" },
     banner: { js: commonjsRequireBanner },
-    plugins: [cyclonedxEsbuildPlugin(cyclonedxEsbuildPluginOptions)]
+    plugins: [cyclonedxEsbuildPlugin({
+      specVersion: "1.6",
+      outputFile
+    })]
   };
 }
 
