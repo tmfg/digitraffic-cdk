@@ -174,7 +174,7 @@ jobs:
               cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts $BIN_DIR/ || true
             fi;
 
-            cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* $BIN_DIR/
+            cp -r digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* $BIN_DIR/
 
       - name: Diff and deploy
         id: deploy
