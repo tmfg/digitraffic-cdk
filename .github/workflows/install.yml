@@ -48,6 +48,8 @@ on:
           - "maintenance-tracking"
           - "maintenance-tracking-municipality"
           - "variable-signs"
+          - "rami"
+          - "yearly-plans"
 
 jobs:
   build_and_deploy:
