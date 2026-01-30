@@ -119,6 +119,7 @@ jobs:
             echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
             echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
             echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
+            echo "skip_environment_on_stack_name=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].skipEnvironmentOnStackName }}" >> $GITHUB_OUTPUT
 
       - name: Read SBOM config
         id: sbom-config
@@ -192,7 +193,7 @@ jobs:
             if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
             # skip environment suffix on stack name if configured
-            if [ "true" == "${{ steps.environment.outputs.install_config.skipEnvironmentOnStackName }}" ]; then
+            if [ "true" == "${{ steps.environment.outputs.skip_environment_on_stack_name }}" ]; then
                 export STACK_NAME=${STACK}
             fi;
 
