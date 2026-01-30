@@ -1,17 +1,248 @@
 name: Build, install and deploy to AWS
+
 on:
   workflow_dispatch:
+    inputs:
+      env:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - "prod"
+          - "test"
+        default: "test"
+      ref:
+        description: "Branch/tag/SHA of digitraffic-cdk-private"
+        required: true
+        default: "master"
+      config-repo-branch:
+        description: "Branch or tag of CI-repo"
+        required: true
+        default: "master"
+      command:
+        description: "Command for cdk"
+        required: true
+        type: choice
+        options: 
+          - "deploy"
+          - "diff"
+        default: "deploy"
+
+      application:
+        description: "Application to install"
+        required: true
+        type: choice
+        options: 
+          - "digitraffic-statistics"
+          - "aton-faults"
+          - "bridge-lock-disruptions"
+          - "marinecam"
+          - "port-call"
+          - "portactivity"
+          - "sea-state-estimate"
+          - "shiplight"
+          - "winter-navigation"
+          - "counting-site"
+          - "data-upload"
+          - "lam-history"
+          - "maintenance-tracking"
+          - "maintenance-tracking-municipality"
+          - "variable-signs"
+          - "rami"
+          - "yearly-plans"
 
 jobs:
-  deploy:
-    if: github.repository != 'tmfg/digitraffic-cdk'
-    environment: ${{ github.event.inputs.env }}
+  build_and_deploy:
+    if: ${{ github.repository != 'tmfg/digitraffic-cdk' }}
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
       contents: read
       actions: read
+    environment: ${{ github.event.inputs.env }}
+
     steps:
-      - name: Simple placeholder
+      - name: Summary
         run: |
-          echo "Placeholder"
+          echo '### Running ${{ github.event.inputs.command }} ${{ github.event.inputs.application }} to ${{ github.event.inputs.env }}! 🚀' >> $GITHUB_STEP_SUMMARY
+          echo 'Using ref ${{ github.event.inputs.ref }}' >> $GITHUB_STEP_SUMMARY
+          echo 'Using ci ${{ github.event.inputs.config-repo-branch }}' >> $GITHUB_STEP_SUMMARY
+
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Checkout CI-repo
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ secrets.CONFIG_REPO_NAME }}
+          ssh-key: ${{ secrets.CONFIG_REPO_SSH_KEY }}
+          ref: ${{ inputs.config-repo-branch }}
+          path: digitraffic-ci
+
+      - name: Read install config
+        id: install-config
+        run: |
+            echo "config<<EOF" >> $GITHUB_OUTPUT
+            cat digitraffic-ci/aws/cdk/install-config.json >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check config exists for ${{ github.event.inputs.application }}
+        run: |
+            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}"
+            if [ "$INSTALL_CONFIG" == "" ]; then
+              echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
+              echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
+
+              exit 1
+            fi;
+
+      - name: Set environment variables for ${{ github.event.inputs.application }}
+        id: environment
+        run: |
+            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}"
+            export DOMAIN="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].domain }}"
+            export DIRECTORY="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].directory }}"
+
+            # by default, directory is same as domain
+            if [ "$DIRECTORY" == "" ]; then
+                export DIRECTORY=$DOMAIN
+            fi;
+
+            # handle multiline output
+            echo "install_config<<EOF" >> $GITHUB_OUTPUT
+            echo $INSTALL_CONFIG >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+            echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
+            echo "stack=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}" >> $GITHUB_OUTPUT
+            echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
+            echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
+            echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
+
+      - name: Read SBOM config
+        id: sbom-config
+        run: |
+            if [ ! -f "digitraffic-ci/aws/sbom/${{ steps.environment.outputs.domain }}.json" ]; then
+              echo "Error: SBOM config for domain ${{ steps.environment.outputs.domain }} not found!"
+              echo "Error: SBOM config for domain ${{ steps.environment.outputs.domain }} not found!" >> $GITHUB_STEP_SUMMARY
+
+              exit 1
+            fi;
+
+            echo "config<<EOF" >> $GITHUB_OUTPUT
+            cat digitraffic-ci/aws/sbom/${{ steps.environment.outputs.domain }}.json >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+            echo "common<<EOF" >> $GITHUB_OUTPUT
+            cat digitraffic-ci/aws/sbom/config.json >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ fromJson(steps.install-config.outputs.config).roles[github.event.inputs.env][steps.environment.outputs.domain] }}
+          role-session-name: gh-actions-install-${{ github.event.inputs.env }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Setup pnpm 10
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Rush Install
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Copy config
+        id: copy-config
+        env:
+          BIN_DIR: ${{ steps.environment.outputs.directory }}/src/bin
+        run: |
+            mkdir $BIN_DIR
+
+            if [ "${{ steps.environment.outputs.install_config.allConfigs }}" == "true" ]; then
+              cp digitraffic-ci/aws/cdk/marine/config.ts $BIN_DIR/config-marine.ts 
+              cp digitraffic-ci/aws/cdk/road/config.ts $BIN_DIR/config-road.ts 
+              cp digitraffic-ci/aws/cdk/rail/config.ts $BIN_DIR/config-rail.ts 
+              cp digitraffic-ci/aws/cdk/aviation/config.ts $BIN_DIR/config-aviation.ts 
+            else
+              # file might not exist, so skipping errors 
+              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts $BIN_DIR/ || true
+            fi;
+
+            cp -r digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* $BIN_DIR/
+
+      - name: Diff and deploy
+        id: deploy
+        env:
+          ENV: ${{ github.event.inputs.env }}
+          STACK: ${{ steps.environment.outputs.stack }}
+        run: |
+            if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
+ 
+            # skip environment suffix on stack name if configured
+            if [ "true" == "${{ steps.environment.outputs.install_config.skipEnvironmentOnStackName }}" ]; then
+                export STACK_NAME=${STACK}
+            fi;
+
+            node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
+
+            cd ${{ steps.environment.outputs.directory }}
+            # and the run command
+            node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
+
+            if [ "${{ steps.environment.outputs.generate_sbom }}" == "true" ] && [ "${{ github.event.inputs.command }}" == "deploy" ]; then
+              export IMAGE_URL=$(aws cloudformation describe-stacks \
+                --region ${{ secrets.AWS_REGION }} \
+                --stack-name $STACK_NAME \
+                --query "Stacks[0].Outputs[?OutputKey=='ImageUrl'].OutputValue" \
+                --output text)
+
+              echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_OUTPUT
+            fi;
+
+      - name: Generate SBOM
+        if: github.event.inputs.command == 'deploy' && steps.environment.outputs.generate_sbom == 'true'
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: image
+          image-ref: ${{ steps.deploy.outputs.IMAGE_URL }}
+          format: cyclonedx
+          scanners: vuln,license
+          version: latest
+          output: ${{ steps.environment.outputs.directory }}/sbom.json
+
+      - name: Configure AWS credentials for SBOM
+        if: github.event.inputs.command == 'deploy'
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ fromJson(steps.sbom-config.outputs.common).sbomUploadRoleArn }}
+          role-session-name: gh-actions-upload-sbom-${{ github.event.inputs.application }}-${{ github.event.inputs.env }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload SBOM
+        if: github.event.inputs.command == 'deploy'
+        run: |          
+          aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json \
+            s3://${{ fromJson(steps.sbom-config.outputs.common).bucketArn }}/${{ fromJson(steps.sbom-config.outputs.config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
+
+      - name: Notify Slack
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: FAILED ${{ github.event.inputs.application }} install on ${{ github.event.inputs.env }}
+          fields: repo, job, took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

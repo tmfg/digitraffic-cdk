@@ -1,5 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import { basename, dirname } from "node:path";
+import { cyclonedxEsbuildPlugin } from "@cyclonedx/cyclonedx-esbuild";
 import type { BuildOptions, BuildResult } from "esbuild";
 import { globby } from "globby";
 
@@ -34,6 +35,9 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
   console.log(`Lambdas (${lambdas.length}):\n${lambdas.join("\n")}\n`);
   console.log(`Esbuild outdir: ${outdir}\n`);
 
+  const outputFile =
+    lambdas.length === 1 ? "../../../sbom.json" : "../../sbom.json";
+
   return {
     entryPoints: lambdas,
     logLevel: "warning",
@@ -47,6 +51,12 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
     format: "esm",
     outExtension: { ".js": ".mjs" },
     banner: { js: commonjsRequireBanner },
+    plugins: [
+      cyclonedxEsbuildPlugin({
+        specVersion: "1.6",
+        outputFile,
+      }),
+    ],
   };
 }
 

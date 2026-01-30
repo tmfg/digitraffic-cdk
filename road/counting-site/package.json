@@ -1,5 +1,5 @@
 {
-  "name": "counting-sites",
+  "name": "counting-site",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,6 @@
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22",
     "compile-lambdas": "node lib/esbuild.js",
-    "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --metafile=meta.json --platform=node --outdir=dist/lambda --target=node22",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
