@@ -40,8 +40,8 @@
     "@digitraffic/common": "2026.1.26-1",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",
-    "es-toolkit": "1.43.0",
-    "ky": "1.14.2",
+    "es-toolkit": "1.44.0",
+    "ky": "1.14.3",
     "lodash-es": "4.17.23",
     "zod": "4.3.5"
   },
