@@ -13,23 +13,23 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.965.0",
-    "@aws-sdk/lib-storage": "3.965.0",
+    "@aws-sdk/client-s3": "3.978.0",
+    "@aws-sdk/lib-storage": "3.978.0",
     "@digitraffic/common": "2026.1.26-1",
-    "aws-cdk-lib": "2.234.0",
+    "aws-cdk-lib": "2.236.0",
     "aws-sdk": "2.1693.0",
-    "constructs": "10.4.4"
+    "constructs": "10.4.5"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.1.7",
-    "@rushstack/heft-jest-plugin": "1.1.7",
-    "@types/aws-lambda": "8.10.159",
+    "@rushstack/heft": "1.1.11",
+    "@rushstack/heft-jest-plugin": "1.1.11",
+    "@types/aws-lambda": "8.10.160",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "24.10.4",
+    "@types/node": "25.1.0",
     "esbuild": "0.27.2",
     "jest": "30.2.0",
     "typescript": "5.9.3"

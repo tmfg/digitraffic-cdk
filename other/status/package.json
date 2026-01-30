@@ -21,14 +21,14 @@
     "test-build": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "3.965.0",
+    "@aws-sdk/client-secrets-manager": "3.978.0",
     "@digitraffic/common": "2026.1.26-1",
-    "aws-cdk-lib": "2.234.0",
-    "constructs": "10.4.4",
+    "aws-cdk-lib": "2.236.0",
+    "constructs": "10.4.5",
     "date-fns": "4.1.0",
-    "ky": "1.14.2",
+    "ky": "1.14.3",
     "lodash": "4.17.23",
-    "mqtt": "5.14.0",
+    "mqtt": "5.14.1",
     "ws": "8.19.0"
   },
   "devDependencies": {
@@ -38,14 +38,14 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
-    "@rushstack/heft": "1.1.7",
-    "@rushstack/heft-jest-plugin": "1.1.7",
-    "@types/aws-lambda": "8.10.159",
+    "@rushstack/heft": "1.1.11",
+    "@rushstack/heft-jest-plugin": "1.1.11",
+    "@types/aws-lambda": "8.10.160",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.23",
-    "@types/node": "24.10.4",
-    "aws-cdk": "2.1100.2",
+    "@types/node": "25.1.0",
+    "aws-cdk": "2.1104.0",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"
   }

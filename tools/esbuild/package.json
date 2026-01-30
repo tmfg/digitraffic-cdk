@@ -27,9 +27,9 @@
     "@cyclonedx/cyclonedx-esbuild": "1.0.0",
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.1.7",
-    "@rushstack/heft-typescript-plugin": "1.1.7",
-    "@types/node": "24.10.4",
+    "@rushstack/heft": "1.1.11",
+    "@rushstack/heft-typescript-plugin": "1.1.11",
+    "@types/node": "25.1.0",
     "typescript": "5.9.3"
   }
 }
