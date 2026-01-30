@@ -3,6 +3,7 @@ export const transportType = {
   MARINE: "marine",
   RAIL: "rail",
   ROAD: "road",
+  AFIR: "afir",
 } as const;
 
 export type TransportType = (typeof transportType)[keyof typeof transportType];

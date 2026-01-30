@@ -1,28 +1,22 @@
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import {
-  type OpenApiSchema,
-  openapiSchema,
-} from "@digitraffic/common/dist/types/openapi-schema";
+import type { OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
+import { openapiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { AssumeRoleRequest } from "aws-sdk/clients/sts.js";
 import STS from "aws-sdk/clients/sts.js";
 import ky, { HTTPError } from "ky";
 import { OpenSearch, OpenSearchApiMethod } from "../api/opensearch.js";
+import type { TransportType } from "../constants.js";
+import { DB_TRANSPORT_TYPE_FIELD, transportType } from "../constants.js";
 import { EnvKeys } from "../env.js";
+import type { DbFilter, OsFilter } from "../filter-types.js";
 import { osQueries } from "../os-queries.js";
+import { query } from "../util/db.js";
 import {
   getAccountNameOsFilterFromTransportTypeName,
-  getTransportTypeDbFilterFromAccountNameFilter,
   getUriFiltersFromPath,
 } from "../util/filter.js";
-import { query } from "../util/db.js";
-import type { DbFilter, OsFilter } from "../filter-types.js";
-import {
-  DB_TRANSPORT_TYPE_FIELD,
-  type TransportType,
-  transportType,
-} from "../constants.js";
 
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
@@ -105,8 +99,8 @@ export const handler = async (
   const credentials = await assumeRole(ROLE_ARN);
   const openSearchApi = new OpenSearch(OS_HOST, OS_VPC_ENDPOINT, credentials);
 
-  const apiPaths = (await getApiPaths()).filter((s) =>
-    s.transportType === event.TRANSPORT_TYPE
+  const apiPaths = (await getApiPaths()).filter(
+    (s) => s.transportType === event.TRANSPORT_TYPE,
   );
   const firstPath = apiPaths[0];
 
@@ -119,12 +113,9 @@ export const handler = async (
   }
 
   logger.info({
-    message:
-      `OS: ${OS_HOST},  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${
-        apiPaths
-          .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
-          .join(",")
-      }`,
+    message: `OS: ${OS_HOST},  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
+      .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
+      .join(",")}`,
     method: "collect-os-key-figures.handler",
   });
 
@@ -245,7 +236,8 @@ export async function getOsResults(
       );
     } catch (error: unknown) {
       logger.error({
-        message: "Error getting OS query results: " +
+        message:
+          "Error getting OS query results: " +
           (error instanceof Error && error.message),
         method: "collect-os-key-figures.getOsResults",
       });
@@ -261,9 +253,9 @@ export async function getOsResults(
       });
       osResults.push(
         getOsResult(openSearchApi, keyFigures, startDate, endDate, {
-          osFilter: `${
-            getAccountNameOsFilterFromTransportTypeName(apiPath.transportType)
-          } AND ${getUriFiltersFromPath(path).osFilter}` as OsFilter,
+          osFilter: `${getAccountNameOsFilterFromTransportTypeName(
+            apiPath.transportType,
+          )} AND ${getUriFiltersFromPath(path).osFilter}` as OsFilter,
           dbFilter: `${DB_TRANSPORT_TYPE_FIELD}:${apiPath.transportType} AND ${
             getUriFiltersFromPath(path).dbFilter
           }`,
@@ -298,18 +290,15 @@ async function getRowAmountWithDateNameFilter(
     return Promise.resolve(firstRow[resultKey]);
   } catch (error: unknown) {
     logger.error({
-      message: "Error querying database: " +
-        (error instanceof Error && error.message),
+      message:
+        "Error querying database: " + (error instanceof Error && error.message),
       method: "collect-os-key-figures.getRowAmountWithDateNameFilter",
     });
     throw error;
   }
 }
 
-async function insertFigures(
-  osResults: KeyFigureResult[],
-  tableName: string,
-) {
+async function insertFigures(osResults: KeyFigureResult[], tableName: string) {
   for (const result of osResults) {
     /**
          * Even though the actual filters used in the OS queries is by accountName.keyword:[name] and request:[uri],
@@ -322,12 +311,15 @@ async function insertFigures(
     // prettier-ignore
     await query(
       `INSERT INTO \`${tableName}\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
-                         VALUES ('${
-        startDate.toISOString().substring(0, 10)
-      }', '${endDate.toISOString().substring(0, 10)}', '${result.query}',
-                                 '${
-        JSON.stringify(result.value)
-      }', '${result.name}', '${result.filter.dbFilter}');`,
+                         VALUES ('${startDate
+                           .toISOString()
+                           .substring(
+                             0,
+                             10,
+                           )}', '${endDate.toISOString().substring(0, 10)}', '${result.query}',
+                                 '${JSON.stringify(
+                                   result.value,
+                                 )}', '${result.name}', '${result.filter.dbFilter}');`,
     );
   }
 }
@@ -366,8 +358,7 @@ async function persistToDatabase(osResults: KeyFigureResult[]) {
     // save duplicate rows to a separate table if current set of results already exists in database
     if (existingRows > 0) {
       logger.info({
-        message:
-          `Found existing result '${osResult.name}' where 'from' is '${startIsoDate}' and filter is '${osResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`,
+        message: `Found existing result '${osResult.name}' where 'from' is '${startIsoDate}' and filter is '${osResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`,
         method: "collect-os-key-figures.persistToDatabase",
       });
       await query("DROP TABLE IF EXISTS ??", [DUPLICATES_TABLE_NAME]);
@@ -397,6 +388,9 @@ export async function getApiPaths(): Promise<
   const marineSwaggerPaths = await getPaths(
     "https://meri.digitraffic.fi/swagger/openapi.json",
   );
+  const afirSwaggerPaths = await getPaths(
+    "https://afir.digitraffic.fi/swagger/openapi.json",
+  );
 
   railSwaggerPaths.add("/api/v2/graphql/");
   railSwaggerPaths.add("/api/v1/trains/history");
@@ -423,6 +417,10 @@ export async function getApiPaths(): Promise<
     {
       transportType: transportType.MARINE,
       paths: marineSwaggerPaths,
+    },
+    {
+      transportType: transportType.AFIR,
+      paths: afirSwaggerPaths,
     },
   ];
 }
@@ -463,8 +461,7 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
   } catch (error) {
     if (error instanceof HTTPError) {
       logger.error({
-        message:
-          `Fetching OpenApi description from ${endpointUrl} failed with: ${error.message}`,
+        message: `Fetching OpenApi description from ${endpointUrl} failed with: ${error.message}`,
         method: "collect-os-key-figures.getPaths",
       });
     }
