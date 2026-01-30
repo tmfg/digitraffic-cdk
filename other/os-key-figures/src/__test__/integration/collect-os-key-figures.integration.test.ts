@@ -22,7 +22,7 @@ import {
 import ky from "ky";
 import mysql from "mysql";
 import type { OpenSearch } from "../../api/opensearch.js";
-import type { TransportType } from "../../constants";
+import type { TransportType } from "../../constants.js";
 import type { OpenSearchTestDocument } from "./setup.js";
 import {
   clearTestIndex,
@@ -99,7 +99,9 @@ describe("Integration Tests: collect-os-key-figures", () => {
     test("should fetch API paths from real OpenAPI endpoints", async () => {
       // This test uses real endpoints as decided
       // Retry logic for transient network failures
-      let apiPaths: { transportType: TransportType; paths: Set<string> }[];
+      let apiPaths:
+        | { transportType: TransportType; paths: Set<string> }[]
+        | undefined;
       let lastError: unknown;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
@@ -138,7 +140,7 @@ describe("Integration Tests: collect-os-key-figures", () => {
 
     test("should parse OpenAPI paths correctly from rata.digitraffic.fi", async () => {
       // Retry logic for transient network failures
-      let paths: Set<string>;
+      let paths: Set<string> | undefined;
       let lastError: unknown;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
