@@ -1,7 +1,7 @@
 /**
  * Integration tests for the collect-os-key-figures Lambda function.
  *
- * These tests verify the current behavior before refactoring.
+ * These tests verify the refactored hexagonal architecture implementation.
  * They use real OpenSearch and MySQL containers via Docker Compose.
  *
  * To run these tests:
@@ -21,8 +21,19 @@ import {
 } from "@jest/globals";
 import ky from "ky";
 import mysql from "mysql";
-import type { OpenSearch } from "../../api/opensearch.js";
-import type { TransportType } from "../../constants.js";
+import { KyResourceFetcher } from "../../adapters/driven/http/ky-resource-fetcher.js";
+import type { OpenSearchResponse } from "../../adapters/driven/opensearch/metric-query.js";
+import {
+  CountMetricQuery,
+  SumMetricQuery,
+  TermsMetricQuery,
+} from "../../adapters/driven/opensearch/metric-query.js";
+import { OpenSearchMetricSource } from "../../adapters/driven/opensearch/opensearch-metric-source.js";
+import { EndpointDiscoveryService } from "../../domain/services/endpoint-discovery-service.js";
+import { MetricValueType } from "../../domain/types/metric-value.js";
+import type { MonitoredEndpoints } from "../../domain/types/monitored-endpoints.js";
+// Static imports - no longer need dynamic imports since refactored code uses constructor injection
+import { Service } from "../../domain/types/service.js";
 import type { OpenSearchTestDocument } from "./setup.js";
 import {
   clearTestIndex,
@@ -30,20 +41,9 @@ import {
   deleteTestIndex,
   generateTestDocuments,
   seedTestData,
-  setTestEnvironment,
   TEST_CONFIG,
   waitForOpenSearch,
 } from "./setup.js";
-
-// Set up test environment before importing the lambda
-// This must happen before the lambda module is loaded
-setTestEnvironment();
-
-// We'll dynamically import the lambda functions after setting up environment
-let getApiPaths: typeof import("../../lambda/collect-os-key-figures.js").getApiPaths;
-let getOsResults: typeof import("../../lambda/collect-os-key-figures.js").getOsResults;
-let getKeyFigureOsQueries: typeof import("../../lambda/collect-os-key-figures.js").getKeyFigureOsQueries;
-let getPaths: typeof import("../../lambda/collect-os-key-figures.js").getPaths;
 
 // Test date range - last month
 const now = new Date();
@@ -53,7 +53,7 @@ const endDate = new Date(now.getFullYear(), now.getMonth(), 1);
 // MySQL connection for verifying persisted data
 let mysqlConnection: mysql.Connection;
 
-describe("Integration Tests: collect-os-key-figures", () => {
+describe("Integration Tests: Refactored Architecture", () => {
   beforeAll(async () => {
     // Wait for OpenSearch to be ready
     console.log("Waiting for OpenSearch...");
@@ -61,13 +61,6 @@ describe("Integration Tests: collect-os-key-figures", () => {
 
     // Create test index
     await createTestIndex();
-
-    // Import lambda functions after environment is set
-    const lambda = await import("../../lambda/collect-os-key-figures.js");
-    getApiPaths = lambda.getApiPaths;
-    getOsResults = lambda.getOsResults;
-    getKeyFigureOsQueries = lambda.getKeyFigureOsQueries;
-    getPaths = lambda.getPaths;
 
     // Set up MySQL connection
     mysqlConnection = mysql.createConnection({
@@ -77,10 +70,9 @@ describe("Integration Tests: collect-os-key-figures", () => {
       password: TEST_CONFIG.mysql.password,
       database: TEST_CONFIG.mysql.database,
     });
-  }, 60000); // 60 second timeout for container startup
+  }, 60000);
 
   afterAll(async () => {
-    // Clean up
     await deleteTestIndex();
 
     if (mysqlConnection) {
@@ -91,21 +83,26 @@ describe("Integration Tests: collect-os-key-figures", () => {
   });
 
   beforeEach(async () => {
-    // Clear test data before each test
     await clearTestIndex();
   });
 
-  describe("Endpoint Discovery (getApiPaths, getPaths)", () => {
-    test("should fetch API paths from real OpenAPI endpoints", async () => {
-      // This test uses real endpoints as decided
-      // Retry logic for transient network failures
-      let apiPaths:
-        | { transportType: TransportType; paths: Set<string> }[]
-        | undefined;
+  describe("EndpointDiscoveryService", () => {
+    test("should discover endpoints from real OpenAPI specs", async () => {
+      const httpClient = new KyResourceFetcher();
+      const config = {
+        openApiUrls: new Map([
+          [Service.RAIL, "https://rata.digitraffic.fi/swagger/openapi.json"],
+        ]),
+        customEndpoints: new Map<typeof Service.RAIL, string[]>(),
+      };
+
+      const discoveryService = new EndpointDiscoveryService(httpClient, config);
+
+      let endpoints: MonitoredEndpoints;
       let lastError: unknown;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          apiPaths = await getApiPaths();
+          endpoints = await discoveryService.discoverEndpoints(Service.RAIL);
           break;
         } catch (error) {
           lastError = error;
@@ -116,70 +113,43 @@ describe("Integration Tests: collect-os-key-figures", () => {
         }
       }
 
-      if (!apiPaths) {
+      if (!endpoints) {
         throw lastError;
       }
 
-      expect(apiPaths).toBeDefined();
-      expect(Array.isArray(apiPaths)).toBe(true);
-      expect(apiPaths.length).toBeGreaterThan(0);
-
-      // Verify structure
-      for (const apiPath of apiPaths) {
-        expect(apiPath).toHaveProperty("transportType");
-        expect(apiPath).toHaveProperty("paths");
-        expect(apiPath.paths instanceof Set).toBe(true);
-      }
-
-      // Verify we have paths for expected transport types
-      const transportTypes = apiPaths.map((p) => p.transportType);
-      expect(transportTypes).toContain("rail");
-      expect(transportTypes).toContain("road");
-      expect(transportTypes).toContain("marine");
-    }, 60000); // 60 second timeout for network calls with retries
-
-    test("should parse OpenAPI paths correctly from rata.digitraffic.fi", async () => {
-      // Retry logic for transient network failures
-      let paths: Set<string> | undefined;
-      let lastError: unknown;
-      for (let attempt = 1; attempt <= 3; attempt++) {
-        try {
-          paths = await getPaths(
-            "https://rata.digitraffic.fi/swagger/openapi.json",
-          );
-          break;
-        } catch (error) {
-          lastError = error;
-          console.log(`Attempt ${attempt} failed, retrying...`);
-          if (attempt < 3) {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-          }
-        }
-      }
-
-      if (!paths) {
-        throw lastError;
-      }
-
-      expect(paths).toBeDefined();
-      expect(paths instanceof Set).toBe(true);
-      expect(paths.size).toBeGreaterThan(0);
+      expect(endpoints).toBeDefined();
+      expect(endpoints.service).toBe(Service.RAIL);
+      expect(endpoints.endpoints.size).toBeGreaterThan(0);
 
       // Paths should end with /
-      for (const path of paths) {
+      for (const path of endpoints.endpoints) {
         expect(path.endsWith("/")).toBe(true);
       }
 
-      // Should include some known rail API paths
-      const pathArray = Array.from(paths);
+      // Should include known rail API paths
+      const pathArray = Array.from(endpoints.endpoints);
       const hasTrainsPath = pathArray.some((p) => p.includes("/trains"));
       expect(hasTrainsPath).toBe(true);
-    }, 15000);
+    }, 60000);
+
+    test("should include custom endpoints", async () => {
+      const httpClient = new KyResourceFetcher();
+      const customPaths = ["/api/v2/graphql/", "/custom-endpoint/"];
+      const config = {
+        openApiUrls: new Map<typeof Service.RAIL, string>(),
+        customEndpoints: new Map([[Service.RAIL, customPaths]]),
+      };
+
+      const discoveryService = new EndpointDiscoveryService(httpClient, config);
+      const endpoints = await discoveryService.discoverEndpoints(Service.RAIL);
+
+      expect(endpoints.endpoints.has("/api/v2/graphql/")).toBe(true);
+      expect(endpoints.endpoints.has("/custom-endpoint/")).toBe(true);
+    });
   });
 
-  describe("OpenSearch Query Execution (getOsResults)", () => {
-    test("should return count for HTTP requests (count type)", async () => {
-      // Seed test data
+  describe("OpenSearchMetricSource with MetricQuery", () => {
+    test("should return count for HTTP requests using CountMetricQuery", async () => {
       const testDocs = generateTestDocuments({
         accountName: TEST_CONFIG.accountNames.rail,
         startDate,
@@ -189,45 +159,40 @@ describe("Integration Tests: collect-os-key-figures", () => {
       });
       await seedTestData(testDocs);
 
-      // Create a mock OpenSearch API that works with local instance
-      const mockOpenSearchApi = createLocalOpenSearchApi();
-
-      // Get only the "Http req" query (count type)
-      const keyFigures = getKeyFigureOsQueries().filter(
-        (kf) => kf.name === "Http req",
-      );
-
-      const apiPaths = [
-        {
-          transportType: "rail" as const,
-          paths: new Set(["/api/v1/trains/"]),
+      const mockClient = createLocalOpenSearchClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const metricSource = new OpenSearchMetricSource(mockClient, {
+        defaultIndex: TEST_CONFIG.opensearch.index,
+        accountNames: {
+          [Service.ALL]: "*",
+          [Service.RAIL]: TEST_CONFIG.accountNames.rail,
+          [Service.ROAD]: TEST_CONFIG.accountNames.road,
+          [Service.MARINE]: TEST_CONFIG.accountNames.marine,
+          [Service.AFIR]: TEST_CONFIG.accountNames.afir,
         },
-      ];
+      });
 
-      const results = await getOsResults(
-        mockOpenSearchApi,
-        keyFigures,
-        apiPaths,
+      const scope = {
+        service: Service.RAIL,
+        storageTag: "@transport_type:rail",
+      };
+      const definition = {
+        name: "Http req",
+        valueType: MetricValueType.SCALAR,
+      };
+      const period = { from: startDate, to: endDate };
+
+      const value = await metricSource.retrieveMetric(
+        scope,
+        definition,
+        period,
       );
 
-      expect(results).toBeDefined();
-      expect(Array.isArray(results)).toBe(true);
-
-      // Should have results for the transport type level
-      const railResults = results.filter((r) =>
-        r.filter.dbFilter.includes("rail"),
-      );
-      expect(railResults.length).toBeGreaterThan(0);
-
-      // Value should be a number for count type
-      const countResult = railResults.find((r) => r.name === "Http req");
-      expect(countResult).toBeDefined();
-      expect(typeof countResult?.value).toBe("number");
-      expect(countResult?.value).toBeGreaterThanOrEqual(0);
+      expect(typeof value).toBe("number");
+      expect(value).toBeGreaterThanOrEqual(0);
     }, 30000);
 
-    test("should return aggregation value for bytes (agg type)", async () => {
-      // Seed test data with known byte sizes
+    test("should return sum for bytes using SumMetricQuery", async () => {
       const testDocs: OpenSearchTestDocument[] = [];
       for (let i = 0; i < 50; i++) {
         testDocs.push({
@@ -239,44 +204,54 @@ describe("Integration Tests: collect-os-key-figures", () => {
           request: "GET /api/v1/data/ HTTP/1.1",
           httpHost: "tie.digitraffic.fi",
           response_status: 200,
-          response_body_size: 1000, // 1000 bytes each
+          response_body_size: 1000,
           remote_addr: "192.168.1.1",
           skip_statistics: false,
         });
       }
       await seedTestData(testDocs);
 
-      const mockOpenSearchApi = createLocalOpenSearchApi();
-
-      // Get "Bytes out" query (agg type with sum)
-      const keyFigures = getKeyFigureOsQueries().filter(
-        (kf) => kf.name === "Bytes out",
-      );
-
-      const apiPaths = [
-        {
-          transportType: "road" as const,
-          paths: new Set<string>(),
+      const mockClient = createLocalOpenSearchClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const metricSource = new OpenSearchMetricSource(mockClient, {
+        defaultIndex: TEST_CONFIG.opensearch.index,
+        accountNames: {
+          [Service.ALL]: "*",
+          [Service.RAIL]: TEST_CONFIG.accountNames.rail,
+          [Service.ROAD]: TEST_CONFIG.accountNames.road,
+          [Service.MARINE]: TEST_CONFIG.accountNames.marine,
+          [Service.AFIR]: TEST_CONFIG.accountNames.afir,
         },
-      ];
+      });
 
-      const results = await getOsResults(
-        mockOpenSearchApi,
-        keyFigures,
-        apiPaths,
+      const scope = {
+        service: Service.ROAD,
+        storageTag: "@transport_type:road",
+      };
+      const definition = {
+        name: "Bytes out",
+        valueType: MetricValueType.SCALAR,
+      };
+      const period = { from: startDate, to: endDate };
+
+      const value = await metricSource.retrieveMetric(
+        scope,
+        definition,
+        period,
       );
 
-      const bytesResult = results.find((r) => r.name === "Bytes out");
-      expect(bytesResult).toBeDefined();
-      expect(typeof bytesResult?.value).toBe("number");
+      expect(typeof value).toBe("number");
     }, 30000);
 
-    test("should return distribution for field aggregation (field_agg type)", async () => {
-      // Seed test data with various status codes
+    test("should return distribution for terms aggregation using TermsMetricQuery", async () => {
       const testDocs: OpenSearchTestDocument[] = [];
-      const statusCodes = [200, 200, 200, 304, 404, 500];
+      const referers = [
+        "https://google.com",
+        "https://github.com",
+        "https://example.com",
+      ];
 
-      for (const status of statusCodes) {
+      for (let i = 0; i < 30; i++) {
         testDocs.push({
           "@timestamp": new Date(
             startDate.getTime() +
@@ -285,45 +260,49 @@ describe("Integration Tests: collect-os-key-figures", () => {
           accountName: TEST_CONFIG.accountNames.marine,
           request: "GET /api/v1/vessels/ HTTP/1.1",
           httpHost: "meri.digitraffic.fi",
-          response_status: status,
+          response_status: 200,
           response_body_size: 500,
           remote_addr: "10.0.0.1",
           skip_statistics: false,
+          httpReferer: referers[i % referers.length],
         });
       }
       await seedTestData(testDocs);
 
-      const mockOpenSearchApi = createLocalOpenSearchApi();
-
-      // Find a field_agg type query - should exist in the query definitions
-      const keyFigures = getKeyFigureOsQueries().filter(
-        (kf) => kf.type === "field_agg",
-      );
-
-      // Test should fail if there are no field_agg queries defined
-      expect(keyFigures.length).toBeGreaterThan(0);
-
-      const apiPaths = [
-        {
-          transportType: "marine" as const,
-          paths: new Set<string>(),
+      const mockClient = createLocalOpenSearchClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const metricSource = new OpenSearchMetricSource(mockClient, {
+        defaultIndex: TEST_CONFIG.opensearch.index,
+        accountNames: {
+          [Service.ALL]: "*",
+          [Service.RAIL]: TEST_CONFIG.accountNames.rail,
+          [Service.ROAD]: TEST_CONFIG.accountNames.road,
+          [Service.MARINE]: TEST_CONFIG.accountNames.marine,
+          [Service.AFIR]: TEST_CONFIG.accountNames.afir,
         },
-      ];
+      });
 
-      const results = await getOsResults(
-        mockOpenSearchApi,
-        keyFigures,
-        apiPaths,
+      const scope = {
+        service: Service.MARINE,
+        storageTag: "@transport_type:marine",
+      };
+      const definition = {
+        name: "Top 10 Referers",
+        valueType: MetricValueType.CATEGORICAL_COUNTS,
+      };
+      const period = { from: startDate, to: endDate };
+
+      const value = await metricSource.retrieveMetric(
+        scope,
+        definition,
+        period,
       );
 
-      // For field_agg, value should be an object
-      const fieldAggResult = results.find((r) => r.type === "field_agg");
-      expect(fieldAggResult).toBeDefined();
-      expect(typeof fieldAggResult?.value).toBe("object");
+      expect(typeof value).toBe("object");
+      expect(value).not.toBeNull();
     }, 30000);
 
-    test("should handle multiple transport types", async () => {
-      // Seed data for multiple services
+    test("should handle multiple services", async () => {
       const railDocs = generateTestDocuments({
         accountName: TEST_CONFIG.accountNames.rail,
         startDate,
@@ -342,94 +321,124 @@ describe("Integration Tests: collect-os-key-figures", () => {
 
       await seedTestData([...railDocs, ...roadDocs]);
 
-      const mockOpenSearchApi = createLocalOpenSearchApi();
-      const keyFigures = getKeyFigureOsQueries().filter(
-        (kf) => kf.name === "Http req",
+      const mockClient = createLocalOpenSearchClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const metricSource = new OpenSearchMetricSource(mockClient, {
+        defaultIndex: TEST_CONFIG.opensearch.index,
+        accountNames: {
+          [Service.ALL]: "*",
+          [Service.RAIL]: TEST_CONFIG.accountNames.rail,
+          [Service.ROAD]: TEST_CONFIG.accountNames.road,
+          [Service.MARINE]: TEST_CONFIG.accountNames.marine,
+          [Service.AFIR]: TEST_CONFIG.accountNames.afir,
+        },
+      });
+
+      const definition = {
+        name: "Http req",
+        valueType: MetricValueType.SCALAR,
+      };
+      const period = { from: startDate, to: endDate };
+
+      const railValue = await metricSource.retrieveMetric(
+        { service: Service.RAIL, storageTag: "@transport_type:rail" },
+        definition,
+        period,
       );
 
-      const apiPaths = [
-        { transportType: "rail" as const, paths: new Set<string>() },
-        { transportType: "road" as const, paths: new Set<string>() },
-      ];
-
-      const results = await getOsResults(
-        mockOpenSearchApi,
-        keyFigures,
-        apiPaths,
+      const roadValue = await metricSource.retrieveMetric(
+        { service: Service.ROAD, storageTag: "@transport_type:road" },
+        definition,
+        period,
       );
 
-      // Should have results for both transport types
-      const railResults = results.filter((r) =>
-        r.filter.dbFilter.includes("rail"),
-      );
-      const roadResults = results.filter((r) =>
-        r.filter.dbFilter.includes("road"),
-      );
-
-      expect(railResults.length).toBeGreaterThan(0);
-      expect(roadResults.length).toBeGreaterThan(0);
+      expect(typeof railValue).toBe("number");
+      expect(typeof roadValue).toBe("number");
+      expect(railValue).toBeGreaterThanOrEqual(0);
+      expect(roadValue).toBeGreaterThanOrEqual(0);
     }, 30000);
   });
 
-  describe("Key Figure Queries", () => {
-    test("should return all expected key figure query definitions", () => {
-      const keyFigures = getKeyFigureOsQueries();
+  describe("MetricQuery classes", () => {
+    test("CountMetricQuery should build valid query", () => {
+      const query = new CountMetricQuery(
+        "Http req",
+        TEST_CONFIG.opensearch.index,
+      );
+      const params = {
+        accountFilter: `accountName.keyword:${TEST_CONFIG.accountNames.rail}`,
+        period: { from: startDate, to: endDate },
+      };
 
-      expect(keyFigures).toBeDefined();
-      expect(Array.isArray(keyFigures)).toBe(true);
-      expect(keyFigures.length).toBeGreaterThan(0);
+      const queryString = query.buildQuery(params);
+      const parsed = JSON.parse(queryString);
 
-      // Verify structure
-      for (const kf of keyFigures) {
-        expect(kf).toHaveProperty("name");
-        expect(kf).toHaveProperty("query");
-        expect(kf).toHaveProperty("type");
-        expect(typeof kf.name).toBe("string");
-        expect(typeof kf.query).toBe("string");
-        expect(["count", "agg", "field_agg", "sub_agg"]).toContain(kf.type);
-      }
-
-      // Verify we have different types
-      const types = new Set(keyFigures.map((kf) => kf.type));
-      expect(types.has("count")).toBe(true);
-      expect(types.has("agg")).toBe(true);
+      expect(parsed).toHaveProperty("query");
+      expect(parsed.query).toHaveProperty("bool");
+      expect(parsed.query.bool).toHaveProperty("must");
+      expect(parsed.query.bool).toHaveProperty("filter");
     });
 
-    test("should have time placeholders in queries", () => {
-      const keyFigures = getKeyFigureOsQueries();
+    test("SumMetricQuery should build valid aggregation query", () => {
+      const query = new SumMetricQuery(
+        "Bytes out",
+        TEST_CONFIG.opensearch.index,
+        "bytes",
+      );
+      const params = {
+        accountFilter: `accountName.keyword:${TEST_CONFIG.accountNames.road}`,
+        period: { from: startDate, to: endDate },
+      };
 
-      for (const kf of keyFigures) {
-        expect(kf.query).toContain("START_TIME");
-        expect(kf.query).toContain("END_TIME");
-      }
+      const queryString = query.buildQuery(params);
+      const parsed = JSON.parse(queryString);
+
+      expect(parsed).toHaveProperty("aggs");
+      expect(parsed.aggs).toHaveProperty("agg");
+      expect(parsed.aggs.agg).toHaveProperty("sum");
+      expect(parsed).toHaveProperty("size", 0);
     });
 
-    test("should have account filter placeholder in queries", () => {
-      const keyFigures = getKeyFigureOsQueries();
+    test("TermsMetricQuery should build valid terms aggregation query", () => {
+      const query = new TermsMetricQuery(
+        "Top 10 IPs",
+        TEST_CONFIG.opensearch.index,
+        "clientIp",
+        10,
+      );
+      const params = {
+        accountFilter: `accountName.keyword:${TEST_CONFIG.accountNames.marine}`,
+        period: { from: startDate, to: endDate },
+      };
 
-      for (const kf of keyFigures) {
-        expect(kf.query).toContain("accountName.keyword:*");
-      }
+      const queryString = query.buildQuery(params);
+      const parsed = JSON.parse(queryString);
+
+      expect(parsed).toHaveProperty("aggs");
+      expect(parsed.aggs).toHaveProperty("agg");
+      expect(parsed.aggs.agg).toHaveProperty("terms");
+      expect(parsed.aggs.agg.terms).toHaveProperty("field", "clientIp");
+      expect(parsed.aggs.agg.terms).toHaveProperty("size", 10);
     });
   });
 });
 
 /**
- * Create a mock OpenSearch API client that works with the local test instance.
- * This bypasses AWS authentication since our test OpenSearch doesn't require it.
- * We use type assertion to satisfy the OpenSearch type requirement.
+ * Create a mock OpenSearch client that works with the local test instance.
  */
-function createLocalOpenSearchApi(): OpenSearch {
-  const mockApi = {
-    actualHost: TEST_CONFIG.opensearch.host,
-    endpointHost: TEST_CONFIG.opensearch.url,
-    credentials: {},
-
+function createLocalOpenSearchClient(): {
+  makeOsQuery(
+    index: string,
+    method: string,
+    query: string,
+  ): Promise<OpenSearchResponse>;
+} {
+  return {
     async makeOsQuery(
       _index: string,
       method: string,
       query: string,
-    ): Promise<unknown> {
+    ): Promise<OpenSearchResponse> {
       const url = `${TEST_CONFIG.opensearch.url}/${TEST_CONFIG.opensearch.index}/${method}`;
 
       try {
@@ -439,7 +448,7 @@ function createLocalOpenSearchApi(): OpenSearch {
             headers: { "Content-Type": "application/json" },
             timeout: 30000,
           })
-          .json();
+          .json<OpenSearchResponse>();
 
         return response;
       } catch (error) {
@@ -447,10 +456,5 @@ function createLocalOpenSearchApi(): OpenSearch {
         throw error;
       }
     },
-
-    handleResponseFromOs: () => {},
-    signOsRequest: async () => ({}),
   };
-
-  return mockApi as unknown as OpenSearch;
 }
