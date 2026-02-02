@@ -28,17 +28,17 @@ describe("parser-35-tests", () => {
     expect(situations.length).toEqual(1);
     expect(situations[0]!.id).toEqual("VME038713");
     expect(situations[0]!.type).toEqual("CONTROLLER_STATUS");
-    expect(situations[0]!.datex2.startsWith("<vmsControllerStatus"))
-      .toBeTruthy();
+    expect(
+      situations[0]!.datex2.startsWith("<vmsControllerStatus"),
+    ).toBeTruthy();
   });
 
   test("parse vmsTablePublication", async () => {
     const situations = await parseDatex(TEST_DATEX2_VMS_TABLE_PUBLICATION);
 
-    expect(situations.length).toEqual(1);
-    expect(situations[0]!.id).toEqual("VME015511");
+    expect(situations.length).toEqual(2);
+    expect(situations[0]!.id).toEqual("VME/VLK014512");
     expect(situations[0]!.type).toEqual("CONTROLLER");
-    expect(situations[0]!.datex2.startsWith("<vmsController"))
-      .toBeTruthy();
+    expect(situations[0]!.datex2.startsWith("<vmsController")).toBeTruthy();
   });
 });

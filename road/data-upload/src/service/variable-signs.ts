@@ -1,14 +1,13 @@
-import {
-  type DTDatabase,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
-import { updateDatex2 } from "../dao/variable-signs.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { type DataIncomingDb, getNewData, updateStatus } from "../dao/data.js";
-import { Datex2Version, SOURCES, TYPES } from "../model/types.js";
-import { parseSituations223 } from "./vs-datex2-223-parser.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import type { DataIncomingDb } from "../dao/data.js";
+import { getNewData, updateStatus } from "../dao/data.js";
+import { updateDatex2 } from "../dao/variable-signs.js";
+import { Datex2Version, SOURCES, TYPES } from "../model/types.js";
 import { parseDatex } from "./vs-datex2-35-parser.js";
+import { parseSituations223 } from "./vs-datex2-223-parser.js";
 
 export type DatexType = "SITUATION" | "CONTROLLER_STATUS" | "CONTROLLER";
 export interface DatexFile {
@@ -25,20 +24,23 @@ export async function handleVariableSignMessages(): Promise<void> {
       TYPES.VMS_DATEX2_METADATA_XML,
     ]);
 
-    await Promise.allSettled(unhandled.map(async (data) => {
-      try {
-        await handleVariableSign(db, data);
+    await Promise.allSettled(
+      unhandled.map(async (data) => {
+        try {
+          await handleVariableSign(db, data);
 
-        await updateStatus(db, data.data_id, "PROCESSED");
-      } catch (error) {
-        logger.error({
-          method: "VariableSignsService.handleVariableSignMessages",
-          error,
-        });
+          await updateStatus(db, data.data_id, "PROCESSED");
+        } catch (error) {
+          logger.error({
+            method: "VariableSignsService.handleVariableSignMessages",
+            customDataId: data.data_id,
+            error,
+          });
 
-        await updateStatus(db, data.data_id, "FAILED");
-      }
-    }));
+          await updateStatus(db, data.data_id, "FAILED");
+        }
+      }),
+    );
   });
 }
 
@@ -55,58 +57,69 @@ async function handleVariableSign(
   const xml = data.data;
   const started = Date.now();
 
+  logger.info({
+    method,
+    message: `Processing variable sign data_id=${data.data_id}, version=${data.version}`,
+  });
+
   switch (data.version) {
-    case Datex2Version["2.2.3"]:
+    case Datex2Version["2.2.3"]: {
       const situations223 = parseSituations223(xml);
 
       if (situations223.length === 0) {
         logger.debug(`No situations parsed from ${data.data_id}!`);
       }
 
-      await Promise.allSettled(situations223.map(async (s) => {
-        updated223Count++;
-        try {
-          await updateDatex2(
-            db,
-            s.id,
-            data.version,
-            s.type,
-            s.datex2,
-            s.effectDate,
-          );
-        } catch (error) {
-          logException(logger, error);
-          error223Count++;
-        }
-      }));
+      await Promise.allSettled(
+        situations223.map(async (s) => {
+          updated223Count++;
+          try {
+            await updateDatex2(
+              db,
+              s.id,
+              data.version,
+              s.type,
+              s.datex2,
+              s.effectDate,
+            );
+          } catch (error) {
+            logException(logger, error);
+            error223Count++;
+          }
+        }),
+      );
 
       break;
+    }
 
-    case Datex2Version["3.5"]:
+    case Datex2Version["3.5"]: {
       const datexFiles = await parseDatex(xml);
 
       if (datexFiles.length === 0) {
         logger.debug(`No datex files parsed from ${data.data_id}!`);
       }
 
-      await Promise.allSettled(datexFiles.map(async (df) => {
-        updated35Count++;
-        try {
-          await updateDatex2(
-            db,
-            df.id,
-            data.version,
-            df.type,
-            df.datex2,
-            df.effectDate,
-          );
-        } catch (error) {
-          logException(logger, error);
-          error35Count++;
-        }
-      }));
+      await Promise.allSettled(
+        datexFiles.map(async (df) => {
+          updated35Count++;
+          try {
+            await updateDatex2(
+              db,
+              df.id,
+              data.version,
+              df.type,
+              df.datex2,
+              df.effectDate,
+            );
+          } catch (error) {
+            logException(logger, error);
+            error35Count++;
+          }
+        }),
+      );
 
       break;
+    }
     default:
       unknownCount++;
       logger.error({

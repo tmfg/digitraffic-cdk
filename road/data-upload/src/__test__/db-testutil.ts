@@ -1,6 +1,6 @@
-import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Countable } from "@digitraffic/common/dist/database/models";
+import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { DataStatus } from "../model/types.js";
 
@@ -14,6 +14,7 @@ function truncate(db: DTDatabase): Promise<void> {
   return db.tx(async (t) => {
     await t.none("DELETE FROM data_incoming");
     await t.none("DELETE FROM device_data_datex2");
+    await t.none("DELETE FROM datex2_rtti");
   });
 }
 
@@ -33,8 +34,7 @@ export async function assertRttiDatex2Count(
   db: DTDatabase,
   expectedCount: number,
 ): Promise<void> {
-  const sql =
-    "select count(*) as count from datex2_rtti";
+  const sql = "select count(*) as count from datex2_rtti";
   const dataCount: Countable = await db.one(sql);
 
   expect(dataCount.count).toEqual(expectedCount);

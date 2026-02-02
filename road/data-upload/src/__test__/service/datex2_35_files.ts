@@ -1,5 +1,4 @@
-export const TEST_DATEX2_SITUATION_PUBLICATION =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+export const TEST_DATEX2_SITUATION_PUBLICATION = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <sit:situationPublication lang="fi" modelBaseVersion="3"
 	xmlns:com="http://datex2.eu/schema/3/common"
 	xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
@@ -58,8 +57,7 @@ export const TEST_DATEX2_SITUATION_PUBLICATION =
 	</sit:situation>
 </sit:situationPublication>`;
 
-export const TEST_DATEX2_SITUATION =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+export const TEST_DATEX2_SITUATION = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
   <d2:payload xsi:type="sit:SituationPublication">
   	<com:publicationTime>2025-10-17T08:15:52.992Z</com:publicationTime>
 	<sit:situation id="KRM123456">
@@ -99,8 +97,7 @@ export const TEST_DATEX2_SITUATION =
 	</sit:situation>
 </d2:payload>`;
 
-export const TEST_DATEX2_VMSPUBLICATION_1 =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+export const TEST_DATEX2_VMSPUBLICATION_1 = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2:payload xsi:type="vms:VmsPublication"
 	xmlns:com="http://datex2.eu/schema/3/common"
 	xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
@@ -151,8 +148,8 @@ export const TEST_DATEX2_VMSPUBLICATION_1 =
 </d2:payload>
 `;
 
-export const TEST_DATEX2_VMS_TABLE_PUBLICATION =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+export const TEST_DATEX2_VMS_TABLE_PUBLICATION = `
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2:payload xsi:type="vms:VmsTablePublication"
 	xmlns:com="http://datex2.eu/schema/3/common"
 	xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
@@ -170,33 +167,42 @@ export const TEST_DATEX2_VMS_TABLE_PUBLICATION =
 	xmlns:vms="http://datex2.eu/schema/3/vms"
 	xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
 	xmlns:sit="http://datex2.eu/schema/3/situation">
-	<publicationTime>2025-10-20T02:12:19.331Z</publicationTime>
-	<publicationCreator>
-		<country>FI</country>
-		<nationalIdentifier>FTA</nationalIdentifier>
-	</publicationCreator>
-	<headerInformation>
-		<confidentiality>noRestriction</confidentiality>
-		<informationStatus>real</informationStatus>
-	</headerInformation>
-	<vmsControllerTable>
-		<vmsController id="VME015511">
-			<vms vmsIndex="0">
-				<vms>
-					<description>
-						<values>
-							<com:value lang="fi">Varoitusmerkki. Yhteismerkki KRM015512-merkin kanssa. Kts. Merkin IP-osoitteet VME015511/KRM015512-hallinta, VME015511/KRM015512-kontrolleri ja VME015511/KRM015512-s laitteilta.</com:value>
-						</values>
-					</description>
-					<vmsType>other</vmsType>
-					<vmsLocation xsi:type="PointLocation">
-						<coordinatesForDisplay>
-							<latitude>6683809.0</latitude>
-							<longitude>406975.0</longitude>
-						</coordinatesForDisplay>
-					</vmsLocation>
-				</vms>
-			</vms>
-		</vmsController>
-	</vmsControllerTable>
+	<com:publicationTime>2026-01-29T03:13:18.397Z</com:publicationTime>
+	<com:publicationCreator>
+		<com:country>FI</com:country>
+		<com:nationalIdentifier>FTA</com:nationalIdentifier>
+	</com:publicationCreator>
+	<vms:headerInformation>
+		<com:confidentiality>noRestriction</com:confidentiality>
+		<com:informationStatus>real</com:informationStatus>
+	</vms:headerInformation>
+	<vms:vmsControllerTable>
+		<vms:vmsController id="VME/VLK014512">
+			<vms:vms vmsIndex="0">
+				<vms:vms>
+					<vms:vmsType>other</vms:vmsType>
+					<vms:vmsLocation xsi:type="loc:PointLocation">
+						<loc:coordinatesForDisplay>
+							<loc:latitude>6676544.0</loc:latitude>
+							<loc:longitude>377334.0</loc:longitude>
+						</loc:coordinatesForDisplay>
+					</vms:vmsLocation>
+				</vms:vms>
+			</vms:vms>
+		</vms:vmsController>
+		<vms:vmsController id="VME/VLK014522">
+			<vms:vms vmsIndex="0">
+				<vms:vms>
+					<vms:vmsType>other</vms:vmsType>
+					<vms:vmsLocation xsi:type="loc:PointLocation">
+						<loc:coordinatesForDisplay>
+							<loc:latitude>6676544.0</loc:latitude>
+							<loc:longitude>377334.0</loc:longitude>
+						</loc:coordinatesForDisplay>
+					</vms:vmsLocation>
+				</vms:vms>
+			</vms:vms>
+		</vms:vmsController>
+	
+	</vms:vmsControllerTable>
 </d2:payload>`;
