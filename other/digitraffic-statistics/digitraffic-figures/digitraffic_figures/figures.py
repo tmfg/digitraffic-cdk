@@ -40,7 +40,7 @@ class Figures:
         dff = df.loc[
             (df["name"].isin(["Http req", "Bytes out"]))
             & (df["request_uri"] == "")
-            & (df["liikennemuoto"].isin(["tie", "rata", "meri"])),
+            & (df["liikennemuoto"].isin(["tie", "rata", "meri", "afir"])),
             ["from", "liikennemuoto", "name", "value"],
         ]
 
@@ -75,7 +75,7 @@ class Figures:
         dff = df.loc[
             (df["name"].isin(["Http req", "Bytes out"]))
             & (df["request_uri"] == "")
-            & (df["liikennemuoto"].isin(["tie", "rata", "meri"])),
+            & (df["liikennemuoto"].isin(["tie", "rata", "meri", "afir"])),
             ["from", "liikennemuoto", "name", "value"],
         ]
 

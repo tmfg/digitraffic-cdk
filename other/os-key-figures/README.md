@@ -30,42 +30,88 @@ Metrics are collected per-service (RAIL, ROAD, MARINE, AFIR) and per-endpoint.
 
 The codebase follows **Hexagonal Architecture (Ports and Adapters)**:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        Lambda Handler                                    │
-│                    (Orchestrates the flow)                              │
-└─────────────────────────────────────────────────────────────────────────┘
-                                  │
-                    ┌─────────────┴─────────────┐
-                    ▼                           ▼
-        ┌───────────────────────┐   ┌───────────────────────────┐
-        │ ForCollectingMetrics  │   │ ForDiscoveringEndpoints   │
-        │   (Driving Port)      │   │   (Driving Port)          │
-        └───────────────────────┘   └───────────────────────────┘
-                    │                           │
-                    ▼                           ▼
-        ┌───────────────────────┐   ┌───────────────────────────┐
-        │MetricCollectionService│   │EndpointDiscoveryService   │
-        │   (Domain Service)    │   │   (Domain Service)        │
-        └───────────────────────┘   └───────────────────────────┘
-                    │
-        ┌───────────┴───────────┐
-        ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐
-│ForRetrievingMet.│     │ForPersistingMet.│
-│ (Driven Port)   │     │ (Driven Port)   │
-└─────────────────┘     └─────────────────┘
-        │                       │
-        ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐
-│OpenSearchMetric │     │MySqlMetricStore │
-│Source (Adapter) │     │   (Adapter)     │
-└─────────────────┘     └─────────────────┘
+```mermaid
+classDiagram
+    direction TB
+    
+    %% Lambda Handler
+    class LambdaHandler {
+        +handler(event)
+    }
+    
+    %% Driving Ports
+    class ForCollectingMetrics {
+        <<interface>>
+    }
+    class ForDiscoveringEndpoints {
+        <<interface>>
+    }
+    
+    %% Domain Services
+    class MetricCollectionService {
+        +collectAndPersist()
+    }
+    class EndpointDiscoveryService {
+        +discoverEndpoints()
+    }
+    
+    %% Driven Ports
+    class ForRetrievingMetrics {
+        <<interface>>
+    }
+    class ForPersistingMetrics {
+        <<interface>>
+    }
+    class ForFetchingResources {
+        <<interface>>
+    }
+    
+    %% Adapters
+    class OpenSearchMetricSource
+    class MySqlMetricStore
+    class KyResourceFetcher
+    
+    %% Relationships
+    LambdaHandler --> ForCollectingMetrics : uses
+    LambdaHandler --> ForDiscoveringEndpoints : uses
+    
+    ForCollectingMetrics <|.. MetricCollectionService : implements
+    ForDiscoveringEndpoints <|.. EndpointDiscoveryService : implements
+    
+    MetricCollectionService --> ForRetrievingMetrics : uses
+    MetricCollectionService --> ForPersistingMetrics : uses
+    EndpointDiscoveryService --> ForFetchingResources : uses
+    
+    ForRetrievingMetrics <|.. OpenSearchMetricSource : implements
+    ForPersistingMetrics <|.. MySqlMetricStore : implements
+    ForFetchingResources <|.. KyResourceFetcher : implements
 ```
 
 ### Key Concepts
 
-The domain speaks in terms of **Metrics**, **Scopes**, and **Time Periods**.
+#### Domain Types
+
+| Term | Description |
+|------|-------------|
+| **Service** | Enum representing Digitraffic services: `RAIL`, `ROAD`, `MARINE`, `AFIR`, `ALL` |
+| **MetricScope** | Defines *what* we're collecting metrics for — a service, optionally an endpoint, and a `storageTag` for database persistence |
+| **MetricDefinition** | Defines *which* metric to collect — name and value type (`SCALAR` or `CATEGORICAL_COUNTS`) |
+| **TimePeriod** | The time range for metric collection (`from`/`to` dates) |
+
+#### Error Types
+
+| Term | Description |
+|------|-------------|
+| **CollectionError** | Base error class with context: scope, definition, input values, and stack trace |
+| **MetricSourceError** | Error from data retrieval (OpenSearch). Extends `CollectionError` with optional `statusCode` |
+| **MetricStoreError** | Error from persistence (MySQL). Extends `CollectionError` with optional `operation` name |
+
+#### Domain Services
+
+| Term | Description |
+|------|-------------|
+| **MetricCollectionService** | Orchestrates metric collection — retrieves metrics via `ForRetrievingMetrics` port and persists via `ForPersistingMetrics` port. Implements `ForCollectingMetrics` driving port |
+| **EndpointDiscoveryService** | Discovers API endpoints from OpenAPI specs and custom configurations. Uses `ForFetchingResources` port. Implements `ForDiscoveringEndpoints` driving port |
 
 ---
 
@@ -177,7 +223,11 @@ function createAccountNames(): Record<Service, string> {
 
 **Step 5: Add environment variables and collect statistics for the new service** (`os-key-figures-stack.ts`)
 
-Add environment variables to `lambdaConf` and add a new rule. 
+Add environment variables to `lambdaConf` and add a new rule.
+
+**Step 6 (OPTIONAL): Update digitraffic-statistics project**
+
+If you want to visualize the new service's metrics, update the `digitraffic-statistics` project to include it.
 
 ---
 
