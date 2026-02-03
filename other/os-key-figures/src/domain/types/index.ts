@@ -22,6 +22,7 @@ export {
 export {
   isCategoricalCountsValue,
   isScalarValue,
+  type MetricRetrievalResult,
   type MetricValue,
   MetricValueType,
 } from "./metric-value.js";

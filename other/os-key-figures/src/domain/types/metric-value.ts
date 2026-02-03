@@ -21,6 +21,14 @@ export enum MetricValueType {
  */
 export type MetricValue = number | Record<string, number>;
 
+/**
+ * Result from retrieving a metric, includes the query for storage.
+ */
+export interface MetricRetrievalResult {
+  readonly value: MetricValue;
+  readonly query: string;
+}
+
 export function isScalarValue(value: MetricValue): value is number {
   return typeof value === "number";
 }

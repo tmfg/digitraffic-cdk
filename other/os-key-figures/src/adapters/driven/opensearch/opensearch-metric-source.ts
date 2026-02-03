@@ -1,7 +1,10 @@
 import { MetricSourceError } from "../../../domain/errors/collection-error.js";
 import type { MetricDefinition } from "../../../domain/types/metric-definition.js";
 import type { MetricScope } from "../../../domain/types/metric-scope.js";
-import type { MetricValue } from "../../../domain/types/metric-value.js";
+import type {
+  MetricRetrievalResult,
+  MetricValue,
+} from "../../../domain/types/metric-value.js";
 import { Service } from "../../../domain/types/service.js";
 import type { TimePeriod } from "../../../domain/types/time-period.js";
 import type { ForRetrievingMetrics } from "../../../ports/driven/for-retrieving-metrics.js";
@@ -33,14 +36,6 @@ export interface OpenSearchClient {
     method: string,
     query: string,
   ): Promise<OpenSearchResponse>;
-}
-
-/**
- * Result from retrieving a metric, includes the query for storage.
- */
-export interface MetricRetrievalResult {
-  readonly value: MetricValue;
-  readonly query: string;
 }
 
 /**

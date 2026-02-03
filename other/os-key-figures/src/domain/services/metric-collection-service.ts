@@ -76,11 +76,11 @@ export class MetricCollectionService implements ForCollectingMetrics {
     definition: MetricDefinition,
     period: TimePeriod,
   ): Promise<CollectedMetric> {
-    const value = await this.metricSource.retrieveMetric(
+    const { value, query } = await this.metricSource.retrieveMetricWithQuery(
       scope,
       definition,
       period,
     );
-    return createCollectedMetric(definition, scope, value, period);
+    return createCollectedMetric(definition, scope, value, period, query);
   }
 }

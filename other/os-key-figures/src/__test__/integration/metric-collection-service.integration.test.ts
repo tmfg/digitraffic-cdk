@@ -284,6 +284,18 @@ describe("Integration Tests: MetricCollectionService.collectAndPersist", () => {
 
       const persistedMetrics = await getPersistedMetrics();
       expect(persistedMetrics.length).toBe(2);
+      const peristedServiceMetric = persistedMetrics.find(
+        (m) => m.filter === "@transport_type:marine",
+      );
+      const persistedEndpointMetric = persistedMetrics.find(
+        (m) =>
+          m.filter ===
+          '@transport_type:marine AND @fields.request_uri:"/api/v1/vessels/"',
+      );
+      expect(peristedServiceMetric).toBeDefined();
+      expect(persistedEndpointMetric).toBeDefined();
+      expect(peristedServiceMetric?.query).toBeDefined();
+      expect(persistedEndpointMetric?.query).toBeDefined();
 
       // Verify that the endpoint-level metric has fewer requests than service-level
       // since it filters to only /api/v1/vessels/ paths

@@ -210,7 +210,7 @@ pnpm run test:integration:teardown
 ### One-liner (all steps)
 
 ```bash
-pnpm run test:integration:setup && pnpm run test:integration; pnpm run test:integration:teardown
+pnpm run test:integration:setup && pnpm run test:integration && pnpm run test:integration:teardown
 ```
 
 ### Run a specific test

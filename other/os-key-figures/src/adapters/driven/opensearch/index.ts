@@ -9,7 +9,6 @@ export {
   TermsWithSubAggMetricQuery,
 } from "./metric-query.js";
 export {
-  type MetricRetrievalResult,
   type OpenSearchClient,
   OpenSearchMetricSource,
   type OpenSearchMetricSourceConfig,

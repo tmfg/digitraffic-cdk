@@ -1,6 +1,9 @@
 import type { MetricDefinition } from "../../domain/types/metric-definition.js";
 import type { MetricScope } from "../../domain/types/metric-scope.js";
-import type { MetricValue } from "../../domain/types/metric-value.js";
+import type {
+  MetricRetrievalResult,
+  MetricValue,
+} from "../../domain/types/metric-value.js";
 import type { TimePeriod } from "../../domain/types/time-period.js";
 
 /**
@@ -24,4 +27,10 @@ export interface ForRetrievingMetrics {
     definition: MetricDefinition,
     period: TimePeriod,
   ): Promise<MetricValue>;
+
+  retrieveMetricWithQuery(
+    scope: MetricScope,
+    definition: MetricDefinition,
+    period: TimePeriod,
+  ): Promise<MetricRetrievalResult>;
 }

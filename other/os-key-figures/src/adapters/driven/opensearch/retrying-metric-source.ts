@@ -1,6 +1,9 @@
 import type { MetricDefinition } from "../../../domain/types/metric-definition.js";
 import type { MetricScope } from "../../../domain/types/metric-scope.js";
-import type { MetricValue } from "../../../domain/types/metric-value.js";
+import type {
+  MetricRetrievalResult,
+  MetricValue,
+} from "../../../domain/types/metric-value.js";
 import type { TimePeriod } from "../../../domain/types/time-period.js";
 import type { ForRetrievingMetrics } from "../../../ports/driven/for-retrieving-metrics.js";
 import type { RetryPolicy } from "./retry-policy.js";
@@ -23,6 +26,17 @@ export class RetryingMetricSource implements ForRetrievingMetrics {
   ): Promise<MetricValue> {
     return executeWithRetry(
       () => this.delegate.retrieveMetric(scope, definition, period),
+      this.retryPolicy,
+    );
+  }
+
+  async retrieveMetricWithQuery(
+    scope: MetricScope,
+    definition: MetricDefinition,
+    period: TimePeriod,
+  ): Promise<MetricRetrievalResult> {
+    return executeWithRetry(
+      () => this.delegate.retrieveMetricWithQuery(scope, definition, period),
       this.retryPolicy,
     );
   }
