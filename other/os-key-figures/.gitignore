@@ -3,10 +3,13 @@
 !cdk.json
 !package.json
 !tsconfig.json
+!README.md
 
 !/config/
 !/config/*.json
 !/src/
 !/src/**/
 !/src/**/*.ts
+!/src/__test__/**/
+!/src/__test__/**/*.yml
 /src/bin

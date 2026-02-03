@@ -18,7 +18,8 @@ export interface LambdaConfiguration {
 export interface OpenSearchConfig {
   readonly host: string;
   readonly vpcEndpoint: string;
-  readonly defaultIndex: string;
+  readonly defaultAccessLogIndex: string;
+  readonly afirAccessLogIndex: string;
 }
 
 export function createConfigFromEnvironment(): LambdaConfiguration {
@@ -27,7 +28,8 @@ export function createConfigFromEnvironment(): LambdaConfiguration {
     opensearch: {
       host: getEnvVariable(EnvKeys.OS_HOST),
       vpcEndpoint: getEnvVariable(EnvKeys.OS_VPC_ENDPOINT),
-      defaultIndex: getEnvVariable(EnvKeys.OS_INDEX),
+      defaultAccessLogIndex: getEnvVariable(EnvKeys.OS_INDEX),
+      afirAccessLogIndex: getEnvVariable(EnvKeys.OS_AFIR_INDEX),
     },
     database: {
       host: getEnvVariable("MYSQL_ENDPOINT"),

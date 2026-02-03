@@ -65,7 +65,6 @@ describe("Integration Tests: Refactored Architecture", () => {
     // Set up MySQL connection
     mysqlConnection = mysql.createConnection({
       host: TEST_CONFIG.mysql.host,
-      port: TEST_CONFIG.mysql.port,
       user: TEST_CONFIG.mysql.user,
       password: TEST_CONFIG.mysql.password,
       database: TEST_CONFIG.mysql.database,
@@ -98,7 +97,7 @@ describe("Integration Tests: Refactored Architecture", () => {
 
       const discoveryService = new EndpointDiscoveryService(httpClient, config);
 
-      let endpoints: MonitoredEndpoints;
+      let endpoints: MonitoredEndpoints | undefined;
       let lastError: unknown;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
@@ -162,7 +161,8 @@ describe("Integration Tests: Refactored Architecture", () => {
       const mockClient = createLocalOpenSearchClient();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const metricSource = new OpenSearchMetricSource(mockClient, {
-        defaultIndex: TEST_CONFIG.opensearch.index,
+        defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
+        afirAccessLogIndex: TEST_CONFIG.opensearch.index,
         accountNames: {
           [Service.ALL]: "*",
           [Service.RAIL]: TEST_CONFIG.accountNames.rail,
@@ -201,7 +201,7 @@ describe("Integration Tests: Refactored Architecture", () => {
               Math.random() * (endDate.getTime() - startDate.getTime()),
           ).toISOString(),
           accountName: TEST_CONFIG.accountNames.road,
-          request: "GET /api/v1/data/ HTTP/1.1",
+          request: "/api/v1/data",
           httpHost: "tie.digitraffic.fi",
           response_status: 200,
           response_body_size: 1000,
@@ -214,7 +214,8 @@ describe("Integration Tests: Refactored Architecture", () => {
       const mockClient = createLocalOpenSearchClient();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const metricSource = new OpenSearchMetricSource(mockClient, {
-        defaultIndex: TEST_CONFIG.opensearch.index,
+        defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
+        afirAccessLogIndex: TEST_CONFIG.opensearch.index,
         accountNames: {
           [Service.ALL]: "*",
           [Service.RAIL]: TEST_CONFIG.accountNames.rail,
@@ -258,7 +259,7 @@ describe("Integration Tests: Refactored Architecture", () => {
               Math.random() * (endDate.getTime() - startDate.getTime()),
           ).toISOString(),
           accountName: TEST_CONFIG.accountNames.marine,
-          request: "GET /api/v1/vessels/ HTTP/1.1",
+          request: "/api/v1/vessels",
           httpHost: "meri.digitraffic.fi",
           response_status: 200,
           response_body_size: 500,
@@ -272,7 +273,8 @@ describe("Integration Tests: Refactored Architecture", () => {
       const mockClient = createLocalOpenSearchClient();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const metricSource = new OpenSearchMetricSource(mockClient, {
-        defaultIndex: TEST_CONFIG.opensearch.index,
+        defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
+        afirAccessLogIndex: TEST_CONFIG.opensearch.index,
         accountNames: {
           [Service.ALL]: "*",
           [Service.RAIL]: TEST_CONFIG.accountNames.rail,
@@ -324,7 +326,8 @@ describe("Integration Tests: Refactored Architecture", () => {
       const mockClient = createLocalOpenSearchClient();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const metricSource = new OpenSearchMetricSource(mockClient, {
-        defaultIndex: TEST_CONFIG.opensearch.index,
+        defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
+        afirAccessLogIndex: TEST_CONFIG.opensearch.index,
         accountNames: {
           [Service.ALL]: "*",
           [Service.RAIL]: TEST_CONFIG.accountNames.rail,
@@ -360,17 +363,20 @@ describe("Integration Tests: Refactored Architecture", () => {
   });
 
   describe("MetricQuery classes", () => {
+    const accountNames = { ...TEST_CONFIG.accountNames, [Service.ALL]: "*" };
     test("CountMetricQuery should build valid query", () => {
       const query = new CountMetricQuery(
+        accountNames,
         "Http req",
         TEST_CONFIG.opensearch.index,
       );
-      const params = {
-        accountFilter: `accountName.keyword:${TEST_CONFIG.accountNames.rail}`,
-        period: { from: startDate, to: endDate },
+      const scope = {
+        service: Service.RAIL,
+        storageTag: "@transport_type:rail",
       };
+      const period = { from: startDate, to: endDate };
 
-      const queryString = query.buildQuery(params);
+      const queryString = query.buildQuery(scope, period);
       const parsed = JSON.parse(queryString);
 
       expect(parsed).toHaveProperty("query");
@@ -381,16 +387,20 @@ describe("Integration Tests: Refactored Architecture", () => {
 
     test("SumMetricQuery should build valid aggregation query", () => {
       const query = new SumMetricQuery(
+        accountNames,
         "Bytes out",
         TEST_CONFIG.opensearch.index,
         "bytes",
       );
-      const params = {
-        accountFilter: `accountName.keyword:${TEST_CONFIG.accountNames.road}`,
-        period: { from: startDate, to: endDate },
-      };
 
-      const queryString = query.buildQuery(params);
+      const scope = {
+        service: Service.ROAD,
+        storageTag: "@transport_type:road",
+      };
+      const period = { from: startDate, to: endDate };
+
+      const queryString = query.buildQuery(scope, period);
+
       const parsed = JSON.parse(queryString);
 
       expect(parsed).toHaveProperty("aggs");
@@ -401,17 +411,21 @@ describe("Integration Tests: Refactored Architecture", () => {
 
     test("TermsMetricQuery should build valid terms aggregation query", () => {
       const query = new TermsMetricQuery(
+        accountNames,
         "Top 10 IPs",
         TEST_CONFIG.opensearch.index,
         "clientIp",
         10,
       );
-      const params = {
-        accountFilter: `accountName.keyword:${TEST_CONFIG.accountNames.marine}`,
-        period: { from: startDate, to: endDate },
-      };
 
-      const queryString = query.buildQuery(params);
+      const scope = {
+        service: Service.MARINE,
+        storageTag: "@transport_type:marine",
+      };
+      const period = { from: startDate, to: endDate };
+
+      const queryString = query.buildQuery(scope, period);
+
       const parsed = JSON.parse(queryString);
 
       expect(parsed).toHaveProperty("aggs");

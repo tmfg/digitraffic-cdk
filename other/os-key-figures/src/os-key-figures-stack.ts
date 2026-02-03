@@ -40,6 +40,7 @@ export interface Props {
   readonly roadAccountName: string;
   readonly afirAccountName: string;
   readonly osIndex: string;
+  readonly osAfirIndex: string;
   readonly visualizationsBucketName: string;
 }
 
@@ -208,6 +209,7 @@ export class OsKeyFiguresStack extends Stack {
         OS_HOST: osKeyFiguresProps.openSearchHost,
         OS_VPC_ENDPOINT: osKeyFiguresProps.openSearchVPCEndpoint,
         OS_INDEX: osKeyFiguresProps.osIndex,
+        OS_AFIR_INDEX: osKeyFiguresProps.osAfirIndex,
         MYSQL_ENDPOINT: osKeyFiguresProps.mysql.host,
         MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
         MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,

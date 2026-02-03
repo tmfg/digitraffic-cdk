@@ -4,7 +4,6 @@ export {
   type MetricQuery,
   OpenSearchApiMethod,
   type OpenSearchResponse,
-  type QueryParams,
   SumMetricQuery,
   TermsMetricQuery,
   TermsWithSubAggMetricQuery,

@@ -73,7 +73,8 @@ export const handler = async (
 
   const metricSource = new RetryingMetricSource(
     new OpenSearchMetricSource(openSearchClient, {
-      defaultIndex: config.opensearch.defaultIndex,
+      defaultAccessLogIndex: config.opensearch.defaultAccessLogIndex,
+      afirAccessLogIndex: config.opensearch.afirAccessLogIndex,
       accountNames: config.accountNames,
     }),
   );

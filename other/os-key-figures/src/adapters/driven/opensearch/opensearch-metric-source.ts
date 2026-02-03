@@ -5,11 +5,7 @@ import type { MetricValue } from "../../../domain/types/metric-value.js";
 import { Service } from "../../../domain/types/service.js";
 import type { TimePeriod } from "../../../domain/types/time-period.js";
 import type { ForRetrievingMetrics } from "../../../ports/driven/for-retrieving-metrics.js";
-import type {
-  MetricQuery,
-  OpenSearchResponse,
-  QueryParams,
-} from "./metric-query.js";
+import type { MetricQuery, OpenSearchResponse } from "./metric-query.js";
 import {
   CardinalityMetricQuery,
   CountMetricQuery,
@@ -22,7 +18,8 @@ import {
  * Configuration for the OpenSearch metric source.
  */
 export interface OpenSearchMetricSourceConfig {
-  readonly defaultIndex: string;
+  readonly defaultAccessLogIndex: string;
+  readonly afirAccessLogIndex: string;
   readonly accountNames: Record<Service, string>;
 }
 
@@ -53,12 +50,10 @@ export interface MetricRetrievalResult {
 export class OpenSearchMetricSource implements ForRetrievingMetrics {
   private readonly client: OpenSearchClient;
   private readonly config: OpenSearchMetricSourceConfig;
-  private readonly metricQueries: Map<string, MetricQuery>;
 
   constructor(client: OpenSearchClient, config: OpenSearchMetricSourceConfig) {
     this.client = client;
     this.config = config;
-    this.metricQueries = this.initializeMetricQueries();
   }
 
   async retrieveMetric(
@@ -82,16 +77,9 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
     definition: MetricDefinition,
     period: TimePeriod,
   ): Promise<MetricRetrievalResult> {
-    const metricQuery = this.metricQueries.get(definition.name);
-    if (!metricQuery) {
-      throw new MetricSourceError(`Unknown metric: ${definition.name}`, {
-        definition,
-        scope,
-      });
-    }
+    const metricQuery = this.getMetricQuery(scope, definition);
 
-    const queryParams = this.buildQueryParams(scope, period);
-    const query = metricQuery.buildQuery(queryParams);
+    const query = metricQuery.buildQuery(scope, period);
 
     try {
       const response = await this.client.makeOsQuery(
@@ -116,104 +104,91 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
     }
   }
 
-  private buildQueryParams(
+  private getMetricQuery(
     scope: MetricScope,
-    period: TimePeriod,
-  ): QueryParams {
-    const accountFilter = this.buildAccountFilter(scope.service);
-    const endpointFilter = scope.endpoint
-      ? `request:\\"${scope.endpoint.replace(/\/$/, "")}*\\"`
-      : undefined;
+    definition: MetricDefinition,
+  ): MetricQuery {
+    const accessLogIndex = this.config.defaultAccessLogIndex;
+    const afirAccessLogIndex = this.config.afirAccessLogIndex;
 
-    return {
-      accountFilter,
-      period,
-      endpointFilter,
-    };
-  }
+    const index =
+      scope.service === Service.AFIR ? afirAccessLogIndex : accessLogIndex;
 
-  private buildAccountFilter(service: Service): string {
-    if (service === Service.ALL) {
-      // For ALL, include all services
-      const allFilters = Object.values(Service)
-        .filter((service) => service !== Service.ALL)
-        .map((s) => `accountName.keyword:${this.config.accountNames[s]}`)
-        .join(" OR ");
-      return `(${allFilters})`;
-    }
-
-    const accountName = this.config.accountNames[service];
-    if (!accountName) {
-      throw new MetricSourceError(
-        `No account name configured for service: ${service}`,
-      );
-    }
-    return `accountName.keyword:${accountName}`;
-  }
-
-  private initializeMetricQueries(): Map<string, MetricQuery> {
-    const index = this.config.defaultIndex;
-
-    return new Map<string, MetricQuery>([
-      // Count metrics
-      ["Http req", new CountMetricQuery("Http req", index)],
-      [
-        "Http req 200",
-        new CountMetricQuery("Http req 200", index, "httpStatusCode:200"),
-      ],
-
-      // Sum/Cardinality metrics
-      ["Bytes out", new SumMetricQuery("Bytes out", index, "bytes")],
-      [
-        "Unique IPs",
-        new CardinalityMetricQuery("Unique IPs", index, "clientIp"),
-      ],
-
-      // Terms aggregation metrics (top N by count)
-      [
-        "Top 10 Referers",
-        new TermsMetricQuery(
+    switch (definition.name) {
+      case "Http req":
+        return new CountMetricQuery(
+          this.config.accountNames,
+          "Http req",
+          index,
+        );
+      case "Http req 200":
+        return new CountMetricQuery(
+          this.config.accountNames,
+          "Http req 200",
+          index,
+          "httpStatusCode:200",
+        );
+      case "Bytes out":
+        return new SumMetricQuery(
+          this.config.accountNames,
+          "Bytes out",
+          index,
+          "bytes",
+        );
+      case "Unique IPs":
+        return new CardinalityMetricQuery(
+          this.config.accountNames,
+          "Unique IPs",
+          index,
+          "clientIp",
+        );
+      case "Top 10 Referers":
+        return new TermsMetricQuery(
+          this.config.accountNames,
           "Top 10 Referers",
           index,
           "httpReferer.keyword",
           100,
-        ),
-      ],
-      [
-        "Top 10 digitraffic-users",
-        new TermsMetricQuery(
+        );
+      case "Top 10 digitraffic-users":
+        return new TermsMetricQuery(
+          this.config.accountNames,
           "Top 10 digitraffic-users",
           index,
           "httpDigitrafficUser.keyword",
           100,
-        ),
-      ],
-      [
-        "Top 10 User Agents",
-        new TermsMetricQuery(
+        );
+      case "Top 10 User Agents":
+        return new TermsMetricQuery(
+          this.config.accountNames,
           "Top 10 User Agents",
           index,
           "httpUserAgent.keyword",
           100,
-        ),
-      ],
-      [
-        "Top 10 IPs",
-        new TermsMetricQuery("Top 10 IPs", index, "clientIp", 100),
-      ],
-
-      // Terms with sub-aggregation (top N by nested value)
-      [
-        "Top digitraffic-users by bytes",
-        new TermsWithSubAggMetricQuery(
+        );
+      case "Top 10 IPs":
+        return new TermsMetricQuery(
+          this.config.accountNames,
+          "Top 10 IPs",
+          index,
+          "clientIp",
+          100,
+        );
+      case "Top digitraffic-users by bytes":
+        return new TermsWithSubAggMetricQuery(
+          this.config.accountNames,
           "Top digitraffic-users by bytes",
           index,
           "httpDigitrafficUser.keyword",
           "bytes",
           "sum",
           100,
-        ),
-      ],
-    ]);
+        );
+      default:
+        throw new MetricSourceError(`Unknown metric: ${definition.name}`, {
+          definition,
+          scope,
+        });
+    }
   }
 }

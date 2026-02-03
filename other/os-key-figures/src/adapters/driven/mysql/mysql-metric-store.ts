@@ -112,8 +112,9 @@ export class MySqlMetricStore implements ForPersistingMetrics {
   }
 
   private async createIndex(tableName: string): Promise<void> {
+    // Use prefix length for filter column to avoid exceeding max key length (3072 bytes)
     await this.execute(
-      "CREATE INDEX filter_name_date ON ?? (`filter`, `name`, `from`, `to`)",
+      "CREATE INDEX filter_name_date ON ?? (`filter`(255), `name`, `from`, `to`)",
       [tableName],
     );
   }

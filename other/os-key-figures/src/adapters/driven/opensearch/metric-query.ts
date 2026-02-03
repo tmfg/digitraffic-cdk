@@ -1,13 +1,17 @@
-import type { MetricValue } from "../../../domain/types/metric-value.js";
-import type { TimePeriod } from "../../../domain/types/time-period.js";
-import { toIsoDateRange } from "../../../domain/types/time-period.js";
+import { MetricSourceError } from "../../../domain/errors/index.js";
+import type {
+  MetricScope,
+  MetricValue,
+  TimePeriod,
+} from "../../../domain/types/index.js";
+import { Service, toIsoDateRange } from "../../../domain/types/index.js";
 
 export enum OpenSearchApiMethod {
   COUNT = "_count",
   SEARCH = "_search",
 }
 
-export interface QueryParams {
+interface QueryParams {
   readonly accountFilter: string;
   readonly period: TimePeriod;
   readonly endpointFilter?: string;
@@ -39,68 +43,128 @@ export abstract class MetricQuery {
     readonly apiMethod: OpenSearchApiMethod,
   ) {}
 
-  abstract buildQuery(params: QueryParams): string;
+  abstract buildQuery(scope: MetricScope, period: TimePeriod): string;
+
   abstract extractValue(response: OpenSearchResponse): MetricValue;
 
-  getQueryForStorage(params: QueryParams): string {
-    return this.buildQuery(params);
+  getQueryForStorage(scope: MetricScope, period: TimePeriod): string {
+    return this.buildQuery(scope, period);
   }
 }
 
-function buildBaseBoolQuery(params: QueryParams): {
-  must: unknown[];
-  must_not: unknown[];
-  filter: unknown[];
-} {
-  const { startTime, endTime } = toIsoDateRange(params.period);
-
-  let queryString = `NOT log_line:* AND ${params.accountFilter}`;
-  if (params.endpointFilter) {
-    queryString += ` AND ${params.endpointFilter}`;
+export abstract class AccessLogQuery extends MetricQuery {
+  readonly accountNames: Record<Service, string>;
+  constructor(
+    accountNames: Record<Service, string>,
+    name: string,
+    index: string,
+    apiMethod: OpenSearchApiMethod,
+  ) {
+    super(name, index, apiMethod);
+    this.accountNames = accountNames;
   }
 
-  return {
-    must: [
-      {
-        query_string: {
-          query: queryString,
-          analyze_wildcard: true,
-          time_zone: "Europe/Helsinki",
-        },
-      },
-    ],
-    must_not: [
-      { term: { skip_statistics: true } },
-      { wildcard: { httpHost: "*.integration.digitraffic.fi" } },
-    ],
-    filter: [
-      {
-        range: {
-          "@timestamp": {
-            gte: startTime,
-            lte: endTime,
-            format: "strict_date_optional_time",
+  protected buildBaseBoolQuery(
+    scope: MetricScope,
+    period: TimePeriod,
+  ): {
+    must: unknown[];
+    must_not: unknown[];
+    filter: unknown[];
+  } {
+    const queryParams = this.buildQueryParams(scope, period);
+    const { startTime, endTime } = toIsoDateRange(queryParams.period);
+
+    let queryString = `NOT log_line:* AND ${queryParams.accountFilter}`;
+    if (queryParams.endpointFilter) {
+      queryString += ` AND ${queryParams.endpointFilter}`;
+    }
+
+    return {
+      must: [
+        {
+          query_string: {
+            query: queryString,
+            analyze_wildcard: true,
+            time_zone: "Europe/Helsinki",
           },
         },
-      },
-    ],
-  };
+      ],
+      must_not: [
+        { term: { skip_statistics: true } },
+        { wildcard: { httpHost: "*.integration.digitraffic.fi" } },
+      ],
+      filter: [
+        {
+          range: {
+            "@timestamp": {
+              gte: startTime,
+              lte: endTime,
+              format: "strict_date_optional_time",
+            },
+          },
+        },
+      ],
+    };
+  }
+
+  private buildQueryParams(
+    scope: MetricScope,
+    period: TimePeriod,
+  ): QueryParams {
+    const accountFilter = this.buildAccountFilter(scope.service);
+    // Use quoted phrase query for text fields - the analyzer tokenizes the path
+    // and the phrase query matches the tokens in order
+    const endpointFilter = scope.endpoint
+      ? `request:"${scope.endpoint.replace(/\/$/, "")}*"`
+      : undefined;
+
+    return {
+      accountFilter,
+      period,
+      endpointFilter,
+    };
+  }
+
+  private buildAccountFilter(service: Service): string {
+    if (service === Service.ALL) {
+      // For ALL, include all services
+      const allFilters = Object.values<string>(Service)
+        .filter((service) => service !== Service.ALL)
+        .map((s) => `accountName.keyword:${s}`)
+        .join(" OR ");
+      return `(${allFilters})`;
+    }
+
+    const accountName = this.accountNames[service];
+    if (!accountName) {
+      throw new MetricSourceError(
+        `No account name configured for service: ${service}`,
+      );
+    }
+    return `accountName.keyword:${accountName}`;
+  }
 }
 
 function sanitizeKey(key: string): string {
   return key.replace(/["'\\]/g, "");
 }
 
-export class CountMetricQuery extends MetricQuery {
+export class CountMetricQuery extends AccessLogQuery {
   private readonly additionalQueryCondition?: string;
 
-  constructor(name: string, index: string, additionalCondition?: string) {
-    super(name, index, OpenSearchApiMethod.COUNT);
+  constructor(
+    accountNames: Record<Service, string>,
+    name: string,
+    index: string,
+    additionalCondition?: string,
+  ) {
+    super(accountNames, name, index, OpenSearchApiMethod.COUNT);
     this.additionalQueryCondition = additionalCondition;
   }
 
-  buildQuery(params: QueryParams): string {
-    const boolQuery = buildBaseBoolQuery(params);
+  buildQuery(scope: MetricScope, period: TimePeriod): string {
+    const boolQuery = this.buildBaseBoolQuery(scope, period);
     if (this.additionalQueryCondition) {
       const queryStringClause = boolQuery.must[0] as {
         query_string: { query: string };
@@ -118,17 +182,18 @@ export class CountMetricQuery extends MetricQuery {
   }
 }
 
-export class SumMetricQuery extends MetricQuery {
+export class SumMetricQuery extends AccessLogQuery {
   constructor(
+    accountNames: Record<Service, string>,
     name: string,
     index: string,
     private readonly field: string,
   ) {
-    super(name, index, OpenSearchApiMethod.SEARCH);
+    super(accountNames, name, index, OpenSearchApiMethod.SEARCH);
   }
 
-  buildQuery(params: QueryParams): string {
-    const boolQuery = buildBaseBoolQuery(params);
+  buildQuery(scope: MetricScope, period: TimePeriod): string {
+    const boolQuery = this.buildBaseBoolQuery(scope, period);
     return JSON.stringify({
       aggs: { agg: { sum: { field: this.field } } },
       query: { bool: boolQuery },
@@ -144,17 +209,18 @@ export class SumMetricQuery extends MetricQuery {
   }
 }
 
-export class CardinalityMetricQuery extends MetricQuery {
+export class CardinalityMetricQuery extends AccessLogQuery {
   constructor(
+    accountNames: Record<Service, string>,
     name: string,
     index: string,
     private readonly field: string,
   ) {
-    super(name, index, OpenSearchApiMethod.SEARCH);
+    super(accountNames, name, index, OpenSearchApiMethod.SEARCH);
   }
 
-  buildQuery(params: QueryParams): string {
-    const boolQuery = buildBaseBoolQuery(params);
+  buildQuery(scope: MetricScope, period: TimePeriod): string {
+    const boolQuery = this.buildBaseBoolQuery(scope, period);
     return JSON.stringify({
       aggs: { agg: { cardinality: { field: this.field } } },
       query: { bool: boolQuery },
@@ -170,18 +236,19 @@ export class CardinalityMetricQuery extends MetricQuery {
   }
 }
 
-export class TermsMetricQuery extends MetricQuery {
+export class TermsMetricQuery extends AccessLogQuery {
   constructor(
+    accountNames: Record<Service, string>,
     name: string,
     index: string,
     private readonly field: string,
     private readonly size: number = 10,
   ) {
-    super(name, index, OpenSearchApiMethod.SEARCH);
+    super(accountNames, name, index, OpenSearchApiMethod.SEARCH);
   }
 
-  buildQuery(params: QueryParams): string {
-    const boolQuery = buildBaseBoolQuery(params);
+  buildQuery(scope: MetricScope, period: TimePeriod): string {
+    const boolQuery = this.buildBaseBoolQuery(scope, period);
     return JSON.stringify({
       aggs: {
         agg: {
@@ -211,8 +278,9 @@ export class TermsMetricQuery extends MetricQuery {
   }
 }
 
-export class TermsWithSubAggMetricQuery extends MetricQuery {
+export class TermsWithSubAggMetricQuery extends AccessLogQuery {
   constructor(
+    accountNames: Record<Service, string>,
     name: string,
     index: string,
     private readonly field: string,
@@ -220,11 +288,11 @@ export class TermsWithSubAggMetricQuery extends MetricQuery {
     private readonly subAggType: "sum" | "avg" | "max" | "min" = "sum",
     private readonly size: number = 100,
   ) {
-    super(name, index, OpenSearchApiMethod.SEARCH);
+    super(accountNames, name, index, OpenSearchApiMethod.SEARCH);
   }
 
-  buildQuery(params: QueryParams): string {
-    const boolQuery = buildBaseBoolQuery(params);
+  buildQuery(scope: MetricScope, period: TimePeriod): string {
+    const boolQuery = this.buildBaseBoolQuery(scope, period);
     return JSON.stringify({
       aggs: {
         agg: {
