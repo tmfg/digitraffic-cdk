@@ -5,7 +5,7 @@
   "description": "digitraffic-cdk toolchain",
   "type": "module",
   "scripts": {
-    "build": "",
-    "test": ""
+    "build": "echo 'No build implemented'",
+    "test": "echo 'No tests implemented'"
   }
 }

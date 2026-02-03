@@ -1,4 +1,5 @@
 import {
+  compressBuffer,
   decodeBase64ToAscii,
   decodeBase64ToUtf8,
   encodeAsciiToBase64,
@@ -33,5 +34,18 @@ describe("Base64UtilTest", () => {
     const decodedUtf8 = decodeBase64ToUtf8(EXPECTED_UTF8_BASE64);
     expect(encodedUtf8).toEqual(EXPECTED_UTF8_BASE64);
     expect(decodedUtf8).toEqual(EXPECTED_UTF8);
+  });
+
+  test("decode utf8 compressed", () => {
+    const originalBody = { message: EXPECTED_UTF8 };
+    const body = JSON.stringify(originalBody);
+    const rawBuffer = Buffer.from(body, "utf8");
+    const compressed = compressBuffer(rawBuffer);
+    const compressedBase64 = compressed.toString("base64");
+
+    const uncompressedBody = decodeBase64ToUtf8(compressedBase64, true);
+    const restoredBody = JSON.parse(uncompressedBody);
+
+    expect(originalBody).toEqual(restoredBody);
   });
 });

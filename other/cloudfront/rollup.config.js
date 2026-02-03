@@ -35,10 +35,10 @@ const excludeTerser = [
 ];
 
 export default inputs.map((input) => {
-  const isOutputEsm = false; // moduleJs.some((esm) => input.includes(esm))
+  const isOutputEsm = false; // Changed to false - output CommonJS for CloudFront compatibility
   const outputFile = isOutputEsm
-    ? input.replace("src/", `${outputDir}/`).replace("ts", "mjs")
-    : input.replace("src/", `${outputDir}/`).replace("ts", "cjs");
+    ? input.replace("src/", `${outputDir}/`).replace(/\.ts$/, ".mjs")
+    : input.replace("src/", `${outputDir}/`).replace(/\.ts$/, ".cjs");
 
   const outputFileDirectories = input.replace("src/", `${outputDir}/`).split(
     "/",
@@ -61,6 +61,7 @@ export default inputs.map((input) => {
       inlineDynamicImports: true,
       file: outputFile,
       format: isOutputEsm ? "es" : "cjs",
+      sourcemap: true,
     },
     input,
     plugins,

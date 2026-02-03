@@ -5,11 +5,11 @@ import {
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
 import { PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S } from "../../constants.js";
-import { type DbWorkMachine } from "../../model/db-data.js";
-import {
-  type ApiWorkevent,
-  type ApiWorkeventDevice,
-  type ApiWorkeventIoDevice,
+import type { DbWorkMachine } from "../../model/db-data.js";
+import type {
+  ApiWorkevent,
+  ApiWorkeventDevice,
+  ApiWorkeventIoDevice,
 } from "../../model/paikannin-api-data.js";
 import {
   createDbWorkMachine,
@@ -365,11 +365,9 @@ describe("paikannin-utils-service-test", () => {
     const result = Utils.calculateSpeedInMS(10, 0);
     expect(result).toEqual(Infinity);
     console.info(
-      `r: ${result} r>0: ${(result > 0).toString()} r<50: ${
-        (
-          result < 50
-        ).toString()
-      } isFinite(r): ${Number.isFinite(result).toString()}`,
+      `r: ${result} r>0: ${(result > 0).toString()} r<50: ${(
+        result < 50
+      ).toString()} isFinite(r): ${Number.isFinite(result).toString()}`,
     );
 
     expect(Utils.calculateSpeedInMS(10, 1)).toEqual(10);
@@ -414,10 +412,9 @@ describe("paikannin-utils-service-test", () => {
         // index is even
         // clear ioChannels and replace with ignored and not mapped values
         value.ioChannels.splice(0, value.ioChannels.length);
-        value.ioChannels.push(...[
-          PAIKANNIN_OPERATION_SALTING,
-          PAIKANNIN_OPERATION_PAVING,
-        ]);
+        value.ioChannels.push(
+          ...[PAIKANNIN_OPERATION_SALTING, PAIKANNIN_OPERATION_PAVING],
+        );
       }
     });
 
@@ -438,9 +435,9 @@ describe("paikannin-utils-service-test", () => {
     expect(resultDeviceWithFilteredEvents.workEvents.length).toEqual(
       deviceWithIgnoredTasks.workEvents.length / 2,
     );
-    resultDeviceWithFilteredEvents.workEvents.forEach((we) =>
-      expect(we.ioChannels[0]!.name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name)
-    );
+    for (const we of resultDeviceWithFilteredEvents.workEvents) {
+      expect(we.ioChannels[0]!.name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name);
+    }
 
     // deviceWithAcceptedTasks has all events untouched
     const resultDeviceWithAcceptedTasks = resultDevices[1]!;

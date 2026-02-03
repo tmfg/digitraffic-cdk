@@ -1,0 +1,12 @@
+{
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": ["node"],
+    "checkJs": false
+  },
+
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

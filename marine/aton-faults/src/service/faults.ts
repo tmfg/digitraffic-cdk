@@ -1,17 +1,12 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-import * as FaultsDB from "../db/faults.js";
-import * as S124Converter from "./s124-converter.js";
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import { Geometry, LineString, Point } from "wkx";
-import { Builder } from "xml2js";
-import type { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
-import type { Feature, FeatureCollection, GeometryObject } from "geojson";
-import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import type { Language } from "@digitraffic/common/dist/types/language";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
+
+import type { Feature, FeatureCollection, GeometryObject } from "geojson";
+import { Geometry } from "wkx";
+import * as FaultsDB from "../db/faults.js";
 import type { DbFault } from "../model/fault.js";
 
 export const ATON_FAULTS_CHECK = "ATON_FAULTS_CHECK";
@@ -57,47 +52,6 @@ export function findAllFaults(
   });
 }
 
-export async function getFaultS124ById(
-  db: DTDatabase,
-  faultId: number,
-): Promise<string | undefined> {
-  const start = Date.now();
-  const fault = await FaultsDB.getFaultById(db, faultId);
-
-  try {
-    if (!fault) {
-      return undefined;
-    }
-
-    return new Builder().buildObject(S124Converter.convertFault(fault));
-  } finally {
-    logger.info({
-      method: "FaultsService.getFaultS124ById",
-      tookMs: Date.now() - start,
-    });
-  }
-}
-
-export async function findFaultIdsForVoyagePlan(
-  voyagePlan: RtzVoyagePlan,
-): Promise<number[]> {
-  const start = Date.now();
-  const voyageLineString = new LineString(
-    voyagePlan.route.waypoints
-      .flatMap((w) => w.waypoint.flatMap((wp) => wp.position))
-      .map((p) => new Point(p.$.lon, p.$.lat)),
-  );
-  const faultIds = await inDatabaseReadonly((db: DTDatabase) => {
-    return FaultsDB.findFaultIdsByRoute(db, voyageLineString);
-  });
-  logger.info({
-    method: "FaultsService.findFaultIdsForVoyagePlan",
-    tookMs: Date.now() - start,
-    customCount: faultIds.length,
-  });
-  return faultIds;
-}
-
 function convertFeature(fault: DbFault): Feature {
   const properties: FaultProps = {
     id: fault.id,
@@ -119,8 +73,9 @@ function convertFeature(fault: DbFault): Feature {
   };
 
   // convert geometry from db to geojson
-  const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex"))
-    .toGeoJSON() as GeometryObject;
+  const geometry = Geometry.parse(
+    Buffer.from(fault.geometry, "hex"),
+  ).toGeoJSON() as GeometryObject;
 
   return {
     type: "Feature",

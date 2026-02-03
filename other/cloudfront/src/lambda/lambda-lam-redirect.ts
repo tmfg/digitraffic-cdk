@@ -1,3 +1,9 @@
+import queryStringHelper, {
+  type ParsedUrlQuery,
+  type ParsedUrlQueryInput,
+} from "node:querystring";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import {
@@ -6,21 +12,12 @@ import {
 } from "@digitraffic/common/dist/utils/utils";
 import type {
   CloudFrontRequest,
-  CloudFrontRequestCallback,
   CloudFrontRequestEvent,
   CloudFrontRequestHandler,
   CloudFrontRequestResult,
   CloudFrontResultResponse,
-  Context,
 } from "aws-lambda";
-
-import queryStringHelper, {
-  type ParsedUrlQuery,
-  type ParsedUrlQueryInput,
-} from "querystring";
-import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 import { createAndLogError } from "./header-util.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 setEnvVariable(EnvKeys.SECRET_ID, "road");
 // Set region for secret reading manually to eu-west-1 as edge lambda is in us-west-1 or "random" region at runtime
@@ -35,19 +32,15 @@ export const PATHS = {
 
 export const handler: CloudFrontRequestHandler = async (
   event: CloudFrontRequestEvent,
-  _: Context,
-  callback: CloudFrontRequestCallback,
 ): Promise<CloudFrontRequestResult> => {
   const records = event.Records;
   if (records) {
     const record = records[0];
     if (!record) {
-      const err = createAndLogError(
+      throw createAndLogError(
         "lambda-lam-redirect.handler",
         "Records did not have a record",
       );
-      callback(err);
-      throw err;
     }
     const request: CloudFrontRequest = record.cf.request;
 
@@ -55,7 +48,7 @@ export const handler: CloudFrontRequestHandler = async (
       method: "lambda-lam-redirect.handler",
       customUri: request.uri,
       customRequest: JSON.stringify(request),
-      // eslint-disable-next-line dot-notation
+      // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
       customRegion: process.env["AWS_REGION"],
       message: "Redirect called",
     });
@@ -69,10 +62,10 @@ export const handler: CloudFrontRequestHandler = async (
       const parts = request.uri.split("_");
 
       if (Array.isArray(parts) && parts.length > 2) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // biome-ignore lint/style/noNonNullAssertion: Checked length above
         const year = parseInt(parts[2]!, 10);
 
-        if (!isNaN(year) && year > 21) {
+        if (!Number.isNaN(year) && year > 21) {
           // Change origin
           const secret = await secretHolder.get();
           if (request.origin?.s3) {
@@ -82,7 +75,7 @@ export const handler: CloudFrontRequestHandler = async (
               "method=tmsHistoryHandler type=raw Empty request.origin.s3!",
             );
           }
-          // eslint-disable-next-line dot-notation
+          // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
           request.headers["host"] = [
             {
               key: "host",
@@ -96,7 +89,7 @@ export const handler: CloudFrontRequestHandler = async (
         method: "lambda-lam-redirect.handler",
         type: "raw fix",
         customRequestUri: request.uri,
-        // eslint-disable-next-line dot-notation
+        // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
         customHost: JSON.stringify(request.headers["host"]),
       });
       // This is for the SnowLake request and GET works with webpage address (/ui/tms/history) and with api-url.
@@ -137,11 +130,13 @@ export const handler: CloudFrontRequestHandler = async (
       };
 
       // host is not allowed in CF custom headers
-      // eslint-disable-next-line dot-notation
-      request.headers["host"] = [{
-        key: "host",
-        value: secret.snowflakeDomain,
-      }];
+      // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
+      request.headers["host"] = [
+        {
+          key: "host",
+          value: secret.snowflakeDomain,
+        },
+      ];
 
       request.uri = getApiPath(request.querystring);
       request.querystring = newQuery;
@@ -150,7 +145,7 @@ export const handler: CloudFrontRequestHandler = async (
         message: "",
         type: "snowflake",
         customRequestUri: request.uri,
-        // eslint-disable-next-line dot-notation
+        // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
         customHost: JSON.stringify(request.headers["host"]),
         customQueryString: request.querystring,
       });
@@ -186,14 +181,13 @@ export const handler: CloudFrontRequestHandler = async (
         message: "",
         type: "redirectToWebpage",
         customRequestUri: request.uri,
-        // eslint-disable-next-line dot-notation
+        // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
         customHost: JSON.stringify(request.headers["host"]),
         customQueryString: request.querystring,
         customResponseStatus: redirectResponse.status,
-        // @ts-ignore
+        // @ts-expect-error
         customLocation: JSON.stringify(redirectResponse?.headers?.location),
       });
-      callback(null, redirectResponse);
       return redirectResponse;
       // This is for the webpage and it's resources
     } else if (request.uri.includes("/ui/tms/history/")) {
@@ -210,7 +204,7 @@ export const handler: CloudFrontRequestHandler = async (
         message: "",
         type: "webpage",
         customRequestUri: request.uri,
-        // eslint-disable-next-line dot-notation
+        // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
         customHost: JSON.stringify(request.headers["host"]),
       });
     }
@@ -220,15 +214,12 @@ export const handler: CloudFrontRequestHandler = async (
       message: `Return request ${JSON.stringify(request)}`,
     });
 
-    callback(null, request);
     return request;
   } else {
-    const err = createAndLogError(
+    throw createAndLogError(
       "lambda-lam-redirect.handler",
       "Event did not have records",
     );
-    callback(err);
-    throw err;
   }
 };
 
@@ -266,7 +257,7 @@ interface ResponseParams extends ParsedUrlQueryInput {
 }
 
 function getApiPath(query: string): string {
-  // eslint-disable-next-line dot-notation
+  // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
   const api = queryStringHelper.parse(query)["api"];
   if (typeof api === "string") {
     return `/${api}`;
@@ -286,14 +277,16 @@ function parseQuery(query: string): string {
   const q = queryStringHelper.parse(query) as QueryParams;
 
   if (
-    !q.api || !q.tyyppi || (!q.piste && !q.pistejoukko) || (!q.pvm && !q.viikko)
+    !q.api ||
+    !q.tyyppi ||
+    (!q.piste && !q.pistejoukko) ||
+    (!q.pvm && !q.viikko)
   ) {
     logger.warn({
       method: "lambda-lam-redirect.parseQuery",
-      message:
-        `invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${
-          JSON.stringify(q)
-        }`,
+      message: `invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${JSON.stringify(
+        q,
+      )}`,
     });
     return "";
   }
@@ -314,9 +307,9 @@ function parseQuery(query: string): string {
 
   if (q.loppu) {
     if (q.pvm) {
-      resp.pvm += "-" + q.loppu;
+      resp.pvm += `-${q.loppu}`;
     } else {
-      resp.viikko += "-" + q.loppu;
+      resp.viikko += `-${q.loppu}`;
     }
   }
 

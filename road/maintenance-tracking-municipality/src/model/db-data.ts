@@ -1,6 +1,6 @@
-import {
-  type GeoJsonLineString,
-  type GeoJsonPoint,
+import type {
+  GeoJsonLineString,
+  GeoJsonPoint,
 } from "@digitraffic/common/dist/utils/geojson-types";
 
 export interface DbWorkMachine {

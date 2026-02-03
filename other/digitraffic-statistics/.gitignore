@@ -2,13 +2,11 @@
 
 !/tsconfig.json
 !/package.json
-!/.eslintignore
-!/.eslintrc.cjs
-!/.eslintrc.js
 !/.gitignore
 !/cdk.json
 !/jest.config.js
 !/README.md
+!/esbuild.ts
 
 !/config/
 !/config/*.json
@@ -34,3 +32,4 @@
 !/digitraffic-figures/requirements.txt
 !/digitraffic-figures/update_requirements.sh
 !/digitraffic-figures/dbfigures/data/test/test_data.csv
+

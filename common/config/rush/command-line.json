@@ -76,6 +76,15 @@
       "enableParallelism": false
     },
     {
+      "name": "generate-sbom",
+      "commandKind": "bulk",
+      "summary": "Generate SBOM for all projects in the monorepo.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true,
+      "ignoreMissingScript": true
+    },
+    {
       "name": "repo:check-dependencies",
       "commandKind": "global",
       "summary": "Checks if dependencies are declared correctly",

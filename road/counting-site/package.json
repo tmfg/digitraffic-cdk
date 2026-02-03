@@ -1,11 +1,11 @@
 {
-  "name": "counting-sites",
+  "name": "counting-site",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "heft build --clean && npm run postbuild",
-    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
+    "build": "heft build --clean && npm run build:bundle",
+    "build:bundle": "npm run compile-lambdas && npm run compile-canaries",
     "cdk": "cdk",
     "cdk-deploy-road-prod": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-prod deploy CountingSiteProd",
     "cdk-deploy-road-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-test deploy CountingSiteTest",
@@ -14,14 +14,14 @@
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22",
-    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --metafile=meta.json --platform=node --outdir=dist/lambda --target=node22",
+    "compile-lambdas": "node lib/esbuild.js",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
     "@date-fns/tz": "1.4.1",
-    "@digitraffic/common": "2025.11.11-1",
+    "@digitraffic/common": "2026.1.26-1",
     "@std/csv": "npm:@jsr/std__csv@1.0.6",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",
@@ -35,7 +35,8 @@
     "zod": "4.3.5"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace: *",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
@@ -45,7 +46,7 @@
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",
     "jest": "30.2.0",

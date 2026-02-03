@@ -1,5 +1,5 @@
 {
-  "name": "status-cdk",
+  "name": "status",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,25 +14,28 @@
     "cdk-diff-status-prod": "rushx build &&../../scripts/cdk-diff-and-deploy.sh status-prod diff StatusStack",
     "compile-canaries": "echo 'No canaries'",
     "compile-canaries_": "esbuild src/canaries/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",
-    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/lambda --target=node22,es2022 --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --out-extension:.js=.mjs",
+    "compile-lambdas": "node lib/esbuild.js",
+    "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/lambda --target=node22,es2022 --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --out-extension:.js=.mjs",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test-build": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean",
+    "test-build": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle"
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "3.965.0",
-    "@digitraffic/common": "2025.11.11-1",
+    "@digitraffic/common": "2026.1.26-1",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",
     "date-fns": "4.1.0",
     "ky": "1.14.2",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "mqtt": "5.14.0",
     "ws": "8.19.0"
   },
   "devDependencies": {
     "@date-fns/tz": "1.4.1",
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.7",
@@ -40,8 +43,8 @@
     "@types/aws-lambda": "8.10.159",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/lodash": "4.17.21",
-    "@types/node": "22.19.3",
+    "@types/lodash": "4.17.23",
+    "@types/node": "24.10.4",
     "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"

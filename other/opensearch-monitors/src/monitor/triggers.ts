@@ -1,5 +1,7 @@
-import { sendSlackMessage, SlackEmoji, type SlackMessage } from "./slack.js";
-import { RUNBOOK_SEARCH_TERM } from "./monitor-builder.js";
+import type { SlackMessage } from "./slack.js";
+import { SlackEmoji, sendSlackMessage } from "./slack.js";
+
+export const RUNBOOK_SEARCH_TERM = "SEARCH_TERM" as const;
 
 export interface OSAction {
   readonly destination: string;
@@ -43,12 +45,9 @@ function sumNotBetween(name: string, lower: number, upper: number): string {
 }
 
 export enum OSMessageSubjects {
-  LAMBDA_ERRORS =
-    "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}}",
-  JAVA_ERRORS =
-    "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
-  LAMBDA_TIMEOUT =
-    "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
+  LAMBDA_ERRORS = "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}}",
+  JAVA_ERRORS = "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
+  LAMBDA_TIMEOUT = "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}",
 }
 
 /** Sends a message to all given destinations */
@@ -58,7 +57,7 @@ function sendAlerts(
   throttleMinutes?: number,
 ): OSAction[] {
   return destinations.map((destination) =>
-    sendSlackMessage(message, destination, throttleMinutes)
+    sendSlackMessage(message, destination, throttleMinutes),
   );
 }
 
@@ -102,9 +101,10 @@ export function triggerWhenSumOutside(
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
-    subject: `${
-      replaceRunbookWithSearchLink(name, runbookSearchLink)
-    } should be between ${betweenLower} MB and ${betweenUpper} MB, was {{ctx.results.0.aggregations.sum_${field}.value}} MB`,
+    subject: `${replaceRunbookWithSearchLink(
+      name,
+      runbookSearchLink,
+    )} should be between ${betweenLower} MB and ${betweenUpper} MB, was {{ctx.results.0.aggregations.sum_${field}.value}} MB`,
     message,
   };
   return {
@@ -124,9 +124,10 @@ export function triggerWhenLinesFound(
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
-    subject: `${
-      replaceRunbookWithSearchLink(name, runbookSearchLink)
-    } {{ctx.results.0.hits.total.value}} should not be more than ${threshold}`,
+    subject: `${replaceRunbookWithSearchLink(
+      name,
+      runbookSearchLink,
+    )} {{ctx.results.0.hits.total.value}} should not be more than ${threshold}`,
     message,
   };
   return {
@@ -166,8 +167,7 @@ export function triggerWhenAggregationBucketsFound(
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
-    subject:
-      `${name} {{ctx.results.0.aggregations.${aggName}.buckets.length}} should not be more than ${threshold}`,
+    subject: `${name} {{ctx.results.0.aggregations.${aggName}.buckets.length}} should not be more than ${threshold}`,
     message,
   };
   return {
@@ -188,9 +188,10 @@ export function triggerWhenLineCountOutside(
 ): OSTrigger {
   const msg: SlackMessage = {
     emoji: SlackEmoji.RED_CIRCLE,
-    subject: `${
-      replaceRunbookWithSearchLink(name, runbookSearchLink)
-    } should be between ${betweenLower} and ${betweenUpper}, was {{ctx.results.0.hits.total.value}}`,
+    subject: `${replaceRunbookWithSearchLink(
+      name,
+      runbookSearchLink,
+    )} should be between ${betweenLower} and ${betweenUpper}, was {{ctx.results.0.hits.total.value}}`,
     message,
   };
   return {

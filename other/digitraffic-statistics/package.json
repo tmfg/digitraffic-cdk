@@ -9,16 +9,19 @@
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "cdk": "cdk",
-    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22,es2022",
-    "test": "echo 'No tests implemented'"
+    "compile-lambdas": "node lib/esbuild.js",
+    "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22,es2022",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.11.11-1",
+    "@digitraffic/common": "2026.1.26-1",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.7",
@@ -26,8 +29,9 @@
     "@types/aws-lambda": "8.10.159",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "aws-cdk": "2.1100.2",
+    "cdk-ecr-deployment": "4.0.6",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"
   },

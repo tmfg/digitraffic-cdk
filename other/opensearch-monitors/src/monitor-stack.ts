@@ -1,20 +1,15 @@
-import { Duration, type Environment, Stack } from "aws-cdk-lib";
-import {
-  type ISecurityGroup,
-  type IVpc,
-  Peer,
-  Port,
-  SecurityGroup,
-  Vpc,
-} from "aws-cdk-lib/aws-ec2";
+import { writeFileSync } from "node:fs";
+import type { Environment } from "aws-cdk-lib";
+import { Duration, Stack } from "aws-cdk-lib";
+import type { ISecurityGroup, IVpc } from "aws-cdk-lib/aws-ec2";
+import { Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { TriggerFunction } from "aws-cdk-lib/triggers";
 import type { Construct } from "constructs";
-import type { OSMonitor } from "./monitor/monitor.js";
-import { writeFileSync } from "node:fs";
 import { EnvKeys } from "./env.js";
-import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import type { OSMonitor } from "./monitor/monitor.js";
 
 export interface OSMonitorsConfiguration {
   /** account */
@@ -58,12 +53,13 @@ export class UpdateOSMonitorsStack extends Stack {
 
     if (config.createLambda) {
       writeFileSync(
-        "./dist/lambda/monitors.json",
+        "./dist/lambda/update-os-monitors/monitors.json",
         JSON.stringify(config.monitors, null, 2),
       );
 
       // Just for local diffing
-      const timestamp = new Date().toISOString()
+      const timestamp = new Date()
+        .toISOString()
         .replace(/\.\d{3}Z$/, "Z") // drop milliseconds
         .replace(/[:]/g, "-"); // replace ":" with "-"
       writeFileSync(
@@ -80,11 +76,7 @@ export class UpdateOSMonitorsStack extends Stack {
         config.secretId,
       );
 
-      const secret = Secret.fromSecretNameV2(
-        this,
-        "Secret",
-        config.secretId,
-      );
+      const secret = Secret.fromSecretNameV2(this, "Secret", config.secretId);
       secret.grantRead(lambda);
     }
   }
@@ -126,9 +118,9 @@ export class UpdateOSMonitorsStack extends Stack {
       securityGroups: [sg],
       timeout: Duration.seconds(30),
       functionName: "UpdateOSMonitors",
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: "update-os-monitors.handler",
-      code: new AssetCode("dist/lambda"),
+      code: new AssetCode("dist/lambda/update-os-monitors"),
       environment: {
         [EnvKeys.ROLE]: roleArn,
         [EnvKeys.OS_HOST]: osHost,

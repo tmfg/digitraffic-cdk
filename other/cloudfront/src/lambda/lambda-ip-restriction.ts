@@ -15,32 +15,27 @@ const FORBIDDEN = {
   statusDescription: "Forbidden",
 } as const;
 
-export const handler: CloudFrontRequestHandler = (event, context, callback) => {
+export const handler: CloudFrontRequestHandler = async (event) => {
   const records = event.Records;
   if (records) {
     const record = records[0];
     if (!record) {
-      const err = createAndLogError(
+      throw createAndLogError(
         "lambda-ip-restriction.handler",
         "Records did not have a record",
       );
-      callback(err);
-      throw err;
     }
     const request: CloudFrontRequest = record.cf.request;
 
     if (ALLOWED_IPS.indexOf(request.clientIp) === -1) {
-      callback(null, FORBIDDEN);
-      return;
+      return FORBIDDEN;
     }
 
-    callback(null, request);
+    return request;
   } else {
-    const err = createAndLogError(
+    throw createAndLogError(
       "lambda-ip-restriction.handler",
       "Event did not have records",
     );
-    callback(err);
-    throw err;
   }
 };

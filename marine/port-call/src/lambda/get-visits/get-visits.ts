@@ -1,19 +1,21 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { z, ZodError } from "zod";
-import { findAllVisits } from "../../service/visit-service.js";
+import { ZodError, z } from "zod";
+import { getAllVisits } from "../../service/visit-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
 const EmptyStringUndefined = z.literal("").transform(() => undefined);
 const OptionalDateString = z.coerce.date().optional().or(EmptyStringUndefined);
 
-const getVisitsSchema = z.object({
-  from: OptionalDateString,
-  to: OptionalDateString,
-})
+const getVisitsSchema = z
+  .object({
+    from: OptionalDateString,
+    to: OptionalDateString,
+  })
   .strict()
   .readonly();
 
@@ -29,20 +31,22 @@ export const handler = async (
 
     return proxyHolder
       .setCredentials()
-      .then(() => findAllVisits(getVisitsEvent))
+      .then(() => getAllVisits(getVisitsEvent))
       .then(([visits, lastUpdated]) => {
         return lastUpdated
-          ? LambdaResponse.okJson(visits).withTimestamp(lastUpdated)
-          : LambdaResponse.okJson(visits);
+          ? LambdaResponseBuilder.create(visits)
+              .withTimestamp(lastUpdated)
+              .build()
+          : LambdaResponseBuilder.create(visits).build();
       });
   } catch (error) {
     if (error instanceof ZodError) {
-      return LambdaResponse.badRequest(JSON.stringify(error.issues));
+      return LambdaResponseBuilder.badRequest(JSON.stringify(error.issues));
     }
 
     logException(logger, error, true);
 
-    return LambdaResponse.internalError();
+    return LambdaResponseBuilder.internalError();
   } finally {
     logger.info({
       method: "GetVisits.handler",

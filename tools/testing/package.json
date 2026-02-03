@@ -16,22 +16,22 @@
     "build": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
     "madge": "8.0.0"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/common": "2025.11.11-1",
+    "@digitraffic/common": "2026.1.26-1",
     "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.7",
     "@rushstack/heft-jest-plugin": "1.1.7",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/madge": "5.0.3",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "esbuild": "0.27.2",
     "rollup": "4.55.1",
     "typescript": "5.9.3"

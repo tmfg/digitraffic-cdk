@@ -1,5 +1,6 @@
-import { Duration, Stack, type StackProps } from "aws-cdk-lib";
-import { type Construct } from "constructs";
+import type { TrafficType } from "@digitraffic/common/dist/types/traffictype";
+import type { StackProps } from "aws-cdk-lib";
+import { Duration, Stack } from "aws-cdk-lib";
 import {
   Effect,
   OpenIdConnectProvider,
@@ -7,18 +8,33 @@ import {
   Role,
   WebIdentityPrincipal,
 } from "aws-cdk-lib/aws-iam";
-import { Function } from "aws-cdk-lib/aws-lambda";
-import { type TrafficType } from "@digitraffic/common/dist/types/traffictype";
+import { Function as AwsFunction } from "aws-cdk-lib/aws-lambda";
+import type { Construct } from "constructs";
 
 export interface AwsGithubProps {
   readonly roles: {
     readonly updateSwaggerForTrafficType?: TrafficType;
     readonly shortName: string;
     readonly repo: string;
-    readonly environment: string;
+    readonly environment?: string; // if missing, applies to all environments
     readonly allowedActions: string[];
     readonly additionalPolicies?: PolicyStatement[];
   }[];
+}
+
+function createStringLikeCondition(
+  repo: string,
+  environment?: string,
+): { [key: string]: string } {
+  if (environment) {
+    return {
+      "token.actions.githubusercontent.com:sub": `repo:tmfg/${repo}:environment:${environment}`,
+    };
+  }
+
+  return {
+    "token.actions.githubusercontent.com:sub": `repo:tmfg/${repo}:*`,
+  };
 }
 
 export class AwsGithubOidcStack extends Stack {
@@ -40,23 +56,15 @@ export class AwsGithubOidcStack extends Stack {
     });
 
     props.roles.forEach((role) => {
-      const envCapitalized = role.environment.replace(
-        /^\w/,
-        (c) => c.toUpperCase(),
-      );
       const createdRole = new Role(this, `${role.shortName}-OIDCRole`, {
         assumedBy: new WebIdentityPrincipal(
           `arn:aws:iam::${this.account}:oidc-provider/token.actions.githubusercontent.com`,
           {
-            StringLike: {
-              "token.actions.githubusercontent.com:sub":
-                `repo:tmfg/${role.repo}:environment:${role.environment}`,
-            },
+            StringLike: createStringLikeCondition(role.repo, role.environment),
           },
         ),
         roleName: `${role.shortName}-GitHub-OIDC-Role`,
-        description:
-          `Used by GitHub Actions to perform ${role.shortName} related actions in this account`,
+        description: `Used by GitHub Actions to perform ${role.shortName} related actions in this account`,
         maxSessionDuration: Duration.hours(1),
       });
       if (role.allowedActions.length) {
@@ -74,21 +82,22 @@ export class AwsGithubOidcStack extends Stack {
         });
       }
       if (role.updateSwaggerForTrafficType) {
-        const updateApiDocsFunctionName =
-          `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateApiDocumentation`;
-        const updateSwaggerDocsFunctionName =
-          `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateSwaggerDescriptions`;
+        const envCapitalized = role.environment?.replace(/^\w/, (c) =>
+          c.toUpperCase(),
+        );
+        const updateApiDocsFunctionName = `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateApiDocumentation`;
+        const updateSwaggerDocsFunctionName = `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateSwaggerDescriptions`;
         createdRole.addToPrincipalPolicy(
           new PolicyStatement({
             effect: Effect.ALLOW,
             actions: ["lambda:InvokeFunction"],
             resources: [
-              Function.fromFunctionName(
+              AwsFunction.fromFunctionName(
                 this,
                 updateApiDocsFunctionName,
                 updateApiDocsFunctionName,
               ).functionArn,
-              Function.fromFunctionName(
+              AwsFunction.fromFunctionName(
                 this,
                 updateSwaggerDocsFunctionName,
                 updateSwaggerDocsFunctionName,

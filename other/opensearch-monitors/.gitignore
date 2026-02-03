@@ -1,14 +1,12 @@
 *
 
-!/.eslintignore
-!/.eslintrc.cjs
-!/.eslintrc.js
 !/.gitignore
 !/cdk.json
 !/jest.config.js
 !/*.json
 !/*.md
 !/*.sh
+!/esbuild.ts
 
 !/config/
 !/config/*.json
@@ -18,3 +16,4 @@
 /src/bin
 
 cdk.context.json
+

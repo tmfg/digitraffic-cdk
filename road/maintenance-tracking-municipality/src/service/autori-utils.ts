@@ -4,13 +4,8 @@ import {
   GeoJsonPoint,
 } from "@digitraffic/common/dist/utils/geojson-types";
 import * as GeometryUtils from "@digitraffic/common/dist/utils/geometry";
-import {
-  type Feature,
-  type Geometry,
-  type LineString,
-  type Position,
-} from "geojson";
 import { sub } from "date-fns/sub";
+import type { Feature, Geometry, LineString, Position } from "geojson";
 import {
   AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
   AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M,
@@ -18,20 +13,20 @@ import {
   AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH,
   AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S,
 } from "../constants.js";
-import {
-  type ApiContractData,
-  type ApiOperationData,
-  type ApiRouteData,
+import type {
+  ApiContractData,
+  ApiOperationData,
+  ApiRouteData,
 } from "../model/autori-api-data.js";
-import {
-  type DbDomainContract,
-  type DbDomainTaskMapping,
-  type DbMaintenanceTracking,
-  type DbWorkMachine,
+import type {
+  DbDomainContract,
+  DbDomainTaskMapping,
+  DbMaintenanceTracking,
+  DbWorkMachine,
 } from "../model/db-data.js";
 import { UNKNOWN_TASK_NAME } from "../model/tracking-save-result.js";
-import { calculateSpeedInKmH, createHarjaId } from "./utils.js";
 import logger from "./maintenance-logger.js";
+import { calculateSpeedInKmH, createHarjaId } from "./utils.js";
 
 /**
  * This fixes:
@@ -46,9 +41,9 @@ export function fixApiRouteDatas(
     .slice()
     .sort((a, b) =>
       CommonDateUtils.dateFromIsoString(a.startTime).getTime() <
-          CommonDateUtils.dateFromIsoString(b.startTime).getTime()
+      CommonDateUtils.dateFromIsoString(b.startTime).getTime()
         ? -1
-        : 1
+        : 1,
     );
   const fixedRouteData: ApiRouteData[] = [];
   sortedRouteData.forEach((routeData) => {
@@ -125,9 +120,10 @@ export function groupFeaturesToIndividualGeometries(
     );
 
     const newFeatures = positionGroups.map((positions) => {
-      const g: Geometry = positions.length === 1 && positions[0]
-        ? new GeoJsonPoint(positions[0])
-        : new GeoJsonLineString(positions);
+      const g: Geometry =
+        positions.length === 1 && positions[0]
+          ? new GeoJsonPoint(positions[0])
+          : new GeoJsonLineString(positions);
       return {
         type: "Feature",
         geometry: g,
@@ -136,9 +132,9 @@ export function groupFeaturesToIndividualGeometries(
     if (newFeatures.length > 1) {
       logger.info({
         method: "AutoriUtils.groupFeaturesToIndividualGeometries",
-        message: `split feature: ${JSON.stringify(feature)} to ${
-          JSON.stringify(newFeatures)
-        }`,
+        message: `split feature: ${JSON.stringify(feature)} to ${JSON.stringify(
+          newFeatures,
+        )}`,
       });
     }
     return newFeatures;
@@ -239,21 +235,23 @@ export function isExtendingPreviousTracking(
     previousPosition,
     nextPosition,
   );
-  const diffInS = previousTime && nextTime
-    ? CommonDateUtils.countDiffInSeconds(previousTime, nextTime)
-    : 0;
-  const speedInKmH = previousTime && nextTime
-    ? calculateSpeedInKmH(distInM, diffInS)
-    : 0;
+  const diffInS =
+    previousTime && nextTime
+      ? CommonDateUtils.countDiffInSeconds(previousTime, nextTime)
+      : 0;
+  const speedInKmH =
+    previousTime && nextTime ? calculateSpeedInKmH(distInM, diffInS) : 0;
   if (distInM > AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M) {
     return false;
   } else if (
-    isFinite(speedInKmH) && diffInS > 0 &&
+    Number.isFinite(speedInKmH) &&
+    diffInS > 0 &&
     speedInKmH > AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH
   ) {
     return false;
   } else if (
-    !isFinite(speedInKmH) && distInM > AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M
+    !Number.isFinite(speedInKmH) &&
+    distInM > AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M
   ) {
     // Simplification/saving resolution to db might move location of previous tracking's end point a bit and then when comparing
     // it with next tracking's start point the result is infinity in speed. If point has moved significantly then consider as
@@ -276,7 +274,7 @@ export function getTasksForOperations(
     return [];
   }
 
-  return operations.reduce(function (filtered: string[], operation: string) {
+  return operations.reduce((filtered: string[], operation: string) => {
     const taskMapping = taskMappings.find(
       (mapping: DbDomainTaskMapping): boolean => {
         return mapping.original_id === operation && !mapping.ignore;
@@ -335,10 +333,9 @@ export function createDbWorkMachine(
   return {
     harjaUrakkaId: createHarjaId(contractId),
     harjaId: createHarjaId(user + (vehicleType ?? "")),
-    type:
-      `domainName: ${domainName} / contractId: ${contractId} / user: ${user} vehicleType: ${
-        vehicleType ?? ""
-      }`,
+    type: `domainName: ${domainName} / contractId: ${contractId} / user: ${user} vehicleType: ${
+      vehicleType ?? ""
+    }`,
   };
 }
 
@@ -383,8 +380,7 @@ export function createDbMaintenanceTracking(
   if (harjaTasks.length === 0) {
     logger.info({
       method: "AutoriUpdate.createDbMaintenanceTracking",
-      message:
-        `No tasks for tracking api id ${routeData.id} -> no data to save`,
+      message: `No tasks for tracking api id ${routeData.id} -> no data to save`,
       customDomain: contract.domain,
       customContract: contract.contract,
     });
@@ -404,9 +400,9 @@ export function createDbMaintenanceTracking(
   if (routeData.geography.features.length > 1) {
     logger.warn({
       method: `AutoriUpdate.createDbMaintenanceTracking`,
-      message: `geography.features length bigger than 1 data: ${
-        JSON.stringify(routeData)
-      }`,
+      message: `geography.features length bigger than 1 data: ${JSON.stringify(
+        routeData,
+      )}`,
       customDomain: contract.domain,
       customContract: contract.contract,
     });
@@ -417,9 +413,9 @@ export function createDbMaintenanceTracking(
   let geometry: GeoJsonPoint | GeoJsonLineString;
   if (!f) {
     throw new Error(
-      `Undefined feature routeData.geography.features[0] geometry for ${
-        JSON.stringify(routeData?.geography)
-      }`,
+      `Undefined feature routeData.geography.features[0] geometry for ${JSON.stringify(
+        routeData?.geography,
+      )}`,
     );
   } else if (f.geometry.type === "Point") {
     lastPoint = new GeoJsonPoint(f.geometry.coordinates);
@@ -432,9 +428,9 @@ export function createDbMaintenanceTracking(
       geometry = new GeoJsonLineString(f.geometry.coordinates);
     } else {
       throw new Error(
-        `Invalid LineString for maintenance tracking ${f.geometry.type} ${
-          JSON.stringify(f.geometry.coordinates)
-        }`,
+        `Invalid LineString for maintenance tracking ${f.geometry.type} ${JSON.stringify(
+          f.geometry.coordinates,
+        )}`,
       );
     }
   } else {

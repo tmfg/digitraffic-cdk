@@ -1,7 +1,6 @@
-import { Agent, request } from "undici";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { Agent, request } from "undici";
 import type { NemoResponse } from "../model/nemo.js";
-import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export class NemoApi {
   readonly _url: string;
@@ -49,7 +48,7 @@ export class NemoApi {
         return Promise.reject();
       }
 
-      const response = await resp.body.json() as NemoResponse;
+      const response = (await resp.body.json()) as NemoResponse;
 
       logger.debug("returning " + JSON.stringify(response));
 

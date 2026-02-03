@@ -1,38 +1,29 @@
-import { loginUser } from "./cognito_backend.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { CognitoUserSession } from "amazon-cognito-identity-js";
 import type {
   APIGatewayAuthorizerResult,
   APIGatewayRequestAuthorizerEvent,
   APIGatewayRequestAuthorizerEventHeaders,
   AuthResponse,
-  Callback,
-  Context,
   PolicyDocument,
   Statement,
   StatementEffect,
 } from "aws-lambda";
-import type { CognitoUserSession } from "amazon-cognito-identity-js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { loginUser } from "./cognito_backend.js";
 
 const EFFECT_ALLOW = "Allow";
 const EFFECT_DENY = "Deny";
 
 const KEY_COGNITO_GROUPS = "cognito:groups";
 
-export const handler: (
+export const handler = async (
   event: APIGatewayRequestAuthorizerEvent,
-  context: Context,
-  callback: Callback<APIGatewayAuthorizerResult>,
-) => Promise<void> = async function (
-  event: APIGatewayRequestAuthorizerEvent,
-  _context: Context,
-  callback: Callback<APIGatewayAuthorizerResult>,
-) {
+): Promise<APIGatewayAuthorizerResult> => {
   const result = parseAuthentication(event.headers);
-
+  const group = getGroupFromPath(event.path);
   if (!result) {
-    callback("Unauthorized");
+    throw new Error("Unauthorized");
   } else {
-    const group = getGroupFromPath(event.path);
     const policy = await generatePolicy(
       group,
       result[0],
@@ -42,7 +33,7 @@ export const handler: (
 
     logger.debug(policy);
 
-    callback(null, policy);
+    return policy;
   }
 };
 
@@ -50,24 +41,32 @@ function parseAuthentication(
   // eslint-disable-next-line @rushstack/no-new-null
   headers: APIGatewayRequestAuthorizerEventHeaders | null,
 ): [string, string] | undefined {
-  // eslint-disable-next-line dot-notation
+  // biome-ignore lint/complexity/useLiteralKeys: Indexed access
   if (!headers?.["authorization"]) {
     return undefined;
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
-    const encodedCreds = headers["authorization"].split(" ")[1]!;
-    const plainCreds = Buffer.from(encodedCreds, "base64").toString().split(
-      ":",
-    );
+    // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+    const encodedCreds = headers["authorization"].split(" ")[1];
+    if (!encodedCreds) {
+      return undefined;
+    }
+    const plainCreds = Buffer.from(encodedCreds, "base64")
+      .toString()
+      .split(":");
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return [plainCreds[0]!, plainCreds[1]!];
+    if (plainCreds.length !== 2 || !plainCreds[0] || !plainCreds[1]) {
+      return undefined;
+    }
+    return [plainCreds[0], plainCreds[1]];
   }
 }
 
 function getGroupFromPath(path: string): string {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return path.split("/")[2]!; // images/[group]/[image]
+  const group = path.split("/")[2]; // images/[group]/[image]
+  if (!group) {
+    if (!group) throw new Error(`Invalid path, group not found: ${path}`);
+  }
+  return group;
 }
 
 async function generatePolicy(

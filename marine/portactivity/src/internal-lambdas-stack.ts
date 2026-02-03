@@ -1,30 +1,30 @@
-import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
-import type { Stack } from "aws-cdk-lib";
-import { Duration } from "aws-cdk-lib";
+import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import {
   databaseFunctionProps,
   defaultLambdaConfiguration,
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
-import type { Queue } from "aws-cdk-lib/aws-sqs";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import type { Bucket } from "aws-cdk-lib/aws-s3";
-import type { QueueAndDLQ } from "./sqs.js";
-import { PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { Rule, Schedule } from "aws-cdk-lib/aws-events";
-import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import { PortactivityEnvKeys, PortActivityParameterKeys } from "./keys.js";
 import {
   MonitoredDBFunction,
   MonitoredFunction,
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import type { PortactivityConfiguration } from "./app-props.js";
+import type { Stack } from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
+import { Rule, Schedule } from "aws-cdk-lib/aws-events";
+import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import type { Bucket } from "aws-cdk-lib/aws-s3";
 import { Topic } from "aws-cdk-lib/aws-sns";
-import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import type { PortactivityConfiguration } from "./app-props.js";
+import { PortActivityParameterKeys, PortactivityEnvKeys } from "./keys.js";
 import type { PortActivityStack } from "./portactivity-stack.js";
+import type { QueueAndDLQ } from "./sqs.js";
 
 export function create(
   stack: PortActivityStack,
@@ -108,10 +108,7 @@ export function create(
     queueAndDLQ.queue,
   );
   const updateTimestampsFromPilotwebLambda =
-    createUpdateTimestampsFromPilotwebLambda(
-      stack,
-      queueAndDLQ.queue,
-    );
+    createUpdateTimestampsFromPilotwebLambda(stack, queueAndDLQ.queue);
   const deleteOldTimestampsLambda = createDeleteOldTimestampsLambda(stack);
 
   stack.grantSecret(
@@ -235,8 +232,8 @@ function createUpdateTimestampsFromSchedules(
   const functionName = "PortActivity-UpdateTimestampsFromSchedules";
   const environment = stack.createLambdaEnvironment();
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
-  environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig
-    .enableETBForAllPorts.toString();
+  environment[PortactivityEnvKeys.ENABLE_ETB] =
+    stack.portActivityConfig.enableETBForAllPorts.toString();
   const logGroup = createLambdaLogGroup({ stack, functionName });
   const lambda = MonitoredFunction.create(
     stack,
@@ -293,7 +290,7 @@ function createProcessDLQLambda(
   const functionName = "PortActivity-ProcessTimestampsDLQ";
   const logGroup = createLambdaLogGroup({ stack, functionName });
   const processDLQLambda = MonitoredFunction.create(stack, functionName, {
-    runtime: Runtime.NODEJS_22_X,
+    runtime: Runtime.NODEJS_24_X,
     logGroup: logGroup,
     functionName: functionName,
     code: new AssetCode("dist/lambda/process-dlq"),
@@ -309,7 +306,7 @@ function createProcessDLQLambda(
   const statement = new PolicyStatement();
   statement.addActions("s3:PutObject");
   statement.addActions("s3:PutObjectAcl");
-  statement.addResources(dlqBucket.bucketArn + "/*");
+  statement.addResources(`${dlqBucket.bucketArn}/*`);
   processDLQLambda.addToRolePolicy(statement);
 
   return processDLQLambda;
@@ -334,8 +331,8 @@ function createUpdateAwakeAiETXTimestampsLambda(
 ): MonitoredFunction {
   const environment = stack.createLambdaEnvironment();
   environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
-  environment[PortactivityEnvKeys.ENABLE_ETB] = stack.portActivityConfig
-    .enableETBForAllPorts.toString();
+  environment[PortactivityEnvKeys.ENABLE_ETB] =
+    stack.portActivityConfig.enableETBForAllPorts.toString();
   const logGroup = createLambdaLogGroup({ stack, functionName });
   const lambdaConf = databaseFunctionProps(
     stack,

@@ -1,10 +1,10 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { Language } from "@digitraffic/common/dist/types/language";
+import type { Feature, GeoJsonProperties, Geometry } from "geojson";
 import type { FaultProps } from "../../service/faults.js";
 import * as FaultsService from "../../service/faults.js";
+import { dbTestBase, insert } from "../db-testutil.js";
 import { newFault } from "../testdata.js";
-import { dbTestBase, insert, validateS124 } from "../db-testutil.js";
-import { Language } from "@digitraffic/common/dist/types/language";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Feature, GeoJsonProperties, Geometry } from "geojson";
 
 // XML validation takes a while
 //jest.setTimeout(30000);
@@ -12,31 +12,6 @@ import type { Feature, GeoJsonProperties, Geometry } from "geojson";
 describe(
   "faults",
   dbTestBase((db: DTDatabase) => {
-    test("getFaults124ById - not found", async () => {
-      const nullFault = await FaultsService.getFaultS124ById(db, 666);
-      expect(nullFault).not.toBeDefined();
-    });
-
-    test("getFaultS124ById creates valid XML", async () => {
-      const fault = newFault({
-        geometry: {
-          lat: 60.285807,
-          lon: 27.321659,
-        },
-      });
-      await insert(db, [fault]);
-
-      const faultS124 = await FaultsService.getFaultS124ById(db, fault.id);
-
-      if (!faultS124) {
-        throw new Error("empty");
-      }
-
-      //console.info(faultS124);
-
-      await validateS124(faultS124);
-    });
-
     test("findAllFaults", async () => {
       const fault = newFault();
       await insert(db, [fault]);

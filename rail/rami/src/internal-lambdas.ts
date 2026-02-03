@@ -1,16 +1,16 @@
+import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import {
   MonitoredDBFunction,
   MonitoredFunction,
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Duration } from "aws-cdk-lib";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { RamiEnvKeys } from "./keys.js";
-import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
-import { Duration } from "aws-cdk-lib";
 
 export function create(
   stack: DigitrafficStack,
@@ -42,8 +42,9 @@ function createProcessRosmQueueLambda(
   dlq: Queue,
 ): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId &&
-      { SECRET_ID: stack.configuration.secretId }),
+    ...(stack.configuration.secretId && {
+      SECRET_ID: stack.configuration.secretId,
+    }),
     DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
   };
@@ -72,8 +73,9 @@ function createProcessSmQueueLambda(
   dlq: Queue,
 ): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId &&
-      { SECRET_ID: stack.configuration.secretId }),
+    ...(stack.configuration.secretId && {
+      SECRET_ID: stack.configuration.secretId,
+    }),
     DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
     [RamiEnvKeys.UDOT_SQS_URL]: udotQueue.queueUrl,
@@ -109,8 +111,9 @@ function createProcessUdotQueueLambda(
   dlq: Queue,
 ): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId &&
-      { SECRET_ID: stack.configuration.secretId }),
+    ...(stack.configuration.secretId && {
+      SECRET_ID: stack.configuration.secretId,
+    }),
     DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
   };
@@ -138,8 +141,9 @@ function createProcessUdotQueueLambda(
 
 function createDeleteOldDataLambda(stack: DigitrafficStack): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId &&
-      { SECRET_ID: stack.configuration.secretId }),
+    ...(stack.configuration.secretId && {
+      SECRET_ID: stack.configuration.secretId,
+    }),
     DB_APPLICATION: "avoindata",
   };
   const deleteOldDataLambda = MonitoredDBFunction.create(
@@ -176,7 +180,7 @@ function createProcessDLQLambda(
       reservedConcurrentExecutions: 5,
       timeout: 10,
       memorySize: 256,
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
     },
   );
 
@@ -185,7 +189,7 @@ function createProcessDLQLambda(
   const statement = new PolicyStatement();
   statement.addActions("s3:PutObject");
   statement.addActions("s3:PutObjectAcl");
-  statement.addResources(dlqBucket.bucketArn + "/*");
+  statement.addResources(`${dlqBucket.bucketArn}/*`);
   processDLQLambda.addToRolePolicy(statement);
 
   return processDLQLambda;

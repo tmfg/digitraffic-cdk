@@ -1,0 +1,35 @@
+{
+  "name": "@digitraffic-cdk/esbuild",
+  "version": "1.0.0",
+  "private": true,
+  "description": "digitraffic-cdk esbuild package",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/common.d.ts",
+      "default": "./dist/common.js"
+    }
+  },
+  "main": "./dist/common.js",
+  "types": "./dist/common.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "heft build --clean",
+    "test": "echo 'No tests implemented'"
+  },
+  "dependencies": {
+    "esbuild": "0.27.2",
+    "globby": "16.1.0"
+  },
+  "devDependencies": {
+    "@cyclonedx/cyclonedx-esbuild": "1.0.0",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/heft": "1.1.7",
+    "@rushstack/heft-typescript-plugin": "1.1.7",
+    "@types/node": "24.10.4",
+    "typescript": "5.9.3"
+  }
+}

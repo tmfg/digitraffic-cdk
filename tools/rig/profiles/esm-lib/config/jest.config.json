@@ -1,7 +1,7 @@
 {
   "extends": "@rushstack/heft-jest-plugin/includes/jest-shared.config.json",
   "roots": ["<rootDir>/lib/"],
-  "testMatch": ["<rootDir>/lib/__test__/**/*.test.[j]s"],
+  "testMatch": ["<rootDir>/lib/__test__/**/*.test.js"],
   "collectCoverage": true,
   "maxWorkers": "1",
   "collectCoverageFrom": [

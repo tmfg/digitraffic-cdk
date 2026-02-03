@@ -1,16 +1,15 @@
+import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
 import {
   addCorsHeadersToLambdaResponse,
   createAndLogError,
 } from "./header-util.js";
-import type { CloudFrontRequest, CloudFrontRequestHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
 export const NOT_ACCEPTABLE = {
   status: "406",
   statusDescription: "Not Acceptable",
-  body:
-    "Use of gzip compression is required with Accept-Encoding: gzip header.",
+  body: "Use of gzip compression is required with Accept-Encoding: gzip header.",
 };
 
 /*
@@ -18,17 +17,15 @@ export const NOT_ACCEPTABLE = {
     It checks the request for accept-encoding header and if it does not contains gzip return 406.
     It also intercepts HTTP OPTIONS preflight requests to return CORS data.
  */
-export const handler: CloudFrontRequestHandler = (event, context, callback) => {
+export const handler: CloudFrontRequestHandler = async (event) => {
   const records = event.Records;
   if (records) {
     const record = records[0];
     if (!record) {
-      const err = createAndLogError(
+      throw createAndLogError(
         "lambda-gzip-requirement.handler",
         "Records did not have a record",
       );
-      callback(err);
-      throw err;
     }
     const request: CloudFrontRequest = record.cf.request;
 
@@ -46,22 +43,17 @@ export const handler: CloudFrontRequestHandler = (event, context, callback) => {
         },
       };
       addCorsHeadersToLambdaResponse(response);
-      callback(null, response);
-      return;
+      return response;
     } else if (!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {
-      callback(null, NOT_ACCEPTABLE);
-      return;
+      return NOT_ACCEPTABLE;
     }
 
-    // correct header, please continue
-    callback(null, request);
+    return request;
   } else {
-    const err = createAndLogError(
+    throw createAndLogError(
       "lambda-gzip-requirement.handler",
       "Event did not have records",
     );
-    callback(err);
-    throw err;
   }
 };
 

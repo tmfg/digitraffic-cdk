@@ -1,7 +1,8 @@
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { cleanMaintenanceTrackingData } from "../../service/maintenance-tracking.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { type Handler } from "aws-lambda";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { Handler } from "aws-lambda";
+import { cleanMaintenanceTrackingData } from "../../service/maintenance-tracking.js";
+
 const proxyHolder = ProxyHolder.create();
 
 export const handler: Handler = (): void => {

@@ -7,11 +7,11 @@ import { CfnBucket } from "aws-cdk-lib/aws-s3";
 import { CfnQueue } from "aws-cdk-lib/aws-sqs";
 import { kebabCase } from "change-case";
 import type { IConstruct } from "constructs";
-import { snakeCase } from "lodash-es";
+import { snakeCase } from "es-toolkit";
 import { DigitrafficStack, SOLUTION_KEY } from "./stack.js";
 
 const MAX_CONCURRENCY_LIMIT = 100;
-const NODE_RUNTIMES = [Runtime.NODEJS_22_X.name, Runtime.NODEJS_20_X.name];
+const NODE_RUNTIMES = [Runtime.NODEJS_24_X.name, Runtime.NODEJS_22_X.name];
 
 enum ResourceType {
   stackName = "STACK_NAME",
@@ -73,8 +73,13 @@ export class StackCheckingAspect implements IAspect {
     }
   }
 
+  private isDigitrafficStack(node: IConstruct): node is DigitrafficStack {
+    return (node as unknown) instanceof DigitrafficStack;
+  }
+
   private checkStack(node: IConstruct): void {
-    if (node instanceof DigitrafficStack) {
+    // Fix Invalid 'instanceof' check: 'nodeToCheck' has type that is not related to 'DigitrafficStack'
+    if (this.isDigitrafficStack(node)) {
       if (
         (node.stackName.includes("Test") || node.stackName.includes("Tst")) &&
         node.configuration.production
@@ -214,6 +219,7 @@ export class StackCheckingAspect implements IAspect {
           node,
           ResourceType.resourcePath,
           "Path part should be in kebab-case",
+          false, // warning only
         );
       }
     } else if (node instanceof CfnMethod) {

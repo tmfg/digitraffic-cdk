@@ -1,18 +1,14 @@
-import { getShiplist } from "../../service/shiplist.js";
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type {
-  ProxyLambdaRequest,
-  ProxyLambdaResponse,
-} from "@digitraffic/common/dist/aws/types/proxytypes";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { APIGatewayProxyEventSubset } from "@digitraffic/common/dist/aws/types/lambda-proxy-types";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
+import type { APIGatewayProxyResult } from "aws-lambda";
 import type { PublicApiTimestamp } from "../../model/timestamp.js";
+import { getShiplist } from "../../service/shiplist.js";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>("shiplist");
@@ -25,7 +21,7 @@ function response(
   statusCode: number,
   message: string,
   contentType: MediaType = MediaType.TEXT_PLAIN,
-): ProxyLambdaResponse {
+): APIGatewayProxyResult {
   return {
     statusCode,
     body: message,
@@ -51,10 +47,10 @@ class ValidationError extends Error {
 }
 
 function validateParameters(
-  parameters: Partial<ShiplistParameters>,
+  parameters: Partial<ShiplistParameters> | undefined | null,
   secret: ShiplistSecret,
 ): ShiplistParameters {
-  if (!parameters.auth) {
+  if (!parameters?.auth) {
     throw new ValidationError(401, "Missing authentication");
   }
   if (parameters.auth !== secret.auth) {
@@ -75,8 +71,8 @@ function validateParameters(
 }
 
 export const handler = (
-  event: ProxyLambdaRequest,
-): Promise<ProxyLambdaResponse> => {
+  event: APIGatewayProxyEventSubset,
+): Promise<APIGatewayProxyResult> => {
   return rdsHolder
     .setCredentials()
     .then(() => secretHolder.get())
@@ -85,10 +81,10 @@ export const handler = (
         event.queryStringParameters,
         secret,
       );
-      const interval = Number.parseInt(parameters.interval ?? "4*24");
+      const interval = Number.parseInt(parameters.interval ?? "4*24", 10);
 
       return inDatabaseReadonly(
-        async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
+        async (db: DTDatabase): Promise<APIGatewayProxyResult> => {
           const shiplist = await getShiplist(db, parameters.locode, interval);
 
           return response(200, getPageSource(shiplist), MediaType.TEXT_HTML);

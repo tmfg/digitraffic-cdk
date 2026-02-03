@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && npm run postbuild",
-    "postbuild": "npm run compile-lambdas",
+    "build": "tsc && npm run build:bundle",
+    "build:bundle": "npm run compile-lambdas",
     "cdk": "cdk",
     "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy",
     "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
@@ -13,13 +13,14 @@
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "compile-lambdas": "esbuild src/lambda/**/*.ts --log-level=warning --minify --bundle --platform=node --outdir=dist/lambda --out-extension:.js=.mjs --format=esm --target=node22 --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
+    "compile-lambdas": "node lib/esbuild.js",
+    "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --minify --bundle --platform=node --outdir=dist/lambda --out-extension:.js=.mjs --format=esm --target=node22 --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\"",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft-watch test --clean"
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2025.11.24-1",
+    "@digitraffic/common": "2026.1.26-1",
     "@rgrove/parse-xml": "4.2.0",
     "aws-cdk-lib": "2.234.0",
     "constructs": "10.4.4",
@@ -33,7 +34,8 @@
   "devDependencies": {
     "@aws-sdk/client-api-gateway": "3.965.0",
     "@aws-sdk/client-sqs": "3.965.0",
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.0.5",
@@ -42,7 +44,7 @@
     "@types/aws-lambda": "8.10.159",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "@types/xml2js": "0.4.14",
     "aws-cdk": "2.1100.2",
     "esbuild": "0.27.2",

@@ -1,23 +1,13 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import {
-  type DbDomain,
-  type DbDomainContract,
-  type DbMaintenanceTracking,
+import type {
+  DbDomain,
+  DbDomainContract,
+  DbMaintenanceTracking,
 } from "../model/db-data.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
   return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");
-}
-
-export function dbTestBaseNoTruncate(fn: (db: DTDatabase) => void): () => void {
-  return commonDbTestBase(
-    fn,
-    () => Promise.resolve(),
-    "road",
-    "road",
-    "localhost:54322/road",
-  );
 }
 
 export function truncate(db: DTDatabase): Promise<void> {

@@ -9,25 +9,28 @@
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "echo 'No tests implemented'",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "watch": "tsc -w"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.965.0",
     "@aws-sdk/lib-storage": "3.965.0",
-    "@digitraffic/common": "2025.11.11-1",
+    "@digitraffic/common": "2026.1.26-1",
     "aws-cdk-lib": "2.234.0",
     "aws-sdk": "2.1693.0",
     "constructs": "10.4.4"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.1.7",
     "@rushstack/heft-jest-plugin": "1.1.7",
     "@types/aws-lambda": "8.10.159",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
+    "esbuild": "0.27.2",
     "jest": "30.2.0",
     "typescript": "5.9.3"
   },

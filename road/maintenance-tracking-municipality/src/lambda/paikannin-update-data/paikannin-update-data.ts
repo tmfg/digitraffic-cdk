@@ -1,14 +1,14 @@
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import type { Handler } from "aws-lambda";
 import { PaikanninApi } from "../../api/paikannin.js";
 import { MaintenanceTrackingMunicipalityEnvKeys } from "../../keys.js";
-import { type MaintenanceTrackingPaikanninSecret } from "../../model/maintenance-tracking-municipality-secret.js";
-import { type TrackingSaveResult } from "../../model/tracking-save-result.js";
+import type { MaintenanceTrackingPaikanninSecret } from "../../model/maintenance-tracking-municipality-secret.js";
+import type { TrackingSaveResult } from "../../model/tracking-save-result.js";
 import * as CommonUpdate from "../../service/common-update.js";
-import { PaikanninUpdate } from "../../service/paikannin-update.js";
 import logger from "../../service/maintenance-logger.js";
-import { type Handler } from "aws-lambda";
+import { PaikanninUpdate } from "../../service/paikannin-update.js";
 
 const domainName = getEnvVariable(
   MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME,
@@ -18,9 +18,8 @@ const domainPrefix = getEnvVariable(
 );
 
 const proxyHolder: ProxyHolder = ProxyHolder.create();
-const secretHolder = SecretHolder.create<MaintenanceTrackingPaikanninSecret>(
-  domainPrefix,
-);
+const secretHolder =
+  SecretHolder.create<MaintenanceTrackingPaikanninSecret>(domainPrefix);
 let paikanninUpdateServiceHolder: PaikanninUpdate | undefined;
 
 export const handler: Handler = (): Promise<TrackingSaveResult> => {

@@ -5,6 +5,7 @@
 !/*.json
 !/*.md
 !/*.sh
+!/esbuild.ts
 
 !/config/
 !/config/*.json
@@ -19,3 +20,4 @@
 !/src/**/
 !/src/**/*.ts
 /src/bin
+

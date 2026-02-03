@@ -1,24 +1,21 @@
-import {
-  saveTimestamp,
-  type UpdatedTimestamp,
-} from "../../service/timestamps.js";
-import { validateTimestamp } from "../../service/timestamp-validation.js";
-import type { ApiTimestamp } from "../../model/timestamp.js";
-import type { Handler, SQSEvent } from "aws-lambda";
-import {
-  type DTDatabase,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logException } from "@digitraffic/common/dist/utils/logging";
+import type { Handler, SQSEvent } from "aws-lambda";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { validateTimestamp } from "../../service/timestamp-validation.js";
+import type { UpdatedTimestamp } from "../../service/timestamps.js";
+import { saveTimestamp } from "../../service/timestamps.js";
 
 const rdsHolder = RdsHolder.create();
 
 export function handlerFn(): (
   event: SQSEvent,
+  // biome-ignore lint/suspicious/noConfusingVoidType: Promise.resolve() returns void
 ) => Promise<PromiseSettledResult<void | UpdatedTimestamp>[]> {
   return (event: SQSEvent) => {
     return rdsHolder.setCredentials().then(() => {

@@ -1,13 +1,12 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import * as Utils from "@digitraffic/common/dist/utils/utils";
 import type {
+  CloudFrontRequest,
   CloudFrontResponseEvent,
   CloudFrontResponseHandler,
-  CloudFrontResponseResult,
 } from "aws-lambda";
-import type { Callback, CloudFrontRequest, Context } from "aws-lambda";
 import queryStringHelper from "querystring";
 import { createAndLogError } from "./header-util.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const HEADERS = {
   CONTENT_DISPOSITION: "Content-Disposition",
@@ -23,22 +22,18 @@ export const HEADERS = {
     You must replace EXT_VERSION with timestamp to change code when deploying.  You can't deploy a new lambda version
     if the code does not change.
  */
-export const handler: CloudFrontResponseHandler = (
+export const handler: CloudFrontResponseHandler = async (
   event: CloudFrontResponseEvent,
-  _: Context,
-  callback: Callback<CloudFrontResponseResult>,
-): void => {
+) => {
   const records = event.Records;
   if (records) {
     const record = records[0];
 
     if (!record) {
-      const err = createAndLogError(
+      throw createAndLogError(
         "lambda-lam-headers.handler",
         "Records did not have a record",
       );
-      callback(err);
-      throw err;
     }
     const { request, response } = record.cf;
     const { headers } = response;
@@ -50,7 +45,7 @@ export const handler: CloudFrontResponseHandler = (
       headers[HEADERS.CONTENT_DISPOSITION.toLowerCase()] = [
         {
           key: HEADERS.CONTENT_DISPOSITION,
-          value: 'attachment; filename="' + filename + '"',
+          value: `attachment; filename="${filename}"`,
         },
       ];
 
@@ -74,14 +69,13 @@ export const handler: CloudFrontResponseHandler = (
       customHeaders: JSON.stringify(headers),
       customResponseHeaders: JSON.stringify(response.headers),
     });
-    callback(null, response);
+
+    return response;
   } else {
-    const err = createAndLogError(
+    throw createAndLogError(
       "lambda-lam-headers.handler",
       "Event did not have records",
     );
-    callback(err);
-    throw err;
   }
 };
 

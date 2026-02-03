@@ -1,13 +1,18 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import {
-  assertDataCount,
-  assertVsDatex2Count,
-  dbTestBase,
-} from "../db-testutil.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { jest } from "@jest/globals";
 import { insertData } from "../../dao/data.js";
 import { Datex2Version, SOURCES, TYPES } from "../../model/types.js";
+import {
+  assertDataCount,
+  assertRttiDatex2Count,
+  assertVsDatex2Count,
+  dbTestBase,
+} from "../db-testutil.js";
+import {
+  TEST_DATEX2_SITUATION,
+  TEST_DATEX2_VMS_TABLE_PUBLICATION,
+} from "../service/datex2_35_files.js";
 import { TEST_DATEX2 } from "../service/datex2_223_files.js";
 
 async function getResponseFromLambda(): Promise<void> {
@@ -27,7 +32,23 @@ describe(
       await getResponseFromLambda();
     });
 
-    test("handle one vs", async () => {
+    test("handle one rtti", async () => {
+      await insertData(
+        db,
+        "test124",
+        SOURCES.TOPIC,
+        "3.5",
+        TYPES.RTTI_DATEX2_XML,
+        TEST_DATEX2_SITUATION,
+      );
+      await assertDataCount(db, 1, "NEW");
+
+      await getResponseFromLambda();
+      await assertDataCount(db, 1, "PROCESSED");
+      await assertRttiDatex2Count(db, 1);
+    });
+
+    test("handle one vs 2.2.3", async () => {
       await insertData(
         db,
         "test123",
@@ -35,6 +56,22 @@ describe(
         Datex2Version["2.2.3"],
         TYPES.VMS_DATEX2_XML,
         TEST_DATEX2,
+      );
+      await assertDataCount(db, 1, "NEW");
+
+      await getResponseFromLambda();
+      await assertDataCount(db, 1, "PROCESSED");
+      await assertVsDatex2Count(db, 2);
+    });
+
+    test("handle one vs 3.5 metadata", async () => {
+      await insertData(
+        db,
+        "test123",
+        SOURCES.API,
+        Datex2Version["3.5"],
+        TYPES.VMS_DATEX2_METADATA_XML,
+        TEST_DATEX2_VMS_TABLE_PUBLICATION,
       );
       await assertDataCount(db, 1, "NEW");
 

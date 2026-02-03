@@ -1,11 +1,10 @@
-import type { DbFault } from "../model/fault.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
   assertCount,
   dbTestBase as commonDbTestBase,
 } from "@digitraffic/common/dist/test/db-testutils";
-import { JSON_CACHE_KEY } from "@digitraffic/common/dist/database/cached";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as xsdValidator from "xsd-schema-validator";
+import type { DbFault } from "../model/fault.js";
 import type { AtonSecret } from "../model/secret.js";
 
 export const TEST_ACTIVE_WARNINGS_VALID = {
@@ -270,14 +269,6 @@ export const TEST_ATON_SECRET: AtonSecret = {
   serviceRegistryUrl: "",
 };
 
-export async function validateS124(faultS124: string): Promise<void> {
-  const result = await xsdValidator.validateXML(
-    faultS124,
-    "src/__test__/service/S124.xsd",
-  );
-  expect(result.valid).toBe(true);
-}
-
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
   return commonDbTestBase(
     fn,
@@ -365,17 +356,4 @@ export async function insert(db: DTDatabase, faults: DbFault[]): Promise<void> {
       }),
     );
   });
-}
-
-export async function insertActiveWarnings<T>(
-  db: DTDatabase,
-  value: T,
-): Promise<void> {
-  await db.none(
-    "insert into cached_json(cache_id, content, last_updated) values ($1, $2, now())",
-    [
-      JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE,
-      value,
-    ],
-  );
 }

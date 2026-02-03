@@ -1,6 +1,10 @@
 import { Writable } from "node:stream";
 import { DtLogger } from "../../aws/runtime/dt-logger.js";
-import { logException } from "../../utils/logging.js";
+import {
+  logException,
+  truncateEnd,
+  truncateMiddle,
+} from "../../utils/logging.js";
 
 interface ErrorLogLine {
   type: string;
@@ -93,5 +97,29 @@ describe("logging-test", () => {
       },
       true,
     );
+  });
+
+  test("truncateEnd - not truncated as would be longer", () => {
+    expect(truncateEnd("This is a test string", 10)).toBe(
+      "This is a test string",
+    );
+  });
+
+  test("truncateEnd", () => {
+    expect(truncateEnd("This is a test string that is long enough", 10)).toBe(
+      "This is a [TRUNCATED 31 CHARS]",
+    );
+  });
+
+  test("truncateMiddle - not truncated as would be longer", () => {
+    expect(truncateMiddle("This is a test string", 10)).toBe(
+      "This is a test string",
+    );
+  });
+
+  test("truncateMiddle", () => {
+    expect(
+      truncateMiddle("This is a test string that is long enough", 20),
+    ).toBe("This is a [TRUNCATED 21 CHARS] ong enough");
   });
 });

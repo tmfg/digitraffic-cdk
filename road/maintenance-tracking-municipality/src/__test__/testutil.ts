@@ -3,29 +3,21 @@ import {
   getRandomIntegerAsString,
   getRandomNumber,
 } from "@digitraffic/common/dist/test/testutils";
-import {
-  type GeoJsonLineString,
-  GeoJsonPoint,
-} from "@digitraffic/common/dist/utils/geojson-types";
-import {
-  type Feature,
-  type Geometry,
-  type LineString,
-  type Point,
-  type Position,
-} from "geojson";
-import _ from "lodash";
+import type { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
+import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
-import {
-  type DbDomainContract,
-  type DbDomainTaskMapping,
-  type DbMaintenanceTracking,
+import type { Feature, Geometry, LineString, Point, Position } from "geojson";
+import _ from "lodash";
+import type {
+  DbDomainContract,
+  DbDomainTaskMapping,
+  DbMaintenanceTracking,
 } from "../model/db-data.js";
-import {
-  type ApiWorkevent,
-  type ApiWorkeventDevice,
-  type ApiWorkeventIoDevice,
+import type {
+  ApiWorkevent,
+  ApiWorkeventDevice,
+  ApiWorkeventIoDevice,
 } from "../model/paikannin-api-data.js";
 import {
   PAIKANNIN_OPERATION_BRUSHING,
@@ -106,13 +98,13 @@ export function createZigZagCoordinates(
   distBetweenPointsM: number = 100,
 ): Position[] {
   // a = sqr(c^2/2)
-  const distInXyKm = Math.sqrt(Math.pow(distBetweenPointsM / 1000, 2) / 2);
+  const distInXyKm = Math.sqrt((distBetweenPointsM / 1000) ** 2 / 2);
   const xAddition = KM_IN_X * distInXyKm;
   const yAddition = KM_IN_Y * distInXyKm;
   const x = getRandomNumber(X_MIN, X_MAX);
   const y = getRandomNumber(Y_MIN, Y_MAX);
-  // @ts-ignore
-  return Array.from({ length: coordinateCount }).map((i, index) => {
+
+  return Array.from({ length: coordinateCount }).map((_i, index) => {
     const even: boolean = index % 2 === 0;
     // Make linestring to go zigzag, so it won't be simplified
     const nextX = x + index * xAddition;

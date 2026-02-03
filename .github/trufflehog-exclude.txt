@@ -1,0 +1,5 @@
+mcp-db/docker-compose.yml
+yarn.lock
+apps/mir/lambda/secrets/mir_secrets_test.go
+apps/cert-gen/src/__test__/*
+lib/secom/src/__test__/server/exchange-set.test.ts

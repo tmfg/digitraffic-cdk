@@ -1,15 +1,16 @@
-import { AssetCode, type FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
-import { Duration } from "aws-cdk-lib";
-import { type Props } from "./app-props.js";
-import { PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { type Bucket } from "aws-cdk-lib/aws-s3";
+import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
-import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation.js";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Duration } from "aws-cdk-lib";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { type LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import type { FunctionProps } from "aws-cdk-lib/aws-lambda";
+import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import type { Bucket } from "aws-cdk-lib/aws-s3";
+import type { Props } from "./app-props.js";
+import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation.js";
 import { UPDATE_SWAGGER_KEYS } from "./model/keys.js";
 
 export function create(stack: DigitrafficStack, bucket: Bucket): void {
@@ -32,7 +33,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
     logGroup: logGroup,
     code: new AssetCode("dist/lambda/update-api-documentation"),
     handler: "lambda-update-api-documentation.handler",
-    runtime: Runtime.NODEJS_22_X,
+    runtime: Runtime.NODEJS_24_X,
     environment: lambdaEnv,
     reservedConcurrentExecutions: 1,
     memorySize: 128,
@@ -97,7 +98,7 @@ function createUpdateSwaggerDescriptionsLambda(
     logGroup: logGroup,
     code: new AssetCode("dist/lambda/update-swagger"),
     handler: "lambda-update-swagger.handler",
-    runtime: Runtime.NODEJS_22_X,
+    runtime: Runtime.NODEJS_24_X,
     memorySize: 192,
     reservedConcurrentExecutions: 1,
     environment: lambdaEnv,

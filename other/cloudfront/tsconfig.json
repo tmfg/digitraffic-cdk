@@ -1,6 +1,8 @@
 {
   "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-esm.json",
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
@@ -8,6 +10,7 @@
     "inlineSources": false,
     "strictPropertyInitialization": false,
     "preserveSymlinks": true,
-    "allowJs": true
+    "allowJs": true,
+    "checkJs": true
   }
 }

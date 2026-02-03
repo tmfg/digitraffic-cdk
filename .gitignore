@@ -6,6 +6,7 @@
 !/.github/workflows/**/**.yml
 !/.github/CODEOWNERS
 !/.github/dependabot.yml
+!/.github/trufflehog-exclude.txt
 
 !/.editorconfig
 !/.git-blame-ignore-revs
@@ -27,20 +28,18 @@
 !/common/
 !/common/*
 
-# digitraffic-common and repo-scripts
+# digitraffic-common
 !/lib/
 !/lib/*/
-!/lib/repo-scripts/*
-!/lib/repo-scripts/**/*
 
-# Helpper scripts
+# Helper scripts
 !/scripts/
 !/scripts/*.sh
 !/scripts/*.md
 !/scripts/*.py
 !/scripts/*.template
 
-# Templlate for new projects
+# Template for new projects
 !/template/
 !/template/*
 !/template/esm/*

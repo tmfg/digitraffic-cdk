@@ -1,5 +1,5 @@
 {
-  "name": "patchmanager-cdk",
+  "name": "patchmanager",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "echo no tests for this project",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
     "watch": "tsc -w"
   },
   "dependencies": {
@@ -17,13 +17,16 @@
     "constructs": "10.4.4"
   },
   "devDependencies": {
-    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.1.7",
     "@rushstack/heft-jest-plugin": "1.1.7",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.4",
     "aws-cdk": "2.1100.2",
+    "esbuild": "0.27.2",
     "ts-node": "10.9.2",
     "typescript": "5.9.3"
   },

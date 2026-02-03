@@ -4,6 +4,7 @@
 !package.json
 !tsconfig.json
 !README.md
+!/esbuild.ts
 
 !/config/
 !/config/*.json
@@ -13,3 +14,4 @@
 !/src/__test__/**/
 !/src/__test__/**/*.yml
 /src/bin
+

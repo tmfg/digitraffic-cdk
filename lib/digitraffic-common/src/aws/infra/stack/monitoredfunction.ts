@@ -10,7 +10,7 @@ import {
   SystemLogLevel,
 } from "aws-cdk-lib/aws-lambda";
 import type { ITopic } from "aws-cdk-lib/aws-sns";
-import { chain } from "lodash-es";
+import { camelCase, startCase } from "es-toolkit";
 import type { TrafficType } from "../../../types/traffictype.js";
 import type {
   LambdaEnvironment,
@@ -240,11 +240,7 @@ export class MonitoredFunction extends LambdaFunction {
   ): MonitoredFunction {
     const functionName =
       functionParameters?.functionName ??
-      `${stack.configuration.shortName}-${chain(name)
-        .camelCase()
-        .startCase()
-        .replace(/\s/g, "")
-        .value()}`;
+      `${stack.configuration.shortName}-${startCase(camelCase(name)).replace(/\s/g, "")}`;
 
     const logGroup = createLambdaLogGroup({ stack, functionName });
 
@@ -326,11 +322,7 @@ export const MonitoredDBFunction = {
   ): MonitoredFunction {
     const functionName =
       functionParameters?.functionName ??
-      `${stack.configuration.shortName}-${chain(name)
-        .camelCase()
-        .startCase()
-        .replace(/\s/g, "")
-        .value()}`;
+      `${stack.configuration.shortName}-${startCase(camelCase(name)).replace(/\s/g, "")}`;
 
     const logGroup = createLambdaLogGroup({ stack, functionName });
     const env = environment ? environment : stack.createLambdaEnvironment();
