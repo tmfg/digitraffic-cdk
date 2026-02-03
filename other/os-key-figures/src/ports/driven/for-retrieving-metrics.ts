@@ -7,8 +7,6 @@ import type { TimePeriod } from "../../domain/types/time-period.js";
  * ForRetrievingMetrics is a driven port (secondary port) that defines
  * what the application needs for retrieving metric values from a data source.
  *
- * Named using Cockburn's "ForDoingSomething" convention.
- *
  * The adapter implementing this port (e.g., OpenSearchMetricSource) will
  * translate domain concepts into data source specific queries.
  */

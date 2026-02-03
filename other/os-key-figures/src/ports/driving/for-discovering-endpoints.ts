@@ -4,8 +4,6 @@ import type { Service } from "../../domain/types/service.js";
 /**
  * ForDiscoveringEndpoints is a driving port (primary port) that defines
  * what the application offers for endpoint discovery.
- *
- * Named using Cockburn's "ForDoingSomething" convention.
  */
 export interface ForDiscoveringEndpoints {
   /**

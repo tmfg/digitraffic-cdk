@@ -5,8 +5,6 @@ import type { TimePeriod } from "../../domain/types/time-period.js";
 /**
  * ForCollectingMetrics is a driving port (primary port) that defines
  * what the application offers for metric collection.
- *
- * Named using Cockburn's "ForDoingSomething" convention.
  */
 export interface ForCollectingMetrics {
   /**

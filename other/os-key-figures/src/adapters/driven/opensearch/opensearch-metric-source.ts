@@ -118,34 +118,34 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
       case "Http req":
         return new CountMetricQuery(
           this.config.accountNames,
-          "Http req",
+          definition.name,
           index,
         );
       case "Http req 200":
         return new CountMetricQuery(
           this.config.accountNames,
-          "Http req 200",
+          definition.name,
           index,
           "httpStatusCode:200",
         );
       case "Bytes out":
         return new SumMetricQuery(
           this.config.accountNames,
-          "Bytes out",
+          definition.name,
           index,
           "bytes",
         );
       case "Unique IPs":
         return new CardinalityMetricQuery(
           this.config.accountNames,
-          "Unique IPs",
+          definition.name,
           index,
           "clientIp",
         );
       case "Top 10 Referers":
         return new TermsMetricQuery(
           this.config.accountNames,
-          "Top 10 Referers",
+          definition.name,
           index,
           "httpReferer.keyword",
           100,
@@ -153,7 +153,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
       case "Top 10 digitraffic-users":
         return new TermsMetricQuery(
           this.config.accountNames,
-          "Top 10 digitraffic-users",
+          definition.name,
           index,
           "httpDigitrafficUser.keyword",
           100,
@@ -161,7 +161,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
       case "Top 10 User Agents":
         return new TermsMetricQuery(
           this.config.accountNames,
-          "Top 10 User Agents",
+          definition.name,
           index,
           "httpUserAgent.keyword",
           100,
@@ -169,7 +169,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
       case "Top 10 IPs":
         return new TermsMetricQuery(
           this.config.accountNames,
-          "Top 10 IPs",
+          definition.name,
           index,
           "clientIp",
           100,
@@ -177,7 +177,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
       case "Top digitraffic-users by bytes":
         return new TermsWithSubAggMetricQuery(
           this.config.accountNames,
-          "Top digitraffic-users by bytes",
+          definition.name,
           index,
           "httpDigitrafficUser.keyword",
           "bytes",

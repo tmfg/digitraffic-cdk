@@ -2,8 +2,6 @@
  * ForFetchingResources is a driven port (secondary port) that defines
  * what the application needs for fetching HTTP resources.
  *
- * Named using Cockburn's "ForDoingSomething" convention.
- *
  * Used primarily for fetching OpenAPI specs for endpoint discovery.
  */
 export interface ForFetchingResources {

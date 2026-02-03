@@ -3,8 +3,6 @@ import type { CollectedMetric } from "../../domain/types/collected-metric.js";
 /**
  * ForPersistingMetrics is a driven port (secondary port) that defines
  * what the application needs for storing collected metrics.
- *
- * Named using Cockburn's "ForDoingSomething" convention.
  */
 export interface ForPersistingMetrics {
   /**

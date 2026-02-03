@@ -1,6 +1,5 @@
 /**
  * Service enum representing the different Digitraffic services.
- * Renamed from ServiceDomain to avoid confusion with DDD "domain" term.
  */
 export enum Service {
   ALL = "*",
