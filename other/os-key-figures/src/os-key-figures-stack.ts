@@ -20,7 +20,7 @@ import {
   Runtime,
 } from "aws-cdk-lib/aws-lambda";
 import * as s3 from "aws-cdk-lib/aws-s3";
-import { transportType } from "./constants.js";
+import { Service } from "./domain/types/service.js";
 
 export interface Props {
   readonly openSearchVPCEndpoint: string;
@@ -241,7 +241,7 @@ export class OsKeyFiguresStack extends Stack {
     rule.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.ALL,
+          TRANSPORT_TYPE: Service.ALL,
         }),
       }),
     );
@@ -252,7 +252,7 @@ export class OsKeyFiguresStack extends Stack {
     rule2.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.RAIL,
+          TRANSPORT_TYPE: Service.RAIL,
         }),
       }),
     );
@@ -263,7 +263,7 @@ export class OsKeyFiguresStack extends Stack {
     rule3.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.MARINE,
+          TRANSPORT_TYPE: Service.MARINE,
         }),
       }),
     );
@@ -274,7 +274,7 @@ export class OsKeyFiguresStack extends Stack {
     rule1.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.ROAD,
+          TRANSPORT_TYPE: Service.ROAD,
         }),
       }),
     );
@@ -285,7 +285,7 @@ export class OsKeyFiguresStack extends Stack {
     rule4.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.AFIR,
+          TRANSPORT_TYPE: Service.AFIR,
         }),
       }),
     );
