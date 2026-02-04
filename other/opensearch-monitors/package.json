@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "5.2.0",
-    "@aws-sdk/client-sts": "3.978.0",
+    "@aws-sdk/client-sts": "3.975.0",
     "@aws-sdk/types": "3.973.1",
     "@digitraffic/common": "2026.1.26-1",
     "@smithy/node-http-handler": "4.4.8",
@@ -35,11 +35,11 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.1.11",
-    "@rushstack/heft-jest-plugin": "1.1.11",
+    "@rushstack/heft": "1.1.10",
+    "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "25.1.0",
-    "aws-cdk": "2.1104.0",
+    "@types/node": "25.0.10",
+    "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"
   }
