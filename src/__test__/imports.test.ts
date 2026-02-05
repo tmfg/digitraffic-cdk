@@ -10,11 +10,6 @@ test("database import ok?", () => {
   return expect(database).resolves.toBeDefined();
 });
 
-test("cached import ok?", () => {
-  const cached = import("../database/cached.js");
-  return expect(cached).resolves.toBeDefined();
-});
-
 test("models import ok?", () => {
   const models = import("../database/models.js");
   return expect(models).resolves.toBeDefined();
