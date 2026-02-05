@@ -1,6 +1,6 @@
 {
   "name": "@digitraffic/common",
-  "version": "2026.2.5-1",
+  "version": "2026.2.5-2",
   "private": false,
   "description": "",
   "repository": {
@@ -175,19 +175,19 @@
     "@aws-sdk/client-sns": "3.975.0",
     "@aws-sdk/lib-storage": "3.975.0",
     "@date-fns/tz": "1.4.1",
-    "@smithy/fetch-http-handler": "5.3.8",
-    "@smithy/node-http-handler": "4.4.7",
-    "aws-cdk-lib": "2.234.0",
+    "@smithy/fetch-http-handler": "5.3.9",
+    "@smithy/node-http-handler": "4.4.8",
+    "aws-cdk-lib": "2.236.0",
     "change-case": "5.4.4",
-    "constructs": "10.4.4",
+    "constructs": "10.4.5",
     "date-fns": "4.1.0",
-    "es-toolkit": "1.43.0",
+    "es-toolkit": "1.44.0",
     "geojson-validation": "1.0.2",
-    "ky": "1.14.2",
+    "ky": "1.14.3",
     "lodash-es": "4.17.23",
     "pg-native": "3.5.2",
     "pg-promise": "12.3.0",
-    "zod": "4.3.5"
+    "zod": "4.3.6"
   },
   "engines": {
     "node": ">=24 <25"
