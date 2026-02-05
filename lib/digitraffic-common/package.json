@@ -1,6 +1,6 @@
 {
   "name": "@digitraffic/common",
-  "version": "2026.1.26-1",
+  "version": "2026.2.5-1",
   "private": false,
   "description": "",
   "repository": {
@@ -12,7 +12,6 @@
   "exports": {
     ".": "./dist/index.js",
     "./dist/database/database": "./dist/database/database.js",
-    "./dist/database/cached": "./dist/database/cached.js",
     "./dist/database/models": "./dist/database/models.js",
     "./dist/database/last-updated": "./dist/database/last-updated.js",
     "./dist/types/geojson": "./dist/types/geojson.js",
@@ -161,6 +160,7 @@
     "madge": "8.0.0",
     "pg-native": "3.5.2",
     "pg-promise": "12.3.0",
+    "pg-query-stream": "4.10.3",
     "rimraf": "6.1.2",
     "sort-package-json": "3.6.1",
     "ts-jest": "29.4.6",
@@ -169,11 +169,11 @@
     "zod": "4.3.6"
   },
   "peerDependencies": {
-    "@aws-sdk/client-api-gateway": "3.965.0",
-    "@aws-sdk/client-s3": "3.965.0",
-    "@aws-sdk/client-secrets-manager": "3.965.0",
-    "@aws-sdk/client-sns": "3.965.0",
-    "@aws-sdk/lib-storage": "3.965.0",
+    "@aws-sdk/client-api-gateway": "3.975.0",
+    "@aws-sdk/client-s3": "3.975.0",
+    "@aws-sdk/client-secrets-manager": "3.975.0",
+    "@aws-sdk/client-sns": "3.975.0",
+    "@aws-sdk/lib-storage": "3.975.0",
     "@date-fns/tz": "1.4.1",
     "@smithy/fetch-http-handler": "5.3.8",
     "@smithy/node-http-handler": "4.4.7",
