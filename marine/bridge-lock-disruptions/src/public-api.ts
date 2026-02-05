@@ -13,7 +13,7 @@ import {
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
 import type { IModel, Resource } from "aws-cdk-lib/aws-apigateway";
-import type { BridgeLockDisruptionsProps } from "./app-props";
+import type { BridgeLockDisruptionsProps } from "./app-props.js";
 import { default as DisruptionSchema } from "./model/disruption-schema.js";
 
 const BRIDGE_LOCK_DISRUPTION_TAGS_V1 = ["Bridge Lock Disruption V1"];
