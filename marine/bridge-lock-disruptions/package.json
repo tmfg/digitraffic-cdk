@@ -17,7 +17,7 @@
     "watch": "heft build-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.1.26-1",
+    "@digitraffic/common": "2026.2.5-1",
     "aws-cdk-lib": "2.236.0",
     "aws-sdk": "^2.1693.0",
     "constructs": "10.4.5",
