@@ -13,6 +13,7 @@ import {
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
 import type { IModel, Resource } from "aws-cdk-lib/aws-apigateway";
+import type { BridgeLockDisruptionsProps } from "./app-props";
 import { default as DisruptionSchema } from "./model/disruption-schema.js";
 
 const BRIDGE_LOCK_DISRUPTION_TAGS_V1 = ["Bridge Lock Disruption V1"];
@@ -21,7 +22,10 @@ export class PublicApi {
   // @ts-expect-error
   disruptionsResource: Resource;
 
-  constructor(stack: DigitrafficStack) {
+  constructor(
+    stack: DigitrafficStack,
+    bridgeLockDisruptionsProps: BridgeLockDisruptionsProps,
+  ) {
     const publicApi = this.createApi(stack);
 
     // eslint-disable-next-line deprecation/deprecation
@@ -48,7 +52,11 @@ export class PublicApi {
     );
 
     this.createResourcePaths(publicApi);
-    this.createDisruptionsResource(disruptionsModel, stack);
+    this.createDisruptionsResource(
+      disruptionsModel,
+      stack,
+      bridgeLockDisruptionsProps,
+    );
 
     publicApi.documentResource(
       // @ts-expect-error
@@ -64,10 +72,16 @@ export class PublicApi {
   createDisruptionsResource(
     disruptionsJsonModel: IModel,
     stack: DigitrafficStack,
+    bridgeLockDisruptionsProps: BridgeLockDisruptionsProps,
   ): void {
-    const getDisruptionsLambda = FunctionBuilder.create(stack, "get-disruptions")
+    const getDisruptionsLambda = FunctionBuilder.create(
+      stack,
+      "get-disruptions",
+    )
+      .withReservedConcurrentExecutions(
+        bridgeLockDisruptionsProps.getDisruptionsLambda.reservedConcurrency,
+      )
       .withMemorySize(256)
-      .withReservedConcurrentExecutions(4)
       .build();
 
     const getDisruptionsIntegration = new DigitrafficIntegration(
