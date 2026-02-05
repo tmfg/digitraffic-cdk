@@ -16,8 +16,8 @@
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
   "nodeSupportedVersionRange": ">=24.0.0 <25.0.0",
-  "rushVersion": "5.165.0",
-  "pnpmVersion": "10.27.0",
+  "rushVersion": "5.166.0",
+  "pnpmVersion": "10.28.1",
   "ensureConsistentVersions": false,
   "repository": {
     "url": "https://github.com/tmfg/digitraffic-cdk",
@@ -236,12 +236,6 @@
     {
       "packageName": "maintenance-tracking-municipality",
       "projectFolder": "road/maintenance-tracking-municipality",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "road"]
-    },
-    {
-      "packageName": "open311",
-      "projectFolder": "road/open311",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "road"]
     },

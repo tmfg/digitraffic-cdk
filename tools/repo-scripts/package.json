@@ -27,16 +27,16 @@
     "@rollup/plugin-node-resolve": "16.0.3",
     "@rollup/plugin-terser": "0.4.4",
     "@rollup/plugin-typescript": "12.3.0",
-    "@rushstack/heft": "1.1.7",
-    "@rushstack/heft-jest-plugin": "1.1.7",
+    "@rushstack/heft": "1.1.10",
+    "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/async": "3.2.25",
     "@types/fs-extra": "11.0.4",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.23",
-    "@types/node": "24.10.4",
+    "@types/node": "25.0.10",
     "async": "3.2.6",
-    "rollup": "4.55.1",
+    "rollup": "4.57.0",
     "typescript": "5.9.3"
   }
 }

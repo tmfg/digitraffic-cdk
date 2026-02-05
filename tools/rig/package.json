@@ -9,9 +9,9 @@
     "test": "echo 'No tests implemented'"
   },
   "dependencies": {
-    "@rushstack/heft": "^1.1.7",
-    "@rushstack/heft-jest-plugin": "^1.1.7",
-    "@rushstack/heft-typescript-plugin": "^1.1.7",
-    "typescript": "~5.9.3"
+    "@rushstack/heft": "1.1.10",
+    "@rushstack/heft-jest-plugin": "1.1.10",
+    "@rushstack/heft-typescript-plugin": "1.1.10",
+    "typescript": "5.9.3"
   }
 }

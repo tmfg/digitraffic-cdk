@@ -24,16 +24,16 @@
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/common": "2026.1.26-1",
+    "@digitraffic/common": "2026.2.5-3",
     "@jest/globals": "30.2.0",
-    "@rushstack/heft": "1.1.7",
-    "@rushstack/heft-jest-plugin": "1.1.7",
+    "@rushstack/heft": "1.1.10",
+    "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/madge": "5.0.3",
-    "@types/node": "24.10.4",
+    "@types/node": "25.0.10",
     "esbuild": "0.27.2",
-    "rollup": "4.55.1",
+    "rollup": "4.57.0",
     "typescript": "5.9.3"
   }
 }
