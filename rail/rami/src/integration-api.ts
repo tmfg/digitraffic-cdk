@@ -67,7 +67,7 @@ export class IntegrationApi {
       code: new AssetCode("dist/lambda/upload-rosm-message"),
       handler: "upload-rosm-message.handler",
       logGroup: logGroup,
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       reservedConcurrentExecutions: 20,
       environment: {
         [RamiEnvKeys.ROSM_SQS_URL]: sqs.queueUrl,

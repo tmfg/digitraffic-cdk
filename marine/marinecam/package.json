@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.975.0",
-    "@digitraffic/common": "2026.2.5-3",
+    "@digitraffic/common": "2026.2.5-4",
     "amazon-cognito-identity-js": "6.3.16",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
