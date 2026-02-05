@@ -240,12 +240,6 @@
       "tags": ["cdk", "road"]
     },
     {
-      "packageName": "open311",
-      "projectFolder": "road/open311",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "road"]
-    },
-    {
       "packageName": "variable-signs",
       "projectFolder": "road/variable-signs",
       "decoupledLocalDependencies": ["@digitraffic/common"],
