@@ -140,7 +140,7 @@ jobs:
             echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ fromJson(steps.install-config.outputs.config).roles[github.event.inputs.env][steps.environment.outputs.domain] }}
           role-session-name: gh-actions-install-${{ github.event.inputs.env }}
@@ -226,7 +226,7 @@ jobs:
 
       - name: Configure AWS credentials for SBOM
         if: github.event.inputs.command == 'deploy'
-        uses: aws-actions/configure-aws-credentials@v5
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ fromJson(steps.sbom-config.outputs.common).sbomUploadRoleArn }}
           role-session-name: gh-actions-upload-sbom-${{ github.event.inputs.application }}-${{ github.event.inputs.env }}

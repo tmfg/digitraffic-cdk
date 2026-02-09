@@ -24,7 +24,9 @@ export type AppField =
   | "messageType"
   | "messages"
   | "meterName"
-  | "statisticValue";
+  | "statisticValue"
+  | "prefix"
+  | "count";
 
 // prettier-ignore
 export type NginxField = "@timestamp";

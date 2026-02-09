@@ -14,9 +14,9 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.1.26-1",
-    "aws-cdk-lib": "2.234.0",
-    "constructs": "10.4.4"
+    "@digitraffic/common": "2026.2.5-3",
+    "aws-cdk-lib": "2.236.0",
+    "constructs": "10.4.5"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
@@ -24,13 +24,13 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@jest/globals": "30.2.0",
-    "@rushstack/heft": "1.1.7",
-    "@rushstack/heft-jest-plugin": "1.1.7",
-    "@types/aws-lambda": "8.10.159",
+    "@rushstack/heft": "1.1.10",
+    "@rushstack/heft-jest-plugin": "1.1.10",
+    "@types/aws-lambda": "8.10.160",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "24.10.4",
-    "aws-cdk": "2.1100.2",
+    "@types/node": "25.0.10",
+    "aws-cdk": "2.1103.0",
     "cdk-ecr-deployment": "4.0.6",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"
