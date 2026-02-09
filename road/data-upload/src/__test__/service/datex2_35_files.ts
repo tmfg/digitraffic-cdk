@@ -115,21 +115,21 @@ export const TEST_DATEX2_VMSPUBLICATION_1 = `<?xml version="1.0" encoding="UTF-8
 	xmlns:vms="http://datex2.eu/schema/3/vms"
 	xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
 	xmlns:sit="http://datex2.eu/schema/3/situation">
-	<publicationTime>2025-10-20T05:11:10.570Z</publicationTime>
-	<publicationCreator>
-		<country>FI</country>
-		<nationalIdentifier>FTA</nationalIdentifier>
-	</publicationCreator>
-	<headerInformation>
-		<confidentiality>noRestriction</confidentiality>
-		<informationStatus>real</informationStatus>
-	</headerInformation>
+	<com:publicationTime>2025-10-20T05:11:10.570Z</com:publicationTime>
+	<com:publicationCreator>
+		<com:country>FI</com:country>
+		<com:nationalIdentifier>FTA</com:nationalIdentifier>
+	</com:publicationCreator>
+	<vms:headerInformation>
+		<com:confidentiality>noRestriction</com:confidentiality>
+		<com:informationStatus>real</com:informationStatus>
+	</vms:headerInformation>
 	<vms:vmsControllerStatus>
 		<vms:vmsControllerReference id="VME038713"/>
 		<vms:statusUpdateTime>2025-10-20T05:11:10.570Z</vms:statusUpdateTime>
 		<vms:vmsStatus vmsIndex="0">
 			<vmsStatus>
-				<statusUpdateTime>2025-10-20T05:10:23.783Z</statusUpdateTime>
+				<vms:statusUpdateTime>2025-10-20T05:10:23.783Z</vms:statusUpdateTime>
 				<vmsMessage messageIndex="0">
 					<vmsMessage>
 						<displayAreaSettings displayAreaIndex="0">
@@ -203,6 +203,5 @@ export const TEST_DATEX2_VMS_TABLE_PUBLICATION = `
 				</vms:vms>
 			</vms:vms>
 		</vms:vmsController>
-	
 	</vms:vmsControllerTable>
 </d2:payload>`;

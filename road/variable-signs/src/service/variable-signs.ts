@@ -1,12 +1,9 @@
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import { isProductionMessage } from "./filtering-service.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { findAll } from "../db/datex2.js";
+import { isProductionMessage } from "./filtering-service.js";
 
-const DATEX2_223_TEMPLATE =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+const DATEX2_223_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2LogicalModel modelBaseVersion="2"
                 xsi:schemaLocation="http://datex2.eu/schema/2/2_0 https://tie.digitraffic.fi/schemas/datex2/DATEXIISchema_2_2_3_with_definitions_FI.xsd"
                 xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -27,8 +24,7 @@ const DATEX2_223_TEMPLATE =
 </d2LogicalModel>
 `;
 
-const DATEX2_SITUATION_PUBLICATION_35_TEMPLATE =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+const DATEX2_SITUATION_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <sit:situationPublication lang="fi" modelBaseVersion="3" 
     xmlns:com="http://datex2.eu/schema/3/common"
 	  xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
@@ -45,17 +41,16 @@ const DATEX2_SITUATION_PUBLICATION_35_TEMPLATE =
     xmlns:vms="http://datex2.eu/schema/3/vms"
     xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
     xmlns:sit="http://datex2.eu/schema/3/situation">
-    <publicationTime>PUBLICATION_TIME</publicationTime>
-    <publicationCreator>
-        <country>FI</country>
-        <nationalIdentifier>FTA</nationalIdentifier>
-    </publicationCreator>
+    <com:publicationTime>PUBLICATION_TIME</com:publicationTime>
+    <com:publicationCreator>
+        <com:country>FI</com:country>
+        <com:nationalIdentifier>FTA</com:nationalIdentifier>
+    </com:publicationCreator>
     SITUATIONS
 </sit:situationPublication>
 `;
 
-const DATEX2_VMS_PUBLICATION_35_TEMPLATE =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+const DATEX2_VMS_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2:payload xsi:type="vms:VmsPublication"
     xmlns:com="http://datex2.eu/schema/3/common"
     xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
@@ -73,20 +68,19 @@ const DATEX2_VMS_PUBLICATION_35_TEMPLATE =
     xmlns:vms="http://datex2.eu/schema/3/vms"
     xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
     xmlns:sit="http://datex2.eu/schema/3/situation">
-    <publicationTime>PUBLICATION_TIME<publicationTime>
-    <publicationCreator>
-        <country>FI</country>
-        <nationalIdentifier>FTA</nationalIdentifier>
-    </publicationCreator>
-    <headerInformation>
-        <confidentiality>noRestriction</confidentiality>
-        <informationStatus>real</informationStatus>
-    </headerInformation>
+    <com:publicationTime>PUBLICATION_TIME</com:publicationTime>
+    <com:publicationCreator>
+        <com:country>FI</com:country>
+        <com:nationalIdentifier>FTA</com:nationalIdentifier>
+    </com:publicationCreator>
+    <vms:headerInformation>
+        <com:confidentiality>noRestriction</com:confidentiality>
+        <com:informationStatus>real</com:informationStatus>
+    </vms:headerInformation>
     STATUSES
 </d2:payload>`;
 
-const DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE =
-  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+const DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2:payload xsi:type="vms:VmsTablePublication"
     xmlns:com="http://datex2.eu/schema/3/common"
     xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
@@ -104,18 +98,18 @@ const DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE =
     xmlns:vms="http://datex2.eu/schema/3/vms"
     xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced"
     xmlns:sit="http://datex2.eu/schema/3/situation">
-  	<publicationTime>PUBLICATION_TIME</publicationTime>
-	  <publicationCreator>
-		    <country>FI</country>
-		    <nationalIdentifier>FTA</nationalIdentifier>
-	  </publicationCreator>
-	  <headerInformation>
-		    <confidentiality>noRestriction</confidentiality>
-		    <informationStatus>real</informationStatus>
-	  </headerInformation>
-	  <vmsControllerTable>
+  	<com:publicationTime>PUBLICATION_TIME</com:publicationTime>
+	  <com:publicationCreator>
+		    <com:country>FI</com:country>
+		    <com:nationalIdentifier>FTA</com:nationalIdentifier>
+	  </com:publicationCreator>
+	  <vms:headerInformation>
+		    <com:confidentiality>noRestriction</com:confidentiality>
+		    <com:informationStatus>real</com:informationStatus>
+	  </vms:headerInformation>
+	  <vms:vmsControllerTable>
 		    CONTROLLERS
-	  </vmsControllerTable>
+	  </vms:vmsControllerTable>
 </d2:payload>`;
 
 export function findControllersDatex2_35(): Promise<[string, Date]> {
@@ -125,9 +119,7 @@ export function findControllersDatex2_35(): Promise<[string, Date]> {
       "DATEXII_3_5",
       "CONTROLLER",
     );
-    const datex2: string[] = datex2DbSituations
-      .map((d) => d.datex2);
-    //      .filter((d) => isProductionMessage(d));
+    const datex2: string[] = datex2DbSituations.map((d) => d.datex2);
 
     return [createVmsTablePublication35(datex2, lastModified), lastModified];
   });
@@ -140,9 +132,7 @@ export function findStatusesDatex2_35(): Promise<[string, Date]> {
       "DATEXII_3_5",
       "CONTROLLER_STATUS",
     );
-    const datex2: string[] = datex2DbSituations
-      .map((d) => d.datex2);
-    //      .filter((d) => isProductionMessage(d));
+    const datex2: string[] = datex2DbSituations.map((d) => d.datex2);
 
     return [createVmsPublication35(datex2, lastModified), lastModified];
   });
@@ -178,16 +168,33 @@ export function findSituationsDatex2_223(): Promise<[string, Date]> {
   });
 }
 
+function addNamespaceIfMissing(
+  datex2: string,
+  tag: string,
+  namespace: string,
+): string {
+  if (datex2.includes(`<${tag}`)) {
+    return datex2
+      .replace(`<${tag}`, `<${namespace}:${tag}`)
+      .replace(`</${tag}>`, `</${namespace}:${tag}>`);
+  }
+
+  return datex2;
+}
+
 function createVmsTablePublication35(
   datex2: string[],
   lastUpdated: Date | undefined,
 ): string {
   const publicationTime = lastUpdated ?? new Date();
-  const controllers = datex2.join("\n");
+  const controllers = datex2
+    .map((d) => addNamespaceIfMissing(d, "vmsController", "vms"))
+    .join("\n");
 
-  return DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE
-    .replace("PUBLICATION_TIME", publicationTime.toISOString())
-    .replace("CONTROLLERS", controllers);
+  return DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE.replace(
+    "PUBLICATION_TIME",
+    publicationTime.toISOString(),
+  ).replace("CONTROLLERS", controllers);
 }
 
 function createVmsPublication35(
@@ -195,11 +202,14 @@ function createVmsPublication35(
   lastUpdated: Date | undefined,
 ): string {
   const publicationTime = lastUpdated ?? new Date();
-  const statuses = datex2.join("\n");
+  const statuses = datex2
+    .map((d) => addNamespaceIfMissing(d, "vmsControllerStatus", "vms"))
+    .join("\n");
 
-  return DATEX2_VMS_PUBLICATION_35_TEMPLATE
-    .replace("PUBLICATION_TIME", publicationTime.toISOString())
-    .replace("STATUSES", statuses);
+  return DATEX2_VMS_PUBLICATION_35_TEMPLATE.replace(
+    "PUBLICATION_TIME",
+    publicationTime.toISOString(),
+  ).replace("STATUSES", statuses);
 }
 
 function createSituationPublication35(
@@ -207,11 +217,14 @@ function createSituationPublication35(
   lastUpdated: Date | undefined,
 ): string {
   const publicationTime = lastUpdated ?? new Date();
-  const situations = datex2.join("\n");
+  const situations = datex2
+    .map((d) => addNamespaceIfMissing(d, "situation", "sit"))
+    .join("\n");
 
-  return DATEX2_SITUATION_PUBLICATION_35_TEMPLATE
-    .replace("PUBLICATION_TIME", publicationTime.toISOString())
-    .replace("SITUATIONS", situations);
+  return DATEX2_SITUATION_PUBLICATION_35_TEMPLATE.replace(
+    "PUBLICATION_TIME",
+    publicationTime.toISOString(),
+  ).replace("SITUATIONS", situations);
 }
 
 function createD2LogicalModel223(
@@ -221,7 +234,8 @@ function createD2LogicalModel223(
   const publicationTime = lastUpdated ?? new Date();
   const situations = datex2.join("\n");
 
-  return DATEX2_223_TEMPLATE
-    .replace("PUBLICATION_TIME", publicationTime.toISOString())
-    .replace("SITUATIONS", situations);
+  return DATEX2_223_TEMPLATE.replace(
+    "PUBLICATION_TIME",
+    publicationTime.toISOString(),
+  ).replace("SITUATIONS", situations);
 }

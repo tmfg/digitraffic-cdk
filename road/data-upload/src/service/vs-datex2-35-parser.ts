@@ -48,7 +48,7 @@ export async function parseDatex(datex2: string): Promise<DatexFile[]> {
   const xml = (await parseStringPromise(datex2)) as Datex35File;
 
   // eslint-disable-next-line
-  //  console.debug("xml " + JSON.stringify(xml));
+  console.debug("xml " + JSON.stringify(xml));
 
   switch (getType(xml)) {
     case "SITUATION":
@@ -97,7 +97,7 @@ function getType(datex2: Datex35File): DatexType {
 function parseController(controller: VmsController): DatexFile {
   const id = controller.$.id;
   const type = "CONTROLLER";
-  const datex2 = createXml(controller, "vmsController");
+  const datex2 = createXml(controller, "vms:vmsController");
   const effectDate = new Date();
 
   return { id, type, datex2, effectDate };
@@ -107,7 +107,7 @@ function parseControllerStatus(status: VmsControllerStatus): DatexFile {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const id = status["vms:vmsControllerReference"][0]!.$.id;
   const type = "CONTROLLER_STATUS";
-  const datex2 = createXml(status, "vmsControllerStatus");
+  const datex2 = createXml(status, "vms:vmsControllerStatus");
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const effectDate = status["vms:statusUpdateTime"][0]!;
@@ -118,7 +118,7 @@ function parseControllerStatus(status: VmsControllerStatus): DatexFile {
 function parseSituation(situation: Situation): DatexFile {
   const id = situation.$.id;
   const type = "SITUATION";
-  const datex2 = createXml(situation, "situation");
+  const datex2 = createXml(situation, "sit:situation");
   const effectDate = getEffectDate(situation);
 
   return { id, type, datex2, effectDate };
