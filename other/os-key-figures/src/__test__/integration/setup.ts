@@ -218,28 +218,6 @@ export async function deleteTestIndex(): Promise<void> {
   }
 }
 
-/**
- * Set environment variables for integration tests
- */
-export function setTestEnvironment(): void {
-  // biome-ignore-start lint/complexity/useLiteralKeys: TS likes the following notation, Biome does not
-  process.env["OS_HOST"] = TEST_CONFIG.opensearch.host;
-  process.env["OS_VPC_ENDPOINT"] = TEST_CONFIG.opensearch.url;
-  process.env["OS_INDEX"] = TEST_CONFIG.opensearch.index;
-  process.env["ROLE"] = "arn:aws:iam::000000000000:role/test-role";
-
-  process.env["MYSQL_ENDPOINT"] = TEST_CONFIG.mysql.host;
-  process.env["MYSQL_USERNAME"] = TEST_CONFIG.mysql.user;
-  process.env["MYSQL_PASSWORD"] = TEST_CONFIG.mysql.password;
-  process.env["MYSQL_DATABASE"] = TEST_CONFIG.mysql.database;
-
-  process.env["MARINE_ACCOUNT_NAME"] = TEST_CONFIG.accountNames.marine;
-  process.env["RAIL_ACCOUNT_NAME"] = TEST_CONFIG.accountNames.rail;
-  process.env["ROAD_ACCOUNT_NAME"] = TEST_CONFIG.accountNames.road;
-  process.env["AFIR_ACCOUNT_NAME"] = TEST_CONFIG.accountNames.afir;
-  // biome-ignore-end lint/complexity/useLiteralKeys: TS likes the following notation, Biome does not
-}
-
 // Helper functions
 
 function sleep(ms: number): Promise<void> {

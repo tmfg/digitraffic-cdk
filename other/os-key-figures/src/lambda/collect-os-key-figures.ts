@@ -97,7 +97,7 @@ export const handler = async (
         ? await endpointDiscovery.discoverAllEndpoints()
         : [await endpointDiscovery.discoverEndpoints(service)];
 
-    const scopes = buildScopes(monitoredEndpoints, service);
+    const scopes = buildScopes(monitoredEndpoints);
 
     logger.info({
       message: `Collecting metrics for ${scopes.length} scopes`,
@@ -140,15 +140,10 @@ export const handler = async (
 
 function buildScopes(
   monitoredEndpoints: { service: Service; endpoints: Set<string> }[],
-  requestedService: Service,
 ): MetricScope[] {
   const scopes: MetricScope[] = [];
 
   for (const { service, endpoints } of monitoredEndpoints) {
-    if (requestedService !== Service.ALL && service !== requestedService) {
-      continue;
-    }
-
     scopes.push(createServiceScope(service));
 
     for (const endpoint of endpoints) {

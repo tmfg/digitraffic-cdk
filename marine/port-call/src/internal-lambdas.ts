@@ -1,7 +1,7 @@
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import { Duration } from "aws-cdk-lib";
-import type { AWSFunction } from "aws-cdk-lib/aws-lambda";
+import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 import type { PortCallStack } from "./port-call-stack.js";
 
 export class InternalLambdas {
