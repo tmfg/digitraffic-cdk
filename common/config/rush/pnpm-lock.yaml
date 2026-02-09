@@ -1462,6 +1462,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: 3.975.0
         version: 3.975.0
+      '@aws-sdk/client-sts':
+        specifier: 3.975.0
+        version: 3.975.0
       '@digitraffic/common':
         specifier: 2026.2.5-3
         version: 2026.2.5-3(@aws-sdk/client-api-gateway@3.975.0)(@aws-sdk/client-s3@3.975.0)(@aws-sdk/client-secrets-manager@3.975.0)(@aws-sdk/client-sns@3.975.0)(@aws-sdk/lib-storage@3.975.0(@aws-sdk/client-s3@3.975.0))(@date-fns/tz@1.4.1)(@smithy/fetch-http-handler@5.3.9)(@smithy/node-http-handler@4.4.8)(aws-cdk-lib@2.236.0(constructs@10.4.5))(change-case@5.4.4)(constructs@10.4.5)(date-fns@4.1.0)(es-toolkit@1.44.0)(geojson-validation@1.0.2)(ky@1.14.3)(lodash-es@4.17.23)(pg-native@3.5.2)(pg-promise@12.3.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2))))(zod@4.3.6)
@@ -1480,9 +1483,6 @@ importers:
       aws-lambda:
         specifier: 1.0.7
         version: 1.0.7
-      aws-sdk:
-        specifier: 2.1693.0
-        version: 2.1693.0
       constructs:
         specifier: 10.4.5
         version: 10.4.5
