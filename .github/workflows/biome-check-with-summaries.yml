@@ -123,14 +123,13 @@ jobs:
 
           // ---------- COMPACT SUMMARY WITH LINKS ----------
           let summary = `# Biome Report Summary\n\n`;
-          const ghPrefix = 'user-content-'; // prefix for GitHub anchor links
 
           for (const root of ROOT_DIRS) {
             const subs = Object.keys(grouped[root]);
 
             // If no annotations exist for this root directory
             if (subs.length === 0) {
-              summary += `**<a href="#${ghPrefix}${root}">${root}</a>** — _No issues_\n`;
+              summary += `**[${root}](#${root})** — _No issues_\n`;
               continue;
             }
 
@@ -138,13 +137,13 @@ jobs:
             const rootAnnos = subs.flatMap(sub => grouped[root][sub]);
             const rootCounts = countLevels(rootAnnos);
 
-            summary += `**<a href="#${ghPrefix}${root}">${root}</a>** — ❌ ${rootCounts.error} ⚠️ ${rootCounts.warning} 📌 ${rootCounts.notice}\n`;
+            summary += `**[${root}](#${root})** — ❌ ${rootCounts.error} ⚠️ ${rootCounts.warning} 📌 ${rootCounts.notice}\n`;
 
             // Subdirectory counts (one line each)
             for (const sub of subs) {
               const c = countLevels(grouped[root][sub]);
               const subId = sub.replace(/\//g, '-'); // safe anchor ID
-              summary += `&nbsp;&nbsp;• <a href="#${ghPrefix}${subId}">${sub}</a> — ❌ ${c.error} ⚠️ ${c.warning} 📌 ${c.notice}\n`;
+              summary += `&nbsp;&nbsp;• [${sub}](#${subId}) — ❌ ${c.error} ⚠️ ${c.warning} 📌 ${c.notice}\n`;
             }
           }
 
@@ -159,7 +158,8 @@ jobs:
           for (const root of ROOT_DIRS) {
             const rootId = `user-content-${root}`;
             // Markdown header + inline anchor for links
-            md += `## ${root} {#${rootId}}\n\n`;
+            md += `## ${root}\n\n`;
+            md += `<a name="${root}"></a>\n\n`;
 
             const subs = Object.keys(grouped[root]);
             if (subs.length === 0) {
@@ -169,7 +169,9 @@ jobs:
 
             for (const sub of subs) {
               const subId = `user-content-${sub.replace(/\//g, '-')}`;
-              md += `### ${sub} {#${subId}}\n\n`;
+              
+              md += `### ${sub}\n\n`;
+              md += `<a name="${subId}"></a>\n\n`;
 
               for (const a of grouped[root][sub]) {
                 const icon = levelIcon[a.level] || '';
