@@ -3,6 +3,7 @@
 !cdk.json
 !package.json
 !tsconfig.json
+!README.md
 !/esbuild.ts
 
 !/config/
@@ -10,5 +11,7 @@
 !/src/
 !/src/**/
 !/src/**/*.ts
+!/src/__test__/**/
+!/src/__test__/**/*.yml
 /src/bin
 

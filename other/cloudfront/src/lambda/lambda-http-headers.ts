@@ -1,8 +1,8 @@
+import type { CloudFrontResponseHandler } from "aws-lambda";
 import {
   addCorsHeadersToLambdaResponse,
   createAndLogError,
 } from "./header-util.js";
-import type { CloudFrontResponseHandler } from "aws-lambda";
 
 const VERSION_HEADERS = "EXT_VERSION";
 

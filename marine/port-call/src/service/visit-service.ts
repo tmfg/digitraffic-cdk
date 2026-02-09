@@ -1,13 +1,14 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
-  type DTDatabase,
   inDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { NemoApi } from "../api/nemo-api.js";
-import { findAllVisits, findVisit, upsertVisits, type DbInsertedUpdated, type DbVisit } from "../db/visits.js";
-import { updateUpdatedTimestamp} from "@digitraffic/common/dist/database/last-updated";
+import { updateUpdatedTimestamp } from "@digitraffic/common/dist/database/last-updated";
 import { addDays, startOfDay, subDays } from "date-fns";
+import { NemoApi } from "../api/nemo-api.js";
+import type { DbInsertedUpdated, DbVisit } from "../db/visits.js";
+import { findAllVisits, findVisit, upsertVisits } from "../db/visits.js";
 import type { GetVisitsParameters } from "../lambda/get-visits/get-visits.js";
 import type { VisitResponse } from "../model/visit-schema.js";
 
@@ -23,7 +24,7 @@ interface UpdateInfo extends DbInsertedUpdated {
 export async function getAllVisits(
   getVisitsEvent: GetVisitsParameters,
 ): Promise<[VisitResponse[], Date]> {
-  const visits = await inDatabaseReadonly ((db: DTDatabase) => {
+  const visits = await inDatabaseReadonly((db: DTDatabase) => {
     return findAllVisits(db, getVisitsEvent.from, getVisitsEvent.to);
   });
 
@@ -53,7 +54,7 @@ export async function getVisit(
     return findVisit(db, visitId);
   });
 
-  if(!visit) {
+  if (!visit) {
     return Promise.resolve([undefined, new Date()]);
   }
 
@@ -72,27 +73,30 @@ function getDaysToUpdate(dayCount: number): Date[] {
   return days;
 }
 
-async function updateVisitsForDay(api: NemoApi, day: Date): Promise<UpdateInfo> {
+async function updateVisitsForDay(
+  api: NemoApi,
+  day: Date,
+): Promise<UpdateInfo> {
   const from = startOfDay(day);
   const to = addDays(from, 1);
   const response = await api.getVisits(from, to);
 
-  if(response.length === 0) {
+  if (response.length === 0) {
     return {
       inserted: 0,
       updated: 0,
-      items: 0
+      items: 0,
     };
   }
 
   return await inDatabase(async (db: DTDatabase) => {
-      const updated = await upsertVisits(db, response);
+    const updated = await upsertVisits(db, response);
 
-      return {
-        inserted: updated.inserted,
-        updated: updated.updated,
-        items: response.length,
-      };
+    return {
+      inserted: updated.inserted,
+      updated: updated.updated,
+      items: response.length,
+    };
   });
 }
 
@@ -106,18 +110,18 @@ export async function updateVisits(
   const daysToUpdate = getDaysToUpdate(dayCount);
 
   let updatedCount = 0;
-  let insertedCount = 0; 
+  let insertedCount = 0;
   let itemCount = 0;
 
-  for(const day of daysToUpdate) {
+  for (const day of daysToUpdate) {
     const updated = await updateVisitsForDay(api, day);
 
     logger.info({
       method: "VisitService.updateVisits",
-      customDate: day.toISOString().substring(0,10),
+      customDate: day.toISOString().substring(0, 10),
       customUpdatedCount: updated.updated,
       customInsertedCount: updated.inserted,
-      customItemCount: updated.items
+      customItemCount: updated.items,
     });
 
     updatedCount += updated.updated;
@@ -125,13 +129,13 @@ export async function updateVisits(
     itemCount += updated.items;
   }
 
-  await inDatabase(async (db: DTDatabase) => {    
+  await inDatabase(async (db: DTDatabase) => {
     await updateUpdatedTimestamp(db, DATATYPE, new Date());
   });
 
   return {
     inserted: insertedCount,
     updated: updatedCount,
-    items: itemCount
-  }
+    items: itemCount,
+  };
 }

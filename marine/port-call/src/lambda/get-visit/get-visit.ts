@@ -1,6 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { LambdaResponse, LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { getVisit } from "../../service/visit-service.js";
 

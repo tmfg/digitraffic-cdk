@@ -16,11 +16,11 @@ import {
 import type { FunctionProps } from "aws-cdk-lib/aws-lambda";
 import {
   AssetCode,
-  Function as AwsFunction,
+  Function as AWSFunction,
   Runtime,
 } from "aws-cdk-lib/aws-lambda";
 import * as s3 from "aws-cdk-lib/aws-s3";
-import { transportType } from "./constants.js";
+import { Service } from "./domain/types/service.js";
 
 export interface Props {
   readonly openSearchVPCEndpoint: string;
@@ -38,7 +38,9 @@ export interface Props {
   readonly marineAccountName: string;
   readonly railAccountName: string;
   readonly roadAccountName: string;
+  readonly afirAccountName: string;
   readonly osIndex: string;
+  readonly osAfirIndex: string;
   readonly visualizationsBucketName: string;
 }
 
@@ -129,7 +131,7 @@ export class OsKeyFiguresStack extends Stack {
       functionName: functionName,
       code: new AssetCode("dist/lambda"),
       handler: "create-visualizations.handler",
-      runtime: Runtime.NODEJS_24_X,
+      runtime: Runtime.NODEJS_22_X,
       timeout: Duration.minutes(15),
       logGroup: logGroup,
       vpc: vpc,
@@ -144,7 +146,7 @@ export class OsKeyFiguresStack extends Stack {
         BUCKET_NAME: osKeyFiguresProps.visualizationsBucketName,
       },
     };
-    const createKeyFigureVisualizationsLambda = new AwsFunction(
+    const createKeyFigureVisualizationsLambda = new AWSFunction(
       this,
       functionName,
       lambdaConf,
@@ -196,7 +198,7 @@ export class OsKeyFiguresStack extends Stack {
       functionName: functionName,
       code: new AssetCode("dist/lambda"),
       handler: "collect-os-key-figures.handler",
-      runtime: Runtime.NODEJS_24_X,
+      runtime: Runtime.NODEJS_22_X,
       timeout: Duration.minutes(15),
       logGroup: logGroup,
       vpc: vpc,
@@ -207,6 +209,7 @@ export class OsKeyFiguresStack extends Stack {
         OS_HOST: osKeyFiguresProps.openSearchHost,
         OS_VPC_ENDPOINT: osKeyFiguresProps.openSearchVPCEndpoint,
         OS_INDEX: osKeyFiguresProps.osIndex,
+        OS_AFIR_INDEX: osKeyFiguresProps.osAfirIndex,
         MYSQL_ENDPOINT: osKeyFiguresProps.mysql.host,
         MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
         MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
@@ -214,10 +217,11 @@ export class OsKeyFiguresStack extends Stack {
         MARINE_ACCOUNT_NAME: osKeyFiguresProps.marineAccountName,
         RAIL_ACCOUNT_NAME: osKeyFiguresProps.railAccountName,
         ROAD_ACCOUNT_NAME: osKeyFiguresProps.roadAccountName,
+        AFIR_ACCOUNT_NAME: osKeyFiguresProps.afirAccountName,
       },
     };
 
-    const collectOsKeyFiguresLambda = new AwsFunction(
+    const collectOsKeyFiguresLambda = new AWSFunction(
       this,
       functionName,
       lambdaConf,
@@ -237,7 +241,7 @@ export class OsKeyFiguresStack extends Stack {
     rule.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.ALL,
+          TRANSPORT_TYPE: Service.ALL,
         }),
       }),
     );
@@ -248,7 +252,7 @@ export class OsKeyFiguresStack extends Stack {
     rule2.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.RAIL,
+          TRANSPORT_TYPE: Service.RAIL,
         }),
       }),
     );
@@ -259,7 +263,7 @@ export class OsKeyFiguresStack extends Stack {
     rule3.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.MARINE,
+          TRANSPORT_TYPE: Service.MARINE,
         }),
       }),
     );
@@ -270,7 +274,18 @@ export class OsKeyFiguresStack extends Stack {
     rule1.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
-          TRANSPORT_TYPE: transportType.ROAD,
+          TRANSPORT_TYPE: Service.ROAD,
+        }),
+      }),
+    );
+
+    const rule4 = new Rule(this, "collect afir", {
+      schedule: Schedule.expression("cron(0 4 1 * ? *)"),
+    });
+    rule4.addTarget(
+      new LambdaFunction(collectOsKeyFiguresLambda, {
+        event: events.RuleTargetInput.fromObject({
+          TRANSPORT_TYPE: Service.AFIR,
         }),
       }),
     );

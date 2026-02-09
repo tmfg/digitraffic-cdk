@@ -1,16 +1,16 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertVisitCount, dbTestBase } from "../db-testutil.js";
-import { updateVisits } from "../../service/visit-service.js";
-import { NemoApi } from "../../api/nemo-api.js";
 import { jest } from "@jest/globals";
-import { createTestVisit } from "../testdata.js";
+import { NemoApi } from "../../api/nemo-api.js";
 import type { NemoResponse } from "../../model/nemo.js";
+import { updateVisits } from "../../service/visit-service.js";
+import { assertVisitCount, dbTestBase } from "../db-testutil.js";
+import { createTestVisit } from "../testdata.js";
 
 export async function updateAndExpect(
   response: NemoResponse,
   expectInserted: number,
   expectUpdated: number,
-  expectItems: number
+  expectItems: number,
 ): Promise<void> {
   jest.spyOn(NemoApi.prototype, "getVisits").mockResolvedValue(response);
 
@@ -21,43 +21,46 @@ export async function updateAndExpect(
   expect(updated.items).toBe(expectItems);
 }
 
-const TEST_RESPONSE = [{
-  "visitId": "32ab881cf91a46428e8bc916bdf753f2",
-  "portCall": {
-    "vesselInformation": {
-      "identification": "9878319",
-      "name": "AURORA BOTNIA",
+const TEST_RESPONSE = [
+  {
+    visitId: "32ab881cf91a46428e8bc916bdf753f2",
+    portCall: {
+      vesselInformation: {
+        identification: "9878319",
+        name: "AURORA BOTNIA",
+      },
+      voyageInformation: {
+        portIdentification: "FIVAA",
+        estimatedArrivalDateTime: "2025-03-19T13:00:00.00+02:00",
+        estimatedDepartureDateTime: "2025-03-19T14:00:00.00+02:00",
+      },
+      arrivalNotification: { actualArrivalDateTime: null },
+      departureNotification: { actualDepartureDateTime: null },
+      portCallStatus: { status: "Expected to Arrive" },
     },
-    "voyageInformation": {
-      "portIdentification": "FIVAA",
-      "estimatedArrivalDateTime": "2025-03-19T13:00:00.00+02:00",
-      "estimatedDepartureDateTime": "2025-03-19T14:00:00.00+02:00",
-    },
-    "arrivalNotification": { "actualArrivalDateTime": null },
-    "departureNotification": { "actualDepartureDateTime": null },
-    "portCallStatus": { "status": "Expected to Arrive" },
+    latestUpdateTime: "2025-03-19T12:42:49.852078+02:00",
   },
-  "latestUpdateTime": "2025-03-19T12:42:49.852078+02:00",
-}, {
-  "visitId": "667c3398d7794c2eb4b84aac130b422b",
-  "portCall": {
-    "vesselInformation": {
-      "identification": "9878319",
-      "name": "AURORA BOTNIA",
+  {
+    visitId: "667c3398d7794c2eb4b84aac130b422b",
+    portCall: {
+      vesselInformation: {
+        identification: "9878319",
+        name: "AURORA BOTNIA",
+      },
+      voyageInformation: {
+        portIdentification: "FIVAA",
+        estimatedArrivalDateTime: "2025-03-19T15:00:00.00+02:00",
+        estimatedDepartureDateTime: "2025-03-19T16:00:00.00+02:00",
+      },
+      arrivalNotification: {
+        actualArrivalDateTime: "2025-03-19T14:50:00.00+02:00",
+      },
+      departureNotification: { actualDepartureDateTime: null },
+      portCallStatus: { status: "Arrived" },
     },
-    "voyageInformation": {
-      "portIdentification": "FIVAA",
-      "estimatedArrivalDateTime": "2025-03-19T15:00:00.00+02:00",
-      "estimatedDepartureDateTime": "2025-03-19T16:00:00.00+02:00",
-    },
-    "arrivalNotification": {
-      "actualArrivalDateTime": "2025-03-19T14:50:00.00+02:00",
-    },
-    "departureNotification": { "actualDepartureDateTime": null },
-    "portCallStatus": { "status": "Arrived" },
+    latestUpdateTime: "2025-03-19T14:49:55.638824+02:00",
   },
-  "latestUpdateTime": "2025-03-19T14:49:55.638824+02:00",
-}] as unknown as NemoResponse;
+] as unknown as NemoResponse;
 
 describe(
   "visit-service-tests",

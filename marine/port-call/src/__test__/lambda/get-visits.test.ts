@@ -1,15 +1,15 @@
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { ExpectResponse } from "@digitraffic-cdk/testing";
+import { addHours } from "date-fns";
+import type { VisitResponse } from "../../model/visit-schema.js";
 import {
   assertVisitCount,
   dbTestBase,
   mockProxyAndSecretHolder,
 } from "../db-testutil.js";
-import { ExpectResponse } from "@digitraffic-cdk/testing";
-import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { updateAndExpect } from "../service/visits-service.test.js";
 import { createTestVisit } from "../testdata.js";
-import { addHours } from "date-fns";
-import type { VisitResponse } from "../../model/visit-schema.js";
 
 // eslint-disable-next-line dot-notation
 process.env["SECRET_ID"] = "";
@@ -34,11 +34,11 @@ describe(
 
       ExpectResponse.ok(response).expectJson([]);
     });
-    
-    test("invalid parameter", async () => {
-        const response = await getResponseFromLambda({answer: "42"});
 
-        ExpectResponse.badRequest(response);
+    test("invalid parameter", async () => {
+      const response = await getResponseFromLambda({ answer: "42" });
+
+      ExpectResponse.badRequest(response);
     });
 
     test("one visit", async () => {
@@ -47,20 +47,20 @@ describe(
       await assertVisitCount(db, 1);
 
       const response = await getResponseFromLambda();
-      ExpectResponse.ok(response).expectJson([{
-        "ata": undefined,
-        "atd": undefined,
-        "eta": testVisit.portCall.voyageInformation.estimatedArrivalDateTime
-          .toISOString(),
-        "etd": testVisit.portCall.voyageInformation.estimatedDepartureDateTime!
-          .toISOString(),
-        "portLocode": testVisit.portCall.voyageInformation.portIdentification,
-        "status": testVisit.portCall.portCallStatus.status,
-        "updateTime": testVisit.latestUpdateTime.toISOString(),
-        "vesselId": testVisit.portCall.vesselInformation.identification,
-        "vesselName": testVisit.portCall.vesselInformation.name,
-        "visitId": testVisit.visitId,
-      } satisfies VisitResponse]);
+      ExpectResponse.ok(response).expectJson([
+        {
+          ata: undefined,
+          atd: undefined,
+          eta: testVisit.portCall.voyageInformation.estimatedArrivalDateTime.toISOString(),
+          etd: testVisit.portCall.voyageInformation.estimatedDepartureDateTime!.toISOString(),
+          portLocode: testVisit.portCall.voyageInformation.portIdentification,
+          status: testVisit.portCall.portCallStatus.status,
+          updateTime: testVisit.latestUpdateTime.toISOString(),
+          vesselId: testVisit.portCall.vesselInformation.identification,
+          vesselName: testVisit.portCall.vesselInformation.name,
+          visitId: testVisit.visitId,
+        } satisfies VisitResponse,
+      ]);
     });
 
     test("one visit - match from inclusive", async () => {
@@ -71,20 +71,20 @@ describe(
       const response = await getResponseFromLambda({
         from: testVisit.latestUpdateTime.toISOString(),
       });
-      ExpectResponse.ok(response).expectJson([{
-        "ata": undefined,
-        "atd": undefined,
-        "eta": testVisit.portCall.voyageInformation.estimatedArrivalDateTime
-          .toISOString(),
-        "etd": testVisit.portCall.voyageInformation.estimatedDepartureDateTime!
-          .toISOString(),
-        "portLocode": testVisit.portCall.voyageInformation.portIdentification,
-        "status": testVisit.portCall.portCallStatus.status,
-        "updateTime": testVisit.latestUpdateTime.toISOString(),
-        "vesselId": testVisit.portCall.vesselInformation.identification,
-        "vesselName": testVisit.portCall.vesselInformation.name,
-        "visitId": testVisit.visitId,
-      } satisfies VisitResponse]);
+      ExpectResponse.ok(response).expectJson([
+        {
+          ata: undefined,
+          atd: undefined,
+          eta: testVisit.portCall.voyageInformation.estimatedArrivalDateTime.toISOString(),
+          etd: testVisit.portCall.voyageInformation.estimatedDepartureDateTime!.toISOString(),
+          portLocode: testVisit.portCall.voyageInformation.portIdentification,
+          status: testVisit.portCall.portCallStatus.status,
+          updateTime: testVisit.latestUpdateTime.toISOString(),
+          vesselId: testVisit.portCall.vesselInformation.identification,
+          vesselName: testVisit.portCall.vesselInformation.name,
+          visitId: testVisit.visitId,
+        } satisfies VisitResponse,
+      ]);
     });
 
     test("one visit - no match to exclusive", async () => {

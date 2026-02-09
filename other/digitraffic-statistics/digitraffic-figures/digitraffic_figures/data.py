@@ -11,7 +11,7 @@ SQL_QUERY = text(
     """
     SELECT *
     FROM key_figures
-    WHERE filter IN ('@transport_type:*', '@transport_type:rail', '@transport_type:road', '@transport_type:marine')
+    WHERE filter IN ('@transport_type:*', '@transport_type:rail', '@transport_type:road', '@transport_type:marine', '@transport_type:afir')
 """
 )
 
@@ -23,6 +23,8 @@ def transport_type_in_fi(x):
         return "rata"
     elif x == "road":
         return "tie"
+    elif x == "afir":
+        return "afir"
     elif x == "*":
         return "kaikki"
     else:

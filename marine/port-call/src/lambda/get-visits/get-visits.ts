@@ -1,8 +1,9 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { LambdaResponse, LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { z, ZodError } from "zod";
+import { ZodError, z } from "zod";
 import { getAllVisits } from "../../service/visit-service.js";
 
 const proxyHolder = ProxyHolder.create();
@@ -10,10 +11,11 @@ const proxyHolder = ProxyHolder.create();
 const EmptyStringUndefined = z.literal("").transform(() => undefined);
 const OptionalDateString = z.coerce.date().optional().or(EmptyStringUndefined);
 
-const getVisitsSchema = z.object({
-  from: OptionalDateString,
-  to: OptionalDateString,
-})
+const getVisitsSchema = z
+  .object({
+    from: OptionalDateString,
+    to: OptionalDateString,
+  })
   .strict()
   .readonly();
 
@@ -32,7 +34,9 @@ export const handler = async (
       .then(() => getAllVisits(getVisitsEvent))
       .then(([visits, lastUpdated]) => {
         return lastUpdated
-          ? LambdaResponseBuilder.create(visits).withTimestamp(lastUpdated).build()
+          ? LambdaResponseBuilder.create(visits)
+              .withTimestamp(lastUpdated)
+              .build()
           : LambdaResponseBuilder.create(visits).build();
       });
   } catch (error) {

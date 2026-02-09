@@ -1,12 +1,12 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import * as Utils from "@digitraffic/common/dist/utils/utils";
 import type {
+  CloudFrontRequest,
   CloudFrontResponseEvent,
   CloudFrontResponseHandler,
 } from "aws-lambda";
-import type { CloudFrontRequest } from "aws-lambda";
 import queryStringHelper from "querystring";
 import { createAndLogError } from "./header-util.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const HEADERS = {
   CONTENT_DISPOSITION: "Content-Disposition",

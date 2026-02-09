@@ -1,11 +1,11 @@
-import { default as pgPromise } from "pg-promise";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type {
   DTDatabase,
   DTTransaction,
 } from "@digitraffic/common/dist/database/database";
+import { default as pgPromise } from "pg-promise";
 import type { NemoResponse, NemoVisit } from "../model/nemo.js";
-import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { VISIT_STATUS_VALUES } from "../model/visit-schema.js";
 
 export interface DbInsertedUpdated {
@@ -22,12 +22,11 @@ export interface DbVisit {
   readonly etd?: Date;
   readonly ata?: Date;
   readonly atd?: Date;
-  readonly status: typeof VISIT_STATUS_VALUES[number];
+  readonly status: (typeof VISIT_STATUS_VALUES)[number];
   readonly update_time: Date;
 }
 
-const UPSERT_VISITS_SQL =
-  `INSERT INTO pc2_visit(visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time)
+const UPSERT_VISITS_SQL = `INSERT INTO pc2_visit(visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 ON CONFLICT(visit_id)
 DO UPDATE SET
@@ -59,10 +58,9 @@ export async function upsertVisits(
           response.map((visit) => upsertVisit(tx, visit)),
         )
         .then((results: DbInsertedUpdated[]) => {
-          const inserted = results.map((r) => r.inserted).reduce((
-            a: number,
-            b: number,
-          ) => a + b);
+          const inserted = results
+            .map((r) => r.inserted)
+            .reduce((a: number, b: number) => a + b);
           const updated = results.map((r) => r.updated).reduce((a, b) => a + b);
           return { inserted: inserted, updated: updated };
         });
@@ -114,8 +112,7 @@ export async function upsertVisit(
 
 const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
   name: "find-all-visits",
-  text:
-    `select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time 
+  text: `select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time 
     from pc2_visit
     where ($1::timestamptz is null or update_time >= $1::timestamptz)
     and ($2::timestamptz is null or update_time < $2::timestamptz)`,
@@ -131,13 +128,12 @@ export function findAllVisits(
 
 const FIND_VISIT_PS = new pgPromise.PreparedStatement({
   name: "find-visit",
-  text:
-    "select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time from pc2_visit where visit_id = $1",
+  text: "select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time from pc2_visit where visit_id = $1",
 });
 
 export async function findVisit(
   db: DTDatabase,
   visitId: string,
 ): Promise<DbVisit | undefined> {
-  return await db.oneOrNone(FIND_VISIT_PS, [visitId]) ?? undefined;
+  return (await db.oneOrNone(FIND_VISIT_PS, [visitId])) ?? undefined;
 }

@@ -1,14 +1,14 @@
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { ExpectResponse } from "@digitraffic-cdk/testing";
+import type { VisitResponse } from "../../model/visit-schema.js";
 import {
   assertVisitCount,
   dbTestBase,
   mockProxyAndSecretHolder,
 } from "../db-testutil.js";
-import { ExpectResponse } from "@digitraffic-cdk/testing";
-import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { updateAndExpect } from "../service/visits-service.test.js";
 import { createTestVisit } from "../testdata.js";
-import type { VisitResponse } from "../../model/visit-schema.js";
 
 // eslint-disable-next-line dot-notation
 process.env["SECRET_ID"] = "";
@@ -39,18 +39,16 @@ describe(
 
       const response = await getResponseFromLambda(testVisit.visitId);
       ExpectResponse.ok(response).expectJson({
-        "ata": undefined,
-        "atd": undefined,
-        "eta": testVisit.portCall.voyageInformation.estimatedArrivalDateTime
-          .toISOString(),
-        "etd": testVisit.portCall.voyageInformation.estimatedDepartureDateTime!
-          .toISOString(),
-        "portLocode": testVisit.portCall.voyageInformation.portIdentification,
-        "status": testVisit.portCall.portCallStatus.status,
-        "updateTime": testVisit.latestUpdateTime.toISOString(),
-        "vesselId": testVisit.portCall.vesselInformation.identification,
-        "vesselName": testVisit.portCall.vesselInformation.name,
-        "visitId": testVisit.visitId,
+        ata: undefined,
+        atd: undefined,
+        eta: testVisit.portCall.voyageInformation.estimatedArrivalDateTime.toISOString(),
+        etd: testVisit.portCall.voyageInformation.estimatedDepartureDateTime!.toISOString(),
+        portLocode: testVisit.portCall.voyageInformation.portIdentification,
+        status: testVisit.portCall.portCallStatus.status,
+        updateTime: testVisit.latestUpdateTime.toISOString(),
+        vesselId: testVisit.portCall.vesselInformation.identification,
+        vesselName: testVisit.portCall.vesselInformation.name,
+        visitId: testVisit.visitId,
       } satisfies VisitResponse);
     });
   }),

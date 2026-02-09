@@ -1,14 +1,14 @@
 import type { DigitrafficStack } from "@digitraffic/common";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
-import type { JsonSchema, Resource } from "aws-cdk-lib/aws-apigateway";
-import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
-import { visitResponseSchema } from "./model/visit-schema.js";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { addServiceModel } from "@digitraffic/common/dist/utils/api-model";
+import type { JsonSchema, Resource } from "aws-cdk-lib/aws-apigateway";
 import z from "zod";
+import { visitResponseSchema } from "./model/visit-schema.js";
 
 const PORT_CALL_TAG_V2 = ["Port Call V2"];
 
@@ -49,7 +49,7 @@ export class PublicApi {
       this.publicApi,
       z.toJSONSchema(visitResponseSchema, {
         target: "draft-4",
-      }) as JsonSchema
+      }) as JsonSchema,
     );
     const visitsIntegration = new DigitrafficIntegration(visitsLambda)
       .passAllQueryParameters()

@@ -10,7 +10,10 @@
     "compile-lambdas": "node lib/esbuild.js",
     "compile-lambdas-old": "esbuild src/lambda/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node24",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
+    "test:integration": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean --test-path-pattern 'integration'",
+    "test:integration:setup": "docker compose -f src/__test__/integration/docker-compose.yml up -d && echo 'Waiting for containers...' && sleep 10",
+    "test:integration:teardown": "docker compose -f src/__test__/integration/docker-compose.yml down -v"
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "5.2.0",
