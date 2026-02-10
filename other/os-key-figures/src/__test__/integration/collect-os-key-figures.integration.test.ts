@@ -265,7 +265,7 @@ describe("Integration Tests: Refactored Architecture", () => {
           response_body_size: 500,
           remote_addr: "10.0.0.1",
           skip_statistics: false,
-          httpReferer: referers[i % referers.length],
+          httpReferrer: referers[i % referers.length],
         });
       }
       await seedTestData(testDocs);

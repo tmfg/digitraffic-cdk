@@ -142,8 +142,8 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
           this.config.accountNames,
           definition.name,
           index,
-          "httpReferer.keyword",
-          100,
+          "httpReferrer.keyword",
+          10,
         );
       case "Top 10 digitraffic-users":
         return new TermsMetricQuery(
@@ -151,7 +151,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
           definition.name,
           index,
           "httpDigitrafficUser.keyword",
-          100,
+          10,
         );
       case "Top 10 User Agents":
         return new TermsMetricQuery(
@@ -159,7 +159,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
           definition.name,
           index,
           "httpUserAgent.keyword",
-          100,
+          10,
         );
       case "Top 10 IPs":
         return new TermsMetricQuery(
@@ -167,7 +167,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
           definition.name,
           index,
           "clientIp",
-          100,
+          10,
         );
       case "Top digitraffic-users by bytes":
         return new TermsWithSubAggMetricQuery(

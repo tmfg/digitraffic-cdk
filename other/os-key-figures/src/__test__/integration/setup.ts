@@ -102,7 +102,7 @@ export async function createTestIndex(): Promise<void> {
         remote_addr: { type: "ip" },
         skip_statistics: { type: "boolean" },
         log_line: { type: "text" },
-        httpReferer: { type: "text" },
+        httpReferrer: { type: "text" },
         httpDigitrafficUser: { type: "text" },
         httpUserAgent: { type: "text" },
         clientIp: { type: "ip" },
@@ -264,7 +264,7 @@ export interface OpenSearchTestDocument {
   remote_addr: string;
   skip_statistics: boolean;
   log_line?: string;
-  httpReferer?: string;
+  httpReferrer?: string;
   httpDigitrafficUser?: string;
   httpUserAgent?: string;
   clientIp?: string;

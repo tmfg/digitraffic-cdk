@@ -336,7 +336,7 @@ describe("Integration Tests: MetricCollectionService.collectAndPersist", () => {
           response_body_size: 1000,
           remote_addr: "192.168.1.1",
           skip_statistics: false,
-          httpReferer: referers[i % referers.length],
+          httpReferrer: referers[i % referers.length],
         });
       }
       await seedTestData(testDocs);
