@@ -151,14 +151,14 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
           definition.name,
           index,
           "httpDigitrafficUser.keyword",
-          10,
+          100,
         );
       case "Top 10 User Agents":
         return new TermsMetricQuery(
           this.config.accountNames,
           definition.name,
           index,
-          "httpUserAgent.keyword",
+          "agent.keyword",
           10,
         );
       case "Top 10 IPs":
@@ -168,6 +168,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
           index,
           "clientIp",
           10,
+          undefined,
         );
       case "Top digitraffic-users by bytes":
         return new TermsWithSubAggMetricQuery(

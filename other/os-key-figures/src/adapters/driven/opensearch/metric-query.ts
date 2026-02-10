@@ -243,6 +243,7 @@ export class TermsMetricQuery extends AccessLogQuery {
     index: string,
     private readonly field: string,
     private readonly size: number = 10,
+    private readonly missingBucket: string = "__missing__",
   ) {
     super(accountNames, name, index, OpenSearchApiMethod.SEARCH);
   }
@@ -255,8 +256,8 @@ export class TermsMetricQuery extends AccessLogQuery {
           terms: {
             field: this.field,
             order: { _count: "desc" },
-            missing: "__missing__",
             size: this.size,
+            ...(this.missingBucket && { missing: this.missingBucket }),
           },
         },
       },
