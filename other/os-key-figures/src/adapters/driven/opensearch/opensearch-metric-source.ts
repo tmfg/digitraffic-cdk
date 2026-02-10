@@ -168,7 +168,7 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
           index,
           "clientIp",
           10,
-          undefined,
+          null,
         );
       case "Top digitraffic-users by bytes":
         return new TermsWithSubAggMetricQuery(

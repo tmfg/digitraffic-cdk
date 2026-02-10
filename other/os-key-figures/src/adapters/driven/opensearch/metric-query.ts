@@ -243,7 +243,7 @@ export class TermsMetricQuery extends AccessLogQuery {
     index: string,
     private readonly field: string,
     private readonly size: number = 10,
-    private readonly missingBucket: string = "__missing__",
+    private readonly missingBucket: string | null = "__missing__",
   ) {
     super(accountNames, name, index, OpenSearchApiMethod.SEARCH);
   }
