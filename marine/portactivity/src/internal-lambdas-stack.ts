@@ -197,7 +197,7 @@ function createUpdateTimestampsFromPilotwebLambda(
     environment,
     {
       memorySize: 256,
-      timeout: 10,
+      timeout: 15,
     },
   );
 
