@@ -240,7 +240,7 @@ function createUpdateTimestampsFromSchedules(
     functionName,
     defaultLambdaConfiguration({
       functionName,
-      timeout: 10,
+      timeout: 20,
       code: new AssetCode("dist/lambda/update-timestamps-from-schedules"),
       handler: "lambda-update-timestamps-from-schedules.handler",
       logGroup: logGroup,
