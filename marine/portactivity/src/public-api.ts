@@ -111,7 +111,7 @@ export class PublicApi {
       "get-timestamps",
       stack.createLambdaEnvironment(),
       {
-        timeout: 15,
+        timeout: 25,
         memorySize: 512,
         reservedConcurrentExecutions: 20,
         errorAlarmProps: {
