@@ -33,11 +33,17 @@ const query = util.promisify(conn.query).bind(conn);
 const BUCKET_NAME = getEnvVariable("BUCKET_NAME");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createGraph(id: string, otsikko: string, data: any): string {
+function createGraph(
+  id: string,
+  otsikko: string,
+  data: any,
+  height: number = 400,
+): string {
   return `
 	nv.addGraph(function() {
         var chart = nv.models.lineChart()
             .useInteractiveGuideline(true)
+            .height(${height})
             .x(function(d) { return d[0] })
             .y(function(d) { return d[1] })
             .color(d3.scale.category10().range())
@@ -325,15 +331,15 @@ async function createIndex(): Promise<string> {
     <style>
 .grid-container {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 400px 800px 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 400px 800px 800px 1fr 1fr;
   gap: 40px 0px;
   grid-template-areas:
-    "requests bytesOut uniqueIPs"
-    "road-endpoints rail-endpoints"
-    "marine-endpoints afir-endpoint"
-    "road-links rail-links"
-    "marine-links afir-links";
+    "requests requests bytesOut bytesOut uniqueIPs uniqueIPs"
+    "road-endpoints road-endpoints road-endpoints rail-endpoints rail-endpoints rail-endpoints"
+    "marine-endpoints marine-endpoints marine-endpoints afir-endpoints afir-endpoints afir-endpoints"
+    "road-links road-links road-links rail-links rail-links rail-links"
+    "marine-links marine-links marine-links afir-links afir-links afir-links";
 }
 
 .requests { grid-area: requests; }
@@ -381,6 +387,7 @@ async function createIndex(): Promise<string> {
                 (o) => `[${o[0].getTime()}, ${o[1]}]`,
               )} ] }`,
           ),
+          400,
         )}            
         ${createGraph(
           "bytesOut",
@@ -395,6 +402,7 @@ async function createIndex(): Promise<string> {
                 (o) => `[${o[0].getTime()}, ${o[1]}]`,
               )} ] }`,
           ),
+          400,
         )}
         ${createGraph(
           "uniqueIPs",
@@ -409,6 +417,7 @@ async function createIndex(): Promise<string> {
                 (o) => `[${o[0].getTime()}, ${o[1]}]`,
               )} ] }`,
           ),
+          400,
         )}                                    
         ${createGraph(
           "roadEndpoints",
@@ -423,6 +432,7 @@ async function createIndex(): Promise<string> {
                 (o) => `[${o[0].getTime()}, ${o[1]}]`,
               )} ] }`,
           ),
+          800,
         )}         
         ${createGraph(
           "railEndpoints",
@@ -437,6 +447,7 @@ async function createIndex(): Promise<string> {
                 (o) => `[${o[0].getTime()}, ${o[1]}]`,
               )} ] }`,
           ),
+          800,
         )}   
         ${createGraph(
           "marineEndpoints",
@@ -451,6 +462,7 @@ async function createIndex(): Promise<string> {
                 (o) => `[${o[0].getTime()}, ${o[1]}]`,
               )} ] }`,
           ),
+          800,
         )}     
         ${createGraph(
           "afirEndpoints",
@@ -465,6 +477,7 @@ async function createIndex(): Promise<string> {
                 (o) => `[${o[0].getTime()}, ${o[1]}]`,
               )} ] }`,
           ),
+          800,
         )}                   
       }
     </script>
