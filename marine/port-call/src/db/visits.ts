@@ -122,7 +122,8 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
     and ($3::text is null or port_locode = $3)
     and ($4::text is null or vessel_name ILIKE '%' || $4 || '%')
     and ($5::text is null or vessel_id = $5::text)
-    and ($6::text is null or status = $6)`,
+    and ($6::text is null or status = $6)
+    order by coalesce(ata, eta) asc`,
 });
 
 export function findAllVisits(

@@ -1,7 +1,7 @@
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
-import { addHours } from "date-fns";
+import { addHours, subHours } from "date-fns";
 import type { VisitResponse } from "../../model/visit-schema.js";
 import {
   assertVisitCount,
@@ -9,7 +9,7 @@ import {
   mockProxyAndSecretHolder,
 } from "../db-testutil.js";
 import { updateAndExpect } from "../service/visits-service.test.js";
-import { createTestVisit } from "../testdata.js";
+import { createTestVisit, createTestVisitWith } from "../testdata.js";
 
 // eslint-disable-next-line dot-notation
 process.env["SECRET_ID"] = "";
@@ -336,6 +336,76 @@ describe(
         expect(visits).toHaveLength(1);
         expect(visits[0]!.vesselName).toBe("Queen Mary");
         expect(visits[0]!.vesselId).toBe("1111111");
+      });
+    });
+
+    // sorting tests
+
+    test("results sorted by ETA ascending when no ATA", async () => {
+      const now = new Date();
+      const visit1 = createTestVisitWith({
+        visitId: "V1",
+        vesselName: "Late Ship",
+        identification: "1111111",
+        eta: addHours(now, 3),
+      });
+      const visit2 = createTestVisitWith({
+        visitId: "V2",
+        vesselName: "Early Ship",
+        identification: "2222222",
+        eta: addHours(now, 1),
+      });
+      const visit3 = createTestVisitWith({
+        visitId: "V3",
+        vesselName: "Middle Ship",
+        identification: "3333333",
+        eta: addHours(now, 2),
+      });
+      await updateAndExpect([visit1, visit2, visit3], 3, 0, 3);
+
+      const response = await getResponseFromLambda();
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(3);
+        expect(visits[0]!.vesselName).toBe("Early Ship");
+        expect(visits[1]!.vesselName).toBe("Middle Ship");
+        expect(visits[2]!.vesselName).toBe("Late Ship");
+      });
+    });
+
+    test("results sorted by ATA when available, falling back to ETA", async () => {
+      const now = new Date();
+      // Ship with ATA earlier than others' ETAs
+      const visit1 = createTestVisitWith({
+        visitId: "V1",
+        vesselName: "Arrived Early",
+        identification: "1111111",
+        eta: addHours(now, 10),
+        ata: subHours(now, 1),
+      });
+      // Ship with no ATA, sorts by ETA
+      const visit2 = createTestVisitWith({
+        visitId: "V2",
+        vesselName: "Expected Soon",
+        identification: "2222222",
+        eta: addHours(now, 1),
+      });
+      // Ship with ATA later than visit2's ETA
+      const visit3 = createTestVisitWith({
+        visitId: "V3",
+        vesselName: "Arrived Late",
+        identification: "3333333",
+        eta: addHours(now, 5),
+        ata: addHours(now, 6),
+      });
+      await updateAndExpect([visit1, visit2, visit3], 3, 0, 3);
+
+      const response = await getResponseFromLambda();
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(3);
+        // ATA -1h < ETA +1h < ATA +6h
+        expect(visits[0]!.vesselName).toBe("Arrived Early");
+        expect(visits[1]!.vesselName).toBe("Expected Soon");
+        expect(visits[2]!.vesselName).toBe("Arrived Late");
       });
     });
   }),
