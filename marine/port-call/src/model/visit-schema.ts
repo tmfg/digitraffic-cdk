@@ -7,6 +7,25 @@ export const VISIT_STATUS_VALUES = [
   "Cancelled",
 ] as const;
 
+export const VISIT_STATUS_QUERY_VALUES = [
+  "expected-to-arrive",
+  "arrived",
+  "departed",
+  "cancelled",
+] as const;
+
+export const VISIT_STATUS_QUERY_TO_VALUE_MAP: Record<
+  (typeof VISIT_STATUS_QUERY_VALUES)[number],
+  (typeof VISIT_STATUS_VALUES)[number]
+> = {
+  "expected-to-arrive": "Expected to Arrive",
+  arrived: "Arrived",
+  departed: "Departed",
+  cancelled: "Cancelled",
+} as const;
+
+export type VisitStatus = (typeof VISIT_STATUS_VALUES)[number];
+
 // this type is returned from lambdas
 export const visitResponseSchema = z
   .object({

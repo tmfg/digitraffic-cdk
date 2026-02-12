@@ -6,7 +6,10 @@ import type {
 } from "@digitraffic/common/dist/database/database";
 import { default as pgPromise } from "pg-promise";
 import type { NemoResponse, NemoVisit } from "../model/nemo.js";
-import type { VISIT_STATUS_VALUES } from "../model/visit-schema.js";
+import type {
+  VISIT_STATUS_VALUES,
+  VisitStatus,
+} from "../model/visit-schema.js";
 
 export interface DbInsertedUpdated {
   readonly inserted: number;
@@ -115,15 +118,30 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
   text: `select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time 
     from pc2_visit
     where ($1::timestamptz is null or update_time >= $1::timestamptz)
-    and ($2::timestamptz is null or update_time < $2::timestamptz)`,
+    and ($2::timestamptz is null or update_time < $2::timestamptz)
+    and ($3::text is null or port_locode = $3)
+    and ($4::text is null or vessel_name ILIKE '%' || $4 || '%')
+    and ($5::text is null or vessel_id = $5::text)
+    and ($6::text is null or status = $6)`,
 });
 
 export function findAllVisits(
   db: DTDatabase,
   from: Date | undefined,
   to: Date | undefined,
+  locode: string | undefined,
+  vesselName: string | undefined,
+  imo: number | undefined,
+  status: VisitStatus | undefined,
 ): Promise<DbVisit[]> {
-  return db.manyOrNone(FIND_ALL_VISITS_PS, [from, to]);
+  return db.manyOrNone(FIND_ALL_VISITS_PS, [
+    from,
+    to,
+    locode,
+    vesselName,
+    imo,
+    status,
+  ]);
 }
 
 const FIND_VISIT_PS = new pgPromise.PreparedStatement({

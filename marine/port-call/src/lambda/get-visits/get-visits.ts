@@ -4,22 +4,39 @@ import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-r
 import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { ZodError, z } from "zod";
+import type { VisitStatus } from "../../model/visit-schema.js";
+import {
+  VISIT_STATUS_QUERY_TO_VALUE_MAP,
+  VISIT_STATUS_QUERY_VALUES,
+} from "../../model/visit-schema.js";
 import { getAllVisits } from "../../service/visit-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
 const EmptyStringUndefined = z.literal("").transform(() => undefined);
 const OptionalDateString = z.coerce.date().optional().or(EmptyStringUndefined);
+const OptionalString = z.string().optional();
+const OptionalNumber = z.coerce.number().optional().or(EmptyStringUndefined);
+const OptionalStatus = z.enum(VISIT_STATUS_QUERY_VALUES).optional();
 
 const getVisitsSchema = z
   .object({
-    from: OptionalDateString,
-    to: OptionalDateString,
+    fromDateTime: OptionalDateString,
+    toDateTime: OptionalDateString,
+    portOfCall: OptionalString,
+    shipName: OptionalString,
+    imo: OptionalNumber,
+    status: OptionalStatus,
   })
   .strict()
   .readonly();
 
-export type GetVisitsParameters = z.infer<typeof getVisitsSchema>;
+export type GetVisitsParameters = Omit<
+  z.infer<typeof getVisitsSchema>,
+  "status"
+> & {
+  status?: VisitStatus;
+};
 
 export const handler = async (
   event: Record<string, string>,
@@ -27,7 +44,14 @@ export const handler = async (
   const start = Date.now();
 
   try {
-    const getVisitsEvent = getVisitsSchema.parse(event);
+    const parsed = getVisitsSchema.parse(event);
+    const getVisitsEvent = {
+      ...parsed,
+      status: parsed.status
+        ? VISIT_STATUS_QUERY_TO_VALUE_MAP[parsed.status]
+        : undefined,
+      portOfCall: parsed.portOfCall?.toUpperCase(),
+    };
 
     return proxyHolder
       .setCredentials()

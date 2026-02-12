@@ -25,7 +25,15 @@ export async function getAllVisits(
   getVisitsEvent: GetVisitsParameters,
 ): Promise<[VisitResponse[], Date]> {
   const visits = await inDatabaseReadonly((db: DTDatabase) => {
-    return findAllVisits(db, getVisitsEvent.from, getVisitsEvent.to);
+    return findAllVisits(
+      db,
+      getVisitsEvent.fromDateTime,
+      getVisitsEvent.toDateTime,
+      getVisitsEvent.portOfCall,
+      getVisitsEvent.shipName,
+      getVisitsEvent.imo,
+      getVisitsEvent.status,
+    );
   });
 
   // get from visits
