@@ -1,5 +1,5 @@
 # Checks out the full repository and ensures links to all files in the branch work, even for files not part of the current commit.
-name: Biome CI - Lint, Format & Sort Imports report
+name: Biome CI - Custom Check
 
 on:
   workflow_dispatch:
@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      ROOT_DIRS: "aviation common marine other rail road template tools"
     steps:
       # 1. Checkout full repo
       - name: Checkout
@@ -36,13 +38,20 @@ jobs:
       - name: Run Biome per subdirectory
         run: |
           mkdir -p reports
-          ROOT_DIRS="aviation marine other rail road"
+
+          echo "ROOT_DIRS: $ROOT_DIRS"
 
           for ROOT in $ROOT_DIRS; do
-            echo "::group::Scanning $ROOT"
+            echo "Scanning root directory: $ROOT"
+
+            # List only directories in the root directory for debugging
+            echo "Directories in $ROOT:"
+            ls -1d "$ROOT"/*/ || echo "No directories found in $ROOT"
 
             # find subdirectories (only dirs, no files)
             SUBDIRS=$(find "$ROOT" -mindepth 1 -maxdepth 1 -type d 2>/dev/null || true)
+
+            echo "Found subdirectories: $SUBDIRS"
 
             if [ -z "$SUBDIRS" ]; then
               echo "No subdirectories in $ROOT"
@@ -51,7 +60,7 @@ jobs:
             fi
 
             for SUB in $SUBDIRS; do
-              echo "### Running Biome in $SUB"
+              echo "Running Biome in subdirectory: $SUB"
               biome ci "$SUB" --reporter=github --no-errors-on-unmatched 2>&1 \
                 | tee -a "reports/biome-gh.txt"
             done
@@ -68,7 +77,8 @@ jobs:
           const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 'master';
           const repo = process.env.GITHUB_REPOSITORY;
 
-          const ROOT_DIRS = ['aviation','marine','other','rail','road'];
+          // Parse ROOT_DIRS from the environment variable
+          const ROOT_DIRS = process.env.ROOT_DIRS.split(' ');
 
           // Icons used in the report for each severity level
           const levelIcon = {
@@ -169,7 +179,7 @@ jobs:
 
             for (const sub of subs) {
               const subId = `user-content-${sub.replace(/\//g, '-')}`;
-              
+          
               md += `### ${sub}\n\n`;
               md += `<a name="${subId}"></a>\n\n`;
 
