@@ -225,9 +225,10 @@ function createAccountNames(): Record<Service, string> {
 
 Add environment variables to `lambdaConf` and add a new rule.
 
-**Step 6 (OPTIONAL): Update digitraffic-statistics project**
+**Step 6 (OPTIONAL): Visualize the new service metrics**
 
-If you want to visualize the new service's metrics, update the `digitraffic-statistics` project to include it.
+- **Update create-visualizations.ts Lambda**: Add the new service into the HTML generation logic.
+- **Update digitraffic-statistics project**: Update the `digitraffic-statistics` project to include it.
 
 ---
 

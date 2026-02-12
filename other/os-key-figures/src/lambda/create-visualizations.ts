@@ -1,9 +1,9 @@
-import mysql from "mysql";
 import util from "node:util";
+import { S3Client } from "@aws-sdk/client-s3";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { S3Client } from "@aws-sdk/client-s3";
+import mysql from "mysql";
 
 const s3 = new S3Client();
 interface KeyFigure {
@@ -133,121 +133,104 @@ async function createDetailPage(filter: string): Promise<string> {
     
     <script>
   	  window.onload = function() {
-        ${
-    createGraph(
-      "requests",
-      `Requests (${friendlyFilterString(filter)})`,
-      `{key:'Requests', values: [${
-        (
-          (await query(
-            `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Http req' order by \`from\` asc`,
-          )) as KeyFiguresQueryResult
-        )
-          .map((s: { from: Date; value: number }) =>
-            `[${s.from.getTime()}, ${Number(s.value)}]`
+        ${createGraph(
+          "requests",
+          `Requests (${friendlyFilterString(filter)})`,
+          `{key:'Requests', values: [${(
+            (await query(
+              `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Http req' order by \`from\` asc`,
+            )) as KeyFiguresQueryResult
           )
-          .join(",")
-      } ] }`,
-    )
-  } 
-        ${
-    createGraph(
-      "bytesOut",
-      `Bytes out (${friendlyFilterString(filter)})`,
-      `{key:'Bytes out', values: [${
-        (
-          (await query(
-            `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Bytes Out' order by \`from\` asc`,
-          )) as KeyFiguresQueryResult
-        )
-          .map((s: { from: Date; value: number }) =>
-            `[${s.from.getTime()}, ${Number(s.value)}]`
+            .map(
+              (s: { from: Date; value: number }) =>
+                `[${s.from.getTime()}, ${Number(s.value)}]`,
+            )
+            .join(",")} ] }`,
+        )} 
+        ${createGraph(
+          "bytesOut",
+          `Bytes out (${friendlyFilterString(filter)})`,
+          `{key:'Bytes out', values: [${(
+            (await query(
+              `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Bytes Out' order by \`from\` asc`,
+            )) as KeyFiguresQueryResult
           )
-          .join(",")
-      } ] }`,
-    )
-  }
-        ${
-    createGraph(
-      "uniqueIPs",
-      `Unique IPs (${friendlyFilterString(filter)})`,
-      `{key:'Unique IPs', values: [${
-        (
-          (await query(
-            `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Unique IPs' order by \`from\` asc`,
-          )) as KeyFiguresQueryResult
-        )
-          .map((s: { from: Date; value: number }) =>
-            `[${s.from.getTime()}, ${Number(s.value)}]`
+            .map(
+              (s: { from: Date; value: number }) =>
+                `[${s.from.getTime()}, ${Number(s.value)}]`,
+            )
+            .join(",")} ] }`,
+        )}
+        ${createGraph(
+          "uniqueIPs",
+          `Unique IPs (${friendlyFilterString(filter)})`,
+          `{key:'Unique IPs', values: [${(
+            (await query(
+              `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Unique IPs' order by \`from\` asc`,
+            )) as KeyFiguresQueryResult
           )
-          .join(",")
-      } ] }`,
-    )
-  }            
-        ${
-    createGraph(
-      "top10digitrafficUsers",
-      `Top 10 Digitraffic-Users (${friendlyFilterString(filter)})`,
-      topDataToGraphData(
-        (await query(
-          `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 digitraffic-users' order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }
-        ${
-    createGraph(
-      "top10IPs",
-      `Top 10 IPs (${friendlyFilterString(filter)})`,
-      topDataToGraphData(
-        (await query(
-          `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 IPs' order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }
-        ${
-    createGraph(
-      "top10userAgents",
-      `Top 10 User agents (${friendlyFilterString(filter)})`,
-      topDataToGraphData(
-        (await query(
-          `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 User Agents' order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }
-        ${
-    createGraph(
-      "top10referers",
-      `Top 10 Referers (${friendlyFilterString(filter)})`,
-      topDataToGraphData(
-        (await query(
-          `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 Referers' order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }
+            .map(
+              (s: { from: Date; value: number }) =>
+                `[${s.from.getTime()}, ${Number(s.value)}]`,
+            )
+            .join(",")} ] }`,
+        )}            
+        ${createGraph(
+          "top10digitrafficUsers",
+          `Top 10 Digitraffic-Users (${friendlyFilterString(filter)})`,
+          topDataToGraphData(
+            (await query(
+              `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 digitraffic-users' order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}
+        ${createGraph(
+          "top10IPs",
+          `Top 10 IPs (${friendlyFilterString(filter)})`,
+          topDataToGraphData(
+            (await query(
+              `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 IPs' order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}
+        ${createGraph(
+          "top10userAgents",
+          `Top 10 User agents (${friendlyFilterString(filter)})`,
+          topDataToGraphData(
+            (await query(
+              `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 User Agents' order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}
+        ${createGraph(
+          "top10referers",
+          `Top 10 Referers (${friendlyFilterString(filter)})`,
+          topDataToGraphData(
+            (await query(
+              `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 Referers' order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}
       }
     </script>
   </head>
@@ -289,54 +272,52 @@ async function createIndex(): Promise<string> {
     "<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>";
 
   let roadFilterHtml = filterHeader;
-  for (
-    const row of filters.filter((s) => s.filter.includes("transport_type:road"))
-  ) {
-    roadFilterHtml += `<tr><td><a href="${
-      base64encodeFilter(row.filter)
-    }.html">${
-      friendlyFilterString(
-        row.filter,
-      )
-    }</a></td><td>${
-      row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    }</td></tr>`;
+  for (const row of filters.filter((s) =>
+    s.filter.includes("transport_type:road"),
+  )) {
+    roadFilterHtml += `<tr><td><a href="${base64encodeFilter(
+      row.filter,
+    )}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td></tr>`;
   }
   roadFilterHtml += "</table>";
 
   let railFilterHtml = filterHeader;
-  for (
-    const row of filters.filter((s) => s.filter.includes("transport_type:rail"))
-  ) {
-    railFilterHtml += `<tr><td><a href="${
-      base64encodeFilter(row.filter)
-    }.html">${
-      friendlyFilterString(
-        row.filter,
-      )
-    }</a></td><td>${
-      row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    }</td></tr>`;
+  for (const row of filters.filter((s) =>
+    s.filter.includes("transport_type:rail"),
+  )) {
+    railFilterHtml += `<tr><td><a href="${base64encodeFilter(
+      row.filter,
+    )}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td></tr>`;
   }
   railFilterHtml += "</table>";
 
   let marineFilterHtml = filterHeader;
-  for (
-    const row of filters.filter((s) =>
-      s.filter.includes("transport_type:marine")
-    )
-  ) {
-    marineFilterHtml += `<tr><td><a href="${
-      base64encodeFilter(row.filter)
-    }.html">${
-      friendlyFilterString(
-        row.filter,
-      )
-    }</a></td><td>${
-      row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    }</td></tr>`;
+  for (const row of filters.filter((s) =>
+    s.filter.includes("transport_type:marine"),
+  )) {
+    marineFilterHtml += `<tr><td><a href="${base64encodeFilter(
+      row.filter,
+    )}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td></tr>`;
   }
   marineFilterHtml += "</table>";
+
+  let afirFilterHtml = filterHeader;
+  for (const row of filters.filter((s) =>
+    s.filter.includes("transport_type:afir"),
+  )) {
+    afirFilterHtml += `<tr><td><a href="${base64encodeFilter(
+      row.filter,
+    )}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td></tr>`;
+  }
+  afirFilterHtml += "</table>";
 
   return `
   <html>
@@ -349,8 +330,10 @@ async function createIndex(): Promise<string> {
   gap: 40px 0px;
   grid-template-areas:
     "requests bytesOut uniqueIPs"
-    "road-endpoints rail-endpoints marine-endpoints"
-    "road-links rail-links marine-links"    ;
+    "road-endpoints rail-endpoints"
+    "marine-endpoints afir-endpoint"
+    "road-links rail-links"
+    "marine-links afir-links";
 }
 
 .requests { grid-area: requests; }
@@ -359,9 +342,11 @@ async function createIndex(): Promise<string> {
 .road-links { grid-area: road-links; }
 .rail-links { grid-area: rail-links; }
 .marine-links { grid-area: marine-links; }
+.afir-links { grid-area: afir-links; }
 .road-endpoints { grid-area: road-endpoints; }
 .rail-endpoints { grid-area: rail-endpoints; }
 .marine-endpoints { grid-area: marine-endpoints; }
+.afir-endpoints { grid-area: afir-endpoints; }
       
       div h1 {
           text-align: center;
@@ -383,102 +368,104 @@ async function createIndex(): Promise<string> {
     
     <script>
   	  window.onload = function() {  	      	            
-        ${
-    createGraph(
-      "requests",
-      `Requests`,
-      endDataToGraphData(
-        (await query(
-          `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Http req' order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }            
-        ${
-    createGraph(
-      "bytesOut",
-      `Bytes out`,
-      endDataToGraphData(
-        (await query(
-          `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Bytes Out' order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }
-        ${
-    createGraph(
-      "uniqueIPs",
-      `Unique IPs`,
-      endDataToGraphData(
-        (await query(
-          `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Unique IPs' order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }                                    
-        ${
-    createGraph(
-      "roadEndpoints",
-      `Road Requests`,
-      endDataToGraphData(
-        (await query(
-          `select * from key_figures where filter like '@transport_type:road AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }         
-        ${
-    createGraph(
-      "railEndpoints",
-      `Rail Requests`,
-      endDataToGraphData(
-        (await query(
-          `select * from key_figures where filter like '@transport_type:rail AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }   
-        ${
-    createGraph(
-      "marineEndpoints",
-      `Marine Requests`,
-      endDataToGraphData(
-        (await query(
-          `select * from key_figures where filter like '@transport_type:marine AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`,
-        )) as KeyFigure[],
-      ).map(
-        (s) =>
-          `{key:'${s.key}', values: [${
-            s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)
-          } ] }`,
-      ),
-    )
-  }                   
+        ${createGraph(
+          "requests",
+          `Requests`,
+          endDataToGraphData(
+            (await query(
+              `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:afir','@transport_type:*') and name = 'Http req' order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}            
+        ${createGraph(
+          "bytesOut",
+          `Bytes out`,
+          endDataToGraphData(
+            (await query(
+              `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:afir','@transport_type:*') and name = 'Bytes Out' order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}
+        ${createGraph(
+          "uniqueIPs",
+          `Unique IPs`,
+          endDataToGraphData(
+            (await query(
+              `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:afir','@transport_type:*') and name = 'Unique IPs' order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}                                    
+        ${createGraph(
+          "roadEndpoints",
+          `Road Requests`,
+          endDataToGraphData(
+            (await query(
+              `select * from key_figures where filter like '@transport_type:road AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}         
+        ${createGraph(
+          "railEndpoints",
+          `Rail Requests`,
+          endDataToGraphData(
+            (await query(
+              `select * from key_figures where filter like '@transport_type:rail AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}   
+        ${createGraph(
+          "marineEndpoints",
+          `Marine Requests`,
+          endDataToGraphData(
+            (await query(
+              `select * from key_figures where filter like '@transport_type:marine AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}     
+        ${createGraph(
+          "afirEndpoints",
+          `AFIR Requests`,
+          endDataToGraphData(
+            (await query(
+              `select * from key_figures where filter like '@transport_type:afir AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`,
+            )) as KeyFigure[],
+          ).map(
+            (s) =>
+              `{key:'${s.key}', values: [${s.values.map(
+                (o) => `[${o[0].getTime()}, ${o[1]}]`,
+              )} ] }`,
+          ),
+        )}                   
       }
     </script>
   </head>
@@ -490,20 +477,18 @@ async function createIndex(): Promise<string> {
       <div id="uniqueIPs" class="uniqueIPs"><div><svg></svg></div></div> 
       <div id="roadEndpoints" class="road-endpoints"><div><svg></svg></div></div>
       <div id="railEndpoints" class="rail-endpoints"><div><svg></svg></div></div>
-      <div id="marineEndpoints" class="marine-endpoints"><div><svg></svg></div></div>      
+      <div id="marineEndpoints" class="marine-endpoints"><div><svg></svg></div></div>
+      <div id="afirEndpoints" class="afir-endpoints"><div><svg></svg></div></div>
       <div class="road-links"><h1>Road details</h1>${roadFilterHtml}</div>
       <div class="rail-links"><h1>Rail details</h1>${railFilterHtml}</div>
       <div class="marine-links"><h1>Marine details</h1>${marineFilterHtml}</div>
+      <div class="afir-links"><h1>AFIR details</h1>${afirFilterHtml}</div>
   
   </div>
   <footer>
-    <span>Details for whole service <a href="${
-    base64encodeFilter(
+    <span>Details for whole service <a href="${base64encodeFilter(
       "@transport_type:*",
-    )
-  }.html">here</a>. Graphs only show endpoints which receive over 50k requests. Last updated: ${
-    new Date().toISOString()
-  }</span>
+    )}.html">here</a>. Graphs only show endpoints which receive over 50k requests. Last updated: ${new Date().toISOString()}</span>
   </footer>
   </body>
   </html>
