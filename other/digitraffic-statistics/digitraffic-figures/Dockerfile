@@ -1,6 +1,6 @@
 ARG FUNCTION_DIR="/function"
 
-ARG PYTHON_VERSION=3.14
+ARG PYTHON_VERSION=3.12
 
 FROM arm64v8/python:${PYTHON_VERSION}-slim as build-image
 
