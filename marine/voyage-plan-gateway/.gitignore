@@ -4,6 +4,7 @@
 !/cdk.json
 !/jest.config.js
 !/*.json
+/sbom.json
 !/*.md
 !/*.sh
 !/*.xsd

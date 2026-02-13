@@ -24,9 +24,6 @@ importers:
       aws-cdk-lib:
         specifier: 2.236.0
         version: 2.236.0(constructs@10.4.5)
-      aws-sdk:
-        specifier: 2.1693.0
-        version: 2.1693.0
       constructs:
         specifier: 10.4.5
         version: 10.4.5
@@ -323,9 +320,6 @@ importers:
       aws-cdk-lib:
         specifier: 2.236.0
         version: 2.236.0(constructs@10.4.5)
-      aws-sdk:
-        specifier: 2.1693.0
-        version: 2.1693.0
       constructs:
         specifier: 10.4.5
         version: 10.4.5
@@ -423,9 +417,6 @@ importers:
       aws-cdk-lib:
         specifier: 2.236.0
         version: 2.236.0(constructs@10.4.5)
-      aws-sdk:
-        specifier: 2.1693.0
-        version: 2.1693.0
       constructs:
         specifier: 10.4.5
         version: 10.4.5
@@ -948,9 +939,6 @@ importers:
       aws-cdk:
         specifier: 2.1103.0
         version: 2.1103.0
-      aws-sdk:
-        specifier: 2.1693.0
-        version: 2.1693.0
       esbuild:
         specifier: 0.27.2
         version: 0.27.2
@@ -1836,9 +1824,6 @@ importers:
       aws-cdk-lib:
         specifier: 2.236.0
         version: 2.236.0(constructs@10.4.5)
-      aws-sdk:
-        specifier: 2.1693.0
-        version: 2.1693.0
       constructs:
         specifier: 10.4.5
         version: 10.4.5
