@@ -95,5 +95,12 @@ export class PublicApi {
         "Limit visit timestamp(exclusive)",
       ),
     );
+    this.publicApi.documentResource(
+      visitResource,
+      DocumentationPart.queryParameter(
+        "sort",
+        "Sort results by field:direction. Fields: eta, etd, ata, atd, vesselName, portOfCall, status. Directions: asc, desc. Example: sort=eta:desc",
+      ),
+    );
   }
 }

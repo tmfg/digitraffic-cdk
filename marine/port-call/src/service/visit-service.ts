@@ -30,9 +30,10 @@ export async function getAllVisits(
       getVisitsEvent.fromDateTime,
       getVisitsEvent.toDateTime,
       getVisitsEvent.portOfCall,
-      getVisitsEvent.shipName,
+      getVisitsEvent.vesselName,
       getVisitsEvent.imo,
       getVisitsEvent.status,
+      getVisitsEvent.sort,
     );
   });
 
@@ -45,7 +46,7 @@ function convertVisit(dbVisit: DbVisit): VisitResponse {
     visitId: dbVisit.visit_id,
     vesselId: dbVisit.vessel_id,
     vesselName: dbVisit.vessel_name,
-    portLocode: dbVisit.port_locode,
+    portOfCall: dbVisit.port_locode,
     eta: dbVisit.eta.toISOString(),
     etd: dbVisit.etd?.toISOString(),
     ata: dbVisit.ata?.toISOString(),

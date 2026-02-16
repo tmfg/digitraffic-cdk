@@ -8,6 +8,7 @@ import { default as pgPromise } from "pg-promise";
 import type { NemoResponse, NemoVisit } from "../model/nemo.js";
 import type {
   VISIT_STATUS_VALUES,
+  VisitSort,
   VisitStatus,
 } from "../model/visit-schema.js";
 
@@ -123,7 +124,30 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
     and ($4::text is null or vessel_name ILIKE '%' || $4 || '%')
     and ($5::text is null or vessel_id = $5::text)
     and ($6::text is null or status = $6)
-    order by coalesce(ata, eta) asc`,
+    order by
+      case when $8 = 'asc' then
+        case $7
+          when 'eta' then eta::text
+          when 'etd' then etd::text
+          when 'ata' then ata::text
+          when 'atd' then atd::text
+          when 'vesselName' then vessel_name
+          when 'portOfCall' then port_locode
+          when 'status' then status
+        end
+      end asc nulls last,
+      case when $8 = 'desc' then
+        case $7
+          when 'eta' then eta::text
+          when 'etd' then etd::text
+          when 'ata' then ata::text
+          when 'atd' then atd::text
+          when 'vesselName' then vessel_name
+          when 'portOfCall' then port_locode
+          when 'status' then status
+        end
+      end desc nulls last,
+      case when $7 is null then coalesce(ata, eta) end asc`,
 });
 
 export function findAllVisits(
@@ -134,6 +158,7 @@ export function findAllVisits(
   vesselName: string | undefined,
   imo: number | undefined,
   status: VisitStatus | undefined,
+  sort?: VisitSort,
 ): Promise<DbVisit[]> {
   return db.manyOrNone(FIND_ALL_VISITS_PS, [
     from,
@@ -142,6 +167,8 @@ export function findAllVisits(
     vesselName,
     imo,
     status,
+    sort?.field ?? null,
+    sort?.direction ?? null,
   ]);
 }
 

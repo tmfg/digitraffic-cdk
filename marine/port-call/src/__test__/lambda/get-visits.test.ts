@@ -53,7 +53,7 @@ describe(
           atd: undefined,
           eta: testVisit.portCall.voyageInformation.estimatedArrivalDateTime.toISOString(),
           etd: testVisit.portCall.voyageInformation.estimatedDepartureDateTime!.toISOString(),
-          portLocode: testVisit.portCall.voyageInformation.portIdentification,
+          portOfCall: testVisit.portCall.voyageInformation.portIdentification,
           status: testVisit.portCall.portCallStatus.status,
           updateTime: testVisit.latestUpdateTime.toISOString(),
           vesselId: testVisit.portCall.vesselInformation.identification,
@@ -77,7 +77,7 @@ describe(
           atd: undefined,
           eta: testVisit.portCall.voyageInformation.estimatedArrivalDateTime.toISOString(),
           etd: testVisit.portCall.voyageInformation.estimatedDepartureDateTime!.toISOString(),
-          portLocode: testVisit.portCall.voyageInformation.portIdentification,
+          portOfCall: testVisit.portCall.voyageInformation.portIdentification,
           status: testVisit.portCall.portCallStatus.status,
           updateTime: testVisit.latestUpdateTime.toISOString(),
           vesselId: testVisit.portCall.vesselInformation.identification,
@@ -118,7 +118,7 @@ describe(
       const response = await getResponseFromLambda({ portOfCall: "FIHEL" });
       ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
         expect(visits).toHaveLength(1);
-        expect(visits[0]!.portLocode).toBe("FIHEL");
+        expect(visits[0]!.portOfCall).toBe("FIHEL");
       });
     });
 
@@ -129,7 +129,7 @@ describe(
       const response = await getResponseFromLambda({ portOfCall: "fihel" });
       ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
         expect(visits).toHaveLength(1);
-        expect(visits[0]!.portLocode).toBe("FIHEL");
+        expect(visits[0]!.portOfCall).toBe("FIHEL");
       });
     });
 
@@ -141,48 +141,52 @@ describe(
       ExpectResponse.ok(response).expectJson([]);
     });
 
-    // shipName filter tests
+    // vesselName filter tests
 
-    test("filter by shipName - exact match", async () => {
+    test("filter by vesselName - exact match", async () => {
       const visit1 = createTestVisit("V1", "PORT1", "Queen Mary");
       const visit2 = createTestVisit("V2", "PORT1", "Viking Grace");
       await updateAndExpect([visit1, visit2], 2, 0, 2);
 
-      const response = await getResponseFromLambda({ shipName: "Queen Mary" });
+      const response = await getResponseFromLambda({
+        vesselName: "Queen Mary",
+      });
       ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
         expect(visits).toHaveLength(1);
         expect(visits[0]!.vesselName).toBe("Queen Mary");
       });
     });
 
-    test("filter by shipName - partial match", async () => {
+    test("filter by vesselName - partial match", async () => {
       const visit1 = createTestVisit("V1", "PORT1", "Queen Mary 2");
       const visit2 = createTestVisit("V2", "PORT1", "Viking Grace");
       await updateAndExpect([visit1, visit2], 2, 0, 2);
 
-      const response = await getResponseFromLambda({ shipName: "Queen" });
+      const response = await getResponseFromLambda({ vesselName: "Queen" });
       ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
         expect(visits).toHaveLength(1);
         expect(visits[0]!.vesselName).toBe("Queen Mary 2");
       });
     });
 
-    test("filter by shipName - case insensitive", async () => {
+    test("filter by vesselName - case insensitive", async () => {
       const visit = createTestVisit("V1", "PORT1", "Queen Mary");
       await updateAndExpect([visit], 1, 0, 1);
 
-      const response = await getResponseFromLambda({ shipName: "queen mary" });
+      const response = await getResponseFromLambda({
+        vesselName: "queen mary",
+      });
       ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
         expect(visits).toHaveLength(1);
         expect(visits[0]!.vesselName).toBe("Queen Mary");
       });
     });
 
-    test("filter by shipName - no match", async () => {
+    test("filter by vesselName - no match", async () => {
       const visit = createTestVisit("V1", "PORT1", "Queen Mary");
       await updateAndExpect([visit], 1, 0, 1);
 
-      const response = await getResponseFromLambda({ shipName: "Viking" });
+      const response = await getResponseFromLambda({ vesselName: "Viking" });
       ExpectResponse.ok(response).expectJson([]);
     });
 
@@ -313,12 +317,12 @@ describe(
       });
       ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
         expect(visits).toHaveLength(1);
-        expect(visits[0]!.portLocode).toBe("FIHEL");
+        expect(visits[0]!.portOfCall).toBe("FIHEL");
         expect(visits[0]!.status).toBe("Arrived");
       });
     });
 
-    test("filter by shipName and imo", async () => {
+    test("filter by vesselName and imo", async () => {
       const visit1 = createTestVisit("V1", "PORT1", "Queen Mary", "1111111");
       const visit2 = createTestVisit(
         "V2",
@@ -329,7 +333,7 @@ describe(
       await updateAndExpect([visit1, visit2], 2, 0, 2);
 
       const response = await getResponseFromLambda({
-        shipName: "Queen",
+        vesselName: "Queen",
         imo: "1111111",
       });
       ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
@@ -406,6 +410,185 @@ describe(
         expect(visits[0]!.vesselName).toBe("Arrived Early");
         expect(visits[1]!.vesselName).toBe("Expected Soon");
         expect(visits[2]!.vesselName).toBe("Arrived Late");
+      });
+    });
+
+    // sort parameter tests
+
+    test("invalid sort format returns bad request", async () => {
+      const response = await getResponseFromLambda({ sort: "invalid" });
+      ExpectResponse.badRequest(response);
+    });
+
+    test("invalid sort field returns bad request", async () => {
+      const response = await getResponseFromLambda({ sort: "foo:asc" });
+      ExpectResponse.badRequest(response);
+    });
+
+    test("invalid sort direction returns bad request", async () => {
+      const response = await getResponseFromLambda({ sort: "eta:up" });
+      ExpectResponse.badRequest(response);
+    });
+
+    test("sort by eta ascending", async () => {
+      const now = new Date();
+      const visit1 = createTestVisitWith({
+        visitId: "V1",
+        vesselName: "Late Ship",
+        identification: "1111111",
+        eta: addHours(now, 3),
+      });
+      const visit2 = createTestVisitWith({
+        visitId: "V2",
+        vesselName: "Early Ship",
+        identification: "2222222",
+        eta: addHours(now, 1),
+      });
+      const visit3 = createTestVisitWith({
+        visitId: "V3",
+        vesselName: "Middle Ship",
+        identification: "3333333",
+        eta: addHours(now, 2),
+      });
+      await updateAndExpect([visit1, visit2, visit3], 3, 0, 3);
+
+      const response = await getResponseFromLambda({ sort: "eta:asc" });
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(3);
+        expect(visits[0]!.vesselName).toBe("Early Ship");
+        expect(visits[1]!.vesselName).toBe("Middle Ship");
+        expect(visits[2]!.vesselName).toBe("Late Ship");
+      });
+    });
+
+    test("sort by eta descending", async () => {
+      const now = new Date();
+      const visit1 = createTestVisitWith({
+        visitId: "V1",
+        vesselName: "Late Ship",
+        identification: "1111111",
+        eta: addHours(now, 3),
+      });
+      const visit2 = createTestVisitWith({
+        visitId: "V2",
+        vesselName: "Early Ship",
+        identification: "2222222",
+        eta: addHours(now, 1),
+      });
+      const visit3 = createTestVisitWith({
+        visitId: "V3",
+        vesselName: "Middle Ship",
+        identification: "3333333",
+        eta: addHours(now, 2),
+      });
+      await updateAndExpect([visit1, visit2, visit3], 3, 0, 3);
+
+      const response = await getResponseFromLambda({ sort: "eta:desc" });
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(3);
+        expect(visits[0]!.vesselName).toBe("Late Ship");
+        expect(visits[1]!.vesselName).toBe("Middle Ship");
+        expect(visits[2]!.vesselName).toBe("Early Ship");
+      });
+    });
+
+    test("sort by vesselName ascending", async () => {
+      const now = new Date();
+      const visit1 = createTestVisitWith({
+        visitId: "V1",
+        vesselName: "Charlie",
+        identification: "1111111",
+        eta: addHours(now, 1),
+      });
+      const visit2 = createTestVisitWith({
+        visitId: "V2",
+        vesselName: "Alpha",
+        identification: "2222222",
+        eta: addHours(now, 2),
+      });
+      const visit3 = createTestVisitWith({
+        visitId: "V3",
+        vesselName: "Bravo",
+        identification: "3333333",
+        eta: addHours(now, 3),
+      });
+      await updateAndExpect([visit1, visit2, visit3], 3, 0, 3);
+
+      const response = await getResponseFromLambda({ sort: "vesselName:asc" });
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(3);
+        expect(visits[0]!.vesselName).toBe("Alpha");
+        expect(visits[1]!.vesselName).toBe("Bravo");
+        expect(visits[2]!.vesselName).toBe("Charlie");
+      });
+    });
+
+    test("sort by status descending", async () => {
+      const now = new Date();
+      const visit1 = createTestVisitWith({
+        visitId: "V1",
+        vesselName: "Ship A",
+        identification: "1111111",
+        eta: addHours(now, 1),
+        status: "Arrived",
+      });
+      const visit2 = createTestVisitWith({
+        visitId: "V2",
+        vesselName: "Ship B",
+        identification: "2222222",
+        eta: addHours(now, 2),
+        status: "Expected to Arrive",
+      });
+      const visit3 = createTestVisitWith({
+        visitId: "V3",
+        vesselName: "Ship C",
+        identification: "3333333",
+        eta: addHours(now, 3),
+        status: "Departed",
+      });
+      await updateAndExpect([visit1, visit2, visit3], 3, 0, 3);
+
+      const response = await getResponseFromLambda({ sort: "status:desc" });
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(3);
+        // alphabetical desc: Expected to Arrive > Departed > Arrived
+        expect(visits[0]!.vesselName).toBe("Ship B");
+        expect(visits[1]!.vesselName).toBe("Ship C");
+        expect(visits[2]!.vesselName).toBe("Ship A");
+      });
+    });
+
+    test("sort by portOfCall ascending", async () => {
+      const now = new Date();
+      const visit1 = createTestVisitWith({
+        visitId: "V1",
+        vesselName: "Ship A",
+        identification: "1111111",
+        eta: addHours(now, 1),
+        portIdentification: "FIHEL",
+      });
+      const visit2 = createTestVisitWith({
+        visitId: "V2",
+        vesselName: "Ship B",
+        identification: "2222222",
+        eta: addHours(now, 2),
+        portIdentification: "FIANK",
+      });
+      const visit3 = createTestVisitWith({
+        visitId: "V3",
+        vesselName: "Ship C",
+        identification: "3333333",
+        eta: addHours(now, 3),
+        portIdentification: "FITUL",
+      });
+      await updateAndExpect([visit1, visit2, visit3], 3, 0, 3);
+
+      const response = await getResponseFromLambda({ sort: "portOfCall:asc" });
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(3);
+        expect(visits[0]!.portOfCall).toBe("FIANK");
+        expect(visits[1]!.portOfCall).toBe("FIHEL");
+        expect(visits[2]!.portOfCall).toBe("FITUL");
       });
     });
   }),

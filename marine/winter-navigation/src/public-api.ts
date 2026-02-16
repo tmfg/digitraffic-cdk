@@ -1,19 +1,20 @@
 /* eslint-disable dot-notation */
-import type { JsonSchema, Model, Resource } from "aws-cdk-lib/aws-apigateway";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { omitDeep } from "@digitraffic/common/dist/utils/utils";
+import type { JsonSchema, Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { toJSONSchema } from "zod";
 import {
   DirwayFeatureCollectionSchema,
   LocationFeatureCollectionSchema,
   VesselsResponseSchema,
 } from "./model/public-api-model.js";
-import { omitDeep } from "@digitraffic/common/dist/utils/utils";
 
 const WN_TAGS_V2 = ["Winter Navigation V2"];
 
@@ -31,10 +32,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     "pattern",
   );
 
-  const locationsModel = publicApi.addJsonModel(
-    "Locations",
-    locationsSchema,
-  );
+  const locationsModel = publicApi.addJsonModel("Locations", locationsSchema);
   const [locationResource, locationsResource] = createLocationResources(
     stack,
     v2Resource,
@@ -48,10 +46,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     "pattern",
   );
 
-  const vesselsModel = publicApi.addJsonModel(
-    "Vessels",
-    vesselsSchema,
-  );
+  const vesselsModel = publicApi.addJsonModel("Vessels", vesselsSchema);
   const [vesselResource, vesselsResource] = createVesselResources(
     stack,
     v2Resource,
@@ -65,10 +60,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     "pattern",
   );
 
-  const dirwaysModel = publicApi.addJsonModel(
-    "Dirways",
-    dirwaysSchema,
-  );
+  const dirwaysModel = publicApi.addJsonModel("Dirways", dirwaysSchema);
   const dirwaysResource = createDirwayResources(
     stack,
     v2Resource,
