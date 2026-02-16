@@ -107,7 +107,9 @@ export const handler = async (
       });
   } catch (error) {
     if (error instanceof ZodError) {
-      return LambdaResponseBuilder.badRequest(JSON.stringify(error.issues));
+      return LambdaResponseBuilder.badRequest(
+        JSON.stringify(z.flattenError(error).fieldErrors),
+      );
     }
 
     logException(logger, error, true);

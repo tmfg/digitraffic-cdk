@@ -59,8 +59,13 @@ export class PublicApi {
       visitResource.addMethod(httpMethod, visitsIntegration, {
         apiKeyRequired: true,
         requestParameters: {
-          "method.request.querystring.from": false,
-          "method.request.querystring.to": false,
+          "method.request.querystring.fromDateTime": false,
+          "method.request.querystring.toDateTime": false,
+          "method.request.querystring.portOfCall": false,
+          "method.request.querystring.vesselName": false,
+          "method.request.querystring.imo": false,
+          "method.request.querystring.status": false,
+          "method.request.querystring.sort": false,
         },
         methodResponses: [
           DigitrafficMethodResponse.response200(
@@ -84,15 +89,37 @@ export class PublicApi {
     this.publicApi.documentResource(
       visitResource,
       DocumentationPart.queryParameter(
-        "from",
-        "Limit visit timestamp(inclusive)",
+        "fromDateTime",
+        "Limit visit timestamp, inclusive. ISO 8601 datetime.",
       ),
     );
     this.publicApi.documentResource(
       visitResource,
       DocumentationPart.queryParameter(
-        "to",
-        "Limit visit timestamp(exclusive)",
+        "toDateTime",
+        "Limit visit timestamp, exclusive. ISO 8601 datetime.",
+      ),
+    );
+    this.publicApi.documentResource(
+      visitResource,
+      DocumentationPart.queryParameter("portOfCall", "Filter by port locode."),
+    );
+    this.publicApi.documentResource(
+      visitResource,
+      DocumentationPart.queryParameter(
+        "vesselName",
+        "Filter by vessel name. Case-insensitive partial match.",
+      ),
+    );
+    this.publicApi.documentResource(
+      visitResource,
+      DocumentationPart.queryParameter("imo", "Filter by IMO number."),
+    );
+    this.publicApi.documentResource(
+      visitResource,
+      DocumentationPart.queryParameter(
+        "status",
+        "Filter by visit status. Values: expected-to-arrive, arrived, departed, cancelled.",
       ),
     );
     this.publicApi.documentResource(
