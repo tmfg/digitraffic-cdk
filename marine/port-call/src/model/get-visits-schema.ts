@@ -1,3 +1,8 @@
+import {
+  zNonEmptyString,
+  zStringToDate,
+  zStringToNumber,
+} from "@digitraffic/common/dist/utils/zod-utils";
 import { z } from "zod";
 import type { VisitSort, VisitStatus } from "./visit-schema.js";
 import {
@@ -6,15 +11,10 @@ import {
   VISIT_STATUS_QUERY_VALUES,
 } from "./visit-schema.js";
 
-const EmptyStringUndefined = z.literal("").transform(() => undefined);
-const OptionalDateString = z.coerce.date().optional().or(EmptyStringUndefined);
-const OptionalString = z.string().optional();
-const OptionalNumber = z.coerce.number().optional().or(EmptyStringUndefined);
-const OptionalStatus = z.enum(VISIT_STATUS_QUERY_VALUES).optional();
-const OptionalSort = z
+const zOptionalStatus = z.enum(VISIT_STATUS_QUERY_VALUES).optional();
+const zOptionalSort = z
   .string()
   .optional()
-  .or(EmptyStringUndefined)
   .transform((val, ctx) => {
     if (!val) return undefined;
     const parts = val.split(":");
@@ -51,13 +51,13 @@ const OptionalSort = z
   });
 export const getVisitsSchema = z
   .object({
-    fromDateTime: OptionalDateString,
-    toDateTime: OptionalDateString,
-    portOfCall: OptionalString,
-    vesselName: OptionalString,
-    imo: OptionalNumber,
-    status: OptionalStatus,
-    sort: OptionalSort,
+    fromDateTime: zStringToDate().optional(),
+    toDateTime: zStringToDate().optional(),
+    portOfCall: zNonEmptyString().optional(),
+    vesselName: zNonEmptyString().optional(),
+    imo: zStringToNumber().optional(),
+    status: zOptionalStatus,
+    sort: zOptionalSort,
   })
   .strict()
   .readonly();
