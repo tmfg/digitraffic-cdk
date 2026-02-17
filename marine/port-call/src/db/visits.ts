@@ -154,12 +154,12 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
 
 export function findAllVisits(
   db: DTDatabase,
-  from: Date | undefined,
-  to: Date | undefined,
-  locode: string | undefined,
-  vesselName: string | undefined,
-  imo: number | undefined,
-  status: VisitStatus | undefined,
+  from?: Date,
+  to?: Date,
+  locode?: string,
+  vesselName?: string,
+  imo?: number,
+  status?: VisitStatus,
   sort?: VisitSort,
 ): Promise<DbVisit[]> {
   return db.manyOrNone(FIND_ALL_VISITS_PS, [
@@ -169,8 +169,8 @@ export function findAllVisits(
     vesselName,
     imo,
     status,
-    sort?.field ?? null,
-    sort?.direction ?? null,
+    sort?.field,
+    sort?.direction,
   ]);
 }
 

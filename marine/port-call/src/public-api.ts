@@ -90,14 +90,14 @@ export class PublicApi {
       visitResource,
       DocumentationPart.queryParameter(
         "fromDateTime",
-        "Limit visit timestamp, inclusive. ISO 8601 datetime.",
+        "Limit visit timestamp (updateTime), inclusive. ISO 8601 datetime.",
       ),
     );
     this.publicApi.documentResource(
       visitResource,
       DocumentationPart.queryParameter(
         "toDateTime",
-        "Limit visit timestamp, exclusive. ISO 8601 datetime.",
+        "Limit visit timestamp (updateTime), exclusive. ISO 8601 datetime.",
       ),
     );
     this.publicApi.documentResource(
