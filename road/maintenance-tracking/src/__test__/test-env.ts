@@ -1,5 +1,5 @@
-import { MaintenanceTrackingEnvKeys } from "../keys.js";
 import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { MaintenanceTrackingEnvKeys } from "../keys.js";
 
 export function setTestEnv(): void {
   setEnvVariable(MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME, "sqs-bucket-name");

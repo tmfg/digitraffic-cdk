@@ -1,6 +1,6 @@
-import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
 import { Duration } from "aws-cdk-lib";
-import { type Construct } from "constructs";
+import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
+import type { Construct } from "constructs";
 
 /**
  * Creates main queue and dead letter queue

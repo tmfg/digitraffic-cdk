@@ -1,27 +1,27 @@
-import { setTestEnv } from "../test-env.js";
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { ReceiveMessageCommandOutput } from "@aws-sdk/client-sqs";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { type ExtendedSqsClient } from "sqs-extended-client";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { jest } from "@jest/globals";
+import type { SQSEvent } from "aws-lambda";
+import { parseISO } from "date-fns";
+import { cloneDeep } from "es-toolkit";
+import type { ExtendedSqsClient } from "sqs-extended-client";
+import {
+  createExtendedSqsClient,
+  createSqsReceiveMessageCommandOutput,
+} from "../../service/sqs-big-payload.js";
 import {
   dbTestBase,
   findAllObservations,
   mockSecrets,
 } from "../db-testutil.js";
-import { parseISO } from "date-fns";
-import { type ReceiveMessageCommandOutput } from "@aws-sdk/client-sqs";
-import {
-  createExtendedSqsClient,
-  createSqsReceiveMessageCommandOutput,
-} from "../../service/sqs-big-payload.js";
-import { jest } from "@jest/globals";
-import type { SQSEvent } from "aws-lambda";
+import { setTestEnv } from "../test-env.js";
 import {
   createSQSEventWithBodies,
   getRandompId,
   getTrackingJsonWith3Observations,
   getTrackingJsonWith3ObservationsAndMissingSendingSystem,
 } from "../testdata.js";
-import _ from "lodash";
 
 setTestEnv();
 const { handlerFn } = await import(
@@ -71,9 +71,7 @@ describe(
       const bigOutputFromS3 =
         createCopyOfSqsReceiveMessageCommandOutputAndFillBody(
           outputWithRefToS3,
-          [
-            json,
-          ],
+          [json],
         );
       const extendedSqsClientStub = jest
         .spyOn(extendedSqsClient, "_processReceive")
@@ -114,10 +112,7 @@ describe(
       const bigOutputFromS3 =
         createCopyOfSqsReceiveMessageCommandOutputAndFillBody(
           outputWithRefToS3,
-          [
-            json1,
-            json2,
-          ],
+          [json1, json2],
         );
       const extendedSqsClientStub = jest
         .spyOn(extendedSqsClient, "_processReceive")
@@ -142,7 +137,8 @@ describe(
     });
 
     test("invalid record", async () => {
-      const json = `invalid json ` +
+      const json =
+        `invalid json ` +
         getTrackingJsonWith3Observations(getRandompId(), getRandompId());
       const event = createSQSEventWithBodies(["bigMessageInS3"]);
 
@@ -151,9 +147,7 @@ describe(
       const bigOutputFromS3 =
         createCopyOfSqsReceiveMessageCommandOutputAndFillBody(
           outputWithRefToS3,
-          [
-            json,
-          ],
+          [json],
         );
       const extendedSqsClientStub = jest
         .spyOn(extendedSqsClient, "_processReceive")
@@ -171,7 +165,8 @@ describe(
 
     test("invalid and valid record", async () => {
       // Create two records
-      const invalidJson = `invalid json ` +
+      const invalidJson =
+        `invalid json ` +
         getTrackingJsonWith3Observations(getRandompId(), getRandompId());
       const validJson = getTrackingJsonWith3Observations(
         getRandompId(),
@@ -186,10 +181,7 @@ describe(
       const bigOutputFromS3 =
         createCopyOfSqsReceiveMessageCommandOutputAndFillBody(
           outputWithRefToS3,
-          [
-            invalidJson,
-            validJson,
-          ],
+          [invalidJson, validJson],
         );
 
       const extendedSqsClientStub = jest
@@ -237,13 +229,10 @@ function createCopyOfSqsReceiveMessageCommandOutputAndFillBody(
   outputWithRefToS3: ReceiveMessageCommandOutput,
   jsons: string[],
 ): ReceiveMessageCommandOutput {
-  const outputValueWithBigJsonFromS3 = _.cloneDeep(outputWithRefToS3);
+  const outputValueWithBigJsonFromS3 = cloneDeep(outputWithRefToS3);
   jsons.forEach((json, index) => {
-    if (
-      outputValueWithBigJsonFromS3.Messages &&
-      outputValueWithBigJsonFromS3.Messages[index]
-    ) {
-      _.set(outputValueWithBigJsonFromS3.Messages[index], "Body", json); //  Set payload from S3
+    if (outputValueWithBigJsonFromS3.Messages?.[index]) {
+      outputValueWithBigJsonFromS3.Messages[index].Body = json; //  Set payload from S3
     } else {
       throw new Error(
         `outputValueWithBigJsonFromS3.Messages[${index}] was missing`,
