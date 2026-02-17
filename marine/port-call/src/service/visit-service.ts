@@ -9,7 +9,7 @@ import { addDays, startOfDay, subDays } from "date-fns";
 import { NemoApi } from "../api/nemo-api.js";
 import type { DbInsertedUpdated, DbVisit } from "../db/visits.js";
 import { findAllVisits, findVisit, upsertVisits } from "../db/visits.js";
-import type { GetVisitsParameters } from "../lambda/get-visits/get-visits.js";
+import type { GetVisitsParameters } from "../model/get-visits-schema.js";
 import type { VisitResponse } from "../model/visit-schema.js";
 
 const DATATYPE = "PC2_VISITS" as const;

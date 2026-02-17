@@ -124,6 +124,8 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
     and ($4::text is null or vessel_name ILIKE '%' || $4 || '%')
     and ($5::text is null or vessel_id = $5::text)
     and ($6::text is null or status = $6)
+    and eta >= now() - interval '3 months'
+    and eta <= now() + interval '3 months'
     order by
       case when $8 = 'asc' then
         case $7

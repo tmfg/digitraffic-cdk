@@ -2,6 +2,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { decodeBase64ToAscii } from "@digitraffic/common/dist/utils/base64";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { PortCallSecret } from "../../model/secret.js";
 import { updateVisits } from "../../service/visit-service.js";
 
@@ -21,9 +22,7 @@ export const handler = async (): Promise<void> => {
       decodeBase64ToAscii(secret.certificate),
     );
   } catch (error) {
-    logger.debug("got error " + JSON.stringify(error));
-
-    //        logException(logger, error, true);
+    logException(logger, error, true);
   } finally {
     logger.info({
       method: "UpdateVisits.handler",

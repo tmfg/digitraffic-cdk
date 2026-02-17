@@ -1,7 +1,7 @@
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
-import { addHours, subHours } from "date-fns";
+import { addHours, addMonths, subHours, subMonths } from "date-fns";
 import type { VisitResponse } from "../../model/visit-schema.js";
 import {
   assertVisitCount,
@@ -589,6 +589,88 @@ describe(
         expect(visits[0]!.portOfCall).toBe("FIANK");
         expect(visits[1]!.portOfCall).toBe("FIHEL");
         expect(visits[2]!.portOfCall).toBe("FITUL");
+      });
+    });
+
+    // ETA 3-month window restriction tests
+
+    test("visit with eta more than 3 months in the past is not returned", async () => {
+      const now = new Date();
+      const oldVisit = createTestVisitWith({
+        visitId: "V-OLD",
+        vesselName: "Old Ship",
+        identification: "1111111",
+        eta: subMonths(now, 4),
+      });
+      const recentVisit = createTestVisitWith({
+        visitId: "V-RECENT",
+        vesselName: "Recent Ship",
+        identification: "2222222",
+        eta: addHours(now, 1),
+      });
+      await updateAndExpect([oldVisit, recentVisit], 2, 0, 2);
+
+      const response = await getResponseFromLambda();
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(1);
+        expect(visits[0]!.vesselName).toBe("Recent Ship");
+      });
+    });
+
+    test("visit with eta more than 3 months in the future is not returned", async () => {
+      const now = new Date();
+      const futureVisit = createTestVisitWith({
+        visitId: "V-FUTURE",
+        vesselName: "Future Ship",
+        identification: "1111111",
+        eta: addMonths(now, 4),
+      });
+      const soonVisit = createTestVisitWith({
+        visitId: "V-SOON",
+        vesselName: "Soon Ship",
+        identification: "2222222",
+        eta: addHours(now, 1),
+      });
+      await updateAndExpect([futureVisit, soonVisit], 2, 0, 2);
+
+      const response = await getResponseFromLambda();
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(1);
+        expect(visits[0]!.vesselName).toBe("Soon Ship");
+      });
+    });
+
+    test("visit with eta within 3 months in the past is returned", async () => {
+      const now = new Date();
+      const visit = createTestVisitWith({
+        visitId: "V-PAST-OK",
+        vesselName: "Past Ship",
+        identification: "1111111",
+        eta: subMonths(now, 2),
+      });
+      await updateAndExpect([visit], 1, 0, 1);
+
+      const response = await getResponseFromLambda();
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(1);
+        expect(visits[0]!.vesselName).toBe("Past Ship");
+      });
+    });
+
+    test("visit with eta within 3 months in the future is returned", async () => {
+      const now = new Date();
+      const visit = createTestVisitWith({
+        visitId: "V-FUTURE-OK",
+        vesselName: "Upcoming Ship",
+        identification: "1111111",
+        eta: addMonths(now, 2),
+      });
+      await updateAndExpect([visit], 1, 0, 1);
+
+      const response = await getResponseFromLambda();
+      ExpectResponse.ok(response).expectContent((visits: VisitResponse[]) => {
+        expect(visits).toHaveLength(1);
+        expect(visits[0]!.vesselName).toBe("Upcoming Ship");
       });
     });
   }),

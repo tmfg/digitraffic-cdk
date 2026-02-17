@@ -82,7 +82,7 @@ export class PublicApi {
       DocumentationPart.method(
         PORT_CALL_TAG_V2,
         "GetVisits",
-        "Return all active visits",
+        "Return all active visits. Visits are sorted by default in ascending order by ATA if available, otherwise by ETA.",
       ),
     );
 
