@@ -1,29 +1,29 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { retry } from "@digitraffic/common/dist/utils/retry";
 import { differenceInHours } from "date-fns";
-import type { AwakeAiETAShipApi } from "../api/awake-ai-ship.js";
-import {
-  type AwakeAiShipApiResponse,
-  AwakeAiShipPredictability,
-  type AwakeAiShipVoyageSchedule,
+import type {
+  AwakeAiETAShipApi,
+  AwakeAiShipApiResponse,
+  AwakeAiShipVoyageSchedule,
 } from "../api/awake-ai-ship.js";
-import {
-  type AwakeAiPredictedVoyage,
-  type AwakeAiVoyageEtaPrediction,
-  AwakeAiVoyageStatus,
-  AwakeAiZoneType,
+import { AwakeAiShipPredictability } from "../api/awake-ai-ship.js";
+import type {
+  AwakeAiPredictedVoyage,
+  AwakeAiVoyageEtaPrediction,
 } from "../api/awake-common.js";
+import { AwakeAiVoyageStatus, AwakeAiZoneType } from "../api/awake-common.js";
 import type { DbETAShip } from "../dao/timestamps.js";
 import { EventSource } from "../model/eventsource.js";
 import type { Locode } from "../model/locode.js";
-import { type ApiTimestamp, EventType } from "../model/timestamp.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports.js";
 import {
   AwakeDataState,
   etaPredictionToTimestamp,
   isAwakeEtaPrediction,
   isDigitrafficEtaPrediction,
 } from "./awake-ai-etx-helper.js";
-import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports.js";
 
 interface AwakeAiETAResponseAndShip {
   readonly response: AwakeAiShipApiResponse;
@@ -60,33 +60,34 @@ export class AwakeAiETAShipService {
   }
 
   getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
-    return Promise.allSettled(ships.map(this.getAwakeAiTimestamp.bind(this)))
-      .then((responses) =>
-        responses.reduce<ApiTimestamp[]>((acc, result) => {
-          const val = result.status === "fulfilled" ? result.value : undefined;
-          if (!val) {
-            return acc;
-          }
-          logger.info({
-            method: "AwakeAiETAShipService.getAwakeAiTimestamps",
-            message: `Received ETA response: ${JSON.stringify(val)}`,
-          });
-          const timestamps = this.toTimeStamps(val);
+    return Promise.allSettled(
+      ships.map(this.getAwakeAiTimestamp.bind(this)),
+    ).then((responses) =>
+      responses.reduce<ApiTimestamp[]>((acc, result) => {
+        const val = result.status === "fulfilled" ? result.value : undefined;
+        if (!val) {
+          return acc;
+        }
+        logger.info({
+          method: "AwakeAiETAShipService.getAwakeAiTimestamps",
+          message: `Received ETA response: ${JSON.stringify(val)}`,
+        });
+        const timestamps = this.toTimeStamps(val);
 
-          // ETA timestamps from VTS A sources must also be published as ETB timestamps
-          // for the moment only timestamps related to specific ports may be published as ETB in production
-          const etbs = timestamps
-            .filter((ts) => ts.eventType === EventType.ETA)
-            .filter(
-              (ts) =>
-                this.enableETBForAllPorts ||
-                VTS_A_ETB_PORTS.includes(ts.location.port as Locode),
-            )
-            .map((ts) => ({ ...ts, eventType: EventType.ETB }));
+        // ETA timestamps from VTS A sources must also be published as ETB timestamps
+        // for the moment only timestamps related to specific ports may be published as ETB in production
+        const etbs = timestamps
+          .filter((ts) => ts.eventType === EventType.ETA)
+          .filter(
+            (ts) =>
+              this.enableETBForAllPorts ||
+              VTS_A_ETB_PORTS.includes(ts.location.port as Locode),
+          )
+          .map((ts) => ({ ...ts, eventType: EventType.ETB }));
 
-          return acc.concat(timestamps, etbs);
-        }, [])
-      );
+        return acc.concat(timestamps, etbs);
+      }, []),
+    );
   }
 
   private async getAwakeAiTimestamp(
@@ -104,8 +105,7 @@ export class AwakeAiETAShipService {
 
     logger.info({
       method: "AwakeAiETAShipService.getAwakeAiTimestamps",
-      message:
-        `fetched ETA for ship with IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
+      message: `fetched ETA for ship with IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
       tookMs: Date.now() - start,
     });
     return {
@@ -145,8 +145,7 @@ export class AwakeAiETAShipService {
             // 24 hours or more to ship arrival and LOCODE doesn't match, ignore this
             logger.warn({
               method: "AwakeAiETAShipService.handleSchedule",
-              message:
-                `state=${AwakeDataState.DIFFERING_LOCODE} not persisting, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
+              message: `state=${AwakeDataState.DIFFERING_LOCODE} not persisting, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
             });
             return undefined;
           } else if (this.overridableDestination(ship.locode as Locode)) {
@@ -154,8 +153,7 @@ export class AwakeAiETAShipService {
             // don't trust predicted destination, override destination with port call LOCODE
             logger.warn({
               method: "AwakeAiETAShipService.handleSchedule",
-              message:
-                `state=${AwakeDataState.OVERRIDDEN_LOCODE} LOCODE in override list, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
+              message: `state=${AwakeDataState.OVERRIDDEN_LOCODE} LOCODE in override list, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
             });
             port = ship.locode;
           }
@@ -168,8 +166,7 @@ export class AwakeAiETAShipService {
         ) {
           logger.warn({
             method: "AwakeAiETAShipService.handleSchedule",
-            message:
-              `ETP event for non-publishable LOCODE, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
+            message: `ETP event for non-publishable LOCODE, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
           });
           return undefined;
         }
@@ -201,10 +198,9 @@ export class AwakeAiETAShipService {
     if (schedule.predictability !== AwakeAiShipPredictability.PREDICTABLE) {
       logger.warn({
         method: "AwakeAiETAShipService.getETAPredictions",
-        message:
-          `state=${AwakeDataState.NO_PREDICTED_ETA} voyage was not predictable, schedule ${
-            JSON.stringify(schedule)
-          }`,
+        message: `state=${AwakeDataState.NO_PREDICTED_ETA} voyage was not predictable, schedule ${JSON.stringify(
+          schedule,
+        )}`,
       });
       return [];
     }
@@ -212,10 +208,9 @@ export class AwakeAiETAShipService {
     if (!schedule.predictedVoyages.length) {
       logger.warn({
         method: "AwakeAiETAShipService.getETAPredictions",
-        message:
-          `state=${AwakeDataState.NO_PREDICTED_ETA} predicted voyages was empty, schedule ${
-            JSON.stringify(schedule)
-          }`,
+        message: `state=${AwakeDataState.NO_PREDICTED_ETA} predicted voyages was empty, schedule ${JSON.stringify(
+          schedule,
+        )}`,
       });
       return [];
     }
@@ -227,10 +222,9 @@ export class AwakeAiETAShipService {
     if (eta.voyageStatus !== AwakeAiVoyageStatus.UNDER_WAY) {
       logger.warn({
         method: "AwakeAiETAShipService.getETAPredictions",
-        message:
-          `state=${AwakeDataState.SHIP_NOT_UNDER_WAY} actual ship status ${eta.voyageStatus}, schedule ${
-            JSON.stringify(schedule)
-          }`,
+        message: `state=${AwakeDataState.SHIP_NOT_UNDER_WAY} actual ship status ${eta.voyageStatus}, schedule ${JSON.stringify(
+          schedule,
+        )}`,
       });
       return [];
     }
@@ -243,10 +237,9 @@ export class AwakeAiETAShipService {
           if (isDigitrafficEtaPrediction(etaPrediction)) {
             logger.warn({
               method: "AwakeAiETAShipService.getETAPredictions",
-              message:
-                `received Digitraffic ETA prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${
-                  JSON.stringify(etaPrediction)
-                }`,
+              message: `received Digitraffic ETA prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
+                etaPrediction,
+              )}`,
             });
             return false;
           }

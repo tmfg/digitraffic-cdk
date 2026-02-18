@@ -1,6 +1,6 @@
-import { assertVisitCount, dbTestBase } from "../db-testutil.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as VisitsDAO from "../../db/visits.js";
+import { assertVisitCount, dbTestBase } from "../db-testutil.js";
 import { createTestVisit } from "../testdata.js";
 
 describe(

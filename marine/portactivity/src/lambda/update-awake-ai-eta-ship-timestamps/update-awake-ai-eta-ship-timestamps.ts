@@ -6,7 +6,7 @@ import { parseISO } from "date-fns";
 import { AwakeAiETAShipApi } from "../../api/awake-ai-ship.js";
 import type { DbETAShip } from "../../dao/timestamps.js";
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
-import { type UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
+import type { UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
 import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship.js";
 import { sendMessage } from "../../service/queue-service.js";
 
@@ -21,22 +21,19 @@ interface SnsETAShip extends Omit<DbETAShip, "eta"> {
 
 const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>(
   "awake",
-  [
-    PortactivitySecretKeys.AWAKE_URL,
-    PortactivitySecretKeys.AWAKE_AUTH,
-  ],
+  [PortactivitySecretKeys.AWAKE_URL, PortactivitySecretKeys.AWAKE_AUTH],
 );
 
 export const handler = (event: SNSEvent): Promise<void> => {
   // always a single event, guaranteed by SNS
-  const ships = (JSON.parse(
-    event.Records[0]?.Sns.Message as unknown as string,
-  ) as SnsETAShip[]).map(
-    (ship) => ({
-      ...ship,
-      eta: parseISO(ship.eta),
-    }),
-  );
+  const ships = (
+    JSON.parse(
+      event.Records[0]?.Sns.Message as unknown as string,
+    ) as SnsETAShip[]
+  ).map((ship) => ({
+    ...ship,
+    eta: parseISO(ship.eta),
+  }));
 
   return secretHolder.get().then(async (secret) => {
     if (!service) {

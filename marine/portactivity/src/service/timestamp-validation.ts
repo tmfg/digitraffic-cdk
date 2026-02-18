@@ -1,10 +1,11 @@
-import { EventSource } from "../model/eventsource.js";
-import { findVesselSpeedAndNavStatus } from "../dao/timestamps.js";
-import { type ApiTimestamp, EventType } from "../model/timestamp.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { isValid, parseISO } from "date-fns";
+import { findVesselSpeedAndNavStatus } from "../dao/timestamps.js";
 import { NavStatus } from "../model/ais-status.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
 
 export const SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS = 2;
 
@@ -67,18 +68,18 @@ export async function validateTimestamp(
   if (!timestamp.ship.mmsi && !timestamp.ship.imo) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message: `Both MMSI and IMO are missing for timestamp ${
-        JSON.stringify(timestamp)
-      }`,
+      message: `Both MMSI and IMO are missing for timestamp ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return undefined;
   }
   if (!timestamp.location) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message: `Missing location info for timestamp ${
-        JSON.stringify(timestamp)
-      }`,
+      message: `Missing location info for timestamp ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return undefined;
   }
@@ -116,9 +117,9 @@ export async function validateTimestamp(
   ) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message: `ETD prediction from Awake.AI - not persisting ${
-        JSON.stringify(timestamp)
-      }`,
+      message: `ETD prediction from Awake.AI - not persisting ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return undefined;
   }
@@ -136,20 +137,18 @@ export async function validateTimestamp(
     if (shipStatus && !navStatusIsValid(shipStatus.nav_stat)) {
       logger.warn({
         method: "ProcessQueue.validateTimestamp",
-        message:
-          `VTS prediction for ship with invalid AIS status ${shipStatus.nav_stat} ${
-            JSON.stringify(timestamp)
-          }`,
+        message: `VTS prediction for ship with invalid AIS status ${shipStatus.nav_stat} ${JSON.stringify(
+          timestamp,
+        )}`,
       });
       return undefined;
     }
     if (shipStatus && shipStatus.sog < SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS) {
       logger.warn({
         method: "ProcessQueue.validateTimestamp",
-        message:
-          `VTS prediction for stationary ship with speed ${shipStatus.sog} knots and AIS status ${shipStatus.nav_stat} ${
-            JSON.stringify(timestamp)
-          }`,
+        message: `VTS prediction for stationary ship with speed ${shipStatus.sog} knots and AIS status ${shipStatus.nav_stat} ${JSON.stringify(
+          timestamp,
+        )}`,
       });
       return undefined;
     }
@@ -175,55 +174,53 @@ function validateConfidenceInterval(timestamp: Partial<ApiTimestamp>): boolean {
   if (
     !timestamp.eventTimeConfidenceLowerDiff ||
     !timestamp.eventTimeConfidenceUpperDiff
-  ) return false;
+  )
+    return false;
   if (isNaN(timestamp.eventTimeConfidenceLowerDiff)) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message: `eventTimeConfidenceLowerDiff is not a number ${
-        JSON.stringify(timestamp)
-      }`,
+      message: `eventTimeConfidenceLowerDiff is not a number ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return false;
   }
   if (isNaN(timestamp.eventTimeConfidenceUpperDiff)) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message: `eventTimeConfidenceUpperDiff is not a number ${
-        JSON.stringify(timestamp)
-      }`,
+      message: `eventTimeConfidenceUpperDiff is not a number ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return false;
   }
   if (
     timestamp.eventTimeConfidenceLowerDiff >
-      timestamp.eventTimeConfidenceUpperDiff
+    timestamp.eventTimeConfidenceUpperDiff
   ) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message:
-        `eventTimeConfidenceLowerDiff is greater than eventTimeConfidenceUpperDiff ${
-          JSON.stringify(
-            timestamp,
-          )
-        }`,
+      message: `eventTimeConfidenceLowerDiff is greater than eventTimeConfidenceUpperDiff ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return false;
   }
   if (timestamp.eventTimeConfidenceLowerDiff > 0) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message: `eventTimeConfidenceLowerDiff is greater than zero ${
-        JSON.stringify(timestamp)
-      }`,
+      message: `eventTimeConfidenceLowerDiff is greater than zero ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return false;
   }
   if (timestamp.eventTimeConfidenceUpperDiff < 0) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
-      message: `eventTimeConfidenceUpperDiff is less than zero ${
-        JSON.stringify(timestamp)
-      }`,
+      message: `eventTimeConfidenceUpperDiff is less than zero ${JSON.stringify(
+        timestamp,
+      )}`,
     });
     return false;
   }

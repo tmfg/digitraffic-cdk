@@ -1,8 +1,8 @@
-import { PortactivityEnvKeys } from "../../keys.js";
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { ETA_PORTS } from "../../model/awake-ai-etx-ports.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { PortactivityEnvKeys } from "../../keys.js";
+import { ETA_PORTS } from "../../model/awake-ai-etx-ports.js";
 
 const publishTopic = getEnvVariable(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 

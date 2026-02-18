@@ -21,7 +21,7 @@ export const handler = async (): Promise<void> => {
       decodeBase64ToAscii(secret.certificate),
     );
   } catch (error) {
-    logger.debug("got error " + JSON.stringify(error));
+    logger.debug(`got error ${JSON.stringify(error)}`);
 
     //        logException(logger, error, true);
   } finally {

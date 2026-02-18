@@ -1,28 +1,28 @@
-import { newAwakeATXMessage, someNumber } from "../testdata.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import {
+  randomBoolean,
+  shuffle,
+} from "@digitraffic/common/dist/test/testutils";
+import { jest } from "@jest/globals";
+import { addHours, subHours } from "date-fns";
+import { WebSocket } from "ws";
 import type { AwakeAIATXTimestampMessage } from "../../api/awake-ai-atx.js";
 import {
   AwakeAiATXApi,
   AwakeATXZoneEventType,
 } from "../../api/awake-ai-atx.js";
+import { AwakeAiZoneType } from "../../api/awake-common.js";
+import { EventSource } from "../../model/eventsource.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
 import { AwakeAiATXService } from "../../service/awake-ai-atx.js";
 import {
   dbTestBase,
   insertPortAreaDetails,
   insertPortCall,
 } from "../db-testutil.js";
-import type { ApiTimestamp } from "../../model/timestamp.js";
-import { EventType } from "../../model/timestamp.js";
-import {
-  randomBoolean,
-  shuffle,
-} from "@digitraffic/common/dist/test/testutils";
-import { EventSource } from "../../model/eventsource.js";
-import { AwakeAiZoneType } from "../../api/awake-common.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { WebSocket } from "ws";
-import { addHours, subHours } from "date-fns";
 import { assertDefined } from "../test-utils.js";
-import { jest } from "@jest/globals";
+import { newAwakeATXMessage, someNumber } from "../testdata.js";
 
 describe(
   "service Awake.AI ATx",
@@ -34,9 +34,9 @@ describe(
     test("getATXs - no portcall found for ATx", async () => {
       const atxMessage = newAwakeATXMessage();
       const api = createAiATXApi();
-      jest.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
-        atxMessage,
-      ]);
+      jest
+        .spyOn(AwakeAiATXApi.prototype, "getATXs")
+        .mockResolvedValue([atxMessage]);
       const service = new AwakeAiATXService(api);
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant
@@ -53,9 +53,9 @@ describe(
       await createPortcall(atxMessage, portcallId);
 
       const api = createAiATXApi();
-      jest.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
-        atxMessage,
-      ]);
+      jest
+        .spyOn(AwakeAiATXApi.prototype, "getATXs")
+        .mockResolvedValue([atxMessage]);
       const service = new AwakeAiATXService(api);
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant
@@ -66,9 +66,10 @@ describe(
       assertDefined(locode);
 
       const expectedTimestamp: ApiTimestamp = {
-        eventType: zoneEventType === AwakeATXZoneEventType.ARRIVAL
-          ? EventType.ATA
-          : EventType.ATD,
+        eventType:
+          zoneEventType === AwakeATXZoneEventType.ARRIVAL
+            ? EventType.ATA
+            : EventType.ATD,
         eventTime: atxMessage.eventTimestamp,
         recordTime: atxMessage.eventTimestamp,
         location: {
@@ -85,8 +86,8 @@ describe(
 
     test("getATXs - ATx with portcall - other than berth events are filtered", async () => {
       const otherThanBerth = shuffle(
-        Object.values(AwakeAiZoneType).filter((zone) =>
-          zone !== AwakeAiZoneType.BERTH
+        Object.values(AwakeAiZoneType).filter(
+          (zone) => zone !== AwakeAiZoneType.BERTH,
         ),
       );
       const atxMessage = newAwakeATXMessage({
@@ -96,9 +97,9 @@ describe(
       await createPortcall(atxMessage, portcallId);
 
       const api = createAiATXApi();
-      jest.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
-        atxMessage,
-      ]);
+      jest
+        .spyOn(AwakeAiATXApi.prototype, "getATXs")
+        .mockResolvedValue([atxMessage]);
       const service = new AwakeAiATXService(api);
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant

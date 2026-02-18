@@ -1,4 +1,9 @@
-import { AwakeAiETAPortService } from "../../service/awake-ai-eta-port.js";
+import {
+  getRandomNumber,
+  randomBoolean,
+} from "@digitraffic/common/dist/test/testutils";
+import { jest } from "@jest/globals";
+import { addHours, subHours } from "date-fns";
 import type { AwakeAiPortResponse } from "../../api/awake-ai-port.js";
 import { AwakeAiPortApi } from "../../api/awake-ai-port.js";
 import type {
@@ -11,13 +16,8 @@ import {
   AwakeAiVoyageStatus,
   AwakeAiZoneType,
 } from "../../api/awake-common.js";
-import {
-  getRandomNumber,
-  randomBoolean,
-} from "@digitraffic/common/dist/test/testutils";
-import { addHours, subHours } from "date-fns";
+import { AwakeAiETAPortService } from "../../service/awake-ai-eta-port.js";
 import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil.js";
-import { jest } from "@jest/globals";
 
 describe("AwakeAiETAPortService(", () => {
   test("getAwakeAiTimestamps - no schedule", async () => {
@@ -27,9 +27,9 @@ describe("AwakeAiETAPortService(", () => {
       excludeSchedule: true,
       includePortCallPrediction: true,
     });
-    jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiPortApi.prototype, "getETAs")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -43,9 +43,9 @@ describe("AwakeAiETAPortService(", () => {
       voyageStatus: AwakeAiVoyageStatus.STOPPED,
       includePortCallPrediction: true,
     });
-    jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiPortApi.prototype, "getETAs")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -60,9 +60,9 @@ describe("AwakeAiETAPortService(", () => {
         ? AwakeAiPredictionType.TRAVEL_TIME
         : AwakeAiPredictionType.DESTINATION,
     });
-    jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiPortApi.prototype, "getETAs")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -78,9 +78,9 @@ describe("AwakeAiETAPortService(", () => {
       predictionType: AwakeAiPredictionType.ETA,
       includePortCallPrediction: true,
     });
-    jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiPortApi.prototype, "getETAs")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -98,9 +98,9 @@ describe("AwakeAiETAPortService(", () => {
         source: "urn:awake:digitraffic-portcall:2959158",
       },
     });
-    jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiPortApi.prototype, "getETAs")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -110,9 +110,11 @@ describe("AwakeAiETAPortService(", () => {
   test("getAwakeAiTimestamps - correct with port call prediction", async () => {
     const api = createApi();
     const service = new AwakeAiETAPortService(api);
-    jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
-      createEtaResponse({ includePortCallPrediction: true }),
-    );
+    jest
+      .spyOn(AwakeAiPortApi.prototype, "getETAs")
+      .mockResolvedValue(
+        createEtaResponse({ includePortCallPrediction: true }),
+      );
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -122,9 +124,11 @@ describe("AwakeAiETAPortService(", () => {
   test("getAwakeAiTimestamps - correct without port call prediction", async () => {
     const api = createApi();
     const service = new AwakeAiETAPortService(api);
-    jest.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
-      createEtaResponse({ includePortCallPrediction: true }),
-    );
+    jest
+      .spyOn(AwakeAiPortApi.prototype, "getETAs")
+      .mockResolvedValue(
+        createEtaResponse({ includePortCallPrediction: true }),
+      );
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -150,7 +154,8 @@ function createEtaResponse(options?: {
       locode: "FILOL",
       zoneType: AwakeAiZoneType.BERTH,
       recordTime: new Date().toISOString(),
-      arrivalTime: options?.arrivalTime?.toISOString() ??
+      arrivalTime:
+        options?.arrivalTime?.toISOString() ??
         addHours(new Date(), 25).toISOString(),
       metadata: options?.metadata,
     } as AwakeAiVoyageEtaPrediction,

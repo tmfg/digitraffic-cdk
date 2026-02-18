@@ -1,3 +1,12 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
+import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
+import _ from "lodash";
+import type { DbTimestamp } from "../../dao/timestamps.js";
+import * as TimestampsDb from "../../dao/timestamps.js";
+import { EventSource } from "../../model/eventsource.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
 import {
   dbTestBase,
   insert,
@@ -6,22 +15,13 @@ import {
   insertPortCall,
   insertVessel,
 } from "../db-testutil.js";
+import { assertDefined } from "../test-utils.js";
 import {
   newPortAreaDetails,
   newPortCall,
   newTimestamp,
   newVessel,
 } from "../testdata.js";
-import * as TimestampsDb from "../../dao/timestamps.js";
-import type { DbTimestamp } from "../../dao/timestamps.js";
-import type { ApiTimestamp } from "../../model/timestamp.js";
-import { EventType } from "../../model/timestamp.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { EventSource } from "../../model/eventsource.js";
-import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
-import _ from "lodash";
-import { assertDefined } from "../test-utils.js";
 
 const EVENT_SOURCE = "TEST";
 
@@ -106,46 +106,30 @@ describe(
       });
     }
 
-    testFound(
-      "findByMmsi",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
+    testFound("findByMmsi", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
     );
-    testFound(
-      "findByImo",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
+    testFound("findByImo", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
     );
-    testFound(
-      "findByLocode",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.location.port),
+    testFound("findByLocode", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.location.port),
     );
-    testFound(
-      "findBySource",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findBySource(db, timestamp.source),
+    testFound("findBySource", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findBySource(db, timestamp.source),
     );
 
-    testFoundInFuture(
-      "findByMmsi",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
+    testFoundInFuture("findByMmsi", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
     );
-    testFoundInFuture(
-      "findByImo",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
+    testFoundInFuture("findByImo", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
     );
-    testFoundInFuture(
-      "findByLocode",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.location.port),
+    testFoundInFuture("findByLocode", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.location.port),
     );
-    testFoundInFuture(
-      "findBySource",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findBySource(db, timestamp.source),
+    testFoundInFuture("findBySource", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findBySource(db, timestamp.source),
     );
 
     function testNotFound(
@@ -163,25 +147,17 @@ describe(
       });
     }
 
-    testNotFound(
-      "findByMmsi",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByMmsi(db, (timestamp.ship.mmsi ?? -1) + 1),
+    testNotFound("findByMmsi", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByMmsi(db, (timestamp.ship.mmsi ?? -1) + 1),
     );
-    testNotFound(
-      "findByImo",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByImo(db, (timestamp.ship.imo ?? -1) - 1),
+    testNotFound("findByImo", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByImo(db, (timestamp.ship.imo ?? -1) - 1),
     );
-    testNotFound(
-      "findByLocode",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.location.port + "asdf"),
+    testNotFound("findByLocode", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.location.port + "asdf"),
     );
-    testNotFound(
-      "findBySource",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.source + "asdf"),
+    testNotFound("findBySource", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.source + "asdf"),
     );
 
     function testNewest(
@@ -209,25 +185,17 @@ describe(
       });
     }
 
-    testNewest(
-      "findByMmsi",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
+    testNewest("findByMmsi", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
     );
-    testNewest(
-      "findByImo",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
+    testNewest("findByImo", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
     );
-    testNewest(
-      "findByLocode",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.location.port),
+    testNewest("findByLocode", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.location.port),
     );
-    testNewest(
-      "findBySource",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findBySource(db, timestamp.source),
+    testNewest("findBySource", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findBySource(db, timestamp.source),
     );
 
     /**
@@ -277,25 +245,17 @@ describe(
       });
     }
 
-    testMissingPortCallId(
-      "findByMmsi",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
+    testMissingPortCallId("findByMmsi", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
     );
-    testMissingPortCallId(
-      "findByImo",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
+    testMissingPortCallId("findByImo", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
     );
-    testMissingPortCallId(
-      "findByLocode",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.location.port),
+    testMissingPortCallId("findByLocode", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.location.port),
     );
-    testMissingPortCallId(
-      "findBySource",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findBySource(db, timestamp.source),
+    testMissingPortCallId("findBySource", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findBySource(db, timestamp.source),
     );
 
     function testMissingPortCallIdWithPastEventtime(
@@ -373,25 +333,17 @@ describe(
       });
     }
 
-    testTooOld(
-      "findByMmsi",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
+    testTooOld("findByMmsi", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
     );
-    testTooOld(
-      "findByImo",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
+    testTooOld("findByImo", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
     );
-    testTooOld(
-      "findByLocode",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.location.port),
+    testTooOld("findByLocode", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.location.port),
     );
-    testTooOld(
-      "findBySource",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findBySource(db, timestamp.source),
+    testTooOld("findBySource", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findBySource(db, timestamp.source),
     );
 
     function testTooFarInTheFuture(
@@ -412,25 +364,17 @@ describe(
       });
     }
 
-    testTooFarInTheFuture(
-      "findByMmsi",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
+    testTooFarInTheFuture("findByMmsi", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1),
     );
-    testTooFarInTheFuture(
-      "findByImo",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
+    testTooFarInTheFuture("findByImo", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1),
     );
-    testTooFarInTheFuture(
-      "findByLocode",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findByLocode(db, timestamp.location.port),
+    testTooFarInTheFuture("findByLocode", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findByLocode(db, timestamp.location.port),
     );
-    testTooFarInTheFuture(
-      "findBySource",
-      (timestamp: ApiTimestamp) =>
-        TimestampsDb.findBySource(db, timestamp.source),
+    testTooFarInTheFuture("findBySource", (timestamp: ApiTimestamp) =>
+      TimestampsDb.findBySource(db, timestamp.source),
     );
 
     test("findByMmsi - two sources", async () => {
@@ -673,8 +617,8 @@ describe(
       });
       await insert(db, [ts]);
 
-      const ships = await TimestampsDb
-        .findVtsShipImosTooCloseToPortByPortCallId(db, [
+      const ships =
+        await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [
           ts.portcallId ?? -1,
         ]);
 
@@ -695,8 +639,8 @@ describe(
       });
       await insert(db, [ts]);
 
-      const ships = await TimestampsDb
-        .findVtsShipImosTooCloseToPortByPortCallId(db, [
+      const ships =
+        await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [
           ts.portcallId ?? -1,
         ]);
 
@@ -715,7 +659,7 @@ describe(
       await insertVessel(db, vessel);
 
       const mmsi = await db.tx((t) =>
-        TimestampsDb.findMmsiByImo(t, vessel.imo)
+        TimestampsDb.findMmsiByImo(t, vessel.imo),
       );
 
       expect(mmsi).toEqual(vessel.mmsi);
@@ -726,7 +670,7 @@ describe(
       await createPortcall(timestamp);
 
       const mmsi = await db.tx((t) =>
-        TimestampsDb.findMmsiByImo(t, timestamp.ship.imo ?? -1)
+        TimestampsDb.findMmsiByImo(t, timestamp.ship.imo ?? -1),
       );
 
       expect(mmsi).toEqual(timestamp.ship.mmsi);
@@ -744,7 +688,7 @@ describe(
       await insertVessel(db, vessel);
 
       const imo = await db.tx((t) =>
-        TimestampsDb.findImoByMmsi(t, vessel.mmsi)
+        TimestampsDb.findImoByMmsi(t, vessel.mmsi),
       );
 
       expect(imo).toEqual(vessel.imo);
@@ -755,7 +699,7 @@ describe(
       await createPortcall(timestamp);
 
       const imo = await db.tx((t) =>
-        TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi ?? -1)
+        TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi ?? -1),
       );
 
       expect(imo).toEqual(timestamp.ship.imo);
@@ -868,7 +812,7 @@ describe(
       ]);
 
       const deletedCount = await db.tx((t) =>
-        TimestampsDb.deleteOldTimestamps(t)
+        TimestampsDb.deleteOldTimestamps(t),
       );
 
       expect(deletedCount).toBe(1);
@@ -882,7 +826,7 @@ describe(
       ]);
 
       const deletedCount = await db.tx((t) =>
-        TimestampsDb.deleteOldTimestamps(t)
+        TimestampsDb.deleteOldTimestamps(t),
       );
 
       expect(deletedCount).toBe(0);
@@ -892,7 +836,7 @@ describe(
       await insertPilotage(db, 1, "ACTIVE", new Date(), olderThanAWeek());
 
       const deletedCount = await db.tx((t) =>
-        TimestampsDb.deleteOldPilotages(t)
+        TimestampsDb.deleteOldPilotages(t),
       );
 
       expect(deletedCount).toBe(1);
@@ -902,7 +846,7 @@ describe(
       await insertPilotage(db, 1, "ACTIVE", new Date(), newerThanAWeek());
 
       const deletedCount = await db.tx((t) =>
-        TimestampsDb.deleteOldPilotages(t)
+        TimestampsDb.deleteOldPilotages(t),
       );
 
       expect(deletedCount).toBe(0);

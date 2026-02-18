@@ -37,7 +37,7 @@ export class NemoApi {
       });
 
       if (resp.statusCode !== 200) {
-        logger.debug("error " + JSON.stringify(resp));
+        logger.debug(`error ${JSON.stringify(resp)}`);
 
         logger.error({
           method,
@@ -50,11 +50,11 @@ export class NemoApi {
 
       const response = (await resp.body.json()) as NemoResponse;
 
-      logger.debug("returning " + JSON.stringify(response));
+      logger.debug(`returning ${JSON.stringify(response)}`);
 
       return Promise.resolve(response);
     } catch (error) {
-      logger.debug("error " + JSON.stringify(error));
+      logger.debug(`error ${JSON.stringify(error)}`);
 
       //            logException(logger, error);
 

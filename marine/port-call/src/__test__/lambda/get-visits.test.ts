@@ -11,9 +11,9 @@ import {
 import { updateAndExpect } from "../service/visits-service.test.js";
 import { createTestVisit } from "../testdata.js";
 
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "";
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["AWS_REGION"] = "eu-west-1";
 
 mockProxyAndSecretHolder();

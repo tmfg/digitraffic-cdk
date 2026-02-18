@@ -1,7 +1,7 @@
-import ky, { HTTPError } from "ky";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import ky, { HTTPError } from "ky";
+import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 
 export enum AwakeAiShipResponseType {
   OK = "OK",

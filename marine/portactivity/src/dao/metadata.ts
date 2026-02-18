@@ -1,22 +1,22 @@
-import pgPromise from "pg-promise";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import pgPromise from "pg-promise";
 
-const FIND_DISTINCT_LOCODES_BY_TIMESTAMP_SOURCE = new pgPromise
-  .PreparedStatement({
-  name: "find-distinct-locodes-by-timestamp-source",
-  text: `
+const FIND_DISTINCT_LOCODES_BY_TIMESTAMP_SOURCE =
+  new pgPromise.PreparedStatement({
+    name: "find-distinct-locodes-by-timestamp-source",
+    text: `
         SELECT DISTINCT location_locode
         FROM port_call_timestamp
         WHERE event_source = ANY ($1);
     `,
-  rowMode: "array",
-});
+    rowMode: "array",
+  });
 
 export function findLocodesBySource(
   db: DTDatabase,
   sources: string[][],
 ): Promise<string[]> {
   return db.tx((t) =>
-    t.manyOrNone(FIND_DISTINCT_LOCODES_BY_TIMESTAMP_SOURCE, sources)
+    t.manyOrNone(FIND_DISTINCT_LOCODES_BY_TIMESTAMP_SOURCE, sources),
   );
 }

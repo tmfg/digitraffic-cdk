@@ -1,3 +1,9 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { addHours, addMinutes, parseISO, subDays } from "date-fns";
+import _ from "lodash";
+import { EventSource } from "../../model/eventsource.js";
+import { EventType } from "../../model/timestamp.js";
+import * as TimestampsService from "../../service/timestamps.js";
 import {
   dbTestBase,
   findAll,
@@ -8,19 +14,13 @@ import {
   insertPortCall,
   insertVessel,
 } from "../db-testutil.js";
+import { assertDefined } from "../test-utils.js";
 import {
   newPortAreaDetails,
   newPortCall,
   newTimestamp,
   newVessel,
 } from "../testdata.js";
-import * as TimestampsService from "../../service/timestamps.js";
-import { EventType } from "../../model/timestamp.js";
-import { EventSource } from "../../model/eventsource.js";
-import _ from "lodash";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { addHours, addMinutes, parseISO, subDays } from "date-fns";
-import { assertDefined } from "../test-utils.js";
 
 describe(
   "timestamps",
@@ -104,10 +104,9 @@ describe(
 
       await insert(db, timestamps);
 
-      const foundTimestamp =
-        (await TimestampsService.findAllTimestamps(undefined, undefined, imo))[
-          0
-        ];
+      const foundTimestamp = (
+        await TimestampsService.findAllTimestamps(undefined, undefined, imo)
+      )[0];
 
       assertDefined(foundTimestamp);
       // eventtime should be the average of the two eventtimes
@@ -148,8 +147,10 @@ describe(
       });
       const newerTimestamp = {
         ...olderTimestamp,
-        eventTime: addHours(parseISO(olderTimestamp.eventTime), 1)
-          .toISOString(),
+        eventTime: addHours(
+          parseISO(olderTimestamp.eventTime),
+          1,
+        ).toISOString(),
       };
 
       await TimestampsService.saveTimestamp(olderTimestamp, db);
@@ -174,14 +175,18 @@ describe(
 
       expect(ret?.locodeChanged).toBe(true);
       expect(
-        (await TimestampsService.findAllTimestamps(
-          olderTimestamp.location.port,
-        )).length,
+        (
+          await TimestampsService.findAllTimestamps(
+            olderTimestamp.location.port,
+          )
+        ).length,
       ).toBe(0);
       expect(
-        (await TimestampsService.findAllTimestamps(
-          newerTimestamp.location.port,
-        )).length,
+        (
+          await TimestampsService.findAllTimestamps(
+            newerTimestamp.location.port,
+          )
+        ).length,
       ).toBe(1);
     });
 
@@ -280,8 +285,10 @@ describe(
       );
       const awakeTimestamp = {
         ...vtsTimestamp,
-        eventTime: addMinutes(parseISO(vtsTimestamp.eventTime), 30)
-          .toISOString(),
+        eventTime: addMinutes(
+          parseISO(vtsTimestamp.eventTime),
+          30,
+        ).toISOString(),
         source: EventSource.AWAKE_AI,
       };
 
@@ -371,8 +378,9 @@ describe(
       await insertPortAreaDetails(db, newPortAreaDetails(eta2));
       await insert(db, [eta1, eta2]);
 
-      const ship =
-        (await TimestampsService.findETAShipsByLocode([locode1, locode2]))[0];
+      const ship = (
+        await TimestampsService.findETAShipsByLocode([locode1, locode2])
+      )[0];
       assertDefined(ship);
 
       expect(ship.locode).toBe(locode1);
