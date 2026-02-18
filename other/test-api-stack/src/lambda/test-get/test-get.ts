@@ -1,7 +1,7 @@
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { z, ZodError } from "zod";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { ZodError, z } from "zod";
 
 const HOURS_ERROR = {
   message: "Hours must be between 0 and 2400",
@@ -9,20 +9,20 @@ const HOURS_ERROR = {
 
 const EmptyStringHours = z.literal("").transform(() => 168);
 
-const TestSchema = z.object({
-  q1: z.coerce.string().optional(),
-  q2: z.coerce.string().optional(),
-  multi: z.coerce
-    .string()
-    .optional(),
-  hours: z.coerce
-    .number()
-    .gt(0, HOURS_ERROR)
-    .lt(24 * 100, HOURS_ERROR)
-    .optional()
-    .default(168)
-    .or(EmptyStringHours),
-}).strict();
+const TestSchema = z
+  .object({
+    q1: z.coerce.string().optional(),
+    q2: z.coerce.string().optional(),
+    multi: z.coerce.string().optional(),
+    hours: z.coerce
+      .number()
+      .gt(0, HOURS_ERROR)
+      .lt(24 * 100, HOURS_ERROR)
+      .optional()
+      .default(168)
+      .or(EmptyStringHours),
+  })
+  .strict();
 
 export const handler = (
   event: Record<string, string>,
@@ -31,7 +31,7 @@ export const handler = (
 
   logger.info({
     method: "TestGet.handler",
-    message: "Entering handler, event " + JSON.stringify(event),
+    message: `Entering handler, event ${JSON.stringify(event)}`,
   });
 
   try {
@@ -39,7 +39,7 @@ export const handler = (
 
     logger.info({
       method: "TestGet.handler",
-      message: "parsed event " + JSON.stringify(testEvent),
+      message: `parsed event ${JSON.stringify(testEvent)}`,
     });
 
     return Promise.resolve(
@@ -51,7 +51,7 @@ export const handler = (
     if (error instanceof ZodError) {
       logger.info({
         method: "TestGet.handler",
-        message: "Error when parsing, " + JSON.stringify(error),
+        message: `Error when parsing, ${JSON.stringify(error)}`,
       });
 
       return Promise.resolve(
