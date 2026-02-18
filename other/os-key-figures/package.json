@@ -24,7 +24,6 @@
     "@smithy/protocol-http": "5.3.8",
     "@smithy/signature-v4": "5.3.8",
     "aws-cdk-lib": "2.236.0",
-    "aws-lambda": "1.0.7",
     "constructs": "10.4.5",
     "ky": "1.14.3",
     "mysql": "2.18.1",

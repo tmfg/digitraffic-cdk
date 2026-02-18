@@ -4,7 +4,8 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";
 import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
-import { HttpRequest, HttpResponse } from "@smithy/protocol-http";
+import type { HttpResponse } from "@smithy/protocol-http";
+import { HttpRequest } from "@smithy/protocol-http";
 import { SignatureV4 } from "@smithy/signature-v4";
 
 export enum OpenSearchApiMethod {
@@ -96,10 +97,10 @@ export class OpenSearch {
       return;
     }
     let responseBody = "";
-    response.body.on("data", function (chunk: string) {
+    response.body.on("data", (chunk: string) => {
       responseBody += chunk;
     });
-    response.body.on("end", function () {
+    response.body.on("end", () => {
       try {
         successCallback(JSON.parse(responseBody));
       } catch (e) {
