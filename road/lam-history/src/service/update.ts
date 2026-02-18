@@ -1,8 +1,5 @@
-import {
-  PutObjectCommand,
-  type PutObjectCommandOutput,
-  S3,
-} from "@aws-sdk/client-s3";
+import type { PutObjectCommandOutput } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3 } from "@aws-sdk/client-s3";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import ky, { HTTPError } from "ky";
 
@@ -76,12 +73,9 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
     if (result.status !== 200) {
       logger.error({
         method: `${SERVICE}.getFromServer`,
-        message:
-          `url=${url} failed with return code ${result.status} and data ${
-            JSON.stringify(
-              await result.json(),
-            )
-          }`,
+        message: `url=${url} failed with return code ${result.status} and data ${JSON.stringify(
+          await result.json(),
+        )}`,
       });
       return Promise.reject();
     }
@@ -97,10 +91,9 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
       }
       logger.error({
         method: `${SERVICE}.getFromServer`,
-        message:
-          `url=${url} failed with return code ${response.status} and data ${
-            JSON.stringify(errorBody)
-          }`,
+        message: `url=${url} failed with return code ${response.status} and data ${JSON.stringify(
+          errorBody,
+        )}`,
         error,
       });
     } else {

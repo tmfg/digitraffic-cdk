@@ -1,13 +1,13 @@
+import {
+  grantOACRights,
+  grantOAIRights,
+} from "@digitraffic/common/dist/aws/infra/bucket-policy";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { BlockPublicAccess, Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
 import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 import type { Construct } from "constructs";
 import type { LamHistoryProps } from "./app-props.js";
 import { InternalLambdas } from "./internal-lambdas.js";
-import {
-  grantOACRights,
-  grantOAIRights,
-} from "@digitraffic/common/dist/aws/infra/bucket-policy";
 
 export class LamHistoryStack extends DigitrafficStack {
   private readonly appProps: LamHistoryProps;
