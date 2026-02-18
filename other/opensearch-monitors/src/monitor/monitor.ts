@@ -1,6 +1,6 @@
+import type { TermsAggregate } from "./aggregates.js";
 import type { Query, ScriptedMetric, Sort } from "./queries.js";
 import type { OSTrigger } from "./triggers.js";
-import type { TermsAggregate } from "./aggregates.js";
 
 interface OSQueryData {
   readonly size?: number;
@@ -59,7 +59,7 @@ export function opensearchMonitor(osMonitor: OSMonitor): unknown {
           },
         },
         actions: trigger.actions.map((action, i) => ({
-          name: "Slack alert" + (i ? ` ${i + 1}` : ""),
+          name: `Slack alert${i ? ` ${i + 1}` : ""}`,
           destination_id: action.destination,
           subject_template: {
             source: action.subject || " ",

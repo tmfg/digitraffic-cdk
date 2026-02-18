@@ -23,9 +23,11 @@ export interface EmojiConfig {
   readonly failedToOk?: SlackEmoji;
 }
 
-function defaultMessageFormatter(
-  { subject, message, emoji }: SlackMessage,
-): SubjectAndMessage {
+function defaultMessageFormatter({
+  subject,
+  message,
+  emoji,
+}: SlackMessage): SubjectAndMessage {
   return {
     subject: emoji ? `${emoji} ${subject}` : subject,
     message,
