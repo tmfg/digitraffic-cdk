@@ -1,6 +1,6 @@
+import type { Stack } from "aws-cdk-lib";
 import type { Function as CloudfrontFunction } from "aws-cdk-lib/aws-cloudfront";
 import type { Construct } from "constructs";
-import type { Stack } from "aws-cdk-lib";
 import {
   createHttpHeadersFunction,
   createIndexHtml,
@@ -35,25 +35,22 @@ export class EdgeFunctionFactory {
   getRedirectFunction(redirectUrl: string): CloudfrontFunction {
     const key = `redirect_${redirectUrl}`;
 
-    return this.getFunction(
-      key,
-      () => createRedirectFunction(this._scope, redirectUrl),
+    return this.getFunction(key, () =>
+      createRedirectFunction(this._scope, redirectUrl),
     );
   }
 
   getPathRewriteFunction(pathRemoveCount: number): CloudfrontFunction {
     const key = `pathRewrite_${pathRemoveCount}`;
 
-    return this.getFunction(
-      key,
-      () => createPathRewriteFunction(this._scope, pathRemoveCount),
+    return this.getFunction(key, () =>
+      createPathRewriteFunction(this._scope, pathRemoveCount),
     );
   }
 
   getHttpHeadersFunction(): CloudfrontFunction {
-    return this.getFunction(
-      "http-headers-function",
-      () => createHttpHeadersFunction(this._scope),
+    return this.getFunction("http-headers-function", () =>
+      createHttpHeadersFunction(this._scope),
     );
   }
 }

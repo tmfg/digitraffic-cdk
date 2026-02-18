@@ -31,7 +31,7 @@ export async function responseHandlerCall(
     handler as unknown as (
       event: CloudFrontResponseEvent,
       context: Context,
-    ) => Promise<CloudFrontResultResponse | void>
+    ) => Promise<CloudFrontResultResponse | undefined>
   )(event, context);
   return result as CloudFrontResultResponse | undefined;
 }

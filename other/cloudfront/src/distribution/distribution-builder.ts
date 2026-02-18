@@ -34,14 +34,14 @@ export class DistributionBuilder {
     const defaults = this.behaviors.filter((b) => b.behaviorPath === "*");
 
     if (defaults.length > 1) {
-      throw new Error("Too many default behaviors defined for " + this.name);
+      throw new Error(`Too many default behaviors defined for ${this.name}`);
     }
 
     if (defaults[0]) {
       return defaults[0];
     }
 
-    throw new Error("No default behavior defined for " + this.name);
+    throw new Error(`No default behavior defined for ${this.name}`);
   }
 
   public build(): CloudfrontCdkStack {

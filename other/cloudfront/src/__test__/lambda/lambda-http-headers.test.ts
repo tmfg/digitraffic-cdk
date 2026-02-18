@@ -5,21 +5,29 @@ import {
 } from "./response-util.js";
 
 test("GET request gets headers", async () => {
-  const cb = await responseHandlerCall(handler, {
-    method: "GET",
-  }, {
-    headers: {},
-  });
+  const cb = await responseHandlerCall(
+    handler,
+    {
+      method: "GET",
+    },
+    {
+      headers: {},
+    },
+  );
 
   expectResponseCorsHeaders(cb);
 });
 
 test("OPTIONS request", async () => {
-  const cb = await responseHandlerCall(handler, {
-    method: "OPTIONS",
-  }, {
-    headers: {},
-  });
+  const cb = await responseHandlerCall(
+    handler,
+    {
+      method: "OPTIONS",
+    },
+    {
+      headers: {},
+    },
+  );
 
   expectResponseCorsHeaders(cb, false);
 });

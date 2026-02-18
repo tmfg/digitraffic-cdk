@@ -1,22 +1,25 @@
-import { Duration, Stack, type StackProps, Tags } from "aws-cdk-lib";
+import type { StackProps } from "aws-cdk-lib";
+import { Duration, Stack, Tags } from "aws-cdk-lib";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import type {
+  BehaviorOptions,
+  CfnDistribution,
+  EdgeLambda,
+  FunctionAssociation,
+  IOrigin,
+  IOriginRequestPolicy,
+  IRealtimeLogConfig,
+} from "aws-cdk-lib/aws-cloudfront";
 import {
-  type BehaviorOptions,
   CachedMethods,
-  type CfnDistribution,
   CfnVpcOrigin,
+  VpcOrigin as CfVpcOrigin,
   Distribution,
-  type EdgeLambda,
-  type FunctionAssociation,
   HttpVersion,
-  type IOrigin,
-  type IOriginRequestPolicy,
-  type IRealtimeLogConfig,
   OriginProtocolPolicy,
   OriginRequestPolicy,
   ResponseHeadersPolicy,
   ViewerProtocolPolicy,
-  VpcOrigin as CfVpcOrigin,
 } from "aws-cdk-lib/aws-cloudfront";
 import {
   HttpOrigin,
@@ -24,22 +27,17 @@ import {
   VpcOrigin,
 } from "aws-cdk-lib/aws-cloudfront-origins";
 import { Bucket } from "aws-cdk-lib/aws-s3";
-import type { Construct } from "constructs";
-import type { WafRules } from "./acl/waf-rules.js";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-
-import {
-  type Behavior,
-  Origin,
-  type OriginType,
-} from "./distribution/behavior.js";
+import type { Construct } from "constructs";
+import { createWebAcl } from "./acl/acl-creator.js";
+import type { WafRules } from "./acl/waf-rules.js";
+import type { Behavior, OriginType } from "./distribution/behavior.js";
 import { DistributionBuilder } from "./distribution/distribution-builder.js";
 import { CachePolicyFactory } from "./util/cachepolicy-factory.js";
 import { EdgeLambdaFactory } from "./util/edgalambda-factory.js";
 import { EdgeFunctionFactory } from "./util/edgefunction-factory.js";
 import { FunctionType } from "./util/function-creator.js";
 import { LambdaType } from "./util/lambda-creator.js";
-import { createWebAcl } from "./acl/acl-creator.js";
 
 export class CloudfrontCdkStack extends Stack {
   readonly _cachePolicyFactory: CachePolicyFactory;
@@ -55,11 +53,7 @@ export class CloudfrontCdkStack extends Stack {
   private _vpcOrigins: Record<string, CfnVpcOrigin> = {};
   private _originCache: Record<string, IOrigin> = {};
 
-  constructor(
-    scope: Construct,
-    id: string,
-    props?: StackProps,
-  ) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     this._defaults = {};
@@ -103,7 +97,7 @@ export class CloudfrontCdkStack extends Stack {
     buildFunction(builder);
 
     if (builder.behaviors.length === 0) {
-      throw new Error("No behaviors defined for " + builder.name);
+      throw new Error(`No behaviors defined for ${builder.name}`);
     }
     this.addDistribution(builder);
 
@@ -112,11 +106,11 @@ export class CloudfrontCdkStack extends Stack {
 
   addDistribution(builder: DistributionBuilder): void {
     if (!builder.logConfig) {
-      throw new Error("Missing logConfig for " + builder.name);
+      throw new Error(`Missing logConfig for ${builder.name}`);
     }
     const defaultBehavior = builder.findDefaultBehavior();
-    const additionalBehaviors = builder.behaviors.filter((b) =>
-      b !== defaultBehavior
+    const additionalBehaviors = builder.behaviors.filter(
+      (b) => b !== defaultBehavior,
     );
 
     const certificate = Certificate.fromCertificateArn(
@@ -237,21 +231,17 @@ export class CloudfrontCdkStack extends Stack {
     // if bucket has full address, use it, otherwise
     // add default ending
     const dotIndex = bucketParameter.indexOf(".");
-    const bucketRegionalDomainName = dotIndex > -1
-      ? bucketParameter
-      : bucketParameter + ".s3.eu-west-1.amazonaws.com";
-    const bucketName = dotIndex > -1
-      ? bucketParameter.substring(0, dotIndex)
-      : bucketParameter;
+    const bucketRegionalDomainName =
+      dotIndex > -1
+        ? bucketParameter
+        : `${bucketParameter}.s3.eu-west-1.amazonaws.com`;
+    const bucketName =
+      dotIndex > -1 ? bucketParameter.substring(0, dotIndex) : bucketParameter;
 
-    const bucket = Bucket.fromBucketAttributes(
-      this,
-      "bucket-" + bucketName,
-      {
-        bucketArn: `arn:aws:s3:::${bucketName}`,
-        bucketRegionalDomainName,
-      },
-    );
+    const bucket = Bucket.fromBucketAttributes(this, `bucket-${bucketName}`, {
+      bucketArn: `arn:aws:s3:::${bucketName}`,
+      bucketRegionalDomainName,
+    });
 
     return S3BucketOrigin.withOriginAccessControl(bucket, {
       originId: `origin${this._originIndex}`,
@@ -267,14 +257,14 @@ export class CloudfrontCdkStack extends Stack {
 
     const customHeaders = behavior.apiKey
       ? { "x-api-key": behavior.apiKey }
-      : {} as Record<string, string>;
+      : ({} as Record<string, string>);
     // TODO: other custom headers
 
     if (behavior.origin._type === "vpc") {
       const vpcOrigin = this._vpcOrigins[behavior.origin._origin];
 
       if (!vpcOrigin) {
-        throw new Error("Missing vpc origin " + behavior.origin._origin);
+        throw new Error(`Missing vpc origin ${behavior.origin._origin}`);
       }
 
       const cfVpcOrigin = CfVpcOrigin.fromVpcOriginId(
@@ -296,9 +286,10 @@ export class CloudfrontCdkStack extends Stack {
       });
     }
 
-    const protocolPolicy = behavior.origin._type === "http"
-      ? OriginProtocolPolicy.HTTP_ONLY
-      : OriginProtocolPolicy.HTTPS_ONLY;
+    const protocolPolicy =
+      behavior.origin._type === "http"
+        ? OriginProtocolPolicy.HTTP_ONLY
+        : OriginProtocolPolicy.HTTPS_ONLY;
 
     return new HttpOrigin(behavior.origin._origin, {
       originId: `origin${this._originIndex}`,
@@ -323,12 +314,12 @@ export class CloudfrontCdkStack extends Stack {
 
       switch (lambdaType) {
         case LambdaType.WEATHERCAM_HTTP_HEADERS:
-          functionVersion = this._edgeLambdaFactory
-            .getWeathercamHeadersLambda();
+          functionVersion =
+            this._edgeLambdaFactory.getWeathercamHeadersLambda();
 
           break;
 
-        case LambdaType.WEATHERCAM_REDIRECT:
+        case LambdaType.WEATHERCAM_REDIRECT: {
           const weathercamParams = behavior.lambdaConfig.parameters.weathercam;
 
           if (!weathercamParams) throw new Error("Missing weathercam params");
@@ -339,6 +330,7 @@ export class CloudfrontCdkStack extends Stack {
           );
 
           break;
+        }
 
         case LambdaType.LAM_REDIRECT:
           if (!behavior.lambdaConfig.parameters.smRef) {
@@ -361,14 +353,14 @@ export class CloudfrontCdkStack extends Stack {
 
           break;
 
-        case LambdaType.IP_RESTRICTION:
+        case LambdaType.IP_RESTRICTION: {
           const parameters = behavior.lambdaConfig.parameters.ipRestriction;
           if (!parameters) throw new Error("Missing ip restriction parameters");
-          functionVersion = this._edgeLambdaFactory.getIpRestrictionLambda(
-            parameters,
-          );
+          functionVersion =
+            this._edgeLambdaFactory.getIpRestrictionLambda(parameters);
 
           break;
+        }
 
         case LambdaType.GZIP_REQUIREMENT:
           functionVersion = this._edgeLambdaFactory.getGzipRequirementLambda();
@@ -398,26 +390,26 @@ export class CloudfrontCdkStack extends Stack {
 
           break;
 
-        case FunctionType.REDIRECT:
+        case FunctionType.REDIRECT: {
           const redirectUrl = behavior.lambdaConfig.parameters.redirectUrl;
           if (!redirectUrl) throw new Error("Missing redirect url");
 
-          functionVersion = this._edgeFunctionFactory.getRedirectFunction(
-            redirectUrl,
-          );
+          functionVersion =
+            this._edgeFunctionFactory.getRedirectFunction(redirectUrl);
 
           break;
+        }
 
-        case FunctionType.PATH_REWRITE:
+        case FunctionType.PATH_REWRITE: {
           const pathRemoveCount =
             behavior.lambdaConfig.parameters.pathRemoveCount;
           if (!pathRemoveCount) throw new Error("Missing pathRemoveCount");
 
-          functionVersion = this._edgeFunctionFactory.getPathRewriteFunction(
-            pathRemoveCount,
-          );
+          functionVersion =
+            this._edgeFunctionFactory.getPathRewriteFunction(pathRemoveCount);
 
           break;
+        }
 
         case FunctionType.HTTP_HEADERS:
           functionVersion = this._edgeFunctionFactory.getHttpHeadersFunction();

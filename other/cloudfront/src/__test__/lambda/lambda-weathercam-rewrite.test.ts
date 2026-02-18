@@ -13,7 +13,7 @@ test("without version", async () => {
     method: "GET",
     uri: "/C123.jpg",
     headers: {
-      "host": false,
+      host: false,
     },
   });
 });
@@ -31,7 +31,7 @@ test("with version", async () => {
     uri: "/C123.jpg",
     querystring: "versionId=123",
     headers: {
-      "host": "EXT_HOST_NAME",
+      host: "EXT_HOST_NAME",
     },
   });
 });

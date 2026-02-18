@@ -1,14 +1,16 @@
-import type { SourceConfiguration } from "aws-cdk-lib/aws-cloudfront";
+import type { CfnResource, Stack } from "aws-cdk-lib";
+import { Tags } from "aws-cdk-lib";
+import type {
+  SourceConfiguration,
+  ViewerCertificate,
+} from "aws-cdk-lib/aws-cloudfront";
 import {
   CloudFrontWebDistribution,
   GeoRestriction,
   HttpVersion,
   SecurityPolicyProtocol,
 } from "aws-cdk-lib/aws-cloudfront";
-import type { CfnResource, Stack } from "aws-cdk-lib";
-import { Tags } from "aws-cdk-lib";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import type { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront";
 
 import { createWebAcl } from "./acl/acl-creator.js";
 import type { CFProps, DistributionProps } from "./app-props.js";
@@ -58,9 +60,9 @@ export function createDistribution(
   const webAcl = doCreateWebAcl(stack, distributionProps);
   const viewerCertificate = distributionProps.acmCertRef
     ? createViewerCertificate(
-      distributionProps.acmCertRef,
-      distributionProps.aliasNames,
-    )
+        distributionProps.acmCertRef,
+        distributionProps.aliasNames,
+      )
     : undefined;
 
   return createDistributionWithStreamingLogging(

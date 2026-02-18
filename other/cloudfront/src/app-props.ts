@@ -4,8 +4,8 @@ import {
   OriginProtocolPolicy,
 } from "aws-cdk-lib/aws-cloudfront";
 import type { WafRules } from "./acl/waf-rules.js";
-import { LambdaType } from "./util/lambda-creator.js";
 import { FunctionType } from "./util/function-creator.js";
+import { LambdaType } from "./util/lambda-creator.js";
 
 export class CFBehavior {
   readonly path: string;
@@ -43,7 +43,8 @@ export class CFBehavior {
   }
 
   static passAll(path: string = "*", ...cacheHeaders: string[]): CFBehavior {
-    return new CFBehavior(path).withCacheHeaders(...cacheHeaders)
+    return new CFBehavior(path)
+      .withCacheHeaders(...cacheHeaders)
       .allowAllMethods();
   }
 
@@ -178,7 +179,7 @@ export class CFDomain extends CFOrigin {
     apiKey: string,
     ...behaviors: CFBehavior[]
   ): CFDomain {
-    const domain = this.apiGateway(domainName, ...behaviors);
+    const domain = CFDomain.apiGateway(domainName, ...behaviors);
 
     domain.apiKey = apiKey;
 
@@ -258,7 +259,7 @@ export class S3Domain extends CFOrigin {
   }
 
   static swagger(s3BucketName: string, path: string = "swagger/*"): S3Domain {
-    return this.s3(
+    return S3Domain.s3(
       s3BucketName,
       CFBehavior.path(path).withCacheTtl(120).withIndexHtmlFunction(),
     );

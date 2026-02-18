@@ -1,8 +1,9 @@
-import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
-import { RemovalPolicy, type Stack } from "aws-cdk-lib";
 import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder";
-import type { WafRules } from "./waf-rules.js";
+import type { Stack } from "aws-cdk-lib";
+import { RemovalPolicy } from "aws-cdk-lib";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
+import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import type { WafRules } from "./waf-rules.js";
 
 export function createWebAcl(
   stack: Stack,
@@ -26,9 +27,7 @@ export function createWebAcl(
         .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
         .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
         .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
-        .withThrottleAnonymousUserIpAndUriPath(
-          rules.perIpAndQueryWithoutHeader,
-        )
+        .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader)
         .withThrottleAnonymousUserIpByUriPath(
           rules.perIpAndQueryWithoutHeaderByPath?.limit,
           rules.perIpAndQueryWithoutHeaderByPath?.path,
@@ -39,7 +38,7 @@ export function createWebAcl(
   const acl = aclBuilder.build();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
+  const _logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
     // group name must begin with aws-waf-logs!!!!
     logGroupName: `aws-waf-logs-${
       logGroupName ?? distributionName
