@@ -1,7 +1,7 @@
-import type { SpatialDisruption } from "../model/disruption.js";
-import type { FeatureCollection } from "geojson";
-import { DISRUPTIONS_DATE_FORMAT } from "../service/disruptions.js";
 import { format } from "date-fns";
+import type { FeatureCollection } from "geojson";
+import type { SpatialDisruption } from "../model/disruption.js";
+import { DISRUPTIONS_DATE_FORMAT } from "../service/disruptions.js";
 
 export function someNumber(): number {
   return Math.floor(Math.random() * 999999);

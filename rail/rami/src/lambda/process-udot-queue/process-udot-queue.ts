@@ -1,10 +1,10 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent, SQSRecord } from "aws-lambda";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { processUdotMessage } from "../../service/process-udot-message.js";
-import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { UnknownDelayOrTrackMessage } from "../../model/dt-rosm-message.js";
+import { processUdotMessage } from "../../service/process-udot-message.js";
 import {
   createTraceContext,
   getTraceFields,
@@ -18,9 +18,7 @@ async function handleSQSRecord(r: SQSRecord): Promise<void> {
     const recordBody = r.body;
 
     try {
-      const udotMessage = JSON.parse(
-        recordBody,
-      ) as UnknownDelayOrTrackMessage;
+      const udotMessage = JSON.parse(recordBody) as UnknownDelayOrTrackMessage;
 
       logger.info({
         ...getTraceFields(),
@@ -66,9 +64,7 @@ export function handlerFn(): (
     const traceContext = createTraceContext();
     return await runWithTraceContext(traceContext, async () => {
       try {
-        return await Promise.allSettled(
-          event.Records.map(handleSQSRecord),
-        );
+        return await Promise.allSettled(event.Records.map(handleSQSRecord));
       } finally {
         logger.info({
           ...getTraceFields(),

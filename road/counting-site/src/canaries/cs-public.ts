@@ -1,3 +1,4 @@
+import { constants } from "node:http2";
 import {
   ContentChecker,
   ContentTypeChecker,
@@ -5,17 +6,16 @@ import {
   HeaderChecker,
   UrlChecker,
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
-import { Asserter } from "@digitraffic/common/dist/test/asserter";
-import { constants } from "http2";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import type { ResponseValue } from "../model/v2/response-model.js";
 
 const BASE_URL = "/prod/api/counting-site/v2/";
-const DIRECTIONS_URL = BASE_URL + "directions";
-const TRAVEL_MODES_URL = BASE_URL + "travel-modes";
-const VALUES_URL = BASE_URL + "values";
-const SITES_URL = BASE_URL + "sites";
-const CSV_URL = BASE_URL + "values.csv";
+const DIRECTIONS_URL = `${BASE_URL}directions`;
+const TRAVEL_MODES_URL = `${BASE_URL}travel-modes`;
+const VALUES_URL = `${BASE_URL}values`;
+const SITES_URL = `${BASE_URL}sites`;
+const CSV_URL = `${BASE_URL}values.csv`;
 
 export const handler = async (): Promise<string> => {
   const checker = await UrlChecker.createV2();
@@ -32,17 +32,17 @@ export const handler = async (): Promise<string> => {
 
   // json values
   await checker.expect403WithoutApiKey(
-    VALUES_URL + "?siteId=1&date=2024-10-01",
+    `${VALUES_URL}?siteId=1&date=2024-10-01`,
   );
   await checker.expect200(
-    VALUES_URL + "?siteId=1&date=2024-10-01",
+    `${VALUES_URL}?siteId=1&date=2024-10-01`,
     ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
     ContentChecker.checkJson((json: ResponseValue[]) => {
       Asserter.assertLength(json, 0);
     }),
   );
   await checker.expect200(
-    VALUES_URL + "?siteId=300035277&date=2024-10-01",
+    `${VALUES_URL}?siteId=300035277&date=2024-10-01`,
     ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
     HeaderChecker.checkHeaderMissing(
       constants.HTTP2_HEADER_CONTENT_DISPOSITION,
@@ -51,12 +51,12 @@ export const handler = async (): Promise<string> => {
       Asserter.assertLengthGreaterThan(json, 10);
     }),
   );
-  await checker.expect400(VALUES_URL + "?date=bad_input");
+  await checker.expect400(`${VALUES_URL}?date=bad_input`);
 
   // sites
   await checker.expect403WithoutApiKey(SITES_URL);
   await checker.expect200(
-    SITES_URL + "/300035277",
+    `${SITES_URL}/300035277`,
     ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
     GeoJsonChecker.validFeatureCollection((fc) => {
       Asserter.assertLengthGreaterThan(fc.features, 1);
@@ -69,10 +69,10 @@ export const handler = async (): Promise<string> => {
 
   // csv values
   await checker.expect403WithoutApiKey(
-    CSV_URL + "?year=2024&month=10&siteId=300035277",
+    `${CSV_URL}?year=2024&month=10&siteId=300035277`,
   );
   await checker.expect200(
-    CSV_URL + "?year=2024&month=10&siteId=300035277",
+    `${CSV_URL}?year=2024&month=10&siteId=300035277`,
     ContentTypeChecker.checkContentType(MediaType.TEXT_CSV),
     HeaderChecker.checkHeaderExists(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
     ContentChecker.checkResponse((body) => {
@@ -80,13 +80,13 @@ export const handler = async (): Promise<string> => {
     }),
   );
   await checker.expect200(
-    CSV_URL + "?year=2022&month=10&siteId=300035277",
+    `${CSV_URL}?year=2022&month=10&siteId=300035277`,
     ContentChecker.checkResponse((body) => {
       Asserter.assertLength(body.split("\n"), 2); // just header
     }),
   );
 
-  await checker.expect400(CSV_URL + "?date=bad_input");
+  await checker.expect400(`${CSV_URL}?date=bad_input`);
 
   return checker.done();
 };

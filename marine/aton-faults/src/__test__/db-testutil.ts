@@ -3,7 +3,6 @@ import {
   assertCount,
   dbTestBase as commonDbTestBase,
 } from "@digitraffic/common/dist/test/db-testutils";
-import * as xsdValidator from "xsd-schema-validator";
 import type { DbFault } from "../model/fault.js";
 import type { AtonSecret } from "../model/secret.js";
 

@@ -1,13 +1,10 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertDataCount, dbTestBase } from "../db-testutil.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { jest } from "@jest/globals";
-import {
-  type APIGatewayProxyEvent,
-  type APIGatewayProxyResult,
-} from "aws-lambda";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { ERRORS } from "../../lambda/upload-datex2/upload-datex2.js";
 import type { Datex2UpdateObject } from "../../model/datex2-update-object.js";
+import { assertDataCount, dbTestBase } from "../db-testutil.js";
 
 async function getResponseFromLambda(
   event: Partial<APIGatewayProxyEvent> = {},
@@ -22,11 +19,13 @@ async function getResponseFromLambda(
 }
 
 const validUpdateObject: Datex2UpdateObject = {
-  datexIIVersions: [{
-    type: "variable-sign",
-    version: "3.6",
-    message: "<datex message>",
-  }],
+  datexIIVersions: [
+    {
+      type: "variable-sign",
+      version: "3.6",
+      message: "<datex message>",
+    },
+  ],
 };
 
 describe(

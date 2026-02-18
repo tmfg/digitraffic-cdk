@@ -1,7 +1,7 @@
-import ky from "ky";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import ky from "ky";
 
 export interface AreaVisibilityResponse {
   // ISO 8601

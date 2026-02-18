@@ -1,15 +1,13 @@
 import { DigitrafficSqsQueue } from "@digitraffic/common/dist/aws/infra/sqs-queue";
-import {
-  DigitrafficStack,
-  type StackConfiguration,
-} from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Duration } from "aws-cdk-lib";
 import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
 import type { Construct } from "constructs";
 import * as Canaries from "./canaries.js";
+import { IntegrationApi } from "./integration-api.js";
 import * as InternalLambdas from "./internal-lambdas.js";
 import { PublicApi } from "./public-api.js";
-import { IntegrationApi } from "./integration-api.js";
 
 export interface RamiConfiguration extends StackConfiguration {
   readonly dlqBucketName: string;

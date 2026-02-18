@@ -1,12 +1,12 @@
-import * as JsonUpdateService from "../../service/json-update-service.js";
-import type { TloikLaite, TloikMetatiedot } from "../../model/metatiedot.js";
-import { dbTestBase } from "../db-testutil.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { Countable } from "@digitraffic/common/dist/database/models";
+import type { TloikLaite, TloikMetatiedot } from "../../model/metatiedot.js";
 import type {
   TloikLiikennemerkinTila,
   TloikTilatiedot,
 } from "../../model/tilatiedot.js";
-import type { Countable } from "@digitraffic/common/dist/database/models";
+import * as JsonUpdateService from "../../service/json-update-service.js";
+import { dbTestBase } from "../db-testutil.js";
 
 const TEST_DEVICE: TloikLaite = {
   tunnus: "test",

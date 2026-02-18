@@ -1,9 +1,9 @@
 import { addHours } from "date-fns";
+import { chain } from "lodash-es";
 import type { DtRosmMessage } from "../model/dt-rami-message.js";
 import type { RosmMessageOperation } from "../model/rosm-message.js";
 import { validRamiMonitoredJourneyScheduledMessage } from "./testdata-rosm.js";
 import { validMessageUnknownTrackAndDelay } from "./testdata-sm.js";
-import { chain } from "lodash-es";
 
 export function createDtRosmMessage(properties: {
   created?: Date;
@@ -64,10 +64,12 @@ export function createMonitoredJourneyScheduledMessage(properties: {
         ...payload.monitoredJourneyScheduledMessage,
         vehicleJourney: {
           ...payload.monitoredJourneyScheduledMessage.vehicleJourney,
-          vehicleJourneyName: properties.trainNumber?.toString() ??
+          vehicleJourneyName:
+            properties.trainNumber?.toString() ??
             payload.monitoredJourneyScheduledMessage.vehicleJourney
               .vehicleJourneyName,
-          dataFrameRef: properties.trainDepartureDate ??
+          dataFrameRef:
+            properties.trainDepartureDate ??
             payload.monitoredJourneyScheduledMessage.vehicleJourney
               .dataFrameRef,
         },
@@ -92,7 +94,8 @@ export function createScheduledMessage(properties: {
     ...validRamiMonitoredJourneyScheduledMessage,
     payload: {
       ...validRamiMonitoredJourneyScheduledMessage.payload,
-      operation: properties.operation ??
+      operation:
+        properties.operation ??
         validRamiMonitoredJourneyScheduledMessage.payload.operation,
       startValidity: properties.start
         ? properties.start.toISOString()
@@ -112,39 +115,51 @@ export function createSmMessage(properties: {
 }): unknown {
   return chain(validMessageUnknownTrackAndDelay)
     .clone()
-    .set([
-      "payload",
-      "monitoredStopVisits",
-      0,
-      "monitoredVehicleJourney",
-      "monitoredCall",
-      "expectedArrivalTime",
-    ], properties.arrivalTime)
-    .set([
-      "payload",
-      "monitoredStopVisits",
-      0,
-      "monitoredVehicleJourney",
-      "monitoredCall",
-      "expectedDepartureTime",
-    ], properties.departureTime)
-    .set([
-      "payload",
-      "monitoredStopVisits",
-      0,
-      "monitoredVehicleJourney",
-      "monitoredCall",
-      "arrivalStopAssignment",
-      "expectedQuayName",
-    ], properties.arrivalQuay)
-    .set([
-      "payload",
-      "monitoredStopVisits",
-      0,
-      "monitoredVehicleJourney",
-      "monitoredCall",
-      "departureStopAssignment",
-      "expectedQuayName",
-    ], properties.departureQuay)
+    .set(
+      [
+        "payload",
+        "monitoredStopVisits",
+        0,
+        "monitoredVehicleJourney",
+        "monitoredCall",
+        "expectedArrivalTime",
+      ],
+      properties.arrivalTime,
+    )
+    .set(
+      [
+        "payload",
+        "monitoredStopVisits",
+        0,
+        "monitoredVehicleJourney",
+        "monitoredCall",
+        "expectedDepartureTime",
+      ],
+      properties.departureTime,
+    )
+    .set(
+      [
+        "payload",
+        "monitoredStopVisits",
+        0,
+        "monitoredVehicleJourney",
+        "monitoredCall",
+        "arrivalStopAssignment",
+        "expectedQuayName",
+      ],
+      properties.arrivalQuay,
+    )
+    .set(
+      [
+        "payload",
+        "monitoredStopVisits",
+        0,
+        "monitoredVehicleJourney",
+        "monitoredCall",
+        "departureStopAssignment",
+        "expectedQuayName",
+      ],
+      properties.departureQuay,
+    )
     .value();
 }

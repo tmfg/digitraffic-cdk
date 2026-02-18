@@ -1,10 +1,10 @@
+import type { AwakeAiPortResponse } from "../../api/awake-ai-port.js";
+import { AwakeAiPortResponseType } from "../../api/awake-ai-port.js";
 import type { AwakeAiPrediction } from "../../api/awake-common.js";
 import {
   AwakeAiPredictionType,
   AwakeAiVoyageStatus,
 } from "../../api/awake-common.js";
-import type { AwakeAiPortResponse } from "../../api/awake-ai-port.js";
-import { AwakeAiPortResponseType } from "../../api/awake-ai-port.js";
 import { randomIMO, randomMMSI } from "../testdata.js";
 
 export function createAwakeAiPortResponse(
@@ -25,14 +25,14 @@ export function createAwakeAiPortResponse(
             mmsi: randomMMSI(),
           },
           voyage: {
-            voyageStatus: options?.voyageStatus ??
-              AwakeAiVoyageStatus.UNDER_WAY,
+            voyageStatus:
+              options?.voyageStatus ?? AwakeAiVoyageStatus.UNDER_WAY,
             predictions: options?.includePortCallPrediction
               ? predictions.concat([
-                {
-                  predictionType: AwakeAiPredictionType.ARRIVAL_PORT_CALL,
-                },
-              ])
+                  {
+                    predictionType: AwakeAiPredictionType.ARRIVAL_PORT_CALL,
+                  },
+                ])
               : predictions,
             sequenceNo: 1,
           },

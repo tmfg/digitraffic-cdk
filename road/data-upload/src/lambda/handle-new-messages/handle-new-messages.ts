@@ -1,7 +1,7 @@
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { handleVariableSignMessages } from "../../service/variable-signs.js";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { handleRttiMessages } from "../../service/rtti.js";
+import { handleVariableSignMessages } from "../../service/variable-signs.js";
 
 const proxyHolder = ProxyHolder.create();
 

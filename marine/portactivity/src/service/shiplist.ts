@@ -1,10 +1,10 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DbPublicShiplist } from "../dao/shiplist-public.js";
+import { findByLocodePublicShiplist } from "../dao/shiplist-public.js";
 import {
   getDisplayableNameForEventSource,
   mergeTimestamps,
 } from "../event-sourceutil.js";
-import type { DbPublicShiplist } from "../dao/shiplist-public.js";
-import { findByLocodePublicShiplist } from "../dao/shiplist-public.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { PublicApiTimestamp } from "../model/timestamp.js";
 
 export type ShiplistTimestamp = PublicApiTimestamp & DbPublicShiplist;
@@ -34,10 +34,9 @@ export async function getShiplist(
   locode: string,
   interval: number,
 ): Promise<ShiplistTimestamp[]> {
-  const dbShiplist =
-    (await findByLocodePublicShiplist(db, locode.toUpperCase(), interval)).map((
-      ts,
-    ) => dbPublicShiplistToPublicApiTimestamp(ts, locode.toUpperCase()));
+  const dbShiplist = (
+    await findByLocodePublicShiplist(db, locode.toUpperCase(), interval)
+  ).map((ts) => dbPublicShiplistToPublicApiTimestamp(ts, locode.toUpperCase()));
 
   // don't overwrite source before merging as it utilizes source name in prioritizing
   return mergeTimestamps(dbShiplist).map(

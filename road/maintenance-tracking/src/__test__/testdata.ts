@@ -1,17 +1,17 @@
-import _ from "lodash";
 import { getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { type DbObservationData } from "../dao/maintenance-tracking-dao.js";
-import { type TyokoneenseurannanKirjaus } from "../model/models.js";
+import type { SQSEvent, SQSRecord } from "aws-lambda";
+import type { DbObservationData } from "../dao/maintenance-tracking-dao.js";
 import { MaintenanceTrackingEnvKeys } from "../keys.js";
-import { type SQSEvent, type SQSRecord } from "aws-lambda";
-const REGEXP_ID = new RegExp("ID_PLACEHOLDER", "g");
-const REGEXP_TK = new RegExp("TK_PLACEHOLDER", "g");
+import type { TyokoneenseurannanKirjaus } from "../model/models.js";
+
+const REGEXP_ID = /ID_PLACEHOLDER/g;
+const REGEXP_TK = /TK_PLACEHOLDER/g;
 
 const TRACKING_JSON_WITH_3_OBSERVATIONS = `{
             "otsikko": {
                 "lahettaja": {
-                    "jarjestelma": "Urakoitsijan järjestelmä",
+                    "jarjestelma": "Urakoitsijan j\u00e4rjestelm\u00e4",
                     "organisaatio": {
                         "nimi": "Urakoitsija viivageometrialla",
                         "ytunnus": "6547365-0"
@@ -119,7 +119,12 @@ export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
 ): string {
   const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
   const trackingJson = JSON.parse(validJson) as TyokoneenseurannanKirjaus;
-  return JSON.stringify(_.omit(trackingJson, "otsikko.lahettaja.jarjestelma"));
+  // Remove otsikko.lahettaja.jarjestelma property safely
+  if (trackingJson.otsikko?.lahettaja) {
+    delete (trackingJson.otsikko.lahettaja as { jarjestelma?: string })
+      .jarjestelma;
+  }
+  return JSON.stringify(trackingJson);
 }
 
 export function assertObservationData(
@@ -127,12 +132,12 @@ export function assertObservationData(
   results: DbObservationData[],
 ): void {
   results.forEach((resultObservation) => {
-    const resultObservationWithoutId = _.omit(resultObservation, "id");
-
+    // Remove id property for comparison
+    const { id, ...resultObservationWithoutId } = resultObservation;
     const foundSrcObservations = srcObservations.filter(
       (o) =>
         o.observationTime.getTime() ===
-          resultObservationWithoutId.observationTime.getTime(),
+        resultObservationWithoutId.observationTime.getTime(),
     );
     expect(foundSrcObservations.length).toBe(1);
 
@@ -150,13 +155,11 @@ export function createSQSEventWithBodies(bodies: string[] = []): SQSEvent {
     return {
       body,
       messageId: "",
-      receiptHandle: `s3://${
-        getEnvVariable(
-          MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME,
-        )
-      }/${
-        getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL)
-      }/${getRandompId()}`,
+      receiptHandle: `s3://${getEnvVariable(
+        MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME,
+      )}/${getEnvVariable(
+        MaintenanceTrackingEnvKeys.SQS_QUEUE_URL,
+      )}/${getRandompId()}`,
       messageAttributes: {},
       md5OfBody: "",
       attributes: {

@@ -1,11 +1,12 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { connectAsync } from "mqtt";
 import { getRttiBySituationId } from "../dao/rtti.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const clientId = "mqtt-publisher" as const;
 
-const PAYLOAD_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+const PAYLOAD_TEMPLATE =
+  `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2:payload xsi:type="sit:SituationPublication" lang="fi" 
     xmlns:com="http://datex2.eu/schema/3/common" 
     xmlns:loc="http://datex2.eu/schema/3/locationReferencing" 
@@ -31,36 +32,44 @@ const PAYLOAD_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?
     SITUATION
 </d2:payload>` as const;
 
-export async function sendMqttUpdates(url: string, username: string, password: string, ids: string[]): Promise<void> {    
-    const rttiData = await inDatabaseReadonly((db) => getRttiBySituationId(db, ids));
+export async function sendMqttUpdates(
+  url: string,
+  username: string,
+  password: string,
+  ids: string[],
+): Promise<void> {
+  const rttiData = await inDatabaseReadonly((db) =>
+    getRttiBySituationId(db, ids),
+  );
 
-    if(rttiData.length > 0) {
-        const client = await connectAsync(url, {
-            username,
-            password,
-            clean: false,
-            clientId,
-        });
+  if (rttiData.length > 0) {
+    const client = await connectAsync(url, {
+      username,
+      password,
+      clean: false,
+      clientId,
+    });
 
-        for (const rtti of rttiData) {
-            // first zip and then base64 encode the message
-//            const mqttMessage = Buffer.from(gzipSync(rtti.message)).toString("base64");
-            const topic = `traffic-message-v3/traffic-data/datex2-3.5/${rtti.is_srti ? "SRTI" : "RTTI"}`;
+    for (const rtti of rttiData) {
+      // first zip and then base64 encode the message
+      //            const mqttMessage = Buffer.from(gzipSync(rtti.message)).toString("base64");
+      const topic = `traffic-message-v3/traffic-data/datex2-3.5/${rtti.is_srti ? "SRTI" : "RTTI"}`;
 
-            await client.publishAsync(topic, createMessage(rtti.message));
-        }
-
-        await client.endAsync();
-    } else {
-        logger.error({
-            method: "MqttSendingService.sendMqttUpdate", 
-            error : `Could not find RTTI data for situation ids ${ids.join(", ")}`
-        });
+      await client.publishAsync(topic, createMessage(rtti.message));
     }
+
+    await client.endAsync();
+  } else {
+    logger.error({
+      method: "MqttSendingService.sendMqttUpdate",
+      error: `Could not find RTTI data for situation ids ${ids.join(", ")}`,
+    });
+  }
 }
 
 function createMessage(datexSituation: string): string {
-    return PAYLOAD_TEMPLATE
-        .replace("PUBLICATION_TIME", new Date().toISOString())
-        .replace("SITUATION", datexSituation);
+  return PAYLOAD_TEMPLATE.replace(
+    "PUBLICATION_TIME",
+    new Date().toISOString(),
+  ).replace("SITUATION", datexSituation);
 }

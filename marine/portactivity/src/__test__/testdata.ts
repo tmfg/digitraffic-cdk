@@ -1,13 +1,13 @@
-import type { ApiTimestamp } from "../model/timestamp.js";
-import { EventType } from "../model/timestamp.js";
+import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import { v4 as uuidv4 } from "uuid";
 import type { AwakeAIATXTimestampMessage } from "../api/awake-ai-atx.js";
 import {
   AwakeAiATXEventType,
   AwakeATXZoneEventType,
 } from "../api/awake-ai-atx.js";
 import { AwakeAiZoneType } from "../api/awake-common.js";
-import { v4 as uuidv4 } from "uuid";
-import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
 import type { Port } from "../service/portareas.js";
 
 export function newAwakeATXMessage(options?: {

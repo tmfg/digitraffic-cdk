@@ -1,5 +1,5 @@
-import type { ApiData } from "../model/v2/api-model.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { ApiData } from "../model/v2/api-model.js";
 import type { DbCsvData, DbValues } from "../model/v2/db-model.js";
 import type { TravelMode } from "../model/v2/types.js";
 import { database } from "./db.js";
@@ -11,7 +11,8 @@ async function findLastModified(
   siteId?: number,
   travelMode?: TravelMode,
 ): Promise<Date> {
-  let creator = database.selectFrom("cs2_data")
+  let creator = database
+    .selectFrom("cs2_data")
     .select(({ fn }) => fn("max", ["modified"]).as("modified"))
     .where("data_timestamp", ">=", startDate)
     .where("data_timestamp", "<", endDate);
@@ -20,8 +21,10 @@ async function findLastModified(
   if (travelMode) creator = creator.where("travel_mode", "=", travelMode);
 
   const compiled = creator.compile();
-  return (await db.one<DbModified>(compiled.sql, compiled.parameters))
-    .modified ?? new Date();
+  return (
+    (await db.one<DbModified>(compiled.sql, compiled.parameters)).modified ??
+    new Date()
+  );
 }
 
 export async function findValuesForDate(
@@ -47,7 +50,8 @@ export async function findValuesForDate(
     travelMode,
   );
 
-  let creator = database.selectFrom("cs2_data")
+  let creator = database
+    .selectFrom("cs2_data")
     .select([
       "site_id",
       "travel_mode",
@@ -93,7 +97,8 @@ export async function findCsvValuesForMonth(
     travelMode,
   );
 
-  let creator = database.selectFrom("cs2_data")
+  let creator = database
+    .selectFrom("cs2_data")
     .leftJoin("cs2_site", "cs2_data.site_id", "cs2_site.id")
     .select([
       "name",
@@ -128,23 +133,29 @@ export async function addSiteData(
 ): Promise<number> {
   let pointCount = 0;
 
-  await Promise.all(data.map(async (d) => {
-    await Promise.all(d.data.map((point) => {
-      const compiled = database.insertInto("cs2_data")
-        .values({
-          site_id: siteId,
-          travel_mode: d.travelMode,
-          direction: d.direction,
-          data_timestamp: point.timestamp,
-          granularity: point.granularity,
-          counts: point.counts,
-        }).compile();
+  await Promise.all(
+    data.map(async (d) => {
+      await Promise.all(
+        d.data.map((point) => {
+          const compiled = database
+            .insertInto("cs2_data")
+            .values({
+              site_id: siteId,
+              travel_mode: d.travelMode,
+              direction: d.direction,
+              data_timestamp: point.timestamp,
+              granularity: point.granularity,
+              counts: point.counts,
+            })
+            .compile();
 
-      pointCount++;
+          pointCount++;
 
-      return db.none(compiled.sql, compiled.parameters);
-    }));
-  }));
+          return db.none(compiled.sql, compiled.parameters);
+        }),
+      );
+    }),
+  );
 
   return pointCount;
 }

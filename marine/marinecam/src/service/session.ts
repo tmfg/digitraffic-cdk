@@ -1,11 +1,12 @@
+import util from "node:util";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import util from "util";
+import type { Dispatcher } from "undici";
+import { Agent, interceptors, request } from "undici";
 import { parseString } from "xml2js";
+import type { Command, CommandResponse } from "./command.js";
 import {
   ChangeStreamCommand,
   CloseStreamCommand,
-  type Command,
-  type CommandResponse,
   ConnectCommand,
   GetThumbnailByTimeCommand,
   GetThumbnailCommand,
@@ -13,7 +14,6 @@ import {
   LogoutCommand,
   RequestStreamCommand,
 } from "./command.js";
-import { Agent, type Dispatcher, interceptors, request } from "undici";
 
 const COMPR_LEVEL = "70" as const;
 const DEST_WIDTH = "1280" as const;
@@ -51,14 +51,16 @@ export class Session {
       pipelining: 6,
     });
 
-    this.dispatcher = agent.compose(interceptors.retry({
-      methods: ["POST"],
-      maxRetries: 3,
-      minTimeout: 1000,
-      maxTimeout: 10000,
-      timeoutFactor: 2,
-      retryAfter: true,
-    }));
+    this.dispatcher = agent.compose(
+      interceptors.retry({
+        methods: ["POST"],
+        maxRetries: 3,
+        minTimeout: 1000,
+        maxTimeout: 10000,
+        timeoutFactor: 2,
+        retryAfter: true,
+      }),
+    );
   }
 
   async post(
@@ -72,7 +74,7 @@ export class Session {
         body: xml,
         headers: {
           host: this.hostname,
-          "accept": "application/json",
+          accept: "application/json",
         },
         dispatcher: this.dispatcher,
         bodyTimeout: REQUEST_TIMEOUT_MILLIS,
@@ -102,13 +104,13 @@ export class Session {
     //        logger.debug("response " + JSON.stringify(resp));
 
     if (resp.statusCode !== 200) {
-      throw Error("sendMessage failed " + JSON.stringify(resp));
+      throw Error(`sendMessage failed ${JSON.stringify(resp)}`);
     }
 
     // it's actually xml, so we have to take it as text and then parse it
     const body = await resp.body.text();
 
-    const response = await parse(body) as CommandResponse;
+    const response = (await parse(body)) as CommandResponse;
     command.checkError(response);
 
     return command.getResult(response);
@@ -198,7 +200,7 @@ export class Session {
 
     logger.info({
       method: "SessionService.getFrameFromStream",
-      message: "posting to " + streamUrl,
+      message: `posting to ${streamUrl}`,
     });
 
     const response = await this.post(streamUrl, "");

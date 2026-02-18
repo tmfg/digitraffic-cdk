@@ -1,8 +1,8 @@
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { ApiData, Vessel } from "../model/api-db-model.js";
-import { default as pgPromise } from "pg-promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { subDays } from "date-fns";
+import { default as pgPromise } from "pg-promise";
+import type { ApiData, Vessel } from "../model/api-db-model.js";
 import type { VesselDTO } from "../model/dto-model.js";
 
 const SQL_UPDATE_VESSELS = `
@@ -323,12 +323,10 @@ export async function getVessel(
   activeFrom?: Date,
   activeTo?: Date,
 ): Promise<VesselDTO | undefined> {
-  return await db.oneOrNone(PS_GET_VESSEL, [
-    activeFrom,
-    activeTo,
-    vesselId,
-  ]) ??
-    undefined;
+  return (
+    (await db.oneOrNone(PS_GET_VESSEL, [activeFrom, activeTo, vesselId])) ??
+    undefined
+  );
 }
 
 export async function getVessels(
@@ -338,9 +336,9 @@ export async function getVessels(
 ): Promise<VesselDTO[]> {
   logger.info({
     method: "GetVessels.getVessels",
-    message: `from: ${JSON.stringify(activeFrom)} to: ${
-      JSON.stringify(activeTo)
-    }`,
+    message: `from: ${JSON.stringify(activeFrom)} to: ${JSON.stringify(
+      activeTo,
+    )}`,
   });
 
   return db.manyOrNone(PS_GET_VESSELS, [

@@ -1,5 +1,5 @@
-import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
   return commonDbTestBase(

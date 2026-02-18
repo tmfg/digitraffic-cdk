@@ -1,11 +1,11 @@
-import { UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
-import { getSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
-import type { ShiplistSecret } from "../lambda/get-shiplist-public/get-shiplist-public.js";
 import {
   ENV_HOSTNAME,
   ENV_SECRET,
 } from "@digitraffic/common/dist/aws/infra/canaries/canary-keys";
+import { UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
+import { getSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import type { ShiplistSecret } from "../lambda/get-shiplist-public/get-shiplist-public.js";
 
 const hostname = getEnvVariable(ENV_HOSTNAME);
 const secretId = getEnvVariable(ENV_SECRET);

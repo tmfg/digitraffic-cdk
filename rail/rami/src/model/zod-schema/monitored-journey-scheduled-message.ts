@@ -14,9 +14,9 @@ export const monitoredJourneyScheduledMessage = z
       })
       .describe("vehicle journey identifiers information")
       .nullable(),
-    messageContentType: z.enum(["AUDIO", "VIDEO", "AUDIO_VIDEO"]).describe(
-      "message content type",
-    ),
+    messageContentType: z
+      .enum(["AUDIO", "VIDEO", "AUDIO_VIDEO"])
+      .describe("message content type"),
     deliveryPoints: z
       .array(
         z
@@ -37,12 +37,12 @@ export const monitoredJourneyScheduledMessage = z
           .array(
             z
               .object({
-                language: z.string().describe(
-                  "identifies the language of the content",
-                ),
-                audioText: z.string().describe(
-                  "audio text used for tts system",
-                ),
+                language: z
+                  .string()
+                  .describe("identifies the language of the content"),
+                audioText: z
+                  .string()
+                  .describe("audio text used for tts system"),
               })
               .describe(
                 "audio message content to be delivered for monitored journey scheduled message",
@@ -86,9 +86,9 @@ export const monitoredJourneyScheduledMessage = z
       .array(
         z
           .object({
-            language: z.string().describe(
-              "identifies the language of the content",
-            ),
+            language: z
+              .string()
+              .describe("identifies the language of the content"),
             videoText: z.string().describe("audio text used for tts system"),
           })
           .describe(

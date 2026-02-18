@@ -1,12 +1,10 @@
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { updateDatex2 } from "../../service/datex2-update.js";
-import {
-  type Datex2UpdateObject,
-  Datex2UpdateObjectSchema,
-} from "../../model/datex2-update-object.js";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { v4 } from "uuid";
+import type { Datex2UpdateObject } from "../../model/datex2-update-object.js";
+import { Datex2UpdateObjectSchema } from "../../model/datex2-update-object.js";
+import { updateDatex2 } from "../../service/datex2-update.js";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -37,7 +35,7 @@ export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   // eslint-disable-next-line dot-notation
-  const body = event["body"];
+  const body = event.body;
   const requestId = event.headers["X-Request-ID"];
   const start = Date.now();
 
@@ -94,7 +92,7 @@ function parsePayload(body: string): Datex2UpdateObject | undefined {
     const parsed = Datex2UpdateObjectSchema.safeParse(json);
 
     if (parsed.error) {
-      logger.debug("parse error from:" + body);
+      logger.debug(`parse error from: ${body}`);
       logger.error({ method, error: parsed.error });
 
       return undefined;
@@ -109,8 +107,8 @@ function parsePayload(body: string): Datex2UpdateObject | undefined {
     // check type and version?
 
     return parsed.data;
-  } catch (error) {
-    logger.debug("error from:" + body);
+  } catch (_error) {
+    logger.debug(`error from: ${body}`);
     logger.error({ method, message: ERRORS.INVALID_PAYLOAD });
 
     return undefined;

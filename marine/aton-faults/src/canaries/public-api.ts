@@ -15,7 +15,7 @@ export const handler = async (): Promise<string> => {
   const rs = ResponseChecker.forGeojson();
 
   await checker.expect200(
-    API_PATH + "?language=fi",
+    `${API_PATH}?language=fi`,
     rs.checkJson((json: FaultPublicApiFeatureCollection) => {
       assert.ok(json.features.length > 10);
       assert.ok(
@@ -27,7 +27,7 @@ export const handler = async (): Promise<string> => {
   );
 
   await checker.expect200(
-    API_PATH + "?language=sv",
+    `${API_PATH}?language=sv`,
     rs.checkJson((json: FaultPublicApiFeatureCollection) => {
       assert.ok(json.features.length > 10);
       assert.ok(
@@ -40,7 +40,7 @@ export const handler = async (): Promise<string> => {
 
   // unknown locale ge -> english is used
   await checker.expect200(
-    API_PATH + "?language=ge",
+    `${API_PATH}?language=ge`,
     rs.checkJson((json: FaultPublicApiFeatureCollection) => {
       assert.ok(json.features.length > 10);
       assert.ok(
@@ -51,9 +51,9 @@ export const handler = async (): Promise<string> => {
     }),
   );
 
-  await checker.expect403WithoutApiKey(API_PATH + "?language=fi");
-  await checker.expect400(API_PATH + "?fixed_in_hours=-2");
-  await checker.expect400(API_PATH + "?fixed_in_hours=12345567");
+  await checker.expect403WithoutApiKey(`${API_PATH}?language=fi`);
+  await checker.expect400(`${API_PATH}?fixed_in_hours=-2`);
+  await checker.expect400(`${API_PATH}?fixed_in_hours=12345567`);
 
   return checker.done();
 };

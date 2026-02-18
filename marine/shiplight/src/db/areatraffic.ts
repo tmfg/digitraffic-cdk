@@ -1,5 +1,5 @@
-import { default as pgPromise } from "pg-promise";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { default as pgPromise } from "pg-promise";
 
 export interface DbAreaTraffic {
   readonly id: number;

@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { ApiData, Source } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
+import type { ApiData, Source } from "../model/api-db-model.js";
 
 const SQL_UPDATE_SOURCES = `
 insert into wn_source(id, name, shortname, nationality, type, vessel_id, deleted)

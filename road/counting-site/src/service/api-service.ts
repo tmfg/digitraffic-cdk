@@ -1,14 +1,13 @@
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import { type FeatureCollection } from "geojson";
-import { getSitesAsFeatureCollection } from "../dao/site.js";
-import type { ResponseValue } from "../model/v2/response-model.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import type { Column } from "@std/csv";
+import { stringify } from "@std/csv";
+import type { FeatureCollection } from "geojson";
 import { findCsvValuesForMonth, findValuesForDate } from "../dao/data.js";
-import type { TravelMode } from "../model/v2/types.js";
+import { getSitesAsFeatureCollection } from "../dao/site.js";
 import type { DbCsvData } from "../model/v2/db-model.js";
-import { type Column, stringify } from "@std/csv";
+import type { ResponseValue } from "../model/v2/response-model.js";
+import type { TravelMode } from "../model/v2/types.js";
 
 export function getSites(
   siteId?: number,
@@ -18,9 +17,8 @@ export function getSites(
     return getSitesAsFeatureCollection(db, siteId, domain).then(
       (featureCollection) => {
         // FeatureCollection has nonstandard dataUpdatedTime field in sql query
-        const collectionWithDataUpdatedTime = featureCollection as
-          & FeatureCollection
-          & {
+        const collectionWithDataUpdatedTime =
+          featureCollection as FeatureCollection & {
             dataUpdatedTime: string;
           };
         const lastModified = new Date(

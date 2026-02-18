@@ -4,16 +4,16 @@ import { z } from "zod";
 
 export const recipientAudioMessagesToDeliver = z
   .object({
-    audioContentType: z.enum(["AUDIO_TEXT", "AUDIO_FILE"]).describe(
-      "type of audio content",
-    ),
+    audioContentType: z
+      .enum(["AUDIO_TEXT", "AUDIO_FILE"])
+      .describe("type of audio content"),
     audioText: z
       .array(
         z
           .object({
-            language: z.string().describe(
-              "identifies the language of the audio content",
-            ),
+            language: z
+              .string()
+              .describe("identifies the language of the audio content"),
             text: z.string().describe("audio text used for tts system"),
           })
           .describe(
@@ -146,9 +146,9 @@ export const recipientVideoMessagesToDeliver = z
     videoTexts: z.array(
       z
         .object({
-          language: z.string().describe(
-            "identifies the language of the video content",
-          ),
+          language: z
+            .string()
+            .describe("identifies the language of the video content"),
           text: z.string(),
         })
         .describe("information about video text"),
@@ -209,9 +209,9 @@ export const recipientVideoMessagesToDeliver = z
 
 export const onGroundRecipient = z
   .object({
-    messageContentType: z.enum(["AUDIO", "VIDEO", "AUDIO_VIDEO"]).describe(
-      "message content type",
-    ),
+    messageContentType: z
+      .enum(["AUDIO", "VIDEO", "AUDIO_VIDEO"])
+      .describe("message content type"),
     deliveryPoints: z
       .array(
         z
@@ -267,17 +267,17 @@ export const scheduledMessage = z
         vehicleJourneys: z.array(
           z
             .object({
-              datedVehicleJourneyRef: z.string().describe(
-                "id of vehicle journey",
-              ),
+              datedVehicleJourneyRef: z
+                .string()
+                .describe("id of vehicle journey"),
               dataFrameRef: z
                 .string()
                 .describe(
                   "unique identifier of data frame within participant service",
                 ),
-              vehicleJourneyName: z.string().describe(
-                "name of vehicle journey",
-              ),
+              vehicleJourneyName: z
+                .string()
+                .describe("name of vehicle journey"),
             })
             .describe("vehicle journey identifiers information"),
         ),
@@ -438,9 +438,11 @@ export const scheduledMessage = z
                   .nullable()
                   .optional()
                   .describe("scheduling start date"),
-                endDateTime: z.string().nullable().optional().describe(
-                  "scheduling end date",
-                ),
+                endDateTime: z
+                  .string()
+                  .nullable()
+                  .optional()
+                  .describe("scheduling end date"),
                 startTime: z
                   .string()
                   .describe(
@@ -496,9 +498,9 @@ export const scheduledMessage = z
         messageContents: z.array(
           z
             .object({
-              language: z.string().describe(
-                "identifies the language of the external content",
-              ),
+              language: z
+                .string()
+                .describe("identifies the language of the external content"),
               text: z.string(),
             })
             .describe("information about external text"),
@@ -518,9 +520,15 @@ export const scheduledMessage = z
           )
           .nullable()
           .optional(),
-        startDateTime: z.string().describe("scheduling start date-time")
-          .nullable().optional(),
-        endDateTime: z.string().describe("scheduling end date-time").nullable()
+        startDateTime: z
+          .string()
+          .describe("scheduling start date-time")
+          .nullable()
+          .optional(),
+        endDateTime: z
+          .string()
+          .describe("scheduling end date-time")
+          .nullable()
           .optional(),
       })
       .describe(

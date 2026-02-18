@@ -1,12 +1,12 @@
-import { sendMessage } from "../../service/queue-service.js";
-import * as PilotwebService from "../../service/pilotweb.js";
-import { PortactivityEnvKeys } from "../../keys.js";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { PortactivityEnvKeys } from "../../keys.js";
+import * as PilotwebService from "../../service/pilotweb.js";
+import { sendMessage } from "../../service/queue-service.js";
 
 const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
@@ -18,8 +18,8 @@ interface PilotWebSecret extends GenericSecret {
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<PilotWebSecret>("pilotweb");
 
-export const handler = function (): Promise<void> {
-  return rdsHolder
+export const handler = (): Promise<void> =>
+  rdsHolder
     .setCredentials()
     .then(() => secretHolder.get())
     .then(async (secret) => {
@@ -39,4 +39,3 @@ export const handler = function (): Promise<void> {
     .catch((error) => {
       logException(logger, error);
     });
-};

@@ -1,5 +1,5 @@
-import type { Connection, QueryResult, ResultSetHeader } from "mysql2/promise";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { Connection, QueryResult, ResultSetHeader } from "mysql2/promise";
 import { getTraceFields } from "../util/tracing.js";
 
 const SQL_DELETE_OLD_UDOT_VALUES = `
@@ -53,9 +53,10 @@ export async function insertOrUpdate(
 
   try {
     // if both values are false, there is no point inserting it, you can just update existing values if any
-    const updateSql = values.ud === false && values.ut === false
-      ? SQL_UPDATE_FALSE_VALUES
-      : SQL_UPSERT_UDOT_VALUES;
+    const updateSql =
+      values.ud === false && values.ut === false
+        ? SQL_UPDATE_FALSE_VALUES
+        : SQL_UPSERT_UDOT_VALUES;
     const result = await executeWithRetry<ResultSetHeader>(
       conn,
       updateSql,
@@ -83,7 +84,7 @@ export async function insertOrUpdate(
       ...getTraceFields(),
       method,
       customEvent: "query_failed",
-      customDoUpdate: (values.ud === false && values.ut === false),
+      customDoUpdate: values.ud === false && values.ut === false,
       customSql: SQL_UPSERT_UDOT_VALUES,
       customTrainNumber: values.trainNumber,
       customTrainDepartureDate: values.trainDepartureDate,

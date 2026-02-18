@@ -2,7 +2,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { Builder } from "xml2js";
 
 export type IdentityAttribute = {
-  "$": {
+  $: {
     id: string;
   };
 };
@@ -38,7 +38,7 @@ export function getTags(xml: string, tag: string): string[] {
       const conEndIndex = xml.indexOf(endTag, conIndex + tag.length / 2);
 
       if (conEndIndex === -1) {
-        logger.debug("Can't find end for " + endTag);
+        logger.debug(`Can't find end for ${endTag}`);
         logger.debug(`conIndex ${conIndex}, xml: ${xml}`);
 
         throw new Error("Cannot find end tag!");

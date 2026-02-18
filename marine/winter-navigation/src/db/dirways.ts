@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { ApiData, Dirway, Dirwaypoint } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
+import type { ApiData, Dirway, Dirwaypoint } from "../model/api-db-model.js";
 import type { DirwayDTO } from "../model/dto-model.js";
 
 const SQL_UPDATE_DIRWAYS = `

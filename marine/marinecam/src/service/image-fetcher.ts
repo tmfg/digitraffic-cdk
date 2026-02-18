@@ -1,8 +1,8 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { Session } from "./session.js";
 import pLimit from "p-limit";
 import * as ImageStore from "./image-store.js";
 import * as MetadataService from "./metadata.js";
+import { Session } from "./session.js";
 
 export const CAMERA_GROUP_ID = "Saimaa";
 
@@ -17,9 +17,8 @@ export async function updateAllCameras(
   ca: string,
   hostname: string,
 ): Promise<void> {
-  const cameraIds = await MetadataService.getAllCameraIdsForGroup(
-    CAMERA_GROUP_ID,
-  );
+  const cameraIds =
+    await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
   const session = await loginToCameraServer(
     url,
     username,
@@ -47,7 +46,7 @@ async function updateAllImages(
         if (!image) {
           logger.info({
             method: "ImageFetcher.updateAllImages",
-            message: "empty picture from camera " + cameraId,
+            message: `empty picture from camera ${cameraId}`,
           });
         } else {
           updatedCameras.push(cameraId);
@@ -55,7 +54,7 @@ async function updateAllImages(
         }
 
         return Promise.resolve();
-      })
+      }),
     ),
   );
 

@@ -21,8 +21,10 @@ export function create(
   addDLQAlarm(stack, dlq, stack.configuration as RamiConfiguration);
 
   if (stack.configuration.stackFeatures?.enableCanaries ?? true) {
-    const urlRole = new DigitrafficCanaryRole(stack, "rami-url")
-      .withVpcAccess();
+    const urlRole = new DigitrafficCanaryRole(
+      stack,
+      "rami-url",
+    ).withVpcAccess();
 
     UrlCanary.create(
       stack,

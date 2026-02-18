@@ -1,9 +1,9 @@
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import type { ApiData, ApiSite } from "../../model/v2/api-model.js";
+import { TZDate } from "@date-fns/tz";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
-import { TZDate } from "@date-fns/tz";
+import type { ApiData, ApiSite } from "../../model/v2/api-model.js";
 
 export const URL_ALL_SITES = "/api/v2/sites?include=domain";
 export const URL_SITE_DATA = "/api/v2/history/traffic/raw";
@@ -23,7 +23,7 @@ export class EcoCounterApi {
 
     logger.info({
       method: "EcoCounterApi.getFromServer",
-      message: "sending to url " + serverUrl,
+      message: `sending to url ${serverUrl}`,
     });
 
     try {
@@ -67,15 +67,15 @@ export class EcoCounterApi {
     const tzTo = new TZDate(to).withTimeZone("Europe/Helsinki");
 
     // formats dates to YYYY-MM-DD
-    const fromString = tzFrom.toLocaleDateString("en-CA");
-    const toString = tzTo.toLocaleDateString("en-CA");
+    const fromDate = tzFrom.toLocaleDateString("en-CA");
+    const toDate = tzTo.toLocaleDateString("en-CA");
 
     // format times and get HH:MM
     const fromTime = tzFrom.toLocaleTimeString("en-GB").substring(0, 5);
     const toTime = tzTo.toLocaleTimeString("en-GB").substring(0, 5);
 
     return this.getFromServer(
-      `${URL_SITE_DATA}?siteId=${siteId}&startDate=${fromString}&endDate=${toString}&startTime=${fromTime}&endTime=${toTime}`,
+      `${URL_SITE_DATA}?siteId=${siteId}&startDate=${fromDate}&endDate=${toDate}&startTime=${fromTime}&endTime=${toTime}`,
     );
   }
 }

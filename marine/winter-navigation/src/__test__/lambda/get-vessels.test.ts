@@ -1,8 +1,29 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase } from "../db-testutil.js";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
-import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { subDays } from "date-fns";
+import { saveAllActivities } from "../../db/activities.js";
+import { saveAllQueues } from "../../db/queues.js";
+import { saveAllSources } from "../../db/sources.js";
 import { saveAllVessels } from "../../db/vessels.js";
+import type { GetVesselEvent } from "../../lambda/get-vessels/get-vessels.js";
+import type {
+  Activity,
+  ApiData,
+  Queue,
+  Source,
+  Vessel,
+} from "../../model/api-db-model.js";
+import type {
+  Vessel as PublicApiVessel,
+  VesselsResponse,
+} from "../../model/public-api-model.js";
+import {
+  isAssistanceGiven,
+  isAssistanceReceived,
+} from "../../model/public-api-model.js";
+import { dbTestBase } from "../db-testutil.js";
+import { mockProxyHolder } from "../mock.js";
 import {
   ACTIVITY_1,
   createActivity,
@@ -11,25 +32,6 @@ import {
   createVessel,
   VESSEL_1,
 } from "../service/data-updater.test.js";
-import {
-  isAssistanceGiven,
-  isAssistanceReceived,
-  type Vessel as PublicApiVessel,
-  type VesselsResponse,
-} from "../../model/public-api-model.js";
-import { saveAllActivities } from "../../db/activities.js";
-import { mockProxyHolder } from "../mock.js";
-import { saveAllQueues } from "../../db/queues.js";
-import type {
-  Activity,
-  ApiData,
-  Queue,
-  Source,
-  Vessel,
-} from "../../model/api-db-model.js";
-import { saveAllSources } from "../../db/sources.js";
-import { subDays } from "date-fns";
-import type { GetVesselEvent } from "../../lambda/get-vessels/get-vessels.js";
 
 mockProxyHolder();
 
@@ -67,12 +69,10 @@ describe(
     test("get all - empty", async () => {
       const response = await getResponseFromLambda();
 
-      ExpectResponse.ok(response).expectContent(
-        (body: VesselsResponse) => {
-          expect(body.vessels).toEqual([]);
-          expect(body).toHaveProperty("lastUpdated");
-        },
-      );
+      ExpectResponse.ok(response).expectContent((body: VesselsResponse) => {
+        expect(body.vessels).toEqual([]);
+        expect(body).toHaveProperty("lastUpdated");
+      });
     });
 
     test("get all - one location", async () => {
@@ -85,7 +85,7 @@ describe(
     });
 
     test("get one - not found", async () => {
-      const response = await getResponseFromLambda({ "vesselId": "123" });
+      const response = await getResponseFromLambda({ vesselId: "123" });
 
       ExpectResponse.notFound(response);
     });
@@ -94,7 +94,7 @@ describe(
       await insertVessel(db);
 
       const response = await getResponseFromLambda({
-        "vesselId": String(VESSEL_1.imo) ?? "123",
+        vesselId: String(VESSEL_1.imo) ?? "123",
       });
 
       ExpectResponse.ok(response).expectContent((vessel: PublicApiVessel) => {
@@ -217,7 +217,8 @@ describe(
           expect(apiVessel?.plannedAssistances).toHaveLength(1);
           const receivedAssistance = apiVessel?.plannedAssistances?.[0];
           if (
-            !receivedAssistance || !isAssistanceReceived(receivedAssistance)
+            !receivedAssistance ||
+            !isAssistanceReceived(receivedAssistance)
           ) {
             fail("Expected assistance to be of type AssistanceReceived");
           }
@@ -229,7 +230,8 @@ describe(
           expect(apiIcebreaker?.plannedAssistances).toHaveLength(1);
           const icebreakerAssistance = apiIcebreaker?.plannedAssistances?.[0];
           if (
-            !icebreakerAssistance || !isAssistanceGiven(icebreakerAssistance)
+            !icebreakerAssistance ||
+            !isAssistanceGiven(icebreakerAssistance)
           ) {
             fail("Expected assistance to be of type AssistanceGiven");
           }
@@ -296,8 +298,8 @@ describe(
           const vessels = vesselsResponse.vessels;
           expect(vessels.length).toEqual(4);
 
-          const foundIcebreaker3 = vessels.find((v) =>
-            v.imo === icebreaker3.imo
+          const foundIcebreaker3 = vessels.find(
+            (v) => v.imo === icebreaker3.imo,
           );
           expect(foundIcebreaker3).toBeUndefined();
 

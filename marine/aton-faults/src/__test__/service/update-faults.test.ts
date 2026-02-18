@@ -1,9 +1,9 @@
-import { assertFaultCount, dbTestBase } from "../db-testutil.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import * as UpdateFaultsService from "../../service/update-faults.js";
+import { jest } from "@jest/globals";
 import { FaultsApi } from "../../api/faults.js";
 import type { FaultFeature } from "../../model/fault.js";
-import { jest } from "@jest/globals";
+import * as UpdateFaultsService from "../../service/update-faults.js";
+import { assertFaultCount, dbTestBase } from "../db-testutil.js";
 
 const FAULT_DOMAIN = "C_NA";
 
@@ -69,21 +69,22 @@ describe(
 
     test("updateFaults - 1 fault - Kirjattu", async () => {
       await assertFaultCount(db, 0);
-      jest.spyOn(FaultsApi.prototype, "getFaults").mockResolvedValue([
-        FAULT_KIRJATTU,
-      ]);
+      jest
+        .spyOn(FaultsApi.prototype, "getFaults")
+        .mockResolvedValue([FAULT_KIRJATTU]);
 
-      await expect(() => UpdateFaultsService.updateFaults("", FAULT_DOMAIN))
-        .rejects.toThrow();
+      await expect(() =>
+        UpdateFaultsService.updateFaults("", FAULT_DOMAIN),
+      ).rejects.toThrow();
 
       await assertFaultCount(db, 0);
     });
 
     test("updateFaults - 1 fault", async () => {
       await assertFaultCount(db, 0);
-      jest.spyOn(FaultsApi.prototype, "getFaults").mockResolvedValue([
-        FAULT_OK,
-      ]);
+      jest
+        .spyOn(FaultsApi.prototype, "getFaults")
+        .mockResolvedValue([FAULT_OK]);
 
       await UpdateFaultsService.updateFaults("", FAULT_DOMAIN);
 

@@ -31,18 +31,16 @@ const ACTIVITY_1_1: ApiData<Activity> = {
   ...{ rv: 1, text_compilation: "foo" },
 };
 
-export function createActivity(
-  props: {
-    id?: string;
-    vessel_id?: string;
-    icebreaker_id?: string;
-    type?: string;
-    reason?: string;
-    rv?: number;
-    start_time?: Date;
-    end_time?: Date;
-  },
-): ApiData<Activity> {
+export function createActivity(props: {
+  id?: string;
+  vessel_id?: string;
+  icebreaker_id?: string;
+  type?: string;
+  reason?: string;
+  rv?: number;
+  start_time?: Date;
+  end_time?: Date;
+}): ApiData<Activity> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     vessel_id: props.vessel_id ?? "",
@@ -125,16 +123,14 @@ const VESSEL_1_1: ApiData<Vessel> = {
   ...{ rv: 1, text_compilation: "foo" },
 };
 
-export function createVessel(
-  props: {
-    id?: string;
-    name?: string;
-    type?: string;
-    rv?: number;
-    imo?: number;
-    mmsi?: number;
-  },
-): ApiData<Vessel> {
+export function createVessel(props: {
+  id?: string;
+  name?: string;
+  type?: string;
+  rv?: number;
+  imo?: number;
+  mmsi?: number;
+}): ApiData<Vessel> {
   return {
     rv: props.rv ?? 1,
     id: props.id ?? randomInt(1000000).toString(),
@@ -162,17 +158,15 @@ export const QUEUE_1: ApiData<Queue> = {
 
 const QUEUE_1_1: ApiData<Queue> = { ...QUEUE_1, ...{ rv: 1, order_num: 2 } };
 
-export function createQueue(
-  props: {
-    icebreaker_id?: string;
-    vessel_id?: string;
-    id?: string;
-    order_num?: number;
-    rv?: number;
-    start_time?: Date;
-    end_time?: Date;
-  },
-): ApiData<Queue> {
+export function createQueue(props: {
+  icebreaker_id?: string;
+  vessel_id?: string;
+  id?: string;
+  order_num?: number;
+  rv?: number;
+  start_time?: Date;
+  end_time?: Date;
+}): ApiData<Queue> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     start_time: props.start_time ?? new Date(),
@@ -186,16 +180,14 @@ export function createQueue(
   };
 }
 
-export function createSource(
-  props: {
-    vessel_id?: string;
-    id?: string;
-    rv?: number;
-    name?: string;
-    nationality?: string;
-    type?: string;
-  },
-): ApiData<Source> {
+export function createSource(props: {
+  vessel_id?: string;
+  id?: string;
+  rv?: number;
+  name?: string;
+  nationality?: string;
+  type?: string;
+}): ApiData<Source> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     vessel_id: props.vessel_id ?? "",
@@ -236,17 +228,15 @@ export const DIRWAYPOINT_1: ApiData<Dirwaypoint> = {
 
 const DIRWAYPOINT_1_1 = { ...DIRWAYPOINT_1, ...{ rv: 1, name: "foo" } };
 
-export function createDirwaypoint(
-  props: {
-    id?: string;
-    dirway_id?: string;
-    order_num?: number;
-    name?: string;
-    latitude?: number;
-    longitude?: number;
-    rv?: number;
-  },
-): ApiData<Dirwaypoint> {
+export function createDirwaypoint(props: {
+  id?: string;
+  dirway_id?: string;
+  order_num?: number;
+  name?: string;
+  latitude?: number;
+  longitude?: number;
+  rv?: number;
+}): ApiData<Dirwaypoint> {
   return {
     id: props.id ?? randomInt(1000000).toString(),
     dirway_id: props.dirway_id ?? "",

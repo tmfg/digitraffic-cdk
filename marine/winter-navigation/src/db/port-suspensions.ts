@@ -1,10 +1,10 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { default as pgPromise } from "pg-promise";
 import type {
   ApiData,
   PortSuspensionLocation,
   Suspension,
 } from "../model/api-db-model.js";
-import { default as pgPromise } from "pg-promise";
 
 const SQL_UPDATE_SUSPENSIONS = `
 insert into wn_port_suspension(id, start_time, end_time, prenotification, ports_closed, due_to, specifications, deleted)

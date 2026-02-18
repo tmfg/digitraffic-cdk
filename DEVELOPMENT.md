@@ -152,9 +152,12 @@ Manually formatting can be done with the following commands.
 
     rush format:fix-changed  
                         Runs Biome’s linting and formatting checks only on 
-                        changed (according to Git) files without modifying 
-                        files.
-    
+                        changed (according to Git) files with applying safe fixes.
+
+    rush format:fix-changed-unsafe"   
+                        Runs Biome’s linting and formatting checks only on 
+                        changed (according to Git) files with applying unsafe fixes.
+
     npx --yes --package=@biomejs/biome@latest biome check [--write] <file-path>
                         Runs Biome to check and automatically fix linting and 
                         formatting issues in the specified file.

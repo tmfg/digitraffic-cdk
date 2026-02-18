@@ -1,25 +1,27 @@
-import * as TextConverterService from "../../service/text-converter.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { InputError } from "@digitraffic/common/dist/types/input-error";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import * as TextConverterService from "../../service/text-converter.js";
+
+interface GetSignImageEvent {
+  text: string;
+}
 
 /**
  * Update IMPLEMENTATION_LAST_MODIFIED when ever making changes to implementation.
  */
 const IMPLEMENTATION_LAST_MODIFIED = new Date("2022-11-24T00:00:00Z");
 export const handler = async (
-  event: Record<string, string>,
+  event: GetSignImageEvent,
 ): Promise<LambdaResponse> => {
   const start = Date.now();
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
-  const text = event["text"]!;
+  const text = event.text;
 
   try {
     return Promise.resolve(
-      LambdaResponse.ok(TextConverterService.convertTextToSvg(text))
-        .withTimestamp(
-          IMPLEMENTATION_LAST_MODIFIED,
-        ),
+      LambdaResponse.ok(
+        TextConverterService.convertTextToSvg(text),
+      ).withTimestamp(IMPLEMENTATION_LAST_MODIFIED),
     );
   } catch (e) {
     // bad user input -> 400

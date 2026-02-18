@@ -1,18 +1,18 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
+import _ from "lodash";
+import * as TimestampsDb from "../../dao/timestamps.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
 import {
   dbTestBase,
   findAll,
   insertPortAreaDetails,
   insertPortCall,
 } from "../db-testutil.js";
+import { assertDefined } from "../test-utils.js";
 import type { PortAreaDetails, PortCall } from "../testdata.js";
 import { newPortAreaDetails, newPortCall, newTimestamp } from "../testdata.js";
-import * as TimestampsDb from "../../dao/timestamps.js";
-import type { ApiTimestamp } from "../../model/timestamp.js";
-import { EventType } from "../../model/timestamp.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
-import _ from "lodash";
-import { assertDefined } from "../test-utils.js";
 
 describe(
   "db-timestamps - updates",
@@ -52,8 +52,9 @@ describe(
         },
       });
 
-      await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects
-        .toThrow();
+      await expect(() =>
+        TimestampsDb.updateTimestamp(db, timestamp),
+      ).rejects.toThrow();
     });
 
     test("updateTimestamp - imo exists, mmsi undefined, timestamp is saved", async () => {
@@ -64,8 +65,9 @@ describe(
         },
       });
 
-      await expect(TimestampsDb.updateTimestamp(db, timestamp)).resolves.not
-        .toThrow();
+      await expect(
+        TimestampsDb.updateTimestamp(db, timestamp),
+      ).resolves.not.toThrow();
     });
 
     test("updateTimestamp - both ids", async () => {
@@ -198,23 +200,21 @@ describe(
       // cumbersome way to generate a number range
       const portCallData = [
         ...new Set([...Array(5 + Math.floor(Math.random() * 10)).keys()]),
-      ].map(
-        (i) => {
-          const portcallId = i + 1;
-          const pc = newPortCall(timestamp, portcallId);
-          const pac = newPortAreaDetails(timestamp, {
-            portcallId: portcallId,
-            eta: addMinutes(
-              parseISO(timestamp.eventTime),
-              1 + Math.floor(Math.random() * 100),
-            ),
-          });
-          return [pc, pac];
-        },
-      );
+      ].map((i) => {
+        const portcallId = i + 1;
+        const pc = newPortCall(timestamp, portcallId);
+        const pac = newPortAreaDetails(timestamp, {
+          portcallId: portcallId,
+          eta: addMinutes(
+            parseISO(timestamp.eventTime),
+            1 + Math.floor(Math.random() * 100),
+          ),
+        });
+        return [pc, pac];
+      });
       const portCalls = portCallData.map((p) => p[0]) as PortCall[];
-      const portAreaDetails = portCallData.map((p) =>
-        p[1]
+      const portAreaDetails = portCallData.map(
+        (p) => p[1],
       ) as PortAreaDetails[];
       await db.tx(async (t) => {
         for (const pc of portCalls) {

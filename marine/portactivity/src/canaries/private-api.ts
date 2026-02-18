@@ -1,8 +1,8 @@
-import { UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import {
   ENV_API_KEY,
   ENV_HOSTNAME,
 } from "@digitraffic/common/dist/aws/infra/canaries/canary-keys";
+import { UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 const hostname = getEnvVariable(ENV_HOSTNAME);

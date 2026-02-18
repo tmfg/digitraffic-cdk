@@ -1,15 +1,15 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
+  getAreaTraffic,
+  SHIP_SPEED_NOT_AVAILABLE,
+  SHIP_SPEED_THRESHOLD_KNOTS,
+} from "../../db/areatraffic.js";
+import {
   dbTestBase,
   insertAreaTraffic,
   insertVessel,
   insertVesselLocation,
 } from "../db-testutil.js";
-import {
-  getAreaTraffic,
-  SHIP_SPEED_NOT_AVAILABLE,
-  SHIP_SPEED_THRESHOLD_KNOTS,
-} from "../../db/areatraffic.js";
 
 const OVER_MINIMUM_SPEED = SHIP_SPEED_THRESHOLD_KNOTS + 1;
 

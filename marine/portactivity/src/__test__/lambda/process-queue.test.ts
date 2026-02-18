@@ -1,14 +1,14 @@
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "Test";
 
-import { dbTestBase, findAll, mockSecrets } from "../db-testutil.js";
-import { handlerFn } from "../../lambda/process-queue/process-queue.js";
-import type { SQSRecord } from "aws-lambda";
-import type { ApiTimestamp } from "../../model/timestamp.js";
-import { newTimestamp } from "../testdata.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import _ from "lodash";
 import { jest } from "@jest/globals";
+import type { SQSRecord } from "aws-lambda";
+import _ from "lodash";
+import { handlerFn } from "../../lambda/process-queue/process-queue.js";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { dbTestBase, findAll, mockSecrets } from "../db-testutil.js";
+import { newTimestamp } from "../testdata.js";
 
 describe(
   "process-queue",
@@ -69,8 +69,8 @@ describe(
       });
 
       expect(
-        promises.filter((p: PromiseSettledResult<unknown>) =>
-          p.status === "fulfilled"
+        promises.filter(
+          (p: PromiseSettledResult<unknown>) => p.status === "fulfilled",
         ),
       ).toHaveLength(2);
       const allTimestamps = await findAll(db);

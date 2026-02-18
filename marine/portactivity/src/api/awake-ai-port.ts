@@ -1,11 +1,8 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky, { HTTPError } from "ky";
-import {
-  type AwakeAiPredictedVoyage,
-  AwakeAiPredictionType,
-  type AwakeAiShip,
-} from "./awake-common.js";
+import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
+import { AwakeAiPredictionType } from "./awake-common.js";
 
 export enum AwakeAiPortResponseType {
   OK = "OK",
@@ -54,8 +51,7 @@ export class AwakeAiPortApi {
   ): Promise<AwakeAiPortResponse> {
     const start = Date.now();
     try {
-      const url =
-        `${this.url}/port/${locode}/${resource}?maxSequenceNo=${maxSequenceNo}&predictionType=${predictionType}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}&predictionMetadata=true`;
+      const url = `${this.url}/port/${locode}/${resource}?maxSequenceNo=${maxSequenceNo}&predictionType=${predictionType}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}&predictionMetadata=true`;
 
       logger.info({
         method: "AwakeAiPortApi.getPredictions",

@@ -1,9 +1,9 @@
+import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
+import { jest } from "@jest/globals";
 import ky from "ky";
 import type { SchedulesResponse } from "../../api/schedules.js";
 import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
 import { assertDefined } from "../test-utils.js";
-import { jest } from "@jest/globals";
-import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -33,9 +33,9 @@ describe("api-schedules", () => {
 
   test("getSchedulesTimestamps - in VTS control", async () => {
     const api = new SchedulesApi(`http:/something/schedules`);
-    jest.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(200, fakeSchedules)
-    );
+    jest
+      .spyOn(ky, "get")
+      .mockImplementation(() => mockKyResponse(200, fakeSchedules));
     const resp = await api.getSchedulesTimestamps(
       SchedulesDirection.EAST,
       false,

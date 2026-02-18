@@ -1,14 +1,14 @@
+import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import { jest } from "@jest/globals";
+import { subHours, subMinutes } from "date-fns";
 import type { SchedulesResponse } from "../../api/schedules.js";
 import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
+import { EventSource } from "../../model/eventsource.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
 import { EventType } from "../../model/timestamp.js";
-import { newTimestamp } from "../testdata.js";
-import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
 import { ports } from "../../service/portareas.js";
-import { EventSource } from "../../model/eventsource.js";
 import { SchedulesService } from "../../service/schedules.js";
-import { subHours, subMinutes } from "date-fns";
-import { jest } from "@jest/globals";
+import { newTimestamp } from "../testdata.js";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -46,7 +46,7 @@ describe("schedules", () => {
       const getSchedulesTimestampsSpy = jest
         .spyOn(api, "getSchedulesTimestamps")
         .mockImplementation(() =>
-          Promise.resolve(createSchedulesResponse(1, false, false))
+          Promise.resolve(createSchedulesResponse(1, false, false)),
         );
       const service = new SchedulesService(api);
 
@@ -213,23 +213,23 @@ function createSchedulesResponse(
             ],
             eta: eta
               ? [
-                {
-                  $: {
-                    time: etaEventTime,
-                    uts: etaTimestamp,
+                  {
+                    $: {
+                      time: etaEventTime,
+                      uts: etaTimestamp,
+                    },
                   },
-                },
-              ]
+                ]
               : undefined,
             etd: etd
               ? [
-                {
-                  $: {
-                    time: etdEventTime,
-                    uts: etdTimestamp,
+                  {
+                    $: {
+                      time: etdEventTime,
+                      uts: etdTimestamp,
+                    },
                   },
-                },
-              ]
+                ]
               : undefined,
           },
         ],

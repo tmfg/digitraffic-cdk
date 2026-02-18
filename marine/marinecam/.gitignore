@@ -3,6 +3,7 @@
 !/cdk.json
 !/jest.config.js
 !/*.json
+/sbom.json
 !/*.md
 !/*.sh
 !/esbuild.ts
@@ -21,3 +22,4 @@
 !/src/**/*.ts
 /src/bin
 
+sbom.json

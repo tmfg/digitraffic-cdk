@@ -1,7 +1,7 @@
 import { set } from "lodash-es";
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";
-import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";
 import { cloneAndUndefine, undefine } from "../message-util.js";
+import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";
 
 describe("validate incoming rosm message", () => {
   test("validateIncomingRamiMessage - invalid scheduledMessage", () => {
@@ -36,15 +36,14 @@ describe("validate incoming rosm message", () => {
       "messageId",
     );
     undefine(invalidMessage, "payload", "messageVersion");
-    set(invalidMessage, [
-      "payload",
-      "monitoredJourneyScheduledMessage",
-      "deliveryPoints",
-      0,
-    ], {
-      id: 0,
-      nameLong: "abc",
-    });
+    set(
+      invalidMessage,
+      ["payload", "monitoredJourneyScheduledMessage", "deliveryPoints", 0],
+      {
+        id: 0,
+        nameLong: "abc",
+      },
+    );
 
     const result = validateIncomingRosmMessage(invalidMessage);
     expect(result.valid).toBe(false);

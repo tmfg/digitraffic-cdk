@@ -1,33 +1,35 @@
-import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type {
+  DTDatabase,
+  DTTransaction,
+} from "@digitraffic/common/dist/database/database";
 import {
-  type DTDatabase,
-  type DTTransaction,
   inDatabaseReadonly,
   inTransaction,
 } from "@digitraffic/common/dist/database/database";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
+import {
+  createFeatureCollection,
+  isValidGeoJson,
+} from "@digitraffic/common/dist/utils/geometry";
+import { parse } from "date-fns";
 import type {
   Feature,
   FeatureCollection,
   GeoJSON,
   Geometry as GeoJSONGeometry,
 } from "geojson";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { Disruption, SpatialDisruption } from "../model/disruption.js";
-import * as DisruptionsApi from "../api/disruptions.js";
-import {
-  createFeatureCollection,
-  isValidGeoJson,
-} from "@digitraffic/common/dist/utils/geometry";
-import type { DisruptionFeature } from "../api/disruptions.js";
 import { Geometry } from "wkx";
-import { parse } from "date-fns";
-import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
+import type { DisruptionFeature } from "../api/disruptions.js";
+import * as DisruptionsApi from "../api/disruptions.js";
+import type { DbDisruption } from "../db/disruptions.js";
 import {
-  type DbDisruption,
   deleteAllButDisruptions,
   findAll,
   updateDisruptions,
 } from "../db/disruptions.js";
+import type { Disruption, SpatialDisruption } from "../model/disruption.js";
 
 export const DISRUPTIONS_DATE_FORMAT = "d.M.yyyy H:mm" as const;
 
@@ -42,10 +44,11 @@ export function findAllDisruptions(): Promise<[FeatureCollection, Date]> {
     async (db: DTDatabase): Promise<[FeatureCollection, Date]> => {
       const disruptions = await findAll(db);
       const disruptionsFeatures = disruptions.map(convertFeature);
-      const lastUpdated = (await LastUpdatedDB.getUpdatedTimestamp(
-        db,
-        BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE,
-      )) ?? EPOCH;
+      const lastUpdated =
+        (await LastUpdatedDB.getUpdatedTimestamp(
+          db,
+          BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE,
+        )) ?? EPOCH;
 
       return [
         createFeatureCollection(disruptionsFeatures, lastUpdated),
@@ -73,11 +76,9 @@ export async function saveDisruptions(
       disruptions.map((d) => d.Id),
     );
 
-    updatedCount =
-      (await tx.batch(updateDisruptions(tx, disruptions.reverse()))).reduce(
-        (sum, c) => sum + c,
-        0,
-      );
+    updatedCount = (
+      await tx.batch(updateDisruptions(tx, disruptions.reverse()))
+    ).reduce((sum, c) => sum + c, 0);
 
     const updatedTimestampUpdates = [
       LastUpdatedDB.updateUpdatedTimestamp(
@@ -142,7 +143,7 @@ export function normalizeDisruptionDate(dateStr: string): Date {
 export function validateGeoJson(geoJson: GeoJSON): boolean {
   try {
     return isValidGeoJson(geoJson);
-  } catch (e) {
+  } catch (_error) {
     logger.warn({
       method: "DisruptionsService.validateGeoJson",
       message: "invalid GeoJSON",
@@ -165,8 +166,9 @@ export function convertFeature(disruption: DbDisruption): Feature {
     DescriptionEn: disruption.description_en,
   };
   // convert geometry from wkb to geojson
-  const geometry = Geometry.parse(Buffer.from(disruption.geometry, "hex"))
-    .toGeoJSON() as GeoJSONGeometry;
+  const geometry = Geometry.parse(
+    Buffer.from(disruption.geometry, "hex"),
+  ).toGeoJSON() as GeoJSONGeometry;
   return {
     type: "Feature",
     properties,

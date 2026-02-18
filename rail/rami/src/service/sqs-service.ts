@@ -1,10 +1,10 @@
-import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
-import type { Valid } from "./validate-message.js";
-import { sendToSqs } from "../util/sqs.js";
-import { RamiEnvKeys } from "../keys.js";
-import type { UnknownDelayOrTrackMessage } from "../model/dt-rosm-message.js";
-import type { DlqMessage } from "../model/dlq-message.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
+import { RamiEnvKeys } from "../keys.js";
+import type { DlqMessage } from "../model/dlq-message.js";
+import type { UnknownDelayOrTrackMessage } from "../model/dt-rosm-message.js";
+import { sendToSqs } from "../util/sqs.js";
+import type { Valid } from "./validate-message.js";
 
 const ROSM_SQS_URL = getEnvVariableSafe(RamiEnvKeys.ROSM_SQS_URL);
 const SM_SQS_URL = getEnvVariableSafe(RamiEnvKeys.SM_SQS_URL);
@@ -41,7 +41,7 @@ export async function sendUdotMessage(
 
 export async function sendDlq(dqlMessage: DlqMessage): Promise<void> {
   if (DLQ_URL.result === "ok") {
-    logger.debug("Sending " + JSON.stringify(dqlMessage));
+    logger.debug(`Sending ${JSON.stringify(dqlMessage)}`);
     await sendToSqs(DLQ_URL.value, JSON.stringify(dqlMessage));
   } else {
     throw new Error(`${RamiEnvKeys.DLQ_URL} env variable not defined!`);

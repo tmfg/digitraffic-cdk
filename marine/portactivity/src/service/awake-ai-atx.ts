@@ -1,18 +1,17 @@
-import {
-  type AwakeAiATXApi,
-  type AwakeAIATXTimestampMessage,
-  AwakeATXZoneEventType,
-} from "../api/awake-ai-atx.js";
-import { type ApiTimestamp, EventType } from "../model/timestamp.js";
-import * as TimestampDAO from "../dao/timestamps.js";
-import {
-  type DTDatabase,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
-import { EventSource } from "../model/eventsource.js";
-import { AwakeAiZoneType } from "../api/awake-common.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { TZDate } from "@date-fns/tz";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
+import type {
+  AwakeAIATXTimestampMessage,
+  AwakeAiATXApi,
+} from "../api/awake-ai-atx.js";
+import { AwakeATXZoneEventType } from "../api/awake-ai-atx.js";
+import { AwakeAiZoneType } from "../api/awake-common.js";
+import * as TimestampDAO from "../dao/timestamps.js";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
 
 export class AwakeAiATXService {
   private readonly api: AwakeAiATXApi;
@@ -31,10 +30,9 @@ export class AwakeAiATXService {
           if (atx.locodes.length > 1) {
             logger.warn({
               method: "AwakeAiATXService.getATXs",
-              message:
-                `More than one locode for timestamp! IMO ${atx.imo} locodes ${
-                  JSON.stringify(atx.locodes)
-                }`,
+              message: `More than one locode for timestamp! IMO ${atx.imo} locodes ${JSON.stringify(
+                atx.locodes,
+              )}`,
             });
           } else if (!atx.locodes.length) {
             logger.error({
@@ -43,9 +41,10 @@ export class AwakeAiATXService {
             });
           }
           const port = atx.locodes[0] as unknown as string;
-          const eventType = atx.zoneEventType === AwakeATXZoneEventType.ARRIVAL
-            ? EventType.ATA
-            : EventType.ATD;
+          const eventType =
+            atx.zoneEventType === AwakeATXZoneEventType.ARRIVAL
+              ? EventType.ATA
+              : EventType.ATD;
           const eventTime = new TZDate(atx.eventTimestamp);
 
           const portcallId = await TimestampDAO.findPortcallId(
@@ -75,14 +74,13 @@ export class AwakeAiATXService {
           } else {
             logger.warn({
               method: "AwakeAiATXService.getATXs",
-              message:
-                `no portcall found for ${atx.zoneEventType} IMO ${atx.imo}`,
+              message: `no portcall found for ${atx.zoneEventType} IMO ${atx.imo}`,
             });
             return null;
           }
         });
       return Promise.all(promises).then((timestamps) =>
-        timestamps.filter((timestamp) => !!timestamp)
+        timestamps.filter((timestamp) => !!timestamp),
       );
     });
   }

@@ -1,7 +1,7 @@
-import * as util from "util";
-import * as xml2js from "xml2js";
+import * as util from "node:util";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import ky from "ky";
+import * as xml2js from "xml2js";
 
 export enum SchedulesDirection {
   EAST = "east",

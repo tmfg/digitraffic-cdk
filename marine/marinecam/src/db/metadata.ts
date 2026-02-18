@@ -1,6 +1,6 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { default as pgPromise } from "pg-promise";
 import type { Camera, DbCamera } from "../model/camera.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 const PS_CAMERA_IDS = new pgPromise.PreparedStatement({
   name: "get-camera-ids",
@@ -50,7 +50,7 @@ export async function getAllCameraIdsForGroup(
   db: DTDatabase,
   groupId: string,
 ): Promise<string[]> {
-  return (await db.manyOrNone(PS_CAMERA_IDS, [groupId])).map((
-    x: { id: string },
-  ) => x.id);
+  return (await db.manyOrNone(PS_CAMERA_IDS, [groupId])).map(
+    (x: { id: string }) => x.id,
+  );
 }

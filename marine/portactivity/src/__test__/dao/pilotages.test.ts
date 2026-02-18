@@ -1,4 +1,5 @@
-import { dbTestBase, insertPilotage, insertPortCall } from "../db-testutil.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { subHours } from "date-fns";
 import {
   deletePilotages,
   findPortCallId,
@@ -6,9 +7,8 @@ import {
 } from "../../dao/pilotages.js";
 import type { Pilotage } from "../../model/pilotage.js";
 import type { Location } from "../../model/timestamp.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { dbTestBase, insertPilotage, insertPortCall } from "../db-testutil.js";
 import { newPortCall, newTimestamp } from "../testdata.js";
-import { subHours } from "date-fns";
 
 describe(
   "db-pilotages-public",

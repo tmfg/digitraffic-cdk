@@ -1,12 +1,13 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { findTimeTableRows, type TimeTableRow } from "../dao/time_table_row.js";
 import type { Connection } from "mysql2/promise";
-import { inTransaction } from "../util/database.js";
+import type { TimeTableRow } from "../dao/time_table_row.js";
+import { findTimeTableRows } from "../dao/time_table_row.js";
+import { insertOrUpdate } from "../dao/udot.js";
 import type {
   UnknownDelayOrTrack,
   UnknownDelayOrTrackMessage,
 } from "../model/dt-rosm-message.js";
-import { insertOrUpdate } from "../dao/udot.js";
+import { inTransaction } from "../util/database.js";
 import { getTraceFields } from "../util/tracing.js";
 
 export async function processUdotMessage(
@@ -26,8 +27,7 @@ export async function processUdotMessage(
       logger.info({
         ...getTraceFields(),
         method: "ProcessUdotMessageService.processUdotMessage",
-        message:
-          `Could not find rows for ${message.trainNumber} ${message.departureDate}`,
+        message: `Could not find rows for ${message.trainNumber} ${message.departureDate}`,
         customTrainNumber: message.trainNumber,
         customTrainDepartureDate: message.departureDate,
       });
@@ -59,8 +59,7 @@ export async function processUdotMessage(
     logger.info({
       ...getTraceFields(),
       method: "ProcessUdotMessageService.processUdotMessage",
-      message:
-        `udot for ${message.trainNumber} ${message.departureDate} processed`,
+      message: `udot for ${message.trainNumber} ${message.departureDate} processed`,
       customTrainNumber: message.trainNumber,
       customTrainDepartureDate: message.departureDate,
       tookMs: Date.now() - start,
@@ -70,22 +69,22 @@ export async function processUdotMessage(
   }
 }
 
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function logRowNotFound(
+function _logRowNotFound(
   message: UnknownDelayOrTrackMessage,
   datarow: UnknownDelayOrTrack,
   rows: TimeTableRow[],
 ): void {
   logger.info({
     method: "ProcessUdotMessageService.processUdotMessage",
-    message: `Could not find attapId for ${message.trainNumber} row ${
-      JSON.stringify(datarow)
-    }`,
+    message: `Could not find attapId for ${message.trainNumber} row ${JSON.stringify(
+      datarow,
+    )}`,
   });
 
-  const row = rows.find((r) =>
-    r.station_short_code === datarow.stationShortCode && r.type === datarow.type
+  const row = rows.find(
+    (r) =>
+      r.station_short_code === datarow.stationShortCode &&
+      r.type === datarow.type,
   );
 
   if (row) {

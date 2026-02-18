@@ -1,8 +1,8 @@
+import assert from "node:assert";
 import {
   ResponseChecker,
   UrlChecker,
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
-import assert from "assert";
 import type { Camera } from "../model/camera.js";
 
 const METADATA_IBNET_URL = "/prod/api/marinecam/ibnet/metadata";

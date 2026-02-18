@@ -1,15 +1,15 @@
-import type { WebSocket } from "ws";
-import type { AwakeAiZoneType } from "./awake-common.js";
-import { PortActivityParameterKeys } from "../keys.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logException } from "@digitraffic/common/dist/utils/logging";
-import type { Ports } from "../service/portareas.js";
 import type { PutParameterResult } from "@aws-sdk/client-ssm";
 import {
   GetParameterCommand,
   PutParameterCommand,
   SSMClient,
 } from "@aws-sdk/client-ssm";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
+import type { WebSocket } from "ws";
+import { PortActivityParameterKeys } from "../keys.js";
+import type { Ports } from "../service/portareas.js";
+import type { AwakeAiZoneType } from "./awake-common.js";
 
 interface AwakeAiATXMessage {
   msgType: AwakeAiATXEventType;
@@ -109,7 +109,9 @@ const ssm = new SSMClient({});
 export class AwakeAiATXApi {
   private readonly url: string;
   private readonly apiKey: string;
-  private readonly webSocketClass: new (url: string | URL) => WebSocket;
+  private readonly webSocketClass: new (
+    url: string | URL,
+  ) => WebSocket;
 
   constructor(
     url: string,
@@ -142,8 +144,8 @@ export class AwakeAiATXApi {
 
       switch (message.msgType) {
         case AwakeAiATXEventType.SUBSCRIPTION_STATUS: {
-          const receivedSubscriptionId =
-            (message as AwakeAISubscriptionMessage).subscriptionId;
+          const receivedSubscriptionId = (message as AwakeAISubscriptionMessage)
+            .subscriptionId;
           if (receivedSubscriptionId !== subscriptionId) {
             this.putInParameterStore(
               ssm,
@@ -153,9 +155,8 @@ export class AwakeAiATXApi {
               .then(() =>
                 logger.info({
                   method: "AwakeAiATXApi.getATXs",
-                  message:
-                    `Updated subscriptionId to ${receivedSubscriptionId}`,
-                })
+                  message: `Updated subscriptionId to ${receivedSubscriptionId}`,
+                }),
               )
               .catch((error) => logException(logger, error));
           }

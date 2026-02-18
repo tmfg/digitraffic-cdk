@@ -1,15 +1,15 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { isBefore, parseISO } from "date-fns";
 import type { AwakeAiPortApi } from "../api/awake-ai-port.js";
-import type { ApiTimestamp } from "../model/timestamp.js";
 import { AwakeAiZoneType } from "../api/awake-common.js";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
 import {
   etdPredictionToTimestamp,
   isAwakeEtdPrediction,
   isDigitrafficEtdPrediction,
   voyageUnderwayOrNotStarted,
 } from "./awake-ai-etx-helper.js";
-import { EventSource } from "../model/eventsource.js";
-import { isBefore, parseISO } from "date-fns";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class AwakeAiETDPortService {
   private readonly api: AwakeAiPortApi;
@@ -49,12 +49,9 @@ export class AwakeAiETDPortService {
               if (this.departureTimeInThePast(etdPrediction.departureTime)) {
                 logger.warn({
                   method: "AwakeAiETDPortService.getAwakeAiTimestamps",
-                  message:
-                    `ETD prediction event time in the past, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${
-                      JSON.stringify(
-                        etdPrediction,
-                      )
-                    }`,
+                  message: `ETD prediction event time in the past, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
+                    etdPrediction,
+                  )}`,
                 });
                 return false;
               }
@@ -65,19 +62,17 @@ export class AwakeAiETDPortService {
               if (isDigitrafficEtdPrediction(etdPrediction)) {
                 logger.warn({
                   method: "AwakeAiETDPortService.getAwakeAiTimestamps",
-                  message:
-                    `received Digitraffic ETD prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${
-                      JSON.stringify(
-                        etdPrediction,
-                      )
-                    }`,
+                  message: `received Digitraffic ETD prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
+                    etdPrediction,
+                  )}`,
                 });
                 return false;
               }
               return true;
             })
-            .filter((etdPrediction) =>
-              etdPrediction.zoneType === AwakeAiZoneType.BERTH
+            .filter(
+              (etdPrediction) =>
+                etdPrediction.zoneType === AwakeAiZoneType.BERTH,
             );
 
           return etdPredictions.map((etdPrediction) => {

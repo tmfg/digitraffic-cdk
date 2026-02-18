@@ -1,23 +1,23 @@
-import type { Construct } from "constructs";
-import * as InternalLambdas from "./internal-lambdas-stack.js";
-import * as IntegrationApi from "./integration-api.js";
-import * as Sqs from "./sqs.js";
-import { PublicApi } from "./public-api.js";
-import type { PortactivityConfiguration } from "./app-props.js";
-import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
+import {
+  grantOACRights,
+  grantOAIRights,
+} from "@digitraffic/common/dist/aws/infra/bucket-policy";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
   DatabaseCluster,
   DatabaseClusterEngine,
   DatabaseProxy,
   ProxyTarget,
 } from "aws-cdk-lib/aws-rds";
+import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import type { Construct } from "constructs";
+import type { PortactivityConfiguration } from "./app-props.js";
 import { Canaries } from "./canaries-stack.js";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import {
-  grantOACRights,
-  grantOAIRights,
-} from "@digitraffic/common/dist/aws/infra/bucket-policy";
+import * as IntegrationApi from "./integration-api.js";
+import * as InternalLambdas from "./internal-lambdas-stack.js";
+import { PublicApi } from "./public-api.js";
+import * as Sqs from "./sqs.js";
 
 export class PortActivityStack extends DigitrafficStack {
   readonly portActivityConfig: PortactivityConfiguration;

@@ -1,11 +1,11 @@
-import { dbTestBase } from "../db-testutil.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { TEST_FEATURE_COLLECTION } from "../testdisruptions.js";
-import { DisruptionsTestDriver } from "./disruptions.test.driver.js";
 import {
   normalizeDisruptionDate,
   validateGeoJson,
 } from "../../service/disruptions.js";
+import { dbTestBase } from "../db-testutil.js";
+import { TEST_FEATURE_COLLECTION } from "../testdisruptions.js";
+import { DisruptionsTestDriver } from "./disruptions.test.driver.js";
 
 describe(
   "disruptions",
@@ -69,8 +69,9 @@ describe(
 
     test("validateGeoJson", () => {
       // single valid feature
-      expect(TEST_FEATURE_COLLECTION.features.filter(validateGeoJson).length)
-        .toBe(1);
+      expect(
+        TEST_FEATURE_COLLECTION.features.filter(validateGeoJson).length,
+      ).toBe(1);
     });
 
     test("normalizeDisruptionDate", () => {

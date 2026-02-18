@@ -1,9 +1,9 @@
-import * as TimestampsService from "../../service/timestamps.js";
-import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import * as TimestampsService from "../../service/timestamps.js";
 
 interface GetTimeStampsEvent {
   readonly locode?: string;

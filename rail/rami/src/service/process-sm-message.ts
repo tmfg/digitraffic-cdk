@@ -1,18 +1,16 @@
-import { logException } from "@digitraffic/common/dist/utils/logging";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
+import { compact } from "lodash-es";
+import type { Connection } from "mysql2/promise";
+import type { z } from "zod";
+import { insertMessage } from "../dao/stop_monitoring_message.js";
 import type {
   UnknownDelayOrTrack,
   UnknownDelayOrTrackMessage,
 } from "../model/dt-rosm-message.js";
-import {
-  type monitoredCall,
-  ramiSmMessageSchema,
-} from "../model/zod-schema/sm-message.js";
-import type { z } from "zod";
-import { insertMessage } from "../dao/stop_monitoring_message.js";
-import type { Connection } from "mysql2/promise";
+import type { monitoredCall } from "../model/zod-schema/sm-message.js";
+import { ramiSmMessageSchema } from "../model/zod-schema/sm-message.js";
 import { inTransaction } from "../util/database.js";
-import { compact } from "lodash-es";
 
 export function parseUDOTMessage(
   message: unknown,
@@ -44,7 +42,7 @@ function ramiSmMessageToUDOTMessage(
   message: z.infer<typeof ramiSmMessageSchema>,
 ): UnknownDelayOrTrackMessage {
   const data: UnknownDelayOrTrack[] = [];
-  // @ts-ignore
+  // @ts-expect-error
   const mcj = message.payload.monitoredStopVisits[0].monitoredVehicleJourney;
   const monitoredCall = mcj.monitoredCall;
   const messageId = message.headers.e2eId;
@@ -66,23 +64,23 @@ function parseMonitoredCall(
   const arrival: UnknownDelayOrTrack | undefined =
     !!mc.aimedArrivalTime && includeCall(mc)
       ? {
-        stationShortCode: mc.stopPointRef,
-        scheduledTime: new Date(mc.aimedArrivalTime),
-        type: 0,
-        unknownDelay: !mc.expectedArrivalTime,
-        unknownTrack: !mc.arrivalStopAssignment.expectedQuayName,
-      }
+          stationShortCode: mc.stopPointRef,
+          scheduledTime: new Date(mc.aimedArrivalTime),
+          type: 0,
+          unknownDelay: !mc.expectedArrivalTime,
+          unknownTrack: !mc.arrivalStopAssignment.expectedQuayName,
+        }
       : undefined;
 
   const departure: UnknownDelayOrTrack | undefined =
     !!mc.aimedDepartureTime && includeCall(mc)
       ? {
-        stationShortCode: mc.stopPointRef,
-        scheduledTime: new Date(mc.aimedDepartureTime),
-        type: 1,
-        unknownDelay: !mc.expectedDepartureTime,
-        unknownTrack: !mc.departureStopAssignment.expectedQuayName,
-      }
+          stationShortCode: mc.stopPointRef,
+          scheduledTime: new Date(mc.aimedDepartureTime),
+          type: 1,
+          unknownDelay: !mc.expectedDepartureTime,
+          unknownTrack: !mc.departureStopAssignment.expectedQuayName,
+        }
       : undefined;
 
   return compact([arrival, departure]);
@@ -111,9 +109,10 @@ function parseTrain(vehicleJourney: string): {
   const trainNumber = vehicleJourney.substring(9, 14);
 
   return {
-    departureDate: `${departureDate.substring(0, 4)}-${
-      departureDate.substring(4, 6)
-    }-${departureDate.substring(6, 8)}`,
-    trainNumber: Number.parseInt(trainNumber),
+    departureDate: `${departureDate.substring(0, 4)}-${departureDate.substring(
+      4,
+      6,
+    )}-${departureDate.substring(6, 8)}`,
+    trainNumber: Number.parseInt(trainNumber, 10),
   };
 }

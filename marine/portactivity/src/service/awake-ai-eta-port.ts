@@ -4,12 +4,11 @@ import type {
   AwakeAiPortApi,
   AwakeAiPortSchedule,
 } from "../api/awake-ai-port.js";
-import {
-  AwakeAiPredictionType,
-  type AwakeAiVoyageEtaPrediction,
-  AwakeAiZoneType,
-  type AwakeArrivalPortCallPrediction,
+import type {
+  AwakeAiVoyageEtaPrediction,
+  AwakeArrivalPortCallPrediction,
 } from "../api/awake-common.js";
+import { AwakeAiPredictionType, AwakeAiZoneType } from "../api/awake-common.js";
 import { EventSource } from "../model/eventsource.js";
 import type { ApiTimestamp } from "../model/timestamp.js";
 import {
@@ -34,11 +33,9 @@ export class AwakeAiETAPortService {
     ) {
       logger.warn({
         method: "AwakeAiETAPortService.getAwakeAiTimestamps",
-        message: `arrival is closer than 24 hours, not persisting ETA: ${
-          JSON.stringify(
-            etaPrediction,
-          )
-        }`,
+        message: `arrival is closer than 24 hours, not persisting ETA: ${JSON.stringify(
+          etaPrediction,
+        )}`,
       });
       return false;
     }
@@ -56,17 +53,16 @@ export class AwakeAiETAPortService {
           if (isDigitrafficEtaPrediction(etaPrediction)) {
             logger.warn({
               method: "AwakeAiETAPortService.getAwakeAiTimestamps",
-              message:
-                `received Digitraffic ETA prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${
-                  JSON.stringify(etaPrediction)
-                }`,
+              message: `received Digitraffic ETA prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
+                etaPrediction,
+              )}`,
             });
             return false;
           }
           return true;
         })
-        .filter((etaPrediction) =>
-          etaPrediction.zoneType === AwakeAiZoneType.BERTH
+        .filter(
+          (etaPrediction) => etaPrediction.zoneType === AwakeAiZoneType.BERTH,
         )
     );
   }

@@ -1,14 +1,14 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
 import * as PilotwebAPI from "../api/pilotweb.js";
 import * as PilotagesDAO from "../dao/pilotages.js";
 import * as TimestampDAO from "../dao/timestamps.js";
-import * as LocationConverter from "./location-converter.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { EventSource } from "../model/eventsource.js";
+import type { Pilotage } from "../model/pilotage.js";
 import type { ApiTimestamp, Location } from "../model/timestamp.js";
 import { EventType } from "../model/timestamp.js";
-import type { Pilotage } from "../model/pilotage.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { inDatabase } from "@digitraffic/common/dist/database/database";
-import { EventSource } from "../model/eventsource.js";
+import * as LocationConverter from "./location-converter.js";
 
 export async function getMessagesFromPilotweb(
   host: string,
@@ -158,8 +158,10 @@ function getPortCallId(
 function createApiTimestamp(
   pilotage: Pilotage,
 ): Partial<ApiTimestamp> | undefined {
-  const eventTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime)
-    .toISOString();
+  const eventTime = getMaxDate(
+    pilotage.vesselEta,
+    pilotage.pilotBoardingTime,
+  ).toISOString();
 
   if (pilotage.state === "ESTIMATE" || pilotage.state === "NOTICE") {
     return {
@@ -211,8 +213,8 @@ function findNewAndUpdated(
 
   pilotages.forEach((p) => {
     const timestamp = idMap.get(p.id);
-    const updatedPilotage = timestamp &&
-      timestamp.toISOString() !== p.scheduleUpdated;
+    const updatedPilotage =
+      timestamp && timestamp.toISOString() !== p.scheduleUpdated;
     const newPilotage = !timestamp && p.state !== "FINISHED";
 
     if (updatedPilotage || newPilotage) {

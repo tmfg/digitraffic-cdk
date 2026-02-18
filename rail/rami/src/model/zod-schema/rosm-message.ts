@@ -1,15 +1,18 @@
 import { z } from "zod";
-import { scheduledMessage } from "./scheduled-message.js";
 import { monitoredJourneyScheduledMessage } from "./monitored-journey-scheduled-message.js";
+import { scheduledMessage } from "./scheduled-message.js";
 
 export const headers = z
   .object({
-    e2eId: z.string().describe(
-      "Correlational event unique identifier for logging and instrumentation",
-    ),
-    organisation: z.string().describe(
-      "Data Type for Identifier of an OrganisationCode.",
-    ).optional(),
+    e2eId: z
+      .string()
+      .describe(
+        "Correlational event unique identifier for logging and instrumentation",
+      ),
+    organisation: z
+      .string()
+      .describe("Data Type for Identifier of an OrganisationCode.")
+      .optional(),
     source: z.string().describe("Module identifier that publishes the message"),
     partitionKey: z
       .string()
@@ -40,12 +43,12 @@ export const payload = z
     operation: z
       .enum(["INSERT", "UPDATE", "DELETE"])
       .describe("type of operation performed by the user on the message"),
-    creationDateTime: z.string().describe(
-      "datetime, in UTC ISO8601, creation date time",
-    ),
-    startValidity: z.string().describe(
-      "datetime, in UTC ISO8601, start validity",
-    ),
+    creationDateTime: z
+      .string()
+      .describe("datetime, in UTC ISO8601, creation date time"),
+    startValidity: z
+      .string()
+      .describe("datetime, in UTC ISO8601, start validity"),
     endValidity: z.string().describe("datetime, in UTC ISO8601, end validity"),
     scheduledMessage,
     monitoredJourneyScheduledMessage,
@@ -59,7 +62,10 @@ export const ramiRosmMessageSchema = z
   .object({
     headers,
     payload,
-    extraPayload: z.object({}).describe("Optional extention of payload object")
-      .optional().nullable(),
+    extraPayload: z
+      .object({})
+      .describe("Optional extention of payload object")
+      .optional()
+      .nullable(),
   })
   .strict();
