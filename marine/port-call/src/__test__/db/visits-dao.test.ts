@@ -7,7 +7,15 @@ describe(
   "visits-dao-tests",
   dbTestBase((db: DTDatabase) => {
     test("no visits", async () => {
-      const visits = await VisitsDAO.findAllVisits(db, undefined, undefined);
+      const visits = await VisitsDAO.findAllVisits(
+        db,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(visits.length).toBe(0);
 
       await assertVisitCount(db, 0);
