@@ -11,12 +11,14 @@ import {
   VISIT_STATUS_QUERY_VALUES,
 } from "./visit-schema.js";
 
-const zOptionalStatus = z.enum(VISIT_STATUS_QUERY_VALUES).optional();
-const zOptionalSort = z
-  .string()
-  .optional()
-  .transform((val, ctx) => {
-    if (!val) return undefined;
+const zStatus = () =>
+  z
+    .string()
+    .transform((val) => val.toLowerCase())
+    .pipe(z.enum(VISIT_STATUS_QUERY_VALUES));
+
+const zSort = () =>
+  z.string().transform((val, ctx) => {
     const parts = val.split(":");
     if (parts.length !== 2) {
       ctx.addIssue({
@@ -49,6 +51,7 @@ const zOptionalSort = z
       direction: direction as (typeof SORT_DIRECTIONS)[number],
     };
   });
+
 export const getVisitsSchema = z
   .object({
     fromDateTime: zStringToDate().optional(),
@@ -56,8 +59,8 @@ export const getVisitsSchema = z
     portOfCall: zNonEmptyString().optional(),
     vesselName: zNonEmptyString().optional(),
     imo: zStringToNumber().optional(),
-    status: zOptionalStatus,
-    sort: zOptionalSort,
+    status: zStatus().optional(),
+    sort: zSort().optional(),
   })
   .strict()
   .readonly();
