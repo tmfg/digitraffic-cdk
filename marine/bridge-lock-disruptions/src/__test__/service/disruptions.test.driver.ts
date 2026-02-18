@@ -1,14 +1,12 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { findAll } from "../../db/disruptions.js";
 import type { SpatialDisruption } from "../../model/disruption.js";
-import {
-  getUpdatedTimestamps,
-  type UpdatedTimestamps,
-} from "../db-testutil.js";
 import {
   findAllDisruptions,
   saveDisruptions,
 } from "../../service/disruptions.js";
-import { findAll } from "../../db/disruptions.js";
+import type { UpdatedTimestamps } from "../db-testutil.js";
+import { getUpdatedTimestamps } from "../db-testutil.js";
 
 export class DisruptionsTestDriver {
   private readonly db: DTDatabase;
@@ -81,7 +79,7 @@ export class DisruptionsTestDriver {
     return Array.from({
       length: amount,
     }).map(() => {
-      return this.newDisruption();
+      return DisruptionsTestDriver.newDisruption();
     });
   }
 
@@ -103,16 +101,19 @@ export class DisruptionsTestDriver {
     const EndDate = new Date();
     EndDate.setMilliseconds(0);
     return {
-      DescriptionEn: this.someNumber().toString(),
-      DescriptionFi: this.someNumber().toString(),
-      DescriptionSv: this.someNumber().toString(),
+      DescriptionEn: DisruptionsTestDriver.someNumber().toString(),
+      DescriptionFi: DisruptionsTestDriver.someNumber().toString(),
+      DescriptionSv: DisruptionsTestDriver.someNumber().toString(),
       EndDate,
       StartDate,
-      Type_Id: this.someNumber(),
-      Id: this.someNumber(),
+      Type_Id: DisruptionsTestDriver.someNumber(),
+      Id: DisruptionsTestDriver.someNumber(),
       geometry: {
         type: "Point",
-        coordinates: [this.someNumber(), this.someNumber()],
+        coordinates: [
+          DisruptionsTestDriver.someNumber(),
+          DisruptionsTestDriver.someNumber(),
+        ],
       },
     };
   }

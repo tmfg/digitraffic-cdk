@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Activity, ApiData } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
+import type { Activity, ApiData } from "../model/api-db-model.js";
 
 const SQL_UPDATE_ACTIVITIES = `
 insert into wn_activity(id, icebreaker_id, vessel_id, type, reason, public_comment, start_time, end_time, deleted)
@@ -17,8 +17,7 @@ do update set
     deleted = false
 `;
 
-const SQL_GET_ACTIVITIES =
-  `select icebreaker_id, vessel_id, type, reason, public_comment, start_time, end_time
+const SQL_GET_ACTIVITIES = `select icebreaker_id, vessel_id, type, reason, public_comment, start_time, end_time
 from wn_activity
 where deleted = false`;
 

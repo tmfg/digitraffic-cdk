@@ -1,10 +1,10 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
   assertCount,
   dbTestBase as commonDbTestBase,
 } from "@digitraffic/common/dist/test/db-testutils";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { TableName } from "../db/deleted.js";
 import { jest } from "@jest/globals";
+import type { TableName } from "../db/deleted.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
   return commonDbTestBase(
@@ -53,7 +53,7 @@ export async function mockProxyHolder(): Promise<void> {
   const { ProxyHolder } = await import(
     "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder"
   );
-  jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(
-    async () => Promise.resolve(),
-  );
+  jest
+    .spyOn(ProxyHolder.prototype, "setCredentials")
+    .mockImplementation(async () => Promise.resolve());
 }

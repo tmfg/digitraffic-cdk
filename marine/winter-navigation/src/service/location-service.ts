@@ -1,15 +1,15 @@
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import * as LocationDB from "../db/locations.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
+import type { Feature, Geometry } from "geojson";
+import * as LocationDB from "../db/locations.js";
+import { LOCATIONS_CHECK } from "../keys.js";
 import type {
   LocationDTO,
   RestrictionDTO,
   SuspensionDTO,
 } from "../model/dto-model.js";
-import type { Feature, Geometry } from "geojson";
 import type {
   Location,
   LocationFeature,
@@ -17,8 +17,6 @@ import type {
   Restriction,
   Suspension,
 } from "../model/public-api-model.js";
-import { LOCATIONS_CHECK } from "../keys.js";
-import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 
 export function getLocation(
   locode: string,
@@ -35,10 +33,13 @@ export function getLocation(
       return Promise.resolve([undefined, lastUpdated ?? undefined]);
     }
 
-    return [{
-      ...convertToFeature(location),
-      lastUpdated,
-    }, lastUpdated ?? undefined];
+    return [
+      {
+        ...convertToFeature(location),
+        lastUpdated,
+      },
+      lastUpdated ?? undefined,
+    ];
   });
 }
 
@@ -60,15 +61,14 @@ export function getLocations(): Promise<
   });
 }
 
-function convertToFeature(
-  location: LocationDTO,
-): LocationFeature {
-  const geometry = location.longitude && location.latitude
-    ? {
-      type: "Point" as const,
-      coordinates: [location.longitude, location.latitude],
-    }
-    : null;
+function convertToFeature(location: LocationDTO): LocationFeature {
+  const geometry =
+    location.longitude && location.latitude
+      ? {
+          type: "Point" as const,
+          coordinates: [location.longitude, location.latitude],
+        }
+      : null;
   return {
     type: "Feature",
     geometry,
@@ -78,12 +78,14 @@ function convertToFeature(
       locodeList: location.locode_list,
       nationality: location.nationality,
       winterport: location.winterport,
-      restrictions: (location.restrictions && location.restrictions.length > 0)
-        ? location.restrictions.map(convertRestriction)
-        : [],
-      suspensions: (location.suspensions && location.suspensions.length > 0)
-        ? location.suspensions.map(convertSuspension)
-        : [],
+      restrictions:
+        location.restrictions && location.restrictions.length > 0
+          ? location.restrictions.map(convertRestriction)
+          : [],
+      suspensions:
+        location.suspensions && location.suspensions.length > 0
+          ? location.suspensions.map(convertSuspension)
+          : [],
     },
   };
 }
