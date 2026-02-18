@@ -1,18 +1,20 @@
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { z, ZodError } from "zod";
-import { findSiteData } from "../../service/api-service.js";
+import { ZodError, z } from "zod";
 import { AllTravelModes } from "../../model/v2/types.js";
+import { findSiteData } from "../../service/api-service.js";
 
 const proxyHolder = ProxyHolder.create();
 
-const GetValuesSchema = z.object({
-  date: z.string().date().optional(),
-  siteId: z.coerce.number().optional(),
-  travelMode: z.enum(AllTravelModes).optional(),
-}).strict();
+const GetValuesSchema = z
+  .object({
+    date: z.string().date().optional(),
+    siteId: z.coerce.number().optional(),
+    travelMode: z.enum(AllTravelModes).optional(),
+  })
+  .strict();
 
 export const handler = async (
   event: Record<string, string>,

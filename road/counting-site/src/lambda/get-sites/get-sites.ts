@@ -1,9 +1,9 @@
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { ZodError, z } from "zod";
 import { getSites } from "../../service/api-service.js";
-import { z, ZodError } from "zod";
 
 const proxyHolder = ProxyHolder.create();
 

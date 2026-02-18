@@ -1,23 +1,27 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
-import { dbTestBase } from "../db-testutil.js";
-import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import type { ResponseValue } from "../../model/v2/response-model.js";
-import { insertSite } from "./get-sites.test.js";
 import { addSiteData } from "../../dao/data.js";
+import type { ResponseValue } from "../../model/v2/response-model.js";
+import { dbTestBase } from "../db-testutil.js";
+import { insertSite } from "./get-sites.test.js";
 
 mockProxyHolder();
 
 async function insertData(db: DTDatabase, timestamp: Date): Promise<void> {
-  await addSiteData(db, 1, [{
-    travelMode: "bike",
-    direction: "in",
-    data: [{
-      timestamp,
-      granularity: "P1D",
-      counts: 1,
-    }],
-  }]);
+  await addSiteData(db, 1, [
+    {
+      travelMode: "bike",
+      direction: "in",
+      data: [
+        {
+          timestamp,
+          granularity: "P1D",
+          counts: 1,
+        },
+      ],
+    },
+  ]);
 }
 
 async function getResponseFromLambda(
@@ -31,14 +35,14 @@ async function getResponseFromLambda(
 describe(
   "get-values-lambda",
   dbTestBase((db: DTDatabase) => {
-    test.each(["2024-13-33", "2024-08-08T16:44:04Z"])(
-      "should fail when date is %s",
-      async (date) => {
-        const response = await getResponseFromLambda({ date });
+    test.each([
+      "2024-13-33",
+      "2024-08-08T16:44:04Z",
+    ])("should fail when date is %s", async (date) => {
+      const response = await getResponseFromLambda({ date });
 
-        new ExpectResponse(response).expectStatus(400);
-      },
-    );
+      new ExpectResponse(response).expectStatus(400);
+    });
 
     test("get values - wrong parameters", async () => {
       const response = await getResponseFromLambda({ foo: "bar" });

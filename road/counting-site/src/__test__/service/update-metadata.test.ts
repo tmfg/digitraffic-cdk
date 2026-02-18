@@ -1,11 +1,11 @@
-import { dbTestBase } from "../db-testutil.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
 import { jest } from "@jest/globals";
 import ky from "ky";
-import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
-import type { DbSite } from "../../model/v2/db-model.js";
 import { getAllSites } from "../../dao/site.js";
+import type { DbSite } from "../../model/v2/db-model.js";
 import { updateMetadata } from "../../service/update-service.js";
+import { dbTestBase } from "../db-testutil.js";
 import { insertSite, TEST_SITE_1 } from "../lambda/get-sites.test.js";
 
 describe(
@@ -30,9 +30,9 @@ describe(
     test("updateMetadata - empty", async () => {
       await assertSitesInDb(0);
 
-      const server = jest.spyOn(ky, "get").mockImplementation(() =>
-        mockKyResponse(200, JSON.stringify([]))
-      );
+      const server = jest
+        .spyOn(ky, "get")
+        .mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
       await updateMetadata("", "", "Fintraffic");
       expect(server).toHaveBeenCalled();
 
@@ -42,9 +42,11 @@ describe(
     test("updateMetadata - insert", async () => {
       await assertSitesInDb(0);
 
-      const server = jest.spyOn(ky, "get").mockImplementation(() =>
-        mockKyResponse(200, JSON.stringify([TEST_SITE_1]))
-      );
+      const server = jest
+        .spyOn(ky, "get")
+        .mockImplementation(() =>
+          mockKyResponse(200, JSON.stringify([TEST_SITE_1])),
+        );
       await updateMetadata("", "", "Fintraffic");
       expect(server).toHaveBeenCalled();
 
@@ -57,9 +59,11 @@ describe(
       await insertSite(db);
       await assertSitesInDb(1);
 
-      const server = jest.spyOn(ky, "get").mockImplementation(() =>
-        mockKyResponse(200, JSON.stringify([TEST_SITE_1]))
-      );
+      const server = jest
+        .spyOn(ky, "get")
+        .mockImplementation(() =>
+          mockKyResponse(200, JSON.stringify([TEST_SITE_1])),
+        );
       await updateMetadata("", "", "Fintraffic");
 
       expect(server).toHaveBeenCalled();
@@ -70,9 +74,9 @@ describe(
       await insertSite(db);
       await assertSitesInDb(1);
 
-      const server = jest.spyOn(ky, "get").mockImplementation(() =>
-        mockKyResponse(200, JSON.stringify([]))
-      );
+      const server = jest
+        .spyOn(ky, "get")
+        .mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
       await updateMetadata("", "", "Fintraffic");
 
       expect(server).toHaveBeenCalled();

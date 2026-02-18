@@ -1,17 +1,17 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
-import { dbTestBase } from "../db-testutil.js";
-import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { jest } from "@jest/globals";
 import type { FeatureCollection } from "geojson";
 import { addSites } from "../../dao/site.js";
 import type { ApiSite } from "../../model/v2/api-model.js";
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { jest } from "@jest/globals";
+import { dbTestBase } from "../db-testutil.js";
 
 // for some reason, mockProxyHolder does not work here!?!
-jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
-  Promise.resolve()
-);
+jest
+  .spyOn(ProxyHolder.prototype, "setCredentials")
+  .mockImplementation(() => Promise.resolve());
 
 export const TEST_SITE_1: ApiSite = {
   id: 1,

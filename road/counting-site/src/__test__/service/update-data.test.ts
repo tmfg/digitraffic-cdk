@@ -1,14 +1,13 @@
-import { dbTestBase } from "../db-testutil.js";
-import * as DataDAO from "../../dao/data.js";
-
 //import type { ApiData } from "../../model/v1/data.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { jest } from "@jest/globals";
-import type { ApiData } from "../../model/v2/api-model.js";
-import { insertSite } from "../lambda/get-sites.test.js";
 import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
+import { jest } from "@jest/globals";
 import ky from "ky";
+import * as DataDAO from "../../dao/data.js";
+import type { ApiData } from "../../model/v2/api-model.js";
 import { updateData } from "../../service/update-service.js";
+import { dbTestBase } from "../db-testutil.js";
+import { insertSite } from "../lambda/get-sites.test.js";
 
 describe(
   "update tests",
@@ -34,7 +33,7 @@ describe(
       const server = jest
         .spyOn(ky, "get")
         .mockImplementation(() =>
-          mockKyResponse(200, JSON.stringify(EMPTY_DATA))
+          mockKyResponse(200, JSON.stringify(EMPTY_DATA)),
         );
       await updateData("", "", "Fintraffic");
 
@@ -78,7 +77,7 @@ describe(
       const server = jest
         .spyOn(ky, "get")
         .mockImplementation(() =>
-          mockKyResponse(200, JSON.stringify(RESPONSE_DATA))
+          mockKyResponse(200, JSON.stringify(RESPONSE_DATA)),
         );
       await updateData("", "", "Fintraffic");
 

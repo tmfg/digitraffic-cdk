@@ -6,7 +6,7 @@ export const AllGranularities = [
   "P1M",
   "P1Y",
 ] as const;
-export type Granularity = typeof AllGranularities[number];
+export type Granularity = (typeof AllGranularities)[number];
 
 export const AllTravelModes = [
   "pedestrian",
@@ -22,10 +22,10 @@ export const AllTravelModes = [
   "scooter",
   "cargobike",
 ] as const;
-export type TravelMode = typeof AllTravelModes[number];
+export type TravelMode = (typeof AllTravelModes)[number];
 
 export const AllDirections = ["in", "out", "undefined"] as const;
-export type Direction = typeof AllDirections[number];
+export type Direction = (typeof AllDirections)[number];
 
 export const AllDomains = ["Fintraffic"] as const;
-export type Domain = typeof AllDomains[number];
+export type Domain = (typeof AllDomains)[number];
