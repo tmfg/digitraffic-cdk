@@ -1,6 +1,6 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { retry, RetryLogError } from "@digitraffic/common/dist/utils/retry";
-import { type AreaLightsApi } from "../api/arealights.js";
+import { RetryLogError, retry } from "@digitraffic/common/dist/utils/retry";
+import type { AreaLightsApi } from "../api/arealights.js";
 import type { AreaTraffic } from "../model/areatraffic.js";
 
 export class AreaLightsService {
@@ -37,8 +37,9 @@ export class AreaLightsService {
           if (response.LightsSetSentFailed.length) {
             logger.warn({
               method: "ArealightsService.updateLightsForArea",
-              message: `LightsSetSentFailed : ${response.LightsSetSentFailed.join(", ")
-                }`,
+              message: `LightsSetSentFailed : ${response.LightsSetSentFailed.join(
+                ", ",
+              )}`,
             });
           }
         } catch (error) {

@@ -1,4 +1,4 @@
-// biome-ignore lint/complexity/useLiteralKeys
+// biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "TEST";
 
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
@@ -25,12 +25,12 @@ const secret: ShiplightSecret = {
   visibilityApiKey: "test",
 };
 
-jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
-  Promise.resolve()
-);
-jest.spyOn(SecretHolder.prototype, "get").mockImplementation(() =>
-  Promise.resolve(secret)
-);
+jest
+  .spyOn(ProxyHolder.prototype, "setCredentials")
+  .mockImplementation(() => Promise.resolve());
+jest
+  .spyOn(SecretHolder.prototype, "get")
+  .mockImplementation(() => Promise.resolve(secret));
 
 const { handlerFn } = await import(
   "../../lambda/update-lights/update-lights.js"
@@ -48,12 +48,14 @@ describe(
       const areaId = 4;
       const visibilityInMeters = 1000;
 
-      jest.spyOn(AreaVisibilityApi.prototype, "getVisibilityForArea")
+      jest
+        .spyOn(AreaVisibilityApi.prototype, "getVisibilityForArea")
         .mockResolvedValue({
           lastUpdated: new Date().toISOString(),
           visibilityInMeters,
         });
-      jest.spyOn(AreaLightsApi.prototype, "updateLightsForArea")
+      jest
+        .spyOn(AreaLightsApi.prototype, "updateLightsForArea")
         .mockResolvedValue({
           LightsSetSentFailed: [],
           LightsSetSentSuccessfully: [],

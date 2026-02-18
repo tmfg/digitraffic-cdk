@@ -9,13 +9,12 @@ describe("arealights service", () => {
     const service = new AreaLightsService(api);
     const areaTraffic = createAreaTraffic();
 
-    const updateLightsForAreaStub = jest.spyOn(
-      AreaLightsApi.prototype,
-      "updateLightsForArea",
-    ).mockResolvedValue({
-      LightsSetSentFailed: [],
-      LightsSetSentSuccessfully: [],
-    });
+    const updateLightsForAreaStub = jest
+      .spyOn(AreaLightsApi.prototype, "updateLightsForArea")
+      .mockResolvedValue({
+        LightsSetSentFailed: [],
+        LightsSetSentSuccessfully: [],
+      });
 
     await service.updateLightsForArea(areaTraffic);
 
@@ -33,10 +32,8 @@ describe("arealights service", () => {
     const service = new AreaLightsService(api);
 
     const areaTraffic = createAreaTraffic();
-    const updateLightsForAreaStub = jest.spyOn(
-      AreaLightsApi.prototype,
-      "updateLightsForArea",
-    )
+    const updateLightsForAreaStub = jest
+      .spyOn(AreaLightsApi.prototype, "updateLightsForArea")
       .mockRejectedValueOnce({})
       .mockResolvedValueOnce({
         LightsSetSentFailed: [],

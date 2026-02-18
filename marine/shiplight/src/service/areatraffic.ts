@@ -1,6 +1,6 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
-  type DTDatabase,
   inDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";

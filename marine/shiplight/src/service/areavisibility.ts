@@ -1,5 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { type AreaVisibilityApi } from "../api/areavisibility.js";
+import type { AreaVisibilityApi } from "../api/areavisibility.js";
 
 interface AreaVisibilityWrapper {
   readonly visibilityInMeters: number | undefined;

@@ -25,9 +25,7 @@ export async function assertArea(
   const area = await db.tx((t) => {
     return t.oneOrNone<Area | null>(
       "select brighten_sent,brighten_end from areatraffic where id = $1",
-      [
-        id,
-      ],
+      [id],
     );
   });
 
@@ -68,7 +66,7 @@ export async function insertVessel(
   await db.tx(async (t) => {
     await t.none(
       "INSERT INTO vessel(mmsi,timestamp,name,ship_type,reference_point_a,reference_point_b,reference_point_c,reference_point_d,pos_type,draught,imo,eta) " +
-      "values ($1, $2, $3, $4, 1,1,1,1,1,1,1,1)",
+        "values ($1, $2, $3, $4, 1,1,1,1,1,1,1,1)",
       [mmsi, Date.now(), shipName, ShipTypes.CARGO],
     );
   });
@@ -84,7 +82,7 @@ export async function insertVesselLocation(
   await db.tx(async (t) => {
     await t.none(
       "INSERT INTO vessel_location(mmsi,timestamp_ext,x,y,sog,cog,nav_stat,rot,pos_acc,raim,timestamp) " +
-      "values ($1, $2, $3, $4, $5, 1, 1, 1, true, true, 1)",
+        "values ($1, $2, $3, $4, $5, 1, 1, 1, true, true, 1)",
       [mmsi, timestamp, x, 1, speed],
     );
   });
