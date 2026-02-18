@@ -1,7 +1,7 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { default as pgPromise } from "pg-promise";
-import { type DbNumberId } from "../model/db-data.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { default as pgPromise } from "pg-promise";
+import type { DbNumberId } from "../model/db-data.js";
 
 export enum Status {
   UNHANDLED = "UNHANDLED",
@@ -55,29 +55,30 @@ export function insertMaintenanceTrackingObservationData(
     return t.batch(
       observations.map((observation) =>
         db
-          .oneOrNone<
-            DbNumberId | undefined
-          >(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
-          .then((result) => (result === null ? undefined : result))
+          .oneOrNone<DbNumberId | undefined>(
+            UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
+            observation,
+          )
+          .then((result) => (result === null ? undefined : result)),
       ),
     );
   });
 }
 
-const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS = new pgPromise
-  .PreparedStatement({
-  name: "PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS",
-  text: `
+const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS =
+  new pgPromise.PreparedStatement({
+    name: "PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS",
+    text: `
         UPDATE maintenance_tracking
         SET previous_tracking_id = NULL
         WHERE end_time < (now() - $1 * INTERVAL '1 hour')
 `,
-});
+  });
 
-const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new pgPromise
-  .PreparedStatement({
-  name: "PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS",
-  text: `
+const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS =
+  new pgPromise.PreparedStatement({
+    name: "PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS",
+    text: `
         DELETE
         FROM maintenance_tracking tgt
         WHERE end_time < (now() - $1 * INTERVAL '1 hour')
@@ -87,7 +88,7 @@ const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new pgPromise
           -- to get last modified date for REST API
           AND EXISTS(SELECT NULL FROM maintenance_tracking t WHERE t.domain = tgt.domain AND t.created > tgt.created);
 `,
-});
+  });
 
 export async function cleanMaintenanceTrackingData(
   db: DTDatabase,
@@ -96,9 +97,7 @@ export async function cleanMaintenanceTrackingData(
   await db.tx(async (t) => {
     const cleanUpQuery = t.none(
       PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS,
-      [
-        hoursToKeep,
-      ],
+      [hoursToKeep],
     );
     const deleteQuery = t.none(
       PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS,
@@ -118,14 +117,14 @@ export async function cleanMaintenanceTrackingData(
   });
 }
 
-const PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS = new pgPromise
-  .PreparedStatement({
-  name: "PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS",
-  text: `
+const PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS =
+  new pgPromise.PreparedStatement({
+    name: "PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS",
+    text: `
         select round(EXTRACT(EPOCH FROM (now() - min(end_time)))/60/60) AS hours
         from maintenance_tracking;
 `,
-});
+  });
 
 export function getOldestTrackingHours(db: DTDatabase): Promise<number> {
   return db

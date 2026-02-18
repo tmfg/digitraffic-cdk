@@ -197,7 +197,7 @@ function createUpdateTimestampsFromPilotwebLambda(
     environment,
     {
       memorySize: 256,
-      timeout: 10,
+      timeout: 15,
     },
   );
 
@@ -240,7 +240,7 @@ function createUpdateTimestampsFromSchedules(
     functionName,
     defaultLambdaConfiguration({
       functionName,
-      timeout: 10,
+      timeout: 20,
       code: new AssetCode("dist/lambda/update-timestamps-from-schedules"),
       handler: "lambda-update-timestamps-from-schedules.handler",
       logGroup: logGroup,

@@ -45,7 +45,7 @@ export async function createEsbuildConfig(): Promise<BuildOptions> {
     platform: "node",
     outdir,
     target: ["node24", "es2024"],
-    external: ["@aws-sdk/*", "aws-sdk", "pg-native"],
+    external: ["@aws-sdk/*", "pg-native"],
     sourcemap: true,
     metafile: true,
     format: "esm",

@@ -1,5 +1,7 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { type TyokoneenseurannanKirjaus } from "../../model/models.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { expect } from "@jest/globals";
+import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
 import {
   cleanMaintenanceTrackingData,
   createMaintenanceTrackingMessageHash,
@@ -19,8 +21,6 @@ import {
   assertObservationData,
   getTrackingJsonWith3Observations,
 } from "../testdata.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { expect } from "@jest/globals";
 
 describe(
   "maintenance-tracking",
