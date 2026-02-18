@@ -1,5 +1,5 @@
-import { type AreaVisibilityApi } from "../api/areavisibility.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { type AreaVisibilityApi } from "../api/areavisibility.js";
 
 interface AreaVisibilityWrapper {
   readonly visibilityInMeters: number | undefined;
@@ -33,7 +33,7 @@ export class AreaVisibilityService {
       });
 
       return { visibilityInMeters: resp.visibilityInMeters };
-    } catch (error) {
+    } catch (_error) {
       // error logged at API level
       return { visibilityInMeters: undefined };
     }

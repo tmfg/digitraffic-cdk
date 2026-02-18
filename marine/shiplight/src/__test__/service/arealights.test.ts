@@ -1,7 +1,7 @@
-import { AreaLightsService } from "../../service/arealights.js";
+import { jest } from "@jest/globals";
 import { AreaLightsApi } from "../../api/arealights.js";
 import type { AreaTraffic } from "../../model/areatraffic.js";
-import { jest } from "@jest/globals";
+import { AreaLightsService } from "../../service/arealights.js";
 
 describe("arealights service", () => {
   test("updateLightsForArea - calls API", async () => {

@@ -1,6 +1,15 @@
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys
 process.env["SECRET_ID"] = "TEST";
 
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { jest } from "@jest/globals";
+import { AreaLightsApi } from "../../api/arealights.js";
+import { AreaVisibilityApi } from "../../api/areavisibility.js";
+import type { ShiplightSecret } from "../../model/shiplight-secret.js";
+import { AreaLightsService } from "../../service/arealights.js";
+import { AreaVisibilityService } from "../../service/areavisibility.js";
 import {
   assertArea,
   dbTestBase,
@@ -8,15 +17,6 @@ import {
   insertVessel,
   insertVesselLocation,
 } from "../db-testutil.js";
-import type { ShiplightSecret } from "../../model/shiplight-secret.js";
-import { AreaVisibilityService } from "../../service/areavisibility.js";
-import { AreaVisibilityApi } from "../../api/areavisibility.js";
-import { AreaLightsApi } from "../../api/arealights.js";
-import { AreaLightsService } from "../../service/arealights.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { jest } from "@jest/globals";
 
 const secret: ShiplightSecret = {
   lightsControlEndpointUrl: "test",
