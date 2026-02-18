@@ -154,10 +154,10 @@ describe(
       TimestampsDb.findByImo(db, (timestamp.ship.imo ?? -1) - 1),
     );
     testNotFound("findByLocode", (timestamp: ApiTimestamp) =>
-      TimestampsDb.findByLocode(db, timestamp.location.port + "asdf"),
+      TimestampsDb.findByLocode(db, `${timestamp.location.port}asdf`),
     );
     testNotFound("findBySource", (timestamp: ApiTimestamp) =>
-      TimestampsDb.findByLocode(db, timestamp.source + "asdf"),
+      TimestampsDb.findBySource(db, `${timestamp.source}asdf`),
     );
 
     function testNewest(

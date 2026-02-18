@@ -69,6 +69,6 @@ export class NemoApi {
   // get wanted format
   // 2025-03-25T08:28:09.681Z --> 2025-03-25T08:28:09Z
   getDate(time: Date): string {
-    return time.toISOString().slice(0, -5) + "Z";
+    return `${time.toISOString().slice(0, -5)}Z`;
   }
 }

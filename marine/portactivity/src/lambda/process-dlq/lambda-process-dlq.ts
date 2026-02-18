@@ -15,7 +15,7 @@ interface DlqEvent {
 const s3 = new S3Client({});
 
 export const handler = async (event: DlqEvent): Promise<void> => {
-  const millis = new Date().getTime();
+  const millis = Date.now();
   logger.info({
     method: "PortactivityTimestampsProcessDLQ.handler",
     customPortcallDLQRecordsReceivedCount: event.Records.length,
