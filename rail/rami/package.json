@@ -27,7 +27,7 @@
     "@digitraffic/common": "2026.2.10-1",
     "@middy/core": "7.0.2",
     "@middy/sqs-partial-batch-failure": "7.0.2",
-    "ajv": "8.17.1",
+    "ajv": "8.18.0",
     "ajv-formats": "3.0.1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
