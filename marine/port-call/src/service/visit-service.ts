@@ -9,7 +9,7 @@ import { addDays, startOfDay, subDays } from "date-fns";
 import { NemoApi } from "../api/nemo-api.js";
 import type { DbInsertedUpdated, DbVisit } from "../db/visits.js";
 import { findAllVisits, findVisit, upsertVisits } from "../db/visits.js";
-import type { GetVisitsParameters } from "../lambda/get-visits/get-visits.js";
+import type { GetVisitsParameters } from "../model/get-visits-schema.js";
 import type { VisitResponse } from "../model/visit-schema.js";
 
 const DATATYPE = "PC2_VISITS" as const;
@@ -25,7 +25,16 @@ export async function getAllVisits(
   getVisitsEvent: GetVisitsParameters,
 ): Promise<[VisitResponse[], Date]> {
   const visits = await inDatabaseReadonly((db: DTDatabase) => {
-    return findAllVisits(db, getVisitsEvent.from, getVisitsEvent.to);
+    return findAllVisits(
+      db,
+      getVisitsEvent.fromDateTime,
+      getVisitsEvent.toDateTime,
+      getVisitsEvent.portOfCall,
+      getVisitsEvent.vesselName,
+      getVisitsEvent.imo,
+      getVisitsEvent.status,
+      getVisitsEvent.sort,
+    );
   });
 
   // get from visits
@@ -37,7 +46,7 @@ function convertVisit(dbVisit: DbVisit): VisitResponse {
     visitId: dbVisit.visit_id,
     vesselId: dbVisit.vessel_id,
     vesselName: dbVisit.vessel_name,
-    portLocode: dbVisit.port_locode,
+    portOfCall: dbVisit.port_locode,
     eta: dbVisit.eta.toISOString(),
     etd: dbVisit.etd?.toISOString(),
     ata: dbVisit.ata?.toISOString(),

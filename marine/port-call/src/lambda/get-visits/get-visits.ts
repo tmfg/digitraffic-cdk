@@ -4,22 +4,11 @@ import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-r
 import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { ZodError, z } from "zod";
+import { getVisitsSchema } from "../../model/get-visits-schema.js";
+import { VISIT_STATUS_QUERY_TO_VALUE_MAP } from "../../model/visit-schema.js";
 import { getAllVisits } from "../../service/visit-service.js";
 
 const proxyHolder = ProxyHolder.create();
-
-const EmptyStringUndefined = z.literal("").transform(() => undefined);
-const OptionalDateString = z.coerce.date().optional().or(EmptyStringUndefined);
-
-const getVisitsSchema = z
-  .object({
-    from: OptionalDateString,
-    to: OptionalDateString,
-  })
-  .strict()
-  .readonly();
-
-export type GetVisitsParameters = z.infer<typeof getVisitsSchema>;
 
 export const handler = async (
   event: Record<string, string>,
@@ -27,7 +16,14 @@ export const handler = async (
   const start = Date.now();
 
   try {
-    const getVisitsEvent = getVisitsSchema.parse(event);
+    const parsed = getVisitsSchema.parse(event);
+    const getVisitsEvent = {
+      ...parsed,
+      status: parsed.status
+        ? VISIT_STATUS_QUERY_TO_VALUE_MAP[parsed.status]
+        : undefined,
+      portOfCall: parsed.portOfCall?.toUpperCase(),
+    };
 
     return proxyHolder
       .setCredentials()
@@ -41,7 +37,9 @@ export const handler = async (
       });
   } catch (error) {
     if (error instanceof ZodError) {
-      return LambdaResponseBuilder.badRequest(JSON.stringify(error.issues));
+      return LambdaResponseBuilder.badRequest(
+        JSON.stringify(z.flattenError(error).fieldErrors),
+      );
     }
 
     logException(logger, error, true);

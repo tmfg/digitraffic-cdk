@@ -26,7 +26,15 @@ export async function assertVisitCount(
   db: DTDatabase,
   expectedCount: number,
 ): Promise<void> {
-  const visits = await VisitsDAO.findAllVisits(db, undefined, undefined);
+  const visits = await VisitsDAO.findAllVisits(
+    db,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  );
   expect(visits.length).toBe(expectedCount);
 }
 
