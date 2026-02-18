@@ -1,18 +1,18 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import type { Identifiable } from "@digitraffic/common/dist/database/models";
 import type { SQSEvent } from "aws-lambda";
 import { sendMqttUpdates } from "../../service/mqtt-sending-service.js";
-import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import type { Identifiable } from "@digitraffic/common/dist/database/models";
 
 const method = `SendMqtt.handler` as const;
 
-interface MqttOptionsSecret extends GenericSecret{
+interface MqttOptionsSecret extends GenericSecret {
   username: string;
   password: string;
   url: string;
-};
+}
 
 const secretHolder = SecretHolder.create<MqttOptionsSecret>("mqtt.server");
 const proxyHolder = ProxyHolder.create();
@@ -22,7 +22,7 @@ export const handler = async (event: SQSEvent): Promise<void> => {
     const secret = await secretHolder.get();
     await proxyHolder.setCredentials();
 
-    const updates: string[] = event.Records.map(record => {
+    const updates: string[] = event.Records.map((record) => {
       const body = record.body;
 
       return (JSON.parse(body) as Identifiable<string>).id;
@@ -34,7 +34,12 @@ export const handler = async (event: SQSEvent): Promise<void> => {
       customUpdateCount: updates.length,
     });
 
-    await sendMqttUpdates(secret.url, secret.username, secret.password, updates);
+    await sendMqttUpdates(
+      secret.url,
+      secret.username,
+      secret.password,
+      updates,
+    );
   } catch (error) {
     logger.error({
       method,

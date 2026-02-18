@@ -56,7 +56,7 @@ async function handleRtti(db: DTDatabase, data: DataIncomingDb) {
       const s = await parseRtti35(data.data);
 
       try {
-        logger.debug("Updating RTTI situation " + JSON.stringify(s));
+        logger.debug(`Updating RTTI situation ${JSON.stringify(s)}`);
         updated35Count++;
         await updateRtti(
           db,

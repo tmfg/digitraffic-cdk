@@ -1,5 +1,5 @@
-import { default as pgPromise } from "pg-promise";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { default as pgPromise } from "pg-promise";
 import type { DataStatus } from "../model/types.js";
 
 export interface DataIncomingDb {
@@ -12,14 +12,12 @@ export interface DataIncomingDb {
 
 const PS_INSERT_DATA = new pgPromise.PreparedStatement({
   name: "insert-data",
-  text:
-    "insert into data_incoming(message_id, source, version, type, data, status) values ($1, $2, $3, $4, $5, 'NEW')",
+  text: "insert into data_incoming(message_id, source, version, type, data, status) values ($1, $2, $3, $4, $5, 'NEW')",
 });
 
 const PS_DELETE_OLD_DATA = new pgPromise.PreparedStatement({
   name: "delete-old-data",
-  text:
-    "delete from data_incoming where created_at < (current_date - interval '7 days')",
+  text: "delete from data_incoming where created_at < (current_date - interval '7 days')",
 });
 
 const SQL_NEW_DATA = `select data_id, source, version, type, data

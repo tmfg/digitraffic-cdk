@@ -1,7 +1,8 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { SNSMessage, SQSEvent } from "aws-lambda";
-import { messageSchema, type UpdateObject } from "../../model/sqs-message-schema.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { SNSMessage, SQSEvent } from "aws-lambda";
+import type { UpdateObject } from "../../model/sqs-message-schema.js";
+import { messageSchema } from "../../model/sqs-message-schema.js";
 import { updateRtti } from "../../service/datex2-update.js";
 
 const method = "HandleRtti.handler" as const;
@@ -14,17 +15,21 @@ export const handler = async (event: SQSEvent): Promise<void> => {
   await proxyHolder.setCredentials();
 
   try {
-    await Promise.all(event.Records.map(async (record) => {
-      const { messageId, body } = record;
+    await Promise.all(
+      event.Records.map(async (record) => {
+        const { messageId, body } = record;
 
-      const parsedMessage = parsePayload(body);
+        const parsedMessage = parsePayload(body);
 
-      logger.debug(`Parsed message ${messageId}: ` + JSON.stringify(parsedMessage));
+        logger.debug(
+          `Parsed message ${messageId}: ${JSON.stringify(parsedMessage)}`,
+        );
 
-      await updateRtti(parsedMessage);
-    }));
+        await updateRtti(parsedMessage);
+      }),
+    );
   } catch (error) {
-    logger.debug("Error handling message:" + JSON.stringify(event));
+    logger.debug(`Error handling message: ${JSON.stringify(event)}`);
     logger.error({
       method,
       error,

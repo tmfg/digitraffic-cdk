@@ -31,7 +31,7 @@ export class IntegrationApi {
 
   createDatex2V1Handler(stack: DigitrafficStack, d2Queue: Queue): void {
     const uploadDatexV1Handler = FunctionBuilder.create(stack, "upload-datex2")
-      .withEnvironment({QUEUE_URL: d2Queue.queueUrl})
+      .withEnvironment({ QUEUE_URL: d2Queue.queueUrl })
       .withMemorySize(256)
       .build();
 

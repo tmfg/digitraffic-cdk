@@ -55,7 +55,8 @@ function parseId(datex2: string): string {
 }
 
 function parseEffectDate(datex2: string): Date {
-  const index = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
+  const index =
+    datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
     DATEX2_OVERALL_STARTTIME_TAG_START.length;
   const index2 = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_END, index);
   const dateString = datex2.substring(index, index2);

@@ -1,8 +1,8 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { assertDataCount, dbTestBase } from "../db-testutil.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { jest } from "@jest/globals";
 import { insertData } from "../../dao/data.js";
+import { assertDataCount, dbTestBase } from "../db-testutil.js";
 
 async function getResponseFromLambda(): Promise<void> {
   const { handler } = await import(
