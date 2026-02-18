@@ -1,9 +1,11 @@
 /* eslint-disable dot-notation */
+import type {
+  DocumentationVersion,
+  ExportResponse,
+} from "@aws-sdk/client-api-gateway";
 import {
   APIGatewayClient,
   CreateDocumentationVersionCommand,
-  type DocumentationVersion,
-  type ExportResponse,
   GetDocumentationVersionsCommand,
   GetExportCommand,
 } from "@aws-sdk/client-api-gateway";
@@ -102,9 +104,9 @@ export function fixApiGatewayNullable(schema: OpenApiSchema): void {
 
       if (isObject(schemaPart)) {
         logger.debug({
-          message: `Fixing nullable field with ${compositionKey}: ${
-            JSON.stringify(current)
-          }`,
+          message: `Fixing nullable field with ${compositionKey}: ${JSON.stringify(
+            current,
+          )}`,
         });
 
         // Delete the broken anyOf
@@ -112,11 +114,12 @@ export function fixApiGatewayNullable(schema: OpenApiSchema): void {
 
         // Merge the properties from the actual schema part
         for (const key in schemaPart) {
-          if (Object.prototype.hasOwnProperty.call(schemaPart, key)) {
+          if (Object.hasOwn(schemaPart, key)) {
             current[key] = schemaPart[key];
           }
         }
         // Add the correct nullable property
+        // biome-ignore lint/complexity/useLiteralKeys: nope
         current["nullable"] = true;
 
         logger.debug({
@@ -127,7 +130,7 @@ export function fixApiGatewayNullable(schema: OpenApiSchema): void {
 
     // Find nested objects/arrays to visit next
     for (const key in current) {
-      if (Object.prototype.hasOwnProperty.call(current, key)) {
+      if (Object.hasOwn(current, key)) {
         const value = current[key] as Record<string, unknown>;
         if (isObject(value) || Array.isArray(value)) {
           toVisit.push(value);

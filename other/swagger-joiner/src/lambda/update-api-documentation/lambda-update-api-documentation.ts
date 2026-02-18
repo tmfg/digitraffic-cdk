@@ -1,14 +1,12 @@
+import type { DocumentationVersion } from "@aws-sdk/client-api-gateway";
+import { APIGatewayClient } from "@aws-sdk/client-api-gateway";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import {
   createDocumentationVersion,
   getDocumentationVersion,
 } from "../../apigw-utils.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import {
-  APIGatewayClient,
-  type DocumentationVersion,
-} from "@aws-sdk/client-api-gateway";
 import { UPDATE_SWAGGER_KEYS } from "../../model/keys.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const KEY_APIGW_IDS = "APIGW_IDS" as const;
 
@@ -34,17 +32,18 @@ export const handler = async (): Promise<void> => {
       .map((apiAndVersions) =>
         createDocumentationVersion(
           apiAndVersions.apiId,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          // biome-ignore lint/style/noNonNullAssertion: checked just above
           getLatestVersion(apiAndVersions.versions!),
           apigateway,
-        )
+        ),
       ),
   );
 };
 
 export function getLatestVersion(versions: DocumentationVersion[]): number {
-  const latest =
-    versions.map((v) => Number(v.version)).sort((a, b) => b - a)[0];
+  const latest = versions
+    .map((v) => Number(v.version))
+    .sort((a, b) => b - a)[0];
 
   return latest ?? 0; // should never be 0 as length is checked
 }

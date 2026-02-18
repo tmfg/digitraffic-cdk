@@ -1,8 +1,6 @@
-import {
-  type OpenApiSchema,
-} from "@digitraffic/common/dist/types/openapi-schema";
-import type { HttpMethod } from "../swagger-utils.js";
+import type { OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import { set } from "lodash-es";
+import type { HttpMethod } from "../swagger-utils.js";
 
 export const getOpenapiDescriptionWithPaths = (
   paths: OpenApiSchema["paths"],
@@ -17,8 +15,7 @@ export const getOpenapiDescriptionWithPaths = (
       url: "https://www.digitraffic.fi/",
     },
     license: {
-      name:
-        "Digitraffic is an open data service. All content from the service and the service documentation is licenced under the Creative Commons 4.0 BY license.",
+      name: "Digitraffic is an open data service. All content from the service and the service documentation is licenced under the Creative Commons 4.0 BY license.",
       url: "https://creativecommons.org/licenses/by/4.0/",
     },
     version: "2.92.0-",
@@ -62,9 +59,15 @@ export function getPathWithSecurity(
   method: string = "get",
 ): OpenApiSchema["paths"] {
   const result = getSupportedPath(path);
-  set<OpenApiSchema["paths"]>(result, [path, method, "security"], [{
-    api_key: [],
-  }]);
+  set<OpenApiSchema["paths"]>(
+    result,
+    [path, method, "security"],
+    [
+      {
+        api_key: [],
+      },
+    ],
+  );
   return result;
 }
 

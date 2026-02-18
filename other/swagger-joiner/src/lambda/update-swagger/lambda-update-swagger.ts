@@ -1,31 +1,27 @@
+import type {
+  PutObjectCommandInput,
+  PutObjectCommandOutput,
+} from "@aws-sdk/client-s3";
+import { ObjectCannedACL, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
+import { openapiSchema } from "@digitraffic/common/dist/types/openapi-schema";
+import {
+  getEnvVariable,
+  getEnvVariableOrElse,
+} from "@digitraffic/common/dist/utils/utils";
 import ky, { type Options } from "ky";
+import { exportSwaggerApi, fixApiGatewayNullable } from "../../apigw-utils.js";
+import { UPDATE_SWAGGER_KEYS } from "../../model/keys.js";
+import type { HttpMethod } from "../../swagger-utils.js";
 import {
   constructSwagger,
-  type HttpMethod,
   mergeApiDescriptions,
   withDeprecations,
   withoutApisWithoutHttpMethods,
   withoutMethods,
   withoutSecurity,
 } from "../../swagger-utils.js";
-import { exportSwaggerApi, fixApiGatewayNullable } from "../../apigw-utils.js";
-import {
-  ObjectCannedACL,
-  PutObjectCommand,
-  type PutObjectCommandInput,
-  type PutObjectCommandOutput,
-  S3,
-} from "@aws-sdk/client-s3";
-import {
-  getEnvVariable,
-  getEnvVariableOrElse,
-} from "@digitraffic/common/dist/utils/utils";
-import {
-  type OpenApiSchema,
-  openapiSchema,
-} from "@digitraffic/common/dist/types/openapi-schema";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { UPDATE_SWAGGER_KEYS } from "../../model/keys.js";
 
 const apiRequestHeaders: Options = {
   headers: {

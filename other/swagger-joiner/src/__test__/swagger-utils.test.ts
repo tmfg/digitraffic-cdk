@@ -1,3 +1,4 @@
+import { openapiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import {
   mergeApiDescriptions,
   withDeprecations,
@@ -5,6 +6,7 @@ import {
   withoutMethods,
   withoutSecurity,
 } from "../swagger-utils.js";
+import { TEST } from "./resources/digitraffic-road-test.js";
 import {
   getDeprecatedPathWithHeaders,
   getDeprecatedPathWithRemovalText,
@@ -12,8 +14,6 @@ import {
   getPathWithSecurity,
   getSupportedPath,
 } from "./testdata.js";
-import { openapiSchema } from "@digitraffic/common/dist/types/openapi-schema";
-import { TEST } from "./resources/digitraffic-road-test.js";
 
 describe("swagger-utils", () => {
   test("mergeApiDescriptions", () => {
@@ -90,7 +90,7 @@ describe("swagger-utils", () => {
       ...getSupportedPath(path3, ["options", "put"]),
     });
 
-    console.log("api:\n" + JSON.stringify(api, null, 2));
+    console.log(`api:\n${JSON.stringify(api, null, 2)}`);
 
     const filteredPaths = withoutMethods(
       api.paths,
@@ -98,8 +98,8 @@ describe("swagger-utils", () => {
     );
     const filteredApis = withoutApisWithoutHttpMethods(filteredPaths);
 
-    console.log("filteredPaths:\n" + JSON.stringify(filteredPaths, null, 2));
-    console.log("filteredApis:\n" + JSON.stringify(filteredApis, null, 2));
+    console.log(`filteredPaths:\n${JSON.stringify(filteredPaths, null, 2)}`);
+    console.log(`filteredApis:\n${JSON.stringify(filteredApis, null, 2)}`);
 
     // Initial data
     expect(api.paths[path1]?.get).toBeDefined();

@@ -11,17 +11,18 @@ export const TEST = {
       url: "https://www.digitraffic.fi/",
     },
     license: {
-      name:
-        "Digitraffic is an open data service. All content from the service and the service documentation is licenced under the Creative Commons 4.0 BY license.",
+      name: "Digitraffic is an open data service. All content from the service and the service documentation is licenced under the Creative Commons 4.0 BY license.",
       url: "https://creativecommons.org/licenses/by/4.0/",
     },
     version:
       "Branch: master, tag: 2023.12.11-1 #effbe05 @ 2023-12-11T13:22:14+0000",
   },
-  servers: [{
-    url: "https://tie-test.digitraffic.fi",
-    variables: { basePath: { default: "prod" } },
-  }],
+  servers: [
+    {
+      url: "https://tie-test.digitraffic.fi",
+      variables: { basePath: { default: "prod" } },
+    },
+  ],
   paths: {
     "/api/weathercam/v1/stations": {
       get: {
@@ -45,20 +46,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeathercamStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/WeathercamStationFeatureCollectionSimpleV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeathercamStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/WeathercamStationFeatureCollectionSimpleV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeathercamStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/WeathercamStationFeatureCollectionSimpleV1",
                 },
               },
             },
@@ -86,20 +84,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeathercamStationFeatureV1Detailed",
+                  $ref: "#/components/schemas/WeathercamStationFeatureV1Detailed",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeathercamStationFeatureV1Detailed",
+                  $ref: "#/components/schemas/WeathercamStationFeatureV1Detailed",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeathercamStationFeatureV1Detailed",
+                  $ref: "#/components/schemas/WeathercamStationFeatureV1Detailed",
                 },
               },
             },
@@ -229,8 +224,7 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeathercamStationsPresetsPublicityHistoryV1",
+                  $ref: "#/components/schemas/WeathercamStationsPresetsPublicityHistoryV1",
                 },
               },
             },
@@ -267,20 +261,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeatherStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/WeatherStationFeatureCollectionSimpleV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeatherStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/WeatherStationFeatureCollectionSimpleV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/WeatherStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/WeatherStationFeatureCollectionSimpleV1",
                 },
               },
             },
@@ -513,20 +504,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/ForecastSectionFeatureCollectionV1",
+                  $ref: "#/components/schemas/ForecastSectionFeatureCollectionV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/ForecastSectionFeatureCollectionV1",
+                  $ref: "#/components/schemas/ForecastSectionFeatureCollectionV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/ForecastSectionFeatureCollectionV1",
+                  $ref: "#/components/schemas/ForecastSectionFeatureCollectionV1",
                 },
               },
             },
@@ -820,20 +808,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/ForecastSectionFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/ForecastSectionFeatureCollectionSimpleV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/ForecastSectionFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/ForecastSectionFeatureCollectionSimpleV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/ForecastSectionFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/ForecastSectionFeatureCollectionSimpleV1",
                 },
               },
             },
@@ -1062,12 +1047,14 @@ export const TEST = {
         tags: ["Variable Sign V1"],
         summary: "Return the latest value of a variable sign",
         operationId: "variableSignByPath",
-        parameters: [{
-          name: "deviceId",
-          in: "path",
-          required: true,
-          schema: { type: "string" },
-        }],
+        parameters: [
+          {
+            name: "deviceId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
         responses: {
           "200": {
             description: "Successful retrieval of variable sign data",
@@ -1170,20 +1157,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
+                  $ref: "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
+                  $ref: "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
+                  $ref: "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
                 },
               },
             },
@@ -1227,20 +1211,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
+                  $ref: "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
+                  $ref: "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
+                  $ref: "#/components/schemas/TrafficAnnouncementFeatureCollectionV1",
                 },
               },
             },
@@ -1505,20 +1486,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/RegionGeometryFeatureCollectionV1",
+                  $ref: "#/components/schemas/RegionGeometryFeatureCollectionV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/RegionGeometryFeatureCollectionV1",
+                  $ref: "#/components/schemas/RegionGeometryFeatureCollectionV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/RegionGeometryFeatureCollectionV1",
+                  $ref: "#/components/schemas/RegionGeometryFeatureCollectionV1",
                 },
               },
             },
@@ -1570,20 +1548,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/RegionGeometryFeatureCollectionV1",
+                  $ref: "#/components/schemas/RegionGeometryFeatureCollectionV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/RegionGeometryFeatureCollectionV1",
+                  $ref: "#/components/schemas/RegionGeometryFeatureCollectionV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/RegionGeometryFeatureCollectionV1",
+                  $ref: "#/components/schemas/RegionGeometryFeatureCollectionV1",
                 },
               },
             },
@@ -1622,20 +1597,17 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TmsStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/TmsStationFeatureCollectionSimpleV1",
                 },
               },
               "application/geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TmsStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/TmsStationFeatureCollectionSimpleV1",
                 },
               },
               "application/vnd.geo+json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TmsStationFeatureCollectionSimpleV1",
+                  $ref: "#/components/schemas/TmsStationFeatureCollectionSimpleV1",
                 },
               },
             },
@@ -1760,8 +1732,7 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/TmsStationsSensorConstantsDataDtoV1",
+                  $ref: "#/components/schemas/TmsStationsSensorConstantsDataDtoV1",
                 },
               },
             },
@@ -2023,8 +1994,7 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/MaintenanceTrackingFeatureCollectionV1",
+                  $ref: "#/components/schemas/MaintenanceTrackingFeatureCollectionV1",
                 },
               },
             },
@@ -2213,8 +2183,7 @@ export const TEST = {
             content: {
               "application/json;charset=UTF-8": {
                 schema: {
-                  $ref:
-                    "#/components/schemas/MaintenanceTrackingLatestFeatureCollectionV1",
+                  $ref: "#/components/schemas/MaintenanceTrackingLatestFeatureCollectionV1",
                 },
               },
             },
@@ -2485,12 +2454,14 @@ export const TEST = {
       get: {
         tags: ["Counting site V1"],
         summary: "Return single counter",
-        parameters: [{
-          name: "counterId",
-          in: "path",
-          required: true,
-          schema: { type: "string" },
-        }],
+        parameters: [
+          {
+            name: "counterId",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
         responses: {
           "200": {
             description: "200 response",
@@ -2538,12 +2509,14 @@ export const TEST = {
       get: {
         tags: ["Variable Sign V1"],
         summary: "Generate svg-image from given text",
-        parameters: [{
-          name: "text",
-          in: "path",
-          required: true,
-          schema: { type: "string" },
-        }],
+        parameters: [
+          {
+            name: "text",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
         responses: {
           "200": {
             description: "200 response",
@@ -3271,8 +3244,7 @@ export const TEST = {
             type: "array",
             description: "Stations data",
             items: {
-              $ref:
-                "#/components/schemas/WeathercamStationPresetsPublicityHistoryV1",
+              $ref: "#/components/schemas/WeathercamStationPresetsPublicityHistoryV1",
             },
           },
         },
