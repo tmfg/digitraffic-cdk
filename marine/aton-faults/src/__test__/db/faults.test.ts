@@ -1,13 +1,13 @@
-import { dbTestBase, insert } from "../db-testutil.js";
-import { newFault } from "../testdata.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import { Language } from "@digitraffic/common/dist/types/language";
+import { addHours } from "date-fns";
+import { LineString, Point } from "wkx";
 import * as FaultsDb from "../../db/faults.js";
 import { findAll } from "../../db/faults.js";
-import { LineString, Point } from "wkx";
 import { FaultState } from "../../model/fault.js";
-import { Language } from "@digitraffic/common/dist/types/language";
-import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { addHours } from "date-fns";
+import { dbTestBase, insert } from "../db-testutil.js";
+import { newFault } from "../testdata.js";
 
 describe(
   "db-voyageplan-faults",
@@ -109,7 +109,7 @@ describe(
 
     test("findAllFaults - multiple", async () => {
       const faults = Array.from({ length: getRandomNumber(1, 10) }).map(() =>
-        newFault()
+        newFault(),
       );
       await insert(db, faults);
 

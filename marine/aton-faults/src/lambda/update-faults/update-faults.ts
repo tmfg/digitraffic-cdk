@@ -1,8 +1,8 @@
-import * as UpdateFaultsService from "../../service/update-faults.js";
-import type { Integration } from "../../app-props.js";
-import { AtonEnvKeys } from "../../keys.js";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { getEnvVariableOrElse } from "@digitraffic/common/dist/utils/utils";
+import type { Integration } from "../../app-props.js";
+import { AtonEnvKeys } from "../../keys.js";
+import * as UpdateFaultsService from "../../service/update-faults.js";
 
 const proxyHolder = ProxyHolder.create();
 
