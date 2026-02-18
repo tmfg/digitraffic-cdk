@@ -5,8 +5,8 @@ import {
 } from "@digitraffic/common/dist/utils/date-utils";
 import type { Connection } from "mysql2/promise.js";
 import type { DtRosmMessage } from "../model/dt-rami-message.js";
-import { mapDaysToBits } from "../util/weekdays.js";
 import { inDatabase, inTransaction } from "../util/database.js";
+import { mapDaysToBits } from "../util/weekdays.js";
 
 export interface DbRamiAudio {
   readonly text_fi: string | null;
@@ -352,8 +352,12 @@ function createDtRamiMessageStationInsertValues(
 ): (string | number)[][][] | null {
   return message.stations
     ? [
-      message.stations.map((station) => [message.id, message.version, station]),
-    ]
+        message.stations.map((station) => [
+          message.id,
+          message.version,
+          station,
+        ]),
+      ]
     : null;
 }
 

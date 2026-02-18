@@ -23,7 +23,7 @@ describe("parse sm messages", () => {
     const data = processedMessage.data[index];
 
     if (!data) {
-      throw new Error("No data at index " + index);
+      throw new Error(`No data at index ${index}`);
     }
 
     expect(data.unknownDelay).toEqual(unknownDelay);
@@ -46,36 +46,44 @@ describe("parse sm messages", () => {
   });
 
   test("parseSmMessage - valid scheduledMessage arrival time known", () => {
-    const processedMessage = parseUDOTMessage(createSmMessage({
-      arrivalTime: "2024-06-19T12:03:00",
-    }));
+    const processedMessage = parseUDOTMessage(
+      createSmMessage({
+        arrivalTime: "2024-06-19T12:03:00",
+      }),
+    );
 
     expectMessage(processedMessage, 0, false, true, 0);
     expectMessage(processedMessage, 1, true, true, 1);
   });
 
   test("parseSmMessage - valid scheduledMessage arrival quay known", () => {
-    const processedMessage = parseUDOTMessage(createSmMessage({
-      arrivalQuay: "B1",
-    }));
+    const processedMessage = parseUDOTMessage(
+      createSmMessage({
+        arrivalQuay: "B1",
+      }),
+    );
 
     expectMessage(processedMessage, 0, true, false, 0);
     expectMessage(processedMessage, 1, true, true, 1);
   });
 
   test("parseSmMessage - valid scheduledMessage departure time known", () => {
-    const processedMessage = parseUDOTMessage(createSmMessage({
-      departureTime: "2024-06-19T12:03:00",
-    }));
+    const processedMessage = parseUDOTMessage(
+      createSmMessage({
+        departureTime: "2024-06-19T12:03:00",
+      }),
+    );
 
     expectMessage(processedMessage, 0, true, true, 0);
     expectMessage(processedMessage, 1, false, true, 1);
   });
 
   test("parseSmMessage - valid scheduledMessage departure quay known", () => {
-    const processedMessage = parseUDOTMessage(createSmMessage({
-      departureQuay: "B2",
-    }));
+    const processedMessage = parseUDOTMessage(
+      createSmMessage({
+        departureQuay: "B2",
+      }),
+    );
 
     expectMessage(processedMessage, 0, true, true, 0);
     expectMessage(processedMessage, 1, true, false, 1);

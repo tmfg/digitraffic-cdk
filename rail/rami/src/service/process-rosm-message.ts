@@ -8,13 +8,15 @@ import type {
   DtRosmMessage,
   DtVideoContent,
 } from "../model/dt-rami-message.js";
+import type {
+  RamiMonitoredJourneyScheduledMessageAudio,
+  RamiScheduledMessageAudio,
+  RamiScheduledMessageVideo,
+  RosmMessage,
+  RosmMessagePayload,
+} from "../model/rosm-message.js";
 import {
-  type RamiMonitoredJourneyScheduledMessageAudio,
-  type RamiScheduledMessageAudio,
-  type RamiScheduledMessageVideo,
-  type RosmMessage,
   RosmMessageOperations,
-  type RosmMessagePayload,
   RosmMessageTypes,
 } from "../model/rosm-message.js";
 import { ramiRosmMessageSchema } from "../model/zod-schema/rosm-message.js";
@@ -45,8 +47,7 @@ export function processRosmMessage(message: DtRosmMessage): Promise<void> {
   ) {
     logger.info({
       method: "RamiMessageService.processRosmMessage",
-      message:
-        `Persisting RAMI message id: ${message.id}, version: ${message.version}`,
+      message: `Persisting RAMI message id: ${message.id}, version: ${message.version}`,
     });
     return insertMessage(message);
   } else if (message.operation === RosmMessageOperations.DELETE) {
@@ -69,9 +70,9 @@ export function parseRosmMessage(message: unknown): DtRosmMessage | undefined {
   return undefined;
 }
 
-export function ramiMessageToDtRamiMessage(
-  { payload }: RosmMessage,
-): DtRosmMessage {
+export function ramiMessageToDtRamiMessage({
+  payload,
+}: RosmMessage): DtRosmMessage {
   return {
     id: payload.messageId,
     version: payload.messageVersion,
@@ -81,16 +82,18 @@ export function ramiMessageToDtRamiMessage(
     startValidity: parseISO(payload.startValidity),
     endValidity: parseISO(payload.endValidity),
     trainNumber: payload.monitoredJourneyScheduledMessage?.vehicleJourney
-        ?.vehicleJourneyName
+      ?.vehicleJourneyName
       ? parseInt(
-        payload.monitoredJourneyScheduledMessage?.vehicleJourney
-          ?.vehicleJourneyName,
-      )
+          payload.monitoredJourneyScheduledMessage?.vehicleJourney
+            ?.vehicleJourneyName,
+          10,
+        )
       : undefined,
-    trainDepartureLocalDate: payload.monitoredJourneyScheduledMessage
-      ?.vehicleJourney?.dataFrameRef,
-    journeyRef: payload.monitoredJourneyScheduledMessage?.vehicleJourney
-      ?.datedVehicleJourneyRef,
+    trainDepartureLocalDate:
+      payload.monitoredJourneyScheduledMessage?.vehicleJourney?.dataFrameRef,
+    journeyRef:
+      payload.monitoredJourneyScheduledMessage?.vehicleJourney
+        ?.datedVehicleJourneyRef,
     stations: getDeliveryPoints(payload),
     video: getVideoContent(payload),
     audio: getAudioContent(payload),
@@ -104,8 +107,9 @@ function getAudioContent(
     payload.messageType === RosmMessageTypes.SCHEDULED_MESSAGE &&
     payload.scheduledMessage?.onGroundRecipient?.recipientAudioMessagesToDeliver
   ) {
-    const audioMessage = payload.scheduledMessage?.onGroundRecipient
-      ?.recipientAudioMessagesToDeliver;
+    const audioMessage =
+      payload.scheduledMessage?.onGroundRecipient
+        ?.recipientAudioMessagesToDeliver;
     return parseScheduledMessageAudio(audioMessage);
   } else if (
     payload.messageType ===
@@ -154,15 +158,15 @@ function parseScheduledMessageAudio(
       endDateTime: audioMessage.scheduledAudioDeliveryRules.endDateTime
         ? parseISO(audioMessage.scheduledAudioDeliveryRules.endDateTime)
         : undefined,
-      startTime: audioMessage.scheduledAudioDeliveryRules.startTime ??
-        undefined,
+      startTime:
+        audioMessage.scheduledAudioDeliveryRules.startTime ?? undefined,
       endTime: audioMessage.scheduledAudioDeliveryRules.endTime ?? undefined,
-      repetitions: audioMessage.scheduledAudioDeliveryRules.repetitions ??
-        undefined,
-      repeatEvery: audioMessage.scheduledAudioDeliveryRules.repeatEvery ??
-        undefined,
-      daysOfWeek: audioMessage.scheduledAudioDeliveryRules.daysOfWeek ??
-        undefined,
+      repetitions:
+        audioMessage.scheduledAudioDeliveryRules.repetitions ?? undefined,
+      repeatEvery:
+        audioMessage.scheduledAudioDeliveryRules.repeatEvery ?? undefined,
+      daysOfWeek:
+        audioMessage.scheduledAudioDeliveryRules.daysOfWeek ?? undefined,
       deliveryAt: audioMessage.scheduledAudioDeliveryRules.deliveryAtDateTime
         ? parseISO(audioMessage.scheduledAudioDeliveryRules.deliveryAtDateTime)
         : undefined,
@@ -177,8 +181,9 @@ function getVideoContent(
     payload.messageType === RosmMessageTypes.SCHEDULED_MESSAGE &&
     payload.scheduledMessage?.onGroundRecipient?.recipientVideoMessagesToDeliver
   ) {
-    const videoMessage = payload.scheduledMessage.onGroundRecipient
-      .recipientVideoMessagesToDeliver;
+    const videoMessage =
+      payload.scheduledMessage.onGroundRecipient
+        .recipientVideoMessagesToDeliver;
     return parseScheduledMessageVideo(videoMessage);
   } else if (
     payload.messageType ===
@@ -226,9 +231,9 @@ function getTextInLanguage(
   const textContent = texts.find((text) => text.language === languageCode);
   return (
     textContent?.text?.trim() ??
-      textContent?.videoText?.trim() ??
-      textContent?.audioText?.trim() ??
-      undefined
+    textContent?.videoText?.trim() ??
+    textContent?.audioText?.trim() ??
+    undefined
   );
 }
 
@@ -254,7 +259,7 @@ function getDeliveryPoints(payload: RosmMessagePayload): string[] | undefined {
 }
 
 function mapDeliveryPointsToStationCodes(points: DeliveryPoint[]): string[] {
-  return points.filter((point): point is DeliveryPoint => !!point).map((
-    point,
-  ) => point.id);
+  return points
+    .filter((point): point is DeliveryPoint => !!point)
+    .map((point) => point.id);
 }

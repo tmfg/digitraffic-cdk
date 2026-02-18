@@ -1,4 +1,4 @@
-/* eslint-disable dot-notation */
+// biome-ignore-all lint/complexity/useLiteralKeys: nope
 process.env["DB_USER"] = "root";
 process.env["DB_PASS"] = "";
 process.env["DB_URI"] = "localhost";

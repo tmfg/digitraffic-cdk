@@ -5,9 +5,10 @@ import {
   insertMessage,
   setMessageDeleted,
 } from "../../dao/message.js";
+import type { WeekDaysBitString } from "../../util/weekdays.js";
+import { mapBitsToDays } from "../../util/weekdays.js";
 import { dbTestBase } from "../db-testutil.js";
 import { createDtRosmMessage } from "../testdata-util.js";
-import { mapBitsToDays, type WeekDaysBitString } from "../../util/weekdays.js";
 
 describe(
   "dao",
@@ -25,9 +26,7 @@ describe(
         mapBitsToDays(
           result[0]?.video?.delivery_rules?.days as WeekDaysBitString,
         ).sort(),
-      ).toEqual(
-        message.video?.daysOfWeek?.sort(),
-      );
+      ).toEqual(message.video?.daysOfWeek?.sort());
     });
     test("findActiveMessages - only active is found", async () => {
       const activeMessage = createDtRosmMessage({ id: "abc" });
@@ -245,9 +244,7 @@ describe(
         mapBitsToDays(
           result[0]?.video?.delivery_rules?.days as WeekDaysBitString,
         ).sort(),
-      ).toEqual(
-        message.video?.daysOfWeek?.sort(),
-      );
+      ).toEqual(message.video?.daysOfWeek?.sort());
     });
   }),
 );

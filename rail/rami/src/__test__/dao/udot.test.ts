@@ -1,7 +1,7 @@
-import { dbTestBase, expectRowCount } from "../db-testutil.js";
-import { inTransaction } from "../../util/database.js";
-import { insertOrUpdate } from "../../dao/udot.js";
 import { randomString } from "@digitraffic/common/dist/test/testutils";
+import { insertOrUpdate } from "../../dao/udot.js";
+import { inTransaction } from "../../util/database.js";
+import { dbTestBase, expectRowCount } from "../db-testutil.js";
 
 describe(
   "UdotDaoTests",
@@ -24,7 +24,7 @@ describe(
           attapId: 1234,
           ud,
           ut,
-          messageId: "id_" + randomString(),
+          messageId: `id_${randomString()}`,
         });
       });
     }

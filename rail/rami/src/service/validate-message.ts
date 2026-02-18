@@ -4,7 +4,7 @@ import { ramiRosmMessageJsonSchema } from "../model/json-schema/rosm-message.js"
 import { ramiSmMessageJsonSchema } from "../model/json-schema/sm-message.js";
 
 interface AjvType {
-  // eslint-disable-next-line @typescript-eslint/no-misused-new
+  // biome-ignore lint/suspicious/noMisleadingInstantiator: nope
   new (options?: { allErrors: boolean }): AjvType;
 
   addFormat(name: string, format?: string | RegExp): void;

@@ -1,10 +1,11 @@
+import type { DbRamiMessage } from "../dao/message.js";
 import {
-  type DbRamiMessage,
   findActiveMessages,
   findMessagesUpdatedAfter,
 } from "../dao/message.js";
-import { mapBitsToDays, type WeekDaysBitString } from "../util/weekdays.js";
 import type { WeekDay } from "../model/dt-rami-message.js";
+import type { WeekDaysBitString } from "../util/weekdays.js";
+import { mapBitsToDays } from "../util/weekdays.js";
 
 export interface PassengerInformationText {
   readonly fi?: string;
@@ -98,9 +99,10 @@ function dbRamiMessageToPassengerInformationMessage(
     endValidity: message.end_validity,
     trainNumber: message.train_number ?? undefined,
     trainDepartureDate: message.train_departure_date ?? undefined,
-    stations: message.stations && message.stations.length > 0
-      ? message.stations.split(",")
-      : undefined,
+    stations:
+      message.stations && message.stations.length > 0
+        ? message.stations.split(",")
+        : undefined,
     ...(messageContainsAudio(message) && {
       audio: {
         text: {
@@ -110,22 +112,22 @@ function dbRamiMessageToPassengerInformationMessage(
         },
         ...(audioContainsDeliveryRules(message) && {
           deliveryRules: {
-            startDateTime: message.audio?.delivery_rules?.start_date ??
-              undefined,
+            startDateTime:
+              message.audio?.delivery_rules?.start_date ?? undefined,
             endDateTime: message.audio?.delivery_rules?.end_date ?? undefined,
             startTime: message.audio?.delivery_rules?.start_time ?? undefined,
             endTime: message.audio?.delivery_rules?.end_time ?? undefined,
             weekDays: message.audio?.delivery_rules?.days
               ? mapBitsToDays(
-                message.audio.delivery_rules.days as WeekDaysBitString,
-              )
+                  message.audio.delivery_rules.days as WeekDaysBitString,
+                )
               : undefined,
-            deliveryType: message.audio?.delivery_rules?.delivery_type ??
-              undefined,
-            repetitions: message.audio?.delivery_rules?.repetitions ??
-              undefined,
-            repeatEvery: message.audio?.delivery_rules?.repeat_every ??
-              undefined,
+            deliveryType:
+              message.audio?.delivery_rules?.delivery_type ?? undefined,
+            repetitions:
+              message.audio?.delivery_rules?.repetitions ?? undefined,
+            repeatEvery:
+              message.audio?.delivery_rules?.repeat_every ?? undefined,
             eventType: message.audio?.delivery_rules?.event_type ?? undefined,
           },
         }),
@@ -140,18 +142,18 @@ function dbRamiMessageToPassengerInformationMessage(
         },
         ...(videoContainsDeliveryRules(message) && {
           deliveryRules: {
-            startDateTime: message.video?.delivery_rules.start_date ??
-              undefined,
+            startDateTime:
+              message.video?.delivery_rules.start_date ?? undefined,
             endDateTime: message.video?.delivery_rules.end_date ?? undefined,
             startTime: message.video?.delivery_rules.start_time ?? undefined,
             endTime: message.video?.delivery_rules.end_time ?? undefined,
             weekDays: message.video?.delivery_rules.days
               ? mapBitsToDays(
-                message.video.delivery_rules.days as WeekDaysBitString,
-              )
+                  message.video.delivery_rules.days as WeekDaysBitString,
+                )
               : undefined,
-            deliveryType: message.video?.delivery_rules.delivery_type ??
-              undefined,
+            deliveryType:
+              message.video?.delivery_rules.delivery_type ?? undefined,
           },
         }),
       },
@@ -160,8 +162,11 @@ function dbRamiMessageToPassengerInformationMessage(
 }
 
 function messageContainsAudio(message: DbRamiMessage): boolean {
-  return !!message.audio.text_fi || !!message.audio.text_en ||
-    !!message.audio.text_sv;
+  return (
+    !!message.audio.text_fi ||
+    !!message.audio.text_en ||
+    !!message.audio.text_sv
+  );
 }
 
 function audioContainsDeliveryRules(message: DbRamiMessage): boolean {
@@ -169,8 +174,11 @@ function audioContainsDeliveryRules(message: DbRamiMessage): boolean {
 }
 
 function messageContainsVideo(message: DbRamiMessage): boolean {
-  return !!message.video.text_fi || !!message.video.text_en ||
-    !!message.video.text_sv;
+  return (
+    !!message.video.text_fi ||
+    !!message.video.text_en ||
+    !!message.video.text_sv
+  );
 }
 
 function videoContainsDeliveryRules(message: DbRamiMessage): boolean {

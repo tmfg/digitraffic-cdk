@@ -1,7 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { validateIncomingRosmMessage } from "../../service/validate-message.js";
 import { sendDlq, sendRosmMessage } from "../../service/sqs-service.js";
+import { validateIncomingRosmMessage } from "../../service/validate-message.js";
 
 export const handler = async (
   messageBody: object | undefined,

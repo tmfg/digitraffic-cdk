@@ -14,7 +14,7 @@ export const getActiveMessagesLambdaEvent = z.object({
   train_departure_date: z
     .string()
     .regex(
-      /^\d{4}\-\d{2}\-\d{2}$/,
+      /^\d{4}-\d{2}-\d{2}$/,
       "train_departure_date should be in format yyyy-MM-dd",
     )
     .or(emptyStringToUndefined)

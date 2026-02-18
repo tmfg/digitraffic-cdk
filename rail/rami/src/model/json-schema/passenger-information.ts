@@ -1,8 +1,5 @@
-import {
-  type JsonSchema,
-  JsonSchemaType,
-  JsonSchemaVersion,
-} from "aws-cdk-lib/aws-apigateway";
+import type { JsonSchema } from "aws-cdk-lib/aws-apigateway";
+import { JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
 import { WEEKDAYS } from "../dt-rami-message.js";
 
 export const TextSchema: JsonSchema = {
