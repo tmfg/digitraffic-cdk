@@ -1,9 +1,9 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
-  type DTDatabase,
   inDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 import * as MetadataDB from "../db/metadata.js";
 
@@ -12,7 +12,7 @@ import type { Camera } from "../model/camera.js";
 export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
   logger.info({
     method: "MetadataService.listAllCameras",
-    message: "listing for " + usersGroups.toString(),
+    message: `listing for ${usersGroups.toString()}`,
   });
 
   const start = Date.now();

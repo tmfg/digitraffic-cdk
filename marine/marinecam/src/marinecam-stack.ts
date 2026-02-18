@@ -1,10 +1,10 @@
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { Construct } from "constructs";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import type { MobileServerProps } from "./app-props.js";
+import { Canaries } from "./canaries.js";
 import * as InternalLambas from "./internal-lambdas.js";
 import { PrivateApi } from "./private-api.js";
-import { Canaries } from "./canaries.js";
 
 export class MarinecamStack extends DigitrafficStack {
   constructor(scope: Construct, id: string, configuration: MobileServerProps) {

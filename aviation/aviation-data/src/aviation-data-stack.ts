@@ -1,8 +1,8 @@
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import type { Construct } from "constructs";
-import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import { PolicyStatement, User } from "aws-cdk-lib/aws-iam";
-import { type AviationDataProps } from "./app-props.js";
+import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
+import type { Construct } from "constructs";
+import type { AviationDataProps } from "./app-props.js";
 
 export class AviationDataStack extends DigitrafficStack {
   constructor(scope: Construct, id: string, configuration: AviationDataProps) {
@@ -33,7 +33,7 @@ export class AviationDataStack extends DigitrafficStack {
         new PolicyStatement({
           actions: ["s3:*Object"],
           principals: [user],
-          resources: [bucket.bucketArn + "/*"],
+          resources: [`${bucket.bucketArn}/*`],
         }),
       );
 
@@ -53,7 +53,7 @@ export class AviationDataStack extends DigitrafficStack {
         new PolicyStatement({
           actions: ["s3:GetObject", "s3:GetObjectVersion"],
           principals: [user],
-          resources: [bucket.bucketArn + "/*"],
+          resources: [`${bucket.bucketArn}/*`],
         }),
       );
 

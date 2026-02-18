@@ -1,26 +1,27 @@
-import * as MetadataService from "../../service/metadata.js";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 
 import type { Camera } from "../../model/camera.js";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import * as MetadataService from "../../service/metadata.js";
 
 const rdsHolder = RdsHolder.create();
 
 const GROUP_SEPARATOR = ",";
 
-export const handler: (event: Record<string, string>) => Promise<Camera[]> = (
-  event: Record<string, string>,
-) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, dot-notation
-  const usersGroups = getUserGroups(event["groups"]!);
+interface ListCamerasEvent {
+  groups: string;
+}
+
+export function handler(event: ListCamerasEvent): Promise<Camera[]> {
+  const usersGroups = getUserGroups(event.groups);
 
   if (usersGroups.length === 0) {
     return Promise.resolve([] as Camera[]);
   }
 
-  return rdsHolder.setCredentials().then(() =>
-    MetadataService.listAllCameras(usersGroups)
-  );
-};
+  return rdsHolder
+    .setCredentials()
+    .then(() => MetadataService.listAllCameras(usersGroups));
+}
 
 // eventGroups is in form [group1, group2...]
 function getUserGroups(eventGroups: string): string[] {

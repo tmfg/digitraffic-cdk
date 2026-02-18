@@ -16,3 +16,5 @@
 !/src/__test__/**/*.xsd
 /src/bin
 
+sbom.json
+

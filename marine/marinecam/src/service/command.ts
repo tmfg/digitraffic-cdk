@@ -72,9 +72,10 @@ export abstract class Command<T> {
     sequenceId: number,
     connectionId: string | undefined,
   ): string {
-    const connection = connectionId === undefined
-      ? "<ConnectionId/>"
-      : `<ConnectionId>${connectionId}</ConnectionId>`;
+    const connection =
+      connectionId === undefined
+        ? "<ConnectionId/>"
+        : `<ConnectionId>${connectionId}</ConnectionId>`;
 
     return `<?xml version="1.0" encoding="utf-8"?>
 <Communication xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -108,7 +109,7 @@ export abstract class Command<T> {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const errorCode = resultCommand.ErrorCode[0]!;
 
-      throw new Error("Command Failed with error code " + errorCode);
+      throw new Error(`Command Failed with error code ${errorCode}`);
     }
   }
 }

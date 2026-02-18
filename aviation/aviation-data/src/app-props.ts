@@ -1,4 +1,4 @@
-import { type StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export interface AviationDataProps extends StackConfiguration {
   readonly bucketWriterArns: string[];

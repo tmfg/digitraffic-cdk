@@ -1,11 +1,8 @@
-import {
-  PutObjectCommand,
-  type PutObjectCommandOutput,
-  S3Client,
-} from "@aws-sdk/client-s3";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { writeFile } from "node:fs/promises";
+import type { PutObjectCommandOutput } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { writeFile } from "fs/promises";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 const BASE64 = "base64" as const;
 
