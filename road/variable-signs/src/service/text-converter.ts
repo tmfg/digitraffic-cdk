@@ -1,12 +1,12 @@
+import { InputError } from "@digitraffic/common/dist/types/input-error";
+import type { TextSymbol } from "./textSymbol.js";
 import {
   findSymbol,
   getSymbolType,
   InputSymbols,
   isValidSymbol,
   SymbolType,
-  type TextSymbol,
 } from "./textSymbol.js";
-import { InputError } from "@digitraffic/common/dist/types/input-error";
 
 const MAX_LENGTH = 30;
 
@@ -95,8 +95,7 @@ function creteSvg(symbolList: TextSymbol[]): string {
 
   // then use introduced symbols
   symbolList.forEach((symbol: TextSymbol) => {
-    useText +=
-      `<use href="#${symbol.name}" x="${width}" y="0" width="${symbol.width}" height="32"/>\n`;
+    useText += `<use href="#${symbol.name}" x="${width}" y="0" width="${symbol.width}" height="32"/>\n`;
     width += symbol.width;
   });
 
@@ -106,12 +105,11 @@ function creteSvg(symbolList: TextSymbol[]): string {
 // convert given string-list to list of symbols, add end if needed
 function convertToSymbols(symbols: Symbols): TextSymbol[] {
   const symbolList = symbols.symbols.map((s) =>
-    findSymbol(symbols.symbolType, s)
+    findSymbol(symbols.symbolType, s),
   ) as TextSymbol[];
 
   // and end symbol, if first symbol is starting borders
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  if (symbolList[0]!.startsBorders()) {
+  if (symbolList[0]?.startsBorders()) {
     const end = findSymbol(symbols.symbolType, "END");
 
     if (end) {
@@ -149,7 +147,7 @@ function findUsedSymbolTexts(text: string): Symbols {
 
       index = mark + 1;
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: yes
       symbol = text[index]!;
 
       index++;

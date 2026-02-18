@@ -4,8 +4,7 @@ import type {
   TloikRivi,
 } from "../model/tilatiedot.js";
 
-const SQL_INSERT_DEVICE_DATA_ROW =
-  `insert into device_data_row(id, device_data_id, screen, row_number, text)
+const SQL_INSERT_DEVICE_DATA_ROW = `insert into device_data_row(id, device_data_id, screen, row_number, text)
 values (nextval('device_data_row_id_seq'), $1, $2, $3, $4)`;
 
 export async function insertDeviceDataRows(
@@ -21,8 +20,7 @@ export async function insertDeviceDataRows(
   ]);
 }
 
-const SQL_INSERT_DEVICE_DATA =
-  `insert into device_data(id, device_id, display_value, additional_information, effect_date, cause, reliability)
+const SQL_INSERT_DEVICE_DATA = `insert into device_data(id, device_id, display_value, additional_information, effect_date, cause, reliability)
 values (nextval('device_data_id_seq'), $1, $2, $3, $4, $5, $6)
 returning id`;
 

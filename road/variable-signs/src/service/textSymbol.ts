@@ -399,9 +399,11 @@ function addSymbol(
   svg: string,
   id: string = name,
 ): void {
-  const tieSvg = svg +
+  const tieSvg =
+    svg +
     `\n<rect y="1" width="${width}" height="2"/>\n<rect y="29" width="${width}" height="2"/>`;
-  const varatieSvg = svg +
+  const varatieSvg =
+    svg +
     `\n<rect y="1" width="2" height="2"/>
     <rect x="5.6" y="1" width="4.8" height="2"/>
     <rect x="14" y="1" width="2" height="2"/>
@@ -410,7 +412,8 @@ function addSymbol(
     <rect x="14" y="29" width="2" height="2"/>`;
 
   // alphabets are widers, need different svg for varareitti
-  const varareittiSvg = svg +
+  const varareittiSvg =
+    svg +
     (width === 16
       ? '\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>'
       : '<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-16,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>');

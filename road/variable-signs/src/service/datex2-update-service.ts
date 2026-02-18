@@ -1,19 +1,17 @@
-import {
-  type DTDatabase,
-  type DTTransaction,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
-import type { Situation } from "../model/situation.js";
-import {
-  type StatusCodeValue,
-  StatusCodeValues,
-} from "../model/status-code-value.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { saveDatex2 } from "../db/datex2.js";
+import type {
+  DTDatabase,
+  DTTransaction,
+} from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
 import {
   DataType,
   updateLastUpdated,
 } from "@digitraffic/common/dist/database/last-updated";
+import { saveDatex2 } from "../db/datex2.js";
+import type { Situation } from "../model/situation.js";
+import type { StatusCodeValue } from "../model/status-code-value.js";
+import { StatusCodeValues } from "../model/status-code-value.js";
 
 const REG_PAYLOAD = /<payloadPublication/g;
 
@@ -40,11 +38,7 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
     return db.tx((tx: DTTransaction) => {
       return tx.batch([
         saveDatex2(tx, situations),
-        updateLastUpdated(
-          tx,
-          DataType.VS_DATEX2,
-          timestamp,
-        ),
+        updateLastUpdated(tx, DataType.VS_DATEX2, timestamp),
       ]);
     });
   }).finally(() => {
@@ -103,7 +97,8 @@ function parseId(datex2: string): string {
 }
 
 function parseEffectDate(datex2: string): Date {
-  const index = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
+  const index =
+    datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
     DATEX2_OVERALL_STARTTIME_TAG_START.length;
   const index2 = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_END, index);
   const dateString = datex2.substring(index, index2);
