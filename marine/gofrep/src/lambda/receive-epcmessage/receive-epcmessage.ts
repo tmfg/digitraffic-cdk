@@ -5,7 +5,7 @@ import * as EpcMessageService from "../../service/epcmessage.js";
 
 export function handler(epcMessage: EpcMessage): string | EpcMessageResponse {
   logger.debug(
-    "method=receiveEpcMessage received message: " + JSON.stringify(epcMessage),
+    `method=receiveEpcMessage received message: ${JSON.stringify(epcMessage)}`,
   );
 
   // TODO implement proxying to final destination
