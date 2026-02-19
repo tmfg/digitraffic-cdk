@@ -23,7 +23,7 @@ export const handler: () => Promise<string> = async () => {
     METADATA_IBNET_URL,
     jsonChecker.checkJson((cameras: Camera[]) => {
       assert.ok(cameras.length > 1);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: length checked above
       assert.ok(cameras[0]!.id.length > 0);
     }),
   );
@@ -37,7 +37,7 @@ export const handler: () => Promise<string> = async () => {
     METADATA_CAMERAS_URL,
     jsonChecker.checkJson((cameras: Camera[]) => {
       assert.ok(cameras.length > 1);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: length checked above
       assert.ok(cameras[0]!.id.length > 0);
     }),
   );

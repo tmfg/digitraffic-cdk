@@ -12,7 +12,7 @@ export function storeImage(
   cameraId: string,
   image: string,
   bucketName: string,
-): Promise<void | PutObjectCommandOutput> {
+): Promise<PutObjectCommandOutput | undefined> {
   const imageName = `${cameraId}.jpg`;
 
   logger.info({
@@ -26,7 +26,8 @@ export function storeImage(
       method: "ImageStore.storeImage",
       message: `Storing image ${cameraId} locally!`,
     });
-    return writeFile(imageName, image, BASE64);
+    writeFile(imageName, image, BASE64);
+    return Promise.resolve(undefined);
   } else {
     // store to s3
     const keyName = `images/Saimaa/${imageName}`;
