@@ -193,23 +193,12 @@ function compareSites(
   sitesInApi: ApiSite[],
   sitesInDb: DbSite[],
 ): [ApiSite[], DbSite[], ApiSite[]] {
-  const apiSiteMap = groupBy(sitesInApi, (s) => s.id);
-  const dbSiteMap = groupBy(sitesInDb, (s) => s.id);
+  const apiSiteIdSet = new Set(sitesInApi.map((s) => s.id));
+  const dbSiteIdSet = new Set(sitesInDb.map((s) => s.id));
 
-  const newSites = sitesInApi.filter((s) => !(s.id in dbSiteMap));
-
-  const removedSites = sitesInDb.filter((s) => !(s.id in apiSiteMap));
-
-  const updatedSites = sitesInApi.filter((s) => s.id in dbSiteMap);
+  const newSites = sitesInApi.filter((s) => !dbSiteIdSet.has(s.id));
+  const removedSites = sitesInDb.filter((s) => !apiSiteIdSet.has(s.id));
+  const updatedSites = sitesInApi.filter((s) => dbSiteIdSet.has(s.id));
 
   return [newSites, removedSites, updatedSites];
-}
-
-function groupBy<T>(arr: T[], fn: (item: T) => number): Record<string, T[]> {
-  return arr.reduce<Record<string, T[]>>((prev, curr) => {
-    const key = fn(curr);
-    const group = prev[key] || [];
-    group.push(curr);
-    return { ...prev, [key]: group };
-  }, {});
 }
