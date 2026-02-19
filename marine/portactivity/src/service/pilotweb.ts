@@ -229,11 +229,8 @@ function findRemoved(
   idMap: PilotagesDAO.TimestampMap,
   pilotages: Pilotage[],
 ): number[] {
-  const pilotageSet = new Set<number>();
+  const pilotageSet = new Set<number>(pilotages.map((p) => p.id));
   const removed: number[] = [];
-
-  // construct id-set from pilotages
-  pilotages.forEach((p) => pilotageSet.add(p.id));
 
   [...idMap.keys()].forEach((id) => {
     if (!pilotageSet.has(id)) {

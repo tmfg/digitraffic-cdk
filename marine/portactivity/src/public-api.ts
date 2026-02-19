@@ -42,7 +42,6 @@ export class PublicApi {
       "PortActivity public API",
     );
 
-    // eslint-disable-next-line deprecation/deprecation
     this.apiKeyId = createUsagePlan(
       this.publicApi,
       "PortActivity timestamps Api Key",

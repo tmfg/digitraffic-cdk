@@ -92,7 +92,7 @@ export async function findPortCallId(
     logger.info({
       method: "PilotwebService.convertUpdatedTimestamps",
       message: `portcall found for ${location.port}${
-        location.from ? " and " + location.from : ""
+        location.from ? ` and ${location.from}` : ""
       }`,
     });
     return p2.port_call_id;
@@ -102,7 +102,7 @@ export async function findPortCallId(
     logger.info({
       method: "PilotwebService.convertUpdatedTimestamps",
       message: `no portcall found for ${location.port}${
-        location.from ? " or " + location.from : ""
+        location.from ? ` or ${location.from}` : ""
       }`,
     });
   } else if (p1) {
@@ -120,7 +120,9 @@ export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
   );
   const idMap: TimestampMap = new Map();
 
-  timestamps.forEach((ts) => idMap.set(ts.id, ts.schedule_updated));
+  timestamps.forEach((ts) => {
+    idMap.set(ts.id, ts.schedule_updated);
+  });
 
   return idMap;
 }

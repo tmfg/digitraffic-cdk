@@ -19,9 +19,9 @@ describe(
 
       expect(locodes.length).toBe(predictedTimestamps.length);
       expect(locodes).not.toContain(timestampNoPrediction.location.port);
-      predictedTimestamps.forEach((timestamp) =>
-        expect(locodes).toContain(timestamp.location.port),
-      );
+      predictedTimestamps.forEach((timestamp) => {
+        expect(locodes).toContain(timestamp.location.port);
+      });
     });
   }),
 );

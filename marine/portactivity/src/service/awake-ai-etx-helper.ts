@@ -54,7 +54,7 @@ function portCallIdFromUrn(urn?: AwakeURN): number | undefined {
   }
   const split = urn.split(":");
   if (split.length < 4) {
-    throw new Error("Invalid URN: " + urn);
+    throw new Error(`Invalid URN: ${urn}`);
   }
   return Number(split[3]);
 }

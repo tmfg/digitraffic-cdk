@@ -176,7 +176,10 @@ function validateConfidenceInterval(timestamp: Partial<ApiTimestamp>): boolean {
     !timestamp.eventTimeConfidenceUpperDiff
   )
     return false;
-  if (isNaN(timestamp.eventTimeConfidenceLowerDiff)) {
+  if (
+    typeof timestamp.eventTimeConfidenceLowerDiff !== "number" ||
+    Number.isNaN(timestamp.eventTimeConfidenceLowerDiff)
+  ) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
       message: `eventTimeConfidenceLowerDiff is not a number ${JSON.stringify(
@@ -185,7 +188,10 @@ function validateConfidenceInterval(timestamp: Partial<ApiTimestamp>): boolean {
     });
     return false;
   }
-  if (isNaN(timestamp.eventTimeConfidenceUpperDiff)) {
+  if (
+    typeof timestamp.eventTimeConfidenceUpperDiff !== "number" ||
+    Number.isNaN(timestamp.eventTimeConfidenceUpperDiff)
+  ) {
     logger.warn({
       method: "ProcessQueue.validateTimestamp",
       message: `eventTimeConfidenceUpperDiff is not a number ${JSON.stringify(

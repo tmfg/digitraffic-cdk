@@ -79,9 +79,10 @@ describe("Awake.AI ETA helper", () => {
   });
 
   test("predictionToTimestamp - no arrival time", () => {
-    const eta: AwakeAiVoyageEtaPrediction = newETAPrediction();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (eta as any).arrivalTime = undefined;
+    const eta = {
+      ...newETAPrediction(),
+      arrivalTime: undefined,
+    } as unknown as AwakeAiVoyageEtaPrediction;
 
     const ts = AwakeAiETAHelper.etaPredictionToTimestamp(
       eta,

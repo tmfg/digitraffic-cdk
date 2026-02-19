@@ -163,8 +163,7 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (response.schedule as any).predictedVoyages[0].predictions = [];
+    _.set(response, ["schedule", "predictedVoyages", 0, "predictions"], []);
     jest
       .spyOn(AwakeAiETAShipApi.prototype, "getETA")
       .mockResolvedValue(response);
@@ -179,8 +178,14 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    delete (response.schedule as any).predictedVoyages[0].predictions[0].locode;
+    _.unset(response, [
+      "schedule",
+      "predictedVoyages",
+      0,
+      "predictions",
+      0,
+      "locode",
+    ]);
     jest
       .spyOn(AwakeAiETAShipApi.prototype, "getETA")
       .mockResolvedValue(response);
