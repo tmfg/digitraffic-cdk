@@ -5,7 +5,7 @@ import { AwsIntegration, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 import type { IVpc } from "aws-cdk-lib/aws-ec2";
 import { Peer, Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
 import { Repository } from "aws-cdk-lib/aws-ecr";
-import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
+import { DockerImageAsset, Platform } from "aws-cdk-lib/aws-ecr-assets";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { DockerImageCode } from "aws-cdk-lib/aws-lambda";
@@ -76,9 +76,11 @@ export class StatisticsIntegrations {
     const image = new DockerImageAsset(stack, "FiguresImage", {
       assetName: "digitraffic-figures-image",
       directory: path.join(__dirname, "../digitraffic-figures/"),
+      platform: Platform.LINUX_ARM64,
     });
 
-    const imageUrl = `${repository.repositoryUri}:latest`;
+    const imageHash = image.assetHash;
+    const imageUrl = `${repository.repositoryUri}:${imageHash}`;
 
     const ecrDeployment = new ECRDeployment(stack, "FiguresECRDeployment", {
       src: new DockerImageName(image.imageUri),
@@ -91,7 +93,7 @@ export class StatisticsIntegrations {
     ecrDeployment.node.addDependency(image);
 
     const code = DockerImageCode.fromEcr(repository, {
-      tagOrDigest: "latest",
+      tagOrDigest: imageHash,
     });
 
     const digitrafficMonthlyFunction = new lambda.DockerImageFunction(
