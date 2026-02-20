@@ -111,70 +111,77 @@ class Figures:
             ["from", "liikennemuoto", "name", "value"],
         ]
 
-        pivot = dff.pivot(
-            index="from", columns=["name", "liikennemuoto"], values="value"
-        )
+        # Get all unique liikennemuoto values
+        all_liikennemuoto = dff["liikennemuoto"].unique()
 
-        # Sort index to ensure it's chronological
-        pivot = pivot.sort_index()
+        result_rows = []
 
-        # Check for missing months
-        expected_months = pd.date_range(
-            start=pivot.index.min(), end=pivot.index.max(), freq="MS"
-        )
-        if not pivot.index.equals(expected_months):
-            raise ValueError("Missing monthly data in the time series")
+        for lm in all_liikennemuoto:
+            lm_data = dff[dff["liikennemuoto"] == lm]
 
-        # Calculate rolling sum for the given number of months
-        rolling_sum = pivot.rolling(window=months, min_periods=months).sum()
+            if lm_data.empty:
+                result_rows.append({
+                    "Liikennemuoto": lm,
+                    "Kyselyt (Milj.)": "N/A",
+                    "Kyselyt (muutos-%)": "Ei riittävästi dataa",
+                    "Data (Tt)": "N/A",
+                    "Data (muutos-%)": "Ei riittävästi dataa",
+                })
+                continue
 
-        # Drop rows with NaN that result from the rolling window calculation
-        rolling_sum.dropna(inplace=True)
-
-        # the rolling sum calculation for the 12 month period is found in 12+1 rows
-        # incomplete periods result in NaN and are stripped above
-        if len(rolling_sum) < 13:
-            return dict(
-                columns=[
-                    {
-                        "name": f"<Not enough data for {months}-month year-on-year comparison>"
-                    }
-                ],
-                data=[],
+            pivot = lm_data.pivot(
+                index="from", columns="name", values="value"
             )
 
-        latest_period = rolling_sum.iloc[-1]
-        previous_period = rolling_sum.iloc[-1 - 12]
+            # Sort index to ensure it's chronological
+            pivot = pivot.sort_index()
 
-        # Calculate percentage change
-        with np.errstate(divide="ignore", invalid="ignore"):
-            change = (latest_period - previous_period) / previous_period
-            change = change.replace([np.inf, -np.inf], np.nan)
-
-        latest_values = rolling_sum.iloc[[-1]].stack()
-
-        change_df = change.to_frame(name=latest_period.name).T
-        latest_change = change_df.stack()
-
-        if len(latest_values) > 0:
-            latest_values["Kyselyt (Milj.)"] = latest_values["Http req"].apply(
-                lambda x: round(x / MILJ, 2)
-            )
-            latest_values["Kyselyt (muutos-%)"] = latest_change["Http req"].apply(
-                lambda x: round(x * 100, 2) if pd.notna(x) else "N/A"
-            )
-            latest_values["Data (Tt)"] = latest_values["Bytes out"].apply(
-                lambda x: round(x / TERA, 2)
-            )
-            latest_values["Data (muutos-%)"] = latest_change["Bytes out"].apply(
-                lambda x: round(x * 100, 2) if pd.notna(x) else "N/A"
+            # Check for missing months in this liikennemuoto's data
+            expected_months = pd.date_range(
+                start=pivot.index.min(), end=pivot.index.max(), freq="MS"
             )
 
-            result = (
-                latest_values.reset_index()
-                .drop(columns=["from", "Bytes out", "Http req"])
-                .rename(columns=dict(liikennemuoto="Liikennemuoto"))
-            )
+            # Calculate rolling sum for the given number of months
+            rolling_sum = pivot.rolling(window=months, min_periods=months).sum()
+
+            # Drop rows with NaN that result from the rolling window calculation
+            rolling_sum = rolling_sum.dropna()
+
+            # Need at least 13 rows for year-on-year comparison (current + 12 months back)
+            if len(rolling_sum) < 13:
+                result_rows.append({
+                    "Liikennemuoto": lm,
+                    "Kyselyt (Milj.)": "N/A",
+                    "Kyselyt (muutos-%)": f"Ei riittävästi dataa ({months} kk vertailuun)",
+                    "Data (Tt)": "N/A",
+                    "Data (muutos-%)": f"Ei riittävästi dataa ({months} kk vertailuun)",
+                })
+                continue
+
+            latest_period = rolling_sum.iloc[-1]
+            previous_period = rolling_sum.iloc[-1 - 12]
+
+            # Calculate percentage change
+            with np.errstate(divide="ignore", invalid="ignore"):
+                change = (latest_period - previous_period) / previous_period
+                change = change.replace([np.inf, -np.inf], np.nan)
+
+            # Build the row for this liikennemuoto
+            http_req_value = latest_period.get("Http req", np.nan)
+            bytes_out_value = latest_period.get("Bytes out", np.nan)
+            http_req_change = change.get("Http req", np.nan)
+            bytes_out_change = change.get("Bytes out", np.nan)
+
+            result_rows.append({
+                "Liikennemuoto": lm,
+                "Kyselyt (Milj.)": round(http_req_value / MILJ, 2) if pd.notna(http_req_value) else "N/A",
+                "Kyselyt (muutos-%)": round(http_req_change * 100, 2) if pd.notna(http_req_change) else "N/A",
+                "Data (Tt)": round(bytes_out_value / TERA, 2) if pd.notna(bytes_out_value) else "N/A",
+                "Data (muutos-%)": round(bytes_out_change * 100, 2) if pd.notna(bytes_out_change) else "N/A",
+            })
+
+        if len(result_rows) > 0:
+            result = pd.DataFrame(result_rows)
 
             table = dict(
                 columns=[dict(name=i, id=i) for i in result.columns],
