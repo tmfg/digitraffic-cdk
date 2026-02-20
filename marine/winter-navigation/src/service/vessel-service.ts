@@ -1,10 +1,8 @@
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import * as VesselDB from "../db/vessels.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-
+import * as VesselDB from "../db/vessels.js";
+import { VESSEL_CHECK } from "../keys.js";
 import type { ActivityDTO, QueueDTO, VesselDTO } from "../model/dto-model.js";
 import type {
   Activity,
@@ -12,7 +10,6 @@ import type {
   Vessel,
   VesselsResponse,
 } from "../model/public-api-model.js";
-import { VESSEL_CHECK } from "../keys.js";
 
 export function getVessel(
   vesselId: number,
@@ -47,9 +44,10 @@ export function getVessels(
       VESSEL_CHECK,
     );
     const dtVessels = vessels
-      .filter((v) =>
-        (!!v.queues && v.queues.length > 0) ||
-        (!!v.activities && v.activities.length > 0)
+      .filter(
+        (v) =>
+          (!!v.queues && v.queues.length > 0) ||
+          (!!v.activities && v.activities.length > 0),
       )
       .map((v) => convertVessel(v));
     const response = {
@@ -60,10 +58,7 @@ export function getVessels(
   });
 }
 
-function convertVessel(
-  v: VesselDTO,
-  lastUpdated?: Date,
-): Vessel {
+function convertVessel(v: VesselDTO, lastUpdated?: Date): Vessel {
   return {
     name: v.name,
     callSign: v.callsign ?? null,
@@ -71,20 +66,22 @@ function convertVessel(
     mmsi: v.mmsi ?? null,
     imo: v.imo ?? null,
     type: v.type ?? null,
-    activities: (v.activities && v.activities.length > 0)
-      ? v.activities.map((a): Activity => convertActivity(a, v))
-      : [],
-    plannedAssistances: (v.queues && v.queues.length > 0)
-      ? v.queues.map((q): PlannedAssistance => convertQueue(q, v))
-      : [],
+    activities:
+      v.activities && v.activities.length > 0
+        ? v.activities.map((a): Activity => convertActivity(a, v))
+        : [],
+    plannedAssistances:
+      v.queues && v.queues.length > 0
+        ? v.queues.map((q): PlannedAssistance => convertQueue(q, v))
+        : [],
     // lastUpdated should be left out from responses containing multiple vessels (a single property should be placed in response root instead)
     ...(lastUpdated && { lastUpdated: lastUpdated.toISOString() }),
   };
 }
 
 function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
-  const isIcebreaker = v.mmsi === a.icebreaker_mmsi ||
-    v.imo === a.icebreaker_imo;
+  const isIcebreaker =
+    v.mmsi === a.icebreaker_mmsi || v.imo === a.icebreaker_imo;
   const isVessel = v.mmsi === a.vessel_mmsi || v.imo === a.vessel_imo;
   const baseActivity = {
     type: a.type,
@@ -123,8 +120,8 @@ function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
 }
 
 function convertQueue(q: QueueDTO, v: VesselDTO): PlannedAssistance {
-  const isIcebreaker = v.mmsi === q.icebreaker_mmsi ||
-    v.imo === q.icebreaker_imo;
+  const isIcebreaker =
+    v.mmsi === q.icebreaker_mmsi || v.imo === q.icebreaker_imo;
 
   const baseAssistance = {
     queuePosition: q.order_num,

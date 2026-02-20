@@ -1,4 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { Handler, SQSEvent } from "aws-lambda";
@@ -6,7 +7,6 @@ import {
   parseRosmMessage,
   processRosmMessage,
 } from "../../service/process-rosm-message.js";
-import { logException } from "@digitraffic/common/dist/utils/logging";
 import { sendDlq } from "../../service/sqs-service.js";
 
 export function handlerFn(): (

@@ -1,11 +1,11 @@
-import { default as pgPromise } from "pg-promise";
+import { TZDate } from "@date-fns/tz";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { Language } from "@digitraffic/common/dist/types/language";
 import { createGeometry } from "@digitraffic/common/dist/utils/geometry";
+import { subHours } from "date-fns";
+import { default as pgPromise } from "pg-promise";
 import type { LineString } from "wkx";
 import type { DbFault, FaultFeature } from "../model/fault.js";
-import type { Language } from "@digitraffic/common/dist/types/language";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { subHours } from "date-fns";
-import { TZDate } from "@date-fns/tz";
 
 // 15 nautical miles
 const BUFFER_RADIUS_METERS = 27780;
@@ -36,8 +36,7 @@ const ALL_FAULTS_JSON_SQL = `select id,
     and aton_fault.type = aton_fault_type.name_fi
     and aton_fault.aton_type_fi = aton_type.name_fi`;
 
-const UPSERT_FAULTS_SQL =
-  `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_sv, 
+const UPSERT_FAULTS_SQL = `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_sv, 
     aton_type_fi, fairway_number, fairway_name_fi, fairway_name_sv, area_number, geometry)
     values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     on conflict(id)
@@ -113,9 +112,9 @@ export function getFaultById(
   db: DTDatabase,
   faultId: number,
 ): Promise<DbFault | undefined> {
-  return db.oneOrNone(PS_FAULT_BY_ID, [faultId]).then((
-    result: DbFault | null,
-  ) => result ?? undefined);
+  return db
+    .oneOrNone(PS_FAULT_BY_ID, [faultId])
+    .then((result: DbFault | null) => result ?? undefined);
 }
 
 interface DbFaultId {
@@ -178,9 +177,9 @@ export function findAll<T>(
     text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString()),
   });
 
-  return db.manyOrNone(ps, [fixedLimit]).then((faults) =>
-    faults.map(conversion)
-  );
+  return db
+    .manyOrNone(ps, [fixedLimit])
+    .then((faults) => faults.map(conversion));
 }
 
 // eslint-disable-next-line @rushstack/no-new-null

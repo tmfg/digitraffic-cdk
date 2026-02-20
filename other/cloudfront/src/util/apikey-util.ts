@@ -1,5 +1,5 @@
-import { SSM } from "@aws-sdk/client-ssm";
 import { APIGateway } from "@aws-sdk/client-api-gateway";
+import { SSM } from "@aws-sdk/client-ssm";
 
 export interface EndpointMetadata {
   readonly endpointUrl: string;
@@ -17,16 +17,14 @@ const apiGateway = new APIGateway({
 async function getParameterValue(name: string): Promise<string> {
   const response = await ssm.getParameter({ Name: name });
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return response.Parameter!.Value!;
+  // biome-ignore lint/style/noNonNullAssertion: it should be set
+  return response.Parameter?.Value!;
 }
 
 export async function readApiKey(shortName: string): Promise<EndpointMetadata> {
   // parameter is a full url as in https://api-gateway-address/stage/
   const endpoint = new URL(
-    await getParameterValue(
-      `/digitraffic/${shortName}/endpointUrl`,
-    ),
+    await getParameterValue(`/digitraffic/${shortName}/endpointUrl`),
   );
   const apiKeyId = await getParameterValue(
     `/digitraffic/${shortName}/apiKeyId`,
@@ -47,7 +45,9 @@ export async function getApiKeyFromAPIGateway(apiKey: string): Promise<string> {
     includeValue: true,
   });
 
-  if (!response.value) throw new Error("Could not find apikey " + apiKey);
+  if (!response.value) {
+    throw new Error(`Could not find apikey ${apiKey}`);
+  }
 
   return response.value;
 }

@@ -1,13 +1,14 @@
-import { Stack, type StackProps } from "aws-cdk-lib";
-import { type Props } from "./app-props.js";
+import type { StackProps } from "aws-cdk-lib";
+import { Stack } from "aws-cdk-lib";
+import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { Topic } from "aws-cdk-lib/aws-sns";
 import {
   CfnMaintenanceWindow,
   CfnMaintenanceWindowTarget,
   CfnMaintenanceWindowTask,
 } from "aws-cdk-lib/aws-ssm";
-import { Topic } from "aws-cdk-lib/aws-sns";
-import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { type Construct } from "constructs";
+import type { Construct } from "constructs";
+import type { Props } from "./app-props.js";
 
 export class PatchManagerStack extends Stack {
   constructor(
@@ -73,11 +74,7 @@ export class PatchManagerStack extends Stack {
           serviceRoleArn: snsRole.roleArn,
           notificationConfig: {
             notificationArn: appProps.notificationArn,
-            notificationEvents: [
-              "TimedOut",
-              "Cancelled",
-              "Failed",
-            ],
+            notificationEvents: ["TimedOut", "Cancelled", "Failed"],
             notificationType: "Command", // status of whole command, not per-instance
           },
           parameters: {

@@ -1,8 +1,8 @@
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import type { Connection } from "mysql2/promise.js";
-import { createPool, type Pool } from "mysql2/promise.js";
-import { getFromEnvOrSecret } from "./secret.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import type { Connection, Pool } from "mysql2/promise.js";
+import { createPool } from "mysql2/promise.js";
+import { getFromEnvOrSecret } from "./secret.js";
 import { getTraceFields, runWithChildSpan } from "./tracing.js";
 
 interface MysqlOpts {

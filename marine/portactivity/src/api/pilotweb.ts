@@ -1,4 +1,4 @@
-import * as https from "https";
+import * as https from "node:https";
 
 const PILOTAGES_PATH = "/digitraffic/pilotages/active";
 

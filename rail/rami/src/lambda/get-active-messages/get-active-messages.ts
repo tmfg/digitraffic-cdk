@@ -1,7 +1,7 @@
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { z } from "zod";
 import { getActiveMessagesLambdaEvent } from "../../model/zod-schema/lambda-event.js";
 import { getActiveMessages } from "../../service/get-message.js";
-import { z } from "zod";
 
 export const handler = async (
   event: Record<string, string>,

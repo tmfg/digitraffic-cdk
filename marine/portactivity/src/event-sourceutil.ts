@@ -45,8 +45,8 @@ for (const entry of eventSourceMap.entries()) {
 }
 
 export function dateAverage(dates: Date[]): string {
-  const averageMillis = dates.reduce((acc, curr) => acc + curr.valueOf(), 0) /
-    dates.length;
+  const averageMillis =
+    dates.reduce((acc, curr) => acc + curr.valueOf(), 0) / dates.length;
   return new Date(averageMillis).toISOString();
 }
 
@@ -74,7 +74,7 @@ function filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(
         !timestamp.portcallId &&
         timestamp.source === EventSource.AWAKE_AI_PRED &&
         timestamps.find((potentialDuplicate) =>
-          isDuplicateWithPortcallId(timestamp, potentialDuplicate)
+          isDuplicateWithPortcallId(timestamp, potentialDuplicate),
         )
       ),
   );
@@ -123,16 +123,16 @@ export function mergeTimestamps(ts: unknown[]): unknown[] {
   for (const portcallTimestamps of byPortcallId) {
     let addToList = [...portcallTimestamps];
     let vtsAStamps = portcallTimestamps.filter((t) =>
-      vtsASources.includes(t.source)
+      vtsASources.includes(t.source),
     );
 
     // special handling for out-of-date or incorrect VTS timestamps
-    const vtsTimestamp = vtsAStamps.find((t) =>
-      t.source === EventSource.SCHEDULES_CALCULATED
+    const vtsTimestamp = vtsAStamps.find(
+      (t) => t.source === EventSource.SCHEDULES_CALCULATED,
     );
     if (vtsTimestamp) {
-      const awakeTimestamp = vtsAStamps.find((t) =>
-        t.source === EventSource.AWAKE_AI
+      const awakeTimestamp = vtsAStamps.find(
+        (t) => t.source === EventSource.AWAKE_AI,
       );
       if (
         datesDifferByMinutes(
@@ -155,8 +155,8 @@ export function mergeTimestamps(ts: unknown[]): unknown[] {
 
     // filter out any worse quality PRED estimates if VTS A estimates are available
     if (vtsAStamps.length) {
-      addToList = addToList.filter((t) =>
-        t.source !== EventSource.AWAKE_AI_PRED
+      addToList = addToList.filter(
+        (t) => t.source !== EventSource.AWAKE_AI_PRED,
       );
     }
 

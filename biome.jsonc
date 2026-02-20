@@ -25,6 +25,13 @@
       "!marine/**/lib",
       "!rail/**/lib",
       "!road/**/lib",
+      "!other/**/lib",
+      // Exclude projects sbom.json
+      "!aviation/**/sbom.json",
+      "!marine/**/sbom.json",
+      "!rail/**/sbom.json",
+      "!road/**/sbom.json",
+      "!other/**/sbom.json",
       // Exclude digitraffic-common subtree project
       "!lib/digitraffic-common"
     ]
@@ -38,7 +45,9 @@
       "enabled": true
     }
   },
-  "assist": { "enabled": true },
+  "assist": {
+    "enabled": true
+  },
   "linter": {
     "enabled": true,
     "rules": {

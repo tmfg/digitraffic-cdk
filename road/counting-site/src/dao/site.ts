@@ -1,11 +1,11 @@
-import { default as pgPromise } from "pg-promise";
-import type { DbSite } from "../model/v2/db-model.js";
-import type { FeatureCollection } from "geojson";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { FeatureCollection } from "geojson";
+import { sql } from "kysely";
+import { default as pgPromise } from "pg-promise";
 import type { ApiSite } from "../model/v2/api-model.js";
+import type { DbSite } from "../model/v2/db-model.js";
 import type { Domain } from "../model/v2/types.js";
 import { database } from "./db.js";
-import { sql } from "kysely";
 
 const SQL_GET_SITES_AS_FEATURE_COLLECTION = `select json_build_object(
                     'type', 'FeatureCollection',

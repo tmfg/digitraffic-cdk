@@ -1,3 +1,4 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
@@ -6,7 +7,6 @@ import { SchedulesApi } from "../../api/schedules.js";
 import { PortactivityEnvKeys } from "../../keys.js";
 import { sendMessage } from "../../service/queue-service.js";
 import { SchedulesService } from "../../service/schedules.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 const enableETBForAllPorts = getEnvVariable(PortactivityEnvKeys.ENABLE_ETB);

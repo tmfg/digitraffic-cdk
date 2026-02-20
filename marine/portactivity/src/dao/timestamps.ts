@@ -1,10 +1,3 @@
-import pgPromise from "pg-promise";
-import { type ApiTimestamp, EventType } from "../model/timestamp.js";
-import {
-  DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES,
-  type Ports,
-} from "../service/portareas.js";
-import { EventSource } from "../model/eventsource.js";
 import type {
   DTDatabase,
   DTTransaction,
@@ -14,6 +7,12 @@ import type {
   Identifiable,
 } from "@digitraffic/common/dist/database/models";
 import { parseISO } from "date-fns";
+import pgPromise from "pg-promise";
+import { EventSource } from "../model/eventsource.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import { EventType } from "../model/timestamp.js";
+import type { Ports } from "../service/portareas.js";
+import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES } from "../service/portareas.js";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const PORTNET_TIMESTAMPS_UPPER_LIMIT = `NOW() + INTERVAL '14 DAYS'`;
@@ -407,7 +406,6 @@ const DELETE_OLD_PILOTAGES_SQL = `
 export function updateTimestamp(
   db: DTDatabase | DTTransaction,
   timestamp: ApiTimestamp,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<DbUpdatedTimestamp | null> {
   const ps = new pgPromise.PreparedStatement({
     name: "update-timestamps",
@@ -425,7 +423,7 @@ export function removeTimestamps(
     return db
       .manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
       .then((array: Identifiable<number>[]) =>
-        array.map((object) => object.id)
+        array.map((object) => object.id),
       );
   }
 
@@ -483,7 +481,7 @@ export function findPortnetETAsByLocodes(
 ): Promise<DbETAShip[]> {
   // Prepared statement use not possible due to dynamic IN-list
   return db.tx((t) =>
-    t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes])
+    t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes]),
   );
 }
 
@@ -493,7 +491,7 @@ export function findVtsShipImosTooCloseToPortByPortCallId(
 ): Promise<DbImo[]> {
   // Prepared statement use not possible due to dynamic IN-list
   return db.tx((t) =>
-    t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds])
+    t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds]),
   );
 }
 
@@ -504,15 +502,13 @@ export async function findVesselSpeedAndNavStatus(
   if (mmsi) {
     const result = await db.oneOrNone<{ sog: number; nav_stat: number }>(
       FIND_VESSEL_SOG_AND_NAV_STATUS,
-      [
-        mmsi,
-      ],
+      [mmsi],
     );
     return result
       ? {
-        sog: result.sog,
-        nav_stat: result.nav_stat,
-      }
+          sog: result.sog,
+          nav_stat: result.nav_stat,
+        }
       : undefined;
   }
   return undefined;
@@ -531,7 +527,6 @@ export function findPortnetTimestampsForAnotherLocode(
   return db.manyOrNone(ps);
 }
 
-// eslint-disable-next-line @rushstack/no-new-null
 export function deleteById(
   db: DTDatabase | DTTransaction,
   id: number,

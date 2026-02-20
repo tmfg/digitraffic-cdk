@@ -37,8 +37,9 @@ describe(
       });
       await insert(db, [timestamp1, timestamp2]);
 
-      const foundTimestamp =
-        (await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL))[0];
+      const foundTimestamp = (
+        await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL)
+      )[0];
       assertDefined(foundTimestamp);
 
       expect(foundTimestamp.event_type).toBe(EventType.ATA);
@@ -183,7 +184,7 @@ describe(
       );
       const mergedTimestamp = mergeTimestamps(
         foundTimestamps.map((ts) =>
-          dbPublicShiplistToPublicApiTimestamp(ts, locode)
+          dbPublicShiplistToPublicApiTimestamp(ts, locode),
         ),
       )[0];
       assertDefined(mergedTimestamp);

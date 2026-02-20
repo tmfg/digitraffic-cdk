@@ -1,13 +1,16 @@
+import {
+  getRandomInteger,
+  randomBoolean,
+} from "@digitraffic/common/dist/test/testutils";
+import { jest } from "@jest/globals";
+import { addHours } from "date-fns";
+import _ from "lodash";
 import type { AwakeAiShipApiResponse } from "../../api/awake-ai-ship.js";
 import {
   AwakeAiETAShipApi,
   AwakeAiShipPredictability,
   AwakeAiShipResponseType,
 } from "../../api/awake-ai-ship.js";
-import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship.js";
-import type { DbETAShip } from "../../dao/timestamps.js";
-import type { ApiTimestamp } from "../../model/timestamp.js";
-import { EventType } from "../../model/timestamp.js";
 import type {
   AwakeAiPredictionMetadata,
   AwakeAiVoyageEtaPrediction,
@@ -17,16 +20,13 @@ import {
   AwakeAiVoyageStatus,
   AwakeAiZoneType,
 } from "../../api/awake-common.js";
-import {
-  getRandomInteger,
-  randomBoolean,
-} from "@digitraffic/common/dist/test/testutils";
+import type { DbETAShip } from "../../dao/timestamps.js";
 import { EventSource } from "../../model/eventsource.js";
-import { addHours } from "date-fns";
-import _ from "lodash";
 import type { Locode } from "../../model/locode.js";
-import { jest } from "@jest/globals";
+import type { ApiTimestamp } from "../../model/timestamp.js";
+import { EventType } from "../../model/timestamp.js";
 import { VTS_A_ETB_PORTS } from "../../model/vts-a-etb-ports.js";
+import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship.js";
 
 /**
  * Note: Since it is a source of VTS A timestamps,
@@ -41,9 +41,9 @@ describe("AwakeAiETAShipService", () => {
     const ship = newDbETAShip("FIPOR");
     const mmsi = 123456789;
     const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, mmsi);
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -57,9 +57,9 @@ describe("AwakeAiETAShipService", () => {
     const ship = newDbETAShip(locode);
     const mmsi = 123456789;
     const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, mmsi);
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -74,9 +74,9 @@ describe("AwakeAiETAShipService", () => {
       "FIKEK",
       addHours(Date.now(), getRandomInteger(24, 100)),
     );
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      createVoyageResponse("FILOL", ship.imo, 123456789),
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(createVoyageResponse("FILOL", ship.imo, 123456789));
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -91,9 +91,9 @@ describe("AwakeAiETAShipService", () => {
       addHours(Date.now(), getRandomInteger(1, 23)),
     );
     const voyageTimestamp = createVoyageResponse("FILOL", ship.imo, 123456789);
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -150,9 +150,9 @@ describe("AwakeAiETAShipService", () => {
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
     _.set(response, ["schedule", "predictedVoyages"], []);
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      response,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(response);
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
     expect(timestamps.length).toBe(0);
@@ -163,11 +163,10 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (response.schedule as any).predictedVoyages[0].predictions = [];
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      response,
-    );
+    _.set(response, ["schedule", "predictedVoyages", 0, "predictions"], []);
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(response);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -179,11 +178,17 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    delete (response.schedule as any).predictedVoyages[0].predictions[0].locode;
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      response,
-    );
+    _.unset(response, [
+      "schedule",
+      "predictedVoyages",
+      0,
+      "predictions",
+      0,
+      "locode",
+    ]);
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(response);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -195,9 +200,9 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse("EEMUG", ship.imo, 123456789);
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      response,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(response);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -212,9 +217,9 @@ describe("AwakeAiETAShipService", () => {
       const response = createVoyageResponse(locode, ship.imo, 123456789, {
         zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA,
       });
-      jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-        response,
-      );
+      jest
+        .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+        .mockResolvedValue(response);
 
       const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -240,9 +245,9 @@ describe("AwakeAiETAShipService", () => {
     const response = createVoyageResponse(locode, ship.imo, 123456789, {
       zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA,
     });
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      response,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(response);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -253,15 +258,14 @@ describe("AwakeAiETAShipService", () => {
     const api = createApi();
     const service = new AwakeAiETAShipService(api, true);
     const ship = newDbETAShip(
-      service
-        .overriddenDestinations[
-          getRandomInteger(0, service.overriddenDestinations.length - 1)
-        ],
+      service.overriddenDestinations[
+        getRandomInteger(0, service.overriddenDestinations.length - 1)
+      ],
     );
     const voyageTimestamp = createVoyageResponse("FIKEK", ship.imo, 123456789);
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -310,7 +314,8 @@ describe("AwakeAiETAShipService", () => {
       ship.imo,
       123456789,
     );
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA")
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
       .mockRejectedValueOnce("error")
       .mockResolvedValue(voyageTimestamp);
 
@@ -328,7 +333,8 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA")
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
       .mockRejectedValueOnce("error")
       .mockRejectedValueOnce("error")
       .mockResolvedValue(response);
@@ -352,9 +358,9 @@ describe("AwakeAiETAShipService", () => {
         },
       },
     );
-    jest.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(
-      voyageTimestamp,
-    );
+    jest
+      .spyOn(AwakeAiETAShipApi.prototype, "getETA")
+      .mockResolvedValue(voyageTimestamp);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 

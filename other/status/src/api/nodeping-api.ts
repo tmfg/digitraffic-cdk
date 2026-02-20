@@ -602,7 +602,7 @@ export class NodePingApi {
     )}` as const;
 
     const response: NodePingDisableAllChecksResponse = await this.doPut<
-      {},
+      object,
       NodePingDisableAllChecksResponse
     >(url, {})
       .catch((reason) => {

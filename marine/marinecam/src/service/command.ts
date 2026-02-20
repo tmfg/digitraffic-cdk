@@ -13,7 +13,7 @@ interface ResponseCommand {
   readonly OutputParams: {
     Param: ResponseParam[];
   }[];
-  readonly Items: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+  readonly Items: unknown[]; // eslint-disable-line @typescript-eslint/no-explicit-any
   readonly Thumbnail?: string[];
 }
 
@@ -72,9 +72,10 @@ export abstract class Command<T> {
     sequenceId: number,
     connectionId: string | undefined,
   ): string {
-    const connection = connectionId === undefined
-      ? "<ConnectionId/>"
-      : `<ConnectionId>${connectionId}</ConnectionId>`;
+    const connection =
+      connectionId === undefined
+        ? "<ConnectionId/>"
+        : `<ConnectionId>${connectionId}</ConnectionId>`;
 
     return `<?xml version="1.0" encoding="utf-8"?>
 <Communication xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -92,7 +93,7 @@ export abstract class Command<T> {
   public abstract getResult(result: CommandResponse): T;
 
   public checkError(result: CommandResponse): void {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: should be set
     const resultCommand = result.Communication.Command[0]!;
     const commandResult = resultCommand.Result[0];
     const commandName = resultCommand.Name[0];
@@ -105,10 +106,10 @@ export abstract class Command<T> {
         customDetails: JSON.stringify(result),
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: should be set
       const errorCode = resultCommand.ErrorCode[0]!;
 
-      throw new Error("Command Failed with error code " + errorCode);
+      throw new Error(`Command Failed with error code ${errorCode}`);
     }
   }
 }
@@ -125,7 +126,7 @@ export class ConnectCommand extends Command<string> {
   }
 
   public getResult(response: CommandResponse): string {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: should be set
     return response.Communication.Command[0]!.OutputParams[0]!.Param[0]!.$
       .Value;
   }
@@ -142,7 +143,7 @@ function getFirstFromNullable<T>(array?: T[]): T {
     throw Error("array not set!");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  // biome-ignore lint/style/noNonNullAssertion: should be set
   return array[0]!;
 }
 
@@ -152,7 +153,7 @@ export class GetThumbnailCommand extends Command<string> {
   }
 
   public getResult(response: CommandResponse): string {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: should be set
     return getFirstFromNullable(response.Communication.Command[0]!.Thumbnail);
   }
 }
@@ -163,7 +164,7 @@ export class GetThumbnailByTimeCommand extends Command<string> {
   }
 
   public getResult(response: CommandResponse): string {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: should be set
     return getFirstFromNullable(response.Communication.Command[0]!.Thumbnail);
   }
 }
@@ -174,7 +175,7 @@ export class RequestStreamCommand extends Command<string> {
   }
 
   public getResult(response: CommandResponse): string {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // biome-ignore lint/style/noNonNullAssertion: should be set
     const output = response.Communication.Command[0]!.OutputParams[0]!.Param;
 
     const videoId = output.find((o) => o.$.Name === "VideoId");

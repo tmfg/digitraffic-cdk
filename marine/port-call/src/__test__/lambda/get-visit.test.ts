@@ -10,7 +10,7 @@ import {
 import { updateAndExpect } from "../service/visits-service.test.js";
 import { createTestVisit } from "../testdata.js";
 
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "";
 
 mockProxyAndSecretHolder();
@@ -43,7 +43,7 @@ describe(
         atd: undefined,
         eta: testVisit.portCall.voyageInformation.estimatedArrivalDateTime.toISOString(),
         etd: testVisit.portCall.voyageInformation.estimatedDepartureDateTime!.toISOString(),
-        portLocode: testVisit.portCall.voyageInformation.portIdentification,
+        portOfCall: testVisit.portCall.voyageInformation.portIdentification,
         status: testVisit.portCall.portCallStatus.status,
         updateTime: testVisit.latestUpdateTime.toISOString(),
         vesselId: testVisit.portCall.vesselInformation.identification,

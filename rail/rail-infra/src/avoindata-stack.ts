@@ -148,15 +148,4 @@ export class AvoinDataStack extends Stack {
       securityGroupName: "lambdaDbSg",
     });
   }
-
-  // @ts-expect-error
-  private addAllowSqsSendPolicy(role: iam.IRole): void {
-    role.addToPrincipalPolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ["sqs:SendMessage"],
-        resources: ["*"],
-      }),
-    );
-  }
 }

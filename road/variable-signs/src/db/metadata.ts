@@ -1,7 +1,7 @@
-import type { DbDevice } from "../model/device.js";
 import type { DTTransaction } from "@digitraffic/common/dist/database/database";
-import type { TloikLaite } from "../model/metatiedot.js";
 import { default as pgPromise } from "pg-promise";
+import type { DbDevice } from "../model/device.js";
+import type { TloikLaite } from "../model/metatiedot.js";
 
 const SQL_UPDATE_DEVICE = `
     update device
@@ -44,9 +44,9 @@ export async function insertDevices(
           d.sijainti.ajorata,
           d.sijainti.e,
           d.sijainti.n,
-        ])
+        ]),
       ),
-    )
+    ),
   );
 }
 

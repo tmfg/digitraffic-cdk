@@ -1,5 +1,5 @@
-import { randomUUID } from "crypto";
-import { AsyncLocalStorage } from "async_hooks";
+import { AsyncLocalStorage } from "node:async_hooks";
+import { randomUUID } from "node:crypto";
 
 export interface TraceContext {
   readonly traceId: string;

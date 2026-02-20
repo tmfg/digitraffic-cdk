@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { ApiData, Queue } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
+import type { ApiData, Queue } from "../model/api-db-model.js";
 
 const SQL_UPDATE_QUEUES = `
 insert into wn_queue(id, icebreaker_id, vessel_id, start_time, end_time, order_num, deleted)

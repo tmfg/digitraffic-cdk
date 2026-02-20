@@ -1,18 +1,18 @@
-import type { Queue } from "aws-cdk-lib/aws-sqs";
-import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
-import { Topic } from "aws-cdk-lib/aws-sns";
+import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
+import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
+import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
   ComparisonOperator,
   TreatMissingData,
 } from "aws-cdk-lib/aws-cloudwatch";
-import { Schedule } from "aws-cdk-lib/aws-synthetics";
-import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
-import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
-import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import type { PortactivityConfiguration } from "./app-props.js";
-import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
-import type { PublicApi } from "./public-api.js";
+import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { Topic } from "aws-cdk-lib/aws-sns";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import { Schedule } from "aws-cdk-lib/aws-synthetics";
+import type { PortactivityConfiguration } from "./app-props.js";
+import type { PublicApi } from "./public-api.js";
 
 export class Canaries {
   constructor(
@@ -25,8 +25,10 @@ export class Canaries {
 
     if (stack.configuration.stackFeatures?.enableCanaries ?? false) {
       const urlRole = new DigitrafficCanaryRole(stack, "portactivity-url");
-      const dbRole = new DigitrafficCanaryRole(stack, "portactivity-db")
-        .withDatabaseAccess();
+      const dbRole = new DigitrafficCanaryRole(
+        stack,
+        "portactivity-db",
+      ).withDatabaseAccess();
 
       new UrlCanary(
         stack,

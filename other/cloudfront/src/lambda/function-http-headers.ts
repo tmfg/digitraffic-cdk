@@ -1,5 +1,5 @@
-import { addCorsHeadersToFunctionResponse } from "./header-util.js";
 import type { CloudfrontEvent, CloudfrontResponse } from "./function-events.js";
+import { addCorsHeadersToFunctionResponse } from "./header-util.js";
 
 /*
     This is a cloudfront function that should be run at cloudfront at viewer response event.

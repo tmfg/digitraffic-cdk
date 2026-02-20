@@ -1,20 +1,20 @@
 {
-    "$schema": "http://json-schema.org/draft-03/schema#",
-    "id": "urn:tloik/rivi",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-        "naytto": {
-            "type": "integer",
-            "required": true
-        },
-        "rivi": {
-            "type": "integer",
-            "required": true
-        },
-        "teksti": {
-            "type": "string",
-            "required": false
-        }
+  "$schema": "http://json-schema.org/draft-03/schema#",
+  "id": "urn:tloik/rivi",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "naytto": {
+      "type": "integer",
+      "required": true
+    },
+    "rivi": {
+      "type": "integer",
+      "required": true
+    },
+    "teksti": {
+      "type": "string",
+      "required": false
     }
+  }
 }

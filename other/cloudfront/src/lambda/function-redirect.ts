@@ -4,8 +4,8 @@ const RESPONSE = {
   statusCode: 302,
   statusDescription: "Found",
   headers: {
-    "location": {
-      "value": "EXT_REDIRECT_URL",
+    location: {
+      value: "EXT_REDIRECT_URL",
     },
   },
 };

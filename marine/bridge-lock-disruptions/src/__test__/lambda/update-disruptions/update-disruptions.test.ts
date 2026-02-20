@@ -1,4 +1,4 @@
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "Test";
 
 const { handler } = await import(
@@ -7,10 +7,13 @@ const { handler } = await import(
 const { disruptionFeatures } = await import("../../testdata.js");
 const { dbTestBase } = await import("../../db-testutil.js");
 const DisruptionsDb = await import("../../../db/disruptions.js");
+
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+
 const { ProxyHolder } = await import(
   "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder"
 );
+
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
 import { jest } from "@jest/globals";
@@ -24,18 +27,20 @@ const testSecret = {
 describe(
   "lambda-update-disruptions",
   dbTestBase((db: DTDatabase) => {
-    jest.spyOn(ProxyHolder.prototype, "setCredentials").mockReturnValueOnce(
-      Promise.resolve(),
-    );
-    jest.spyOn(SecretHolder.prototype, "get").mockReturnValueOnce(
-      Promise.resolve(testSecret),
-    );
+    jest
+      .spyOn(ProxyHolder.prototype, "setCredentials")
+      .mockReturnValueOnce(Promise.resolve());
+    jest
+      .spyOn(SecretHolder.prototype, "get")
+      .mockReturnValueOnce(Promise.resolve(testSecret));
 
     test("Update", async () => {
       const features = disruptionFeatures();
-      jest.spyOn(ky, "get").mockImplementation(() =>
-        mockKyResponse(200, JSON.stringify(features))
-      );
+      jest
+        .spyOn(ky, "get")
+        .mockImplementation(() =>
+          mockKyResponse(200, JSON.stringify(features)),
+        );
 
       await handler();
       const disruptions = await DisruptionsDb.findAll(db);

@@ -1,14 +1,14 @@
-import { FaultsApi } from "../api/faults.js";
-import {
-  type DTDatabase,
-  type DTTransaction,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
-import * as FaultsDB from "../db/faults.js";
-import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { ATON_FAULTS_CHECK } from "./faults.js";
+import type {
+  DTDatabase,
+  DTTransaction,
+} from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { FaultsApi } from "../api/faults.js";
+import * as FaultsDB from "../db/faults.js";
 import type { FaultFeature } from "../model/fault.js";
+import { ATON_FAULTS_CHECK } from "./faults.js";
 
 export async function updateFaults(url: string, domain: string): Promise<void> {
   const start = Date.now();

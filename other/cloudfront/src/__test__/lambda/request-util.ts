@@ -45,7 +45,7 @@ export async function requestHandlerCall(
     handler as unknown as (
       event: CloudFrontRequestEvent,
       context: Context,
-    ) => Promise<CloudFrontRequestResult | void>
+    ) => Promise<CloudFrontRequestResult | undefined>
   )(event, context);
   return result as CloudFrontRequestResult | undefined;
 }
@@ -86,7 +86,7 @@ export function expectRequest(
   if (!result) return;
   if (!isCloudFrontRequest(result)) {
     throw new Error(
-      "Result is not a CloudFrontRequest. Got: " + JSON.stringify(result),
+      `Result is not a CloudFrontRequest. Got: ${JSON.stringify(result)}`,
     );
   }
   expect(result.method).toEqual(expected.method);

@@ -1,19 +1,15 @@
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import {
-  type StatusCodeValue,
-  StatusCodeValues,
-} from "../../model/status-code-value.js";
-import type { TloikTilatiedot } from "../../model/tilatiedot.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import type { StatusCodeValue } from "../../model/status-code-value.js";
+import { StatusCodeValues } from "../../model/status-code-value.js";
+import type { TloikTilatiedot } from "../../model/tilatiedot.js";
 import { updateJsonData } from "../../service/json-update-service.js";
+import type { BodyEvent } from "../update-datex2/update-datex2.js";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = (
-  event: Record<string, string>,
-): Promise<StatusCodeValue> => {
-  // eslint-disable-next-line dot-notation
-  const jsonData = event["body"];
+export const handler = (event: BodyEvent): Promise<StatusCodeValue> => {
+  const jsonData = event.body;
   const start = Date.now();
 
   if (jsonData) {
@@ -26,7 +22,7 @@ export const handler = (
         logger.info({
           method: "UpdateJsonData.handler",
           tookMs: Date.now() - start,
-        })
+        }),
       )
       .catch(() => StatusCodeValues.INTERNAL_ERROR);
   }

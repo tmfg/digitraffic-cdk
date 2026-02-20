@@ -4,9 +4,9 @@ interface Response {
   headers: Record<
     string,
     | {
-      key?: string | undefined;
-      value: string;
-    }[]
+        key?: string | undefined;
+        value: string;
+      }[]
     | undefined
   >;
 }

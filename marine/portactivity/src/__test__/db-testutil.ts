@@ -1,17 +1,17 @@
-import type { ApiTimestamp } from "../model/timestamp.js";
-import * as TimestampsDb from "../dao/timestamps.js";
-import type { DbTimestamp } from "../dao/timestamps.js";
-import type { PortAreaDetails, PortCall, Vessel } from "./testdata.js";
-import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type {
   DTDatabase,
   DTTransaction,
 } from "@digitraffic/common/dist/database/database";
-import { updatePilotages } from "../dao/pilotages.js";
 import type { Countable } from "@digitraffic/common/dist/database/models";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { jest } from "@jest/globals";
+import { updatePilotages } from "../dao/pilotages.js";
+import type { DbTimestamp } from "../dao/timestamps.js";
+import * as TimestampsDb from "../dao/timestamps.js";
+import type { ApiTimestamp } from "../model/timestamp.js";
+import type { PortAreaDetails, PortCall, Vessel } from "./testdata.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
   return commonDbTestBase(
@@ -73,7 +73,7 @@ export async function getPilotagesCount(
   db: DTDatabase | DTTransaction,
 ): Promise<number> {
   const ret = await db.tx((t) =>
-    t.one<Countable>("SELECT COUNT(*) FROM pilotage")
+    t.one<Countable>("SELECT COUNT(*) FROM pilotage"),
   );
   return ret.count;
 }

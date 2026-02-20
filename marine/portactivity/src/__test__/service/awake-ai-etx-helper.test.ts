@@ -1,5 +1,4 @@
-import * as AwakeAiETAHelper from "../../service/awake-ai-etx-helper.js";
-import { isPortcallPrediction } from "../../service/awake-ai-etx-helper.js";
+import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import type {
   AwakeAiPredictionMetadata,
   AwakeAiVoyageEtaPrediction,
@@ -11,9 +10,10 @@ import {
   AwakeAiZoneType,
 } from "../../api/awake-common.js";
 import { EventSource } from "../../model/eventsource.js";
-import { randomIMO, randomMMSI } from "../testdata.js";
-import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { EventType } from "../../model/timestamp.js";
+import * as AwakeAiETAHelper from "../../service/awake-ai-etx-helper.js";
+import { isPortcallPrediction } from "../../service/awake-ai-etx-helper.js";
+import { randomIMO, randomMMSI } from "../testdata.js";
 
 describe("Awake.AI ETA helper", () => {
   test("destinationIsFinnish - correct", () => {
@@ -79,9 +79,10 @@ describe("Awake.AI ETA helper", () => {
   });
 
   test("predictionToTimestamp - no arrival time", () => {
-    const eta: AwakeAiVoyageEtaPrediction = newETAPrediction();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (eta as any).arrivalTime = undefined;
+    const eta = {
+      ...newETAPrediction(),
+      arrivalTime: undefined,
+    } as unknown as AwakeAiVoyageEtaPrediction;
 
     const ts = AwakeAiETAHelper.etaPredictionToTimestamp(
       eta,
@@ -156,8 +157,8 @@ function newETAPrediction(options?: {
 }): AwakeAiVoyageEtaPrediction {
   return {
     predictionType: options?.predictionType ?? AwakeAiPredictionType.ETA,
-    arrivalTime: options?.arrivalTime?.toISOString() ??
-      new Date().toISOString(),
+    arrivalTime:
+      options?.arrivalTime?.toISOString() ?? new Date().toISOString(),
     recordTime: options?.recordTime?.toISOString() ?? new Date().toISOString(),
     locode: options?.locode ?? "FILOL",
     metadata: options?.metadata,

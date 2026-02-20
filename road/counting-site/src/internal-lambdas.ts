@@ -1,14 +1,14 @@
-import { CountingSitesEnvKeys } from "./keys.js";
+import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import { CountingSitesEnvKeys } from "./keys.js";
 
 export class InternalLambdas {
   constructor(stack: DigitrafficStack) {
-    const updateMetadataLambda = InternalLambdas
-      .createUpdateMetadataLambdaForFintraffic(stack);
-    const updateDataLambda = InternalLambdas
-      .createUpdateDataLambdaForFintraffic(stack);
+    const updateMetadataLambda =
+      InternalLambdas.createUpdateMetadataLambdaForFintraffic(stack);
+    const updateDataLambda =
+      InternalLambdas.createUpdateDataLambdaForFintraffic(stack);
 
     Scheduler.everyHour(stack, "RuleForMetadataUpdate", updateMetadataLambda);
     Scheduler.everyHour(stack, "RuleForDataUpdate", updateDataLambda);
@@ -24,8 +24,7 @@ export class InternalLambdas {
 
     return MonitoredFunction.createV2(stack, "update-metadata", environment, {
       memorySize: 256,
-      functionName: stack.configuration.shortName +
-        "-UpdateMetadata-Fintraffic",
+      functionName: `${stack.configuration.shortName}-UpdateMetadata-Fintraffic`,
     });
   }
 
@@ -36,7 +35,7 @@ export class InternalLambdas {
     environment[CountingSitesEnvKeys.DOMAIN_NAME] = "Fintraffic";
 
     return MonitoredFunction.createV2(stack, "update-data", environment, {
-      functionName: stack.configuration.shortName + "-UpdateData-Fintraffic",
+      functionName: `${stack.configuration.shortName}-UpdateData-Fintraffic`,
       memorySize: 256,
     });
   }

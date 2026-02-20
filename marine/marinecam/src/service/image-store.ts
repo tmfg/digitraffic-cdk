@@ -1,11 +1,8 @@
-import {
-  PutObjectCommand,
-  type PutObjectCommandOutput,
-  S3Client,
-} from "@aws-sdk/client-s3";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { writeFile } from "node:fs/promises";
+import type { PutObjectCommandOutput } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { writeFile } from "fs/promises";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 const BASE64 = "base64" as const;
 
@@ -15,7 +12,7 @@ export function storeImage(
   cameraId: string,
   image: string,
   bucketName: string,
-): Promise<void | PutObjectCommandOutput> {
+): Promise<PutObjectCommandOutput | undefined> {
   const imageName = `${cameraId}.jpg`;
 
   logger.info({
@@ -29,7 +26,8 @@ export function storeImage(
       method: "ImageStore.storeImage",
       message: `Storing image ${cameraId} locally!`,
     });
-    return writeFile(imageName, image, BASE64);
+    writeFile(imageName, image, BASE64);
+    return Promise.resolve(undefined);
   } else {
     // store to s3
     const keyName = `images/Saimaa/${imageName}`;

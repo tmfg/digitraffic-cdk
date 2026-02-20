@@ -1,4 +1,4 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as MaintenanceTrackingDb from "../../dao/maintenance-tracking-dao.js";
 import * as DbTestutil from "../db-testutil.js";
 import * as TestData from "../testdata.js";
@@ -7,8 +7,8 @@ describe(
   "db-maintenance-tracking-dao",
   DbTestutil.dbTestBase((db: DTDatabase) => {
     test("insertMaintenanceTrackingData", async () => {
-      const maintenanceTrackingDataJson = TestData
-        .getTrackingJsonWith3Observations(
+      const maintenanceTrackingDataJson =
+        TestData.getTrackingJsonWith3Observations(
           TestData.getRandompId(),
           TestData.getRandompId(),
         );
@@ -28,16 +28,10 @@ describe(
     });
 
     test("insertMaintenanceTrackingData multiple machines", async () => {
-      const maintenanceTrackingDataJson1 = TestData
-        .getTrackingJsonWith3Observations(
-          TestData.getRandompId(),
-          "1",
-        );
-      const maintenanceTrackingDataJson2 = TestData
-        .getTrackingJsonWith3Observations(
-          TestData.getRandompId(),
-          "2",
-        );
+      const maintenanceTrackingDataJson1 =
+        TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), "1");
+      const maintenanceTrackingDataJson2 =
+        TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), "2");
 
       const createdObservations1 = DbTestutil.createObservationsDbDatas(
         maintenanceTrackingDataJson1,
@@ -85,15 +79,15 @@ describe(
       const json = '{ "a" : "b" }';
       const data: MaintenanceTrackingDb.DbObservationData[] =
         createDbObservationData();
-      // @ts-ignore
+      // @ts-expect-error
       expect(data[0].json).toEqual(json);
-      // @ts-ignore
+      // @ts-expect-error
       expect(data[1].json).toEqual(json);
       const clones = MaintenanceTrackingDb.cloneObservationsWithoutJson(data);
       const removed = "{...REMOVED...}";
-      // @ts-ignore
+      // @ts-expect-error
       expect(clones[0].json).toEqual(removed);
-      // @ts-ignore
+      // @ts-expect-error
       expect(clones[1].json).toEqual(removed);
     });
   }),

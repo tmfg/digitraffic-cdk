@@ -1,15 +1,19 @@
-import { handler, HEADERS } from "../../lambda/lambda-lam-headers.js";
+import { HEADERS, handler } from "../../lambda/lambda-lam-headers.js";
 import { createHeader } from "./request-util.js";
 import { expectResponse, responseHandlerCall } from "./response-util.js";
 
 test("filename header gets added with pvm", async () => {
-  const cb = await responseHandlerCall(handler, {
-    uri: "/testi",
-    method: "GET",
-    querystring: "tyyppi=h&pvm=2023-03-01&loppu=&lam_type=option1&piste=1",
-  }, {
-    headers: createHeader(HEADERS.REMAPPED_HOST, "value"),
-  });
+  const cb = await responseHandlerCall(
+    handler,
+    {
+      uri: "/testi",
+      method: "GET",
+      querystring: "tyyppi=h&pvm=2023-03-01&loppu=&lam_type=option1&piste=1",
+    },
+    {
+      headers: createHeader(HEADERS.REMAPPED_HOST, "value"),
+    },
+  );
 
   expectResponse(cb, {
     headers: {
@@ -21,13 +25,17 @@ test("filename header gets added with pvm", async () => {
 });
 
 test("filename header gets added with week", async () => {
-  const cb = await responseHandlerCall(handler, {
-    uri: "/testi",
-    method: "GET",
-    querystring: "tyyppi=h&viikko=12&loppu=&lam_type=option1&piste=1",
-  }, {
-    headers: createHeader(HEADERS.REMAPPED_HOST, "value"),
-  });
+  const cb = await responseHandlerCall(
+    handler,
+    {
+      uri: "/testi",
+      method: "GET",
+      querystring: "tyyppi=h&viikko=12&loppu=&lam_type=option1&piste=1",
+    },
+    {
+      headers: createHeader(HEADERS.REMAPPED_HOST, "value"),
+    },
+  );
 
   expectResponse(cb, {
     headers: {
@@ -39,23 +47,31 @@ test("filename header gets added with week", async () => {
 
 test("malformed querystring", async () => {
   await expect(async () => {
-    await responseHandlerCall(handler, {
-      uri: "/testi",
-      method: "GET",
-      querystring: "tyyppi=h&loppu=&lam_type=option1&piste=1",
-    }, {
-      headers: createHeader(HEADERS.REMAPPED_HOST, "value"),
-    });
+    await responseHandlerCall(
+      handler,
+      {
+        uri: "/testi",
+        method: "GET",
+        querystring: "tyyppi=h&loppu=&lam_type=option1&piste=1",
+      },
+      {
+        headers: createHeader(HEADERS.REMAPPED_HOST, "value"),
+      },
+    );
   }).rejects.toThrow();
 });
 
 test("no filename header gets added", async () => {
-  const cb = await responseHandlerCall(handler, {
-    uri: "testi",
-    method: "GET",
-  }, {
-    headers: {},
-  });
+  const cb = await responseHandlerCall(
+    handler,
+    {
+      uri: "testi",
+      method: "GET",
+    },
+    {
+      headers: {},
+    },
+  );
 
   expectResponse(cb, {
     headers: {
@@ -66,12 +82,16 @@ test("no filename header gets added", async () => {
 });
 
 test("snowflake headers get deleted", async () => {
-  const cb = await responseHandlerCall(handler, {
-    uri: "testi",
-    method: "GET",
-  }, {
-    headers: createHeader(HEADERS.X_API_KEY, "value"),
-  });
+  const cb = await responseHandlerCall(
+    handler,
+    {
+      uri: "testi",
+      method: "GET",
+    },
+    {
+      headers: createHeader(HEADERS.X_API_KEY, "value"),
+    },
+  );
 
   expectResponse(cb, {
     headers: {

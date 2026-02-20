@@ -1,5 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { jest } from "@jest/globals";
+import { addHours } from "date-fns";
 import { NemoApi } from "../../api/nemo-api.js";
 import type { NemoResponse } from "../../model/nemo.js";
 import { updateVisits } from "../../service/visit-service.js";
@@ -21,6 +22,8 @@ export async function updateAndExpect(
   expect(updated.items).toBe(expectItems);
 }
 
+const now = new Date();
+
 const TEST_RESPONSE = [
   {
     visitId: "32ab881cf91a46428e8bc916bdf753f2",
@@ -31,14 +34,14 @@ const TEST_RESPONSE = [
       },
       voyageInformation: {
         portIdentification: "FIVAA",
-        estimatedArrivalDateTime: "2025-03-19T13:00:00.00+02:00",
-        estimatedDepartureDateTime: "2025-03-19T14:00:00.00+02:00",
+        estimatedArrivalDateTime: addHours(now, 1).toISOString(),
+        estimatedDepartureDateTime: addHours(now, 2).toISOString(),
       },
       arrivalNotification: { actualArrivalDateTime: null },
       departureNotification: { actualDepartureDateTime: null },
       portCallStatus: { status: "Expected to Arrive" },
     },
-    latestUpdateTime: "2025-03-19T12:42:49.852078+02:00",
+    latestUpdateTime: now.toISOString(),
   },
   {
     visitId: "667c3398d7794c2eb4b84aac130b422b",
@@ -49,16 +52,16 @@ const TEST_RESPONSE = [
       },
       voyageInformation: {
         portIdentification: "FIVAA",
-        estimatedArrivalDateTime: "2025-03-19T15:00:00.00+02:00",
-        estimatedDepartureDateTime: "2025-03-19T16:00:00.00+02:00",
+        estimatedArrivalDateTime: addHours(now, 3).toISOString(),
+        estimatedDepartureDateTime: addHours(now, 4).toISOString(),
       },
       arrivalNotification: {
-        actualArrivalDateTime: "2025-03-19T14:50:00.00+02:00",
+        actualArrivalDateTime: addHours(now, 2).toISOString(),
       },
       departureNotification: { actualDepartureDateTime: null },
       portCallStatus: { status: "Arrived" },
     },
-    latestUpdateTime: "2025-03-19T14:49:55.638824+02:00",
+    latestUpdateTime: now.toISOString(),
   },
 ] as unknown as NemoResponse;
 

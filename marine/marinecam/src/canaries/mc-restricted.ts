@@ -1,8 +1,8 @@
+import assert from "node:assert";
 import {
   ResponseChecker,
   UrlChecker,
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
-import assert from "assert";
 import type { Camera } from "../model/camera.js";
 
 const METADATA_IBNET_URL = "/prod/api/marinecam/ibnet/metadata";
@@ -23,7 +23,7 @@ export const handler: () => Promise<string> = async () => {
     METADATA_IBNET_URL,
     jsonChecker.checkJson((cameras: Camera[]) => {
       assert.ok(cameras.length > 1);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: length checked above
       assert.ok(cameras[0]!.id.length > 0);
     }),
   );
@@ -37,7 +37,7 @@ export const handler: () => Promise<string> = async () => {
     METADATA_CAMERAS_URL,
     jsonChecker.checkJson((cameras: Camera[]) => {
       assert.ok(cameras.length > 1);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // biome-ignore lint/style/noNonNullAssertion: length checked above
       assert.ok(cameras[0]!.id.length > 0);
     }),
   );

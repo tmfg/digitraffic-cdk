@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { ApiData, DbData, Restriction } from "../model/api-db-model.js";
 import { default as pgPromise } from "pg-promise";
+import type { ApiData, DbData, Restriction } from "../model/api-db-model.js";
 
 const SQL_UPDATE_RESTRICTIONS = `
 insert into wn_restriction(id, location_id, text_compilation, start_time, end_time, deleted)
@@ -14,8 +14,7 @@ do update set
     deleted = false
 `;
 
-const SQL_GET_RESTRICTIONS =
-  `select id, location_id, text_compilation, start_time, end_time
+const SQL_GET_RESTRICTIONS = `select id, location_id, text_compilation, start_time, end_time
 from wn_restriction where deleted = false`;
 
 const PS_UPDATE_RESTRICTIONS = new pgPromise.PreparedStatement({

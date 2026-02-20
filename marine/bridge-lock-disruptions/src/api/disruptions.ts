@@ -1,7 +1,7 @@
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import ky, { type KyResponse } from "ky";
-import type { Feature, Geometry } from "geojson";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import type { Feature, Geometry } from "geojson";
+import ky, { type KyResponse } from "ky";
 
 export async function getDisruptions(
   endpointUrl: string,
@@ -17,8 +17,7 @@ export async function getDisruptions(
   if (response.status !== 200) {
     logger.error({
       method: "DisruptionsApi.getDisruptions",
-      message:
-        `Fetching disruptions failed code: ${response.status} details: ${response.statusText}`,
+      message: `Fetching disruptions failed code: ${response.status} details: ${response.statusText}`,
     });
     throw new Error("Fetching disruptions failed");
   }

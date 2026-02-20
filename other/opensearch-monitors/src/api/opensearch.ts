@@ -1,12 +1,13 @@
-import { HttpRequest } from "@smithy/protocol-http";
-import { SignatureV4 } from "@smithy/signature-v4";
+import * as util from "node:util";
 import { Sha256 } from "@aws-crypto/sha256-browser";
-import { NodeHttpHandler } from "@smithy/node-http-handler";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
-import { opensearchMonitor, type OSMonitor } from "../monitor/monitor.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import * as util from "node:util";
+import { NodeHttpHandler } from "@smithy/node-http-handler";
+import { HttpRequest } from "@smithy/protocol-http";
+import { SignatureV4 } from "@smithy/signature-v4";
+import type { OSMonitor } from "../monitor/monitor.js";
+import { opensearchMonitor } from "../monitor/monitor.js";
 
 export interface OSResponse {
   readonly result: string;
@@ -97,7 +98,7 @@ export class OpenSearch {
 
     // 200 from delete, 201 from create
     if (response.statusCode > 201) {
-      logger.debug("RESPONSE: " + util.inspect(response, { depth: null }));
+      logger.debug(`RESPONSE: ${util.inspect(response, { depth: null })}`);
       logger.error({
         method: "OpenSearch.send",
         customUrl: path,
@@ -138,9 +139,9 @@ export class OpenSearch {
 
     return osResponse
       ? osResponse.hits.hits.map((h) => ({
-        name: h._source.name,
-        id: h._id,
-      }))
+          name: h._source.name,
+          id: h._id,
+        }))
       : [];
   }
 
@@ -153,7 +154,7 @@ export class OpenSearch {
   }
 
   addMonitor(monitor: OSMonitor): Promise<OSMonitorsResponse | undefined> {
-    logger.debug("Sending " + monitor.name);
+    logger.debug(`Sending ${monitor.name}`);
 
     return this.send(
       "POST",
@@ -206,9 +207,7 @@ export class OpenSearch {
     );
   }
 
-  async checkMonitorsUptodate(
-    expectedMonitors: OSMonitor[],
-  ): Promise<void> {
+  async checkMonitorsUptodate(expectedMonitors: OSMonitor[]): Promise<void> {
     const currentMonitors = await this.getAllMonitors();
     // Build a Set of names from currentMonitors
     const currentNames = new Set(currentMonitors.map((m) => m.name));
@@ -216,12 +215,12 @@ export class OpenSearch {
 
     // Find monitors that are missing in monitorsAfterUpdate
     // Check for monitors that are in currentMap but missing in updatedMap
-    const unexpectedMonitors = [...currentNames.keys()].filter((name) =>
-      !expectedNames.has(name)
+    const unexpectedMonitors = [...currentNames.keys()].filter(
+      (name) => !expectedNames.has(name),
     );
 
-    const missingMonitors = [...expectedNames.keys()].filter((name) =>
-      !currentNames.has(name)
+    const missingMonitors = [...expectedNames.keys()].filter(
+      (name) => !currentNames.has(name),
     );
 
     if (missingMonitors.length > 0) {
@@ -231,9 +230,9 @@ export class OpenSearch {
         customMissingMonitors: missingMonitors.join(", "),
       });
       throw new Error(
-        `UpdateOsMonitors.checkMonitorsUptodate failed. Missing monitors ${
-          missingMonitors.join(", ")
-        }`,
+        `UpdateOsMonitors.checkMonitorsUptodate failed. Missing monitors ${missingMonitors.join(
+          ", ",
+        )}`,
       );
     } else {
       logger.info({
@@ -250,9 +249,9 @@ export class OpenSearch {
         customNotExpectedMonitors: unexpectedMonitors.join(", "),
       });
       throw new Error(
-        `UpdateOsMonitors.checkMonitorsUptodate failed. Unexpected monitors found: ${
-          unexpectedMonitors.join(", ")
-        }`,
+        `UpdateOsMonitors.checkMonitorsUptodate failed. Unexpected monitors found: ${unexpectedMonitors.join(
+          ", ",
+        )}`,
       );
     } else {
       logger.debug({ message: "No unexpected monitors are present" });

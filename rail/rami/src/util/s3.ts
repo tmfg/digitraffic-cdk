@@ -1,8 +1,5 @@
-import {
-  PutObjectCommand,
-  type PutObjectCommandOutput,
-  S3,
-} from "@aws-sdk/client-s3";
+import type { PutObjectCommandOutput } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3 } from "@aws-sdk/client-s3";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export async function uploadToS3(
@@ -13,14 +10,14 @@ export async function uploadToS3(
   const s3 = new S3({});
   try {
     await doUpload(s3, bucketName, body, objectName);
-  } catch (error) {
+  } catch (_error) {
     logger.warn({
       method: "RAMI-ProcessDLQ.uploadToS3",
       message: `retrying upload to bucket ${bucketName}`,
     });
     try {
       await doUpload(s3, bucketName, body, objectName);
-    } catch (e2) {
+    } catch (_error2) {
       logger.error({
         method: "RAMI-ProcessDLQ.uploadToS3",
         message: `upload failed, retrying upload to bucket ${bucketName}`,

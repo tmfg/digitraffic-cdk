@@ -3,7 +3,7 @@ import {
   MonitoredDBFunction,
   MonitoredFunction,
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { type DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
   ManagedPolicy,
   PolicyStatement,
@@ -11,12 +11,12 @@ import {
   ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { type Bucket } from "aws-cdk-lib/aws-s3";
-import { type Queue } from "aws-cdk-lib/aws-sqs";
-import { type Construct } from "constructs";
+import type { Bucket } from "aws-cdk-lib/aws-s3";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
+import type { Construct } from "constructs";
 import { MaintenanceTrackingEnvKeys } from "./keys.js";
-import { type MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
-import { type QueueAndDLQ } from "./sqs.js";
+import type { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration.js";
+import type { QueueAndDLQ } from "./sqs.js";
 
 export function createCleanMaintenanceTrackingDataLambda(
   stack: DigitrafficStack,
@@ -122,7 +122,7 @@ function createProcessDLQLambda(
   const statement = new PolicyStatement();
   statement.addActions("s3:PutObject");
   statement.addActions("s3:PutObjectAcl");
-  statement.addResources(dlqBucket.bucketArn + "/*");
+  statement.addResources(`${dlqBucket.bucketArn}/*`);
   processDLQLambda.addToRolePolicy(statement);
 }
 
@@ -138,7 +138,7 @@ function createLambdaRoleWithReadS3Policy(
   const s3PolicyStatement = new PolicyStatement();
   s3PolicyStatement.addActions("s3:GetObject"); // Read big messages from S3
   s3PolicyStatement.addActions("s3:DeleteObject"); // Delete handled big messages from S3
-  s3PolicyStatement.addResources(sqsExtendedMessageBucketArn + "/*");
+  s3PolicyStatement.addResources(`${sqsExtendedMessageBucketArn}/*`);
 
   lambdaRole.addToPolicy(s3PolicyStatement);
   lambdaRole.addManagedPolicy(

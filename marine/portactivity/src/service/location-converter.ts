@@ -1,7 +1,6 @@
-import type { Location } from "../model/timestamp.js";
-import type { PilotageRoute } from "../model/pilotage.js";
-
 import _ from "lodash";
+import type { PilotageRoute } from "../model/pilotage.js";
+import type { Location } from "../model/timestamp.js";
 
 const pilotwebToPortnetLocodeMap = {
   FIKOY: "FIKOK",

@@ -1,8 +1,8 @@
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { Geometry } from "wkx";
+import * as DisruptionsDb from "../../db/disruptions.js";
 import { dbTestBase, insertDisruption } from "../db-testutil.js";
 import { newDisruption, someNumber } from "../testdata.js";
-import * as DisruptionsDb from "../../db/disruptions.js";
-import { Geometry } from "wkx";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 describe(
   "db-disruptions",
@@ -37,8 +37,9 @@ describe(
       expect(fd.description_sv).toBe(disruption.DescriptionSv);
       expect(fd.description_en).toBe(disruption.DescriptionEn);
       expect(
-        Geometry.parse(Buffer.from(fetchedDisruptions[0]!.geometry, "hex"))
-          .toGeoJSON(),
+        Geometry.parse(
+          Buffer.from(fetchedDisruptions[0]!.geometry, "hex"),
+        ).toGeoJSON(),
       ).toMatchObject(disruption.geometry);
     });
 
@@ -62,8 +63,9 @@ describe(
       expect(fd.description_sv).toBe(updatedDisruption.DescriptionSv);
       expect(fd.description_en).toBe(updatedDisruption.DescriptionEn);
       expect(
-        Geometry.parse(Buffer.from(fetchedDisruptions[0]!.geometry, "hex"))
-          .toGeoJSON(),
+        Geometry.parse(
+          Buffer.from(fetchedDisruptions[0]!.geometry, "hex"),
+        ).toGeoJSON(),
       ).toMatchObject(updatedDisruption.geometry);
     });
 

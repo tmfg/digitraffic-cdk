@@ -1,5 +1,5 @@
-import { parseXml, XmlElement } from "@rgrove/parse-xml";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { parseXml, XmlElement } from "@rgrove/parse-xml";
 
 export const TEST_DEVICES = new Set<string>([
   "VME/TIO01K502",
@@ -19,25 +19,24 @@ export const TEST_TIMES = [
   },
 ] as const;
 
-function getChild(
-  element: XmlElement,
-  name: string,
-): XmlElement {
+function getChild(element: XmlElement, name: string): XmlElement {
   for (const child of element.children) {
     if (child instanceof XmlElement && child.name.includes(name)) {
       return child;
     }
   }
 
-  throw new Error("Missing element " + name);
+  throw new Error(`Missing element ${name}`);
 }
 
 function isTestTime(time: Date): boolean {
   const timeMs = time.getTime();
 
-  return TEST_TIMES.find((tt) =>
-    tt.start.getTime() <= timeMs && tt.end.getTime() > timeMs
-  ) !== undefined;
+  return (
+    TEST_TIMES.find(
+      (tt) => tt.start.getTime() <= timeMs && tt.end.getTime() > timeMs,
+    ) !== undefined
+  );
 }
 
 export function isProductionMessage(datex2: string): boolean {
@@ -56,7 +55,7 @@ export function isProductionMessage(datex2: string): boolean {
     const situationRecord = getChild(xml, "situationRecord");
 
     // check if the device is test device
-    // eslint-disable-next-line dot-notation
+    // biome-ignore lint/complexity/useLiteralKeys: nope
     if (!TEST_DEVICES.has(situationRecord.attributes["id"] || "")) {
       return true;
     }
@@ -73,7 +72,7 @@ export function isProductionMessage(datex2: string): boolean {
 
     return !isTestTime(new Date(overallStartTime.text));
   } catch (t) {
-    logger.debug("some error from " + datex2);
+    logger.debug(`some error from ${datex2}`);
 
     logger.error({
       method: "FilteringService.isProductionMessage",

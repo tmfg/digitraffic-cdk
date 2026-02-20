@@ -1,13 +1,13 @@
-import * as AreaTrafficService from "../../service/areatraffic.js";
-import type { ShiplightSecret } from "../../model/shiplight-secret.js";
-import { AreaVisibilityApi } from "../../api/areavisibility.js";
-import { AreaVisibilityService } from "../../service/areavisibility.js";
-import { AreaLightsApi } from "../../api/arealights.js";
-import { AreaLightsService } from "../../service/arealights.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { AreaLightsApi } from "../../api/arealights.js";
+import { AreaVisibilityApi } from "../../api/areavisibility.js";
+import type { ShiplightSecret } from "../../model/shiplight-secret.js";
+import { AreaLightsService } from "../../service/arealights.js";
+import * as AreaTrafficService from "../../service/areatraffic.js";
+import { AreaVisibilityService } from "../../service/areavisibility.js";
 
 const secretHolder = SecretHolder.create<ShiplightSecret>("shiplight");
 const proxyHolder = ProxyHolder.create();

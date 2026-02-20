@@ -1,8 +1,5 @@
-import {
-  type JsonSchema,
-  JsonSchemaType,
-  JsonSchemaVersion,
-} from "aws-cdk-lib/aws-apigateway";
+import type { JsonSchema } from "aws-cdk-lib/aws-apigateway";
+import { JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
 import { EventType } from "./timestamp.js";
 
 export enum S211TimeType {

@@ -1,5 +1,5 @@
-import { dbTestBase } from "../db-testutil.js";
 import { findTimeTableRows } from "../../dao/time_table_row.js";
+import { dbTestBase } from "../db-testutil.js";
 
 describe(
   "TimeTableRowDao",

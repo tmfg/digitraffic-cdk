@@ -1,26 +1,27 @@
 import { jest } from "@jest/globals";
-import { newAwakeATXMessage } from "../testdata.js";
 import type { WebSocket } from "ws";
 import {
   AwakeAiATXApi,
   AwakeAiATXEventType,
   SUBSCRIPTION_MESSAGE,
 } from "../../api/awake-ai-atx.js";
+import { newAwakeATXMessage } from "../testdata.js";
 
 const NO_OP = jest.fn();
 
 const mockSubscriptionId = "abc";
 
-jest.spyOn(AwakeAiATXApi.prototype, "getFromParameterStore").mockResolvedValue(
-  mockSubscriptionId,
-);
-jest.spyOn(AwakeAiATXApi.prototype, "putInParameterStore").mockResolvedValue(
-  {},
-);
+jest
+  .spyOn(AwakeAiATXApi.prototype, "getFromParameterStore")
+  .mockResolvedValue(mockSubscriptionId);
+jest
+  .spyOn(AwakeAiATXApi.prototype, "putInParameterStore")
+  .mockResolvedValue({});
 
 describe("api-awake-ai-atx", () => {
   test("getATXs - no existing session subscribes to zone events", async () => {
-    jest.spyOn(AwakeAiATXApi.prototype, "getFromParameterStore")
+    jest
+      .spyOn(AwakeAiATXApi.prototype, "getFromParameterStore")
       // assume parameter store to not contain subscriptionId on first call
       .mockResolvedValueOnce(undefined)
       .mockResolvedValue(mockSubscriptionId);
@@ -34,7 +35,9 @@ describe("api-awake-ai-atx", () => {
       },
       send: sendMock,
       close: NO_OP,
-    })) as new (url: string | URL) => WebSocket;
+    })) as new (
+      url: string | URL,
+    ) => WebSocket;
 
     const api = new AwakeAiATXApi("", "", WebSocket);
     await api.getATXs(10);
@@ -66,7 +69,9 @@ describe("api-awake-ai-atx", () => {
       },
       send: sendMock,
       close: NO_OP,
-    })) as new (url: string | URL) => WebSocket;
+    })) as new (
+      url: string | URL,
+    ) => WebSocket;
     const api = new AwakeAiATXApi("", "", WebSocket);
 
     await api.getATXs(10);
@@ -93,7 +98,9 @@ describe("api-awake-ai-atx", () => {
       },
       send: jest.fn(),
       close: NO_OP,
-    })) as new (url: string | URL) => WebSocket;
+    })) as new (
+      url: string | URL,
+    ) => WebSocket;
     const api = new AwakeAiATXApi("", "", WebSocket);
 
     const atxs = await api.getATXs(10);
@@ -111,7 +118,9 @@ describe("api-awake-ai-atx", () => {
       },
       send: jest.fn(),
       close: NO_OP,
-    })) as new (url: string | URL) => WebSocket;
+    })) as new (
+      url: string | URL,
+    ) => WebSocket;
     const api = new AwakeAiATXApi("", "", WebSocket);
 
     await expect(api.getATXs(10)).rejects.toEqual("Error");

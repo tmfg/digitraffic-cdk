@@ -1,14 +1,14 @@
+import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import { jest } from "@jest/globals";
+import { subHours, subMinutes } from "date-fns";
 import type { SchedulesResponse } from "../../api/schedules.js";
 import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
+import { EventSource } from "../../model/eventsource.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
 import { EventType } from "../../model/timestamp.js";
-import { newTimestamp } from "../testdata.js";
-import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
 import { ports } from "../../service/portareas.js";
-import { EventSource } from "../../model/eventsource.js";
 import { SchedulesService } from "../../service/schedules.js";
-import { subHours, subMinutes } from "date-fns";
-import { jest } from "@jest/globals";
+import { newTimestamp } from "../testdata.js";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -46,7 +46,7 @@ describe("schedules", () => {
       const getSchedulesTimestampsSpy = jest
         .spyOn(api, "getSchedulesTimestamps")
         .mockImplementation(() =>
-          Promise.resolve(createSchedulesResponse(1, false, false))
+          Promise.resolve(createSchedulesResponse(1, false, false)),
         );
       const service = new SchedulesService(api);
 
@@ -75,7 +75,9 @@ describe("schedules", () => {
     );
 
     expect(timestamps.length).toBe(3);
-    timestamps.forEach((ts) => verifyStructure(ts, EventType.ETA, false));
+    timestamps.forEach((ts) => {
+      verifyStructure(ts, EventType.ETA, false);
+    });
   });
 
   test("SchedulesService.schedulesToTimestamps - under VTS control - [ ] ETA [x] ETD", () => {
@@ -88,7 +90,9 @@ describe("schedules", () => {
     );
 
     expect(timestamps.length).toBe(3);
-    timestamps.forEach((ts) => verifyStructure(ts, EventType.ETD, false));
+    timestamps.forEach((ts) => {
+      verifyStructure(ts, EventType.ETD, false);
+    });
   });
 
   test("SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [x] ETD", () => {
@@ -103,10 +107,14 @@ describe("schedules", () => {
     expect(timestamps.length).toBe(6);
     timestamps
       .filter((ts) => ts.eventType === EventType.ETA)
-      .forEach((ts) => verifyStructure(ts, EventType.ETA, false));
+      .forEach((ts) => {
+        verifyStructure(ts, EventType.ETA, false);
+      });
     timestamps
       .filter((ts) => ts.eventType === EventType.ETD)
-      .forEach((ts) => verifyStructure(ts, EventType.ETD, false));
+      .forEach((ts) => {
+        verifyStructure(ts, EventType.ETD, false);
+      });
   });
 
   /**
@@ -126,10 +134,14 @@ describe("schedules", () => {
     expect(timestamps.length).toBe(etaCount * 2);
     timestamps
       .filter((ts) => ts.eventType === EventType.ETA)
-      .forEach((ts) => verifyStructure(ts, EventType.ETA, true));
+      .forEach((ts) => {
+        verifyStructure(ts, EventType.ETA, true);
+      });
     timestamps
       .filter((ts) => ts.eventType === EventType.ETB)
-      .forEach((ts) => verifyStructure(ts, EventType.ETB, true));
+      .forEach((ts) => {
+        verifyStructure(ts, EventType.ETB, true);
+      });
   });
 
   test("SchedulesService.schedulesToTimestamps - calculated - [ ] ETA [x] ETD", () => {
@@ -142,7 +154,9 @@ describe("schedules", () => {
     );
 
     expect(timestamps.length).toBe(3);
-    timestamps.forEach((ts) => verifyStructure(ts, EventType.ETD, true));
+    timestamps.forEach((ts) => {
+      verifyStructure(ts, EventType.ETD, true);
+    });
   });
 
   test("SchedulesService.schedulesToTimestamps - calculated - [x] ETA [x] ETD", () => {
@@ -158,13 +172,19 @@ describe("schedules", () => {
     expect(timestamps.length).toBe(timestampCount * 3);
     timestamps
       .filter((ts) => ts.eventType === EventType.ETA)
-      .forEach((ts) => verifyStructure(ts, EventType.ETA, true));
+      .forEach((ts) => {
+        verifyStructure(ts, EventType.ETA, true);
+      });
     timestamps
       .filter((ts) => ts.eventType === EventType.ETB)
-      .forEach((ts) => verifyStructure(ts, EventType.ETB, true));
+      .forEach((ts) => {
+        verifyStructure(ts, EventType.ETB, true);
+      });
     timestamps
       .filter((ts) => ts.eventType === EventType.ETD)
-      .forEach((ts) => verifyStructure(ts, EventType.ETD, true));
+      .forEach((ts) => {
+        verifyStructure(ts, EventType.ETD, true);
+      });
   });
 
   test("filterTimestamps - older than 5 minutes are filtered", () => {
@@ -213,23 +233,23 @@ function createSchedulesResponse(
             ],
             eta: eta
               ? [
-                {
-                  $: {
-                    time: etaEventTime,
-                    uts: etaTimestamp,
+                  {
+                    $: {
+                      time: etaEventTime,
+                      uts: etaTimestamp,
+                    },
                   },
-                },
-              ]
+                ]
               : undefined,
             etd: etd
               ? [
-                {
-                  $: {
-                    time: etdEventTime,
-                    uts: etdTimestamp,
+                  {
+                    $: {
+                      time: etdEventTime,
+                      uts: etdTimestamp,
+                    },
                   },
-                },
-              ]
+                ]
               : undefined,
           },
         ],

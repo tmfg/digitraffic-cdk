@@ -80,7 +80,8 @@ export interface AwakeArrivalPortCallPrediction extends AwakeAiPrediction {
 export type AwakeAiDestinationPrediction = AwakeAiLocodePrediction;
 
 export interface AwakeAiTravelTimePrediction
-  extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
+  extends AwakeAiLocodePrediction,
+    AwakeAiZonePrediction {
   readonly zoneId: ["berth", "pbp"];
 
   readonly zoneName: string;
@@ -90,13 +91,15 @@ export interface AwakeAiTravelTimePrediction
 }
 
 export interface AwakeAiVoyageEtaPrediction
-  extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
+  extends AwakeAiLocodePrediction,
+    AwakeAiZonePrediction {
   // ISO 8601
   readonly arrivalTime: string;
 }
 
 export interface AwakeAiVoyageEtdPrediction
-  extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
+  extends AwakeAiLocodePrediction,
+    AwakeAiZonePrediction {
   // ISO 8601
   readonly departureTime: string;
 }

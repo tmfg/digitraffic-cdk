@@ -1,7 +1,7 @@
+import { get } from "lodash-es";
 import type { Connection } from "mysql2/promise";
 import * as mysql from "../util/database.js";
 import { inTransaction } from "../util/database.js";
-import { get } from "lodash-es";
 
 export type DbUnitTestFunction = (db: Connection) => void;
 

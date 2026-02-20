@@ -1,13 +1,11 @@
-import {
-  type OpenApiOperation,
-  openapiOperation,
-  type OpenApiSchema,
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type {
+  OpenApiOperation,
+  OpenApiSchema,
 } from "@digitraffic/common/dist/types/openapi-schema";
+import { openapiOperation } from "@digitraffic/common/dist/types/openapi-schema";
 import { cloneDeep, merge } from "lodash-es";
-import {
-  logger,
-  type LoggerMethodType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const HttpMethods = [
   "get",
@@ -67,12 +65,13 @@ export function constructSwagger(spec: object): string {
 
 export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
   if (
-    allApis.length === 0 || (allApis.length === 1 && allApis[0] === undefined)
+    allApis.length === 0 ||
+    (allApis.length === 1 && allApis[0] === undefined)
   ) {
     throw new Error(
-      `method=mergeApiDescriptions No APIs to merge. allApis: ${
-        JSON.stringify(allApis)
-      }`,
+      `method=mergeApiDescriptions No APIs to merge. allApis: ${JSON.stringify(
+        allApis,
+      )}`,
     );
   }
   if (allApis.length === 1 && allApis[0]) {
@@ -87,8 +86,8 @@ export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
 
 function methodIsDeprecated(operation: OpenApiOperation): boolean {
   const deprecationTextMatcher = /(W|w)ill be removed/;
-  const summaryMatch = operation.summary &&
-    deprecationTextMatcher.test(operation.summary);
+  const summaryMatch =
+    operation.summary && deprecationTextMatcher.test(operation.summary);
 
   // I think this witchcraft probably tries to look into operation.response.headers.
   const headerMatcher =
@@ -98,8 +97,7 @@ function methodIsDeprecated(operation: OpenApiOperation): boolean {
   return summaryMatch || headerMatch;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isOperation(value: any): value is OpenApiOperation {
+function isOperation(value: unknown): value is OpenApiOperation {
   // Since all fields are optional, and more can be added, this doesn't discriminate very much.
   // Just check that types of any defined fields in OpenApiOperation type are correct.
   const parsed = openapiOperation.safeParse(value);
@@ -154,10 +152,7 @@ export function withoutMethods(
   Object.values(result).forEach((pathItem) => {
     Object.keys(pathItem).forEach((key) => {
       if (keyTest(key)) {
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access --
-                 * Must cast to any to allow indexing object by string.
-                 **/
-        delete (pathItem as any)[key];
+        delete (pathItem as Record<string, unknown>)[key];
       }
     });
   });
@@ -177,21 +172,20 @@ export function withoutApisWithoutHttpMethods(
     `${SERVICE}."withoutApisWithoutHttpMethods` as const satisfies LoggerMethodType;
   try {
     return Object.fromEntries(
-      Object.entries(result)
-        .filter(([path, pathItem]) => {
-          const pathItemKeys = Object.keys(pathItem);
-          // Check that pathItemKeys contains at least one http method, otherwise delete path
-          const containsHttpMethod = pathItemKeys.some((m) =>
-            HttpMethods.includes(m as HttpMethod)
-          );
-          logger.info({
-            method,
-            message: `path: ${path}, pathItemKeys: ${
-              pathItemKeys.join(",")
-            }, containsHttpMethod: ${containsHttpMethod}`,
-          });
-          return containsHttpMethod;
-        }),
+      Object.entries(result).filter(([path, pathItem]) => {
+        const pathItemKeys = Object.keys(pathItem);
+        // Check that pathItemKeys contains at least one http method, otherwise delete path
+        const containsHttpMethod = pathItemKeys.some((m) =>
+          HttpMethods.includes(m as HttpMethod),
+        );
+        logger.info({
+          method,
+          message: `path: ${path}, pathItemKeys: ${pathItemKeys.join(
+            ",",
+          )}, containsHttpMethod: ${containsHttpMethod}`,
+        });
+        return containsHttpMethod;
+      }),
     );
   } catch (error) {
     logger.error({

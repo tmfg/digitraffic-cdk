@@ -1,10 +1,11 @@
 import * as apigw from "aws-cdk-lib/aws-apigateway";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as route53 from "aws-cdk-lib/aws-route53";
 import * as targets from "aws-cdk-lib/aws-route53-targets";
-import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import type { Construct } from "constructs";
-import { StatisticsIntegrations } from "./aws-integrations.js";
 import { StatisticsApi } from "./api.js";
+import { StatisticsIntegrations } from "./aws-integrations.js";
+
 import cdk = require("aws-cdk-lib");
 
 interface DigitrafficStatisticsProps {

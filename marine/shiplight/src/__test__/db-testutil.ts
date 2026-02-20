@@ -1,5 +1,5 @@
-import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { ShipTypes } from "../db/areatraffic.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
@@ -25,9 +25,7 @@ export async function assertArea(
   const area = await db.tx((t) => {
     return t.oneOrNone<Area | null>(
       "select brighten_sent,brighten_end from areatraffic where id = $1",
-      [
-        id,
-      ],
+      [id],
     );
   });
 

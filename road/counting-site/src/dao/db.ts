@@ -1,4 +1,3 @@
-import type { Database } from "../model/database.js";
 import {
   DummyDriver,
   Kysely,
@@ -6,6 +5,7 @@ import {
   PostgresIntrospector,
   PostgresQueryCompiler,
 } from "kysely";
+import type { Database } from "../model/database.js";
 
 export const database = new Kysely<Database>({
   dialect: {

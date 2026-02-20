@@ -1,8 +1,7 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Deleted } from "../model/api-db-model.js";
 
-const SQL_SET_DELETED =
-  `update $1:name set deleted = true where id in ($2:csv)`;
+const SQL_SET_DELETED = `update $1:name set deleted = true where id in ($2:csv)`;
 
 export type TableName =
   | "wn_location"

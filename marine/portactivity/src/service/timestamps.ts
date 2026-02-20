@@ -9,13 +9,13 @@ import {
 } from "@digitraffic/common/dist/database/database";
 import { parseISO } from "date-fns";
 import _ from "lodash";
-import * as TimestampsDB from "../dao/timestamps.js";
 import type {
   DbETAShip,
   DbTimestamp,
   DbTimestampIdAndLocode,
   DbUpdatedTimestamp,
 } from "../dao/timestamps.js";
+import * as TimestampsDB from "../dao/timestamps.js";
 import {
   getDisplayableNameForEventSource,
   isPortnetTimestamp,
@@ -36,8 +36,8 @@ export interface UpdatedTimestamp extends DbUpdatedTimestamp {
 
 function getPortcallEventType(timestamp: ApiTimestamp): EventType {
   return timestamp.eventType === EventType.ETB &&
-      (timestamp.source === EventSource.SCHEDULES_CALCULATED ||
-        timestamp.source === EventSource.AWAKE_AI)
+    (timestamp.source === EventSource.SCHEDULES_CALCULATED ||
+      timestamp.source === EventSource.AWAKE_AI)
     ? EventType.ETA
     : timestamp.eventType;
 }
@@ -47,7 +47,8 @@ export function saveTimestamp(
   db: DTDatabase,
 ): Promise<UpdatedTimestamp | undefined> {
   return db.tx(async (t) => {
-    const portcallId = timestamp.portcallId ??
+    const portcallId =
+      timestamp.portcallId ??
       (await TimestampsDB.findPortcallId(
         db,
         timestamp.location.port,
@@ -60,44 +61,42 @@ export function saveTimestamp(
       if (timestamp.source !== EventSource.AWAKE_AI_PRED) {
         logger.warn({
           method: "ProcessQueue.saveTimestamp",
-          message:
-            `no port call id could be found for, not persisting timestamp: ${
-              JSON.stringify(
-                timestamp,
-              )
-            }`,
+          message: `no port call id could be found for, not persisting timestamp: ${JSON.stringify(
+            timestamp,
+          )}`,
         });
         // resolve so this gets removed from the queue
         return undefined;
       } else {
         logger.info({
           method: "ProcessQueue.saveTimestamp",
-          message:
-            `portcall id not found but persisting because source is: ${EventSource.AWAKE_AI_PRED}, timestamp: ${
-              JSON.stringify(timestamp)
-            }`,
+          message: `portcall id not found but persisting because source is: ${EventSource.AWAKE_AI_PRED}, timestamp: ${JSON.stringify(
+            timestamp,
+          )}`,
         });
       }
     }
 
     // do not persist timestamp if no imo is found
-    const imo = timestamp.ship.imo ??
+    const imo =
+      timestamp.ship.imo ??
       (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi));
     if (!imo) {
       logger.warn({
         method: "ProcessQueue.saveTimestamp",
-        message: `IMO not found for timestamp, not persisting ${
-          JSON.stringify(timestamp)
-        }`,
+        message: `IMO not found for timestamp, not persisting ${JSON.stringify(
+          timestamp,
+        )}`,
       });
       // resolve so this gets removed from the queue
       return undefined;
     }
 
     // mmsi is allowed to be undefined if imo exists
-    const mmsi = timestamp.ship.mmsi && timestamp.ship.mmsi > 0
-      ? timestamp.ship.mmsi
-      : await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo);
+    const mmsi =
+      timestamp.ship.mmsi && timestamp.ship.mmsi > 0
+        ? timestamp.ship.mmsi
+        : await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo);
     if (!mmsi) {
       logger.warn({
         method: "ProcessQueue.saveTimestamp",
@@ -119,7 +118,7 @@ export function saveTimestamps(
 ): Promise<(DbUpdatedTimestamp | undefined)[]> {
   return inDatabase((db: DTDatabase) => {
     return db.tx((t) =>
-      t.batch(timestamps.map((timestamp) => doSaveTimestamp(t, timestamp)))
+      t.batch(timestamps.map((timestamp) => doSaveTimestamp(t, timestamp))),
     );
   });
 }
@@ -141,8 +140,8 @@ async function removeOldTimestamps(
 ): Promise<DbTimestampIdAndLocode[]> {
   let timestampsAnotherLocode: DbTimestampIdAndLocode[] = [];
   if (isPortnetTimestamp(timestamp) && timestamp.portcallId) {
-    timestampsAnotherLocode = await TimestampsDB
-      .findPortnetTimestampsForAnotherLocode(
+    timestampsAnotherLocode =
+      await TimestampsDB.findPortnetTimestampsForAnotherLocode(
         tx,
         timestamp.portcallId,
         timestamp.location.port,
@@ -150,11 +149,9 @@ async function removeOldTimestamps(
     if (timestampsAnotherLocode.length) {
       logger.info({
         method: "ProcessQueue.removeOldTimestamps",
-        message: `deleting timestamps with changed locode,timestamp ids: ${
-          timestampsAnotherLocode
-            .map((e) => e.id)
-            .toString()
-        }`,
+        message: `deleting timestamps with changed locode,timestamp ids: ${timestampsAnotherLocode
+          .map((e) => e.id)
+          .toString()}`,
       });
       await tx.batch(
         timestampsAnotherLocode.map((e) => TimestampsDB.deleteById(tx, e.id)),
@@ -225,13 +222,12 @@ export async function findETAShipsByLocode(ports: Ports): Promise<DbETAShip[]> {
       _.chain(ships)
         .sortBy((ship: DbETAShip) => ship.eta)
         .head()
-        .value()
+        .value(),
     )
     .filter((ship): ship is DbETAShip => ship !== undefined);
   logger.info({
     method: "TimeStampsService.findETAShipsByLocode",
-    message:
-      `ships count before newest ETA filtering ${portnetShips.length} after newest ETA filtering ${newestShips.length}`,
+    message: `ships count before newest ETA filtering ${portnetShips.length} after newest ETA filtering ${newestShips.length}`,
   });
 
   if (newestShips.length) {
@@ -245,21 +241,21 @@ export async function findETAShipsByLocode(ports: Ports): Promise<DbETAShip[]> {
       ).map((ship) => ship.imo);
       logger.info({
         method: "TimeStampsService.findETAShipsByLocode",
-        message: `Ships too close to port ${
-          JSON.stringify(shipsTooCloseToPortImos)
-        }`,
+        message: `Ships too close to port ${JSON.stringify(
+          shipsTooCloseToPortImos,
+        )}`,
       });
       const filteredShips = newestShips.filter((ship) =>
-        shipsTooCloseToPortImos.includes(ship.imo)
+        shipsTooCloseToPortImos.includes(ship.imo),
       );
       logger.info({
         method: "TimeStampsService.findETAShipsByLocode",
-        message: `Did not fetch ETA for ships too close to port ${
-          JSON.stringify(filteredShips)
-        }`,
+        message: `Did not fetch ETA for ships too close to port ${JSON.stringify(
+          filteredShips,
+        )}`,
       });
-      return newestShips.filter((ship) =>
-        !shipsTooCloseToPortImos.includes(ship.imo)
+      return newestShips.filter(
+        (ship) => !shipsTooCloseToPortImos.includes(ship.imo),
       );
     }).finally(() => {
       logger.info({

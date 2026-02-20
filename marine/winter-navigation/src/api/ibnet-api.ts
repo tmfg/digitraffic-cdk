@@ -1,8 +1,8 @@
-import type { EndpointResponse } from "../model/api-db-model.js";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
+import type { EndpointResponse } from "../model/api-db-model.js";
 
 export type ApiPath =
   | "location"
@@ -26,7 +26,7 @@ export class IbnetApi {
   }
 
   async fetchFromUrl<T>(url: string): Promise<T> {
-    logger.debug("Fetching from " + url);
+    logger.debug(`Fetching from ${url}`);
 
     return ky
       .get(url, {
@@ -50,7 +50,7 @@ export class IbnetApi {
         return await resp.json<T>();
       })
       .catch((error) => {
-        logger.debug("error:" + JSON.stringify(error));
+        logger.debug(`error: ${JSON.stringify(error)}`);
         throw error;
       });
   }

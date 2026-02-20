@@ -9,11 +9,8 @@ test.each([
   ["/example/path/plain.txt", 2, "/plain.txt"],
   ["/example/path/plain.txt", 3, "/plain.txt"],
   ["/example/file.zip", 1, "/file.zip"],
-])(
-  "path should be stripped",
-  async (uri: string, count: number, expected: string) => {
-    const parsedUri = removePathParts(uri, count);
+])("path should be stripped", async (uri: string, count: number, expected: string) => {
+  const parsedUri = removePathParts(uri, count);
 
-    expect(parsedUri).toEqual(expected);
-  },
-);
+  expect(parsedUri).toEqual(expected);
+});

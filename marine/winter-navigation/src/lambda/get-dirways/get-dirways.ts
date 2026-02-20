@@ -1,6 +1,6 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { getDirways } from "../../service/dirway-service.js";
 

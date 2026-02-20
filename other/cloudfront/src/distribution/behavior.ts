@@ -3,10 +3,10 @@ import {
   FunctionEventType,
   LambdaEdgeEventType,
 } from "aws-cdk-lib/aws-cloudfront";
-import { LambdaType } from "../util/lambda-creator.js";
+import type { EndpointMetadata } from "../util/apikey-util.js";
 import type { IpRestrictionParameters } from "../util/edgalambda-factory.js";
 import { FunctionType } from "../util/function-creator.js";
-import type { EndpointMetadata } from "../util/apikey-util.js";
+import { LambdaType } from "../util/lambda-creator.js";
 
 export type OriginType = "s3" | "api-gateway" | "http" | "https" | "vpc";
 
@@ -83,17 +83,16 @@ export class Behavior {
     parameters: {},
   };
 
-  constructor(
-    behaviorPath: string,
-    origin: Origin,
-  ) {
+  constructor(behaviorPath: string, origin: Origin) {
     this.behaviorPath = behaviorPath;
     this.origin = origin;
   }
 
   public static redirect(redirectUrl: string): Behavior {
-    return new Behavior("*", new Origin("https", "www.digitraffic.fi"))
-      .withRedirectFunction(redirectUrl);
+    return new Behavior(
+      "*",
+      new Origin("https", "www.digitraffic.fi"),
+    ).withRedirectFunction(redirectUrl);
   }
 
   public static apiGateway(path: string, originUrl: string): Behavior;
@@ -129,8 +128,10 @@ export class Behavior {
     param2: string | EndpointMetadata,
   ): Behavior {
     if (typeof param2 === "string") {
-      return new Behavior(path, Origin.apiGateway(param2))
-        .withAllowAllMethods();
+      return new Behavior(
+        path,
+        Origin.apiGateway(param2),
+      ).withAllowAllMethods();
     }
 
     return new Behavior(path, Origin.apiGateway(param2.endpointUrl))
@@ -147,7 +148,7 @@ export class Behavior {
   }
 
   public static nginx(path: string, originUrl: string): Behavior {
-    return this.nginxPlain(path, originUrl)
+    return Behavior.nginxPlain(path, originUrl)
       .withHttpHeadersLambda()
       .withGzipRequirementLambda();
   }
@@ -161,8 +162,7 @@ export class Behavior {
   }
 
   public static swagger(path: string, bucketName: string): Behavior {
-    return this.s3(path, bucketName)
-      .withIndexHtmlFunction();
+    return Behavior.s3(path, bucketName).withIndexHtmlFunction();
   }
 
   public withOAI(): this {
@@ -180,7 +180,7 @@ export class Behavior {
     edgeFunction: FunctionType,
   ): this {
     if (this.lambdaConfig.functions.has(type)) {
-      throw new Error("EdgeFunction already assigned for type " + type);
+      throw new Error(`EdgeFunction already assigned for type ${type}`);
     }
 
     if (
@@ -189,7 +189,7 @@ export class Behavior {
       (type === FunctionEventType.VIEWER_RESPONSE &&
         this.lambdaConfig.lambdas.has(LambdaEdgeEventType.VIEWER_RESPONSE))
     ) {
-      throw new Error("EdgeLambda already assigned for type " + type);
+      throw new Error(`EdgeLambda already assigned for type ${type}`);
     }
 
     this.lambdaConfig.functions.set(type, edgeFunction);
@@ -199,7 +199,7 @@ export class Behavior {
 
   private addLambda(type: LambdaEdgeEventType, lambda: LambdaType): this {
     if (this.lambdaConfig.lambdas.has(type)) {
-      throw new Error("Lambda already assigned for type " + type);
+      throw new Error(`Lambda already assigned for type ${type}`);
     }
 
     if (
@@ -208,7 +208,7 @@ export class Behavior {
       (type === LambdaEdgeEventType.VIEWER_RESPONSE &&
         this.lambdaConfig.functions.has(FunctionEventType.VIEWER_RESPONSE))
     ) {
-      throw new Error("EdgeFunction already assigned for type " + type);
+      throw new Error(`EdgeFunction already assigned for type ${type}`);
     }
 
     this.lambdaConfig.lambdas.set(type, lambda);
@@ -235,10 +235,7 @@ export class Behavior {
     ipList: string,
     eventType: LambdaEdgeEventType = LambdaEdgeEventType.VIEWER_REQUEST,
   ): this {
-    this.addLambda(
-      eventType,
-      LambdaType.IP_RESTRICTION,
-    );
+    this.addLambda(eventType, LambdaType.IP_RESTRICTION);
 
     this.lambdaConfig.parameters.ipRestriction = { path, ipList };
 
@@ -254,10 +251,7 @@ export class Behavior {
   public withGzipRequirementLambda(
     eventType: LambdaEdgeEventType = LambdaEdgeEventType.VIEWER_REQUEST,
   ): this {
-    this.addLambda(
-      eventType,
-      LambdaType.GZIP_REQUIREMENT,
-    );
+    this.addLambda(eventType, LambdaType.GZIP_REQUIREMENT);
 
     return this;
   }

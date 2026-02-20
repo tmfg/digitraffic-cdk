@@ -1,9 +1,9 @@
-import type { SpatialDisruption } from "../model/disruption.js";
 import type {
   DTDatabase,
   DTTransaction,
 } from "@digitraffic/common/dist/database/database";
 import type { Geometry } from "geojson";
+import type { SpatialDisruption } from "../model/disruption.js";
 
 export interface DbDisruption {
   readonly id: number;
@@ -92,13 +92,15 @@ export function deleteAllButDisruptions(
 ): Promise<number> {
   if (ids.length === 0) {
     return db.tx((t) =>
-      t.result("DELETE FROM bridgelock_disruption", [], (r) => r.rowCount)
+      t.result("DELETE FROM bridgelock_disruption", [], (r) => r.rowCount),
     );
   } else {
     return db.tx((t) =>
-      t.result("DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)", [
-        ids,
-      ], (r) => r.rowCount)
+      t.result(
+        "DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)",
+        [ids],
+        (r) => r.rowCount,
+      ),
     );
   }
 }

@@ -1,10 +1,11 @@
-import { type ApiPath, IbnetApi } from "../../api/ibnet-api.js";
-import type { Deleted, Response } from "../../model/api-db-model.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { jest } from "@jest/globals";
+import type { ApiPath } from "../../api/ibnet-api.js";
+import { IbnetApi } from "../../api/ibnet-api.js";
+import type { TableName } from "../../db/deleted.js";
+import type { Deleted, Response } from "../../model/api-db-model.js";
 import { DataUpdater } from "../../service/data-updater.js";
-import { type TableName } from "../../db/deleted.js";
 import { assertCountFromTable, dbTestBase } from "../db-testutil.js";
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export async function mockApiResponseAndUpdate<T>(
   mockedApiPath: ApiPath,
@@ -13,13 +14,13 @@ export async function mockApiResponseAndUpdate<T>(
 ): Promise<void> {
   jest.spyOn(IbnetApi.prototype, "getCurrentVersion").mockResolvedValue(to);
 
-  jest.spyOn(IbnetApi.prototype, "fetch").mockImplementation(
-    (apiPath: ApiPath, _from: number, _to: number) => {
+  jest
+    .spyOn(IbnetApi.prototype, "fetch")
+    .mockImplementation((apiPath: ApiPath, _from: number, _to: number) => {
       const apiResponse = apiPath === mockedApiPath ? response : [];
 
       return Promise.resolve(apiResponse);
-    },
-  );
+    });
 
   const updater = new DataUpdater("", "");
   await updater.update();

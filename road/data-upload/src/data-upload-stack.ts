@@ -1,17 +1,15 @@
-import { type Construct } from "constructs";
-import {
-  DigitrafficStack,
-  type StackConfiguration,
-} from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { IntegrationApi } from "./integration-api.js";
 import { DigitrafficSqsQueue } from "@digitraffic/common/dist/aws/infra/sqs-queue";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
+import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { Duration } from "aws-cdk-lib";
-import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
-import { createInternalLambdas } from "./internal-lambas.js";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { SqsSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
+import type { Construct } from "constructs";
+import { IntegrationApi } from "./integration-api.js";
+import { createInternalLambdas } from "./internal-lambas.js";
 
 export interface DataUploadConfiguration extends StackConfiguration {
   readonly rttiTopicArn?: string;
@@ -28,7 +26,7 @@ export class DataUploadStack extends DigitrafficStack {
     const dataQueue = this.createSqsQueue("Data");
     const mqttQueue = this.createSqsQueue("Mqtt");
 
-    if(configuration.rttiTopicArn) {
+    if (configuration.rttiTopicArn) {
       this.createRttiSqsReader(configuration.rttiTopicArn);
     }
 
@@ -47,7 +45,7 @@ export class DataUploadStack extends DigitrafficStack {
     // the topic is fifo-topic, so can't put lambda to it directly
     // so we create a queue and messages go through it
 
-    const topic = Topic.fromTopicAttributes(this, "rttiTopic", {topicArn});
+    const topic = Topic.fromTopicAttributes(this, "rttiTopic", { topicArn });
     // SQS queue encrypted by AWS managed KMS key cannot be used as SNS subscription
     const queue = new DigitrafficSqsQueue(this, "RttiQueue", {
       receiveMessageWaitTime: Duration.seconds(20),
@@ -56,10 +54,12 @@ export class DataUploadStack extends DigitrafficStack {
 
     topic.addSubscription(new SqsSubscription(queue));
     queue.grantConsumeMessages(lambda);
-    lambda.addEventSource(new SqsEventSource(queue, {
-      batchSize: 20,
-      maxBatchingWindow: Duration.seconds(3),
-    }));
+    lambda.addEventSource(
+      new SqsEventSource(queue, {
+        batchSize: 20,
+        maxBatchingWindow: Duration.seconds(3),
+      }),
+    );
   }
 
   createSqsQueue(name: string): DigitrafficSqsQueue {

@@ -1,10 +1,10 @@
 import { validateIncomingSmMessage } from "../../service/validate-message.js";
+import { cloneAndUndefine } from "../message-util.js";
 import {
   realMessage,
   validMessage2,
   validMessageUnknownTrackAndDelay,
 } from "../testdata-sm.js";
-import { cloneAndUndefine } from "../message-util.js";
 
 describe("validate incoming sm message", () => {
   function expectValid(message: unknown): void {

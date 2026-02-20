@@ -1,6 +1,6 @@
-import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
-import { getSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { getSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
 
 export enum EnvKeys {
   AWS_REGION = "AWS_REGION",

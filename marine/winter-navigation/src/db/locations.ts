@@ -1,6 +1,6 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { ApiData, Location } from "../model/api-db-model.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { default as pgPromise } from "pg-promise";
+import type { ApiData, Location } from "../model/api-db-model.js";
 import type { LocationDTO } from "../model/dto-model.js";
 
 const SQL_UPDATE_LOCATIONS = `
@@ -112,11 +112,9 @@ export async function getLocation(
   db: DTDatabase,
   locode: string,
 ): Promise<LocationDTO | undefined> {
-  return await db.oneOrNone(PS_GET_LOCATION, [locode]) ?? undefined;
+  return (await db.oneOrNone(PS_GET_LOCATION, [locode])) ?? undefined;
 }
 
-export async function getLocations(
-  db: DTDatabase,
-): Promise<LocationDTO[]> {
+export async function getLocations(db: DTDatabase): Promise<LocationDTO[]> {
   return db.manyOrNone(PS_GET_LOCATIONS, [null]);
 }

@@ -1,7 +1,6 @@
-import ky, { HTTPError } from "ky";
-
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import ky, { HTTPError } from "ky";
 
 export interface AreaLightsBrightenRequest {
   /**

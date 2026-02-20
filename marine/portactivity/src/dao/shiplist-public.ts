@@ -1,7 +1,7 @@
-import pgPromise from "pg-promise";
-import type { EventType } from "../model/timestamp.js";
-import { EventSource } from "../model/eventsource.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import pgPromise from "pg-promise";
+import { EventSource } from "../model/eventsource.js";
+import type { EventType } from "../model/timestamp.js";
 
 export interface DbPublicShiplist {
   readonly event_type: EventType;

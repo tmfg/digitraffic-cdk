@@ -1,12 +1,12 @@
-import type { DigitrafficStatisticsStack } from "./digitraffic-statistics-stack.js";
-import * as apigw from "aws-cdk-lib/aws-apigateway";
-import * as iam from "aws-cdk-lib/aws-iam";
 import type {
   AwsIntegration,
   LambdaIntegration,
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
+import * as apigw from "aws-cdk-lib/aws-apigateway";
+import * as iam from "aws-cdk-lib/aws-iam";
 import type { StatisticsIntegrations } from "./aws-integrations.js";
+import type { DigitrafficStatisticsStack } from "./digitraffic-statistics-stack.js";
 
 export class StatisticsApi {
   readonly restApi: RestApi;

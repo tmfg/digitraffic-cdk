@@ -1,14 +1,12 @@
-import {
-  type DTDatabase,
-  inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import * as DirwayDB from "../db/dirways.js";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import type { FeatureCollection, LineString, Point } from "geojson";
+import * as DirwayDB from "../db/dirways.js";
+import { DIRWAY_CHECK } from "../keys.js";
 import type { DirwayDTO } from "../model/dto-model.js";
 import type { DirwayFeature } from "../model/public-api-model.js";
-import { DIRWAY_CHECK } from "../keys.js";
-import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 
 export function getDirways(): Promise<[FeatureCollection, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
@@ -26,9 +24,7 @@ export function getDirways(): Promise<[FeatureCollection, Date | undefined]> {
   });
 }
 
-function convertToFeature(
-  dirway: DirwayDTO,
-): DirwayFeature {
+function convertToFeature(dirway: DirwayDTO): DirwayFeature {
   const points = dirway.dirwaypoints;
 
   let geometry: Point | LineString;

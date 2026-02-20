@@ -1,15 +1,17 @@
-import { OpenSearch } from "../api/opensearch.js";
-import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { readFileSync } from "node:fs";
-import type { OSMonitor } from "../monitor/monitor.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import type { AssumeRoleRequest } from "@aws-sdk/client-sts";
+import { STS } from "@aws-sdk/client-sts";
+import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logException } from "@digitraffic/common/dist/utils/logging";
-import { EnvKeys } from "../env.js";
-import { type AssumeRoleRequest, STS } from "@aws-sdk/client-sts";
-import { SlackApi } from "@digitraffic/common/dist/utils/slack";
-import { type StatusSecret } from "../secret.js";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { logException } from "@digitraffic/common/dist/utils/logging";
+import { SlackApi } from "@digitraffic/common/dist/utils/slack";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { OpenSearch } from "../api/opensearch.js";
+import { EnvKeys } from "../env.js";
+import type { OSMonitor } from "../monitor/monitor.js";
+import type { StatusSecret } from "../secret.js";
+
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);
 const OS_VPC_ENDPOINT = getEnvVariable(EnvKeys.OS_VPC_ENDPOINT);
@@ -30,9 +32,9 @@ async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
         reject(err);
       } else {
         resolve({
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          // biome-ignore lint/style/noNonNullAssertion: it should be defined
           accessKeyId: data.Credentials.AccessKeyId!,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          // biome-ignore lint/style/noNonNullAssertion: it should be defined
           secretAccessKey: data.Credentials.SecretAccessKey!,
           sessionToken: data.Credentials.SessionToken,
         });
@@ -73,9 +75,9 @@ export const handler = async (): Promise<void> => {
       await slackApiFailed.notify(error.message);
     } else {
       await slackApiFailed.notify(
-        `UpdateOsMonitors.checkMonitorsUptodate failed: ${
-          JSON.stringify(error)
-        }`,
+        `UpdateOsMonitors.checkMonitorsUptodate failed: ${JSON.stringify(
+          error,
+        )}`,
       );
     }
     return Promise.reject(error);

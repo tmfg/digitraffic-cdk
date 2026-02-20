@@ -1,9 +1,7 @@
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import {
-  getMessagesUpdatedAfterLambdaEvent as lambdaEventSchema,
-} from "../../model/zod-schema/lambda-event.js";
-import { getMessagesUpdatedAfter } from "../../service/get-message.js";
 import { z } from "zod";
+import { getMessagesUpdatedAfterLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event.js";
+import { getMessagesUpdatedAfter } from "../../service/get-message.js";
 
 export const handler = async (
   event: Record<string, string>,

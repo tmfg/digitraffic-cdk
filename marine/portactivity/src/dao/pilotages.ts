@@ -1,8 +1,8 @@
-import type { Location } from "../model/timestamp.js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import pgPromise from "pg-promise";
 import type { Pilotage } from "../model/pilotage.js";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { Location } from "../model/timestamp.js";
 
 export const PORTCALL_TIMESTAMP_AGE_LIMIT = `NOW() - INTERVAL '36 HOURS'`;
 
@@ -13,8 +13,7 @@ const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new pgPromise.PreparedStatement({
   text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL,
 });
 
-const UPSERT_PILOTAGES_SQL =
-  `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, 
+const UPSERT_PILOTAGES_SQL = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, 
     vessel_name, start_code, start_berth, end_code, end_berth)
 values($(id), $(vesselImo), $(vesselMmsi), $(vesselEta), $(pilotBoardingTime), $(endTime), $(scheduleUpdated), $(scheduleSource), $(state), $(vesselName), $(routeStart), 
     $(routeStartBerth), $(routeEnd), $(routeEndBerth))
@@ -93,7 +92,7 @@ export async function findPortCallId(
     logger.info({
       method: "PilotwebService.convertUpdatedTimestamps",
       message: `portcall found for ${location.port}${
-        location.from ? " and " + location.from : ""
+        location.from ? ` and ${location.from}` : ""
       }`,
     });
     return p2.port_call_id;
@@ -103,7 +102,7 @@ export async function findPortCallId(
     logger.info({
       method: "PilotwebService.convertUpdatedTimestamps",
       message: `no portcall found for ${location.port}${
-        location.from ? " or " + location.from : ""
+        location.from ? ` or ${location.from}` : ""
       }`,
     });
   } else if (p1) {
@@ -121,7 +120,9 @@ export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
   );
   const idMap: TimestampMap = new Map();
 
-  timestamps.forEach((ts) => idMap.set(ts.id, ts.schedule_updated));
+  timestamps.forEach((ts) => {
+    idMap.set(ts.id, ts.schedule_updated);
+  });
 
   return idMap;
 }
@@ -148,7 +149,7 @@ export function updatePilotages(
           routeStartBerth: pilotage.route.start.berth?.code,
           routeEnd: pilotage.route.end.code,
           routeEndBerth: pilotage.route.end.berth?.code,
-        })
+        }),
       ),
     );
   }

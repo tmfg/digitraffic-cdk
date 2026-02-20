@@ -6,7 +6,11 @@ import type {
 } from "@digitraffic/common/dist/database/database";
 import { default as pgPromise } from "pg-promise";
 import type { NemoResponse, NemoVisit } from "../model/nemo.js";
-import type { VISIT_STATUS_VALUES } from "../model/visit-schema.js";
+import type {
+  VISIT_STATUS_VALUES,
+  VisitSort,
+  VisitStatus,
+} from "../model/visit-schema.js";
 
 export interface DbInsertedUpdated {
   readonly inserted: number;
@@ -115,15 +119,59 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
   text: `select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time 
     from pc2_visit
     where ($1::timestamptz is null or update_time >= $1::timestamptz)
-    and ($2::timestamptz is null or update_time < $2::timestamptz)`,
+    and ($2::timestamptz is null or update_time < $2::timestamptz)
+    and ($3::text is null or port_locode = $3)
+    and ($4::text is null or vessel_name ILIKE '%' || $4 || '%')
+    and ($5::text is null or vessel_id = $5::text)
+    and ($6::text is null or status = $6)
+    and eta >= now() - interval '3 months'
+    and eta <= now() + interval '3 months'
+    order by
+      case when $8 = 'asc' then
+        case $7
+          when 'eta' then eta::text
+          when 'etd' then etd::text
+          when 'ata' then ata::text
+          when 'atd' then atd::text
+          when 'vesselName' then vessel_name
+          when 'portOfCall' then port_locode
+          when 'status' then status
+        end
+      end asc nulls last,
+      case when $8 = 'desc' then
+        case $7
+          when 'eta' then eta::text
+          when 'etd' then etd::text
+          when 'ata' then ata::text
+          when 'atd' then atd::text
+          when 'vesselName' then vessel_name
+          when 'portOfCall' then port_locode
+          when 'status' then status
+        end
+      end desc nulls last,
+      case when $7 is null then coalesce(ata, eta) end asc`,
 });
 
 export function findAllVisits(
   db: DTDatabase,
-  from: Date | undefined,
-  to: Date | undefined,
+  from?: Date,
+  to?: Date,
+  locode?: string,
+  vesselName?: string,
+  imo?: number,
+  status?: VisitStatus,
+  sort?: VisitSort,
 ): Promise<DbVisit[]> {
-  return db.manyOrNone(FIND_ALL_VISITS_PS, [from, to]);
+  return db.manyOrNone(FIND_ALL_VISITS_PS, [
+    from,
+    to,
+    locode,
+    vesselName,
+    imo,
+    status,
+    sort?.field,
+    sort?.direction,
+  ]);
 }
 
 const FIND_VISIT_PS = new pgPromise.PreparedStatement({

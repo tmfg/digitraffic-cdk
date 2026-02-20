@@ -1,11 +1,11 @@
-import * as ImageFetcher from "../../service/image-fetcher.js";
-import { MarinecamEnvKeys } from "../../keys.js";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import type { MarinecamSecret } from "../../model/secret.js";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { logException } from "@digitraffic/common/dist/utils/logging";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { MarinecamEnvKeys } from "../../keys.js";
+import type { MarinecamSecret } from "../../model/secret.js";
+import * as ImageFetcher from "../../service/image-fetcher.js";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<MarinecamSecret>("mobile_server");
@@ -18,7 +18,7 @@ export const handler: () => Promise<void> = () => {
     .then((secret: MarinecamSecret) => {
       logger.info({
         method: "UpdateImages.handler",
-        message: "updating images from " + secret.url,
+        message: `updating images from ${secret.url}`,
       });
 
       return ImageFetcher.updateAllCameras(

@@ -1,10 +1,8 @@
+import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import type { Construct } from "constructs";
-import {
-  DigitrafficStack,
-  type StackConfiguration,
-} from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { PublicApi } from "./public-api.js";
 import { InternalLambdas } from "./internal-lambdas.js";
+import { PublicApi } from "./public-api.js";
 
 export class PortCallStack extends DigitrafficStack {
   constructor(scope: Construct, id: string, config: StackConfiguration) {

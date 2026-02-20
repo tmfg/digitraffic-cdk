@@ -1,11 +1,11 @@
+import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 import _ from "lodash";
 import { PortactivityEnvKeys } from "../../keys.js";
 import { ports } from "../../service/portareas.js";
 import * as TimestampService from "../../service/timestamps.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const publishTopic = getEnvVariable(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 const CHUNK_SIZE = 10;
@@ -24,8 +24,7 @@ export function handlerFn(sns: SNSClient): () => Promise<void> {
       for (const ship of ships) {
         logger.info({
           method: "TriggerAwakeAiETATimestampsUpdate.handler",
-          message:
-            `Triggering ETA update for ship with IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
+          message: `Triggering ETA update for ship with IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`,
         });
       }
 

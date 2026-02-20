@@ -18,26 +18,28 @@ export function createInternalLambdas(
   dataQueue.grantConsumeMessages(handleNewMessages);
   mqttQueue.grantSendMessages(handleNewMessages);
 
-  handleNewMessages.addEventSource(new SqsEventSource(dataQueue, {
-    batchSize: 20,
-    maxBatchingWindow: Duration.seconds(3),
-  }));
+  handleNewMessages.addEventSource(
+    new SqsEventSource(dataQueue, {
+      batchSize: 20,
+      maxBatchingWindow: Duration.seconds(3),
+    }),
+  );
 
   const mqttSendLambda = createMqttSendLambda(stack);
   mqttQueue.grantConsumeMessages(mqttSendLambda);
-  mqttSendLambda.addEventSource(new SqsEventSource(mqttQueue, {
-    batchSize: 20,
-    maxBatchingWindow: Duration.seconds(3),
-  }));
+  mqttSendLambda.addEventSource(
+    new SqsEventSource(mqttQueue, {
+      batchSize: 20,
+      maxBatchingWindow: Duration.seconds(3),
+    }),
+  );
 }
 
 function createDeleteOldData(stack: DigitrafficStack): AwsFunction {
   return FunctionBuilder.create(stack, "delete-old-messages").build();
 }
 
-function createMqttSendLambda(
-  stack: DigitrafficStack,
-): AwsFunction {
+function createMqttSendLambda(stack: DigitrafficStack): AwsFunction {
   return FunctionBuilder.create(stack, "send-mqtt")
     .withMemorySize(128)
     .withReservedConcurrentExecutions(3)

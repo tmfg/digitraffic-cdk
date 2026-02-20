@@ -1,25 +1,24 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase } from "../db-testutil.js";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { saveAllLocations } from "../../db/locations.js";
+import {
+  saveAllPortSuspensionLocations,
+  saveAllPortSuspensions,
+} from "../../db/port-suspensions.js";
+import { saveAllRestrictions } from "../../db/restrictions.js";
+import type {
+  LocationFeature,
+  LocationFeatureCollection,
+} from "../../model/public-api-model.js";
+import { dbTestBase } from "../db-testutil.js";
+import { mockProxyHolder } from "../mock.js";
 import {
   LOCATION_1,
   PORT_SUSPENSION_1,
   PORT_SUSPENSION_LOCATION_1,
   RESTRICTION_1,
 } from "../service/data-updater.test.js";
-
-import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { saveAllRestrictions } from "../../db/restrictions.js";
-import {
-  saveAllPortSuspensionLocations,
-  saveAllPortSuspensions,
-} from "../../db/port-suspensions.js";
-import { mockProxyHolder } from "../mock.js";
-import type {
-  LocationFeature,
-  LocationFeatureCollection,
-} from "../../model/public-api-model.js";
 
 mockProxyHolder();
 
@@ -68,7 +67,7 @@ describe(
     });
 
     test("get one - not found", async () => {
-      const response = await getResponseFromLambda({ "locode": "foo" });
+      const response = await getResponseFromLambda({ locode: "foo" });
 
       ExpectResponse.notFound(response);
     });
@@ -76,7 +75,7 @@ describe(
     test("get one - found", async () => {
       await insertLocation(db);
 
-      const response = await getResponseFromLambda({ "locode": "FIHEL" });
+      const response = await getResponseFromLambda({ locode: "FIHEL" });
 
       ExpectResponse.ok(response).expectContent((location: LocationFeature) => {
         expect(location.properties.name).toEqual(LOCATION_1.name);

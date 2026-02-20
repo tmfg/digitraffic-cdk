@@ -9,12 +9,12 @@ import type {
 } from "../api/schedules.js";
 import { SchedulesDirection } from "../api/schedules.js";
 import { EventSource } from "../model/eventsource.js";
+import type { Locode } from "../model/locode.js";
 import type { ApiTimestamp } from "../model/timestamp.js";
 import { EventType } from "../model/timestamp.js";
+import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports.js";
 import type { Port } from "./portareas.js";
 import { ports } from "./portareas.js";
-import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports.js";
-import type { Locode } from "../model/locode.js";
 
 export class SchedulesService {
   private readonly api: SchedulesApi;
@@ -57,7 +57,7 @@ export class SchedulesService {
       .filter((ts) =>
         ts.eventType === EventType.ETD
           ? parseISO(ts.eventTime) >= subMinutes(Date.now(), 5)
-          : true
+          : true,
       );
   }
 

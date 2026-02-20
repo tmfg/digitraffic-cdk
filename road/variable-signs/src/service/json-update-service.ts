@@ -1,17 +1,13 @@
-import type { TloikLaite, TloikMetatiedot } from "../model/metatiedot.js";
-import type { TloikTilatiedot } from "../model/tilatiedot.js";
-import * as MetadataDb from "../db/metadata.js";
-import * as DataDb from "../db/data.js";
-import type { DbDevice } from "../model/device.js";
-import {
-  type DTTransaction,
-  inTransaction,
-} from "@digitraffic/common/dist/database/database";
-import {
-  type StatusCodeValue,
-  StatusCodeValues,
-} from "../model/status-code-value.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTTransaction } from "@digitraffic/common/dist/database/database";
+import { inTransaction } from "@digitraffic/common/dist/database/database";
+import * as DataDb from "../db/data.js";
+import * as MetadataDb from "../db/metadata.js";
+import type { DbDevice } from "../model/device.js";
+import type { TloikLaite, TloikMetatiedot } from "../model/metatiedot.js";
+import type { StatusCodeValue } from "../model/status-code-value.js";
+import { StatusCodeValues } from "../model/status-code-value.js";
+import type { TloikTilatiedot } from "../model/tilatiedot.js";
 
 type DeviceIdMap = Map<string, TloikLaite>;
 
@@ -27,8 +23,8 @@ export async function updateJsonData(
 
         return lm.rivit
           ? Promise.all(
-            lm.rivit.map((rivi) => DataDb.insertDeviceDataRows(db, id, rivi)),
-          )
+              lm.rivit.map((rivi) => DataDb.insertDeviceDataRows(db, id, rivi)),
+            )
           : Promise.resolve();
       }),
     );
@@ -72,11 +68,7 @@ export async function updateJsonMetadata(
 }
 
 function createLaiteIdMap(metatiedot: TloikMetatiedot): DeviceIdMap {
-  const idMap: DeviceIdMap = new Map();
-
-  metatiedot.laitteet.forEach((laite) => idMap.set(laite.tunnus, laite));
-
-  return idMap;
+  return new Map(metatiedot.laitteet.map((laite) => [laite.tunnus, laite]));
 }
 
 async function updateDevices(
@@ -95,7 +87,7 @@ async function updateDevices(
       if (device.deleted_date) {
         logger.info({
           method: "JsonUpdateService.updateDevices",
-          message: "Updating deleted device " + device.id,
+          message: `Updating deleted device ${device.id}`,
         });
       }
 
@@ -108,7 +100,7 @@ async function updateDevices(
       // no device from the API was found to match device in DB, and the device in DB is not marked deleted
       logger.info({
         method: "JsonUpdateService.updateDevices",
-        message: "Removing device " + device.id,
+        message: `Removing device ${device.id}`,
       });
 
       removedDevices.push(device.id);

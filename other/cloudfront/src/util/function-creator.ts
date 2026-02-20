@@ -53,7 +53,7 @@ export function createPathRewriteFunction(
 
   return createCloudfrontFunction(
     scope,
-    "rewrite-uri-function-" + pathRemoveCount,
+    `rewrite-uri-function-${pathRemoveCount}`,
     body,
   );
 }

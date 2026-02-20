@@ -1,12 +1,10 @@
-import { type DTDatabase } from "@digitraffic/common/dist/database/database";
-import { dbTestBase, mockProxyHolder } from "../db-testutil.js";
+import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
-import { type LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { dbTestBase, mockProxyHolder } from "../db-testutil.js";
 
 async function getResponseFromLambda(): Promise<LambdaResponse> {
-  const { handler } = await import(
-    "../../lambda/get-datex2/get-datex2.js"
-  );
+  const { handler } = await import("../../lambda/get-datex2/get-datex2.js");
 
   return await handler();
 }

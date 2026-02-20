@@ -1,6 +1,6 @@
-import type { FeatureCollection } from "geojson";
 import { Language } from "@digitraffic/common/dist/types/language";
 import { jest } from "@jest/globals";
+import type { FeatureCollection } from "geojson";
 
 const EMPTY_FEATURECOLLECTION_EN: FeatureCollection = {
   features: [],
@@ -31,15 +31,15 @@ jest.unstable_mockModule("../../service/faults.js", () => ({
   }),
 }));
 
-// eslint-disable-next-line dot-notation
+// biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "";
 
-import { decodeBase64ToAscii } from "@digitraffic/common/dist/utils/base64";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { decodeBase64ToAscii } from "@digitraffic/common/dist/utils/base64";
 
-jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
-  Promise.resolve()
-);
+jest
+  .spyOn(ProxyHolder.prototype, "setCredentials")
+  .mockImplementation(() => Promise.resolve());
 
 describe("get-faults", () => {
   async function expectResponse<T>(

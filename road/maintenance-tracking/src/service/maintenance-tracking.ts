@@ -1,24 +1,14 @@
-import {
-  type DTDatabase,
-  inDatabase,
-} from "@digitraffic/common/dist/database/database";
+import crypto from "node:crypto";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { inDatabase } from "@digitraffic/common/dist/database/database";
 import { parseISO } from "date-fns";
+import type { DbObservationData } from "../dao/maintenance-tracking-dao.js";
 import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao.js";
-import {
-  type DbObservationData,
-  Status,
-} from "../dao/maintenance-tracking-dao.js";
-import { type DbNumberId } from "../model/db-data.js";
-import {
-  type Havainto,
-  type TyokoneenseurannanKirjaus,
-} from "../model/models.js";
-import crypto from "crypto";
-import {
-  logger,
-  type LoggerMethodType,
-} from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import _ from "lodash";
+import { Status } from "../dao/maintenance-tracking-dao.js";
+import type { DbNumberId } from "../model/db-data.js";
+import type { Havainto, TyokoneenseurannanKirjaus } from "../model/models.js";
 
 const matchViestitunnisteRegex =
   /"viestintunniste"\s*:\s*{\s*"id"\s*:\s*[0-9]*\s*}\s*,/;
@@ -82,9 +72,10 @@ export function createMaintenanceTrackingMessageHash(
 export function createObservationHash(
   maintenanceTrackingObservationDataJson: string,
 ): string {
-  return crypto.createHash("sha256").update(
-    maintenanceTrackingObservationDataJson,
-  ).digest("hex");
+  return crypto
+    .createHash("sha256")
+    .update(maintenanceTrackingObservationDataJson)
+    .digest("hex");
 }
 
 export function convertToDbObservationData(
@@ -122,33 +113,28 @@ export async function handleMessage(
   if (!trackingJson.otsikko.lahettaja.jarjestelma) {
     logger.warn({
       method,
-      message: `observations sendingSystem is empty using UNKNOWN otsikko ${
-        JSON.stringify(trackingJson.otsikko)
-      }`,
+      message: `observations sendingSystem is empty using UNKNOWN otsikko ${JSON.stringify(
+        trackingJson.otsikko,
+      )}`,
     });
   }
 
-  const sendingSystem = _.get(trackingJson, [
-    "otsikko",
-    "lahettaja",
-    "jarjestelma",
-  ], "UNKNOWN");
+  const sendingSystem =
+    trackingJson.otsikko?.lahettaja?.jarjestelma ?? "UNKNOWN";
   const observationDatas: MaintenanceTrackingDb.DbObservationData[] =
-    trackingJson.havainnot.map(
-      (havainto: Havainto) =>
-        convertToDbObservationData(
-          havainto,
-          sendingTime,
-          sendingSystem,
-          "TODO unknown",
-        ),
+    trackingJson.havainnot.map((havainto: Havainto) =>
+      convertToDbObservationData(
+        havainto,
+        sendingTime,
+        sendingSystem,
+        "TODO unknown",
+      ),
     );
 
   try {
     const start = Date.now();
-    const insertCount: number = await saveMaintenanceTrackingObservationData(
-      observationDatas,
-    );
+    const insertCount: number =
+      await saveMaintenanceTrackingObservationData(observationDatas);
     const end = Date.now();
     logger.info({
       method,
@@ -160,17 +146,13 @@ export async function handleMessage(
       customSizeBytes: messageSizeBytes,
     });
   } catch (e) {
-    const clones = MaintenanceTrackingDb.cloneObservationsWithoutJson(
-      observationDatas,
-    );
+    const clones =
+      MaintenanceTrackingDb.cloneObservationsWithoutJson(observationDatas);
     logger.error({
       method,
-      message:
-        `Error while handling tracking from SQS to db observationDatas: ${
-          JSON.stringify(
-            clones,
-          )
-        }`,
+      message: `Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(
+        clones,
+      )}`,
       error: e,
     });
     return Promise.reject(e);

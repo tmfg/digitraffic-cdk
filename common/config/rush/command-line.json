@@ -56,9 +56,18 @@
     {
       "name": "format:fix-changed",
       "commandKind": "global",
-      "summary": "Runs Biome’s linting and formatting only on changed (according to Git) files fixing them.",
+      "summary": "Runs Biome’s linting and formatting checks only on changed (according to Git) files with applying safe fixes.",
       "autoinstallerName": "rush-command-line-tools",
-      "shellCommand": "biome check --write --changed --files-ignore-unknown=true --no-errors-on-unmatched"
+      // biome --changed is not working with unstaged
+      "shellCommand": "git diff --name-only HEAD | xargs biome check --write --files-ignore-unknown=true --no-errors-on-unmatched"
+    },
+    {
+      "name": "format:fix-changed-unsafe",
+      "commandKind": "global",
+      "summary": "Runs Biome’s linting and formatting checks only on changed (according to Git) files with applying unsafe fixes.",
+      "autoinstallerName": "rush-command-line-tools",
+      // biome --changed is not working with unstaged
+      "shellCommand": "git diff --name-only HEAD | xargs biome check --write --unsafe --files-ignore-unknown=true --no-errors-on-unmatched"
     },
     {
       "name": "build",
