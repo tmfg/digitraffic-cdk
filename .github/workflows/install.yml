@@ -215,7 +215,7 @@ jobs:
 
       - name: Generate SBOM
         if: github.event.inputs.command == 'deploy' && steps.environment.outputs.generate_sbom == 'true'
-        uses: aquasecurity/trivy-action@0.34.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           scan-type: image
           image-ref: ${{ steps.deploy.outputs.IMAGE_URL }}
