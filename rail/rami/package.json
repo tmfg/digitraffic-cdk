@@ -20,11 +20,11 @@
     "watch": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean --watch --max-workers 1"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.975.0",
-    "@aws-sdk/client-secrets-manager": "3.975.0",
-    "@aws-sdk/client-sqs": "3.975.0",
+    "@aws-sdk/client-s3": "3.995.0",
+    "@aws-sdk/client-secrets-manager": "3.995.0",
+    "@aws-sdk/client-sqs": "3.995.0",
     "@date-fns/tz": "1.4.1",
-    "@digitraffic/common": "2026.2.10-1",
+    "@digitraffic/common": "2026.2.23-1",
     "@middy/core": "7.0.2",
     "@middy/sqs-partial-batch-failure": "7.0.2",
     "ajv": "8.18.0",

@@ -21,7 +21,7 @@
     "test_errors": "rushx test 2>&1 | grep 'FAIL'"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.2.5-3",
+    "@digitraffic/common": "2026.2.23-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
     "zod": "4.3.6"

@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "5.2.0",
-    "@aws-sdk/client-s3": "3.975.0",
-    "@aws-sdk/client-sts": "3.975.0",
-    "@digitraffic/common": "2026.2.5-3",
+    "@aws-sdk/client-s3": "3.995.0",
+    "@aws-sdk/client-sts": "3.995.0",
+    "@digitraffic/common": "2026.2.23-1",
     "@smithy/node-http-handler": "4.4.8",
     "@smithy/protocol-http": "5.3.8",
     "@smithy/signature-v4": "5.3.8",

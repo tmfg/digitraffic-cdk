@@ -16,8 +16,8 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.975.0",
-    "@digitraffic/common": "2026.2.5-3",
+    "@aws-sdk/client-s3": "3.995.0",
+    "@digitraffic/common": "2026.2.23-1",
     "ajv": "8.17.1",
     "ajv-formats": "3.0.1",
     "archiver": "7.0.1",
