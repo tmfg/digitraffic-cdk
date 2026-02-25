@@ -129,7 +129,7 @@ export class CloudfrontCdkStack extends Stack {
             httpsPort: 443,
             httpPort: 80,
             name: `CloudfrontVpcOrigin-${vpcOriginName}`,
-            originProtocolPolicy: "match-viewer",
+            originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
           },
         },
       );
@@ -269,7 +269,7 @@ export class CloudfrontCdkStack extends Stack {
 
       const cfVpcOrigin = CfVpcOrigin.fromVpcOriginId(
         this,
-        "vpcOrigin",
+        `vpcOrigin-${behavior.origin._origin}`,
         vpcOrigin.ref,
       );
 

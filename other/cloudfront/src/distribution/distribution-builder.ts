@@ -60,8 +60,8 @@ export class DistributionBuilder {
     return this;
   }
 
-  public withVpcOrigin(name: string, vpcOrigin: string): this {
-    this.vpcOrigins[name] = vpcOrigin;
+  public withVpcOrigin(name: string, originArn: string): this {
+    this.vpcOrigins[name] = originArn;
 
     return this;
   }

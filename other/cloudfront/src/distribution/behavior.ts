@@ -154,7 +154,9 @@ export class Behavior {
   }
 
   public static vpcLb(path: string, originName: string): Behavior {
-    return new Behavior(path, Origin.vpc(originName));
+    return new Behavior(path, Origin.vpc(originName))
+      .withHttpHeadersLambda()
+      .withGzipRequirementLambda();
   }
 
   public static s3(path: string, bucketName: string): Behavior {
