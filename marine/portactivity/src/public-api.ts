@@ -111,8 +111,8 @@ export class PublicApi {
       stack.createLambdaEnvironment(),
       {
         timeout: 25,
-        memorySize: 512,
-        reservedConcurrentExecutions: 20,
+        memorySize: 600,
+        reservedConcurrentExecutions: 24,
         errorAlarmProps: {
           create: true,
           threshold: 3,
