@@ -241,7 +241,7 @@ Integration tests use Docker Compose to spin up OpenSearch and MySQL containers.
 #### 1. Start the test containers
 
 ```bash
-pnpm run test:integration:setup
+rushx test:integration:setup
 ```
 
 Wait for containers to be healthy (about 10-30 seconds).
@@ -249,25 +249,25 @@ Wait for containers to be healthy (about 10-30 seconds).
 #### 2. Run the integration tests
 
 ```bash
-pnpm run test:integration
+rushx test:integration
 ```
 
 #### 3. Stop the containers when done
 
 ```bash
-pnpm run test:integration:teardown
+rushx test:integration:teardown
 ```
 
 ### One-liner (all steps)
 
 ```bash
-pnpm run test:integration:setup && pnpm run test:integration && pnpm run test:integration:teardown
+rushx test:integration:setup && rushx test:integration && rushx test:integration:teardown
 ```
 
 ### Run a specific test
 
 ```bash
-pnpm run test:integration --test-name-pattern "TEST_NAME"
+rushx test:integration --test-name-pattern "TEST_NAME"
 ```
 
 ### Test Structure
@@ -285,7 +285,7 @@ Should return `status: "green"` or `"yellow"`.
 
 **Clean restart:**
 ```bash
-pnpm run test:integration:teardown
+rushx test:integration:teardown
 docker volume prune -f
-pnpm run test:integration:setup
+rushx run test:integration:setup
 ```

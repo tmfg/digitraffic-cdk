@@ -32,11 +32,11 @@ export class MySqlMetricStore implements ForPersistingMetrics {
   }
 
   async persist(metrics: CollectedMetric[]): Promise<void> {
-    if (metrics.length === 0) {
+    if (metrics.length === 0 || !metrics[0]) {
       return;
     }
 
-    const firstMetric = metrics[0]!;
+    const firstMetric = metrics[0];
     const startDate = firstMetric.period.from;
     const existingRows = await this.existsForPeriod(
       firstMetric.scope.storageTag,

@@ -42,8 +42,8 @@ async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
         reject(err);
       } else {
         resolve({
-          accessKeyId: data.Credentials.AccessKeyId!,
-          secretAccessKey: data.Credentials.SecretAccessKey!,
+          accessKeyId: data.Credentials.AccessKeyId ?? "",
+          secretAccessKey: data.Credentials.SecretAccessKey ?? "",
           sessionToken: data.Credentials.SessionToken,
         });
       }

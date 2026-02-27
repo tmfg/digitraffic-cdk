@@ -56,14 +56,17 @@ function createEndpointDiscoveryConfig(): EndpointDiscoveryConfig {
       Service.RAIL,
       [
         "/api/v2/graphql/",
-        "/api/v1/trains/history",
         "/infra-api/",
         "/jeti-api/",
         "/history",
         "/vuosisuunnitelmat",
+        "/schedules",
+        "/mqtt",
       ],
     ],
-    [Service.ROAD, ["/*.JPG"]],
+    [Service.ROAD, ["/*.JPG", "/mqtt"]],
+    [Service.MARINE, ["/mqtt"]],
+    [Service.AFIR, ["/mqtt"]],
   ]);
 
   return { openApiUrls, customEndpoints };

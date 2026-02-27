@@ -22,6 +22,7 @@ import {
 import ky from "ky";
 import mysql from "mysql";
 import { MySqlMetricStore } from "../../adapters/driven/mysql/mysql-metric-store.js";
+import type { OpenSearchClient } from "../../adapters/driven/opensearch/opensearch-metric-source.js";
 import { OpenSearchMetricSource } from "../../adapters/driven/opensearch/opensearch-metric-source.js";
 import { MetricCollectionService } from "../../domain/services/metric-collection-service.js";
 import { isSuccess } from "../../domain/types/collection-result.js";
@@ -581,8 +582,7 @@ function createMetricSource(): OpenSearchMetricSource {
     },
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new OpenSearchMetricSource(mockClient as any, {
+  return new OpenSearchMetricSource(mockClient as OpenSearchClient, {
     defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
     afirAccessLogIndex: TEST_CONFIG.opensearch.index,
     accountNames: {
