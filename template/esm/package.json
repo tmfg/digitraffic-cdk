@@ -29,7 +29,7 @@
     "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"

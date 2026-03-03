@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@date-fns/tz": "1.4.1",
-    "@digitraffic/common": "2026.2.23-1",
+    "@digitraffic/common": "2026.3.2-1",
     "@std/csv": "npm:@jsr/std__csv@1.0.6",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
@@ -46,7 +46,7 @@
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
     "jest": "30.2.0",

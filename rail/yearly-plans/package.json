@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.995.0",
-    "@digitraffic/common": "2026.2.23-1",
-    "ajv": "8.17.1",
+    "@digitraffic/common": "2026.3.2-1",
+    "ajv": "8.18.0",
     "ajv-formats": "3.0.1",
     "archiver": "7.0.1",
     "aws-cdk-lib": "2.236.0",
@@ -36,7 +36,7 @@
     "@types/archiver": "7.0.0",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"

@@ -26,7 +26,19 @@
 
 # Rush stuff
 !/common/
-!/common/*
+!/common/config/
+!/common/config/rush/
+!/common/config/rush/*
+!/common/config/rush/.*
+!/common/git-hooks/
+!/common/git-hooks/*
+!/common/scripts/
+!/common/scripts/*
+!/common/autoinstallers/
+!/common/autoinstallers/*/
+!/common/autoinstallers/*/package.json
+!/common/autoinstallers/*/pnpm-lock.yaml
+!/common/autoinstallers/*/.*
 
 # digitraffic-common
 !/lib/

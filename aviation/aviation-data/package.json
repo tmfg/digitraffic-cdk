@@ -15,7 +15,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.995.0",
     "@aws-sdk/lib-storage": "3.995.0",
-    "@digitraffic/common": "2026.2.23-1",
+    "@digitraffic/common": "2026.3.2-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5"
   },
@@ -28,7 +28,7 @@
     "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/aws-lambda": "8.10.160",
     "@types/heft-jest": "1.0.6",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "esbuild": "0.27.2",
     "jest": "30.2.0",
     "typescript": "5.9.3"

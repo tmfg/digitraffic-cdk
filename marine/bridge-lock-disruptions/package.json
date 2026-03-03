@@ -17,7 +17,7 @@
     "watch": "heft build-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.2.23-1",
+    "@digitraffic/common": "2026.3.2-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
     "date-fns": "4.1.0",
@@ -42,7 +42,7 @@
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "@types/sinon": "21.0.0",
     "@types/source-map-support": "0.5.10",
     "@types/xml2js": "0.4.14",

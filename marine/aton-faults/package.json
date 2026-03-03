@@ -23,7 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "3.995.0",
     "@date-fns/tz": "1.4.1",
-    "@digitraffic/common": "2026.2.23-1",
+    "@digitraffic/common": "2026.3.2-1",
     "@middy/core": "7.0.2",
     "@middy/sqs-partial-batch-failure": "7.0.2",
     "@turf/turf": "7.3.1",
@@ -53,7 +53,7 @@
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "@types/xml2js": "0.4.14",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",

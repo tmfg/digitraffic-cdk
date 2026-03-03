@@ -5,8 +5,6 @@
 # exit on any error
 set -ex
 
-rush 
-
 PACKAGE=${1:-@aws-cdk}
 
 function updateInDirectory() {
@@ -33,3 +31,9 @@ updateAllInDirectory other
 updateAllInDirectory road
 updateAllInDirectory marine
 updateAllInDirectory aviation
+updateAllInDirectory rail
+updateAllInDirectory tools
+updateAllInDirectory template
+
+# Update lockfile after all package.json files are updated
+rush update

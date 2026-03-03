@@ -91,6 +91,19 @@
   "globalOverrides": {
     // "example1": "^1.0.0",
     // "example2": "npm:@company/example2@^1.0.0"
+    // Fix minimatch security vulnerabilities (GHSA-3ppc-4f35-3m26, GHSA-7r86-cg39-jmmj)
+    // Using versions published at 2/25/2026 which should meet minimumReleaseAge
+    "minimatch@<3.1.4": "3.1.5",
+    "minimatch@>=9.0.0 <9.0.7": "9.0.9",
+    "minimatch@>=10.0.0 <10.2.3": "10.2.4",
+    // Fix serialize-javascript RCE vulnerability (GHSA-5c6j-r48x-rmvq)
+    "serialize-javascript@<=7.0.2": "7.0.3",
+    // Fix glob CLI command injection vulnerability (GHSA-xxxx) in versions >=10.2.0 <10.5.0
+    "glob@>=10.2.0 <10.5.0": "10.5.0",
+    // Fix ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6)
+    "ajv@>=7.0.0-alpha.0 <8.18.0": "8.18.0",
+    // Fix fast-xml-parser stack overflow (GHSA-fj3w-jwp8-x2g3)
+    "fast-xml-parser@<5.3.8": "5.3.8"
   },
 
   /**

@@ -16,7 +16,7 @@
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.2.23-1",
+    "@digitraffic/common": "2026.3.2-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
     "es-toolkit": "1.44.0",
@@ -36,7 +36,7 @@
     "@types/geojson": "7946.0.16",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "aws-cdk": "2.1103.0",
     "date-fns": "4.1.0",
     "esbuild": "0.27.2",

@@ -29,7 +29,7 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.1.10",
     "@rushstack/heft-typescript-plugin": "1.1.10",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "typescript": "5.9.3"
   }
 }

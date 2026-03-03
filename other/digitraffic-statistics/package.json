@@ -14,7 +14,7 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.2.23-1",
+    "@digitraffic/common": "2026.3.2-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5"
   },
@@ -29,7 +29,7 @@
     "@types/aws-lambda": "8.10.160",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
+    "@types/node": "24.10.13",
     "aws-cdk": "2.1103.0",
     "cdk-ecr-deployment": "4.0.6",
     "esbuild": "0.27.2",
