@@ -3,6 +3,7 @@ import type { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-t
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
 import type { LineString, Point } from "geojson";
+import { describe, expect, test } from "vitest";
 import {
   AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
   AUTORI_MAX_MINUTES_TO_HISTORY,

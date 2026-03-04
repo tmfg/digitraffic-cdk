@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { describe, expect, test } from "vitest";
 import * as MetadataService from "../../service/metadata.js";
 import { PREDICTION_SOURCES } from "../../service/metadata.js";
 import { dbTestBase, insert } from "../db-testutil.js";

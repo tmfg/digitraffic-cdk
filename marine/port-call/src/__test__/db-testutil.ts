@@ -2,7 +2,7 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { jest } from "@jest/globals";
+import { expect, vi } from "vitest";
 import * as VisitsDAO from "../db/visits.js";
 import type { PortCallSecret } from "../model/secret.js";
 
@@ -39,10 +39,10 @@ export async function assertVisitCount(
 }
 
 export function mockProxyAndSecretHolder(): void {
-  jest
-    .spyOn(ProxyHolder.prototype, "setCredentials")
-    .mockImplementation(() => Promise.resolve());
-  jest
-    .spyOn(SecretHolder.prototype, "get")
-    .mockResolvedValue({} as PortCallSecret);
+  vi.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
+    Promise.resolve(),
+  );
+  vi.spyOn(SecretHolder.prototype, "get").mockResolvedValue(
+    {} as PortCallSecret,
+  );
 }

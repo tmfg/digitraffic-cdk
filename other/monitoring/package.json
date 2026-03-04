@@ -9,12 +9,13 @@
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "cdk": "cdk",
+    "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.3.2-1",
+    "@digitraffic/common": "2026.3.3-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5"
   },
@@ -23,18 +24,16 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.10",
-    "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/aws-lambda": "8.10.160",
-    "@types/heft-jest": "1.0.6",
     "@types/node": "24.10.13",
+    "@vitest/coverage-v8": "4.0.18",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
-    "jest": "30.2.0",
     "parallelshell": "3.0.2",
     "ts-node": "10.9.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   },
   "externals": []
 }

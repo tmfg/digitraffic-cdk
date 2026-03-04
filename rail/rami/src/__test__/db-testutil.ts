@@ -1,11 +1,14 @@
 import { get } from "lodash-es";
 import type { Connection } from "mysql2/promise";
-import * as mysql from "../util/database.js";
+import { afterAll, beforeAll, beforeEach, expect } from "vitest";
 import { inTransaction } from "../util/database.js";
 
 export type DbUnitTestFunction = (db: Connection) => void;
 
-type JestEmptyFunction = () => void;
+type EmptyFunction = () => void;
+
+// biome-ignore lint/complexity/useLiteralKeys: nope
+process.env["AWS_REGION"] = "eu-west-1";
 
 export enum DatabaseEnvironmentKeys {
   DB_USER = "DB_USER",
@@ -41,12 +44,12 @@ export interface TestConfiguration {
 }
 
 export function dbTestBase(
-  fn: JestEmptyFunction,
+  fn: EmptyFunction,
   config?: TestConfiguration,
-): JestEmptyFunction {
+): EmptyFunction {
   return () => {
     beforeAll(async () => {
-      await mysql.inTransaction(async (db) => {
+      await inTransaction(async (db) => {
         await truncate(db);
         if (config?.beforeAll) {
           await config.beforeAll(db);
@@ -55,7 +58,7 @@ export function dbTestBase(
     });
 
     afterAll(async () => {
-      await mysql.inTransaction(async (db) => {
+      await inTransaction(async (db) => {
         await truncate(db);
         if (config?.afterAll) {
           await config.afterAll(db);
@@ -64,7 +67,7 @@ export function dbTestBase(
     });
 
     beforeEach(async () => {
-      await mysql.inTransaction(async (db) => {
+      await inTransaction(async (db) => {
         await truncate(db);
         if (config?.beforeEach) {
           await config.beforeEach(db);

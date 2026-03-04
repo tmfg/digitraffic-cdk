@@ -1,3 +1,4 @@
+import { expect, test } from "vitest";
 import { handler } from "../../lambda/function-index-html.js";
 import { createCloudfrontEvent } from "./request-util.js";
 

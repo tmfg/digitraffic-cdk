@@ -1,4 +1,5 @@
 import type { HTTPError } from "ky";
+import { describe, expect, test } from "vitest";
 import {
   AwakeAiPortApi,
   AwakeAiPortResponseType,

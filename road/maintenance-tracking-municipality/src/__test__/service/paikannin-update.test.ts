@@ -3,9 +3,9 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { jest } from "@jest/globals";
 import { sub } from "date-fns/sub";
 import type { Position } from "geojson";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { PaikanninApi } from "../../api/paikannin.js";
 import { PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M } from "../../constants.js";
 import * as DataDb from "../../dao/data.js";
@@ -171,7 +171,7 @@ describe(
 
       mockGetWorkEventsApiResponse([route2d]);
       await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-      jest.clearAllMocks(); // ??
+      vi.clearAllMocks(); // ??
 
       mockGetWorkEventsApiResponse([route1d]);
       await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
@@ -287,7 +287,7 @@ describe(
 
       mockGetWorkEventsApiResponse([route]);
       await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
 
       const trackings = await findAllTrackings(db, DOMAIN_1);
 
@@ -340,7 +340,7 @@ describe(
 
       mockGetWorkEventsApiResponse([route1]);
       await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
       mockGetWorkEventsApiResponse([route2]);
       await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
@@ -371,17 +371,17 @@ describe(
     });
 
     function mockGetDevicesApiResponse(response: ApiDevice[]): void {
-      jest
-        .spyOn(PaikanninApi.prototype, "getDevices")
-        .mockReturnValueOnce(Promise.resolve(response));
+      vi.spyOn(PaikanninApi.prototype, "getDevices").mockReturnValueOnce(
+        Promise.resolve(response),
+      );
     }
 
     function mockGetWorkEventsApiResponse(
       response: ApiWorkeventDevice[],
     ): void {
-      jest
-        .spyOn(PaikanninApi.prototype, "getWorkEvents")
-        .mockReturnValueOnce(Promise.resolve(response));
+      vi.spyOn(PaikanninApi.prototype, "getWorkEvents").mockReturnValueOnce(
+        Promise.resolve(response),
+      );
     }
 
     function createDevice(ioChannels: ApiIoChannel[]): ApiDevice {

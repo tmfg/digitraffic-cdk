@@ -14,7 +14,6 @@ export const ATON_FAULTS_CHECK = "ATON_FAULTS_CHECK";
 export interface FaultProps {
   readonly id: number;
   readonly entry_timestamp: Date;
-  // eslint-disable-next-line @rushstack/no-new-null
   readonly fixed_timestamp: Date | null;
   readonly type: string;
   readonly domain: string;
@@ -34,7 +33,6 @@ export interface FaultProps {
 export function findAllFaults(
   language: Language,
   fixedInHours: number,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<[FeatureCollection, Date | null]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const features = await FaultsDB.findAll(

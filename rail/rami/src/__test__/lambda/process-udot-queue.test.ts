@@ -1,4 +1,5 @@
 import type { SQSEvent, SQSRecord } from "aws-lambda";
+import { describe, expect, test } from "vitest";
 import { handlerFn } from "../../lambda/process-udot-queue/process-udot-queue.js";
 import type {
   TimeTableRowType,

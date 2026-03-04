@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import * as Datex2UpdateService from "../../service/datex2-update-service.js";
 import { TEST_DATEX2, TEST_DATEX2_2 } from "./service-test-constants.js";
 

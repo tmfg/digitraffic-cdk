@@ -2,6 +2,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
 import { Language } from "@digitraffic/common/dist/types/language";
 import { addHours } from "date-fns";
+import { describe, expect, test } from "vitest";
 import { LineString, Point } from "wkx";
 import * as FaultsDb from "../../db/faults.js";
 import { findAll } from "../../db/faults.js";

@@ -1,7 +1,7 @@
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { jest } from "@jest/globals";
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { describe, expect, test, vi } from "vitest";
 import { ERRORS } from "../../lambda/upload-datex2/upload-datex2.js";
 import type { Datex2UpdateObject } from "../../model/datex2-update-object.js";
 import { assertDataCount, dbTestBase } from "../db-testutil.js";
@@ -31,7 +31,7 @@ const validUpdateObject: Datex2UpdateObject = {
 describe(
   "upload-datex2-lambda-test",
   dbTestBase((db: DTDatabase) => {
-    jest.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
+    vi.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
 
     test("missing body", async () => {
       const response = await getResponseFromLambda({});

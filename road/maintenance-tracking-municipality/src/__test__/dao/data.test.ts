@@ -2,6 +2,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { add } from "date-fns/add";
 import type { Point } from "geojson";
+import { afterEach, describe, expect, test } from "vitest";
 import * as DataDb from "../../dao/data.js";
 import type {
   DbMaintenanceTracking,

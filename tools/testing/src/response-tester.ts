@@ -1,4 +1,5 @@
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { expect } from "vitest";
 
 export function expectResponse(
   response: LambdaResponse,

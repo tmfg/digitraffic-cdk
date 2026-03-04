@@ -1,6 +1,6 @@
 import { Language } from "@digitraffic/common/dist/types/language";
-import { jest } from "@jest/globals";
 import type { FeatureCollection } from "geojson";
+import { describe, expect, test, vi } from "vitest";
 
 const EMPTY_FEATURECOLLECTION_EN: FeatureCollection = {
   features: [],
@@ -21,8 +21,8 @@ const EMPTY_FEATURECOLLECTION_FI: FeatureCollection = {
   type: "FeatureCollection",
 };
 
-jest.unstable_mockModule("../../service/faults.js", () => ({
-  findAllFaults: jest.fn((language: Language) => {
+vi.mock("../../service/faults.js", () => ({
+  findAllFaults: vi.fn((language: Language) => {
     if (language === Language.FI) {
       return Promise.resolve([EMPTY_FEATURECOLLECTION_FI, new Date()]);
     }
@@ -37,9 +37,9 @@ process.env["SECRET_ID"] = "";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { decodeBase64ToAscii } from "@digitraffic/common/dist/utils/base64";
 
-jest
-  .spyOn(ProxyHolder.prototype, "setCredentials")
-  .mockImplementation(() => Promise.resolve());
+vi.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
+  Promise.resolve(),
+);
 
 describe("get-faults", () => {
   async function expectResponse<T>(

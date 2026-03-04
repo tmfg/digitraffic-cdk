@@ -3,7 +3,6 @@ import type { Feature, FeatureCollection, Geometry } from "geojson";
 export interface DbFault {
   readonly id: number;
   readonly entry_timestamp: Date;
-  // eslint-disable-next-line @rushstack/no-new-null
   readonly fixed_timestamp: Date | null;
   readonly aton_fault_type: string;
   readonly domain: string;
@@ -34,9 +33,7 @@ export enum FaultState {
 export interface AtonProperties {
   readonly ID: number;
   readonly FAULT_TYPE: string;
-  // eslint-disable-next-line @rushstack/no-new-null
   readonly FAULT_ENTRY_TIMESTAMP: string | null;
-  // eslint-disable-next-line @rushstack/no-new-null
   readonly FAULT_FIXED_TIMESTAMP: string | null;
   readonly FAULT_STATE: string;
   readonly FAULT_FIXED: number;

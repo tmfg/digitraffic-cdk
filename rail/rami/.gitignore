@@ -5,6 +5,7 @@
 !/package.json
 !/tscconfig.json
 !/esbuild.ts
+!/vite.config.ts
 
 !/config/
 !/config/*.json

@@ -1,6 +1,6 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { expect } from "@jest/globals";
+import { beforeEach, describe, expect, test } from "vitest";
 import type { TyokoneenseurannanKirjaus } from "../../model/models.js";
 import {
   cleanMaintenanceTrackingData,

@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "build": "heft build --clean",
+    "ci:test": "echo 'No tests implemented'",
     "test": "echo 'No tests implemented'"
   },
   "dependencies": {

@@ -1,6 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
 import _ from "lodash";
+import { describe, expect, test } from "vitest";
 import * as TimestampsDb from "../../dao/timestamps.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
 import { EventType } from "../../model/timestamp.js";

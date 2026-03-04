@@ -4,7 +4,6 @@
  */
 {
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
-
   /**
    * Custom "commands" introduce new verbs for the command-line.  To see the help for these
    * example commands, try "rush --help", "rush my-bulk-command --help", or
@@ -88,6 +87,32 @@
       "name": "generate-sbom",
       "commandKind": "bulk",
       "summary": "Generate SBOM for all projects in the monorepo.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true,
+      "ignoreMissingScript": true
+    },
+    {
+      "name": "ci:prepare",
+      "commandKind": "bulk",
+      "summary": "Prepare for CI-tests.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true,
+      "ignoreMissingScript": true
+    },
+    {
+      "name": "ci:test",
+      "commandKind": "bulk",
+      "summary": "Run CI-tests for all projects in the monorepo.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
+      "name": "ci:teardown",
+      "commandKind": "bulk",
+      "summary": "Teardown after CI-tests.",
       "safeForSimultaneousRushProcesses": false,
       "enableParallelism": false,
       "allowWarningsInSuccessfulBuild": true,

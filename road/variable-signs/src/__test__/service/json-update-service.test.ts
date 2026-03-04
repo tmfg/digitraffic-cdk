@@ -1,5 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Countable } from "@digitraffic/common/dist/database/models";
+import { describe, expect, test } from "vitest";
 import type { TloikLaite, TloikMetatiedot } from "../../model/metatiedot.js";
 import type {
   TloikLiikennemerkinTila,

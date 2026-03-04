@@ -1,8 +1,8 @@
 //import type { ApiData } from "../../model/v1/data.js";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
-import { jest } from "@jest/globals";
 import ky from "ky";
+import { describe, expect, test, vi } from "vitest";
 import * as DataDAO from "../../dao/data.js";
 import type { ApiData } from "../../model/v2/api-model.js";
 import { updateData } from "../../service/update-service.js";
@@ -30,7 +30,7 @@ describe(
     test("updateDataForDomain - no data", async () => {
       await insertSite(db);
 
-      const server = jest
+      const server = vi
         .spyOn(ky, "get")
         .mockImplementation(() =>
           mockKyResponse(200, JSON.stringify(EMPTY_DATA)),
@@ -74,7 +74,7 @@ describe(
     test("updateDataForDomain - two counter and data", async () => {
       await insertSite(db);
 
-      const server = jest
+      const server = vi
         .spyOn(ky, "get")
         .mockImplementation(() =>
           mockKyResponse(200, JSON.stringify(RESPONSE_DATA)),
@@ -89,7 +89,7 @@ describe(
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await db.any("update counting_site_counter set last_data_timestamp=now() - interval '7 days'");
-            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
+            const counterApiResponse = vi.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 
@@ -101,7 +101,7 @@ describe(
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await db.any("update counting_site_counter set last_data_timestamp=now()");
-            const counterApiResponse = jest.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
+            const counterApiResponse = vi.spyOn(EcoCounterApi.prototype, "getDataForSite").mockResolvedValue(RESPONSE_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
 

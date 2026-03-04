@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 import {
   normalizeDisruptionDate,
   validateGeoJson,

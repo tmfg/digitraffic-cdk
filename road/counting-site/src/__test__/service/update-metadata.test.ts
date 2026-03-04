@@ -1,7 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
-import { jest } from "@jest/globals";
 import ky from "ky";
+import { describe, expect, test, vi } from "vitest";
 import { getAllSites } from "../../dao/site.js";
 import type { DbSite } from "../../model/v2/db-model.js";
 import { updateMetadata } from "../../service/update-service.js";
@@ -30,7 +30,7 @@ describe(
     test("updateMetadata - empty", async () => {
       await assertSitesInDb(0);
 
-      const server = jest
+      const server = vi
         .spyOn(ky, "get")
         .mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
       await updateMetadata("", "", "Fintraffic");
@@ -42,7 +42,7 @@ describe(
     test("updateMetadata - insert", async () => {
       await assertSitesInDb(0);
 
-      const server = jest
+      const server = vi
         .spyOn(ky, "get")
         .mockImplementation(() =>
           mockKyResponse(200, JSON.stringify([TEST_SITE_1])),
@@ -59,7 +59,7 @@ describe(
       await insertSite(db);
       await assertSitesInDb(1);
 
-      const server = jest
+      const server = vi
         .spyOn(ky, "get")
         .mockImplementation(() =>
           mockKyResponse(200, JSON.stringify([TEST_SITE_1])),
@@ -74,7 +74,7 @@ describe(
       await insertSite(db);
       await assertSitesInDb(1);
 
-      const server = jest
+      const server = vi
         .spyOn(ky, "get")
         .mockImplementation(() => mockKyResponse(200, JSON.stringify([])));
       await updateMetadata("", "", "Fintraffic");

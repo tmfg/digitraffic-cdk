@@ -1,8 +1,8 @@
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { jest } from "@jest/globals";
+import { vi } from "vitest";
 
 export function mockProxyHolder(): void {
-  jest
-    .spyOn(ProxyHolder.prototype, "setCredentials")
-    .mockImplementation(() => Promise.resolve());
+  vi.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
+    Promise.resolve(),
+  );
 }

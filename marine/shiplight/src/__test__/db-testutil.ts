@@ -1,5 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
+import { assert, expect } from "vitest";
 import { ShipTypes } from "../db/areatraffic.js";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
@@ -30,9 +31,9 @@ export async function assertArea(
   });
 
   if (duration) {
-    if (!area) fail("area not defined");
-    if (!area.brighten_sent) fail("brighten_sent not defined");
-    if (!area.brighten_end) fail("brighten_end not defined");
+    if (!area) assert.fail("area not defined");
+    if (!area.brighten_sent) assert.fail("brighten_sent not defined");
+    if (!area.brighten_end) assert.fail("brighten_end not defined");
 
     const sent = new Date(area.brighten_sent);
     const end = new Date(area.brighten_end);

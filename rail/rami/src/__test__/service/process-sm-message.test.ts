@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import type { UnknownDelayOrTrackMessage } from "../../model/dt-rosm-message.js";
 import { parseUDOTMessage } from "../../service/process-sm-message.js";
 import { realMessage, validMessage2 } from "../testdata-sm.js";

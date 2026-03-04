@@ -1,7 +1,7 @@
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { jest } from "@jest/globals";
+import { expect, test, vi } from "vitest";
 
-jest.spyOn(SecretHolder.prototype, "get").mockImplementation(() =>
+vi.spyOn(SecretHolder.prototype, "get").mockImplementation(() =>
   Promise.resolve({
     s3DomainTmsRawOngoing: "s3domain",
     snowflakeDomain: "snowflakedomain",

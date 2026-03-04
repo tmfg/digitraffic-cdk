@@ -1,7 +1,7 @@
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { randomString } from "@digitraffic/common/dist/test/testutils";
-import { jest } from "@jest/globals";
 import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type {
   NodePingCheck,
   NodePingCheckPostPutData,
@@ -33,7 +33,7 @@ describe("NodePing API test", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("checkNeedsUpdate - timeout configured - equal timeout value", () => {
@@ -224,7 +224,7 @@ describe("NodePing API test", () => {
 
   test("getNodePingChecks", async () => {
     const secret = await secretHolder.get();
-    const spy = jest
+    const spy = vi
       .spyOn(ky, "get")
       .mockImplementation(
         (_url: Input, _options: Options | undefined): ResponsePromise => {
@@ -244,7 +244,7 @@ describe("NodePing API test", () => {
 
   test("getNodepingContacts", async () => {
     const secret = await secretHolder.get();
-    const spy = jest
+    const spy = vi
       .spyOn(ky, "get")
       .mockImplementation(
         (_url: Input, _options: Options | undefined): ResponsePromise => {
@@ -275,7 +275,7 @@ describe("NodePing API test", () => {
     const gitHubPat = "SampleToken";
     const nodepingContactName = "gh-contact";
 
-    const spy = jest
+    const spy = vi
       .spyOn(ky, "post")
       .mockImplementation(
         (_url: Input, _options?: Options | undefined): ResponsePromise => {
@@ -382,7 +382,7 @@ async function testNodePingChecksDisableall(
 ): Promise<void> {
   const url = `${NODEPING_API}/checks?disableall=${JSON.stringify(disableall)}`;
 
-  const spy = jest.spyOn(ky, "put").mockImplementation((async (
+  const spy = vi.spyOn(ky, "put").mockImplementation((async (
     _url: Input,
     _options?: Options | undefined,
   ) => {
@@ -407,7 +407,7 @@ async function testNodePingChecksDisableall(
       formData: () => Promise.resolve(new FormData()),
     };
   }) as unknown as (_url: Input, _options?: Options) => ResponsePromise);
-  const spyDoPut = jest.spyOn(nodepingApi, "doPut");
+  const spyDoPut = vi.spyOn(nodepingApi, "doPut");
 
   if (fail) {
     await expect(async () => {
@@ -441,7 +441,7 @@ async function testCreateNodepingCheck(
     return { [cid]: { delay: 0, schedule: "All" } };
   });
 
-  const spy = jest.spyOn(ky, "post").mockImplementation((async (
+  const spy = vi.spyOn(ky, "post").mockImplementation((async (
     _url: Input,
     _options?: Options | undefined,
   ) => {

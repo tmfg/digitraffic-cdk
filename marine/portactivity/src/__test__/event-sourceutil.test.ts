@@ -4,6 +4,7 @@ import {
 } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO, subMinutes } from "date-fns";
 import _ from "lodash";
+import { describe, expect, test } from "vitest";
 import {
   dateAverage,
   mergeTimestamps,

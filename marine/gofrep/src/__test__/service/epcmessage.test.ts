@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import type { EpcMessage } from "../../model/epcmessage.js";
 import * as EpcMessageService from "../../service/epcmessage.js";
 

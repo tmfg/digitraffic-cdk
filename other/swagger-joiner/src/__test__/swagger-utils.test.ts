@@ -1,4 +1,5 @@
 import { openapiSchema } from "@digitraffic/common/dist/types/openapi-schema";
+import { describe, expect, test } from "vitest";
 import {
   mergeApiDescriptions,
   withDeprecations,

@@ -1,4 +1,5 @@
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
+import { describe, expect, test } from "vitest";
 import type {
   AwakeAiPredictionMetadata,
   AwakeAiVoyageEtaPrediction,

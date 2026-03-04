@@ -2,16 +2,16 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
-import { jest } from "@jest/globals";
 import type { FeatureCollection } from "geojson";
+import { describe, expect, test, vi } from "vitest";
 import { addSites } from "../../dao/site.js";
 import type { ApiSite } from "../../model/v2/api-model.js";
 import { dbTestBase } from "../db-testutil.js";
 
 // for some reason, mockProxyHolder does not work here!?!
-jest
-  .spyOn(ProxyHolder.prototype, "setCredentials")
-  .mockImplementation(() => Promise.resolve());
+vi.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
+  Promise.resolve(),
+);
 
 export const TEST_SITE_1: ApiSite = {
   id: 1,

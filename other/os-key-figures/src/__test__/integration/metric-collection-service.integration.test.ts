@@ -10,6 +10,8 @@
  * 3. Stop containers: npm run test:integration:teardown
  */
 
+import ky from "ky";
+import mysql from "mysql";
 import {
   afterAll,
   afterEach,
@@ -18,9 +20,7 @@ import {
   describe,
   expect,
   test,
-} from "@jest/globals";
-import ky from "ky";
-import mysql from "mysql";
+} from "vitest";
 import { MySqlMetricStore } from "../../adapters/driven/mysql/mysql-metric-store.js";
 import type { OpenSearchClient } from "../../adapters/driven/opensearch/opensearch-metric-source.js";
 import { OpenSearchMetricSource } from "../../adapters/driven/opensearch/opensearch-metric-source.js";

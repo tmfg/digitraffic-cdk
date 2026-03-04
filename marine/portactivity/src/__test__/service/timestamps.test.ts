@@ -1,6 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addHours, addMinutes, parseISO, subDays } from "date-fns";
 import _ from "lodash";
+import { describe, expect, test } from "vitest";
 import { EventSource } from "../../model/eventsource.js";
 import { EventType } from "../../model/timestamp.js";
 import * as TimestampsService from "../../service/timestamps.js";

@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { describe, expect, test } from "vitest";
 import * as SseDb from "../../db/sse-db.js";
 import type { TheItemsSchema } from "../../generated/tlsc-sse-reports-schema.d.ts";
 import * as SseUpdateService from "../../service/sse-update-service.js";

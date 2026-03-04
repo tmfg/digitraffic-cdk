@@ -2,6 +2,7 @@ import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-r
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { addHours, addMonths, subHours, subMonths } from "date-fns";
+import { describe, expect, test } from "vitest";
 import type { VisitResponse } from "../../model/visit-schema.js";
 import {
   assertVisitCount,

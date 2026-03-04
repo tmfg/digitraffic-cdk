@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { parseDatex } from "../../service/vs-datex2-35-parser.js";
 import {
   TEST_DATEX2_SITUATION_PUBLICATION,
@@ -19,7 +20,7 @@ describe("parser-35-tests", () => {
     expect(situations.length).toEqual(1);
     expect(situations[0]!.id).toEqual("KRM123456");
     expect(situations[0]!.type).toEqual("SITUATION");
-    expect(situations[0]!.datex2.startsWith("<situation")).toBeTruthy();
+    expect(situations[0]!.datex2.startsWith("<sit:situation")).toBeTruthy();
   });
 
   test("parse vmsPublication 1", async () => {
@@ -29,7 +30,7 @@ describe("parser-35-tests", () => {
     expect(situations[0]!.id).toEqual("VME038713");
     expect(situations[0]!.type).toEqual("CONTROLLER_STATUS");
     expect(
-      situations[0]!.datex2.startsWith("<vmsControllerStatus"),
+      situations[0]!.datex2.startsWith("<vms:vmsControllerStatus"),
     ).toBeTruthy();
   });
 
@@ -39,6 +40,6 @@ describe("parser-35-tests", () => {
     expect(situations.length).toEqual(2);
     expect(situations[0]!.id).toEqual("VME/VLK014512");
     expect(situations[0]!.type).toEqual("CONTROLLER");
-    expect(situations[0]!.datex2.startsWith("<vmsController")).toBeTruthy();
+    expect(situations[0]!.datex2.startsWith("<vms:vmsController")).toBeTruthy();
   });
 });

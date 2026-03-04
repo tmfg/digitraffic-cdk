@@ -1,4 +1,5 @@
 import type { DocumentationVersion } from "@aws-sdk/client-api-gateway";
+import { describe, expect, test } from "vitest";
 import { getLatestVersion } from "../../../lambda/update-api-documentation/lambda-update-api-documentation.js";
 
 describe("update-api-documentation", () => {

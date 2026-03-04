@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { convertTextToSvg } from "../../service/text-converter.js";
 
 describe("text-converter-tests", () => {
@@ -90,7 +91,10 @@ describe("text-converter-tests", () => {
     expectElements(svg, elements);
   }
 
-  function expectError(text: string, errorText: string = ""): void {
+  function expectError(
+    text: string,
+    errorText: string | undefined = undefined,
+  ): void {
     expect(() => convertTextToSvg(text)).toThrow(errorText);
   }
 

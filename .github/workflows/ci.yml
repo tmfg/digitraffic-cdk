@@ -1,36 +1,119 @@
 name: CI
-on: [push]
+on: [push, workflow_dispatch]
 
-jobs:
-  build:
+jobs:  
+  db-tests:
     if: github.repository != 'tmfg/digitraffic-cdk'
+    strategy:
+      fail-fast: false
+      matrix:
+        domain: [road, marine, rail]
     runs-on: ubuntu-24.04
     steps:
-      - name: Fetch repo
+      - name: Checkout cdk repo
         uses: actions/checkout@v6
         with:
           fetch-depth: 2
-      - name: Git config user
-        uses: snow-actions/git-config-user@v1.0.0
+      - name: Checkout ${{ matrix.domain }} repo
+        uses: actions/checkout@v6
         with:
-          name: digitraffic-ci
-          email: digitraffic@solita.fi
+          repository: tmfg/digitraffic-${{ matrix.domain }}
+          fetch-depth: 2
+          path: digitraffic-${{ matrix.domain }}
       - name: Install Node 24
         uses: actions/setup-node@v6
         with:
           node-version: 24
-      #- name: Check rush.json and dependabot.yml
-      #  run: python scripts/check-dependabot-projects.py
       - name: Cache pnpm store cache
         uses: actions/cache@v5
         with:
           key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
           path: |
             common/temp/pnpm-store
-
-      # - name: Verify Change Logs
-      #   run: node common/scripts/install-run-rush.js change --verify
+      - name: Setup database for ${{ matrix.domain }}
+        working-directory: digitraffic-${{ matrix.domain }}/db${{ matrix.domain }}
+        run: docker compose rm db && docker compose up -d
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
-      - name: Rush rebuild
-        run: node common/scripts/install-run-rush.js rebuild --verbose
+      - name: Rush rebuild ${{ matrix.domain }}
+        run: node common/scripts/install-run-rush.js rebuild --verbose --to tag:${{ matrix.domain }}
+      - name: Prepare ${{ matrix.domain }} 
+        run: node common/scripts/install-run-rush.js ci:prepare --verbose --to tag:${{ matrix.domain }}
+      - name: Run tests ${{ matrix.domain }}
+        run: node common/scripts/install-run-rush.js ci:test --verbose --to tag:${{ matrix.domain }}
+      - name: Teardown ${{ matrix.domain }}
+        if: always()
+        run: node common/scripts/install-run-rush.js ci:teardown --verbose --to tag:${{ matrix.domain }}
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v2
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          name: Test report for ${{ matrix.domain }}
+          reporter: jest-junit
+          path: '${{ matrix.domain }}/**/test-results.xml'
+          max-annotations: 50
+          list-suites: failed
+          badge-title: ${{ matrix.domain }}
+      - name: Stop ${{ matrix.domain }} database containers
+        if: always()
+        working-directory: digitraffic-${{ matrix.domain }}/db${{ matrix.domain }}
+        run: docker compose down
+      - name: Notify Slack
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: FAILED ${{ matrix.domain }} cdk build
+          fields: repo, job, took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  other-tests:
+    if: github.repository != 'tmfg/digitraffic-cdk'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        domain: [other, aviation]
+    steps:
+      - name: Checkout cdk repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2      
+      - name: Install Node 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Cache pnpm store cache
+        uses: actions/cache@v5
+        with:
+          key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
+          path: |
+            common/temp/pnpm-store     
+      - name: Rush Install
+        run: node common/scripts/install-run-rush.js install
+      - name: Rush rebuild ${{ matrix.domain }}
+        run: node common/scripts/install-run-rush.js rebuild --verbose --to tag:${{ matrix.domain }}
+      - name: Prepare ${{ matrix.domain }} 
+        run: node common/scripts/install-run-rush.js ci:prepare --verbose --to tag:${{ matrix.domain }}
+      - name: Run tests ${{ matrix.domain }}
+        run: node common/scripts/install-run-rush.js ci:test --verbose --to tag:${{ matrix.domain }}
+      - name: Publish Test Report
+        uses: dorny/test-reporter@v2
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          name: Test report for ${{ matrix.domain }}
+          reporter: jest-junit
+          path: '${{ matrix.domain }}/**/test-results.xml'
+          max-annotations: 50
+          list-suites: failed
+          badge-title: ${{ matrix.domain }}
+      - name: Notify Slack
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: FAILED ${{ matrix.domain }} cdk build
+          fields: repo, job, took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

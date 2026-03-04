@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { describe, expect, test } from "vitest";
 import * as MaintenanceTrackingDb from "../../dao/maintenance-tracking-dao.js";
 import * as DbTestutil from "../db-testutil.js";
 import * as TestData from "../testdata.js";

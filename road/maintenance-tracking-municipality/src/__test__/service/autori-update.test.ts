@@ -5,10 +5,18 @@ import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import type { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
-import { jest } from "@jest/globals";
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
 import type { Position } from "geojson";
+import {
+  afterEach,
+  assert,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
 import { AutoriApi } from "../../api/autori.js";
 import {
   AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
@@ -361,7 +369,7 @@ describe(
       if (checked) {
         Asserter.assertToBeCloseTo(checked.getTime(), updateTime, 500);
       } else {
-        fail("checked was null");
+        assert.fail("checked was null");
       }
 
       // Check all coordinates has z value 0.5
@@ -501,21 +509,22 @@ describe(
     });
 
     function mockGetOperationsApiResponse(response: ApiOperationData[]): void {
-      jest
-        .spyOn(AutoriApi.prototype, "getOperations")
-        .mockReturnValueOnce(Promise.resolve(response));
+      vi.spyOn(AutoriApi.prototype, "getOperations").mockReturnValueOnce(
+        Promise.resolve(response),
+      );
     }
 
     function mockGetContractsApiResponse(response: ApiContractData[]): void {
-      jest
-        .spyOn(AutoriApi.prototype, "getContracts")
-        .mockReturnValueOnce(Promise.resolve(response));
+      vi.spyOn(AutoriApi.prototype, "getContracts").mockReturnValueOnce(
+        Promise.resolve(response),
+      );
     }
 
     function mockGetWorkEventsApiResponse(response: ApiRouteData[]): void {
-      jest
-        .spyOn(AutoriApi.prototype, "getNextRouteDataForContract")
-        .mockReturnValueOnce(Promise.resolve(response));
+      vi.spyOn(
+        AutoriApi.prototype,
+        "getNextRouteDataForContract",
+      ).mockReturnValueOnce(Promise.resolve(response));
     }
   }),
 );

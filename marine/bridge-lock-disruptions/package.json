@@ -10,14 +10,15 @@
     "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
     "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
     "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
+    "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml",
     "compile-lambdas": "node lib/esbuild.js",
     "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "watch": "heft build-watch --clean"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.3.2-1",
+    "@digitraffic/common": "2026.3.3-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
     "date-fns": "4.1.0",
@@ -35,20 +36,18 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.10",
-    "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/aws-lambda": "8.10.160",
     "@types/geojson": "7946.0.16",
-    "@types/heft-jest": "1.0.6",
-    "@types/jest": "30.0.0",
     "@types/node": "24.10.13",
     "@types/sinon": "21.0.0",
     "@types/source-map-support": "0.5.10",
     "@types/xml2js": "0.4.14",
+    "@vitest/coverage-v8": "4.0.18",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
     "parallelshell": "3.0.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }

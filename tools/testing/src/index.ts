@@ -6,3 +6,5 @@ export {
   expectResponse,
   expectResponseContent,
 } from "./response-tester.js";
+
+export { defaultConfig } from "./vitest-common.js";

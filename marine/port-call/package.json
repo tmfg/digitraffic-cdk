@@ -9,7 +9,7 @@
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "cdk": "cdk",
-    "ci:eslint-report": "eslint . --format html -o report.html || true",
+    "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "echo 'No canaries' #esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node20",
@@ -17,11 +17,11 @@
     "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node24",
     "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch test --clean"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.3.2-1",
+    "@digitraffic/common": "2026.3.3-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
     "date-fns": "4.1.0",
@@ -36,19 +36,14 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.10",
-    "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/aws-lambda": "8.10.160",
-    "@types/heft-jest": "1.0.6",
-    "@types/jest": "30.0.0",
     "@types/node": "24.10.13",
+    "@vitest/coverage-v8": "4.0.18",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
-    "jest": "30.2.0",
-    "jest-junit": "16.0.0",
     "parallelshell": "3.0.2",
-    "ts-jest": "29.4.6",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }

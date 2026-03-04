@@ -1,4 +1,5 @@
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
+import { describe, expect, test } from "vitest";
 import * as Utils from "../../service/utils.js";
 
 describe("UtilsTest", () => {

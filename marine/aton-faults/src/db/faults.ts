@@ -182,7 +182,6 @@ export function findAll<T>(
     .then((faults) => faults.map(conversion));
 }
 
-// eslint-disable-next-line @rushstack/no-new-null
 function parseHelsinkiTime(date: string | null): Date | undefined {
   if (date !== null) {
     // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly

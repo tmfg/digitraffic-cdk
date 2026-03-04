@@ -1,4 +1,5 @@
 import { randomString } from "@digitraffic/common/dist/test/testutils";
+import { describe, test } from "vitest";
 import { insertOrUpdate } from "../../dao/udot.js";
 import { inTransaction } from "../../util/database.js";
 import { dbTestBase, expectRowCount } from "../db-testutil.js";

@@ -1,11 +1,11 @@
 import type { ReceiveMessageCommandOutput } from "@aws-sdk/client-sqs";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { jest } from "@jest/globals";
 import type { SQSEvent } from "aws-lambda";
 import { parseISO } from "date-fns";
 import { cloneDeep } from "es-toolkit";
 import type { ExtendedSqsClient } from "sqs-extended-client";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
   createExtendedSqsClient,
   createSqsReceiveMessageCommandOutput,
@@ -39,7 +39,7 @@ describe(
     });
 
     afterEach(() => {
-      jest.clearAllMocks();
+      vi.restoreAllMocks();
     });
 
     test("no records", async () => {
@@ -47,7 +47,7 @@ describe(
         Messages: [],
         $metadata: {},
       };
-      const extendedSqsClientStub = jest
+      const extendedSqsClientStub = vi
         .spyOn(extendedSqsClient, "_processReceive")
         .mockReturnValue(Promise.resolve(output));
       const event = { Records: [] } satisfies SQSEvent;
@@ -73,7 +73,7 @@ describe(
           outputWithRefToS3,
           [json],
         );
-      const extendedSqsClientStub = jest
+      const extendedSqsClientStub = vi
         .spyOn(extendedSqsClient, "_processReceive")
         .mockReturnValue(Promise.resolve(bigOutputFromS3));
 
@@ -114,7 +114,7 @@ describe(
           outputWithRefToS3,
           [json1, json2],
         );
-      const extendedSqsClientStub = jest
+      const extendedSqsClientStub = vi
         .spyOn(extendedSqsClient, "_processReceive")
         .mockReturnValue(Promise.resolve(bigOutputFromS3));
 
@@ -149,7 +149,7 @@ describe(
           outputWithRefToS3,
           [json],
         );
-      const extendedSqsClientStub = jest
+      const extendedSqsClientStub = vi
         .spyOn(extendedSqsClient, "_processReceive")
         .mockReturnValue(Promise.resolve(bigOutputFromS3));
 
@@ -184,7 +184,7 @@ describe(
           [invalidJson, validJson],
         );
 
-      const extendedSqsClientStub = jest
+      const extendedSqsClientStub = vi
         .spyOn(extendedSqsClient, "_processReceive")
         .mockReturnValue(Promise.resolve(bigOutputFromS3));
 

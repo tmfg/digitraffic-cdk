@@ -1,10 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-use-before-define
-const mockFn = jest.fn(() => {
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+const mockFn = vi.fn(() => {
   return Promise.resolve({ saved: 3, errors: 0 });
 });
 
-// eslint-disable-next-line @typescript-eslint/no-use-before-define
-jest.unstable_mockModule("../../../service/sse-update-service.js", () => {
+vi.mock("../../../service/sse-update-service.js", () => {
   return {
     //...actual,
     __esModule: true,
@@ -13,7 +13,6 @@ jest.unstable_mockModule("../../../service/sse-update-service.js", () => {
 });
 
 import { readFileSync } from "node:fs";
-import { jest } from "@jest/globals";
 import type { TheSSEReportRootSchema } from "../../../generated/tlsc-sse-reports-schema.d.ts";
 
 // biome-ignore lint/complexity/useLiteralKeys: Indexed access
@@ -32,7 +31,7 @@ describe(
   "update-sse-data-test",
   DbTestutil.dbTestBase(() => {
     afterEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     beforeEach(() => {
@@ -49,9 +48,9 @@ describe(
 
       const retVal = { saved: 3, errors: 0 };
 
-      jest
-        .spyOn(RdsHolder.prototype, "setCredentials")
-        .mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(RdsHolder.prototype, "setCredentials").mockImplementationOnce(
+        () => Promise.resolve(),
+      );
 
       await expect(LambdaUpdateSseData.handler(data)).resolves.toStrictEqual(
         retVal,

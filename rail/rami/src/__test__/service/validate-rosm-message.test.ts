@@ -1,4 +1,5 @@
 import { set } from "lodash-es";
+import { describe, expect, test } from "vitest";
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";
 import { cloneAndUndefine, undefine } from "../message-util.js";
 import { validRamiMonitoredJourneyScheduledMessage } from "../testdata-rosm.js";

@@ -1,10 +1,9 @@
 import { APIGatewayClient } from "@aws-sdk/client-api-gateway";
-import { jest } from "@jest/globals";
 import { get } from "lodash-es";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
-const mockSend = jest.fn(() => Promise.resolve({ items: [] }));
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-jest.spyOn(APIGatewayClient.prototype, "send").mockImplementation(mockSend);
+const mockSend = vi.fn(() => Promise.resolve({ items: [] }));
+vi.spyOn(APIGatewayClient.prototype, "send").mockImplementation(mockSend);
 
 import {
   createDocumentationVersion,
@@ -25,6 +24,10 @@ function expectAGCall(expectedClass: string, expected: unknown): void {
 }
 
 describe("apigw-utils", () => {
+  afterEach(() => {
+    mockSend.mockClear();
+  });
+
   test("exportSwaggerApi", async () => {
     await exportSwaggerApi(TEST_API_ID);
 

@@ -15,8 +15,7 @@
   "scripts": {
     "build": "heft build --clean",
     "build:watch": "heft build-watch --clean",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
+    "ci:test": "echo 'No tests implemented'"
   },
   "dependencies": {
     "madge": "8.0.0"
@@ -24,16 +23,14 @@
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/common": "2026.3.2-1",
-    "@jest/globals": "30.2.0",
+    "@digitraffic/common": "2026.3.3-1",
     "@rushstack/heft": "1.1.10",
-    "@rushstack/heft-jest-plugin": "1.1.10",
-    "@types/heft-jest": "1.0.6",
-    "@types/jest": "30.0.0",
     "@types/madge": "5.0.3",
     "@types/node": "24.10.13",
+    "@vitest/coverage-v8": "4.0.18",
     "esbuild": "0.27.2",
-    "rollup": "4.59.0",
-    "typescript": "5.9.3"
+    "rollup": "4.57.0",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }

@@ -1,6 +1,7 @@
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse, mockProxyHolder } from "@digitraffic-cdk/testing";
+import { describe, expect, test } from "vitest";
 import { addSiteData } from "../../dao/data.js";
 import type { ResponseValue } from "../../model/v2/response-model.js";
 import { dbTestBase } from "../db-testutil.js";

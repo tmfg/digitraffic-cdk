@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { findTimeTableRows } from "../../dao/time_table_row.js";
 import { dbTestBase } from "../db-testutil.js";
 

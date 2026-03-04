@@ -13,6 +13,7 @@
     "cdk-deploy-road-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-test deploy LamHistoryTest",
     "cdk-diff-road-prod": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-prod diff LamHistoryProd",
     "cdk-diff-road-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-test diff LamHistoryTest",
+    "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml",
     "compile-canaries": "echo 'No canaries'",
     "compile-canaries_": "esbuild src/canaries/*.ts --log-level=warning --bundle --format=esm --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",
     "compile-lambdas": "node lib/esbuild.js",
@@ -22,13 +23,13 @@
     "generate-fi-index": "ejs src/web/index.template.html -f src/web/translation.fi.json -o ./src/website/index.html",
     "generate-fi-js": "ejs src/web/scripts.template.js -f src/web/translation.fi.json -o ./src/website/scripts.js",
     "generate-translations": "npm run generate-fi-index && npm run generate-fi-js && npm run generate-en-index && npm run generate-en-js",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.995.0",
     "@aws-sdk/client-secrets-manager": "3.995.0",
-    "@digitraffic/common": "2026.3.2-1",
+    "@digitraffic/common": "2026.3.3-1",
     "aws-cdk-lib": "2.236.0",
     "constructs": "10.4.5",
     "ejs": "4.0.1",
@@ -39,15 +40,13 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@jest/globals": "30.2.0",
     "@rushstack/heft": "1.1.10",
-    "@rushstack/heft-jest-plugin": "1.1.10",
     "@types/aws-lambda": "8.10.160",
-    "@types/heft-jest": "1.0.6",
-    "@types/jest": "30.0.0",
     "@types/node": "24.10.13",
+    "@vitest/coverage-v8": "4.0.18",
     "aws-cdk": "2.1103.0",
     "esbuild": "0.27.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }

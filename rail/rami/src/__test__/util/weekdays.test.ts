@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import type { WeekDay } from "../../model/dt-rami-message.js";
 import { mapBitsToDays, mapDaysToBits } from "../../util/weekdays.js";
 

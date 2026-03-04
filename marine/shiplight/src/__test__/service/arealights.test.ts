@@ -1,15 +1,19 @@
-import { jest } from "@jest/globals";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { AreaLightsApi } from "../../api/arealights.js";
 import type { AreaTraffic } from "../../model/areatraffic.js";
 import { AreaLightsService } from "../../service/arealights.js";
 
 describe("arealights service", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   test("updateLightsForArea - calls API", async () => {
     const api = createApi();
     const service = new AreaLightsService(api);
     const areaTraffic = createAreaTraffic();
 
-    const updateLightsForAreaStub = jest
+    const updateLightsForAreaStub = vi
       .spyOn(AreaLightsApi.prototype, "updateLightsForArea")
       .mockResolvedValue({
         LightsSetSentFailed: [],
@@ -32,7 +36,7 @@ describe("arealights service", () => {
     const service = new AreaLightsService(api);
 
     const areaTraffic = createAreaTraffic();
-    const updateLightsForAreaStub = jest
+    const updateLightsForAreaStub = vi
       .spyOn(AreaLightsApi.prototype, "updateLightsForArea")
       .mockRejectedValueOnce({})
       .mockResolvedValueOnce({

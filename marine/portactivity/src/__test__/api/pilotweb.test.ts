@@ -1,3 +1,5 @@
+import { describe, test } from "vitest";
+
 describe("api-pilotweb", () => {
   test("getMessages", async () => {
     // placeholder test

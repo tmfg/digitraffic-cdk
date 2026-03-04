@@ -6,6 +6,7 @@ import type {
   CloudFrontRequestResult,
   Context,
 } from "aws-lambda";
+import { expect } from "vitest";
 import type { CloudfrontEvent } from "../../lambda/function-events.js";
 
 export function createCloudfrontEvent(

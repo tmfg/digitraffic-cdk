@@ -1,6 +1,6 @@
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { jest } from "@jest/globals";
+import { describe, test, vi } from "vitest";
 import { insertData } from "../../dao/data.js";
 import { assertDataCount, dbTestBase } from "../db-testutil.js";
 
@@ -15,8 +15,7 @@ async function getResponseFromLambda(): Promise<void> {
 describe(
   "delete-old-messages-lambda-test",
   dbTestBase((db: DTDatabase) => {
-    jest.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
-    //        jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue({});
+    vi.spyOn(ProxyHolder.prototype, "setCredentials").mockResolvedValue();
 
     test("delete, no data", async () => {
       await getResponseFromLambda();

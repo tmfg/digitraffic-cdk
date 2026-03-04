@@ -1,3 +1,4 @@
+import { test } from "vitest";
 import { handler } from "../../lambda/lambda-ip-restriction.js";
 import { expectRequest, requestHandlerCall } from "./request-util.js";
 import { expectResponse } from "./response-util.js";

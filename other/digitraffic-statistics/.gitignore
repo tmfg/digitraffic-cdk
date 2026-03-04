@@ -7,6 +7,7 @@
 !/jest.config.js
 !/README.md
 !/esbuild.ts
+!/vite.config.ts
 
 !/config/
 !/config/*.json
