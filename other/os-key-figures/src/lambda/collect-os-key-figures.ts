@@ -92,12 +92,12 @@ export const handler = async (
   );
 
   try {
-    const monitoredEndpoints =
+    // For Service.ALL, only produce aggregate totals across all services.
+    // Per-service and per-endpoint scopes are handled by individual service invocations (e.g. transport_type: road).
+    const scopes =
       service === Service.ALL
-        ? await endpointDiscovery.discoverAllEndpoints()
-        : [await endpointDiscovery.discoverEndpoints(service)];
-
-    const scopes = buildScopes(monitoredEndpoints);
+        ? [createServiceScope(Service.ALL)]
+        : buildScopes([await endpointDiscovery.discoverEndpoints(service)]);
 
     logger.info({
       message: `Collecting metrics for ${scopes.length} scopes`,

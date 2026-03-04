@@ -130,8 +130,8 @@ export abstract class AccessLogQuery extends MetricQuery {
     if (service === Service.ALL) {
       // For ALL, include all services
       const allFilters = Object.values<string>(Service)
-        .filter((service) => service !== Service.ALL)
-        .map((s) => `accountName.keyword:${s}`)
+        .filter((s) => s !== Service.ALL)
+        .map((s) => `accountName.keyword:${this.accountNames[s as Service]}`)
         .join(" OR ");
       return `(${allFilters})`;
     }

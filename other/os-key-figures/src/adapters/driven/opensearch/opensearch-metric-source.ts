@@ -106,8 +106,13 @@ export class OpenSearchMetricSource implements ForRetrievingMetrics {
     const accessLogIndex = this.config.defaultAccessLogIndex;
     const afirAccessLogIndex = this.config.afirAccessLogIndex;
 
+    // For ALL, query across both default and AFIR indices using comma-separated multi-index
     const index =
-      scope.service === Service.AFIR ? afirAccessLogIndex : accessLogIndex;
+      scope.service === Service.ALL
+        ? `${accessLogIndex},${afirAccessLogIndex}`
+        : scope.service === Service.AFIR
+          ? afirAccessLogIndex
+          : accessLogIndex;
 
     switch (definition.name) {
       case "Http req":
