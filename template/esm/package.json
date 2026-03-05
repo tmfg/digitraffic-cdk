@@ -26,7 +26,7 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.1.10",
     "@types/node": "24.10.13",
-    "aws-cdk": "2.1103.0",
+    "aws-cdk": "2.1107.0",
     "esbuild": "0.27.2",
     "typescript": "5.9.3"
   }

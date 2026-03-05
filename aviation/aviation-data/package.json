@@ -17,8 +17,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.995.0",
     "@aws-sdk/lib-storage": "3.995.0",
-    "@digitraffic/common": "2026.3.3-1",
-    "aws-cdk-lib": "2.236.0",
+    "@digitraffic/common": "2026.3.5-1",
+    "aws-cdk-lib": "2.240.0",
     "constructs": "10.4.5"
   },
   "devDependencies": {

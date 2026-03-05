@@ -5,35 +5,18 @@
 # exit on any error
 set -ex
 
-PACKAGE=${1:-@aws-cdk}
+# Match aws-cdk (CLI), aws-cdk-lib, and @aws-cdk/* scoped packages
+PACKAGE=${1:-"/^@?aws-cdk/"}
 
-function updateInDirectory() {
-    cd "$1"
-
-    if [ -f package.json ]; then
-      ncu -f /$PACKAGE/ -u >ncu.log
-    fi
-
-    cd ..
-}
-
-function updateAllInDirectory() {
-  cd "$1"
-
-  for d in $(find ./* -maxdepth 0 -type d); do
-    updateInDirectory $d
+# Find all package.json files in project directories and update CDK packages
+for dir in other road marine aviation rail tools template; do
+  find "$dir" -maxdepth 2 -name "package.json" -exec dirname {} \; | while read -r subdir; do
+    echo "Updating $subdir"
+    (cd "$subdir" && npx --yes npm-check-updates@19.6.2 -f "$PACKAGE" -u)
   done
+done
 
-  cd ..
-}
-
-updateAllInDirectory other
-updateAllInDirectory road
-updateAllInDirectory marine
-updateAllInDirectory aviation
-updateAllInDirectory rail
-updateAllInDirectory tools
-updateAllInDirectory template
-
-# Update lockfile after all package.json files are updated
-rush update
+echo ""
+echo "Done! Now running 'rush update --full' to apply changes (enforces 7-day minimum release age)."
+echo ""
+rush update --full

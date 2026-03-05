@@ -23,13 +23,13 @@
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/common": "2026.3.3-1",
+    "@digitraffic/common": "2026.3.5-1",
     "@rushstack/heft": "1.1.10",
     "@types/madge": "5.0.3",
     "@types/node": "24.10.13",
     "@vitest/coverage-v8": "4.0.18",
     "esbuild": "0.27.2",
-    "rollup": "4.57.0",
+    "rollup": "4.59.0",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   }

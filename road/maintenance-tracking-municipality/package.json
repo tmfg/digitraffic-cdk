@@ -21,8 +21,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.3.3-1",
-    "aws-cdk-lib": "2.236.0",
+    "@digitraffic/common": "2026.3.5-1",
+    "aws-cdk-lib": "2.240.0",
     "constructs": "10.4.5",
     "date-fns": "4.1.0",
     "geojson": "0.5.0",
@@ -42,7 +42,7 @@
     "@types/lodash": "4.17.23",
     "@types/node": "24.10.13",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1103.0",
+    "aws-cdk": "2.1107.0",
     "esbuild": "0.27.2",
     "lodash": "4.17.23",
     "typescript": "5.9.3",

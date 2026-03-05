@@ -24,11 +24,11 @@
     "@aws-crypto/sha256-browser": "5.2.0",
     "@aws-sdk/client-sts": "3.995.0",
     "@aws-sdk/types": "3.973.1",
-    "@digitraffic/common": "2026.3.3-1",
+    "@digitraffic/common": "2026.3.5-1",
     "@smithy/node-http-handler": "4.4.8",
     "@smithy/protocol-http": "5.3.8",
     "@smithy/signature-v4": "5.3.8",
-    "aws-cdk-lib": "2.236.0",
+    "aws-cdk-lib": "2.240.0",
     "constructs": "10.4.5"
   },
   "devDependencies": {
@@ -39,7 +39,7 @@
     "@rushstack/heft": "1.1.10",
     "@types/node": "24.10.13",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1103.0",
+    "aws-cdk": "2.1107.0",
     "esbuild": "0.27.2",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
