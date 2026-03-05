@@ -1,4 +1,5 @@
 import { App } from "aws-cdk-lib";
+import { describe, expect, test } from "vitest";
 import { DigitrafficRestApi } from "../../../aws/infra/stack/rest-api.js";
 import type { StackConfiguration } from "../../../aws/infra/stack/stack.js";
 import { DigitrafficStack } from "../../../aws/infra/stack/stack.js";

@@ -42,17 +42,22 @@ Format code
 
 ## Update deps
 
-To update all dependencies to the latest versions allowed by your semver ranges:
-
-```bash
-pnpm up
-```
-
-If you want to ignore the version ranges in package.json and install the
-absolute latest versions:
+This project uses exact dependency versions (no semver ranges). To update all dependencies to the latest versions:
 
 ```bash
 pnpm up --latest
+```
+
+After updating, run `pnpm audit` to check for vulnerabilities. If vulnerabilities exist in transitive dependencies, you may need to add overrides in `package.json` and/or exclusions in `.npmrc`. See [DEPENDENCY_OVERRIDES.md](./DEPENDENCY_OVERRIDES.md) for details.
+
+## Publishing to [npmjs.com](https://www.npmjs.com/)
+
+See https://www.npmjs.com/package/@digitraffic/common
+
+Run the following command to publish a new version:
+
+```bash
+./scripts/publish.sh 2026.3.5-1
 ```
 
 ## How to use

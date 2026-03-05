@@ -1,4 +1,4 @@
-import { expect } from "@jest/globals";
+import { expect, test } from "vitest";
 
 test("index import ok?", () => {
   const index = import("../index.js");

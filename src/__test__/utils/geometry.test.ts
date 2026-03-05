@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import * as Geometry from "../../utils/geometry.js";
 import { Asserter } from "../asserter.js";
 

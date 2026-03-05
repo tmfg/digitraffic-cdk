@@ -1,23 +1,21 @@
 *
 
-
 !/.editorconfig
+!/.git-blame-ignore-revs
 !/.gitattributes
 !/.gitignore
-!/.git-blame-ignore-revs
+!/.madgerc
 !/.npmignore
 !/.npmrc
-!/.madgerc
-!/jest.config.mjs
+!/biome.jsonc
+!/DEPENDENCY_OVERRIDES.md
 !/lefthook.yml
-!/LICENSE
+!/LICENSE.txt
 !/package.json
 !/pnpm-lock.yaml
 !/README.md
 !/tsconfig.json
 !/tsconfig.test.json
-!/dependabot.yml
-!/biome.jsonc
 
 !src/
 !src/**/
@@ -37,5 +35,6 @@
 !scripts/
 !scripts/**/
 !scripts/**/*.js
+!scripts/**/*.sh
 !scripts/**/*.ts
 

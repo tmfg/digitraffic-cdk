@@ -5,6 +5,7 @@ import {
   Runtime,
 } from "aws-cdk-lib/aws-lambda";
 import velocity from "velocityjs";
+import { describe, expect, test } from "vitest";
 import { DigitrafficIntegration } from "../../../aws/infra/api/integration.js";
 import { MediaType } from "../../../aws/types/mediatypes.js";
 import { decodeBase64ToAscii } from "../../../utils/base64.js";
