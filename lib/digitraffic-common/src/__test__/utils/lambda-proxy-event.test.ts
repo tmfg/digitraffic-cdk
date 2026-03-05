@@ -1,4 +1,5 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
+import { describe, expect, test } from "vitest";
 import { parseQueryParams } from "../../utils/lambda-proxy-event.js";
 
 describe("lambda-proxy-event.test", () => {

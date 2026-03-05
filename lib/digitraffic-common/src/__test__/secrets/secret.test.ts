@@ -1,9 +1,10 @@
+import { afterEach } from "node:test";
 import type {
   GetSecretValueCommandInput,
   GetSecretValueCommandOutput,
 } from "@aws-sdk/client-secrets-manager";
 import { SecretsManager } from "@aws-sdk/client-secrets-manager";
-import { jest } from "@jest/globals";
+import { describe, expect, test, vi } from "vitest";
 import { setEnvVariableAwsRegion } from "../../utils/utils.js";
 
 const SECRET_ID = "test_secret";
@@ -16,13 +17,13 @@ const SECRET_WITH_PREFIX = {
 const emptySecret: GetSecretValueCommandOutput = { $metadata: {} };
 
 const getSecretValueMock =
-  jest.fn<
+  vi.fn<
     (arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>
   >();
 
-jest
-  .spyOn(SecretsManager.prototype, "getSecretValue")
-  .mockImplementation(getSecretValueMock);
+vi.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(
+  getSecretValueMock,
+);
 
 function mockSecret<T>(secret: null | T): void {
   if (!secret) {
@@ -43,6 +44,10 @@ const secret = await import("../../aws/runtime/secrets/secret.js");
 const { getSecret } = secret;
 
 describe("secret - test", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   test("getSecret - no secret", async () => {
     mockSecret(null);
     await expect(async () => {

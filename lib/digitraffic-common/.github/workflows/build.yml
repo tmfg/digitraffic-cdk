@@ -35,7 +35,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pnpm test
+          pnpm ci:test
 
       - name: Install madge
         run: npm -g install madge

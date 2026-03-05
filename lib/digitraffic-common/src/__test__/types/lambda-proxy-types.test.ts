@@ -1,7 +1,9 @@
 import type { APIGatewayProxyResult } from "aws-lambda";
+import { describe, expect, test } from "vitest";
 import { LambdaProxyResponseBuilder } from "../../aws/types/lambda-proxy-types.js";
 import { MediaType } from "../../aws/types/mediatypes.js";
 import { decodeBase64ToUtf8 } from "../../utils/base64.js";
+
 // About 18 MB will be compressed to 2 MB
 export const TEST_BIG_JSON = {
   items: Array.from({ length: 10 }, (_, i) => ({

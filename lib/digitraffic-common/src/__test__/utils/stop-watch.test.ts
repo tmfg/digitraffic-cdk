@@ -1,4 +1,4 @@
-import { expect } from "@jest/globals";
+import { describe, expect, test } from "vitest";
 import { StopWatch } from "../../utils/stop-watch.js";
 
 describe("stop-watch.test.ts", () => {

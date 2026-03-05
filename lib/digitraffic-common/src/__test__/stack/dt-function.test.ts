@@ -2,6 +2,7 @@ import { App, Duration } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Architecture, Code, Runtime } from "aws-cdk-lib/aws-lambda";
+import { describe, expect, test } from "vitest";
 import { FunctionBuilder } from "../../aws/infra/stack/dt-function.js";
 import { DigitrafficStack } from "../../aws/infra/stack/stack.js";
 import { EnvKeys } from "../../aws/runtime/environment.js";

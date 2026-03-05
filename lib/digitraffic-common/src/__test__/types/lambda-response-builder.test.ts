@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import type { LambdaResponse } from "../../aws/types/lambda-response.js";
 import { LambdaResponseBuilder } from "../../aws/types/lambda-response.js";
 import { decodeBase64ToUtf8 } from "../../utils/base64.js";
