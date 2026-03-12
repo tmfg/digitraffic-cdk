@@ -16,8 +16,8 @@ const { ProxyHolder } = await import(
 
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
-import { jest } from "@jest/globals";
 import ky from "ky";
+import { describe, expect, test, vi } from "vitest";
 
 const SERVER_PORT = 8089;
 
@@ -27,20 +27,18 @@ const testSecret = {
 describe(
   "lambda-update-disruptions",
   dbTestBase((db: DTDatabase) => {
-    jest
-      .spyOn(ProxyHolder.prototype, "setCredentials")
-      .mockReturnValueOnce(Promise.resolve());
-    jest
-      .spyOn(SecretHolder.prototype, "get")
-      .mockReturnValueOnce(Promise.resolve(testSecret));
+    vi.spyOn(ProxyHolder.prototype, "setCredentials").mockReturnValueOnce(
+      Promise.resolve(),
+    );
+    vi.spyOn(SecretHolder.prototype, "get").mockReturnValueOnce(
+      Promise.resolve(testSecret),
+    );
 
     test("Update", async () => {
       const features = disruptionFeatures();
-      jest
-        .spyOn(ky, "get")
-        .mockImplementation(() =>
-          mockKyResponse(200, JSON.stringify(features)),
-        );
+      vi.spyOn(ky, "get").mockImplementation(() =>
+        mockKyResponse(200, JSON.stringify(features)),
+      );
 
       await handler();
       const disruptions = await DisruptionsDb.findAll(db);

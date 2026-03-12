@@ -4,7 +4,6 @@
  */
 {
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
-
   /**
    * Custom "commands" introduce new verbs for the command-line.  To see the help for these
    * example commands, try "rush --help", "rush my-bulk-command --help", or
@@ -94,6 +93,32 @@
       "ignoreMissingScript": true
     },
     {
+      "name": "ci:prepare",
+      "commandKind": "bulk",
+      "summary": "Prepare for CI-tests.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true,
+      "ignoreMissingScript": true
+    },
+    {
+      "name": "ci:test",
+      "commandKind": "bulk",
+      "summary": "Run CI-tests for all projects in the monorepo.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
+      "name": "ci:teardown",
+      "commandKind": "bulk",
+      "summary": "Teardown after CI-tests.",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true,
+      "ignoreMissingScript": true
+    },
+    {
       "name": "repo:check-dependencies",
       "commandKind": "global",
       "summary": "Checks if dependencies are declared correctly",
@@ -112,6 +137,14 @@
       "summary": "Pull common subtree changes from some branch",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "bash common/scripts/git-subtree-helper.sh"
+    },
+    {
+      "name": "audit",
+      "commandKind": "global",
+      "summary": "Run pnpm audit to check for security vulnerabilities in dependencies",
+      "safeForSimultaneousRushProcesses": true,
+      // Run in common/temp because that's where Rush stores the pnpm-lock.yaml and manages all monorepo dependencies
+      "shellCommand": "cd common/temp && pnpm audit"
     }
   ],
   "parameters": [

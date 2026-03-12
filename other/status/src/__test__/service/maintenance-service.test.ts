@@ -1,7 +1,7 @@
 import { randomString } from "@digitraffic/common/dist/test/testutils";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
-import { jest } from "@jest/globals";
 import _ from "lodash";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type { ActiveMaintenance } from "../../api/cstate-statuspage-api.js";
 import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
 import type {
@@ -28,7 +28,7 @@ describe("MaintenanceServiceTest", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   async function testHandleMaintenance(
@@ -37,21 +37,21 @@ describe("MaintenanceServiceTest", () => {
     nodePingApi_getNodePingChecks: NodePingCheck[] = [],
     nodePingApi_getNodePingChecksSecondCall: NodePingCheck[] = [],
   ): Promise<void> {
-    const stubCStateApiIsActiveMaintenances = jest
+    const stubCStateApiIsActiveMaintenances = vi
       .spyOn(cStateApi, "isActiveMaintenances")
       .mockReturnValue(
         Promise.resolve(cStateApiActiveMaintenance !== undefined),
       );
 
-    const stubCStateApiFindActiveMaintenance = jest
+    const stubCStateApiFindActiveMaintenance = vi
       .spyOn(cStateApi, "findActiveMaintenance")
       .mockReturnValue(Promise.resolve(cStateApiActiveMaintenance));
 
-    const stubCStateApiTriggerUpdateMaintenanceGithubAction = jest
+    const stubCStateApiTriggerUpdateMaintenanceGithubAction = vi
       .spyOn(cStateApi, "triggerUpdateMaintenanceGithubAction")
       .mockReturnValue(Promise.resolve());
 
-    const stubGetNodePingChecks = jest
+    const stubGetNodePingChecks = vi
       .spyOn(nodePingApi, "getNodePingChecks")
       .mockReturnValueOnce(Promise.resolve(nodePingApi_getNodePingChecks));
     if (expectMaintenanceChecksTo === "enabled") {
@@ -60,13 +60,13 @@ describe("MaintenanceServiceTest", () => {
         Promise.resolve(nodePingApi_getNodePingChecksSecondCall),
       );
     }
-    const stubDisableNodePingChecks = jest
+    const stubDisableNodePingChecks = vi
       .spyOn(nodePingApi, "disableNodePingChecks")
       .mockReturnValue(Promise.resolve());
-    const stubEnableNodePingChecks = jest
+    const stubEnableNodePingChecks = vi
       .spyOn(nodePingApi, "enableNodePingChecks")
       .mockReturnValue(Promise.resolve());
-    const stubSlackNotifyApi = jest
+    const stubSlackNotifyApi = vi
       .spyOn(slackNotifyApi, "notify")
       .mockReturnValue(Promise.resolve());
 

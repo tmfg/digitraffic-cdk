@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { expect } from "vitest";
 import { findAll } from "../../db/disruptions.js";
 import type { SpatialDisruption } from "../../model/disruption.js";
 import {

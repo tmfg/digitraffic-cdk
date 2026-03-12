@@ -1,6 +1,7 @@
 import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
+import { describe, expect, test } from "vitest";
 import { saveAllLocations } from "../../db/locations.js";
 import {
   saveAllPortSuspensionLocations,

@@ -1,6 +1,6 @@
-import { expect } from "@jest/globals";
 import { App, Stack } from "aws-cdk-lib";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { describe, expect, test } from "vitest";
 import { AclBuilder } from "../../aws/infra/acl-builder.js";
 
 describe("acl-builder tests", () => {

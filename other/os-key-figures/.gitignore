@@ -5,6 +5,7 @@
 !tsconfig.json
 !README.md
 !/esbuild.ts
+!/vite.config.ts
 
 !/config/
 !/config/*.json

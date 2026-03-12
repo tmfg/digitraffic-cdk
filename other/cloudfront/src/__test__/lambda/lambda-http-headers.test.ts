@@ -1,3 +1,4 @@
+import { test } from "vitest";
 import { handler } from "../../lambda/lambda-http-headers.js";
 import {
   expectResponseCorsHeaders,

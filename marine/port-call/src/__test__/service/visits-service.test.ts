@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { jest } from "@jest/globals";
 import { addHours } from "date-fns";
+import { describe, expect, test, vi } from "vitest";
 import { NemoApi } from "../../api/nemo-api.js";
 import type { NemoResponse } from "../../model/nemo.js";
 import { updateVisits } from "../../service/visit-service.js";
@@ -13,7 +13,7 @@ export async function updateAndExpect(
   expectUpdated: number,
   expectItems: number,
 ): Promise<void> {
-  jest.spyOn(NemoApi.prototype, "getVisits").mockResolvedValue(response);
+  vi.spyOn(NemoApi.prototype, "getVisits").mockResolvedValue(response);
 
   const updated = await updateVisits("", "", "", 0);
 

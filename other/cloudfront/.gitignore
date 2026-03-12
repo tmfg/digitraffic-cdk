@@ -9,6 +9,7 @@
 !/*.md
 !/*.sh
 !/esbuild.ts
+!/vite.config.ts
 
 !/config/
 !/config/*.json

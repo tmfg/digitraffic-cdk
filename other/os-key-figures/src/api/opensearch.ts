@@ -7,6 +7,7 @@ import { NodeHttpHandler } from "@smithy/node-http-handler";
 import type { HttpResponse } from "@smithy/protocol-http";
 import { HttpRequest } from "@smithy/protocol-http";
 import { SignatureV4 } from "@smithy/signature-v4";
+import type { OpenSearchResponse } from "../adapters/driven/opensearch/index.js";
 
 export enum OpenSearchApiMethod {
   COUNT = "_count",
@@ -36,7 +37,7 @@ export class OpenSearch {
     index: string,
     method: OpenSearchApiMethodAndParams,
     query: string,
-  ): Promise<any> {
+  ): Promise<OpenSearchResponse> {
     const request = new HttpRequest({
       method: "POST",
       path: `/${index}/${method}`,
@@ -53,13 +54,14 @@ export class OpenSearch {
 
     const client = new NodeHttpHandler();
 
-    const makeRequest = async (): Promise<Record<string, unknown>> => {
+    const makeRequest = async (): Promise<OpenSearchResponse> => {
+      // biome-ignore lint/suspicious/noAsyncPromiseExecutor: fix later
       return new Promise(async (resolve, reject) => {
         const { response } = await client.handle(signedRequest);
         this.handleResponseFromOs(
           response,
           (result) => {
-            resolve(result);
+            resolve(result as OpenSearchResponse);
           },
           (code, message) => {
             reject(new HttpError(code, message));
@@ -81,7 +83,7 @@ export class OpenSearch {
 
   handleResponseFromOs(
     response: HttpResponse,
-    successCallback: (result: Record<string, unknown>) => void,
+    successCallback: (result: OpenSearchResponse) => void,
     failedCallback: (code: number, message: string) => void,
   ) {
     const statusCode = response.statusCode;
@@ -103,7 +105,7 @@ export class OpenSearch {
     response.body.on("end", () => {
       try {
         successCallback(JSON.parse(responseBody));
-      } catch (e) {
+      } catch (_e) {
         logger.info({
           message: `Failed to parse response body: ${responseBody}`,
           method: "os-query.handleResponseFromOs",

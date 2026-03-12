@@ -1,24 +1,8 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directories: 
-      - "/marine/*"
-      - "/road/*"
-      - "/rail/*"
-      - "/aviation/*"
-      - "/other/*"
-      - "/template"
-      - "/tools/*"
-    schedule:
-      interval: "daily"
-    cooldown:
-      default-days: 7       # Wait 7 days for any update
-      semver-major-days: 14 # Wait 14 days for major version bumps
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     cooldown:
       default-days: 7       # Wait 7 days for any update
-      semver-major-days: 14 # Wait 14 days for major version bumps

@@ -1,7 +1,7 @@
 import type { SendMessageCommandInput } from "@aws-sdk/client-sqs";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { jest } from "@jest/globals";
 import type { APIGatewayEvent } from "aws-lambda";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { MaintenanceTrackingEnvKeys } from "../../keys.js";
 import { createExtendedSqsClient } from "../../service/sqs-big-payload.js";
 import { setTestEnv } from "../test-env.js";
@@ -18,12 +18,12 @@ const testEvent = (await import(
 
 describe("update-queue", () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("no records - should reject", async () => {
     const sqsClient = createExtendedSqsClient();
-    const sendMessageStub = jest
+    const sendMessageStub = vi
       .spyOn(sqsClient, "sendMessage")
       .mockReturnValue(await Promise.resolve());
 
@@ -40,7 +40,7 @@ describe("update-queue", () => {
       getRandompId(),
     );
     const sqsClient = createExtendedSqsClient();
-    const sendMessageStub = jest
+    const sendMessageStub = vi
       .spyOn(sqsClient, "sendMessage")
       .mockReturnValue(await Promise.resolve());
 
@@ -65,7 +65,7 @@ describe("update-queue", () => {
       `invalid json ` +
       getTrackingJsonWith3Observations(getRandompId(), getRandompId());
     const sqsClient = createExtendedSqsClient();
-    const sendMessageStub = jest
+    const sendMessageStub = vi
       .spyOn(sqsClient, "sendMessage")
       .mockReturnValue(await Promise.resolve());
 

@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { afterEach, describe, expect, test } from "vitest";
 import {
   dbTestBase,
   getDomain,

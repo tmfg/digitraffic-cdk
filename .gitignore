@@ -7,6 +7,7 @@
 !/.github/CODEOWNERS
 !/.github/dependabot.yml
 !/.github/trufflehog-exclude.txt
+!/.github/copilot-instructions.md
 
 !/.editorconfig
 !/.git-blame-ignore-revs
@@ -26,7 +27,19 @@
 
 # Rush stuff
 !/common/
-!/common/*
+!/common/config/
+!/common/config/rush/
+!/common/config/rush/*
+!/common/config/rush/.*
+!/common/git-hooks/
+!/common/git-hooks/*
+!/common/scripts/
+!/common/scripts/*
+!/common/autoinstallers/
+!/common/autoinstallers/*/
+!/common/autoinstallers/*/package.json
+!/common/autoinstallers/*/pnpm-lock.yaml
+!/common/autoinstallers/*/.*
 
 # digitraffic-common
 !/lib/
@@ -66,3 +79,4 @@
 
 # Always ignored at last
 .DS_Store
+tools/vitest/node_modules

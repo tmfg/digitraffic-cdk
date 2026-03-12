@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import type { DbAreaTraffic } from "../../db/areatraffic.js";
 import { needToBrighten } from "../../service/areatraffic.js";
 

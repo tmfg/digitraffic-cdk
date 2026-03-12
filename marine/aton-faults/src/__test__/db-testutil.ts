@@ -280,10 +280,7 @@ export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
 
 async function truncate(db: DTDatabase): Promise<void> {
   await db.tx((t) => {
-    return t.batch([
-      t.none("DELETE FROM aton_fault"),
-      t.none("DELETE FROM cached_json"),
-    ]);
+    return t.batch([t.none("DELETE FROM aton_fault")]);
   });
 }
 

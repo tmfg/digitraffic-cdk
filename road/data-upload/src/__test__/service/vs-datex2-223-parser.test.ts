@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { parseSituations223 } from "../../service/vs-datex2-223-parser.js";
 import { TEST_DATEX2, TEST_DATEX2_2 } from "./datex2_223_files.js";
 

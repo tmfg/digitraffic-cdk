@@ -1,9 +1,10 @@
 import { Model } from "aws-cdk-lib/aws-apigateway";
+import { describe, expect, test } from "vitest";
 import { DigitrafficStaticIntegration } from "../../../aws/infra/api/static-integration.js";
 import { MediaType } from "../../../aws/types/mediatypes.js";
 
 describe("response tests", () => {
-  it("createIntegrationResponse works", () => {
+  test("createIntegrationResponse works", () => {
     const integrationResponse =
       DigitrafficStaticIntegration.createIntegrationResponse(
         "FakeResource",
@@ -21,7 +22,7 @@ describe("response tests", () => {
     });
   });
 
-  it("createMethodResponse works", () => {
+  test("createMethodResponse works", () => {
     const methodResponse = DigitrafficStaticIntegration.createMethodResponse(
       {
         "test-header": "test-value",

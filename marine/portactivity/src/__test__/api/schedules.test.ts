@@ -1,6 +1,6 @@
 import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
-import { jest } from "@jest/globals";
 import ky from "ky";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import type { SchedulesResponse } from "../../api/schedules.js";
 import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
 import { assertDefined } from "../test-utils.js";
@@ -28,14 +28,14 @@ const fakeSchedules = `
 
 describe("api-schedules", () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test("getSchedulesTimestamps - in VTS control", async () => {
     const api = new SchedulesApi(`http:/something/schedules`);
-    jest
-      .spyOn(ky, "get")
-      .mockImplementation(() => mockKyResponse(200, fakeSchedules));
+    vi.spyOn(ky, "get").mockImplementation(() =>
+      mockKyResponse(200, fakeSchedules),
+    );
     const resp = await api.getSchedulesTimestamps(
       SchedulesDirection.EAST,
       false,
@@ -55,11 +55,7 @@ function verifyXmlResponse(resp: SchedulesResponse): void {
 
   expect(tt.eta?.length).toBe(1);
 
-  if (tt.eta === undefined) {
-    fail("missing eta!");
-  }
-
-  const eta = tt.eta[0];
+  const eta = tt.eta![0];
   assertDefined(eta);
   expect(eta.$.time).toBe(etaEventTime);
   expect(eta.$.uts).toBe(etaTimestamp);

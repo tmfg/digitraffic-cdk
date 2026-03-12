@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   opensearch:
     image: opensearchproject/opensearch:2.19.4
@@ -23,6 +21,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: os-key-figures-mysql
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: key_figures_test

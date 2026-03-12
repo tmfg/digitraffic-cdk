@@ -1,6 +1,8 @@
 // biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "Test";
 
+import { describe, expect, test, vi } from "vitest";
+
 const { handler } = await import(
   "../../../lambda/get-disruptions/get-disruptions.js"
 );
@@ -13,14 +15,12 @@ const { ProxyHolder } = await import(
   "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder"
 );
 
-import { jest } from "@jest/globals";
-
 describe(
   "lambda-get-disruptions",
   dbTestBase((db) => {
-    jest
-      .spyOn(ProxyHolder.prototype, "setCredentials")
-      .mockReturnValueOnce(Promise.resolve());
+    vi.spyOn(ProxyHolder.prototype, "setCredentials").mockReturnValueOnce(
+      Promise.resolve(),
+    );
 
     test("Get disruptions", async () => {
       const disruptions = Array.from({

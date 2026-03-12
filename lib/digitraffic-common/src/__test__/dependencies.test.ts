@@ -1,5 +1,7 @@
 const madge = await import("madge");
 
+import { expect, test } from "vitest";
+
 const WHITELISTED_DEPENDENCIES = [
   // aspect is using DigitrafficStack with instanceof, can't remove
   `["aws/infra/stack/stack.mjs","aws/infra/stack/stack-checking-aspect.mjs"]`,

@@ -1,3 +1,5 @@
+import { expect } from "vitest";
+
 /**
  * A simple asserter-class for writing canaries without dependency to testing-libraries.
  */

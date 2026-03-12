@@ -2,6 +2,7 @@
 
 ENVIRONMENT=${1:-dev}
 COMMAND=${2:-migrate}
+NETWORK=${3:-dbmarine}
 
 docker build \
 -t marinecam-db-updater \
@@ -10,6 +11,6 @@ docker build \
 
 docker run --rm \
 --name marinecam-db-updater \
---network dbmarine \
+--network $NETWORK \
 marinecam-db-updater \
 $COMMAND

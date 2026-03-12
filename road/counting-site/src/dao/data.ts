@@ -66,12 +66,11 @@ export async function findValuesForDate(
   if (siteId) creator = creator.where("site_id", "=", siteId);
   if (travelMode) creator = creator.where("travel_mode", "=", travelMode);
 
-  creator = creator.orderBy([
-    "site_id",
-    "travel_mode",
-    "direction",
-    "data_timestamp",
-  ]);
+  creator = creator
+    .orderBy("site_id")
+    .orderBy("travel_mode")
+    .orderBy("direction")
+    .orderBy("data_timestamp");
 
   const compiled = creator.compile();
   const data = await db.manyOrNone(compiled.sql, compiled.parameters);
@@ -111,12 +110,10 @@ export async function findCsvValuesForMonth(
     .where("data_timestamp", ">=", startDate)
     .where("data_timestamp", "<", endDate)
     .where("cs2_data.site_id", "=", siteId)
-    .orderBy([
-      "travel_mode",
-      "direction",
-      "cs2_data.granularity",
-      "data_timestamp",
-    ]);
+    .orderBy("travel_mode")
+    .orderBy("direction")
+    .orderBy("cs2_data.granularity")
+    .orderBy("data_timestamp");
 
   if (travelMode) creator = creator.where("travel_mode", "=", travelMode);
 

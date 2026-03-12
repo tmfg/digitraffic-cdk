@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { DocumentationPart } from "../../aws/infra/documentation.js";
 
 const METHOD_NAME = "test" as const;

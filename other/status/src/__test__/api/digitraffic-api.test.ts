@@ -1,6 +1,6 @@
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
-import { jest } from "@jest/globals";
 import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import type { PathItem } from "../../api/digitraffic-api.js";
 import { DigitrafficApi } from "../../api/digitraffic-api.js";
 import type { MonitoredApp, MonitoredEndpoint } from "../../app-props.js";
@@ -19,7 +19,7 @@ const API_WITH_PATH_PARAMS =
 
 describe("DigitrafficApiTest", () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("getAppEndpoints - no exceptions", async () => {
@@ -146,7 +146,7 @@ describe("DigitrafficApiTest", () => {
       endpoints: extraEndpointValues,
     } satisfies MonitoredApp;
 
-    const spy = jest
+    const spy = vi
       .spyOn(ky, "get")
       .mockImplementation(
         (_url: Input, _options: Options | undefined): ResponsePromise => {

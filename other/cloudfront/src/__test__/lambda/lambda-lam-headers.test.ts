@@ -1,3 +1,4 @@
+import { expect, test } from "vitest";
 import { HEADERS, handler } from "../../lambda/lambda-lam-headers.js";
 import { createHeader } from "./request-util.js";
 import { expectResponse, responseHandlerCall } from "./response-util.js";

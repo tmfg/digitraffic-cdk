@@ -1,5 +1,6 @@
 import etag from "etag";
 import velocity from "velocityjs";
+import { describe, expect, test } from "vitest";
 import { RESPONSE_DEFAULT_LAMBDA } from "../../../aws/infra/api/response.js";
 
 const TEST_BODY = "Hello world!";

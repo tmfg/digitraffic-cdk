@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { describe, expect, test, vi } from "vitest";
 import type {
   ErrorHandler,
   LoggingHandler,
@@ -12,7 +12,7 @@ const logger = new DtLogger();
 describe("handler-factory tests", () => {
   test("test defaults", async () => {
     const factory = new HandlerFactory();
-    const method = jest.fn((method: unknown) => {
+    const method = vi.fn((method: unknown) => {
       return method as Promise<LambdaResponse>;
     });
     const handler = factory.createEventHandler(method, logger);
@@ -23,13 +23,13 @@ describe("handler-factory tests", () => {
   });
 
   test("test logging", async () => {
-    const loggingHandler: LoggingHandler = jest.fn(
+    const loggingHandler: LoggingHandler = vi.fn(
       (method: () => Promise<LambdaResponse>) => {
         return method();
       },
     );
     const factory = new HandlerFactory().withLoggingHandler(loggingHandler);
-    const method = jest.fn((method: unknown) => {
+    const method = vi.fn((method: unknown) => {
       return method as Promise<LambdaResponse>;
     });
     const handler = factory.createEventHandler(method, logger);
@@ -41,11 +41,11 @@ describe("handler-factory tests", () => {
   });
 
   test("test error handling", async () => {
-    const eh: ErrorHandler = jest.fn((method: unknown) => {
+    const eh: ErrorHandler = vi.fn((method: unknown) => {
       return method as LambdaResponse;
     });
     const factory = new HandlerFactory().withErrorHandler(eh);
-    const method = jest.fn(() => {
+    const method = vi.fn(() => {
       throw new Error("MAGIC");
     });
     const handler = factory.createEventHandler(method, logger);

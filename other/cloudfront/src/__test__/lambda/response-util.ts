@@ -6,6 +6,7 @@ import type {
   CloudFrontResultResponse,
   Context,
 } from "aws-lambda";
+import { expect } from "vitest";
 import { AC_HEADERS } from "../../lambda/header-util.js";
 import { createHeader } from "./request-util.js";
 

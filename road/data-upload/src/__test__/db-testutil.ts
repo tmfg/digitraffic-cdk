@@ -2,6 +2,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { Countable } from "@digitraffic/common/dist/database/models";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { expect } from "vitest";
 import type { DataStatus } from "../model/types.js";
 
 setEnvVariable("SECRET_ID", "TEST");

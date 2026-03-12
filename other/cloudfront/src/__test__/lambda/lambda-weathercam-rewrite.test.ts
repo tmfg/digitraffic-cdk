@@ -1,3 +1,4 @@
+import { test } from "vitest";
 import { handler } from "../../lambda/lambda-weathercam-rewrite.js";
 import { expectRequest, requestHandlerCall } from "./request-util.js";
 

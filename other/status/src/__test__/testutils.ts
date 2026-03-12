@@ -2,8 +2,8 @@ import { TZDate } from "@date-fns/tz";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { setEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { jest } from "@jest/globals";
 import { format } from "date-fns";
+import { vi } from "vitest";
 import type {
   ActiveMaintenance,
   CStateStatus,
@@ -59,9 +59,9 @@ export const DEFAULT_SECRET_VALUE = {
 export function mockSecretHolder(
   secretValue: UpdateStatusSecret = DEFAULT_SECRET_VALUE,
 ): SecretHolder<UpdateStatusSecret> {
-  jest
-    .spyOn(SecretHolder.prototype, "get")
-    .mockReturnValue(Promise.resolve(secretValue));
+  vi.spyOn(SecretHolder.prototype, "get").mockReturnValue(
+    Promise.resolve(secretValue),
+  );
   return SecretHolder.create<UpdateStatusSecret>();
 }
 

@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import { validateIncomingSmMessage } from "../../service/validate-message.js";
 import { cloneAndUndefine } from "../message-util.js";
 import {

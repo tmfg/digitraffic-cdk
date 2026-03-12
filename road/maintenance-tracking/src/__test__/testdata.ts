@@ -1,6 +1,7 @@
 import { getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { SQSEvent, SQSRecord } from "aws-lambda";
+import { expect } from "vitest";
 import type { DbObservationData } from "../dao/maintenance-tracking-dao.js";
 import { MaintenanceTrackingEnvKeys } from "../keys.js";
 import type { TyokoneenseurannanKirjaus } from "../model/models.js";

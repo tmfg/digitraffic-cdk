@@ -2,8 +2,8 @@ import {
   getRandomNumber,
   randomBoolean,
 } from "@digitraffic/common/dist/test/testutils";
-import { jest } from "@jest/globals";
 import { addHours, subHours } from "date-fns";
+import { describe, expect, test, vi } from "vitest";
 import type { AwakeAiPortResponse } from "../../api/awake-ai-port.js";
 import { AwakeAiPortApi } from "../../api/awake-ai-port.js";
 import type {
@@ -30,9 +30,9 @@ describe("AwakeAiETDPortService", () => {
         source: "urn:awake:digitraffic-portcall:1234567",
       },
     });
-    jest
-      .spyOn(AwakeAiPortApi.prototype, "getETDs")
-      .mockResolvedValue(voyageTimestamp);
+    vi.spyOn(AwakeAiPortApi.prototype, "getETDs").mockResolvedValue(
+      voyageTimestamp,
+    );
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -50,9 +50,9 @@ describe("AwakeAiETDPortService", () => {
         source: "urn:awake:someidstring",
       },
     });
-    jest
-      .spyOn(AwakeAiPortApi.prototype, "getETDs")
-      .mockResolvedValue(voyageTimestamp);
+    vi.spyOn(AwakeAiPortApi.prototype, "getETDs").mockResolvedValue(
+      voyageTimestamp,
+    );
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -67,9 +67,9 @@ describe("AwakeAiETDPortService", () => {
         ? AwakeAiPredictionType.ETA
         : AwakeAiPredictionType.DESTINATION,
     });
-    jest
-      .spyOn(AwakeAiPortApi.prototype, "getETDs")
-      .mockResolvedValue(voyageTimestamp);
+    vi.spyOn(AwakeAiPortApi.prototype, "getETDs").mockResolvedValue(
+      voyageTimestamp,
+    );
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -82,9 +82,9 @@ describe("AwakeAiETDPortService", () => {
     const voyageTimestamp = createEtdResponse({
       voyageStatus: AwakeAiVoyageStatus.STOPPED,
     });
-    jest
-      .spyOn(AwakeAiPortApi.prototype, "getETDs")
-      .mockResolvedValue(voyageTimestamp);
+    vi.spyOn(AwakeAiPortApi.prototype, "getETDs").mockResolvedValue(
+      voyageTimestamp,
+    );
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -97,9 +97,9 @@ describe("AwakeAiETDPortService", () => {
     const voyageTimestamp = createEtdResponse({
       excludeSchedule: true,
     });
-    jest
-      .spyOn(AwakeAiPortApi.prototype, "getETDs")
-      .mockResolvedValue(voyageTimestamp);
+    vi.spyOn(AwakeAiPortApi.prototype, "getETDs").mockResolvedValue(
+      voyageTimestamp,
+    );
 
     const timestamps = await service.getAwakeAiTimestamps("FILOL");
 

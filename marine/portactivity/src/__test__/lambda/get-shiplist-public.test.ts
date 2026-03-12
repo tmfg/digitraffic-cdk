@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEventSubset } from "@digitraffic/common/dist/aws/types/lambda-proxy-types";
-import { jest } from "@jest/globals";
 import type { APIGatewayProxyResult } from "aws-lambda";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { ShiplistSecret } from "../../lambda/get-shiplist-public/get-shiplist-public.js";
 import { handler } from "../../lambda/get-shiplist-public/get-shiplist-public.js";
 import { dbTestBase, mockSecrets } from "../db-testutil.js";
@@ -15,7 +15,7 @@ describe(
   "get-shiplist-public",
   dbTestBase(() => {
     beforeEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
       mockSecrets(secret);
     });
 

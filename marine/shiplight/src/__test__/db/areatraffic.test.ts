@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { describe, expect, test } from "vitest";
 import {
   getAreaTraffic,
   SHIP_SPEED_NOT_AVAILABLE,

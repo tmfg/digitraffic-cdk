@@ -1,5 +1,6 @@
 import { App } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
+import { describe, test } from "vitest";
 import { DigitrafficRestApi } from "../../aws/infra/stack/rest-api.js";
 import { DigitrafficStack } from "../../aws/infra/stack/stack.js";
 import { TrafficType } from "../../types/traffictype.js";

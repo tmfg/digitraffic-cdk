@@ -8,8 +8,7 @@ import mysql from "mysql";
 const s3 = new S3Client();
 interface KeyFigure {
   filter: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
+  value: unknown;
   name: string;
   from: Date;
   to: Date;
@@ -36,7 +35,7 @@ const BUCKET_NAME = getEnvVariable("BUCKET_NAME");
 function createGraph(
   id: string,
   otsikko: string,
-  data: any,
+  data: unknown,
   height: number = 400,
 ): string {
   return `
@@ -75,7 +74,10 @@ function topDataToGraphData(
 ): { values: [Date, number][]; key: string }[] {
   const output: { [key: string]: [Date, number][] } = {};
   for (const rivi of data) {
-    const valueJson = JSON.parse(rivi.value) as Record<string, number>;
+    const valueJson = JSON.parse(rivi.value as string) as Record<
+      string,
+      number
+    >;
     for (const [key, value] of Object.entries(valueJson)) {
       let item = output[key];
       if (!item) {

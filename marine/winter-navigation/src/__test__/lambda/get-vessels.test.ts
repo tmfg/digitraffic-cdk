@@ -2,6 +2,7 @@ import type { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-r
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ExpectResponse } from "@digitraffic-cdk/testing";
 import { subDays } from "date-fns";
+import { assert, describe, expect, test } from "vitest";
 import { saveAllActivities } from "../../db/activities.js";
 import { saveAllQueues } from "../../db/queues.js";
 import { saveAllSources } from "../../db/sources.js";
@@ -156,7 +157,7 @@ describe(
             expect.objectContaining({ type: "TOW" }),
           );
           if (!receivedActivity || !isAssistanceReceived(receivedActivity)) {
-            fail("Expected activity to be of type AssistanceReceived");
+            assert.fail("Expected activity to be of type AssistanceReceived");
           }
           expect(receivedActivity.assistingVessel.imo).toEqual(icebreaker.imo);
 
@@ -166,7 +167,7 @@ describe(
           );
           expect(givenActivity).toBeDefined();
           if (!givenActivity || !isAssistanceGiven(givenActivity)) {
-            fail("Expected activity to be of type AssistanceGiven");
+            assert.fail("Expected activity to be of type AssistanceGiven");
           }
           expect(givenActivity.assistedVessel.imo).toEqual(assistedVessel.imo);
 
@@ -220,7 +221,7 @@ describe(
             !receivedAssistance ||
             !isAssistanceReceived(receivedAssistance)
           ) {
-            fail("Expected assistance to be of type AssistanceReceived");
+            assert.fail("Expected assistance to be of type AssistanceReceived");
           }
           expect(receivedAssistance.assistingVessel.imo).toEqual(
             icebreaker.imo,
@@ -233,7 +234,7 @@ describe(
             !icebreakerAssistance ||
             !isAssistanceGiven(icebreakerAssistance)
           ) {
-            fail("Expected assistance to be of type AssistanceGiven");
+            assert.fail("Expected assistance to be of type AssistanceGiven");
           }
           expect(icebreakerAssistance.assistedVessel.imo).toEqual(
             assistedVessel.imo,

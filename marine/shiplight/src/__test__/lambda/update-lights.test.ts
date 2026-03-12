@@ -4,7 +4,7 @@ process.env["SECRET_ID"] = "TEST";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { jest } from "@jest/globals";
+import { describe, test, vi } from "vitest";
 import { AreaLightsApi } from "../../api/arealights.js";
 import { AreaVisibilityApi } from "../../api/areavisibility.js";
 import type { ShiplightSecret } from "../../model/shiplight-secret.js";
@@ -25,12 +25,12 @@ const secret: ShiplightSecret = {
   visibilityApiKey: "test",
 };
 
-jest
-  .spyOn(ProxyHolder.prototype, "setCredentials")
-  .mockImplementation(() => Promise.resolve());
-jest
-  .spyOn(SecretHolder.prototype, "get")
-  .mockImplementation(() => Promise.resolve(secret));
+vi.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() =>
+  Promise.resolve(),
+);
+vi.spyOn(SecretHolder.prototype, "get").mockImplementation(() =>
+  Promise.resolve(secret),
+);
 
 const { handlerFn } = await import(
   "../../lambda/update-lights/update-lights.js"
@@ -48,18 +48,20 @@ describe(
       const areaId = 4;
       const visibilityInMeters = 1000;
 
-      jest
-        .spyOn(AreaVisibilityApi.prototype, "getVisibilityForArea")
-        .mockResolvedValue({
-          lastUpdated: new Date().toISOString(),
-          visibilityInMeters,
-        });
-      jest
-        .spyOn(AreaLightsApi.prototype, "updateLightsForArea")
-        .mockResolvedValue({
-          LightsSetSentFailed: [],
-          LightsSetSentSuccessfully: [],
-        });
+      vi.spyOn(
+        AreaVisibilityApi.prototype,
+        "getVisibilityForArea",
+      ).mockResolvedValue({
+        lastUpdated: new Date().toISOString(),
+        visibilityInMeters,
+      });
+      vi.spyOn(
+        AreaLightsApi.prototype,
+        "updateLightsForArea",
+      ).mockResolvedValue({
+        LightsSetSentFailed: [],
+        LightsSetSentSuccessfully: [],
+      });
 
       await insertAreaTraffic(
         db,

@@ -1,4 +1,5 @@
 import { Writable } from "node:stream";
+import { describe, expect, test } from "vitest";
 import type {
   LoggableType,
   LoggerConfiguration,

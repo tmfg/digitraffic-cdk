@@ -1,6 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { addDays, addHours, addMinutes, parseISO } from "date-fns";
+import { describe, expect, test } from "vitest";
 import { findByLocodePublicShiplist } from "../../dao/shiplist-public.js";
 import { mergeTimestamps } from "../../event-sourceutil.js";
 import { EventSource } from "../../model/eventsource.js";

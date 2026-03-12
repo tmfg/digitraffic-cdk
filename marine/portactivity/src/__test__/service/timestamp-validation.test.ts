@@ -1,5 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import _ from "lodash";
+import { describe, expect, test } from "vitest";
 import { NavStatus } from "../../model/ais-status.js";
 import { EventSource } from "../../model/eventsource.js";
 import { EventType } from "../../model/timestamp.js";

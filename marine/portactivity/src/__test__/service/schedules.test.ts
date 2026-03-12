@@ -1,6 +1,6 @@
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import { jest } from "@jest/globals";
 import { subHours, subMinutes } from "date-fns";
+import { describe, expect, test, vi } from "vitest";
 import type { SchedulesResponse } from "../../api/schedules.js";
 import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
 import { EventSource } from "../../model/eventsource.js";
@@ -43,7 +43,7 @@ describe("schedules", () => {
   ): void {
     test(description, async () => {
       const api = createApi();
-      const getSchedulesTimestampsSpy = jest
+      const getSchedulesTimestampsSpy = vi
         .spyOn(api, "getSchedulesTimestamps")
         .mockImplementation(() =>
           Promise.resolve(createSchedulesResponse(1, false, false)),

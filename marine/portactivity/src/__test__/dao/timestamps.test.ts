@@ -2,6 +2,7 @@ import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
 import _ from "lodash";
+import { describe, expect, test } from "vitest";
 import type { DbTimestamp } from "../../dao/timestamps.js";
 import * as TimestampsDb from "../../dao/timestamps.js";
 import { EventSource } from "../../model/eventsource.js";

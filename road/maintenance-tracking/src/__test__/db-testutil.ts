@@ -4,8 +4,8 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
-import { jest } from "@jest/globals";
 import { parseISO } from "date-fns";
+import { vi } from "vitest";
 import type { DbObservationData } from "../dao/maintenance-tracking-dao.js";
 import type { Havainto, TyokoneenseurannanKirjaus } from "../model/models.js";
 import { convertToDbObservationData } from "../service/maintenance-tracking.js";
@@ -204,10 +204,10 @@ export function findAllTrackingIds(db: DTDatabase): Promise<number[]> {
 }
 
 export function mockSecrets<T>(secret: T): void {
-  jest
-    .spyOn(RdsHolder.prototype, "setCredentials")
-    .mockReturnValue(Promise.resolve());
-  jest
-    .spyOn(SecretHolder.prototype, "get")
-    .mockReturnValue(Promise.resolve(secret));
+  vi.spyOn(RdsHolder.prototype, "setCredentials").mockReturnValue(
+    Promise.resolve(),
+  );
+  vi.spyOn(SecretHolder.prototype, "get").mockReturnValue(
+    Promise.resolve(secret),
+  );
 }

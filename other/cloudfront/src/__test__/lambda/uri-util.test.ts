@@ -1,3 +1,4 @@
+import { expect, test } from "vitest";
 import { removePathParts } from "../../lambda/uri-util.js";
 
 test.each([

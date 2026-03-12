@@ -1,4 +1,5 @@
 import { Stack } from "aws-cdk-lib";
+import { expect, test } from "vitest";
 import { createWebAcl } from "../../acl/acl-creator.js";
 import { WafRules } from "../../acl/waf-rules.js";
 

@@ -2,6 +2,8 @@ import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/i
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
+import { DtFunctionAlarms } from "@digitraffic/common/dist/aws/infra/stack/dt-function-alarms";
 import type { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
@@ -14,12 +16,15 @@ import {
   createArraySchema,
   getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
+import { Duration } from "aws-cdk-lib";
 import type {
   IModel,
   RequestValidator,
   Resource,
 } from "aws-cdk-lib/aws-apigateway";
 import { LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
+import { ComparisonOperator } from "aws-cdk-lib/aws-cloudwatch";
+import type { Function as AWSLambda } from "aws-cdk-lib/aws-lambda";
 import { LocodeMetadataSchema } from "./model/locode-metadata.js";
 import {
   TimestampMetadata,
@@ -104,21 +109,24 @@ export class PublicApi {
     resource: Resource,
     timestampsJsonModel: IModel,
     validator: RequestValidator,
-  ): MonitoredFunction {
-    const getTimestampsLambda = MonitoredDBFunction.create(
-      stack,
-      "get-timestamps",
-      stack.createLambdaEnvironment(),
-      {
-        timeout: 25,
-        memorySize: 600,
-        reservedConcurrentExecutions: 24,
-        errorAlarmProps: {
-          create: true,
-          threshold: 3,
-        },
-      },
-    );
+  ): AWSLambda {
+    const getTimestampsLambda = FunctionBuilder.create(stack, "get-timestamps")
+      .withTimeout(Duration.seconds(45))
+      .withMemorySize(600)
+      .withReservedConcurrentExecutions(24)
+      .withAlarms(
+        new DtFunctionAlarms()
+          .withThrottleAlarm(undefined)
+          .withDurationAlarm(undefined)
+          .withErrorAlarm({
+            datapointsToAlarm: 1,
+            evaluationPeriods: 1,
+            threshold: 3,
+            comparisonOperator:
+              ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+          }),
+      )
+      .build();
 
     const getTimestampsIntegration = new DigitrafficIntegration(
       getTimestampsLambda,

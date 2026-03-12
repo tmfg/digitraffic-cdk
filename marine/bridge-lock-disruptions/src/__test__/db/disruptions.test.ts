@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { describe, expect, test } from "vitest";
 import { Geometry } from "wkx";
 import * as DisruptionsDb from "../../db/disruptions.js";
 import { dbTestBase, insertDisruption } from "../db-testutil.js";

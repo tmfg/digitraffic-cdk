@@ -3,7 +3,7 @@ import type {
   GetSecretValueCommandOutput,
 } from "@aws-sdk/client-secrets-manager";
 import { SecretsManager } from "@aws-sdk/client-secrets-manager";
-import { jest } from "@jest/globals";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { setEnvVariable, setEnvVariableAwsRegion } from "../../utils/utils.js";
 
 const SECRET_WITH_PREFIX = {
@@ -16,13 +16,13 @@ const SECRET_WITH_PREFIX = {
 const emptySecret: GetSecretValueCommandOutput = { $metadata: {} };
 
 const getSecretValueMock =
-  jest.fn<
+  vi.fn<
     (arg: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>
   >();
 
-jest
-  .spyOn(SecretsManager.prototype, "getSecretValue")
-  .mockImplementation(getSecretValueMock);
+vi.spyOn(SecretsManager.prototype, "getSecretValue").mockImplementation(
+  getSecretValueMock,
+);
 
 const { SecretHolder } = await import(
   "../../aws/runtime/secrets/secret-holder.js"

@@ -6,7 +6,7 @@ import type {
 } from "@digitraffic/common/dist/database/database";
 import type { Countable } from "@digitraffic/common/dist/database/models";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import { jest } from "@jest/globals";
+import { vi } from "vitest";
 import { updatePilotages } from "../dao/pilotages.js";
 import type { DbTimestamp } from "../dao/timestamps.js";
 import * as TimestampsDb from "../dao/timestamps.js";
@@ -274,6 +274,6 @@ export async function insertVesselLocation(
 }
 
 export function mockSecrets<T>(secret: T): void {
-  jest.spyOn(RdsHolder.prototype, "setCredentials").mockResolvedValue();
-  jest.spyOn(SecretHolder.prototype, "get").mockResolvedValue(secret);
+  vi.spyOn(RdsHolder.prototype, "setCredentials").mockResolvedValue();
+  vi.spyOn(SecretHolder.prototype, "get").mockResolvedValue(secret);
 }

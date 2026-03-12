@@ -11,6 +11,8 @@
  * 4. Stop containers: docker compose -f src/__test__/integration/docker-compose.yml down
  */
 
+import ky from "ky";
+import mysql from "mysql";
 import {
   afterAll,
   beforeAll,
@@ -18,9 +20,7 @@ import {
   describe,
   expect,
   test,
-} from "@jest/globals";
-import ky from "ky";
-import mysql from "mysql";
+} from "vitest";
 import { KyResourceFetcher } from "../../adapters/driven/http/ky-resource-fetcher.js";
 import type { OpenSearchResponse } from "../../adapters/driven/opensearch/metric-query.js";
 import {

@@ -1,5 +1,6 @@
 import { App, Stack } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
+import { describe, test } from "vitest";
 import { Scheduler } from "../../aws/infra/scheduler.js";
 
 describe("scheduler tests", () => {

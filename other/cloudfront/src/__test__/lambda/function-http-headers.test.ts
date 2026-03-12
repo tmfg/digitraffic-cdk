@@ -1,3 +1,4 @@
+import { expect, test } from "vitest";
 import { handler } from "../../lambda/function-http-headers.js";
 import { AC_HEADERS } from "../../lambda/header-util.js";
 import { createCloudfrontEvent } from "./request-util.js";

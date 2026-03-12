@@ -2,9 +2,9 @@
 process.env["SECRET_ID"] = "Test";
 
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { jest } from "@jest/globals";
 import type { SQSRecord } from "aws-lambda";
 import _ from "lodash";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { handlerFn } from "../../lambda/process-queue/process-queue.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
 import { dbTestBase, findAll, mockSecrets } from "../db-testutil.js";
@@ -14,7 +14,7 @@ describe(
   "process-queue",
   dbTestBase((db: DTDatabase) => {
     beforeEach(() => {
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
       mockSecrets({});
     });
 

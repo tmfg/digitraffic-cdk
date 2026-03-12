@@ -1,6 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { Language } from "@digitraffic/common/dist/types/language";
 import type { Feature, GeoJsonProperties, Geometry } from "geojson";
+import { describe, expect, test } from "vitest";
 import type { FaultProps } from "../../service/faults.js";
 import * as FaultsService from "../../service/faults.js";
 import { dbTestBase, insert } from "../db-testutil.js";

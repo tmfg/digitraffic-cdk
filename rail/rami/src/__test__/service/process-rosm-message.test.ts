@@ -1,4 +1,5 @@
 import { cloneDeep, set } from "lodash-es";
+import { describe, expect, test } from "vitest";
 import { RosmMessageOperations } from "../../model/rosm-message.js";
 import { getActiveMessages } from "../../service/get-message.js";
 import {
@@ -49,53 +50,53 @@ describe(
       const message = parseRosmMessage(
         createMonitoredJourneyScheduledMessage({}),
       );
-      if (!message) fail();
-      await processRosmMessage(message);
+      expect(message).toBeDefined();
+      await processRosmMessage(message!);
 
       const activeMessages = await getActiveMessages();
       expect(activeMessages.length).toEqual(1);
-      expect(activeMessages[0]?.id).toEqual(message.id);
+      expect(activeMessages[0]?.id).toEqual(message?.id);
     });
     test("processRosmMessage - insert valid scheduledMessage", async () => {
       const message = parseRosmMessage(createScheduledMessage({}));
-      if (!message) fail();
-      await processRosmMessage(message);
+      expect(message).toBeDefined();
+      await processRosmMessage(message!);
 
       const activeMessages = await getActiveMessages();
       expect(activeMessages.length).toEqual(1);
-      expect(activeMessages[0]?.id).toEqual(message.id);
+      expect(activeMessages[0]?.id).toEqual(message?.id);
     });
     test("processRosmMessage - update valid message", async () => {
       const message = parseRosmMessage(
         createScheduledMessage({ operation: RosmMessageOperations.INSERT }),
       );
-      if (!message) fail();
+      expect(message).toBeDefined();
       const updatedMessage = {
-        ...message,
+        ...message!,
         operation: RosmMessageOperations.UPDATE,
-        version: message.version + 1,
+        version: message!.version + 1,
       };
-      await processRosmMessage(message);
+      await processRosmMessage(message!);
       await processRosmMessage(updatedMessage);
 
       const activeMessages = await getActiveMessages();
       expect(activeMessages.length).toEqual(1);
-      expect(activeMessages[0]?.id).toEqual(message.id);
+      expect(activeMessages[0]?.id).toEqual(message!.id);
       expect(activeMessages[0]?.version).toEqual(updatedMessage.version);
     });
     test("processRosmMessage - delete message", async () => {
       const message = parseRosmMessage(
         createScheduledMessage({ operation: RosmMessageOperations.INSERT }),
       );
-      if (!message) fail();
-      await processRosmMessage(message);
+      expect(message).toBeDefined();
+      await processRosmMessage(message!);
 
       const activeMessages = await getActiveMessages();
       expect(activeMessages.length).toEqual(1);
-      expect(activeMessages[0]?.id).toEqual(message.id);
+      expect(activeMessages[0]?.id).toEqual(message?.id);
 
       const deletedMessage = {
-        ...message,
+        ...message!,
         operation: RosmMessageOperations.DELETE,
       };
       await processRosmMessage(deletedMessage);

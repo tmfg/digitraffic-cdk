@@ -1,8 +1,8 @@
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { randomString } from "@digitraffic/common/dist/test/testutils";
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
-import { jest } from "@jest/globals";
 import _ from "lodash";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type {
   CStateStatus,
   CStateSystem,
@@ -63,7 +63,7 @@ describe("StatusServiceTest", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   async function testGetNodePingAndStatuspageComponentNotInSyncStatuses(
@@ -71,12 +71,12 @@ describe("StatusServiceTest", () => {
     returnFromCStateStatus: CStateStatus = emptyCStateStatus,
     returnFromNodePing: NodePingCheck[] = [],
   ): Promise<void> {
-    jest
-      .spyOn(nodePingApi, "getNodePingChecks")
-      .mockReturnValue(Promise.resolve(returnFromNodePing));
-    jest
-      .spyOn(cStateApi, "getStatus")
-      .mockReturnValue(Promise.resolve(returnFromCStateStatus));
+    vi.spyOn(nodePingApi, "getNodePingChecks").mockReturnValue(
+      Promise.resolve(returnFromNodePing),
+    );
+    vi.spyOn(cStateApi, "getStatus").mockReturnValue(
+      Promise.resolve(returnFromCStateStatus),
+    );
 
     const statuses =
       await StatusService.getNodePingAndStatuspageComponentNotInSyncStatuses(
@@ -256,11 +256,11 @@ describe("StatusServiceTest", () => {
     );
     const checks: NodePingCheck[] = [check];
 
-    const nodePingApiCreateNodepingCheckSpy = jest
+    const nodePingApiCreateNodepingCheckSpy = vi
       .spyOn(nodePingApi, "createNodepingCheck")
       .mockReturnValue(Promise.resolve());
 
-    const nodePingApiUpdateSpy = jest
+    const nodePingApiUpdateSpy = vi
       .spyOn(nodePingApi, "updateNodepingCheck")
       .mockReturnValue(Promise.resolve({} as unknown as NodePingCheck));
 
@@ -407,28 +407,28 @@ async function callWithStubsAndVerifyUpdateComponentsAndChecksForApp(
     extraEndpoints: [],
   };
 
-  const getAppEndpointsStub = jest
+  const getAppEndpointsStub = vi
     .spyOn(digitrafficApi, "getAppWithEndpoints")
     .mockReturnValue(Promise.resolve(appEndpoints));
-  const getNodePingChecksStub = jest
+  const getNodePingChecksStub = vi
     .spyOn(nodePingApi, "getNodePingChecks")
     .mockReturnValue(Promise.resolve(returnFromNodePing));
 
-  const getNodepingContactsStub = jest
+  const getNodepingContactsStub = vi
     .spyOn(nodePingApi, "getNodepingContacts")
     .mockReturnValueOnce(Promise.resolve(Promise.resolve(getNodepingContacts1)))
     .mockReturnValueOnce(
       Promise.resolve(Promise.resolve(getNodepingContacts2)),
     );
 
-  const createNodepingContactForCStateStub = jest
+  const createNodepingContactForCStateStub = vi
     .spyOn(nodePingApi, "createNodepingContactForCState")
     .mockReturnValue(Promise.resolve());
 
-  const createNodepingCheckStub = jest
+  const createNodepingCheckStub = vi
     .spyOn(nodePingApi, "createNodepingCheck")
     .mockReturnValue(Promise.resolve());
-  const updateNodepingCheckStub = jest
+  const updateNodepingCheckStub = vi
     .spyOn(nodePingApi, "updateNodepingCheck")
     .mockReturnValue(Promise.resolve({} as unknown as NodePingCheck));
 

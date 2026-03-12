@@ -3,8 +3,8 @@ import {
   randomBoolean,
   shuffle,
 } from "@digitraffic/common/dist/test/testutils";
-import { jest } from "@jest/globals";
 import { addHours, subHours } from "date-fns";
+import { describe, expect, test, vi } from "vitest";
 import { WebSocket } from "ws";
 import type { AwakeAIATXTimestampMessage } from "../../api/awake-ai-atx.js";
 import {
@@ -34,9 +34,9 @@ describe(
     test("getATXs - no portcall found for ATx", async () => {
       const atxMessage = newAwakeATXMessage();
       const api = createAiATXApi();
-      jest
-        .spyOn(AwakeAiATXApi.prototype, "getATXs")
-        .mockResolvedValue([atxMessage]);
+      vi.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
+        atxMessage,
+      ]);
       const service = new AwakeAiATXService(api);
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant
@@ -53,9 +53,9 @@ describe(
       await createPortcall(atxMessage, portcallId);
 
       const api = createAiATXApi();
-      jest
-        .spyOn(AwakeAiATXApi.prototype, "getATXs")
-        .mockResolvedValue([atxMessage]);
+      vi.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
+        atxMessage,
+      ]);
       const service = new AwakeAiATXService(api);
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant
@@ -97,9 +97,9 @@ describe(
       await createPortcall(atxMessage, portcallId);
 
       const api = createAiATXApi();
-      jest
-        .spyOn(AwakeAiATXApi.prototype, "getATXs")
-        .mockResolvedValue([atxMessage]);
+      vi.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
+        atxMessage,
+      ]);
       const service = new AwakeAiATXService(api);
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant

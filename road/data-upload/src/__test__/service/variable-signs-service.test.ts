@@ -1,4 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { describe, test } from "vitest";
 import { insertData } from "../../dao/data.js";
 import { SOURCES, TYPES } from "../../model/types.js";
 import { handleVariableSignMessages } from "../../service/variable-signs.js";

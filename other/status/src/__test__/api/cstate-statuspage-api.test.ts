@@ -1,9 +1,9 @@
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { expect, jest } from "@jest/globals";
 import { add, sub } from "date-fns";
 import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type {
   ActiveMaintenance,
   GithubActionPostData,
@@ -30,7 +30,7 @@ describe("CStateApiTest", () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("getStatus - no maintenances", async (): Promise<void> => {
@@ -169,7 +169,7 @@ describe("CStateApiTest", () => {
     maintenances: TestMaintenance[],
     expectMaintenance: boolean,
   ): Promise<void> {
-    const spy = jest
+    const spy = vi
       .spyOn(ky, "get")
       .mockImplementation(
         (_url: Input, _options: Options | undefined): ResponsePromise => {
@@ -192,7 +192,7 @@ describe("CStateApiTest", () => {
     expectMaintenance: boolean,
   ): Promise<void> {
     const indexJson = getCstateIndexJson(maintenances);
-    const spy = jest
+    const spy = vi
       .spyOn(ky, "get")
       .mockImplementation(
         (_url: Input, _options: Options | undefined): ResponsePromise => {
@@ -226,7 +226,7 @@ describe("CStateApiTest", () => {
       StatusEnvKeys.GITHUB_UPDATE_MAINTENANCE_WORKFLOW_FILE,
     )}/dispatches` as const;
     const gitHubPat = (await secretHolder.get()).gitHubPat;
-    const spy = jest
+    const spy = vi
       .spyOn(ky, "post")
       .mockImplementation(
         (_url: Input, _options?: Options | undefined): ResponsePromise => {
