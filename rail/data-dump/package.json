@@ -1,0 +1,31 @@
+{
+  "name": "data-dump",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bash build-layer.sh && heft build --clean",
+    "build:layer": "bash build-layer.sh",
+    "cdk": "cdk",
+    "clean": "rimraf dist cdk.out",
+    "clean:force": "rimraf dist cdk.out node_modules",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@digitraffic/common": "2026.2.23-1",
+    "aws-cdk-lib": "2.236.0",
+    "constructs": "10.4.5"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/heft": "1.1.10",
+    "@rushstack/heft-jest-plugin": "1.1.10",
+    "@types/heft-jest": "1.0.6",
+    "@types/jest": "30.0.0",
+    "@types/node": "25.0.10",
+    "aws-cdk": "2.1103.0",
+    "typescript": "5.9.3"
+  }
+}

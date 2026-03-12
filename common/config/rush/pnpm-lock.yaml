@@ -1810,6 +1810,46 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
+  ../../rail/data-dump:
+    dependencies:
+      '@digitraffic/common':
+        specifier: 2026.2.23-1
+        version: 2026.2.23-1(@aws-sdk/client-api-gateway@3.995.0)(@aws-sdk/client-s3@3.995.0)(@aws-sdk/client-secrets-manager@3.995.0)(@aws-sdk/client-sns@3.995.0)(@aws-sdk/lib-storage@3.995.0(@aws-sdk/client-s3@3.995.0))(@date-fns/tz@1.4.1)(@smithy/fetch-http-handler@5.3.9)(@smithy/node-http-handler@4.4.10)(aws-cdk-lib@2.236.0(constructs@10.4.5))(change-case@5.4.4)(constructs@10.4.5)(date-fns@4.1.0)(es-toolkit@1.44.0)(geojson-validation@1.0.2)(ky@1.14.3)(lodash-es@4.17.23)(pg-native@3.5.2)(pg-promise@12.3.0(pg-native@3.5.2)(pg-query-stream@4.10.3(pg@8.16.3(pg-native@3.5.2))))(zod@4.3.6)
+      aws-cdk-lib:
+        specifier: 2.236.0
+        version: 2.236.0(constructs@10.4.5)
+      constructs:
+        specifier: 10.4.5
+        version: 10.4.5
+    devDependencies:
+      '@digitraffic-cdk/cdk-rig':
+        specifier: workspace:*
+        version: link:../../tools/rig
+      '@digitraffic-cdk/toolchain':
+        specifier: workspace:*
+        version: link:../../tools/toolchain
+      '@rushstack/heft':
+        specifier: 1.1.10
+        version: 1.1.10(@types/node@25.0.10)
+      '@rushstack/heft-jest-plugin':
+        specifier: 1.1.10
+        version: 1.1.10(@rushstack/heft@1.1.10(@types/node@25.0.10))(@types/node@25.0.10)(jest-environment-node@29.7.0)(ts-node@10.9.2(@types/node@25.0.10)(typescript@5.9.3))
+      '@types/heft-jest':
+        specifier: 1.0.6
+        version: 1.0.6
+      '@types/jest':
+        specifier: 30.0.0
+        version: 30.0.0
+      '@types/node':
+        specifier: 25.0.10
+        version: 25.0.10
+      aws-cdk:
+        specifier: 2.1103.0
+        version: 2.1103.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   ../../rail/rail-infra:
     dependencies:
       '@digitraffic/common':
