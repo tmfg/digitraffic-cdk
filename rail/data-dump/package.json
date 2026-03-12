@@ -14,18 +14,18 @@
   },
   "dependencies": {
     "@digitraffic/common": "2026.3.5-1",
-    "aws-cdk-lib": "2.236.0",
-    "constructs": "10.4.5"
+    "aws-cdk-lib": "2.241.0",
+    "constructs": "10.5.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.1.10",
-    "@rushstack/heft-jest-plugin": "1.1.10",
+    "@rushstack/heft": "1.2.6",
+    "@rushstack/heft-jest-plugin": "1.2.6",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
-    "@types/node": "25.0.10",
-    "aws-cdk": "2.1103.0",
+    "@types/node": "25.3.3",
+    "aws-cdk": "2.1109.0",
     "typescript": "5.9.3"
   }
 }
