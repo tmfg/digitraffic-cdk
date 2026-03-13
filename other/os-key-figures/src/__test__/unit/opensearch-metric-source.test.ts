@@ -1,4 +1,4 @@
-import { describe, expect, jest, test } from "@jest/globals";
+import { describe, expect, test, vi } from "vitest";
 import type {
   OpenSearchClient,
   OpenSearchMetricSourceConfig,
@@ -38,7 +38,7 @@ function createMockClient(): OpenSearchClient & {
     lastCallIndex: undefined as string | undefined,
     lastCallMethod: undefined as string | undefined,
     callCount: 0,
-    makeOsQuery: jest.fn(
+    makeOsQuery: vi.fn(
       async (index: string, method: string, _query: string) => {
         mock.lastCallIndex = index;
         mock.lastCallMethod = method;

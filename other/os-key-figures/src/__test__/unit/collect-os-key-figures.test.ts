@@ -1,4 +1,4 @@
-import { describe, expect, jest, test } from "@jest/globals";
+import { describe, expect, test, vi } from "vitest";
 import { MetricCollectionService } from "../../domain/services/metric-collection-service.js";
 import type { CollectedMetric } from "../../domain/types/collected-metric.js";
 import { isSuccess } from "../../domain/types/collection-result.js";
@@ -47,7 +47,7 @@ const TEST_PERIOD = createTimePeriod(
 
 function createMockMetricSource(): ForRetrievingMetrics {
   return {
-    retrieveMetric: jest.fn(
+    retrieveMetric: vi.fn(
       async (
         _scope: MetricScope,
         _definition: MetricDefinition,
@@ -56,7 +56,7 @@ function createMockMetricSource(): ForRetrievingMetrics {
         return 42;
       },
     ),
-    retrieveMetricWithQuery: jest.fn(
+    retrieveMetricWithQuery: vi.fn(
       async (
         _scope: MetricScope,
         _definition: MetricDefinition,
@@ -73,11 +73,11 @@ function createMockMetricStore(): ForPersistingMetrics & {
 } {
   const store = {
     persistedMetrics: [] as CollectedMetric[],
-    ensureSchema: jest.fn(async () => {}),
-    persist: jest.fn(async (metrics: CollectedMetric[]) => {
+    ensureSchema: vi.fn(async () => {}),
+    persist: vi.fn(async (metrics: CollectedMetric[]) => {
       store.persistedMetrics.push(...metrics);
     }),
-    existsForPeriod: jest.fn(async () => false),
+    existsForPeriod: vi.fn(async () => false),
   };
   return store;
 }
