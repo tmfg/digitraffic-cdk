@@ -8,6 +8,8 @@ import zipfile
 import shutil
 import requests
 
+HEADERS = {'Digitraffic-User': 'internal-digitraffic-data-dump'}
+
 def lambda_handler(event, context):
     logging.warn('Cleaning tmp')
     shutil.rmtree('/tmp', ignore_errors=True)
@@ -26,7 +28,7 @@ def uploadToS3(zipPath):
     today = datetime.date.today()
     first = today.replace(day=1)
     lastMonth = (first - delta).replace(day=1)
-    s3_filename = 'digitraffic-rata-trains-' + str(lastMonth) + '.zip'
+    s3_filename = f'digitraffic-rata-trains-{lastMonth}.zip'
     s3_localFileName = zipPath
 
     s3 = boto3.client('s3')
@@ -42,19 +44,19 @@ def createZipFile():
     start_date = lastMonth
     end_date = first
 
-    zipPath = '/tmp/digitraffic-rata-trains-' + str(first) + '.zip'
+    zipPath = f'/tmp/digitraffic-rata-trains-{first}.zip'
 
     with zipfile.ZipFile(zipPath, 'w', zipfile.ZIP_DEFLATED) as zipped_f:
 
         while start_date < end_date:
             # logging.warn(start_date.strftime("%Y-%m-%d"))
 
-            url = 'https://rata.digitraffic.fi/api/v1/trains/' + str(start_date)
-            filename = str(start_date) + '_trains.json'
+            url = f'https://rata.digitraffic.fi/api/v1/trains/{start_date}'
+            filename = f'{start_date}_trains.json'
 
-            logging.warn(url + ' -> ' + filename)
+            logging.warn(f'{url} -> {filename}')
 
-            trains = requests.get(url)
+            trains = requests.get(url, headers=HEADERS)
 
             zipped_f.writestr(filename, json.dumps(trains.json()))
 
