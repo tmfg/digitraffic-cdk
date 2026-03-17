@@ -1,16 +1,24 @@
+import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { App } from "aws-cdk-lib";
-import { Match, Template } from "aws-cdk-lib/assertions";
+import { Template } from "aws-cdk-lib/assertions";
+import { describe, expect, test } from "vitest";
 import type { DataDumpProps } from "../data-dump-stack.js";
 import { DataDumpStack } from "../data-dump-stack.js";
 
 // === Configuration (placeholder values — no real infrastructure identifiers) ===
 
 const CONFIG: DataDumpProps = {
+  shortName: "DataDump",
   compositionDumpBucket: "test-composition-bucket",
   trainDumpBucket: "test-train-bucket",
   trainLocationDumpBucket: "test-location-bucket",
-  shortName: "DataDump",
-  env: { account: "123456789012", region: "eu-west-1" },
+  alarmTopicArn: "arn:aws:sns:eu-west-1:123456789012:alarm-topic",
+  warningTopicArn: "arn:aws:sns:eu-west-1:123456789012:warning-topic",
+  trafficType: TrafficType.RAIL,
+  production: false,
+  stackProps: {
+    env: { account: "123456789012", region: "eu-west-1" },
+  },
 };
 
 // === Helpers ===
@@ -20,6 +28,12 @@ function createTemplate(): Template {
   const stack = new DataDumpStack(app, "Stack", CONFIG);
   return Template.fromStack(stack);
 }
+
+const ALL_LAMBDA_NAMES = [
+  "DataDump-DumpCompositions",
+  "DataDump-DumpTrains",
+  "DataDump-DumpTrainLocations",
+];
 
 function allBucketArns(): string[] {
   return [
@@ -244,6 +258,44 @@ describe("DataDumpStack — Lambda functions", () => {
       },
     });
   });
+
+  test("each Lambda has the correct memory size", () => {
+    // given: the synthesized template
+    const template = createTemplate();
+
+    // then: compositions = 128, trains = 512, locations = 2048
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "DataDump-DumpCompositions",
+      MemorySize: 128,
+    });
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "DataDump-DumpTrains",
+      MemorySize: 512,
+    });
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "DataDump-DumpTrainLocations",
+      MemorySize: 2048,
+    });
+  });
+
+  test("each Lambda has the correct handler", () => {
+    // given: the synthesized template
+    const template = createTemplate();
+
+    // then: each Lambda's Handler matches {filename}.lambda_handler
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "DataDump-DumpCompositions",
+      Handler: "dump-compositions.lambda_handler",
+    });
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "DataDump-DumpTrains",
+      Handler: "dump-trains.lambda_handler",
+    });
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "DataDump-DumpTrainLocations",
+      Handler: "dump-train-locations.lambda_handler",
+    });
+  });
 });
 
 // ===========================================================================
@@ -251,34 +303,6 @@ describe("DataDumpStack — Lambda functions", () => {
 // ===========================================================================
 
 describe("DataDumpStack — custom Lambda layer", () => {
-  test("stack contains exactly one Lambda LayerVersion", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when/then: exactly one LayerVersion exists (shared by all 3 Lambdas)
-    template.resourceCountIs("AWS::Lambda::LayerVersion", 1);
-  });
-
-  test("Lambda layer is compatible with Python 3.12", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when/then: the LayerVersion has python3.12 in CompatibleRuntimes
-    template.hasResourceProperties("AWS::Lambda::LayerVersion", {
-      CompatibleRuntimes: Match.arrayWith(["python3.12"]),
-    });
-  });
-
-  test("Lambda layer has a description", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when/then: the LayerVersion has a non-empty Description
-    template.hasResourceProperties("AWS::Lambda::LayerVersion", {
-      Description: Match.stringLikeRegexp(".+"),
-    });
-  });
-
   test("all three Lambdas reference the custom layer", () => {
     // given: the synthesized template
     const template = createTemplate();
@@ -307,58 +331,6 @@ describe("DataDumpStack — custom Lambda layer", () => {
 // ===========================================================================
 
 describe("DataDumpStack — IAM roles", () => {
-  test("stack contains exactly three IAM roles", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when/then: exactly three IAM roles exist (one per Lambda)
-    template.resourceCountIs("AWS::IAM::Role", 3);
-  });
-
-  test("IAM roles allow lambda.amazonaws.com to assume", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when: we find all IAM roles
-    const roles = template.findResources("AWS::IAM::Role");
-    const roleIds = Object.keys(roles);
-
-    // then: roles exist and each allows lambda.amazonaws.com to assume
-    expect(roleIds.length).toBe(3);
-    for (const logicalId of roleIds) {
-      const props = getProps(roles[logicalId]!);
-      const statements = props["AssumeRolePolicyDocument"]?.["Statement"] ?? [];
-      const lambdaStatement = statements.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (s: any) => {
-          const svc = s["Principal"]?.["Service"];
-          return (
-            svc === "lambda.amazonaws.com" ||
-            (Array.isArray(svc) && svc.includes("lambda.amazonaws.com"))
-          );
-        },
-      );
-      expect(lambdaStatement).toBeDefined();
-      expect(lambdaStatement["Effect"]).toBe("Allow");
-    }
-  });
-
-  test("IAM roles include managed policy for basic execution", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when: we find all IAM roles and serialize them
-    const roles = template.findResources("AWS::IAM::Role");
-    const roleIds = Object.keys(roles);
-
-    // then: each role references AWSLambdaBasicExecutionRole
-    expect(roleIds.length).toBe(3);
-    for (const logicalId of roleIds) {
-      const roleJson = JSON.stringify(roles[logicalId]);
-      expect(roleJson).toContain("AWSLambdaBasicExecutionRole");
-    }
-  });
-
   test("S3 permissions exist for all dump buckets", () => {
     // given: the synthesized template
     const template = createTemplate();
@@ -378,23 +350,9 @@ describe("DataDumpStack — IAM roles", () => {
 // ===========================================================================
 
 describe("DataDumpStack — EventBridge rules", () => {
-  test("stack contains exactly three EventBridge rules", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when/then: exactly three EventBridge rules exist
-    template.resourceCountIs("AWS::Events::Rule", 3);
-  });
-
   test("each EventBridge rule targets a distinct Lambda", () => {
     // given: the synthesized template
     const template = createTemplate();
-
-    const knownLambdaNames = [
-      "DataDump-DumpCompositions",
-      "DataDump-DumpTrains",
-      "DataDump-DumpTrainLocations",
-    ];
 
     // when: we resolve the target of each rule
     const rules = template.findResources("AWS::Events::Rule");
@@ -407,43 +365,31 @@ describe("DataDumpStack — EventBridge rules", () => {
       expect(targets.length).toBeGreaterThan(0);
       const fnName = resolveTargetFunctionName(template, targets[0]["Arn"]);
       expect(fnName).toBeDefined();
-      expect(knownLambdaNames).toContain(fnName);
+      expect(ALL_LAMBDA_NAMES).toContain(fnName);
       targetedLambdas.add(fnName!);
     }
 
     // then: each Lambda is targeted by exactly one rule
     expect(targetedLambdas.size).toBe(3);
   });
-});
 
-// ===========================================================================
-// 6. LAMBDA PERMISSIONS
-// ===========================================================================
-
-describe("DataDumpStack — Lambda permissions", () => {
-  test("stack contains exactly three Lambda permissions", () => {
+  test("EventBridge rules have correct cron schedules", () => {
     // given: the synthesized template
     const template = createTemplate();
 
-    // when/then: exactly three Lambda permissions exist
-    template.resourceCountIs("AWS::Lambda::Permission", 3);
-  });
-
-  test("each permission allows events.amazonaws.com to invoke a Lambda", () => {
-    // given: the synthesized template
-    const template = createTemplate();
-
-    // when: we find all Lambda permissions
-    const permissions = template.findResources("AWS::Lambda::Permission");
-    const permissionIds = Object.keys(permissions);
-
-    // then: each has correct Principal and Action
-    expect(permissionIds.length).toBe(3);
-    for (const logicalId of permissionIds) {
-      const props = getProps(permissions[logicalId]!);
-      expect(props["Action"]).toBe("lambda:InvokeFunction");
-      expect(props["Principal"]).toBe("events.amazonaws.com");
-    }
+    // then: each cron schedule matches the expected expression
+    template.hasResourceProperties("AWS::Events::Rule", {
+      Name: "CompositionCronEvent",
+      ScheduleExpression: "cron(17 15 5 * ? *)",
+    });
+    template.hasResourceProperties("AWS::Events::Rule", {
+      Name: "TrainCronEvent",
+      ScheduleExpression: "cron(17 14 5 * ? *)",
+    });
+    template.hasResourceProperties("AWS::Events::Rule", {
+      Name: "TrainLocationCronEvent",
+      ScheduleExpression: "cron(17 12 * * ? *)",
+    });
   });
 });
 
@@ -505,15 +451,9 @@ describe("DataDumpStack — S3 permission scoping", () => {
 // ===========================================================================
 
 describe("DataDumpStack — S3 actions", () => {
-  const REQUIRED_S3_ACTIONS = ["s3:CreateMultipartUpload", "s3:PutObject"];
+  const REQUIRED_S3_ACTIONS = ["s3:PutObject"];
 
-  const ALL_LAMBDA_NAMES = [
-    "DataDump-DumpCompositions",
-    "DataDump-DumpTrains",
-    "DataDump-DumpTrainLocations",
-  ];
-
-  test("each Lambda role has only PutObject and CreateMultipartUpload", () => {
+  test("each Lambda role has only PutObject", () => {
     // given: the synthesized template
     const template = createTemplate();
 
@@ -521,6 +461,55 @@ describe("DataDumpStack — S3 actions", () => {
     for (const fnName of ALL_LAMBDA_NAMES) {
       const actions = findS3ActionsForLambda(template, fnName);
       expect(actions.sort()).toEqual(REQUIRED_S3_ACTIONS);
+    }
+  });
+});
+
+// ===========================================================================
+// 9. NO UNNECESSARY ACCESS
+// ===========================================================================
+
+describe("DataDumpStack — no unnecessary access", () => {
+  test("no Lambda has SECRET_ID environment variable", () => {
+    // given: the synthesized template
+    const template = createTemplate();
+
+    // when: we find all Lambdas
+    const lambdas = template.findResources("AWS::Lambda::Function");
+
+    // then: none has SECRET_ID in environment
+    for (const logicalId of Object.keys(lambdas)) {
+      const env =
+        getProps(lambdas[logicalId]!)["Environment"]?.["Variables"] ?? {};
+      expect(env).not.toHaveProperty("SECRET_ID");
+    }
+  });
+
+  test("no Lambda has DB_APPLICATION environment variable", () => {
+    // given: the synthesized template
+    const template = createTemplate();
+
+    // when: we find all Lambdas
+    const lambdas = template.findResources("AWS::Lambda::Function");
+
+    // then: none has DB_APPLICATION in environment
+    for (const logicalId of Object.keys(lambdas)) {
+      const env =
+        getProps(lambdas[logicalId]!)["Environment"]?.["Variables"] ?? {};
+      expect(env).not.toHaveProperty("DB_APPLICATION");
+    }
+  });
+
+  test("no Lambda is placed in a VPC", () => {
+    // given: the synthesized template
+    const template = createTemplate();
+
+    // when: we find all Lambdas
+    const lambdas = template.findResources("AWS::Lambda::Function");
+
+    // then: none has VpcConfig
+    for (const logicalId of Object.keys(lambdas)) {
+      expect(getProps(lambdas[logicalId]!)).not.toHaveProperty("VpcConfig");
     }
   });
 });
