@@ -11,7 +11,12 @@ import { snakeCase } from "es-toolkit";
 import { DigitrafficStack, SOLUTION_KEY } from "./stack.js";
 
 const MAX_CONCURRENCY_LIMIT = 100;
-const NODE_RUNTIMES = [Runtime.NODEJS_24_X.name, Runtime.NODEJS_22_X.name];
+const ALLOWED_RUNTIMES = [
+  Runtime.NODEJS_24_X.name,
+  Runtime.NODEJS_22_X.name,
+  Runtime.PYTHON_3_12.name,
+  Runtime.PYTHON_3_13.name,
+];
 
 enum ResourceType {
   stackName = "STACK_NAME",
@@ -136,7 +141,10 @@ export class StackCheckingAspect implements IAspect {
         );
       }
 
-      if (node.runtime !== undefined && !NODE_RUNTIMES.includes(node.runtime)) {
+      if (
+        node.runtime !== undefined &&
+        !ALLOWED_RUNTIMES.includes(node.runtime)
+      ) {
         this.addAnnotation(
           node,
           ResourceType.functionRuntime,
