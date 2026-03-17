@@ -9,23 +9,30 @@
     "cdk": "cdk",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean",
+    "test": "vitest run",
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.3.5-1",
+    "@digitraffic/common": "2026.3.17-2",
     "aws-cdk-lib": "2.241.0",
     "constructs": "10.5.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/esbuild": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.2.6",
     "@rushstack/heft-jest-plugin": "1.2.6",
+    "@types/aws-lambda": "8.10.160",
     "@types/heft-jest": "1.0.6",
     "@types/jest": "30.0.0",
     "@types/node": "25.3.3",
+    "@vitest/coverage-v8": "4.0.18",
     "aws-cdk": "2.1109.0",
-    "typescript": "5.9.3"
+    "esbuild": "0.27.2",
+    "parallelshell": "3.0.2",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }
