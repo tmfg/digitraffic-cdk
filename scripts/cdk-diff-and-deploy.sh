@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e # Fail on error
 CONCURRENCY=0
+# https://github.com/aws/aws-cdk/releases
+CDK_VERSION=2.241.0
+
 # This script tries to do diff or deploy for cdk stack in given environment
 echo "Required parameters: <app>-<env> <diff|deploy> [stackName]"
 echo "For example: road-test diff"

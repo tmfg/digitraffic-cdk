@@ -21,14 +21,14 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "3.995.0",
+    "@aws-sdk/client-secrets-manager": "3.1004.0",
     "@digitraffic/common": "2026.3.17-2",
     "aws-cdk-lib": "2.241.0",
     "constructs": "10.5.1",
     "date-fns": "4.1.0",
     "ky": "1.14.3",
     "lodash": "4.17.23",
-    "mqtt": "5.14.1",
+    "mqtt": "5.15.0",
     "ws": "8.19.0"
   },
   "devDependencies": {
@@ -38,12 +38,12 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.2.6",
-    "@types/aws-lambda": "8.10.160",
-    "@types/lodash": "4.17.23",
-    "@types/node": "25.3.3",
+    "@types/aws-lambda": "8.10.161",
+    "@types/lodash": "4.17.24",
+    "@types/node": "25.3.5",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1109.0",
-    "esbuild": "0.27.2",
+    "aws-cdk": "3.0.0",
+    "esbuild": "0.27.3",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   }

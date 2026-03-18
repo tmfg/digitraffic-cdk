@@ -23,8 +23,8 @@
     "@digitraffic/common": "2026.3.17-2",
     "aws-cdk-lib": "2.241.0",
     "constructs": "10.5.1",
-    "pg-native": "3.5.2",
-    "pg-promise": "12.3.0"
+    "pg-native": "3.7.0",
+    "pg-promise": "12.6.2"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
@@ -32,16 +32,16 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.2.6",
-    "@types/aws-lambda": "8.10.160",
-    "@types/node": "25.3.3",
+    "@types/aws-lambda": "8.10.161",
+    "@types/node": "25.3.5",
     "@types/sinon": "21.0.0",
     "@types/xml2js": "0.4.14",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1109.0",
-    "esbuild": "0.27.2",
+    "aws-cdk": "3.0.0",
+    "esbuild": "0.27.3",
     "json-schema-to-typescript": "15.0.4",
     "parallelshell": "3.0.2",
-    "sinon": "21.0.1",
+    "sinon": "21.0.2",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   }

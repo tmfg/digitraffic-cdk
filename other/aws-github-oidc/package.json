@@ -22,10 +22,10 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.2.6",
-    "@types/node": "25.3.3",
+    "@types/node": "25.3.5",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1109.0",
-    "esbuild": "0.27.2",
+    "aws-cdk": "3.0.0",
+    "esbuild": "0.27.3",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",
     "vitest": "4.0.18"

@@ -8,9 +8,6 @@
 # . cdk-env.conf <env>
 # . cdk-env.conf road-test
 
-# https://github.com/aws/aws-cdk/releases
-CDK_VERSION=2.230.0
-
 # Read env
 ENV=${1:-"NONE"}
 

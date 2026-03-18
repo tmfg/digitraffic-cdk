@@ -330,7 +330,9 @@ export async function setMessageDeleted(messageId: string): Promise<void> {
   });
 }
 
-function createDtRamiMessageInsertValues(message: DtRosmMessage): unknown {
+function createDtRamiMessageInsertValues(
+  message: DtRosmMessage,
+): Record<string, string | number | Date | null> {
   return {
     id: message.id,
     version: message.version,
@@ -361,7 +363,9 @@ function createDtRamiMessageStationInsertValues(
     : null;
 }
 
-function createDtRamiMessageVideoInsertValues(message: DtRosmMessage): unknown {
+function createDtRamiMessageVideoInsertValues(
+  message: DtRosmMessage,
+): Record<string, string | number | Date | null> {
   return {
     id: message.id,
     version: message.version,
@@ -383,7 +387,9 @@ function createDtRamiMessageVideoInsertValues(message: DtRosmMessage): unknown {
   };
 }
 
-function createDtRamiMessageAudioInsertValues(message: DtRosmMessage): unknown {
+function createDtRamiMessageAudioInsertValues(
+  message: DtRosmMessage,
+): Record<string, string | number | Date | null> {
   return {
     id: message.id,
     version: message.version,

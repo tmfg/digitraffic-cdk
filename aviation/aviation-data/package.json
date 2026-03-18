@@ -15,8 +15,8 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.995.0",
-    "@aws-sdk/lib-storage": "3.995.0",
+    "@aws-sdk/client-s3": "3.1004.0",
+    "@aws-sdk/lib-storage": "3.1004.0",
     "@digitraffic/common": "2026.3.17-2",
     "aws-cdk-lib": "2.241.0",
     "constructs": "10.5.1"
@@ -27,10 +27,10 @@
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.2.6",
-    "@types/aws-lambda": "8.10.160",
-    "@types/node": "25.3.3",
+    "@types/aws-lambda": "8.10.161",
+    "@types/node": "25.3.5",
     "@vitest/coverage-v8": "4.0.18",
-    "esbuild": "0.27.2",
+    "esbuild": "0.27.3",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   },

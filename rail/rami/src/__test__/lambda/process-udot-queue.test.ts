@@ -56,7 +56,7 @@ describe(
                 attapId: 1000 + i,
                 trainNumber,
                 departureDate,
-                stationCode: stationCodes[i],
+                stationCode: stationCodes[i]!,
                 scheduledTime,
                 type: i % 2,
                 cancelled: false,
