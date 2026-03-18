@@ -24,8 +24,7 @@ def lambda_handler(event, context):
     logger.info('Train archiving complete')
 
     return {
-        'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!2')
+        'statusCode': 200
     }
 
 def uploadToS3(zipPath):
@@ -64,6 +63,7 @@ def createZipFile():
             logger.info('Fetching trains', url=url, file_name=filename)
 
             trains = requests.get(url, headers=HEADERS)
+            trains.raise_for_status()
             logger.info('Trains response', status=trains.status_code, length=len(trains.content), date=str(start_date))
 
             zipped_f.writestr(filename, json.dumps(trains.json()))

@@ -9,6 +9,7 @@ from datetime import date, timedelta
 from unittest.mock import MagicMock, patch
 
 import boto3
+import requests
 import requests_mock as rm
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from moto import mock_aws
@@ -94,6 +95,44 @@ class TestDumpTrains(unittest.TestCase):
                         data = json.load(f)
                         self.assertIsInstance(data, list)
                         self.assertEqual(data, MOCK_RESPONSE)
+
+    def test_fails_on_api_error(self):
+        """
+        Given: Today is 2026-03-15,
+               mock API returns 500 for the first day
+        When:  lambda_handler is invoked
+        Then:  Lambda raises HTTPError (we don't want incomplete data in dumps)
+        """
+        # Given
+        context = MagicMock(spec=LambdaContext)
+        pinned_today = date(2026, 3, 15)
+
+        with mock_aws():
+            s3 = boto3.client("s3", region_name=REGION)
+            s3.create_bucket(
+                Bucket=BUCKET_NAME,
+                CreateBucketConfiguration={"LocationConstraint": REGION},
+            )
+
+            with rm.Mocker() as m:
+                m.get(
+                    "https://rata.digitraffic.fi/api/v1/trains/2026-02-01",
+                    status_code=500,
+                    text="Internal Server Error",
+                )
+
+                with patch.object(dump_trains, "datetime") as mock_dt:
+                    mock_dt.date.today.return_value = pinned_today
+                    mock_dt.timedelta = timedelta
+
+                    with patch.dict(os.environ, {"DUMP_BUCKET_NAME": BUCKET_NAME}):
+                        # When / Then
+                        with self.assertRaises(requests.HTTPError):
+                            dump_trains.lambda_handler({}, context)
+
+            # Verify nothing was uploaded to S3
+            objects = s3.list_objects_v2(Bucket=BUCKET_NAME)
+            self.assertEqual(objects.get("KeyCount", 0), 0)
 
 
 if __name__ == "__main__":

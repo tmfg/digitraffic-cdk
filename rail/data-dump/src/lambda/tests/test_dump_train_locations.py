@@ -9,6 +9,7 @@ from datetime import date, timedelta
 from unittest.mock import MagicMock, patch
 
 import boto3
+import requests
 import requests_mock as rm
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from moto import mock_aws
@@ -91,17 +92,13 @@ class TestDumpTrainLocations(unittest.TestCase):
                     self.assertEqual(data[0], MOCK_LOCATIONS_101[0])
                     self.assertEqual(data[1], MOCK_LOCATIONS_102[0])
 
-    def test_handles_failed_location_fetch_gracefully(self):
+    def test_fails_on_location_fetch_error(self):
         """
         Given: Today is 2026-03-15 (processing date is 2026-03-13),
                mock trains API returns 2 trains,
-               mock locations API returns 404 for train 101,
-               mock locations API returns 1 location for train 102,
-               and S3 bucket exists
+               mock locations API returns 404 for train 101
         When:  lambda_handler is invoked
-        Then:  Lambda completes successfully (status 200),
-               zip contains 'train-locations-2026-03-13.json',
-               and JSON file contains array with exactly 1 location object (only train 102)
+        Then:  Lambda raises HTTPError (we don't want incomplete data in dumps)
         """
         # Given
         context = MagicMock(spec=LambdaContext)
@@ -124,28 +121,13 @@ class TestDumpTrainLocations(unittest.TestCase):
                     mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
 
                     with patch.dict(os.environ, {"DUMP_BUCKET_NAME": BUCKET_NAME}):
-                        # When
-                        result = dump_train_locations.lambda_handler({}, context)
+                        # When / Then
+                        with self.assertRaises(requests.HTTPError):
+                            dump_train_locations.lambda_handler({}, context)
 
-            self.assertEqual(result["statusCode"], 200)
-
+            # Verify nothing was uploaded to S3
             objects = s3.list_objects_v2(Bucket=BUCKET_NAME)
-            self.assertEqual(objects["KeyCount"], 1)
-
-            key = objects["Contents"][0]["Key"]
-            response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
-            zip_bytes = response["Body"].read()
-
-            with zipfile.ZipFile(io.BytesIO(zip_bytes), "r") as zf:
-                filenames = zf.namelist()
-                self.assertEqual(len(filenames), 1)
-                self.assertEqual(filenames[0], "train-locations-2026-03-13.json")
-
-                with zf.open(filenames[0]) as f:
-                    data = json.load(f)
-                    self.assertIsInstance(data, list)
-                    self.assertEqual(len(data), 1)
-                    self.assertEqual(data[0], MOCK_LOCATIONS_102[0])
+            self.assertEqual(objects.get("KeyCount", 0), 0)
 
 
 if __name__ == "__main__":

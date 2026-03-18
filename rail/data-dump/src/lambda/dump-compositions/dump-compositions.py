@@ -24,8 +24,7 @@ def lambda_handler(event, context):
     logger.info('Composition archiving complete')
 
     return {
-        'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!2')
+        'statusCode': 200
     }
 
 def uploadToS3(zipPath):
@@ -64,6 +63,7 @@ def createZipFile():
             logger.info('Fetching compositions', url=url, file_name=filename)
 
             compositions = requests.get(url, headers=HEADERS)
+            compositions.raise_for_status()
             logger.info('Compositions response', status=compositions.status_code, length=len(compositions.content), date=str(start_date))
 
             zipped_f.writestr(filename, json.dumps(compositions.json()))

@@ -25,8 +25,7 @@ def lambda_handler(event, context):
     logger.info('GPS archiving complete')
 
     return {
-        'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'statusCode': 200
     }
 
 def getTrainNumbers(departureDate):
@@ -57,16 +56,14 @@ def writeTrainLocationsToFile(departureDate):
             if (i + 1) % 50 == 0 or i == 0:
                 logger.info('Fetching train locations', progress=i + 1, total=total, records_so_far=recordCount)
             trainRequest = requests.get(f'https://rata.digitraffic.fi/api/v1/train-locations/{departureDate}/{trainNumber}', headers=HEADERS)
-            if trainRequest.ok and trainRequest.text:
-                locations = trainRequest.json()
-                for loc in locations:
-                    if not first:
-                        f.write(',')
-                    json.dump(loc, f)
-                    first = False
-                    recordCount += 1
-            else:
-                logger.warning('Train location fetch failed', train_number=trainNumber, status=trainRequest.status_code, body=trainRequest.text[:100] if trainRequest.text else 'empty')
+            trainRequest.raise_for_status()
+            locations = trainRequest.json()
+            for loc in locations:
+                if not first:
+                    f.write(',')
+                json.dump(loc, f)
+                first = False
+                recordCount += 1
         f.write(']')
 
     logger.info('Wrote location records', count=recordCount, file_path=filePath)
