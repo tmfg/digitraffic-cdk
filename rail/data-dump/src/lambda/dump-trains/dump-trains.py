@@ -12,14 +12,37 @@ logger = Logger(service="data-dump-trains")
 
 HEADERS = {'Digitraffic-User': 'internal-digitraffic-data-dump'}
 
+def get_month_range(year: int, month: int) -> tuple[datetime.date, datetime.date]:
+    """Return (first_day_of_month, first_day_of_next_month)."""
+    start_date = datetime.date(year, month, 1)
+    # Calculate first day of next month
+    if month == 12:
+        end_date = datetime.date(year + 1, 1, 1)
+    else:
+        end_date = datetime.date(year, month + 1, 1)
+    return start_date, end_date
+
 @logger.inject_lambda_context
 def lambda_handler(event, context):
     logger.info('Cleaning tmp')
     shutil.rmtree('/tmp', ignore_errors=True)
     os.makedirs('/tmp', exist_ok=True)
 
-    zipPath = createZipFile()
-    uploadToS3(zipPath)
+    # Allow manual override via event: {"month": "2026-02"}
+    if event and 'month' in event:
+        year, month = map(int, event['month'].split('-'))
+        start_date, end_date = get_month_range(year, month)
+        logger.info('Using month from event (manual run)', month=event['month'])
+    else:
+        # Default: previous month
+        today = datetime.date.today()
+        first_of_this_month = today.replace(day=1)
+        last_month = (first_of_this_month - datetime.timedelta(days=1))
+        start_date, end_date = get_month_range(last_month.year, last_month.month)
+        logger.info('Using default month (previous month)', month=f"{start_date.year}-{start_date.month:02d}")
+
+    zipPath = createZipFile(start_date, end_date)
+    uploadToS3(zipPath, start_date)
 
     logger.info('Train archiving complete')
 
@@ -27,29 +50,18 @@ def lambda_handler(event, context):
         'statusCode': 200
     }
 
-def uploadToS3(zipPath):
-    delta = datetime.timedelta(days=1)
-    today = datetime.date.today()
-    first = today.replace(day=1)
-    lastMonth = (first - delta).replace(day=1)
-    s3_filename = f'digitraffic-rata-trains-{lastMonth}.zip'
-    s3_localFileName = zipPath
+def uploadToS3(zipPath, month_start: datetime.date):
+    s3_filename = f'digitraffic-rata-trains-{month_start}.zip'
 
     logger.info('Uploading to S3', s3_file_name=s3_filename)
     s3 = boto3.client('s3')
     bucket_name = os.environ['DUMP_BUCKET_NAME']
-    s3.upload_file(s3_localFileName, bucket_name, s3_filename)
+    s3.upload_file(zipPath, bucket_name, s3_filename)
 
-def createZipFile():
+def createZipFile(start_date: datetime.date, end_date: datetime.date):
     delta = datetime.timedelta(days=1)
-    today = datetime.date.today()
-    first = today.replace(day=1)
-    lastMonth = (first - delta).replace(day=1)
 
-    start_date = lastMonth
-    end_date = first
-
-    zipPath = f'/tmp/digitraffic-rata-trains-{first}.zip'
+    zipPath = f'/tmp/digitraffic-rata-trains-{start_date}.zip'
 
     logger.info('Starting train archiving', start_date=str(start_date), end_date=str(end_date))
 

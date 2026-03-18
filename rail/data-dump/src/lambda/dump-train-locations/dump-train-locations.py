@@ -17,8 +17,13 @@ def lambda_handler(event, context):
     shutil.rmtree('/tmp', ignore_errors=True)
     os.makedirs('/tmp', exist_ok=True)
 
-    dateToProcess = date.today() -  timedelta(2)
-    logger.info('Starting GPS archiving', date=str(dateToProcess))
+    # Allow manual override via event: {"date": "2026-03-15"}
+    if event and 'date' in event:
+        dateToProcess = date.fromisoformat(event['date'])
+        logger.info('Using date from event (manual run)', date=str(dateToProcess))
+    else:
+        dateToProcess = date.today() - timedelta(2)
+        logger.info('Using default date (2 days ago)', date=str(dateToProcess))
 
     writeTrainLocationsToFile(dateToProcess)
 
