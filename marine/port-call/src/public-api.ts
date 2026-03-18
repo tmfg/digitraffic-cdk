@@ -90,14 +90,14 @@ export class PublicApi {
       visitResource,
       DocumentationPart.queryParameter(
         "fromDateTime",
-        "Limit visit timestamp (updateTime), inclusive. ISO 8601 datetime.",
+        "Return visits where any timestamp (ETA, ETD, ATA or ATD) is on or after this value. Inclusive. ISO 8601 datetime.",
       ),
     );
     this.publicApi.documentResource(
       visitResource,
       DocumentationPart.queryParameter(
         "toDateTime",
-        "Limit visit timestamp (updateTime), exclusive. ISO 8601 datetime.",
+        "Return visits where any timestamp (ETA, ETD, ATA or ATD) is before this value. Exclusive. ISO 8601 datetime.",
       ),
     );
     this.publicApi.documentResource(
