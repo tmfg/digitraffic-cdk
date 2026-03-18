@@ -11,6 +11,9 @@ WORK_DIR="$(mktemp -d)"
 
 trap 'rm -rf "$WORK_DIR"' EXIT
 
+echo "Installing Poetry dependencies (ensures export plugin is available)..."
+poetry install --directory="$SCRIPT_DIR" --quiet
+
 echo "Exporting dependencies from Poetry..."
 poetry export --only=main --without-hashes -f requirements.txt -o "$WORK_DIR/requirements.txt" --directory="$SCRIPT_DIR"
 
