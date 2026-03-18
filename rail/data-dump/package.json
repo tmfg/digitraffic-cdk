@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bash build-layer.sh && heft build --clean",
+    "build": "pnpm run build:layer && heft build --clean",
     "build:layer": "bash build-layer.sh",
     "cdk": "cdk",
+    "ci:prepare": "poetry install",
+    "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml && pnpm run test:python",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "test": "vitest run",
+    "test:python": "poetry run python run_tests.py",
     "watch": "tsc -w"
   },
   "dependencies": {

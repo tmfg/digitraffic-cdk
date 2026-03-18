@@ -18,9 +18,6 @@
 !/src/**/*.py
 /src/bin
 
-!/layers/
-!/layers/requirements.txt
-
 !/pyproject.toml
 !/poetry.lock
 !/run_tests.py
