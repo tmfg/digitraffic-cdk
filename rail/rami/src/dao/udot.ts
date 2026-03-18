@@ -35,6 +35,7 @@ and model_updated_time is null
 `;
 
 export interface UdotUpsertValues {
+  readonly [key: string]: string | number | boolean;
   readonly trainNumber: number;
   readonly trainDepartureDate: string;
   readonly attapId: number;

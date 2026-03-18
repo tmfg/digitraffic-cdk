@@ -132,6 +132,20 @@
       "shellCommand": "zx common/scripts/unify-deps.mjs"
     },
     {
+      "name": "repo:update-deps-mature",
+      "commandKind": "global",
+      "summary": "Updates dependencies to the newest stable versions that satisfy the cooldown policy",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "SKIP_RUSH_UPDATE=1 bash ./update-deps.sh"
+    },
+    {
+      "name": "repo:update-cdk-mature",
+      "commandKind": "global",
+      "summary": "Updates CDK dependencies to the newest stable versions that satisfy the cooldown policy",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "SKIP_RUSH_UPDATE=1 bash ./update-cdk.sh"
+    },
+    {
       "name": "common-subtree",
       "commandKind": "global",
       "summary": "Pull common subtree changes from some branch",

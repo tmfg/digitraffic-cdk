@@ -60,11 +60,19 @@ cdk bootstrap aws://<accountnum>/us-east-1
 And diff / deploy
 
 ```
+../../scripts/cdk-diff-and-deploy.sh road-test diff MonitoringRoadTest
 ../../scripts/cdk-diff-and-deploy.sh <project>-<test|pro> <diff|deploy> <StackName>
 
 i.e.
 ../../scripts/cdk-diff-and-deploy.sh afir-test diff MonitoringAfirTest
 ../../scripts/cdk-diff-and-deploy.sh afir-test deploy MonitoringAfirTest
+```
+
+Or use created scripts in [package.json](./package.json)
+
+```
+rushx cdk-diff-road-test
+rushx cdk-deploy-road-test
 ```
 
 Topics created by the stack can be found from AWS console at Amazon SNS Topics

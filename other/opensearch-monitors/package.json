@@ -22,25 +22,25 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-browser": "5.2.0",
-    "@aws-sdk/client-sts": "3.995.0",
-    "@aws-sdk/types": "3.973.1",
+    "@aws-sdk/client-sts": "3.1004.0",
+    "@aws-sdk/types": "3.973.5",
     "@digitraffic/common": "2026.3.5-1",
-    "@smithy/node-http-handler": "4.4.8",
-    "@smithy/protocol-http": "5.3.8",
-    "@smithy/signature-v4": "5.3.8",
-    "aws-cdk-lib": "2.240.0",
-    "constructs": "10.4.5"
+    "@smithy/node-http-handler": "4.4.14",
+    "@smithy/protocol-http": "5.3.11",
+    "@smithy/signature-v4": "5.3.11",
+    "aws-cdk-lib": "2.241.0",
+    "constructs": "10.5.1"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.1.10",
-    "@types/node": "24.10.13",
+    "@rushstack/heft": "1.2.6",
+    "@types/node": "25.3.5",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1107.0",
-    "esbuild": "0.27.2",
+    "aws-cdk": "3.0.0",
+    "esbuild": "0.27.3",
     "typescript": "5.9.3",
     "vitest": "4.0.18"
   }

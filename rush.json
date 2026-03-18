@@ -16,8 +16,8 @@
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
   "nodeSupportedVersionRange": ">=24.0.0 <25.0.0",
-  "rushVersion": "5.166.0",
-  "pnpmVersion": "10.30.1",
+  "rushVersion": "5.169.3",
+  "pnpmVersion": "10.30.3",
   "ensureConsistentVersions": false,
   "repository": {
     "url": "https://github.com/tmfg/digitraffic-cdk",

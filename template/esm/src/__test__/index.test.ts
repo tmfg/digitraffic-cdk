@@ -1,5 +1,4 @@
-// Uncomment to use jest with tests
-// import jest from "@jest/globals";
+import { describe, expect, it } from "vitest";
 
 describe("index", () => {
   it("should pass", () => {

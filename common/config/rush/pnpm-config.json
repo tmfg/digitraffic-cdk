@@ -103,7 +103,9 @@
     // Fix ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6)
     "ajv@>=7.0.0-alpha.0 <8.18.0": "8.18.0",
     // Fix fast-xml-parser stack overflow (GHSA-fj3w-jwp8-x2g3)
-    "fast-xml-parser@<5.3.8": "5.3.8"
+    "fast-xml-parser@<5.3.8": "5.3.8",
+    // Fix undici vulnerabilities (GHSA-f269-vfmq-vjvj, GHSA-vrm6-8vpv-qv8q, GHSA-v9p9-hfj2-hcw8)
+    "undici@>=7.0.0 <7.24.0": "7.24.1"
   },
 
   /**

@@ -13,8 +13,8 @@
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",
     "compile-lambdas": "node lib/esbuild.js",
     "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node22,es2022",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean && npm run build:bundle",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' heft test-watch --clean"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@digitraffic/common": "workspace:*"
@@ -24,10 +24,12 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.1.10",
-    "@types/node": "24.10.13",
-    "aws-cdk": "2.1107.0",
-    "esbuild": "0.27.2",
-    "typescript": "5.9.3"
+    "@rushstack/heft": "1.2.6",
+    "@types/node": "25.3.5",
+    "@vitest/coverage-v8": "4.0.18",
+    "aws-cdk": "3.0.0",
+    "esbuild": "0.27.3",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }
