@@ -18,7 +18,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.3.5-1",
+    "@digitraffic/common": "2026.3.17-2",
     "aws-cdk-lib": "2.241.0",
     "constructs": "10.5.1",
     "date-fns": "4.1.0",
@@ -44,7 +44,7 @@
     "@types/source-map-support": "0.5.10",
     "@types/xml2js": "0.4.14",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "3.0.0",
+    "aws-cdk": "2.1111.0",
     "esbuild": "0.27.3",
     "parallelshell": "3.0.2",
     "typescript": "5.9.3",

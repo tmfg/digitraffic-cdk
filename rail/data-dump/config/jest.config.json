@@ -1,0 +1,3 @@
+{
+  "extends": "@digitraffic-cdk/cdk-rig/profiles/cdk/config/jest.config.json"
+}

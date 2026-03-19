@@ -191,6 +191,12 @@
     },
     // rail
     {
+      "packageName": "data-dump",
+      "projectFolder": "rail/data-dump",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "rail"]
+    },
+    {
       "packageName": "rail-infra",
       "projectFolder": "rail/rail-infra",
       "decoupledLocalDependencies": ["@digitraffic/common"],

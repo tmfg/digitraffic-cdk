@@ -5,6 +5,7 @@ import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import type { ISecurityGroup, IVpc } from "aws-cdk-lib/aws-ec2";
 import type { IRole } from "aws-cdk-lib/aws-iam";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import type { ILayerVersion } from "aws-cdk-lib/aws-lambda";
 import {
   ApplicationLogLevel,
   Architecture,
@@ -51,6 +52,7 @@ export class FunctionBuilder {
   private code: Code = Code.fromInline("placeholder");
   private handler: string = "";
 
+  private readonly layers: ILayerVersion[] = [];
   private readonly securityGroups: ISecurityGroup[] = [];
   private readonly policyStatements: PolicyStatement[] = [];
   private readonly allowedActions: string[] = [];
@@ -190,6 +192,15 @@ export class FunctionBuilder {
   }
 
   /**
+   * Add Lambda layers.
+   */
+  public withLayers(...layers: ILayerVersion[]): this {
+    this.layers.push(...layers);
+
+    return this;
+  }
+
+  /**
    * Set architecture for the lambda.  Default is Architecture.ARM_64.
    */
   public withArchitecture(architecture: Architecture): this {
@@ -308,6 +319,7 @@ export class FunctionBuilder {
       securityGroups,
       environment: this.getEnvironment(),
       description: this.description,
+      layers: this.layers.length > 0 ? this.layers : undefined,
     });
 
     if (this._features.secretAccess) {

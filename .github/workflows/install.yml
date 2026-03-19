@@ -48,6 +48,7 @@ on:
           - "maintenance-tracking"
           - "maintenance-tracking-municipality"
           - "variable-signs"
+          - "data-dump"
           - "rami"
           - "yearly-plans"
 
