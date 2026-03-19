@@ -590,8 +590,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -4365,6 +4365,11 @@ packages:
       - table
       - yaml
       - mime-types
+
+  aws-cdk@2.1111.0:
+    resolution: {integrity: sha512-69AVF04cxbAhYzmeJYtUF5bs6ruNnH05EQZJfjadk5Lpg+HVaJY2NjG/2qgsMmKrfRgvLet73Ir8ehVlAaaGng==}
+    engines: {node: '>= 18.0.0'}
+    hasBin: true
 
   aws-cdk@3.0.0:
     resolution: {integrity: sha512-VBc2jv0In++hzlRwvCDf5VdodTivKE1GsNggudKEAfVCTx0r73vpbY245ktWGJf5yXVl3d2wjfEZv8TRW+i9eQ==}
@@ -9740,6 +9745,8 @@ snapshots:
       '@aws-cdk/asset-node-proxy-agent-v6': 2.1.1
       '@aws-cdk/cloud-assembly-schema': 52.2.0
       constructs: 10.5.1
+
+  aws-cdk@2.1111.0: {}
 
   aws-cdk@3.0.0:
     optionalDependencies:
