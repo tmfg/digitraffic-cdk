@@ -65,7 +65,7 @@ export class PublicApi {
         BRIDGE_LOCK_DISRUPTION_TAGS_V1,
         "getDisruptions",
         "Return all waterway traffic disruptions",
-      ),
+      ).deprecated("Will be removed 2026-04-20"),
     );
   }
 
