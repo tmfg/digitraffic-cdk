@@ -118,8 +118,13 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
   name: "find-all-visits",
   text: `select visit_id, vessel_id, vessel_name, port_locode, eta, etd, ata, atd, status, update_time 
     from pc2_visit
-    where ($1::timestamptz is null or update_time >= $1::timestamptz)
-    and ($2::timestamptz is null or update_time < $2::timestamptz)
+    where (
+      ($1::timestamptz is null and $2::timestamptz is null)
+      or (eta is not null and ($1::timestamptz is null or eta >= $1) and ($2::timestamptz is null or eta < $2))
+      or (etd is not null and ($1::timestamptz is null or etd >= $1) and ($2::timestamptz is null or etd < $2))
+      or (ata is not null and ($1::timestamptz is null or ata >= $1) and ($2::timestamptz is null or ata < $2))
+      or (atd is not null and ($1::timestamptz is null or atd >= $1) and ($2::timestamptz is null or atd < $2))
+    )
     and ($3::text is null or port_locode = $3)
     and ($4::text is null or vessel_name ILIKE '%' || $4 || '%')
     and ($5::text is null or vessel_id = $5::text)
