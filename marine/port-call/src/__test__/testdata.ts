@@ -8,7 +8,9 @@ export interface TestVisitOptions {
   readonly identification?: string;
   readonly status?: VisitStatus;
   readonly eta?: Date;
+  readonly etd?: Date | null;
   readonly ata?: Date | null;
+  readonly atd?: Date | null;
 }
 
 export function createTestVisit(
@@ -26,6 +28,8 @@ export function createTestVisit(
     status,
     new Date(),
     null,
+    null,
+    null,
   );
 }
 
@@ -37,7 +41,9 @@ export function createTestVisitWith(options: TestVisitOptions): NemoVisit {
     options.identification ?? "TESTI",
     options.status ?? "Expected to Arrive",
     options.eta ?? new Date(),
+    options.etd ?? null,
     options.ata ?? null,
+    options.atd ?? null,
   );
 }
 
@@ -48,7 +54,9 @@ function buildVisit(
   identification: string,
   status: VisitStatus,
   eta: Date,
+  etd: Date | null,
   ata: Date | null,
+  atd: Date | null,
 ): NemoVisit {
   return {
     visitId,
@@ -61,13 +69,13 @@ function buildVisit(
       voyageInformation: {
         portIdentification,
         estimatedArrivalDateTime: eta,
-        estimatedDepartureDateTime: new Date(),
+        estimatedDepartureDateTime: etd,
       },
       arrivalNotification: {
         actualArrivalDateTime: ata,
       },
       departureNotification: {
-        actualDepartureDateTime: null,
+        actualDepartureDateTime: atd,
       },
       portCallStatus: {
         status,

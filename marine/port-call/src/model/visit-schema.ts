@@ -51,8 +51,8 @@ export interface VisitSort {
 export const visitResponseSchema = z
   .object({
     visitId: z.string().max(35),
-    vesselId: z.string().min(7).max(7).describe("IMO-number"),
-    vesselName: z.string().max(70).describe("Vessel name"),
+    vesselId: z.string().min(7).max(7).describe("IMO-number").optional(),
+    vesselName: z.string().max(70).describe("Vessel name").optional(),
     portOfCall: z.string().min(5).max(5).describe("Port locode of visit"),
     eta: z.iso.datetime().describe("Estimated time of arrival"),
     etd: z.iso.datetime().describe("Estimated time of departure").optional(),
