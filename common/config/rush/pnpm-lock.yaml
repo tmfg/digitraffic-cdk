@@ -283,8 +283,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -377,8 +377,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -438,8 +438,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -517,8 +517,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -708,8 +708,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -772,8 +772,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -851,8 +851,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -909,8 +909,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -976,8 +976,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       date-fns:
         specifier: 4.1.0
         version: 4.1.0
@@ -1028,8 +1028,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1101,8 +1101,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1162,8 +1162,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       cdk-ecr-deployment:
         specifier: 4.1.2
         version: 4.1.2(aws-cdk-lib@2.241.0(constructs@10.5.1))(constructs@10.5.1)
@@ -1214,8 +1214,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1284,8 +1284,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1369,8 +1369,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       dotenv:
         specifier: 17.3.1
         version: 17.3.1
@@ -1430,8 +1430,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1506,8 +1506,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1576,8 +1576,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1628,8 +1628,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1689,8 +1689,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1741,8 +1741,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1832,8 +1832,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1902,8 +1902,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -1984,8 +1984,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -2069,8 +2069,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -2136,8 +2136,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -2215,8 +2215,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -2294,8 +2294,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -2361,8 +2361,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -2407,8 +2407,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@25.3.5)(terser@5.46.0))
       aws-cdk:
-        specifier: 3.0.0
-        version: 3.0.0
+        specifier: 2.1111.0
+        version: 2.1111.0
       esbuild:
         specifier: 0.27.3
         version: 0.27.3
@@ -4734,12 +4734,6 @@ packages:
     engines: {node: '>= 18.0.0'}
     hasBin: true
 
-  aws-cdk@3.0.0:
-    resolution: {integrity: sha512-VBc2jv0In++hzlRwvCDf5VdodTivKE1GsNggudKEAfVCTx0r73vpbY245ktWGJf5yXVl3d2wjfEZv8TRW+i9eQ==}
-    engines: {node: '>= 14.15.0'}
-    deprecated: This version was published accidentally. Please use 2.x.x instead.
-    hasBin: true
-
   aws-ssl-profiles@1.1.2:
     resolution: {integrity: sha512-NZKeq9AfyQvEeNlN0zSYAaWrmBffJh3IELMZfRpJVWgrpEbtEpnjvzqBPf+mxoI287JohRDoa+/nsfqqiZmF6g==}
     engines: {node: '>= 6.0.0'}
@@ -5369,11 +5363,6 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
-
-  fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -11106,10 +11095,6 @@ snapshots:
 
   aws-cdk@2.1111.0: {}
 
-  aws-cdk@3.0.0:
-    optionalDependencies:
-      fsevents: 2.3.2
-
   aws-ssl-profiles@1.1.2: {}
 
   b4a@1.8.0: {}
@@ -11755,9 +11740,6 @@ snapshots:
       universalify: 2.0.1
 
   fs.realpath@1.0.0: {}
-
-  fsevents@2.3.2:
-    optional: true
 
   fsevents@2.3.3:
     optional: true

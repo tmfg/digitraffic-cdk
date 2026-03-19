@@ -29,7 +29,7 @@
     "@types/aws-lambda": "8.10.161",
     "@types/node": "25.3.5",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "3.0.0",
+    "aws-cdk": "2.1111.0",
     "cdk-ecr-deployment": "4.1.2",
     "esbuild": "0.27.3",
     "typescript": "5.9.3",

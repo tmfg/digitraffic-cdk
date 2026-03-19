@@ -40,7 +40,7 @@
     "@types/node": "25.3.5",
     "@types/xml2js": "0.4.14",
     "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "3.0.0",
+    "aws-cdk": "2.1111.0",
     "esbuild": "0.27.3",
     "parallelshell": "3.0.2",
     "spex": "4.1.0",
