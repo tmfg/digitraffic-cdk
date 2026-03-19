@@ -12,13 +12,43 @@ COOLDOWN_DAYS=${COOLDOWN_DAYS:-7}
 # is outside the cooldown window.
 TARGET=${TARGET:-greatest}
 
-# Optional package filter as first positional argument.
-# Examples:
-#   ./update-deps.sh '/^vitest$/'
-#   ./update-deps.sh '/^@aws-sdk\//'
+echo "Optional package filter as first positional argument (regex or exact name)."
+echo "Examples:"
+echo "  ./update-deps.sh                       # update all packages"
+echo "  ./update-deps.sh 'vitest'              # exact package name"
+echo "  ./update-deps.sh '/^vitest$/'          # exact match via anchored regex"
+echo "  ./update-deps.sh '/^@aws-sdk\//'       # all @aws-sdk/* scoped packages"
+echo "  ./update-deps.sh '/^aws-cdk-lib$/'     # exact match for aws-cdk-lib"
+echo "  ./update-deps.sh '/^(vitest|esbuild)$/' # multiple specific packages"
 PACKAGE_FILTER=${1:-"/.*/"}
 SKIP_RUSH_UPDATE=${SKIP_RUSH_UPDATE:-0}
 
+echo ""
+echo "  cooldown : ${COOLDOWN_DAYS} days"
+echo "  target   : ${TARGET}"
+echo "  filter   : ${PACKAGE_FILTER}"
+echo ""
+while true; do
+  read -r -p "Continue with these settings? [y]es / [n]o / [f]ilter <pattern>: " answer
+  case "$answer" in
+    y|Y|yes)
+      break
+      ;;
+    n|N|no)
+      echo "Aborted."
+      exit 0
+      ;;
+    f\ *|F\ *)
+      PACKAGE_FILTER="${answer#* }"
+      echo "  filter   : ${PACKAGE_FILTER}"
+      ;;
+    *)
+      echo "  Please answer y, n, or f <pattern>"
+      ;;
+  esac
+done
+
+echo ""
 echo "Updating dependencies with cooldown=${COOLDOWN_DAYS}d target=${TARGET} filter=${PACKAGE_FILTER}"
 
 for dir in other road marine aviation rail tools template; do
@@ -31,8 +61,19 @@ for dir in other road marine aviation rail tools template; do
           --target "$TARGET" \
           --cooldown "${COOLDOWN_DAYS}d" \
           --pre false \
-          --reject '/^@digitraffic-cdk\//' \
-          -u
+          --reject '/^@digitraffic-cdk\/|^aws-cdk$/' \
+          -u &&
+        # aws-cdk is updated separately with --target minor to avoid accidentally
+        # published versions (e.g. 3.0.0) being picked up by --target greatest.
+        # Only runs when aws-cdk matches the user-supplied PACKAGE_FILTER.
+        if echo "aws-cdk" | grep -qE "${PACKAGE_FILTER//\//}"; then
+          npx --yes npm-check-updates@19.6.3 \
+            --filter '/^aws-cdk$/' \
+            --target minor \
+            --cooldown "${COOLDOWN_DAYS}d" \
+            --pre false \
+            -u
+        fi
     )
   done
 done
@@ -42,6 +83,9 @@ if [[ "$SKIP_RUSH_UPDATE" == "1" ]]; then
   echo "Skipping 'rush update --full' because this script is running from a Rush command."
   echo "Run this next from shell: rush update --full"
   echo "Then run: rush update-autoinstaller --name rush-command-line-tools"
+  echo "And finally: rush install"
 else
   rush update --full
+  rush update-autoinstaller --name rush-command-line-tools
+  rush install
 fi
