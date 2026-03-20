@@ -163,6 +163,14 @@ jobs:
         with:
           version: 10
 
+      - name: Install Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        run: pipx install poetry==2.3.2
+
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
 
