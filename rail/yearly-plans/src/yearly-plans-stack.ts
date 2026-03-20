@@ -11,6 +11,7 @@ export interface YearlyPlansConfiguration extends StackConfiguration {
   readonly projectPlansBucketName: string;
   readonly cloudFrontArn: string;
   readonly yearlyPlansBucketCorsRules: CorsRule[];
+  readonly projectPlansBucketCorsRules: CorsRule[];
 }
 
 export class YearlyPlansStack extends DigitrafficStack {
@@ -27,6 +28,7 @@ export class YearlyPlansStack extends DigitrafficStack {
     );
     const projectPlansBucket = this.createS3Bucket(
       configuration.projectPlansBucketName,
+      configuration.projectPlansBucketCorsRules,
     );
 
     InternalLambdas.create(this, yearlyPlansBucket, projectPlansBucket);
