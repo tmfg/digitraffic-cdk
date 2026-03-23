@@ -280,7 +280,7 @@ export class PrivateApi {
         },
         methodResponses: [
           //                    DigitrafficMethodResponse.response200(Model.EMPTY_MODEL, MediaType.IMAGE_JPEG),
-          // eslint-disable-next-line deprecation/deprecation
+
           methodResponse("200", MediaType.IMAGE_JPEG, Model.EMPTY_MODEL, {
             "method.response.header.Access-Control-Allow-Origin": true,
             "method.response.header.Timestamp": true,
@@ -350,7 +350,6 @@ export class PrivateApi {
         "method.request.path.folderName": true,
       },
       methodResponses: [
-        // eslint-disable-next-line deprecation/deprecation
         methodResponse("200", MediaType.IMAGE_JPEG, Model.EMPTY_MODEL, {
           "method.response.header.Access-Control-Allow-Origin": true,
           "method.response.header.Timestamp": true,

@@ -1,7 +1,7 @@
 name: CI
 on: [push, workflow_dispatch]
 
-jobs:  
+jobs:
   db-tests:
     if: github.repository != 'tmfg/digitraffic-cdk'
     strategy:
@@ -27,7 +27,7 @@ jobs:
       - name: Install Python 3.12
         uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - name: Install Poetry
         run: pipx install poetry==2.3.2
       - name: Cache pnpm store cache
@@ -41,9 +41,11 @@ jobs:
         run: docker compose rm db && docker compose up -d
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
+      - name: Update autoinstaller
+        run: node common/scripts/install-run-rush.js update-autoinstaller --name rush-command-line-tools
       - name: Rush rebuild ${{ matrix.domain }}
         run: node common/scripts/install-run-rush.js rebuild --verbose --to tag:${{ matrix.domain }}
-      - name: Prepare ${{ matrix.domain }} 
+      - name: Prepare ${{ matrix.domain }}
         run: node common/scripts/install-run-rush.js ci:prepare --verbose --to tag:${{ matrix.domain }}
       - name: Run tests ${{ matrix.domain }}
         run: node common/scripts/install-run-rush.js ci:test --verbose --to tag:${{ matrix.domain }}
@@ -56,7 +58,7 @@ jobs:
         with:
           name: Test report for ${{ matrix.domain }}
           reporter: jest-junit
-          path: '${{ matrix.domain }}/**/test-results.xml'
+          path: "${{ matrix.domain }}/**/test-results.xml"
           max-annotations: 50
           list-suites: failed
           badge-title: ${{ matrix.domain }}
@@ -85,7 +87,7 @@ jobs:
       - name: Checkout cdk repo
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2      
+          fetch-depth: 2
       - name: Install Node 24
         uses: actions/setup-node@v6
         with:
@@ -95,12 +97,14 @@ jobs:
         with:
           key: ${{ runner.os }}-rush-pnpm-store-${{ hashFiles('common/config/rush/repo-state.json') }}
           path: |
-            common/temp/pnpm-store     
+            common/temp/pnpm-store
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
+      - name: Update autoinstaller
+        run: node common/scripts/install-run-rush.js update-autoinstaller --name rush-command-line-tools
       - name: Rush rebuild ${{ matrix.domain }}
         run: node common/scripts/install-run-rush.js rebuild --verbose --to tag:${{ matrix.domain }}
-      - name: Prepare ${{ matrix.domain }} 
+      - name: Prepare ${{ matrix.domain }}
         run: node common/scripts/install-run-rush.js ci:prepare --verbose --to tag:${{ matrix.domain }}
       - name: Run tests ${{ matrix.domain }}
         run: node common/scripts/install-run-rush.js ci:test --verbose --to tag:${{ matrix.domain }}
@@ -110,7 +114,7 @@ jobs:
         with:
           name: Test report for ${{ matrix.domain }}
           reporter: jest-junit
-          path: '${{ matrix.domain }}/**/test-results.xml'
+          path: "${{ matrix.domain }}/**/test-results.xml"
           max-annotations: 50
           list-suites: failed
           badge-title: ${{ matrix.domain }}

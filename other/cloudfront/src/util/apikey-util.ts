@@ -17,8 +17,10 @@ const apiGateway = new APIGateway({
 async function getParameterValue(name: string): Promise<string> {
   const response = await ssm.getParameter({ Name: name });
 
-  // biome-ignore lint/style/noNonNullAssertion: it should be set
-  return response.Parameter?.Value!;
+  if (!response.Parameter?.Value) {
+    throw new Error(`Parameter ${name} not found or has no value`);
+  }
+  return response.Parameter.Value;
 }
 
 export async function readApiKey(shortName: string): Promise<EndpointMetadata> {

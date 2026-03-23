@@ -225,6 +225,7 @@ export class CFDomain extends CFOrigin {
     return domain;
   }
 
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: Might be used in the future
   private addHeader(name: string, value: string): this {
     this.headers[name] = value;
 

@@ -1,3 +1,4 @@
+import queryStringHelper from "node:querystring";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import * as Utils from "@digitraffic/common/dist/utils/utils";
 import type {
@@ -5,7 +6,6 @@ import type {
   CloudFrontResponseEvent,
   CloudFrontResponseHandler,
 } from "aws-lambda";
-import queryStringHelper from "querystring";
 import { createAndLogError } from "./header-util.js";
 
 export const HEADERS = {
@@ -85,13 +85,12 @@ function createFilename(
     "body" | "headers" | "method" | "origin" | "clientIp"
   >,
 ): string {
-  // eslint-disable-next-line dot-notation
-  const type = request["uri"].substring(1); // ie. uri=/liikennemaara
-  // eslint-disable-next-line dot-notation
+  const type = request.uri.substring(1); // ie. uri=/liikennemaara
+  // biome-ignore lint/complexity/useLiteralKeys: Index signature properties must use bracket notation
   const params = queryStringHelper.parse(request["querystring"]); // ie. tyyppi=h&pvm=2023-03-01&loppu=&lam_type=option1&piste=1
-  // eslint-disable-next-line dot-notation
+  // biome-ignore lint/complexity/useLiteralKeys: Index signature properties must use bracket notation
   const subType = typeof params["tyyppi"] === "string" ? params["tyyppi"] : ""; // ie. v (vuosi), h (tunti), vrk (vuorokausi), ...
-  // eslint-disable-next-line dot-notation
+  // biome-ignore lint/complexity/useLiteralKeys: Index signature properties must use bracket notation
   const dateOrWeek = getDateOrWeek(params["pvm"], params["viikko"]); // One of these should always exist
   return `${type}_${subType}_${dateOrWeek}.csv`;
 }

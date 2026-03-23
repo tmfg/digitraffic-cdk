@@ -26,6 +26,7 @@
       "!rail/**/lib",
       "!road/**/lib",
       "!other/**/lib",
+      "!tools/**/lib",
       // Exclude projects sbom.json
       "!aviation/**/sbom.json",
       "!marine/**/sbom.json",

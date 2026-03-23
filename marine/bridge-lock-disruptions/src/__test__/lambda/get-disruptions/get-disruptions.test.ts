@@ -1,4 +1,4 @@
-// biome-ignore lint/complexity/useLiteralKeys: nope
+// biome-ignore lint/complexity/useLiteralKeys: Indexed access
 process.env["SECRET_ID"] = "Test";
 
 import { describe, expect, test, vi } from "vitest";

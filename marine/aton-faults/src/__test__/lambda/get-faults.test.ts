@@ -31,7 +31,7 @@ vi.mock("../../service/faults.js", () => ({
   }),
 }));
 
-// biome-ignore lint/complexity/useLiteralKeys: nope
+// biome-ignore lint/complexity/useLiteralKeys: Indexed access
 process.env["SECRET_ID"] = "";
 
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";

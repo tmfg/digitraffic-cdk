@@ -49,7 +49,7 @@ export const handler: CloudFrontRequestHandler = async (event) => {
         },
       };
 
-      // eslint-disable-next-line dot-notation
+      // biome-ignore lint/complexity/useLiteralKeys: Index signature properties must use bracket notation
       request.headers["host"] = hostHeader;
     }
 

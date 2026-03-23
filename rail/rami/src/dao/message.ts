@@ -1,4 +1,3 @@
-/* eslint-disable @rushstack/no-new-null */
 import {
   dateToUTCString,
   MYSQL_DATETIME_FORMAT,

@@ -47,7 +47,6 @@ describe("filtering-service-tests", () => {
     ${"filter middle"}   | ${"VME/TIO01K502"} | ${2}     | ${false}
     ${"filter wrong id"} | ${"wrong"}         | ${2}     | ${true}
   `("isProductionMessage - $name", ({ id, interval, success }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const value = isProductionMessage(createTestXml(id, interval));
 
     if (success) {

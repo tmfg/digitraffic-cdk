@@ -87,7 +87,6 @@ const psUpdateLatestSite = new PreparedStatement({
 export function updateLatestSiteToFalse(
   db: DTTransaction,
   siteNumber: number,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<null> {
   return db.none(psUpdateLatestSite, siteNumber);
 }
@@ -95,7 +94,6 @@ export function updateLatestSiteToFalse(
 export function insertSseReportData(
   db: DTTransaction,
   sseData: DbSseReport,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<null> {
   const ps = new PreparedStatement({
     name: "update-sse-report",

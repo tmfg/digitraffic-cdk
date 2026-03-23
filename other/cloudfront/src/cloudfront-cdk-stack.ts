@@ -6,6 +6,7 @@ import type {
   CfnDistribution,
   EdgeLambda,
   FunctionAssociation,
+  IFunction,
   IOrigin,
   IOriginRequestPolicy,
   IRealtimeLogConfig,
@@ -26,6 +27,7 @@ import {
   S3BucketOrigin,
   VpcOrigin,
 } from "aws-cdk-lib/aws-cloudfront-origins";
+import type { IVersion } from "aws-cdk-lib/aws-lambda";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import type { Construct } from "constructs";
@@ -310,7 +312,7 @@ export class CloudfrontCdkStack extends Stack {
 
     // handle all edge lambdas
     for (const [eventType, lambdaType] of behavior.lambdaConfig.lambdas) {
-      let functionVersion;
+      let functionVersion: IVersion;
 
       switch (lambdaType) {
         case LambdaType.WEATHERCAM_HTTP_HEADERS:
@@ -382,7 +384,7 @@ export class CloudfrontCdkStack extends Stack {
 
     // handle all edge functions
     for (const [eventType, functionType] of behavior.lambdaConfig.functions) {
-      let functionVersion;
+      let functionVersion: IFunction;
 
       switch (functionType) {
         case FunctionType.INDEX_HTML:

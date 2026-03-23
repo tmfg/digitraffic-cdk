@@ -5,7 +5,10 @@ import {
 } from "./header-util.js";
 import { IMAGE_NOT_AVAILABLE_BASE64 } from "./image-not-available.js";
 
-const VERSION_HEADERS = "EXT_VERSION";
+// TODO: is this needed anymore?
+// You must replace EXT_VERSION with timestamp to change code when deploying.
+// You can't deploy a new lambda version if the code does not change.
+const _VERSION_HEADERS = "EXT_VERSION";
 
 const ERROR_STATUSES = new Set(["403", "404"]);
 
@@ -53,7 +56,9 @@ export const handler: CloudFrontResponseHandler = async (event) => {
 
       // body and bodyEncoding are not in the CloudFrontResponse type but are
       // supported at runtime for origin-response events (up to 1 MB).
+      // biome-ignore lint/suspicious/noExplicitAny: CloudFront runtime feature not in type definitions
       (response as any).body = IMAGE_NOT_AVAILABLE_BASE64;
+      // biome-ignore lint/suspicious/noExplicitAny: CloudFront runtime feature not in type definitions
       (response as any).bodyEncoding = "base64";
 
       return response;

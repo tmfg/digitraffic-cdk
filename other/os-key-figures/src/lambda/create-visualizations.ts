@@ -31,7 +31,6 @@ const query = util.promisify(conn.query).bind(conn);
 
 const BUCKET_NAME = getEnvVariable("BUCKET_NAME");
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createGraph(
   id: string,
   otsikko: string,

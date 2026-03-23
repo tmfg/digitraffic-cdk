@@ -1,8 +1,8 @@
-import { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export type Props = StackConfiguration;
 
-interface BridgeLockDisruptionsProps {
+export interface BridgeLockDisruptionsProps {
   getDisruptionsLambda: {
     reservedConcurrency: number;
   };

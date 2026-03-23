@@ -137,11 +137,6 @@ describe("swagger-utils", () => {
     // Throws error on failure indicating what is wrong.
     const api = openapiSchema.parse(TEST);
 
-    // Need to bypass the type system to check the actual structure of the objects.
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-    /* eslint-disable @typescript-eslint/no-unsafe-argument */
-
     // Check that nothing got accidentally removed.
     const normalizedParsedJson = JSON.parse(JSON.stringify(api));
     const normalizedOriginalJson = JSON.parse(JSON.stringify(TEST));
@@ -151,7 +146,5 @@ describe("swagger-utils", () => {
       Object.keys(normalizedOriginalJson),
     );
     expect(normalizedParsedJson).toEqual(normalizedOriginalJson);
-
-    /* eslint-enable */
   });
 });

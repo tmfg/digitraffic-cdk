@@ -38,7 +38,6 @@ export const handler = async (
 };
 
 function parseAuthentication(
-  // eslint-disable-next-line @rushstack/no-new-null
   headers: APIGatewayRequestAuthorizerEventHeaders | null,
 ): [string, string] | undefined {
   // biome-ignore lint/complexity/useLiteralKeys: Indexed access

@@ -46,7 +46,6 @@ export class LamHistoryStack extends DigitrafficStack {
     }
 
     if (this.appProps.cloudfrontCanonicalUser) {
-      // eslint-disable-next-line deprecation/deprecation
       grantOAIRights({
         bucket,
         canonicalUserId: this.appProps.cloudfrontCanonicalUser,

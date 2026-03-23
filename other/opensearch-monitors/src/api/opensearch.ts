@@ -104,7 +104,7 @@ export class OpenSearch {
         customUrl: path,
         customHttpMethod: method,
         customStatusCode: response.statusCode,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+
         customStatusMessage: response.body.statusMessage,
         customMonitorName: monitorName,
         customBody: body,
@@ -113,11 +113,10 @@ export class OpenSearch {
 
     let responseBody = "";
     await new Promise((resolve) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       response.body.on("data", (chunk: string) => {
         responseBody += chunk;
       });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+
       response.body.on("end", () => {
         resolve(responseBody);
       });

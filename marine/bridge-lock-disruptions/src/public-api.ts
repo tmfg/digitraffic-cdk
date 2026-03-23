@@ -28,7 +28,6 @@ export class PublicApi {
   ) {
     const publicApi = this.createApi(stack);
 
-    // eslint-disable-next-line deprecation/deprecation
     createUsagePlan(publicApi, "BridgeLock Api Key", "BridgeLock Usage Plan");
 
     const disruptionModel = addServiceModel(

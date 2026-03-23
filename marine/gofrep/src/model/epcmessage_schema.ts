@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import type { JsonSchema } from "aws-cdk-lib/aws-apigateway";
 import { JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
 

@@ -3,7 +3,10 @@ import { createAndLogError } from "./header-util.js";
 
 const ALLOWED_IPS = "EXT_IP".split(",");
 
-const VERSION_HEADERS = "EXT_VERSION";
+// TODO: is this needed anymore?
+// You must replace EXT_VERSION with timestamp to change code when deploying.
+// You can't deploy a new lambda version if the code does not change.
+const _VERSION_HEADERS = "EXT_VERSION";
 
 /*
     This is a edge lambda that should be run at cloudfront at origin request event.

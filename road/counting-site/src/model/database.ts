@@ -1,4 +1,3 @@
-/* eslint-disable @rushstack/no-new-null */
 import type { Generated } from "kysely";
 import type { Direction, Domain, Granularity, TravelMode } from "./v2/types.js";
 

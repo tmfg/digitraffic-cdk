@@ -80,20 +80,14 @@ export function addWeathercamImageLastModifiedHeaderFromXAmzMeta(
   response: Response,
 ): void {
   const responseHeaders = response.headers;
-  if (
-    responseHeaders[xAmzLastModifiedHeader] &&
-    responseHeaders[xAmzLastModifiedHeader][0]
-  ) {
+  if (responseHeaders[xAmzLastModifiedHeader]?.[0]) {
     responseHeaders[lastModifiedHeader] = [
       {
         key: lastModifiedHeader,
         value: responseHeaders[xAmzLastModifiedHeader][0].value,
       },
     ];
-  } else if (
-    responseHeaders[xAmzLastModifiedHeaderUpper] &&
-    responseHeaders[xAmzLastModifiedHeaderUpper][0]
-  ) {
+  } else if (responseHeaders[xAmzLastModifiedHeaderUpper]?.[0]) {
     responseHeaders[lastModifiedHeader] = [
       {
         key: lastModifiedHeader,
@@ -104,7 +98,6 @@ export function addWeathercamImageLastModifiedHeaderFromXAmzMeta(
 }
 
 export function createAndLogError(method: string, message: string): Error {
-  // eslint-disable-next-line no-console
   console.error({
     method,
     message,

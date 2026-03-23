@@ -11,7 +11,7 @@ export interface AreaLightsBrightenRequest {
   /**
    * Visibility in metres
    */
-  // eslint-disable-next-line @rushstack/no-new-null
+
   readonly visibility: number | null;
 
   /**

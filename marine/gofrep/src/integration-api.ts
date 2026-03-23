@@ -119,7 +119,6 @@ function createReceiveMrsReportResource(
     ),
   );
 
-  // eslint-disable-next-line deprecation/deprecation
   const integration = defaultIntegration(handler, {
     passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
     disableCors: true,

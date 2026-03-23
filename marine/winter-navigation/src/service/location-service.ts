@@ -20,7 +20,6 @@ import type {
 
 export function getLocation(
   locode: string,
-  // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<[Feature<Geometry | null, Location> | undefined, Date | undefined]> {
   return inDatabaseReadonly(async (db: DTDatabase) => {
     const location = await LocationDB.getLocation(db, locode);

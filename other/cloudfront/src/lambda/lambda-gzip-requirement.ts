@@ -4,7 +4,10 @@ import {
   createAndLogError,
 } from "./header-util.js";
 
-const VERSION_HEADERS = "EXT_VERSION";
+// TODO: is this needed anymore?
+// You must replace EXT_VERSION with timestamp to change code when deploying.
+// You can't deploy a new lambda version if the code does not change.
+const _VERSION_HEADERS = "EXT_VERSION";
 
 export const NOT_ACCEPTABLE = {
   status: "406",

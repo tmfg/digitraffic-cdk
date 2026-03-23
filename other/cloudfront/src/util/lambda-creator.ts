@@ -24,6 +24,9 @@ function readBodyWithVersion(fileName: string): string {
   const versionString = new Date().toISOString();
   const body = fs.readFileSync(fileName);
 
+  // TODO: is this needed anymore?
+  // You must replace EXT_VERSION with timestamp to change code when deploying.
+  // You can't deploy a new lambda version if the code does not change.
   return body.toString().replace(/EXT_VERSION/gi, versionString);
 }
 

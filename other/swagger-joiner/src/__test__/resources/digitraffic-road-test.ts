@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 export const TEST = {
   openapi: "3.0.1",
   info: {

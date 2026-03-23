@@ -1,6 +1,5 @@
 import { vi } from "vitest";
 
-// eslint-disable-next-line dot-notation
 // biome-ignore lint/complexity/useLiteralKeys: nope
 process.env["SECRET_ID"] = "";
 

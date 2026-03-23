@@ -180,9 +180,9 @@ function createTimeRange(
 /** inclusive range */
 export function matchRange(
   field: OSLogField,
-  // eslint-disable-next-line @rushstack/no-new-null
+
   from: string | number | null,
-  // eslint-disable-next-line @rushstack/no-new-null
+
   to: string | number | null,
 ): RangeQuery {
   return { range: { [field]: { from, to } } };

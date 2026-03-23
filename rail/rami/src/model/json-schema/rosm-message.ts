@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 export const ramiRosmMessageJsonSchema = {
   $schema: "http://json-schema.org/draft-07/schema#",
   title: "RamiOperatorScheduledMessage",

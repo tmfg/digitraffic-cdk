@@ -141,7 +141,7 @@ async function main(): Promise<void> {
 
   await async.eachSeries(
     rushJson.projects,
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+
     async (project) => {
       const packageJsonPath = `${project.fullPath}/package.json`;
       const packageJson = (await fs.readJson(

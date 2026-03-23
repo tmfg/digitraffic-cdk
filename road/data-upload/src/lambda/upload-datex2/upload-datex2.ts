@@ -34,7 +34,6 @@ export const StatusCodes = {
 export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  // eslint-disable-next-line dot-notation
   const body = event.body;
   const requestId = event.headers["X-Request-ID"];
   const start = Date.now();

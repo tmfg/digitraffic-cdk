@@ -28,7 +28,7 @@ export function create(
   const api = createRestApi(stack, "VPGW-Public", "VPGW public API");
 
   const resource = api.root.addResource("temp").addResource("schedules");
-  // eslint-disable-next-line deprecation/deprecation
+
   createUsagePlan(
     api,
     "VPGW Public CloudFront API Key",

@@ -10,7 +10,6 @@
  * 3. Run: npm run test:integration
  * 4. Stop containers: docker compose -f src/__test__/integration/docker-compose.yml down
  */
-
 import ky from "ky";
 import mysql from "mysql";
 import {
@@ -159,7 +158,7 @@ describe("Integration Tests: Refactored Architecture", () => {
       await seedTestData(testDocs);
 
       const mockClient = createLocalOpenSearchClient();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const metricSource = new OpenSearchMetricSource(mockClient, {
         defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
         afirAccessLogIndex: TEST_CONFIG.opensearch.index,
@@ -212,7 +211,7 @@ describe("Integration Tests: Refactored Architecture", () => {
       await seedTestData(testDocs);
 
       const mockClient = createLocalOpenSearchClient();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const metricSource = new OpenSearchMetricSource(mockClient, {
         defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
         afirAccessLogIndex: TEST_CONFIG.opensearch.index,
@@ -271,7 +270,7 @@ describe("Integration Tests: Refactored Architecture", () => {
       await seedTestData(testDocs);
 
       const mockClient = createLocalOpenSearchClient();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const metricSource = new OpenSearchMetricSource(mockClient, {
         defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
         afirAccessLogIndex: TEST_CONFIG.opensearch.index,
@@ -324,7 +323,7 @@ describe("Integration Tests: Refactored Architecture", () => {
       await seedTestData([...railDocs, ...roadDocs]);
 
       const mockClient = createLocalOpenSearchClient();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const metricSource = new OpenSearchMetricSource(mockClient, {
         defaultAccessLogIndex: TEST_CONFIG.opensearch.index,
         afirAccessLogIndex: TEST_CONFIG.opensearch.index,

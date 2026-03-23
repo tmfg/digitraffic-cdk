@@ -13,7 +13,7 @@ interface ResponseCommand {
   readonly OutputParams: {
     Param: ResponseParam[];
   }[];
-  readonly Items: unknown[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+  readonly Items: unknown[];
   readonly Thumbnail?: string[];
 }
 

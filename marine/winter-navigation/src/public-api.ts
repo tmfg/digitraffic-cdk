@@ -1,5 +1,3 @@
-/* eslint-disable dot-notation */
-
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";

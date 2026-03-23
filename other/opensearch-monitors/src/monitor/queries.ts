@@ -75,9 +75,8 @@ export interface RegExpQuery {
 export interface RangeQuery {
   range: {
     [field: string]: {
-      // eslint-disable-next-line @rushstack/no-new-null
       from: string | number | null;
-      // eslint-disable-next-line @rushstack/no-new-null
+
       to: string | number | null;
       include_lower?: boolean;
       include_upper?: boolean;

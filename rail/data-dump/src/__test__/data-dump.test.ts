@@ -43,8 +43,8 @@ function allBucketArns(): string[] {
   ].flatMap((bucket) => [`arn:aws:s3:::${bucket}`, `arn:aws:s3:::${bucket}/*`]);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getProps(resource: Record<string, unknown>): Record<string, any> {
+function getProps(resource: Record<string, unknown>): Record<string, unknown> {
+  // biome-ignore lint/complexity/useLiteralKeys: Indexed access
   return resource["Properties"] as Record<string, unknown>;
 }
 
@@ -54,9 +54,12 @@ function getProps(resource: Record<string, unknown>): Record<string, any> {
  */
 function collectS3ResourceArns(template: Template): string[] {
   const policies = template.findResources("AWS::IAM::Policy");
-  const allStatements = Object.values(policies).flatMap(
-    (p) => getProps(p)["PolicyDocument"]?.["Statement"] ?? [],
-  );
+  const allStatements = Object.values(policies).flatMap((p) => {
+    // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+    const policyDoc = getProps(p)["PolicyDocument"] as Record<string, unknown>;
+    // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+    return policyDoc?.["Statement"] ?? [];
+  });
   return extractS3ResourceArns(allStatements);
 }
 
@@ -71,11 +74,13 @@ function findRoleLogicalIdForLambda(
   const lambdas = template.findResources("AWS::Lambda::Function");
   for (const logicalId of Object.keys(lambdas)) {
     const props = getProps(lambdas[logicalId]!);
+    // biome-ignore lint/complexity/useLiteralKeys: Indexed access
     if (props["FunctionName"] === functionName) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const roleRef = props["Role"] as Record<string, any>;
-      if (roleRef?.["Fn::GetAtt"]) {
-        return roleRef["Fn::GetAtt"][0] as string;
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+      const roleRef = props["Role"] as Record<string, unknown>;
+      const fnGetAtt = roleRef?.["Fn::GetAtt"];
+      if (Array.isArray(fnGetAtt) && typeof fnGetAtt[0] === "string") {
+        return fnGetAtt[0];
       }
     }
   }
@@ -91,17 +96,24 @@ function findRoleLogicalIdForLambda(
 function findPolicyStatementsForRole(
   template: Template,
   roleLogicalId: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any[] {
+): unknown[] {
   const policies = template.findResources("AWS::IAM::Policy");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const allStatements: any[] = [];
+
+  const allStatements: unknown[] = [];
   for (const policyId of Object.keys(policies)) {
     const props = getProps(policies[policyId]!);
-    const roles = props["Roles"] ?? [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (roles.some((r: any) => r["Ref"] === roleLogicalId)) {
-      allStatements.push(...(props["PolicyDocument"]?.["Statement"] ?? []));
+    // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+    const roles = (props["Roles"] as unknown[]) ?? [];
+
+    if (
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+      roles.some((r) => (r as Record<string, unknown>)["Ref"] === roleLogicalId)
+    ) {
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+      const policyDoc = props["PolicyDocument"] as Record<string, unknown>;
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+      const statements = (policyDoc?.["Statement"] as unknown[]) ?? [];
+      allStatements.push(...statements);
     }
   }
   return allStatements;
@@ -110,18 +122,25 @@ function findPolicyStatementsForRole(
 /**
  * Extract S3 resource ARNs from IAM policy statements.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractS3ResourceArns(statements: any[]): string[] {
+
+function extractS3ResourceArns(statements: unknown[]): string[] {
   const arns: string[] = [];
   for (const stmt of statements) {
-    const actions = Array.isArray(stmt["Action"])
-      ? stmt["Action"]
-      : [stmt["Action"]];
-    if (actions.some((a: string) => a.startsWith("s3:"))) {
-      const resources = Array.isArray(stmt["Resource"])
-        ? stmt["Resource"]
-        : [stmt["Resource"]];
-      arns.push(...resources);
+    const s = stmt as Record<string, unknown>;
+    // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+    const actions = Array.isArray(s["Action"])
+      ? // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+        (s["Action"] as unknown[])
+      : // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+        [s["Action"]];
+    if (actions.some((a) => typeof a === "string" && a.startsWith("s3:"))) {
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+      const resources = Array.isArray(s["Resource"])
+        ? // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+          (s["Resource"] as unknown[])
+        : // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+          [s["Resource"]];
+      arns.push(...(resources as string[]));
     }
   }
   return arns;
@@ -130,13 +149,17 @@ function extractS3ResourceArns(statements: any[]): string[] {
 /**
  * Extract unique S3 actions from IAM policy statements.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractS3Actions(statements: any[]): string[] {
+
+function extractS3Actions(statements: unknown[]): string[] {
   const actionSet = new Set<string>();
   for (const stmt of statements) {
-    const actions = Array.isArray(stmt["Action"])
-      ? stmt["Action"]
-      : [stmt["Action"]];
+    const s = stmt as Record<string, unknown>;
+    // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+    const actions = Array.isArray(s["Action"])
+      ? // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+        (s["Action"] as unknown[])
+      : // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+        [s["Action"]];
     for (const a of actions) {
       if (typeof a === "string" && a.startsWith("s3:")) {
         actionSet.add(a);
@@ -179,12 +202,12 @@ function resolveTargetFunctionName(
   template: Template,
   targetArn: unknown,
 ): string | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const arnObj = targetArn as Record<string, any>;
+  const arnObj = targetArn as Record<string, unknown>;
   let lambdaLogicalId: string | undefined;
 
-  if (arnObj?.["Fn::GetAtt"]) {
-    lambdaLogicalId = arnObj["Fn::GetAtt"][0];
+  const fnGetAtt = arnObj?.["Fn::GetAtt"];
+  if (Array.isArray(fnGetAtt)) {
+    lambdaLogicalId = fnGetAtt[0] as string;
   } else {
     // Fallback: check JSON for any Lambda logical ID reference
     const serialized = JSON.stringify(targetArn);
@@ -202,6 +225,7 @@ function resolveTargetFunctionName(
   const lambdas = template.findResources("AWS::Lambda::Function");
   const lambdaResource = lambdas[lambdaLogicalId];
   if (!lambdaResource) return undefined;
+  // biome-ignore lint/complexity/useLiteralKeys: Indexed access
   return getProps(lambdaResource)["FunctionName"] as string;
 }
 
@@ -320,6 +344,7 @@ describe("DataDumpStack — custom Lambda layer", () => {
 
     for (const logicalId of lambdaIds) {
       const props = getProps(lambdas[logicalId]!);
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
       const layersValue = JSON.stringify(props["Layers"]);
       expect(layersValue).toContain(layerLogicalId);
     }
@@ -361,9 +386,12 @@ describe("DataDumpStack — EventBridge rules", () => {
 
     const targetedLambdas = new Set<string>();
     for (const ruleId of ruleIds) {
-      const targets = getProps(rules[ruleId]!)["Targets"] ?? [];
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+      const targets = (getProps(rules[ruleId]!)["Targets"] as unknown[]) ?? [];
       expect(targets.length).toBeGreaterThan(0);
-      const fnName = resolveTargetFunctionName(template, targets[0]["Arn"]);
+      const firstTarget = targets[0] as Record<string, unknown>;
+      // biome-ignore lint/complexity/useLiteralKeys: Indexed access
+      const fnName = resolveTargetFunctionName(template, firstTarget["Arn"]);
       expect(fnName).toBeDefined();
       expect(ALL_LAMBDA_NAMES).toContain(fnName);
       targetedLambdas.add(fnName!);
