@@ -14,8 +14,6 @@
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "echo 'No canaries' #esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node20",
     "compile-lambdas": "node lib/esbuild.js",
-    "compile-lambdas-old": "esbuild src/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --target=node24",
-    "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "vitest run",
     "test:watch": "vitest"
