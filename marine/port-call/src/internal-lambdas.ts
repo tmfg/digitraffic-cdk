@@ -5,10 +5,12 @@ import type { Function as AWSFunction } from "aws-cdk-lib/aws-lambda";
 import type { PortCallStack } from "./port-call-stack.js";
 
 export class InternalLambdas {
-  constructor(stack: PortCallStack) {
+  constructor(stack: PortCallStack, enableUpdate: boolean) {
     const updateLambda = this.createUpdateLambda(stack);
 
-    Scheduler.everyMinutes(stack, "UpdateVisits", 10, updateLambda);
+    if (enableUpdate) {
+      Scheduler.everyMinutes(stack, "UpdateVisits", 10, updateLambda);
+    }
   }
 
   createUpdateLambda(stack: PortCallStack): AWSFunction {

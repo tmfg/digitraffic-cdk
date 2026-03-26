@@ -4,11 +4,15 @@ import type { Construct } from "constructs";
 import { InternalLambdas } from "./internal-lambdas.js";
 import { PublicApi } from "./public-api.js";
 
+export interface PortCallConfiguration extends StackConfiguration {
+  readonly enableUpdate: boolean;
+}
+
 export class PortCallStack extends DigitrafficStack {
-  constructor(scope: Construct, id: string, config: StackConfiguration) {
+  constructor(scope: Construct, id: string, config: PortCallConfiguration) {
     super(scope, id, config);
 
-    new InternalLambdas(this);
+    new InternalLambdas(this, config.enableUpdate);
     new PublicApi(this);
   }
 }
