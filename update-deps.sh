@@ -60,20 +60,9 @@ for dir in other road marine aviation rail tools template; do
           --filter "$PACKAGE_FILTER" \
           --target "$TARGET" \
           --cooldown "${COOLDOWN_DAYS}d" \
+          --no-deprecated \
           --pre false \
-          --reject '/^@digitraffic-cdk\/|^aws-cdk$/' \
-          -u &&
-        # aws-cdk is updated separately with --target minor to avoid accidentally
-        # published versions (e.g. 3.0.0) being picked up by --target greatest.
-        # Only runs when aws-cdk matches the user-supplied PACKAGE_FILTER.
-        if echo "aws-cdk" | grep -qE "${PACKAGE_FILTER//\//}"; then
-          npx --yes npm-check-updates@19.6.3 \
-            --filter '/^aws-cdk$/' \
-            --target minor \
-            --cooldown "${COOLDOWN_DAYS}d" \
-            --pre false \
-            -u
-        fi
+          -u
     )
   done
 done

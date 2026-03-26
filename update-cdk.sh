@@ -16,10 +16,11 @@ for dir in other road marine aviation rail tools template; do
     echo "Updating $subdir"
     (
       cd "$subdir" &&
-        npx --yes npm-check-updates@19.6.2 \
+        npx --yes npm-check-updates@19.6.3 \
           --filter "$PACKAGE" \
           --target greatest \
           --cooldown "${COOLDOWN_DAYS}d" \
+          --no-deprecated \
           --pre false \
           -u
     )
