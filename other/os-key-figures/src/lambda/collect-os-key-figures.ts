@@ -25,6 +25,10 @@ import { createConfigFromEnvironment } from "./handler-config.js";
 
 export interface KeyFigureLambdaEvent {
   readonly TRANSPORT_TYPE: string;
+  /** 1-indexed group number for splitting endpoint-level collection across multiple invocations */
+  readonly ENDPOINT_GROUP?: number;
+  /** Total number of groups to split endpoints into (defaults to 1 = no splitting) */
+  readonly TOTAL_GROUPS?: number;
 }
 
 const sts = new STS({ apiVersion: "2011-06-15" });
@@ -58,8 +62,11 @@ export const handler = async (
   const service = parseService(event.TRANSPORT_TYPE);
   const period = lastMonth();
 
+  const endpointGroup = event.ENDPOINT_GROUP;
+  const totalGroups = event.TOTAL_GROUPS ?? 1;
+
   logger.info({
-    message: `Starting metric collection for service: ${service}, period: ${period.from.toISOString()} -> ${period.to.toISOString()}`,
+    message: `Starting metric collection for service: ${service}, group: ${endpointGroup ?? "all"}/${totalGroups}, period: ${period.from.toISOString()} -> ${period.to.toISOString()}`,
     method: "collect-os-key-figures-v2.handler",
   });
 
@@ -97,7 +104,11 @@ export const handler = async (
     const scopes =
       service === Service.ALL
         ? [createServiceScope(Service.ALL)]
-        : buildScopes([await endpointDiscovery.discoverEndpoints(service)]);
+        : buildScopes(
+            [await endpointDiscovery.discoverEndpoints(service)],
+            endpointGroup,
+            totalGroups,
+          );
 
     logger.info({
       message: `Collecting metrics for ${scopes.length} scopes`,
@@ -138,18 +149,43 @@ export const handler = async (
   }
 };
 
-function buildScopes(
+/**
+ * Builds metric scopes from discovered endpoints, optionally splitting
+ * endpoints across multiple groups for parallel invocations.
+ *
+ * @param endpointGroup - 1-indexed group number (undefined = all endpoints)
+ * @param totalGroups - total number of groups (defaults to 1)
+ */
+export function buildScopes(
   monitoredEndpoints: { service: Service; endpoints: Set<string> }[],
+  endpointGroup?: number,
+  totalGroups: number = 1,
 ): MetricScope[] {
   const scopes: MetricScope[] = [];
 
   for (const { service, endpoints } of monitoredEndpoints) {
-    scopes.push(createServiceScope(service));
+    const sortedEndpoints = [...endpoints].sort();
+    const selectedEndpoints =
+      endpointGroup !== undefined && totalGroups > 1
+        ? getGroupSlice(sortedEndpoints, endpointGroup, totalGroups)
+        : sortedEndpoints;
 
-    for (const endpoint of endpoints) {
+    // Include service-level scope only in first group (or when not splitting)
+    if (endpointGroup === undefined || endpointGroup === 1) {
+      scopes.push(createServiceScope(service));
+    }
+
+    for (const endpoint of selectedEndpoints) {
       scopes.push(createEndpointScope(service, endpoint));
     }
   }
 
   return scopes;
+}
+
+/** Returns the slice of items belonging to the given 1-indexed group. */
+function getGroupSlice<T>(items: T[], group: number, totalGroups: number): T[] {
+  const groupSize = Math.ceil(items.length / totalGroups);
+  const start = (group - 1) * groupSize;
+  return items.slice(start, start + groupSize);
 }

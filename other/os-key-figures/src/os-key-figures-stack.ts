@@ -275,12 +275,27 @@ export class OsKeyFiguresStack extends Stack {
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
           TRANSPORT_TYPE: Service.ROAD,
+          ENDPOINT_GROUP: 1,
+          TOTAL_GROUPS: 2,
+        }),
+      }),
+    );
+
+    const rule1b = new Rule(this, "collect road 2", {
+      schedule: Schedule.expression("cron(0 4 1 * ? *)"),
+    });
+    rule1b.addTarget(
+      new LambdaFunction(collectOsKeyFiguresLambda, {
+        event: events.RuleTargetInput.fromObject({
+          TRANSPORT_TYPE: Service.ROAD,
+          ENDPOINT_GROUP: 2,
+          TOTAL_GROUPS: 2,
         }),
       }),
     );
 
     const rule4 = new Rule(this, "collect afir", {
-      schedule: Schedule.expression("cron(0 4 1 * ? *)"),
+      schedule: Schedule.expression("cron(15 4 1 * ? *)"),
     });
     rule4.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {

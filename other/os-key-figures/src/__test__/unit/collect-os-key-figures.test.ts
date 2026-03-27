@@ -16,6 +16,7 @@ import { MetricValueType } from "../../domain/types/metric-value.js";
 import { Service } from "../../domain/types/service.js";
 import type { TimePeriod } from "../../domain/types/time-period.js";
 import { createTimePeriod } from "../../domain/types/time-period.js";
+import { buildScopes } from "../../lambda/collect-os-key-figures.js";
 import type { ForPersistingMetrics } from "../../ports/driven/for-persisting-metrics.js";
 import type { ForRetrievingMetrics } from "../../ports/driven/for-retrieving-metrics.js";
 
@@ -200,5 +201,127 @@ describe("handler scope building behavior", () => {
       );
       expect(endpointMetrics.length).toBe(18);
     });
+  });
+});
+
+describe("buildScopes endpoint group splitting", () => {
+  const endpoints = new Set(["/api/d/", "/api/b/", "/api/a/", "/api/c/"]);
+
+  test("no group params returns service scope + all endpoints", () => {
+    const scopes = buildScopes([{ service: Service.ROAD, endpoints }]);
+
+    expect(scopes.length).toBe(5); // 1 service + 4 endpoints
+    expect(scopes[0]!.endpoint).toBeUndefined();
+    expect(scopes[0]!.storageTag).toBe("@transport_type:road");
+
+    // endpoints should be sorted alphabetically
+    const endpointPaths = scopes.slice(1).map((s) => s.endpoint);
+    expect(endpointPaths).toEqual(["/api/a/", "/api/b/", "/api/c/", "/api/d/"]);
+  });
+
+  test("group 1 of 2 includes service scope + first half of sorted endpoints", () => {
+    const scopes = buildScopes([{ service: Service.ROAD, endpoints }], 1, 2);
+
+    // 1 service + 2 endpoints (ceil(4/2) = 2)
+    expect(scopes.length).toBe(3);
+    expect(scopes[0]!.endpoint).toBeUndefined();
+    expect(scopes[1]!.endpoint).toBe("/api/a/");
+    expect(scopes[2]!.endpoint).toBe("/api/b/");
+  });
+
+  test("group 2 of 2 has no service scope and second half of sorted endpoints", () => {
+    const scopes = buildScopes([{ service: Service.ROAD, endpoints }], 2, 2);
+
+    // 0 service + 2 endpoints
+    expect(scopes.length).toBe(2);
+    expect(scopes[0]!.endpoint).toBe("/api/c/");
+    expect(scopes[1]!.endpoint).toBe("/api/d/");
+  });
+
+  test("groups 1 and 2 together cover all endpoints exactly once", () => {
+    const scopes1 = buildScopes([{ service: Service.ROAD, endpoints }], 1, 2);
+    const scopes2 = buildScopes([{ service: Service.ROAD, endpoints }], 2, 2);
+
+    const allEndpoints = [
+      ...scopes1.filter((s) => s.endpoint).map((s) => s.endpoint),
+      ...scopes2.filter((s) => s.endpoint).map((s) => s.endpoint),
+    ];
+    expect(allEndpoints.sort()).toEqual([
+      "/api/a/",
+      "/api/b/",
+      "/api/c/",
+      "/api/d/",
+    ]);
+  });
+
+  test("odd number of endpoints distributes correctly across 2 groups", () => {
+    const oddEndpoints = new Set(["/api/a/", "/api/b/", "/api/c/"]);
+    const scopes1 = buildScopes(
+      [{ service: Service.ROAD, endpoints: oddEndpoints }],
+      1,
+      2,
+    );
+    const scopes2 = buildScopes(
+      [{ service: Service.ROAD, endpoints: oddEndpoints }],
+      2,
+      2,
+    );
+
+    // Group 1: service + ceil(3/2) = 2 endpoints
+    expect(scopes1.length).toBe(3);
+    // Group 2: 1 endpoint
+    expect(scopes2.length).toBe(1);
+
+    const allEndpoints = [
+      ...scopes1.filter((s) => s.endpoint).map((s) => s.endpoint),
+      ...scopes2.filter((s) => s.endpoint).map((s) => s.endpoint),
+    ];
+    expect(allEndpoints.sort()).toEqual(["/api/a/", "/api/b/", "/api/c/"]);
+  });
+
+  test("3 groups split endpoints correctly", () => {
+    const manyEndpoints = new Set([
+      "/api/a/",
+      "/api/b/",
+      "/api/c/",
+      "/api/d/",
+      "/api/e/",
+    ]);
+    const scopes1 = buildScopes(
+      [{ service: Service.ROAD, endpoints: manyEndpoints }],
+      1,
+      3,
+    );
+    const scopes2 = buildScopes(
+      [{ service: Service.ROAD, endpoints: manyEndpoints }],
+      2,
+      3,
+    );
+    const scopes3 = buildScopes(
+      [{ service: Service.ROAD, endpoints: manyEndpoints }],
+      3,
+      3,
+    );
+
+    // Group 1: service scope + ceil(5/3) = 2 endpoints
+    expect(scopes1.length).toBe(3);
+    expect(scopes1[0]!.endpoint).toBeUndefined();
+    // Group 2: 2 endpoints
+    expect(scopes2.length).toBe(2);
+    // Group 3: 1 endpoint
+    expect(scopes3.length).toBe(1);
+
+    const allEndpoints = [
+      ...scopes1.filter((s) => s.endpoint).map((s) => s.endpoint),
+      ...scopes2.filter((s) => s.endpoint).map((s) => s.endpoint),
+      ...scopes3.filter((s) => s.endpoint).map((s) => s.endpoint),
+    ];
+    expect(allEndpoints.sort()).toEqual([
+      "/api/a/",
+      "/api/b/",
+      "/api/c/",
+      "/api/d/",
+      "/api/e/",
+    ]);
   });
 });
