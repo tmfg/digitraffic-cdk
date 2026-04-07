@@ -22,7 +22,6 @@ import type {
   RequestValidator,
   Resource,
 } from "aws-cdk-lib/aws-apigateway";
-import { EndpointType } from "aws-cdk-lib/aws-apigateway";
 import {
   createAudioSchema,
   createPassengerInformationMessageSchema,
@@ -36,15 +35,7 @@ export class PublicApi {
 
   constructor(stack: DigitrafficStack) {
     const apiName = "RAMI (passenger information) public API";
-    this.publicApi = new DigitrafficRestApi(
-      stack,
-      "RAMI-public",
-      apiName,
-      undefined,
-      {
-        endpointTypes: [EndpointType.PRIVATE],
-      },
-    );
+    this.publicApi = new DigitrafficRestApi(stack, "RAMI-public", apiName);
 
     this.apiKeyId = createDefaultUsagePlan(this.publicApi, apiName).keyId;
     this.publicApi.apiKeyIds.push(this.apiKeyId);
