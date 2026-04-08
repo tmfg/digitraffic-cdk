@@ -45,7 +45,22 @@ export interface StackConfiguration {
   readonly whitelistedResources?: string[];
 }
 
-export class DigitrafficStack extends Stack {
+export interface DigitrafficStackInterface {
+  readonly configuration: StackConfiguration;
+  readonly vpc?: IVpc;
+  readonly lambdaDbSg?: ISecurityGroup;
+  readonly alarmTopic: ITopic;
+  readonly warningTopic: ITopic;
+  createLambdaEnvironment(): DBLambdaEnvironment;
+  createDefaultLambdaEnvironment(dbApplication: string): DBLambdaEnvironment;
+  getSecret(): ISecret;
+  grantSecret(...lambdas: AWSFunction[]): void;
+}
+
+export class DigitrafficStack
+  extends Stack
+  implements DigitrafficStackInterface
+{
   readonly vpc?: IVpc;
   readonly lambdaDbSg?: ISecurityGroup;
   readonly alarmTopic: ITopic;

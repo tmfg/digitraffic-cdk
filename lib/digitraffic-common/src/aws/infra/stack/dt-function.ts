@@ -1,4 +1,5 @@
 import { basename } from "node:path";
+import type { Stack } from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
 import type { Metric } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
@@ -24,7 +25,7 @@ import type { AlarmProps } from "./dt-function-alarms.js";
 import { DtFunctionAlarms } from "./dt-function-alarms.js";
 import type { LambdaEnvironment } from "./lambda-configs.js";
 import { createLambdaLogGroup } from "./lambda-log-group.js";
-import type { DigitrafficStack } from "./stack.js";
+import type { DigitrafficStackInterface } from "./stack.js";
 
 type FunctionFeatures = {
   singleLambda: boolean;
@@ -33,7 +34,7 @@ type FunctionFeatures = {
 };
 
 export class FunctionBuilder {
-  private readonly _stack: DigitrafficStack;
+  private readonly _stack: Stack & DigitrafficStackInterface;
   private readonly _name: string;
 
   private description?: string;
@@ -63,7 +64,7 @@ export class FunctionBuilder {
     secretAccess: true,
   };
 
-  constructor(stack: DigitrafficStack, lambdaName: string) {
+  constructor(stack: Stack & DigitrafficStackInterface, lambdaName: string) {
     this._name = lambdaName;
     this._stack = stack;
 
@@ -84,14 +85,20 @@ export class FunctionBuilder {
    * Creates a new builder with defaults, using the lambdaName as a source for the lambda implementation (dist/lambdaName/lambdaName.js).
    * Database access is given by default.
    */
-  public static create(stack: DigitrafficStack, lambdaName: string) {
+  public static create(
+    stack: Stack & DigitrafficStackInterface,
+    lambdaName: string,
+  ) {
     return new FunctionBuilder(stack, lambdaName);
   }
 
   /**
    * Creates a new builder with defaults, but without database or secret access.
    */
-  public static plain(stack: DigitrafficStack, lambdaName: string) {
+  public static plain(
+    stack: Stack & DigitrafficStackInterface,
+    lambdaName: string,
+  ) {
     return new FunctionBuilder(stack, lambdaName)
       .withoutDatabaseAccess()
       .withoutSecretAccess();

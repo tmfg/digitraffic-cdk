@@ -1,3 +1,4 @@
+import type { Stack } from "aws-cdk-lib";
 import type {
   IResource,
   JsonSchema,
@@ -32,7 +33,7 @@ import type {
   DocumentationProperties,
 } from "../documentation.js";
 import { createDefaultUsagePlan, createUsagePlan } from "../usage-plans.js";
-import type { DigitrafficStack } from "./stack.js";
+import type { DigitrafficStackInterface } from "./stack.js";
 
 export const PUBLIC_REST_API_CORS_CONFIG = {
   defaultCorsPreflightOptions: {
@@ -60,10 +61,10 @@ export class DigitrafficRestApi extends RestApi {
   readonly apiKeyIds: string[];
   readonly enableDocumentation: boolean;
 
-  private readonly _stack: DigitrafficStack;
+  private readonly _stack: Stack & DigitrafficStackInterface;
 
   constructor(
-    stack: DigitrafficStack,
+    stack: Stack & DigitrafficStackInterface,
     apiId: string,
     apiName: string,
     allowFromIpAddresses?: string[] | undefined,
@@ -98,9 +99,7 @@ export class DigitrafficRestApi extends RestApi {
   }
 
   hostname(): string {
-    return `${this.restApiId}.execute-api.${
-      (this.stack as DigitrafficStack).region
-    }.amazonaws.com`;
+    return `${this.restApiId}.execute-api.${this.stack.region}.amazonaws.com`;
   }
 
   /** Export end point and api key to Parameter store */
