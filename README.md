@@ -1,69 +1,146 @@
-# Digitraffic AWS CDK projects
+# Digitraffic-common
 
-This project contains CDK applications for the
-[Digitraffic](https://www.digitraffic.fi) project.
+This is a place for common utilities and classes that can be used in other
+cdk-projects.
 
-Projects are categorized as:
+## Setup
 
-- projects under other are generic, e.g. swagger-joiner
-- projects under road or marine are related to a mode of transport, e.g.
-  road/variable-signs
-
-## Links
-
-- [Developer guide](DEVELOPMENT.md)
-- [Architecture](ARCHITECTURE.md)
-- [Conventions](CONVENTIONS.md)
-
-Digitraffic is operated by [Fintraffic](https://www.fintraffic.fi)
-
-## TL;DR
-
-### Init rush, (e.g., installs Git hooks).
+Initialize the project scripts by running the following command. This only needs
+to be done once, after cloning or pulling the repository for the first time. It
+will install/reinstall lefthook git hooks.
 
 ```shell
-rush install
-rush update-autoinstaller --name rush-command-line-tools
-rush update
+pnpm run setup
 ```
 
-### Update dependencies for all projects
+After that approve esbuild:
 
 ```shell
-# Update to highest versions outside cooldown (default: 7 days), then refresh lockfile
-./update-deps.sh
-
-# Or use Rush command
-rush repo:update-deps-mature
-
-# Then run lockfile refresh in a separate command
-rush update --full
-
-# Example: only update vitest-related packages with 7-day cooldown
-./update-deps.sh '/^@?vitest|^vitest$/'
-
-# CDK-only mature update
-rush repo:update-cdk-mature
-
-# Then run lockfile refresh in a separate command
-rush update --full
-
-# Refresh autoinstaller after dependency updates
-rush update-autoinstaller --name rush-command-line-tools
+pnpm approve-builds
 ```
 
-### Format
+And then run again the setup.
 
-    rush format:package-json
-    rush format:fix-changed
+## How to build
 
-## Rush commands
+Use `pnpm` to build the code i.e.
 
-Global Rush commands are configured in
-[command-line.json](common/config/rush/command-line.json)
+    pnpm install
+    pnpm run build
+    pnpm run test
+    pnpm run test --test-path-pattern 'dt-logger.test'
+    pnpm run test:watch
+    pnpm run test:watch --test-path-pattern 'dt-logger.test'
 
-You can list them with:
+Format code
 
-```shell
-rush --help
+    pnpm run format:package-json # Format package.json
+    pnpm run format:check # Checks all files
+    pnpm run format:check-staged # Checks stagged files
+    pnpm run format:fix # Format all files
+    pnpm run format:fix-staged # Formats stagged files
+
+## Update deps
+
+This project uses exact dependency versions (no semver ranges)
+and it has 7 days cooldown defined in [.npmrc](.npmrc)
+
+To update all dependencies to the latest versions:
+
+```bash
+pnpm up --latest
 ```
+
+To update both normal dependencies and `peerDependencies` in one command, use:
+
+```bash
+pnpm deps:update-all
+```
+
+What `pnpm deps:update-all` does:
+- Runs `pnpm up --latest`.
+- Reads all keys from `peerDependencies` in `package.json`.
+- Runs `pnpm add --save-peer --save-exact <name>@latest ...` for those packages.
+- Updates `.npmrc` `use-node-version` to the newest Node release that is older than `minimum-release-age` and matches `engines.node`.
+
+The command uses `scripts/update-deps-and-peers.ts` and is executed with Node's TypeScript type-stripping support (`node --experimental-strip-types`).
+
+After updating, run `pnpm audit` to check for vulnerabilities. If vulnerabilities exist in transitive dependencies, you may need to add overrides in `package.json` and/or exclusions in `.npmrc`. See [DEPENDENCY_OVERRIDES.md](./DEPENDENCY_OVERRIDES.md) for details.
+
+## Publishing to [npmjs.com](https://www.npmjs.com/)
+
+See https://www.npmjs.com/package/@digitraffic/common
+
+Run the following command to publish a new version:
+
+```bash
+./scripts/publish.sh 2026.3.5-1
+```
+
+## How to use
+
+In package.json dependencies:
+
+```
+"dependencies": {
+  "@digitraffic/common": "*",
+}
+```
+
+In code:
+
+```
+import {DigitrafficStack, StackConfiguration} from "@digitraffic/common/dist/aws/infra/stack/stack";
+```
+
+### DigitrafficStack
+
+If you extend your stack from DigitrafficStack you get many benefits:
+
+- Secret, VPC, Sg & alarmTopics automatically
+- Stack validation with StackCheckingAspect
+- Easier configuration with StackConfiguration
+
+If you do not need those things, you should not use DigitrafficStack.
+
+### StackConfiguration
+
+Some commonly used parameters is predefined configuration. You can write
+configuration for your environments once and use across cdk-projects.
+
+### StackCheckingAspect
+
+Uses cdk aspects to do some sanity checking for your cdk stack:
+
+- Stack naming check(Test/Prod in name)
+- Function configuration(memory, timeout, runtime, reservedConcurrency)
+- Tags, must have Solution tag defined
+- S3 Buckets, no public access
+- Api Gateway resource casing(kebabCase and snake_case)
+- Queue encrypting
+- LogGroup Retention
+
+You can use StackCheckingAspect for any stack, DigitrafficStack does it
+automatically, but you can call it manually:
+
+```
+Aspects.of(this).add(StackCheckingAspect.create(this));
+```
+
+Any resource can be whitelisted by giving it as a parameter or in the
+StackConfiguration
+
+### FunctionBuilder
+
+FunctionBuilder allows you to make lambdas with alarms on memory usage and timeouts.
+
+By default, the created function has access to database, but this can of course be controlled.
+
+Creating lambda is easy:
+```
+const lambda = FunctionBuilder.create(stack, "get-metadata")
+  .withTimeout(Duration.seconds(2))
+  .build();
+```
+
+See the documentation for more information.

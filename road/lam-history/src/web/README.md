@@ -1,1 +1,0 @@
-# template for html pages

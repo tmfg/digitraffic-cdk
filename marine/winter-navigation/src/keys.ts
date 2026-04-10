@@ -1,3 +1,0 @@
-export const VESSEL_CHECK = "WN_VESSEL_CHECK";
-export const LOCATIONS_CHECK = "WN_LOCATION_CHECK";
-export const DIRWAY_CHECK = "WN_DIRWAY_CHECK";

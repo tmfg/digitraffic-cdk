@@ -10,7 +10,7 @@ permissions:
 jobs:
   biome:
     name: Biome Lint & Format
-    if: github.repository != 'tmfg/digitraffic-cdk'
+    if: github.repository != 'tmfg/digitraffic-common'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup Biome
-        uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
+        uses: biomejs/setup-biome@v2
         with:
           version: latest
       - name: Run Biome

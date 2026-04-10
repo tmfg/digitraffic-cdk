@@ -1,82 +1,40 @@
 *
 
-# Github
-!/.github/
-!/.github/**/
-!/.github/workflows/**/**.yml
-!/.github/CODEOWNERS
-!/.github/dependabot.yml
-!/.github/trufflehog-exclude.txt
-!/.github/copilot-instructions.md
-
 !/.editorconfig
 !/.git-blame-ignore-revs
-# for creating empty directories
-!/.git-create
 !/.gitattributes
 !/.gitignore
-!/.node-version
-
-!/*.md
-!/*.sh
-!/*.py
-
+!/.madgerc
+!/.npmignore
+!/.npmrc
 !/biome.jsonc
-!/LICENCE
-!/rush.json
+!/DEPENDENCY_OVERRIDES.md
+!/lefthook.yml
+!/LICENSE.txt
+!/package.json
+!/pnpm-lock.yaml
+!/README.md
+!/tsconfig.json
+!/tsconfig.test.json
 
-# Rush stuff
-!/common/
-!/common/config/
-!/common/config/rush/
-!/common/config/rush/*
-!/common/config/rush/.*
-!/common/git-hooks/
-!/common/git-hooks/*
-!/common/scripts/
-!/common/scripts/*
-!/common/autoinstallers/
-!/common/autoinstallers/*/
-!/common/autoinstallers/*/package.json
-!/common/autoinstallers/*/pnpm-lock.yaml
-!/common/autoinstallers/*/.*
+!src/
+!src/**/
+!src/**/*.ts
 
-# digitraffic-common
-!/lib/
-!/lib/*/
+!config/
+!config/**/
+!config/**/*.json
 
-# Helper scripts
-!/scripts/
-!/scripts/*.sh
-!/scripts/*.md
-!/scripts/*.py
-!/scripts/*.template
+!.github/
+!.github/**/
+!.github/workflows/**/**.yml
+!.github/CODEOWNERS
+!.github/dependabot.yml
+!.github/trufflehog-exclude.txt
 
-# Template for new projects
-!/template/
-!/template/*
-!/template/esm/*
-!/template/esm/**/*
+!scripts/
+!scripts/**/
+!scripts/**/*.js
+!scripts/**/*.sh
+!scripts/**/*.ts
 
-# Tools
-!/tools/
-!/tools/*
-!/tools/**/*
-
-# Project folders
-!aviation/
-!aviation/*/
-!marine/
-!marine/*/
-!other/
-!other/*/
-!rail/
-!rail/*/
-!road/
-!road/*/
-!template/
-!template/esm/
-
-# Always ignored at last
-.DS_Store
-tools/vitest/node_modules

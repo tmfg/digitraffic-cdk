@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0
 
       - name: Secret scanning
-        uses: trufflesecurity/trufflehog@586f66d7886cd0b037c7c245d4a6e34ef357ab10 # v3.94.1
+        uses: trufflesecurity/trufflehog@v3.93.6
         with:
           base: ""
           head: ${{ github.ref_name }}
