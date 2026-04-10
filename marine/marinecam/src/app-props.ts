@@ -2,7 +2,7 @@ import type { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stac
 import type { Duration } from "aws-cdk-lib";
 
 export type MobileServerProps = StackConfiguration & {
-  readonly updateFrequency: Duration;
+  readonly updateFrequency?: Duration;
   readonly enablePasswordProtectedApi: boolean;
   readonly enableKeyProtectedApi: boolean;
 };

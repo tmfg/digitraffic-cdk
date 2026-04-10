@@ -8,13 +8,16 @@ import { MarinecamEnvKeys } from "./keys.js";
 
 export function create(stack: DigitrafficStack, bucket: Bucket): void {
   const updateLambda = createUpdateImagesLambda(stack, bucket);
+  const msp = stack.configuration as MobileServerProps;
 
-  Scheduler.every(
-    stack,
-    "UpdateImages-Rule",
-    (stack.configuration as MobileServerProps).updateFrequency,
-    updateLambda,
-  );
+  if (msp.updateFrequency !== undefined) {
+    Scheduler.every(
+      stack,
+      "UpdateImages-Rule",
+      msp.updateFrequency,
+      updateLambda,
+    );
+  }
   bucket.grantWrite(updateLambda);
 }
 
