@@ -64,6 +64,7 @@ export class NetworkStack extends Stack {
   createVpc(configuration: NetworkConfiguration): Vpc {
     return new Vpc(this, "DigitrafficVPC", {
       vpcName: configuration.vpcName,
+      restrictDefaultSecurityGroup: false,
       availabilityZones: Stack.of(this).availabilityZones.sort().slice(0, 2), // take two first azs
       enableDnsHostnames: true,
       enableDnsSupport: true,

@@ -42,11 +42,28 @@ Format code
 
 ## Update deps
 
-This project uses exact dependency versions (no semver ranges). To update all dependencies to the latest versions:
+This project uses exact dependency versions (no semver ranges)
+and it has 7 days cooldown defined in [.npmrc](.npmrc)
+
+To update all dependencies to the latest versions:
 
 ```bash
 pnpm up --latest
 ```
+
+To update both normal dependencies and `peerDependencies` in one command, use:
+
+```bash
+pnpm deps:update-all
+```
+
+What `pnpm deps:update-all` does:
+- Runs `pnpm up --latest`.
+- Reads all keys from `peerDependencies` in `package.json`.
+- Runs `pnpm add --save-peer --save-exact <name>@latest ...` for those packages.
+- Updates `.npmrc` `use-node-version` to the newest Node release that is older than `minimum-release-age` and matches `engines.node`.
+
+The command uses `scripts/update-deps-and-peers.ts` and is executed with Node's TypeScript type-stripping support (`node --experimental-strip-types`).
 
 After updating, run `pnpm audit` to check for vulnerabilities. If vulnerabilities exist in transitive dependencies, you may need to add overrides in `package.json` and/or exclusions in `.npmrc`. See [DEPENDENCY_OVERRIDES.md](./DEPENDENCY_OVERRIDES.md) for details.
 
