@@ -176,6 +176,12 @@ Direct API Gateway → SQS integration via `attachQueueToApiGatewayResource`, co
 - Optional DLQ S3 bucket for failed message archival
 - Lambda SQS event source consumers
 
+### Adding a new lambda to existing stack
+- Create a new file under `src/lambda/{lambda-name}/lambda-name.ts` with the handler code.
+- Create a new function in the that returns a `Function` construct using `FunctionBuilder`.
+- If it's an API handler, add a new route to the `DigitrafficRestApi` construct in the stack class that points to the new function(e.g. public-api.ts).
+- Add model & documentation, preferably use zod schema to create OpenAPI spec from code.
+
 ## Code Style
 
 You can check for code style by running this in application directory:
