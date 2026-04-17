@@ -17,13 +17,13 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1004.0",
-    "@digitraffic/common": "2026.3.17-2",
+    "@aws-sdk/client-s3": "3.1028.0",
+    "@digitraffic/common": "2026.4.17-2",
     "ajv": "8.18.0",
     "ajv-formats": "3.0.1",
     "archiver": "7.0.1",
-    "aws-cdk-lib": "2.241.0",
-    "constructs": "10.5.1",
+    "aws-cdk-lib": "2.248.0",
+    "constructs": "10.6.0",
     "ky": "1.14.3"
   },
   "devDependencies": {
@@ -31,13 +31,13 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.2.6",
+    "@rushstack/heft": "1.2.11",
     "@types/archiver": "7.0.0",
-    "@types/node": "25.3.5",
-    "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1111.0",
-    "esbuild": "0.27.3",
+    "@types/node": "24.12.2",
+    "@vitest/coverage-v8": "4.1.4",
+    "aws-cdk": "2.1118.0",
+    "esbuild": "0.28.0",
     "typescript": "5.9.3",
-    "vitest": "4.0.18"
+    "vitest": "4.1.4"
   }
 }
