@@ -18,7 +18,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.4.17-3",
+    "@digitraffic/common": "2026.4.17-2",
     "aws-cdk-lib": "2.248.0",
     "constructs": "10.6.0",
     "date-fns": "4.1.0",
@@ -36,18 +36,18 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.2.6",
+    "@rushstack/heft": "1.2.11",
     "@types/aws-lambda": "8.10.161",
     "@types/geojson": "7946.0.16",
-    "@types/node": "25.3.5",
-    "@types/sinon": "21.0.0",
+    "@types/node": "24.12.2",
+    "@types/sinon": "21.0.1",
     "@types/source-map-support": "0.5.10",
     "@types/xml2js": "0.4.14",
-    "@vitest/coverage-v8": "4.0.18",
-    "aws-cdk": "2.1111.0",
-    "esbuild": "0.27.3",
+    "@vitest/coverage-v8": "4.1.4",
+    "aws-cdk": "2.1118.0",
+    "esbuild": "0.28.0",
     "parallelshell": "3.0.2",
     "typescript": "5.9.3",
-    "vitest": "4.0.18"
+    "vitest": "4.1.4"
   }
 }
