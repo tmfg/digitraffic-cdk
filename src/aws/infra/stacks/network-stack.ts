@@ -1,5 +1,5 @@
 import type { IVpc } from "aws-cdk-lib/aws-ec2";
-import { IpAddresses, SubnetType, Vpc } from "aws-cdk-lib/aws-ec2";
+import { CfnRoute, IpAddresses, SubnetType, Vpc } from "aws-cdk-lib/aws-ec2";
 import { Stack } from "aws-cdk-lib/core";
 import type { Construct } from "constructs/lib/construct.js";
 import { exportValue } from "../import-util.js";
@@ -8,8 +8,10 @@ import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
 export interface NetworkConfiguration {
   readonly vpcName: string;
   readonly cidr: string;
+  readonly transitGatewayId?: string;
 }
 
+/** Creates a network stack with VPC and optional transit gateway routing */
 export class NetworkStack extends Stack {
   readonly vpc: IVpc;
 
@@ -62,12 +64,13 @@ export class NetworkStack extends Stack {
   }
 
   createVpc(configuration: NetworkConfiguration): Vpc {
-    return new Vpc(this, "DigitrafficVPC", {
+    const vpc = new Vpc(this, "DigitrafficVPC", {
       vpcName: configuration.vpcName,
       restrictDefaultSecurityGroup: false,
       availabilityZones: Stack.of(this).availabilityZones.sort().slice(0, 2), // take two first azs
       enableDnsHostnames: true,
       enableDnsSupport: true,
+      natGateways: configuration.transitGatewayId ? 0 : 2, // one for each AZ, or none if using transit gateway
       ipAddresses: IpAddresses.cidr(configuration.cidr),
       subnetConfiguration: [
         {
@@ -82,5 +85,19 @@ export class NetworkStack extends Stack {
         },
       ],
     });
+
+    // route traffic to transit gateway
+    if (configuration.transitGatewayId) {     
+      vpc.selectSubnets(undefined).subnets.forEach((subnet) => {
+      new CfnRoute(this, `SubnetRouteToTgw${subnet.node.id}`,
+        {
+          routeTableId: subnet.routeTable.routeTableId,
+          destinationCidrBlock: "0.0.0.0/0",
+          transitGatewayId: configuration.transitGatewayId,
+        });
+      });
+    }
+
+    return vpc;
   }
 }
