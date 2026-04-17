@@ -24,12 +24,12 @@
     "@aws-crypto/sha256-browser": "5.2.0",
     "@aws-sdk/client-sts": "3.1004.0",
     "@aws-sdk/types": "3.973.5",
-    "@digitraffic/common": "2026.3.17-2",
-    "@smithy/node-http-handler": "4.4.14",
+    "@digitraffic/common": "2026.4.17-3",
+    "@smithy/node-http-handler": "4.5.2",
     "@smithy/protocol-http": "5.3.11",
     "@smithy/signature-v4": "5.3.11",
-    "aws-cdk-lib": "2.241.0",
-    "constructs": "10.5.1"
+    "aws-cdk-lib": "2.248.0",
+    "constructs": "10.6.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",

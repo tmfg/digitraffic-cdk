@@ -47,9 +47,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.3.17-2",
-    "aws-cdk-lib": "2.241.0",
-    "constructs": "10.5.1"
+    "@digitraffic/common": "2026.4.17-3",
+    "aws-cdk-lib": "2.248.0",
+    "constructs": "10.6.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
