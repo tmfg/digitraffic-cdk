@@ -28,7 +28,6 @@ function createDataUpdateLambda(
   environment[LamHistoryEnvKeys.BUCKET_NAME] = bucketName;
 
   return FunctionBuilder.create(stack, "update-lam-stations")
-    .singleLambda()
     .withoutDatabaseAccess()
     .withEnvironment(environment)
     .build();

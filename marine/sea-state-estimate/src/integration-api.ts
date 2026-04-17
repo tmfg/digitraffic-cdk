@@ -105,7 +105,6 @@ function createUpdateRequestHandlerLambda(
 ): AwsFunction {
   const environment = stack.createDefaultLambdaEnvironment("SSE");
   const updateSseDataLambda = FunctionBuilder.create(stack, "update-sse-data")
-    .singleLambda()
     .withMemorySize(256)
     .withReservedConcurrentExecutions(1)
     .withEnvironment(environment)

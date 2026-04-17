@@ -113,12 +113,12 @@ function createReceiveMrsReportResource(
       "receive-epcmessage",
       logGroup,
       {
-        singleLambda: true,
         timeout: 10,
       },
     ),
   );
 
+  // eslint-disable-next-line deprecation/deprecation
   const integration = defaultIntegration(handler, {
     passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
     disableCors: true,
