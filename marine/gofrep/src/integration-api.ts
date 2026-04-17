@@ -113,7 +113,6 @@ function createReceiveMrsReportResource(
       "receive-epcmessage",
       logGroup,
       {
-        singleLambda: true,
         timeout: 10,
       },
     ),

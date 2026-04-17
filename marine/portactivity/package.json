@@ -26,7 +26,7 @@
     "@aws-sdk/client-sqs": "3.1028.0",
     "@aws-sdk/client-ssm": "3.1028.0",
     "@date-fns/tz": "1.4.1",
-    "@digitraffic/common": "2026.4.17-2",
+    "@digitraffic/common": "2026.4.17-3",
     "@middy/core": "7.2.1",
     "@middy/sqs-partial-batch-failure": "7.2.1",
     "aws-cdk-lib": "2.248.0",

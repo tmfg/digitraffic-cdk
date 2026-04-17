@@ -34,7 +34,6 @@ export class InternalLambdasCdk {
       {
         functionName: `${stack.configuration.shortName}-${domain}`,
         memorySize: 256,
-        singleLambda: false,
         timeout: 120,
         reservedConcurrentExecutions: 1,
       },

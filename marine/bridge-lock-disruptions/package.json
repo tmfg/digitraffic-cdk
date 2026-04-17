@@ -18,7 +18,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.4.17-2",
+    "@digitraffic/common": "2026.4.17-3",
     "aws-cdk-lib": "2.248.0",
     "constructs": "10.6.0",
     "date-fns": "4.1.0",

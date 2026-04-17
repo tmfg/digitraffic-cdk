@@ -16,7 +16,6 @@ function createUpdateLightsLambda(stack: DigitrafficStack): MonitoredFunction {
   const environment = stack.createLambdaEnvironment();
 
   return MonitoredFunction.createV2(stack, "update-lights", environment, {
-    singleLambda: true,
     timeout: 30,
     memorySize: 192,
   });

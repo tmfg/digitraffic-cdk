@@ -33,7 +33,6 @@ function createTestGetResources(
     "test-get",
     undefined,
     {
-      singleLambda: true,
       memorySize: 256,
       reservedConcurrentExecutions: 6,
     },
