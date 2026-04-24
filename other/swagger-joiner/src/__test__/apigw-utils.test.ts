@@ -1,5 +1,5 @@
 import { APIGatewayClient } from "@aws-sdk/client-api-gateway";
-import { get } from "lodash-es";
+import { get } from "es-toolkit/compat";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 const mockSend = vi.fn(() => Promise.resolve({ items: [] }));

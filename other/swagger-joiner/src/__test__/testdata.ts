@@ -1,5 +1,5 @@
 import type { OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
-import { set } from "lodash-es";
+import { set } from "es-toolkit/compat";
 import type { HttpMethod } from "../swagger-utils.js";
 
 export const getOpenapiDescriptionWithPaths = (
@@ -59,7 +59,7 @@ export function getPathWithSecurity(
   method: string = "get",
 ): OpenApiSchema["paths"] {
   const result = getSupportedPath(path);
-  set<OpenApiSchema["paths"]>(
+  set(
     result,
     [path, method, "security"],
     [

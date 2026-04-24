@@ -5,7 +5,7 @@ import type {
   OpenApiSchema,
 } from "@digitraffic/common/dist/types/openapi-schema";
 import { openapiOperation } from "@digitraffic/common/dist/types/openapi-schema";
-import { cloneDeep, merge } from "lodash-es";
+import { cloneDeep, merge } from "es-toolkit";
 
 const HttpMethods = [
   "get",
@@ -80,7 +80,7 @@ export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
   // Use the first element as the base, then merge the rest into it
   return allApis.slice(1).reduce<OpenApiSchema>(
     (acc, curr) => merge(acc, curr),
-    merge({}, allApis[0]), // clone to avoid mutating caller’s object
+    cloneDeep(allApis[0]!), // clone to avoid mutating caller's object
   );
 }
 
