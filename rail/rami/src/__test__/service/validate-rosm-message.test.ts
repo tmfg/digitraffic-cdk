@@ -1,4 +1,4 @@
-import { set } from "lodash-es";
+import { set } from "es-toolkit/compat";
 import { describe, expect, test } from "vitest";
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";
 import { cloneAndUndefine, undefine } from "../message-util.js";

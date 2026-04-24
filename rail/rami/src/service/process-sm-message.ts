@@ -1,6 +1,6 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { compact } from "lodash-es";
+import { compact } from "es-toolkit";
 import type { Connection } from "mysql2/promise";
 import type { z } from "zod";
 import { insertMessage } from "../dao/stop_monitoring_message.js";

@@ -1,4 +1,4 @@
-import { get } from "lodash-es";
+import { get } from "es-toolkit/compat";
 import type { Connection } from "mysql2/promise";
 import { afterAll, beforeAll, beforeEach, expect } from "vitest";
 import { inTransaction } from "../util/database.js";

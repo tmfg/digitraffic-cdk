@@ -1,5 +1,6 @@
 import { addHours } from "date-fns";
-import { chain } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
+import { set } from "es-toolkit/compat";
 import type { DtRosmMessage } from "../model/dt-rami-message.js";
 import type { RosmMessageOperation } from "../model/rosm-message.js";
 import { validRamiMonitoredJourneyScheduledMessage } from "./testdata-rosm.js";
@@ -113,53 +114,59 @@ export function createSmMessage(properties: {
   departureTime?: string;
   departureQuay?: string;
 }): unknown {
-  return chain(validMessageUnknownTrackAndDelay)
-    .clone()
-    .set(
-      [
-        "payload",
-        "monitoredStopVisits",
-        0,
-        "monitoredVehicleJourney",
-        "monitoredCall",
-        "expectedArrivalTime",
-      ],
-      properties.arrivalTime,
-    )
-    .set(
-      [
-        "payload",
-        "monitoredStopVisits",
-        0,
-        "monitoredVehicleJourney",
-        "monitoredCall",
-        "expectedDepartureTime",
-      ],
-      properties.departureTime,
-    )
-    .set(
-      [
-        "payload",
-        "monitoredStopVisits",
-        0,
-        "monitoredVehicleJourney",
-        "monitoredCall",
-        "arrivalStopAssignment",
-        "expectedQuayName",
-      ],
-      properties.arrivalQuay,
-    )
-    .set(
-      [
-        "payload",
-        "monitoredStopVisits",
-        0,
-        "monitoredVehicleJourney",
-        "monitoredCall",
-        "departureStopAssignment",
-        "expectedQuayName",
-      ],
-      properties.departureQuay,
-    )
-    .value();
+  const result = cloneDeep(validMessageUnknownTrackAndDelay) as Record<
+    string,
+    unknown
+  >;
+  set(
+    result,
+    [
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "expectedArrivalTime",
+    ],
+    properties.arrivalTime,
+  );
+  set(
+    result,
+    [
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "expectedDepartureTime",
+    ],
+    properties.departureTime,
+  );
+  set(
+    result,
+    [
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "arrivalStopAssignment",
+      "expectedQuayName",
+    ],
+    properties.arrivalQuay,
+  );
+  set(
+    result,
+    [
+      "payload",
+      "monitoredStopVisits",
+      0,
+      "monitoredVehicleJourney",
+      "monitoredCall",
+      "departureStopAssignment",
+      "expectedQuayName",
+    ],
+    properties.departureQuay,
+  );
+  return result;
 }

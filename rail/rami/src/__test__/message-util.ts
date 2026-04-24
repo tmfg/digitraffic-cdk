@@ -1,4 +1,5 @@
-import { cloneDeep, set } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
+import { set } from "es-toolkit/compat";
 
 /**
  * Returns new copy of given object, with given path undefined

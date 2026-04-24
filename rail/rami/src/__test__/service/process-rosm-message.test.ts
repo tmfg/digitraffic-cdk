@@ -1,4 +1,5 @@
-import { cloneDeep, set } from "lodash-es";
+import { cloneDeep } from "es-toolkit";
+import { set } from "es-toolkit/compat";
 import { describe, expect, test } from "vitest";
 import { RosmMessageOperations } from "../../model/rosm-message.js";
 import { getActiveMessages } from "../../service/get-message.js";
