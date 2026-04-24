@@ -182,7 +182,9 @@ export class Behavior {
     edgeFunction: FunctionType,
   ): this {
     if (this.lambdaConfig.functions.has(type)) {
-      throw new Error(`EdgeFunction already assigned for type ${type}`);
+      throw new Error(
+        `${this.behaviorPath} §EdgeFunction already assigned for type ${type}`,
+      );
     }
 
     if (
@@ -191,7 +193,9 @@ export class Behavior {
       (type === FunctionEventType.VIEWER_RESPONSE &&
         this.lambdaConfig.lambdas.has(LambdaEdgeEventType.VIEWER_RESPONSE))
     ) {
-      throw new Error(`EdgeLambda already assigned for type ${type}`);
+      throw new Error(
+        `${this.behaviorPath} EdgeLambda already assigned for type ${type}`,
+      );
     }
 
     this.lambdaConfig.functions.set(type, edgeFunction);
@@ -201,7 +205,9 @@ export class Behavior {
 
   private addLambda(type: LambdaEdgeEventType, lambda: LambdaType): this {
     if (this.lambdaConfig.lambdas.has(type)) {
-      throw new Error(`Lambda already assigned for type ${type}`);
+      throw new Error(
+        `${this.behaviorPath} Lambda already assigned for type ${type}`,
+      );
     }
 
     if (
@@ -210,7 +216,9 @@ export class Behavior {
       (type === LambdaEdgeEventType.VIEWER_RESPONSE &&
         this.lambdaConfig.functions.has(FunctionEventType.VIEWER_RESPONSE))
     ) {
-      throw new Error(`EdgeFunction already assigned for type ${type}`);
+      throw new Error(
+        `${this.behaviorPath} EdgeFunction already assigned for type ${type}`,
+      );
     }
 
     this.lambdaConfig.lambdas.set(type, lambda);
