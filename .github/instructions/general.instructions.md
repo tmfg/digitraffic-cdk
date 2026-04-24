@@ -1,5 +1,6 @@
 ---
 name: 'digitraffic-cdk repository instructions'
+applyTo:  "**"
 ---
 
 # Tools
