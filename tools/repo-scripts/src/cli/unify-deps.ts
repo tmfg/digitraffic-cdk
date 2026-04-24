@@ -1,8 +1,8 @@
 #!/usr/bin/env zx --quiet
 
 import async from "async";
+import { groupBy, mapValues } from "es-toolkit";
 import fs from "fs-extra";
-import { chain, head, mapValues, trimStart } from "lodash";
 import { $, chalk, question } from "zx";
 
 interface RushVersion {
@@ -51,10 +51,9 @@ interface PackageJson {
 async function askVersion(check: RushCheck): Promise<DependencyVersion> {
   console.log(`Dependency: ${chalk.blue(check.dependencyName)}`);
 
-  const versions = chain(check.versions)
-    .sortBy(({ version }) => version)
-    .reverse()
-    .value();
+  const versions = [...check.versions].sort((a, b) =>
+    b.version.localeCompare(a.version),
+  );
 
   versions.forEach((version) => {
     console.log(`  Version: ${chalk.green(version.version)}`);
@@ -71,7 +70,7 @@ async function askVersion(check: RushCheck): Promise<DependencyVersion> {
 
   if (check.dependencyName.includes("@types/")) {
     // strip ^ and ~ from @types/ dependencies
-    left.version = trimStart(left.version, "^~");
+    left.version = left.version.replace(/^[\^~]+/, "");
   }
 
   let version = await question(
@@ -100,34 +99,38 @@ async function askVersion(check: RushCheck): Promise<DependencyVersion> {
 function groupByDependency(
   dependencyVersions: DependencyVersion[],
 ): Dependencies {
-  return chain(dependencyVersions)
-    .groupBy("dependencyName")
-    .mapValues((items) => head(items))
-    .value();
+  const grouped = groupBy(dependencyVersions, (item) => item.dependencyName);
+  return mapValues(grouped, (items) => items[0]);
 }
 
 function updateVersions(
   dependencies: Dependencies,
   packageJson: PackageJson,
 ): PackageJson {
-  return mapValues(packageJson, (value, packageJsonKey) => {
-    if (
-      ["dependencies", "devDependencies", "peerDependencies"].includes(
-        packageJsonKey,
-      )
-    ) {
-      return mapValues(value, (version: string, dependencyName: string) => {
-        const newDependency = dependencies[dependencyName];
+  return mapValues(
+    packageJson as unknown as Record<string, unknown>,
+    (value, packageJsonKey) => {
+      if (
+        ["dependencies", "devDependencies", "peerDependencies"].includes(
+          packageJsonKey,
+        )
+      ) {
+        return mapValues(
+          value as Record<string, string>,
+          (version: string, dependencyName: string) => {
+            const newDependency = dependencies[dependencyName];
 
-        if (!newDependency || version.includes("workspace")) {
-          return version;
-        }
+            if (!newDependency || version.includes("workspace")) {
+              return version;
+            }
 
-        return newDependency.version;
-      });
-    }
-    return value;
-  }) as PackageJson;
+            return newDependency.version;
+          },
+        );
+      }
+      return value;
+    },
+  ) as PackageJson;
 }
 
 async function main(): Promise<void> {

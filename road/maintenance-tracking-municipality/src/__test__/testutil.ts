@@ -7,8 +7,8 @@ import type { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-t
 import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { add } from "date-fns/add";
 import { sub } from "date-fns/sub";
+import { cloneDeep } from "es-toolkit";
 import type { Feature, Geometry, LineString, Point, Position } from "geojson";
-import _ from "lodash";
 import type {
   DbDomainContract,
   DbDomainTaskMapping,
@@ -186,7 +186,7 @@ export function createApiRouteDataForEveryMinute(
       altitude: position[2]!,
       deviceName: deviceId.toString(),
       timest: eventTime.toISOString(),
-      ioChannels: _.cloneDeep(operations),
+      ioChannels: cloneDeep(operations),
       timestamp: eventTime,
     };
   });
