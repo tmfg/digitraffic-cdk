@@ -3,7 +3,6 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky from "ky";
-import _ from "lodash";
 import type { MonitoredEndpoint } from "../app-props.js";
 import { EndpointHttpMethod, EndpointProtocol } from "../app-props.js";
 import type { UpdateStatusSecret } from "../secret.js";
@@ -551,7 +550,9 @@ export class NodePingApi {
       needsUpdate = true;
     }
 
-    const currentContactIds = check.notifications.flatMap((n) => _.keys(n));
+    const currentContactIds = check.notifications.flatMap((n) =>
+      Object.keys(n),
+    );
 
     if (
       !currentContactIds.every((c) => contactIds.includes(c)) ||

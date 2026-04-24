@@ -1,7 +1,6 @@
 import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import _ from "lodash";
 import type {
   CStateStatuspageApi,
   CStateSystem,
@@ -333,7 +332,7 @@ function getContactId(
   const contact = Object.values(contacts).find((c) => c.name === contactName);
   const message = `NodePing contact with name ${contactName}` as const;
   if (contact) {
-    const contactId = _.keys(contact.addresses)[0];
+    const contactId = Object.keys(contact.addresses)[0];
     if (!contactId) {
       logger.error({
         method,

@@ -1,7 +1,6 @@
 import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import ky from "ky";
-import _ from "lodash";
 import type { MonitoredApp } from "../app-props.js";
 import type { AppWithEndpoints } from "../model/app-with-endpoints.js";
 
@@ -115,7 +114,7 @@ export class DigitrafficApi {
       method,
       customApiApp: app.name,
       message: `Found ${apisToTest.length}/${
-        _.keys(resp.paths).length
+        Object.keys(resp.paths).length
       } Digitraffic endpoints to test`,
     });
 

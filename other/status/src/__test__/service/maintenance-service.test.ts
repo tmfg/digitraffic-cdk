@@ -1,6 +1,6 @@
 import { randomString } from "@digitraffic/common/dist/test/testutils";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";
-import _ from "lodash";
+import { range } from "es-toolkit";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type { ActiveMaintenance } from "../../api/cstate-statuspage-api.js";
 import { CStateStatuspageApi } from "../../api/cstate-statuspage-api.js";
@@ -183,7 +183,7 @@ function getNodePingChecks(
   checksCount: number,
   checksActive: boolean,
 ): NodePingCheck[] {
-  return _.range(checksCount).map(
+  return range(checksCount).map(
     () =>
       ({
         _id: randomString(),

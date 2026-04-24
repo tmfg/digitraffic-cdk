@@ -1,7 +1,7 @@
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { randomString } from "@digitraffic/common/dist/test/testutils";
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
-import _ from "lodash";
+import { isEqual } from "es-toolkit";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type {
   CStateStatus,
@@ -246,8 +246,8 @@ describe("StatusServiceTest", () => {
 
     const slackContact = makeContact(secret.nodePingContactIdSlack1);
     const ghActionsContact = makeContact(`GitHub Actions for status master`);
-    const slackContactId = _.keys(slackContact.addresses)[0]!;
-    const ghContactId = _.keys(ghActionsContact.addresses)[0]!;
+    const slackContactId = Object.keys(slackContact.addresses)[0]!;
+    const ghContactId = Object.keys(ghActionsContact.addresses)[0]!;
 
     const check = makeNodepingCheck(TrafficType.ROAD, "http://some.url");
     check.notifications.push(
@@ -357,7 +357,10 @@ describe("StatusServiceTest", () => {
       { [secret.nodePingContactIdSlack1]: { delay: 0, schedule: "All" } },
       { [secret.nodePingContactIdSlack2]: { delay: 0, schedule: "All" } },
       {
-        [_.keys(ghActionsContact.addresses)[0]!]: { delay: 0, schedule: "All" },
+        [Object.keys(ghActionsContact.addresses)[0]!]: {
+          delay: 0,
+          schedule: "All",
+        },
       },
     );
 
@@ -447,7 +450,7 @@ async function callWithStubsAndVerifyUpdateComponentsAndChecksForApp(
   expect(getAppEndpointsStub).toHaveBeenCalledTimes(1);
 
   // if contacts are ok they are fetched once, if not, then they are created and fetched for second time
-  const createContact = !_.isEqual(
+  const createContact = !isEqual(
     getNodepingContacts1.sort(),
     getNodepingContacts2.sort(),
   );
