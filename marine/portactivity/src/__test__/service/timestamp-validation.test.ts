@@ -1,5 +1,5 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import _ from "lodash";
+import { omit, set } from "es-toolkit/compat";
 import { describe, expect, test } from "vitest";
 import { NavStatus } from "../../model/ais-status.js";
 import { EventSource } from "../../model/eventsource.js";
@@ -19,22 +19,22 @@ describe(
     });
 
     test("validateTimestamp - missing eventType", async () => {
-      const timestamp = _.omit(newTimestamp(), "eventType");
+      const timestamp = omit(newTimestamp(), "eventType");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - missing eventTime", async () => {
-      const timestamp = _.omit(newTimestamp(), "eventTime");
+      const timestamp = omit(newTimestamp(), "eventTime");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - invalid eventTime", async () => {
-      const timestamp = _.set(newTimestamp(), "eventTime", "123456-qwerty");
+      const timestamp = set(newTimestamp(), "eventTime", "123456-qwerty");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - invalid eventTimeConfidenceLowerDiff", async () => {
-      const timestamp = _.set(
+      const timestamp = set(
         newTimestamp({ eventTimeConfidenceUpperDiff: 1000 }),
         "eventTimeConfidenceLowerDiff",
         "-1000a",
@@ -49,7 +49,7 @@ describe(
     });
 
     test("validateTimestamp - invalid eventTimeConfidenceUpperDiff", async () => {
-      const timestamp = _.set(
+      const timestamp = set(
         newTimestamp({ eventTimeConfidenceLowerDiff: 1000 }),
         "eventTimeConfidenceUpperDiff",
         "-1000a",
@@ -100,37 +100,37 @@ describe(
     });
 
     test("validateTimestamp - missing recordTime", async () => {
-      const timestamp = _.omit(newTimestamp(), "recordTime");
+      const timestamp = omit(newTimestamp(), "recordTime");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - invalid recordTime", async () => {
-      const timestamp = _.set(newTimestamp(), "recordTime", "123456-qwerty");
+      const timestamp = set(newTimestamp(), "recordTime", "123456-qwerty");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - missing source", async () => {
-      const timestamp = _.omit(newTimestamp(), "source");
+      const timestamp = omit(newTimestamp(), "source");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - missing ship", async () => {
-      const timestamp = _.omit(newTimestamp(), "ship");
+      const timestamp = omit(newTimestamp(), "ship");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - missing mmsi & imo", async () => {
-      const timestamp = _.omit(newTimestamp(), ["ship.imo", "ship.mmsi"]);
+      const timestamp = omit(newTimestamp(), ["ship.imo", "ship.mmsi"]);
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - missing location", async () => {
-      const timestamp = _.omit(newTimestamp(), "location");
+      const timestamp = omit(newTimestamp(), "location");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 
     test("validateTimestamp - missing port", async () => {
-      const timestamp = _.omit(newTimestamp(), "location", "port");
+      const timestamp = omit(newTimestamp(), "location", "port");
       expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
     });
 

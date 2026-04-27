@@ -8,7 +8,7 @@ import {
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
 import { parseISO } from "date-fns";
-import _ from "lodash";
+import { groupBy } from "es-toolkit";
 import type {
   DbETAShip,
   DbTimestamp,
@@ -216,13 +216,10 @@ export async function findETAShipsByLocode(ports: Ports): Promise<DbETAShip[]> {
   });
 
   // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
-  const shipsByImo = _.groupBy(portnetShips, (s) => s.imo.toString());
+  const shipsByImo = groupBy(portnetShips, (s) => s.imo.toString());
   const newestShips = Object.values(shipsByImo)
-    .flatMap((ships) =>
-      _.chain(ships)
-        .sortBy((ship: DbETAShip) => ship.eta)
-        .head()
-        .value(),
+    .flatMap(
+      (ships) => ships.toSorted((a, b) => a.eta.getTime() - b.eta.getTime())[0],
     )
     .filter((ship): ship is DbETAShip => ship !== undefined);
   logger.info({

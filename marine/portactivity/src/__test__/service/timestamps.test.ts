@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addHours, addMinutes, parseISO, subDays } from "date-fns";
-import _ from "lodash";
+import { omit } from "es-toolkit/compat";
 import { describe, expect, test } from "vitest";
 import { EventSource } from "../../model/eventsource.js";
 import { EventType } from "../../model/timestamp.js";
@@ -210,7 +210,7 @@ describe(
     });
 
     test("saveTimestamp - no IMO, timestamp not saved", async () => {
-      const timestamp = _.omit(newTimestamp(), "ship.imo");
+      const timestamp = omit(newTimestamp(), "ship.imo");
 
       const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
@@ -218,7 +218,7 @@ describe(
     });
 
     test("saveTimestamp - no MMSI but IMO exists, timestamp saved", async () => {
-      const timestamp = _.omit(newTimestamp(), "ship.mmsi");
+      const timestamp = omit(newTimestamp(), "ship.mmsi");
 
       const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
@@ -230,7 +230,7 @@ describe(
       const vessel = newVessel(timestamp);
       await insertVessel(db, vessel);
 
-      const timestamp2 = _.omit(timestamp, "ship.imo");
+      const timestamp2 = omit(timestamp, "ship.imo");
       const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
       expect(ret?.location_locode).toBe(timestamp2.location.port);
@@ -243,7 +243,7 @@ describe(
       const vessel = newVessel(timestamp);
       await insertVessel(db, vessel);
 
-      const timestamp2 = _.omit(timestamp, "ship.mmsi");
+      const timestamp2 = omit(timestamp, "ship.mmsi");
       const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
       expect(ret?.location_locode).toBe(timestamp.location.port);
@@ -256,7 +256,7 @@ describe(
         Object.values(EventSource)
           .filter((source) => source !== EventSource.AWAKE_AI_PRED)
           .map(async (source) => {
-            const timestamp = _.omit(newTimestamp({ source }), "portcallId");
+            const timestamp = omit(newTimestamp({ source }), "portcallId");
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
             expect(ret).not.toBeDefined();
           }),
@@ -264,7 +264,7 @@ describe(
     });
 
     test("saveTimestamp - saved with missing portcallId when timestamp is PRED", async () => {
-      const predTimestamp = _.omit(
+      const predTimestamp = omit(
         newTimestamp({ source: EventSource.AWAKE_AI_PRED }),
         "portcallId",
       );
@@ -273,7 +273,7 @@ describe(
     });
 
     test("saveTimestamp - portcall id found for ETB timestamp from VTS A source", async () => {
-      const vtsTimestamp = _.omit(
+      const vtsTimestamp = omit(
         newTimestamp({
           eventType: EventType.ETB,
           eventTime: addHours(Date.now(), 1),

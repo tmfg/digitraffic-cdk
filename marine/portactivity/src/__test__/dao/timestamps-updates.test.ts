@@ -1,6 +1,6 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
-import _ from "lodash";
+import { omit } from "es-toolkit/compat";
 import { describe, expect, test } from "vitest";
 import * as TimestampsDb from "../../dao/timestamps.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
@@ -97,7 +97,7 @@ describe(
     });
 
     test("updateTimestamp - no duplicate rows with null mmsi", async () => {
-      const timestamp = _.omit(newTimestamp(), "ship.mmsi");
+      const timestamp = omit(newTimestamp(), "ship.mmsi");
 
       await TimestampsDb.updateTimestamp(db, timestamp);
       expect(await TimestampsDb.updateTimestamp(db, timestamp)).toBeNull();

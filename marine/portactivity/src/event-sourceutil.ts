@@ -1,5 +1,5 @@
 import { differenceInMinutes, parseISO } from "date-fns";
-import _ from "lodash";
+import { groupBy, isEqual } from "es-toolkit";
 import { EventSource } from "./model/eventsource.js";
 import type { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp.js";
 import type { ShiplistTimestamp } from "./service/shiplist.js";
@@ -114,10 +114,12 @@ export function mergeTimestamps(ts: unknown[]): unknown[] {
     );
 
   // group by portcall id and event type
-  const byPortcallId = _.chain(filteredTimestamps)
-    .groupBy((ts) => (ts.portcallId ?? -1).toString() + ts.eventType)
-    .values()
-    .value();
+  const byPortcallId = Object.values(
+    groupBy(
+      filteredTimestamps,
+      (ts) => (ts.portcallId ?? -1).toString() + ts.eventType,
+    ),
+  );
 
   // timestamps relating to specific port call
   for (const portcallTimestamps of byPortcallId) {
@@ -148,8 +150,8 @@ export function mergeTimestamps(ts: unknown[]): unknown[] {
           ))
       ) {
         // remove only VTS timestamp
-        addToList = addToList.filter((t) => !_.isEqual(t, vtsTimestamp));
-        vtsAStamps = vtsAStamps.filter((t) => !_.isEqual(t, vtsTimestamp));
+        addToList = addToList.filter((t) => !isEqual(t, vtsTimestamp));
+        vtsAStamps = vtsAStamps.filter((t) => !isEqual(t, vtsTimestamp));
       }
     }
 
@@ -184,5 +186,7 @@ export function mergeTimestamps(ts: unknown[]): unknown[] {
     ret.push(...addToList);
   }
 
-  return _.sortBy(ret, (ts) => parseISO(ts.eventTime).valueOf());
+  return ret.toSorted(
+    (a, b) => parseISO(a.eventTime).valueOf() - parseISO(b.eventTime).valueOf(),
+  );
 }
