@@ -76,12 +76,6 @@
       "tags": ["cdk", "marine"]
     },
     {
-      "packageName": "bridge-lock-disruptions",
-      "projectFolder": "marine/bridge-lock-disruptions",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "marine"]
-    },
-    {
       "packageName": "gofrep",
       "projectFolder": "marine/gofrep",
       "decoupledLocalDependencies": ["@digitraffic/common"],

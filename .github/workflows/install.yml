@@ -35,7 +35,6 @@ on:
         options: 
           - "digitraffic-statistics"
           - "aton-faults"
-          - "bridge-lock-disruptions"
           - "marinecam"
           - "port-call"
           - "portactivity"
