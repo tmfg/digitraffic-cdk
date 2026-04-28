@@ -7,5 +7,10 @@
     "@biomejs/biome": "2.4.6",
     "sort-package-json": "3.6.0",
     "zx": "8.8.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "picomatch@>=4.0.0 <4.0.4": "4.0.4"
+    }
   }
 }
