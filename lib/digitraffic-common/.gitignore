@@ -16,6 +16,7 @@
 !/README.md
 !/tsconfig.json
 !/tsconfig.test.json
+!/vitest.config.ts
 
 !src/
 !src/**/

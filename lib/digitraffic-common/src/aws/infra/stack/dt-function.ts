@@ -28,7 +28,6 @@ import { createLambdaLogGroup } from "./lambda-log-group.js";
 import type { DigitrafficStackInterface } from "./stack.js";
 
 type FunctionFeatures = {
-  singleLambda: boolean;
   databaseAccess: boolean;
   secretAccess: boolean;
 };
@@ -59,7 +58,6 @@ export class FunctionBuilder {
   private readonly allowedActions: string[] = [];
 
   private readonly _features: FunctionFeatures = {
-    singleLambda: false,
     databaseAccess: true,
     secretAccess: true,
   };
@@ -105,23 +103,10 @@ export class FunctionBuilder {
   }
 
   /**
-   * Stack only has one lambda.  Default is that it has multiple lambdas.
-   */
-  public singleLambda(): this {
-    this._features.singleLambda = true;
-
-    return this;
-  }
-
-  /**
    * Use AssetCode from given path(dist/lambda/${path}).  Default path is lambdaName. Also calls withHandler with the same value.
    */
   public withAssetCode(path: string = this._name): this {
-    const lambdaPath = this._features.singleLambda
-      ? `dist/lambda/`
-      : `dist/lambda/${path}`;
-
-    this.code = new AssetCode(lambdaPath);
+    this.code = new AssetCode(`dist/lambda/${path}`);
 
     this.withHandler(path);
 

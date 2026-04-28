@@ -1,6 +1,3 @@
-import type { ObjectCannedACL } from "@aws-sdk/client-s3";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import type { NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { Duration } from "aws-cdk-lib";
 import {
   ComparisonOperator,
@@ -8,30 +5,18 @@ import {
 } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { InlineCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { QueueProps } from "aws-cdk-lib/aws-sqs";
 import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
-import type { SQSEvent, SQSHandler, SQSRecord } from "aws-lambda";
-import { logger } from "../runtime/dt-logger-default.js";
+// getDlqCode and sanitizeS3BucketName live in a separate internal module so they
+// are not part of the public API surface exported from this package.
+// Tests can import them directly from sqs-queue-internal.ts.
+import { getDlqCode, sanitizeS3BucketName } from "./sqs-queue-internal.js";
 import { createLambdaLogGroup } from "./stack/lambda-log-group.js";
 import { MonitoredFunction } from "./stack/monitoredfunction.js";
 import type { DigitrafficStack } from "./stack/stack.js";
-
-const DLQ_LAMBDA_CODE = `
-import type { ObjectCannedACL } from "@aws-sdk/client-s3";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { type NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
-import { logger } from "./dt-logger-default.mjs";
-
-
-const bucketName = "__bucketName__";
-
-__upload__
-
-exports.handler = async (event) => __handler__
-` as const;
 
 /**
  * Construct for creating SQS-queues.
@@ -90,6 +75,7 @@ export const DigitrafficDLQueue = {
     });
 
     const dlqBucket = new Bucket(stack, `${dlqName}-Bucket`, {
+      bucketName: sanitizeS3BucketName(`${stack.stackName}-${dlqName}`),
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 
@@ -141,52 +127,4 @@ function addDLQAlarm(
       comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
     })
     .addAlarmAction(new SnsAction(stack.warningTopic));
-}
-
-function getDlqCode(Bucket: string): InlineCode {
-  const functionBody = DLQ_LAMBDA_CODE.replace("__bucketName__", Bucket)
-    .replace("__upload__", uploadToS3.toString())
-    .replace("__handler__", createHandler().toString().substring(23)); // remove function handler() from signature
-
-  return new InlineCode(functionBody);
-}
-
-async function uploadToS3(
-  s3: S3Client,
-  bucketName: string,
-  body: NodeJsRuntimeStreamingBlobPayloadInputTypes,
-  objectName: string,
-  cannedAcl?: ObjectCannedACL,
-  contentType?: string,
-): Promise<void> {
-  const command = new PutObjectCommand({
-    Bucket: bucketName,
-    Key: objectName,
-    Body: body,
-    ACL: cannedAcl,
-    ContentType: contentType,
-  });
-  try {
-    await s3.send(command);
-  } catch (_error) {
-    logger.error({
-      method: "s3.uploadToS3",
-      message: `upload failed to bucket ${bucketName}`,
-    });
-  }
-}
-
-// bucketName is unused, will be overridden in the actual lambda code below
-const bucketName = "";
-
-function createHandler(): SQSHandler {
-  return async function handler(event: SQSEvent): Promise<void> {
-    const millis = Date.now();
-    const s3 = new S3Client({});
-    await Promise.all(
-      event.Records.map((e: SQSRecord, idx: number) => {
-        return uploadToS3(s3, bucketName, e.body, `dlq-${millis}-${idx}.json`);
-      }),
-    );
-  };
 }
