@@ -70,4 +70,18 @@ export class DigitrafficCanaryRole extends Role {
     );
     return this;
   }
+
+  /**
+   * Provides permissions to read API keys from API Gateway.
+   * Required for URL canaries that validate API-key-protected endpoints.
+   */
+  withApiGatewayAccess(): this {
+    this.addToPolicy(
+      new PolicyStatement({
+        actions: ["apigateway:GET"],
+        resources: ["arn:aws:apigateway:*::/apikeys/*"],
+      }),
+    );
+    return this;
+  }
 }

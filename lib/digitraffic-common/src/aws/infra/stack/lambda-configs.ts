@@ -68,21 +68,14 @@ export function lambdaFunctionProps(
     timeout: Duration.seconds(config?.timeout ?? 60),
     logGroup: logGroup,
     reservedConcurrentExecutions: config?.reservedConcurrentExecutions ?? 2,
-    code: getAssetCode(simpleLambdaName, config?.singleLambda ?? false),
+    code: getAssetCode(simpleLambdaName),
     handler: `${simpleLambdaName}.handler`,
     environment,
   };
 }
 
-function getAssetCode(
-  simpleLambdaName: string,
-  isSingleLambda: boolean,
-): AssetCode {
-  const lambdaPath = isSingleLambda
-    ? `dist/lambda/`
-    : `dist/lambda/${simpleLambdaName}`;
-
-  return new AssetCode(lambdaPath);
+function getAssetCode(simpleLambdaName: string): AssetCode {
+  return new AssetCode(`dist/lambda/${simpleLambdaName}`);
 }
 
 export function defaultLambdaConfiguration(
@@ -129,7 +122,6 @@ export interface FunctionParameters {
   vpcSubnets?: SubnetSelection;
   runtime?: Runtime;
   architecture?: Architecture;
-  singleLambda?: boolean;
 }
 
 export type MonitoredFunctionParameters = FunctionParameters & {

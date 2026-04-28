@@ -166,9 +166,8 @@ export class DtLogger {
   private log(message: LoggableTypeInternal): void {
     // Append always method to message
     if (
-      !message.message ||
-      !message.message.length ||
-      !message.message.includes(message.method)
+      !message.message?.length ||
+      !message.message?.includes(message.method)
     ) {
       message.message = `${message.method} ${message.message ?? ""}`;
     }

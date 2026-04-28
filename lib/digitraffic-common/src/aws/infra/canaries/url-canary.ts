@@ -7,6 +7,7 @@ import type { DigitrafficStack } from "../stack/stack.js";
 import { DigitrafficCanary } from "./canary.js";
 import { ENV_API_KEY, ENV_HOSTNAME, ENV_SECRET } from "./canary-keys.js";
 import type { CanaryParameters } from "./canary-parameters.js";
+import { DigitrafficCanaryRole } from "./canary-role.js";
 
 export interface UrlCanaryParameters extends CanaryParameters {
   readonly hostname: string;
@@ -66,6 +67,10 @@ export class UrlCanary extends DigitrafficCanary {
     params: Partial<UrlCanaryParameters>,
     secret?: ISecret,
   ): UrlCanary {
+    if (role instanceof DigitrafficCanaryRole) {
+      role.withApiGatewayAccess();
+    }
+
     return new UrlCanary(
       stack,
       role,
