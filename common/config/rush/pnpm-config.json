@@ -96,16 +96,28 @@
     "minimatch@<3.1.4": "3.1.5",
     "minimatch@>=9.0.0 <9.0.7": "9.0.9",
     "minimatch@>=10.0.0 <10.2.3": "10.2.4",
-    // Fix serialize-javascript RCE vulnerability (GHSA-5c6j-r48x-rmvq)
-    "serialize-javascript@<=7.0.2": "7.0.3",
+    // Fix serialize-javascript RCE vulnerability (GHSA-5c6j-r48x-rmvq, CVE-2026-34043)
+    "serialize-javascript@<=7.0.4": "7.0.5",
     // Fix glob CLI command injection vulnerability (GHSA-xxxx) in versions >=10.2.0 <10.5.0
     "glob@>=10.2.0 <10.5.0": "10.5.0",
     // Fix ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6)
     "ajv@>=7.0.0-alpha.0 <8.18.0": "8.18.0",
-    // Fix fast-xml-parser stack overflow (GHSA-fj3w-jwp8-x2g3)
-    "fast-xml-parser@<5.3.8": "5.3.8",
+    // Fix fast-xml-parser stack overflow and XML injection vulnerabilities (GHSA-fj3w-jwp8-x2g3, CVE-2026-41650)
+    "fast-xml-parser@<5.7.0": "5.7.0",
     // Fix undici vulnerabilities (GHSA-f269-vfmq-vjvj, GHSA-vrm6-8vpv-qv8q, GHSA-v9p9-hfj2-hcw8)
-    "undici@>=7.0.0 <7.24.0": "7.24.1"
+    "undici@>=7.0.0 <7.24.0": "7.24.1",
+    // Fix vite path traversal and filesystem access vulnerabilities (CVE-2026-39363, CVE-2026-39364, CVE-2026-39365)
+    "vite@>=7.0.0 <=7.3.1": "7.3.2",
+    "vite@>=8.0.0 <=8.0.4": "8.0.5",
+    // Fix lodash code injection and prototype pollution (CVE-2026-4800, CVE-2026-2950)
+    "lodash@>=4.0.0 <=4.17.23": "4.18.1",
+    // Fix brace-expansion zero-step sequence DoS (CVE-2026-33750)
+    "brace-expansion@<1.1.13": "1.1.13",
+    "brace-expansion@>=2.0.0 <2.0.3": "2.0.3",
+    "brace-expansion@>=4.0.0 <5.0.5": "5.0.5",
+    // Fix picomatch ReDoS vulnerabilities (CVE-2026-33671, CVE-2026-33672)
+    "picomatch@<2.3.2": "2.3.2",
+    "picomatch@>=4.0.0 <4.0.4": "4.0.4"
   },
 
   /**
