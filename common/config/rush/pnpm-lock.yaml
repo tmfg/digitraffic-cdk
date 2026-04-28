@@ -15,7 +15,7 @@ overrides:
   undici@>=7.0.0 <7.24.0: 7.24.1
   vite@>=7.0.0 <=7.3.1: 7.3.2
   vite@>=8.0.0 <=8.0.4: 8.0.5
-  lodash@>=4.0.0 <=4.17.23: 4.18.0
+  lodash@>=4.0.0 <=4.17.23: 4.18.1
   brace-expansion@<1.1.13: 1.1.13
   brace-expansion@>=2.0.0 <2.0.3: 2.0.3
   brace-expansion@>=4.0.0 <5.0.5: 5.0.5
@@ -5988,10 +5988,6 @@ packages:
   lodash-es@4.18.1:
     resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
 
-  lodash@4.18.0:
-    resolution: {integrity: sha512-l1mfj2atMqndAHI3ls7XqPxEjV2J9ZkcNyHpoZA3r2T1LLwDB69jgkMWh71YKwhBbK0G2f4WSn05ahmQXVxupA==}
-    deprecated: Bad release. Please use lodash@4.17.21 instead.
-
   lodash@4.18.1:
     resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
@@ -8936,7 +8932,7 @@ snapshots:
       jest-config: 29.5.0(@types/node@24.12.2)(ts-node@10.9.2(@types/node@24.12.2)(typescript@5.9.3))
       jest-resolve: 29.5.0
       jest-snapshot: 29.5.0
-      lodash: 4.18.0
+      lodash: 4.18.1
       punycode: 2.3.1
     optionalDependencies:
       jest-environment-node: 29.7.0
@@ -12350,8 +12346,6 @@ snapshots:
       p-locate: 4.1.0
 
   lodash-es@4.18.1: {}
-
-  lodash@4.18.0: {}
 
   lodash@4.18.1: {}
 
