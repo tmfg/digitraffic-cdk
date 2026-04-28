@@ -87,10 +87,9 @@ export class NetworkStack extends Stack {
     });
 
     // route traffic to transit gateway
-    if (configuration.transitGatewayId) {     
+    if (configuration.transitGatewayId) {
       vpc.selectSubnets(undefined).subnets.forEach((subnet) => {
-      new CfnRoute(this, `SubnetRouteToTgw${subnet.node.id}`,
-        {
+        new CfnRoute(this, `SubnetRouteToTgw${subnet.node.id}`, {
           routeTableId: subnet.routeTable.routeTableId,
           destinationCidrBlock: "0.0.0.0/0",
           transitGatewayId: configuration.transitGatewayId,
