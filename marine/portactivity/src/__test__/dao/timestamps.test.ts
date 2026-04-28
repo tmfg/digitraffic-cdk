@@ -1,7 +1,7 @@
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
-import _ from "lodash";
+import { omit } from "es-toolkit/compat";
 import { describe, expect, test } from "vitest";
 import type { DbTimestamp } from "../../dao/timestamps.js";
 import * as TimestampsDb from "../../dao/timestamps.js";
@@ -217,7 +217,7 @@ describe(
         const recordTime = new Date();
         const eventTime = addHours(recordTime, 10);
 
-        const predTimestamp = _.omit(
+        const predTimestamp = omit(
           newTimestamp({
             source: EventSource.AWAKE_AI_PRED,
             recordTime,
@@ -272,7 +272,7 @@ describe(
         const futureEventTime = addDays(date, 1);
         const pastEventTime = subDays(date, 1);
 
-        const latestPredTimestamp = _.omit(
+        const latestPredTimestamp = omit(
           newTimestamp({
             source: EventSource.AWAKE_AI_PRED,
             recordTime: latestRecordTime,
@@ -408,7 +408,7 @@ describe(
 
     test("findByImo - null mmsi", async () => {
       const imo = 1234567;
-      const timestamp = _.omit(newTimestamp({ imo }), "ship.mmsi");
+      const timestamp = omit(newTimestamp({ imo }), "ship.mmsi");
 
       await insert(db, [timestamp]);
 
@@ -434,7 +434,7 @@ describe(
 
     test("findByLocode - null mmsi", async () => {
       const locode = "AA111";
-      const timestamp = _.omit(newTimestamp({ locode }), "ship.mmsi");
+      const timestamp = omit(newTimestamp({ locode }), "ship.mmsi");
 
       await insert(db, [timestamp]);
 
@@ -708,7 +708,7 @@ describe(
 
     test("findBySource - null mmsi", async () => {
       const source = "Portnet";
-      const timestamp = _.omit(newTimestamp({ source }), "ship.mmsi");
+      const timestamp = omit(newTimestamp({ source }), "ship.mmsi");
 
       await insert(db, [timestamp]);
 

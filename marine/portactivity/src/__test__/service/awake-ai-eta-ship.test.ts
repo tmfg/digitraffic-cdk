@@ -3,7 +3,7 @@ import {
   randomBoolean,
 } from "@digitraffic/common/dist/test/testutils";
 import { addHours } from "date-fns";
-import _ from "lodash";
+import { set, unset } from "es-toolkit/compat";
 import { describe, expect, test, vi } from "vitest";
 import type { AwakeAiShipApiResponse } from "../../api/awake-ai-ship.js";
 import {
@@ -149,7 +149,7 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    _.set(response, ["schedule", "predictedVoyages"], []);
+    set(response, ["schedule", "predictedVoyages"], []);
     vi.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(response);
     const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -161,7 +161,7 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    _.set(response, ["schedule", "predictedVoyages", 0, "predictions"], []);
+    set(response, ["schedule", "predictedVoyages", 0, "predictions"], []);
     vi.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(response);
 
     const timestamps = await service.getAwakeAiTimestamps([ship]);
@@ -174,7 +174,7 @@ describe("AwakeAiETAShipService", () => {
     const service = new AwakeAiETAShipService(api);
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-    _.unset(response, [
+    unset(response, [
       "schedule",
       "predictedVoyages",
       0,

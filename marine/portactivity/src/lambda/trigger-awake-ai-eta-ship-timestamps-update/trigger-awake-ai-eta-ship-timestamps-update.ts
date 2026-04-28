@@ -2,7 +2,7 @@ import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import _ from "lodash";
+import { chunk } from "es-toolkit";
 import { PortactivityEnvKeys } from "../../keys.js";
 import { ports } from "../../service/portareas.js";
 import * as TimestampService from "../../service/timestamps.js";
@@ -28,10 +28,10 @@ export function handlerFn(sns: SNSClient): () => Promise<void> {
         });
       }
 
-      for (const chunk of _.chunk(ships, CHUNK_SIZE)) {
+      for (const ch of chunk(ships, CHUNK_SIZE)) {
         await sns.send(
           new PublishCommand({
-            Message: JSON.stringify(chunk),
+            Message: JSON.stringify(ch),
             TopicArn: publishTopic,
           }),
         );

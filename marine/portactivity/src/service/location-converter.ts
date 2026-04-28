@@ -1,4 +1,3 @@
-import _ from "lodash";
 import type { PilotageRoute } from "../model/pilotage.js";
 import type { Location } from "../model/timestamp.js";
 
@@ -59,5 +58,5 @@ export function convertLocation(route: PilotageRoute): Location {
 }
 
 function convertPilotwebCodeToPortnetLocode(code: string): string {
-  return _.get(pilotwebToPortnetLocodeMap, code, code);
+  return (pilotwebToPortnetLocodeMap as Record<string, string>)[code] ?? code;
 }

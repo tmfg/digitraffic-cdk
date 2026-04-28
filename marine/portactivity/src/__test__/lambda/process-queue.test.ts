@@ -3,7 +3,7 @@ process.env["SECRET_ID"] = "Test";
 
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import type { SQSRecord } from "aws-lambda";
-import _ from "lodash";
+import { omit } from "es-toolkit/compat";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { handlerFn } from "../../lambda/process-queue/process-queue.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
@@ -36,7 +36,7 @@ describe(
     });
 
     test("missing portcall id does not throw error", async () => {
-      const timestamp = _.omit(newTimestamp(), "portcallId");
+      const timestamp = omit(newTimestamp(), "portcallId");
 
       await handlerFn()({
         Records: [createRecord(timestamp)],
@@ -47,7 +47,7 @@ describe(
     });
 
     test("single invalid record", async () => {
-      const timestamp = _.omit(newTimestamp(), "eventType") as ApiTimestamp;
+      const timestamp = omit(newTimestamp(), "eventType") as ApiTimestamp;
 
       await handlerFn()({
         Records: [createRecord(timestamp)],
@@ -59,7 +59,7 @@ describe(
 
     test("both valid & invalid records return fulfilled promises", async () => {
       const validTimestamp = newTimestamp();
-      const invalidTimestamp = _.omit(
+      const invalidTimestamp = omit(
         newTimestamp(),
         "eventType",
       ) as ApiTimestamp;

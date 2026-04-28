@@ -3,7 +3,7 @@ import {
   shuffle,
 } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO, subMinutes } from "date-fns";
-import _ from "lodash";
+import { omit } from "es-toolkit/compat";
 import { describe, expect, test } from "vitest";
 import {
   dateAverage,
@@ -255,7 +255,7 @@ describe("event-sourceutil", () => {
   });
 
   test("mergeTimestamps - discard duplicate PRED timestamp with missing portcallId", () => {
-    const predTimestampWithoutPortcallId = _.omit(
+    const predTimestampWithoutPortcallId = omit(
       newTimestamp({
         source: EventSource.AWAKE_AI_PRED,
       }),
