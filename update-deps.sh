@@ -20,7 +20,7 @@ echo "  ./update-deps.sh '/^vitest$/'          # exact match via anchored regex"
 echo "  ./update-deps.sh '/^@aws-sdk\//'       # all @aws-sdk/* scoped packages"
 echo "  ./update-deps.sh '/^aws-cdk-lib$/'     # exact match for aws-cdk-lib"
 echo "  ./update-deps.sh '/^(vitest|esbuild)$/' # multiple specific packages"
-PACKAGE_FILTER=${1:-"/.*/"}
+PACKAGE_FILTER=${1:-"/^(?!(typescript|@types\/node)$)/"}
 SKIP_RUSH_UPDATE=${SKIP_RUSH_UPDATE:-0}
 
 echo ""
@@ -56,7 +56,7 @@ for dir in other road marine aviation rail tools template; do
     echo "Updating $subdir"
     (
       cd "$subdir" &&
-        npx --yes npm-check-updates@19.6.3 \
+        npx --yes npm-check-updates@20.0.2 \
           --filter "$PACKAGE_FILTER" \
           --target "$TARGET" \
           --cooldown "${COOLDOWN_DAYS}d" \
