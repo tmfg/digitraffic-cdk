@@ -19,15 +19,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1028.0",
+    "@aws-sdk/client-s3": "3.1047.0",
     "@digitraffic/common": "2026.4.28-1",
     "amazon-cognito-identity-js": "6.3.16",
-    "aws-cdk-lib": "2.248.0",
+    "aws-cdk-lib": "2.254.0",
     "constructs": "10.6.0",
     "p-limit": "7.3.0",
     "pg-native": "3.7.0",
     "pg-promise": "12.6.2",
-    "undici": "7.24.1",
+    "undici": "8.3.0",
     "xml2js": "0.6.2"
   },
   "devDependencies": {
@@ -35,16 +35,16 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.2.11",
+    "@rushstack/heft": "1.2.17",
     "@types/aws-lambda": "8.10.161",
     "@types/node": "24.12.2",
     "@types/xml2js": "0.4.14",
-    "@vitest/coverage-v8": "4.1.4",
-    "aws-cdk": "2.1118.0",
+    "@vitest/coverage-v8": "4.1.6",
+    "aws-cdk": "2.1122.0",
     "esbuild": "0.28.0",
     "parallelshell": "3.0.2",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",
-    "vitest": "4.1.4"
+    "vitest": "4.1.6"
   }
 }
