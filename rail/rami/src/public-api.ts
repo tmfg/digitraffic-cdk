@@ -33,7 +33,7 @@ export class PublicApi {
   readonly publicApi: DigitrafficRestApi;
   readonly apiKeyId: string;
 
-  constructor(stack: DigitrafficStack) {
+  constructor(stack: DigitrafficStack, dbReaderHost: string) {
     const apiName = "RAMI (passenger information) public API";
     this.publicApi = new DigitrafficRestApi(stack, "RAMI-public", apiName);
 
@@ -60,6 +60,7 @@ export class PublicApi {
       passengerInformationMessagesModel,
       errorResponseModel,
       validator,
+      dbReaderHost,
     );
 
     this.createMessagesUpdatedAfterResource(
@@ -68,6 +69,7 @@ export class PublicApi {
       passengerInformationMessagesModel,
       errorResponseModel,
       validator,
+      dbReaderHost,
     );
   }
 
@@ -77,12 +79,14 @@ export class PublicApi {
     messageJsonModel: IModel,
     errorResponseModel: IModel,
     validator: RequestValidator,
+    dbReaderHost: string,
   ): MonitoredFunction {
     const activeResource = resource.addResource("active");
     const lambdaEnv = {
       ...(stack.configuration.secretId && {
         SECRET_ID: stack.configuration.secretId,
       }),
+      DB_URI: dbReaderHost,
       DB_APPLICATION: "avoindata",
     };
     const getActiveMessagesLambda = MonitoredDBFunction.create(
@@ -163,6 +167,7 @@ export class PublicApi {
     messageJsonModel: IModel,
     errorResponseModel: IModel,
     validator: RequestValidator,
+    dbReaderHost: string,
   ): MonitoredFunction {
     const updatedAfterResource = resource
       .addResource("updated-after")
@@ -171,6 +176,7 @@ export class PublicApi {
       ...(stack.configuration.secretId && {
         SECRET_ID: stack.configuration.secretId,
       }),
+      DB_URI: dbReaderHost,
       DB_APPLICATION: "avoindata",
     };
     const getMessagesUpdatedAfterLambda = MonitoredDBFunction.create(
