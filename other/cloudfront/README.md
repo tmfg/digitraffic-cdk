@@ -18,15 +18,20 @@ Now you can deploy cloudfront with:
 
 There is also commands like
 
-    rushx cdk-diff-marine-test
-    rushx cdk-diff-marine-prod
     rushx cdk-diff-road-test
     rushx cdk-diff-road-prod
-
-    rushx cdk-deploy-marine-test
-    rushx cdk-deploy-marine-prod
     rushx cdk-deploy-road-test
     rushx cdk-deploy-road-prod
+
+    rushx cdk-diff-marine-test
+    rushx cdk-diff-marine-prod
+    rushx cdk-deploy-marine-test
+    rushx cdk-deploy-marine-prod
+
+    rushx cdk-diff-afir-test    
+    rushx cdk-diff-afir-prod
+    rushx cdk-deploy-afir-test    
+    rushx cdk-deploy-afir-prod
 
 And after that?
 
