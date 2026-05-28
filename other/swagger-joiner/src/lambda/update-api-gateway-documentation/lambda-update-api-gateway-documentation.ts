@@ -22,7 +22,7 @@ export const handler = async (): Promise<void> => {
   );
 
   logger.info({
-    method: "UpdateApiDocumentation.handler",
+    method: "UpdateApiGatewayDocumentation.handler",
     customVersions: JSON.stringify(apisAndVersions),
   });
 

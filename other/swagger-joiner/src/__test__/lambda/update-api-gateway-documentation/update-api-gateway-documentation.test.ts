@@ -1,8 +1,8 @@
 import type { DocumentationVersion } from "@aws-sdk/client-api-gateway";
 import { describe, expect, test } from "vitest";
-import { getLatestVersion } from "../../../lambda/update-api-documentation/lambda-update-api-documentation.js";
+import { getLatestVersion } from "../../../lambda/update-api-gateway-documentation/lambda-update-api-gateway-documentation.js";
 
-describe("update-api-documentation", () => {
+describe("update-api-gateway-documentation", () => {
   test("getLatestVersion - existing versions", () => {
     // random length array with random versions
     const docVersions: DocumentationVersion[] = Array.from({
