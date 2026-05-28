@@ -45,21 +45,26 @@ export async function getDocumentationVersion(
   };
 }
 
+/**
+ * Creates a new API Gateway documentation version snapshot.
+ * The version identifier is an arbitrary string provided by the caller —
+ * this function does not interpret or modify it.
+ */
 export function createDocumentationVersion(
   apiId: string,
-  latestVersion: number,
+  documentationVersion: string,
   apigateway: APIGatewayClient,
 ): Promise<DocumentationVersion> {
   logger.info({
     method: "APIGWUtils.createDocumentationVersion",
     customApiId: apiId,
-    customLatestVersion: latestVersion,
+    customDocumentationVersion: documentationVersion,
   });
 
   const updateApiCommand = new CreateDocumentationVersionCommand({
     restApiId: apiId,
     stageName: "prod",
-    documentationVersion: (latestVersion + 1).toString(),
+    documentationVersion,
   });
 
   return apigateway.send(updateApiCommand);
