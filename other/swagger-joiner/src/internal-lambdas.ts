@@ -87,6 +87,17 @@ function createUpdateSwaggerDescriptionsLambda(
   if (props.description) {
     lambdaEnv[UPDATE_SWAGGER_KEYS.DESCRIPTION] = props.description;
   }
+  if (props.termsOfService) {
+    lambdaEnv[UPDATE_SWAGGER_KEYS.TERMS_OF_SERVICE] = props.termsOfService;
+  }
+  if (props.contact) {
+    lambdaEnv[UPDATE_SWAGGER_KEYS.CONTACT_NAME] = props.contact.name;
+    lambdaEnv[UPDATE_SWAGGER_KEYS.CONTACT_URL] = props.contact.url;
+  }
+  if (props.license) {
+    lambdaEnv[UPDATE_SWAGGER_KEYS.LICENSE_NAME] = props.license.name;
+    lambdaEnv[UPDATE_SWAGGER_KEYS.LICENSE_URL] = props.license.url;
+  }
   if (props.removeSecurity) {
     lambdaEnv[UPDATE_SWAGGER_KEYS.REMOVESECURITY] = "true";
   }
