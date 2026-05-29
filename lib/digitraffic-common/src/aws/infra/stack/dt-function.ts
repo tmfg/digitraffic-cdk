@@ -70,13 +70,7 @@ export class FunctionBuilder {
     this.environment = {};
     this.vpc = stack.vpc;
 
-    // this calls withHandler as well but with full path
     this.withAssetCode(lambdaName);
-    // Remove path from lambda to get module name.
-    // e.g. for lambdaName "api/charging-network/v1/operators",
-    // moduleName becomes "operators" and handler becomes "operators.handler"
-    const moduleName = basename(lambdaName);
-    this.withHandler(moduleName);
   }
 
   /**
@@ -103,12 +97,26 @@ export class FunctionBuilder {
   }
 
   /**
-   * Use AssetCode from given path(dist/lambda/${path}).  Default path is lambdaName. Also calls withHandler with the same value.
+   * Sets the Lambda deployment package to the directory `dist/lambda/${path}` and configures
+   * the handler to `basename(path).handler`.
+   * @param path - subdirectory under `dist/lambda/` that contains the compiled Lambda code.
+   *   The handler module name is derived from `basename(path)` (e.g. `"locations.handler"`).
+   *   Defaults to `lambdaName`.
+   *   Example: `"dump/locations"` → asset dir `dist/lambda/dump/locations/`, handler `locations.handler`.
+   * @param exclude - optional glob patterns to exclude from the asset bundle.
+   *   Patterns are relative to the asset root (`dist/lambda/${path}/`) — do NOT use a leading slash.
+   *   Use `**` to match files recursively.
+   *   Example: `["datex2-36", "datex2-37", "statuses"]` excludes sibling lambda subdirectories
+   *   that would otherwise be bundled into this lambda's deployment package.
    */
-  public withAssetCode(path: string = this._name): this {
-    this.code = new AssetCode(`dist/lambda/${path}`);
+  public withAssetCode(path: string = this._name, exclude?: string[]): this {
+    this.code = new AssetCode(
+      `dist/lambda/${path}`,
+      exclude ? { exclude } : undefined,
+    );
 
-    this.withHandler(path);
+    const moduleName = basename(path);
+    this.withHandler(moduleName);
 
     return this;
   }

@@ -43,12 +43,21 @@ for arg in "$@"; do
     esac
 done
 
-# Check if version argument is provided
+# If no version given, print usage and offer the default version interactively
 if [ -z "$VERSION" ]; then
-    echo -e "${RED}Error: Version argument required${NC}"
-    echo ""
     print_usage
-    exit 1
+    echo ""
+    echo -e "${YELLOW}Default version for today: ${TODAY_VERSION_1}${NC}"
+    read -p "Press Enter to publish ${TODAY_VERSION_1}, or type a different version (or 'q' to quit): " USER_INPUT
+    echo
+    if [[ "$USER_INPUT" == "q" || "$USER_INPUT" == "Q" ]]; then
+        echo "Aborted."
+        exit 0
+    elif [ -z "$USER_INPUT" ]; then
+        VERSION="$TODAY_VERSION_1"
+    else
+        VERSION="$USER_INPUT"
+    fi
 fi
 
 # Validate version format (YYYY.M.D-N)
@@ -121,7 +130,11 @@ fi
 
 echo -e "${GREEN}Step 4/7: Committing version bump...${NC}"
 git add package.json
-git commit -m "Version bump to ${VERSION}"
+if git diff --cached --quiet; then
+    echo -e "${YELLOW}No changes to package.json (version already set), skipping commit.${NC}"
+else
+    git commit -m "Version bump to ${VERSION}"
+fi
 
 echo -e "${GREEN}Step 5/7: Pushing to remote...${NC}"
 git push

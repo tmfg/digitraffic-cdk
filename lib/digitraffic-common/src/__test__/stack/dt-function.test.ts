@@ -183,13 +183,11 @@ describe("FunctionBuilder test", () => {
     const template = createTemplate(
       (_builder: FunctionBuilder) => {},
       false,
-      "api/charging-network/v1/operators",
+      "api/feature/v1/get-items",
     );
 
-    // const lambdas = template.findResources("AWS::Lambda::Function");
-    // console.debug(JSON.stringify(lambdas, null, 2));
     template.hasResourceProperties("AWS::Lambda::Function", {
-      Handler: "operators.handler",
+      Handler: "get-items.handler",
     });
   });
 
