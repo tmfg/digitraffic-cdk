@@ -32,6 +32,9 @@ export interface StackConfiguration {
   readonly privateSubnetIds?: string[];
   readonly availabilityZones?: string[];
 
+  readonly dbWriterHost?: string;
+  readonly dbReaderHost?: string;
+
   readonly trafficType: TrafficType;
   readonly production: boolean;
   readonly stackProps: StackProps;

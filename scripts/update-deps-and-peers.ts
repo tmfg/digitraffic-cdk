@@ -157,8 +157,10 @@ const updateUseNodeVersionInNpmrc = async (
   console.log(`Updated use-node-version to ${latestAllowed}.`);
 };
 
+const EXCLUDED_PACKAGES = ["typescript", "@types/node"];
+
 // Step 1: Update normal dependency blocks to the newest versions.
-run(["up", "--latest"]);
+run(["up", "--latest", ...EXCLUDED_PACKAGES.flatMap((pkg) => ["--ignore", pkg])]);
 
 const packageJsonText = readFileSync(
   new URL("../package.json", import.meta.url),
@@ -173,9 +175,9 @@ if (peerDependencyNames.length === 0) {
 }
 
 // Step 2: Update peerDependencies explicitly and keep exact versions.
-const peerPackagesAtLatest = peerDependencyNames.map(
-  (name) => `${name}@latest`,
-);
+const peerPackagesAtLatest = peerDependencyNames
+  .filter((name) => !EXCLUDED_PACKAGES.includes(name))
+  .map((name) => `${name}@latest`);
 run(["add", "--save-peer", "--save-exact", ...peerPackagesAtLatest]);
 
 // Step 3: Keep .npmrc use-node-version up to date using the same cooldown window.
