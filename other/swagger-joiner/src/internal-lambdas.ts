@@ -10,16 +10,18 @@ import type { FunctionProps } from "aws-cdk-lib/aws-lambda";
 import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
 import type { Bucket } from "aws-cdk-lib/aws-s3";
 import type { Props } from "./app-props.js";
-import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation.js";
+import { KEY_APIGW_IDS } from "./lambda/update-api-gateway-documentation/lambda-update-api-gateway-documentation.js";
 import { UPDATE_SWAGGER_KEYS } from "./model/keys.js";
 
 export function create(stack: DigitrafficStack, bucket: Bucket): void {
   createUpdateSwaggerDescriptionsLambda(stack, bucket);
-  createUpdateApiDocumentationLambda(stack);
+  createUpdateApiGatewayDocumentationLambda(stack);
 }
 
-function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
-  const functionName = `${stack.stackName}-UpdateApiDocumentation`;
+function createUpdateApiGatewayDocumentationLambda(
+  stack: DigitrafficStack,
+): void {
+  const functionName = `${stack.stackName}-UpdateApiGwDocumentation`;
   const props = stack.configuration as Props;
 
   const lambdaEnv: LambdaEnvironment = {};
@@ -31,9 +33,11 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack): void {
   const lambdaConf: FunctionProps = {
     functionName: functionName,
     logGroup: logGroup,
-    code: new AssetCode("dist/lambda/update-api-documentation"),
-    handler: "lambda-update-api-documentation.handler",
+    code: new AssetCode("dist/lambda/update-api-gateway-documentation"),
+    handler: "lambda-update-api-gateway-documentation.handler",
     runtime: Runtime.NODEJS_24_X,
+    description:
+      "Publishes new API Gateway documentation versions for each REST API",
     environment: lambdaEnv,
     reservedConcurrentExecutions: 1,
     memorySize: 128,
@@ -87,6 +91,17 @@ function createUpdateSwaggerDescriptionsLambda(
   if (props.description) {
     lambdaEnv[UPDATE_SWAGGER_KEYS.DESCRIPTION] = props.description;
   }
+  if (props.termsOfService) {
+    lambdaEnv[UPDATE_SWAGGER_KEYS.TERMS_OF_SERVICE] = props.termsOfService;
+  }
+  if (props.contact) {
+    lambdaEnv[UPDATE_SWAGGER_KEYS.CONTACT_NAME] = props.contact.name;
+    lambdaEnv[UPDATE_SWAGGER_KEYS.CONTACT_URL] = props.contact.url;
+  }
+  if (props.license) {
+    lambdaEnv[UPDATE_SWAGGER_KEYS.LICENSE_NAME] = props.license.name;
+    lambdaEnv[UPDATE_SWAGGER_KEYS.LICENSE_URL] = props.license.url;
+  }
   if (props.removeSecurity) {
     lambdaEnv[UPDATE_SWAGGER_KEYS.REMOVESECURITY] = "true";
   }
@@ -99,6 +114,8 @@ function createUpdateSwaggerDescriptionsLambda(
     code: new AssetCode("dist/lambda/update-swagger"),
     handler: "lambda-update-swagger.handler",
     runtime: Runtime.NODEJS_24_X,
+    description:
+      "Fetches OpenAPI specs from app and API Gateway, merges them, and uploads to S3",
     memorySize: 192,
     reservedConcurrentExecutions: 1,
     environment: lambdaEnv,

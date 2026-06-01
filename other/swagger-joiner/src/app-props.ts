@@ -23,6 +23,12 @@ export interface Props extends StackConfiguration {
   readonly title?: string;
   // Swagger page description
   readonly description?: string;
+  // Terms of service URL
+  readonly termsOfService?: string;
+  // Contact info
+  readonly contact?: { readonly name: string; readonly url: string };
+  // License info
+  readonly license?: { readonly name: string; readonly url: string };
   // Remove security (e.g. API key) from imported Swagger descriptioin
   readonly removeSecurity?: boolean;
 }

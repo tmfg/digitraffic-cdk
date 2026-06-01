@@ -52,6 +52,26 @@ const description = getEnvVariableOrElse(
   UPDATE_SWAGGER_KEYS.DESCRIPTION,
   undefined,
 );
+const termsOfService = getEnvVariableOrElse(
+  UPDATE_SWAGGER_KEYS.TERMS_OF_SERVICE,
+  undefined,
+);
+const contactName = getEnvVariableOrElse(
+  UPDATE_SWAGGER_KEYS.CONTACT_NAME,
+  undefined,
+);
+const contactUrl = getEnvVariableOrElse(
+  UPDATE_SWAGGER_KEYS.CONTACT_URL,
+  undefined,
+);
+const licenseName = getEnvVariableOrElse(
+  UPDATE_SWAGGER_KEYS.LICENSE_NAME,
+  undefined,
+);
+const licenseUrl = getEnvVariableOrElse(
+  UPDATE_SWAGGER_KEYS.LICENSE_URL,
+  undefined,
+);
 const removeSecurity = getEnvVariableOrElse(
   UPDATE_SWAGGER_KEYS.REMOVESECURITY,
   undefined,
@@ -111,6 +131,18 @@ export const handler = async (): Promise<void> => {
 
   if (description) {
     merged.info.description = description;
+  }
+
+  if (termsOfService) {
+    merged.info.termsOfService = termsOfService;
+  }
+
+  if (contactName && contactUrl) {
+    merged.info.contact = { name: contactName, url: contactUrl };
+  }
+
+  if (licenseName && licenseUrl) {
+    merged.info.license = { name: licenseName, url: licenseUrl };
   }
 
   delete merged.security; // always https

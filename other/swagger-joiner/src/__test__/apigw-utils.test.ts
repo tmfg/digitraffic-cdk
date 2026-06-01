@@ -48,7 +48,7 @@ describe("apigw-utils", () => {
   });
 
   test("createDocumentationVersion", async () => {
-    const docVersion = Math.ceil(10 * Math.random());
+    const docVersion = "42";
 
     await createDocumentationVersion(
       TEST_API_ID,
@@ -59,7 +59,7 @@ describe("apigw-utils", () => {
     expectAGCall("CreateDocumentationVersionCommand", {
       restApiId: TEST_API_ID,
       stageName: "prod",
-      documentationVersion: `${docVersion + 1}`,
+      documentationVersion: "42",
     });
   });
 });
