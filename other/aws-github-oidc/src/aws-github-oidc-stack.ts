@@ -85,7 +85,7 @@ export class AwsGithubOidcStack extends Stack {
         const envCapitalized = role.environment?.replace(/^\w/, (c) =>
           c.toUpperCase(),
         );
-        const updateApiDocsFunctionName = `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateApiDocumentation`;
+        const updateApiDocsFunctionName = `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateApiGwDocumentation`;
         const updateSwaggerDocsFunctionName = `SwaggerJoiner${role.updateSwaggerForTrafficType}${envCapitalized}-UpdateSwaggerDescriptions`;
         createdRole.addToPrincipalPolicy(
           new PolicyStatement({
