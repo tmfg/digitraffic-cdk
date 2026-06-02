@@ -18,6 +18,14 @@ echo "Running Biome linting and formatting checks on staged files..."
 node common/scripts/install-run-rush.js format:fix-staged
 # Re-stage any previously staged files
 git update-index --again
+# Verify no remaining errors after auto-fix (e.g. unsafe lint issues that cannot be auto-fixed)
+# format:check-staged includes --error-on-warnings so warnings also block the commit
+if ! node common/scripts/install-run-rush.js format:check-staged; then
+  echo ""
+  echo "Biome check failed on staged files. Fix the issues above before committing."
+  echo "Run: rush format:fix  (to attempt fixing all files)"
+  exit 1
+fi
 echo "Biome linting and formatting checks done."
 
 # Check package dependencies
