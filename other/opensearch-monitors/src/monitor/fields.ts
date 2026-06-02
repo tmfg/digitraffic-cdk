@@ -8,6 +8,7 @@ export type DefaultJavaField =
   | "log_line"
   | "logger_name"
   | "message"
+  | "message.keyword"
   | "thread_name"
   | "type";
 
