@@ -108,7 +108,7 @@ describe("AwakeAiETDPortService", () => {
 });
 
 function createApi(): AwakeAiPortApi {
-  return new AwakeAiPortApi("", "");
+  return new AwakeAiPortApi("", "", "", "");
 }
 
 function createEtdResponse(options?: {

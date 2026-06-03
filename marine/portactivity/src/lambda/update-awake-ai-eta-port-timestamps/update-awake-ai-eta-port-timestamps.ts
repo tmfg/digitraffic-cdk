@@ -34,7 +34,7 @@ export function handler(event: SNSEvent): Promise<void> {
 
       if (!service) {
         service = new AwakeAiETAPortService(
-          new AwakeAiPortApi(secret.voyagesurl, secret.voyagesauth),
+          new AwakeAiPortApi(secret.voyagesurl, secret.voyagesauth, "", ""),
         );
       }
       const timestamps = await service.getAwakeAiTimestamps(locode);
