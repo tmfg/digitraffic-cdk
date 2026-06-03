@@ -4,7 +4,7 @@ import ky, { HTTPError } from "ky";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 import { AwakeAiPredictionType } from "./awake-common.js";
 
-import { OAuthTokenApi } from "./oauth-token-api.ts";
+import { OAuthTokenApi } from "./oauth-token-api.js";
 
 export enum AwakeAiPortResponseType {
   OK = "OK",
