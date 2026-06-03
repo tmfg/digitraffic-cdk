@@ -1,6 +1,8 @@
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 export interface UpdateAwakeAiETXTimestampsSecret extends GenericSecret {
+  readonly oAuthClientId: string;
+  readonly oAuthClientSecret: string;
   readonly voyagesurl: string;
   readonly voyagesauth: string;
 }

@@ -4,6 +4,8 @@ import ky, { HTTPError } from "ky";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 import { AwakeAiPredictionType } from "./awake-common.js";
 
+import { OAuthTokenApi } from "./oauth-token-api.js";
+
 export enum AwakeAiPortResponseType {
   OK = "OK",
   PORT_NOT_FOUND = "PORT_NOT_FOUND",
@@ -31,10 +33,14 @@ export interface AwakeAiPortResponse {
 export class AwakeAiPortApi {
   private readonly url: string;
   private readonly apiKey: string;
+  private readonly oauthClientId: string;
+  private readonly oauthClientSecret: string;
 
-  constructor(url: string, apiKey: string) {
+  constructor(url: string, apiKey: string, oauthClientId: string, oauthClientSecret: string) {
     this.url = url;
     this.apiKey = apiKey;
+    this.oauthClientId = oauthClientId;
+    this.oauthClientSecret = oauthClientSecret;
   }
 
   /**
@@ -57,10 +63,18 @@ export class AwakeAiPortApi {
         method: "AwakeAiPortApi.getPredictions",
         message: `calling URL ${url}`,
       });
+
+      const oAuthTokenApi = new OAuthTokenApi({
+        oAuthTokenEndpoint: "https://auth.dev.awake.ai/realms/awake/protocol/openid-connect/token",
+        oAuthClientId: this.oauthClientId,
+        oAuthClientSecret: this.oauthClientSecret});
+
+      const oAuthToken = await oAuthTokenApi.getOAuthToken();
+
       const response = await ky
         .get(url, {
           headers: {
-            Authorization: this.apiKey,
+            Authorization: "Bearer " + oAuthToken,
             Accept: MediaType.APPLICATION_JSON,
           },
           retry: 0,

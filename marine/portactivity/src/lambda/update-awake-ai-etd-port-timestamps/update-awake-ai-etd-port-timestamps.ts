@@ -14,6 +14,8 @@ const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 const expectedKeys = [
   PortactivitySecretKeys.AWAKE_URL,
   PortactivitySecretKeys.AWAKE_AUTH,
+  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
+  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
 ];
 
 const rdsHolder = RdsHolder.create();
@@ -34,7 +36,7 @@ export function handler(event: SNSEvent): Promise<void> {
 
       if (!service) {
         service = new AwakeAiETDPortService(
-          new AwakeAiPortApi(secret.voyagesurl, secret.voyagesauth),
+          new AwakeAiPortApi(secret.voyagesurl, secret.voyagesauth, secret.oAuthClientId, secret.oAuthClientSecret),
         );
       }
       const timestamps = await service.getAwakeAiTimestamps(locode);
