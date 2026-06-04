@@ -62,7 +62,7 @@ function parseMonitoredCall(
   mc: z.infer<typeof monitoredCall>,
 ): UnknownDelayOrTrack[] {
   const arrival: UnknownDelayOrTrack | undefined =
-    !!mc.aimedArrivalTime && includeCall(mc)
+    mc.aimedArrivalTime && includeCall(mc)
       ? {
           stationShortCode: mc.stopPointRef,
           scheduledTime: new Date(mc.aimedArrivalTime),
@@ -73,7 +73,7 @@ function parseMonitoredCall(
       : undefined;
 
   const departure: UnknownDelayOrTrack | undefined =
-    !!mc.aimedDepartureTime && includeCall(mc)
+    mc.aimedDepartureTime && includeCall(mc)
       ? {
           stationShortCode: mc.stopPointRef,
           scheduledTime: new Date(mc.aimedDepartureTime),

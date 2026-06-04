@@ -1,6 +1,6 @@
 {
   "$schema": "common/autoinstallers/rush-command-line-tools/node_modules/@biomejs/biome/configuration_schema.json",
-  //"$schema": "https://biomejs.dev/schemas/2.0.0-beta/schema.json",
+  //"$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   "files": {
     "ignoreUnknown": true,
     "includes": [
@@ -33,6 +33,8 @@
       "!rail/**/sbom.json",
       "!road/**/sbom.json",
       "!other/**/sbom.json",
+      // Exclude test coverage reports
+      "!**/coverage",
       // Exclude digitraffic-common subtree project
       "!lib/digitraffic-common"
     ]

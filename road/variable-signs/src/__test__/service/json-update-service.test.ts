@@ -1,5 +1,3 @@
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
-import type { Countable } from "@digitraffic/common/dist/database/models";
 import { describe, expect, test } from "vitest";
 import type { TloikLaite, TloikMetatiedot } from "../../model/metatiedot.js";
 import type {
@@ -7,7 +5,13 @@ import type {
   TloikTilatiedot,
 } from "../../model/tilatiedot.js";
 import * as JsonUpdateService from "../../service/json-update-service.js";
-import { dbTestBase } from "../db-testutil.js";
+import {
+  assertActiveDeviceCount,
+  assertDeletedDeviceCount,
+  assertDeviceDataCount,
+  dbTestBase,
+  getUpdatedDate,
+} from "../db-testutil.js";
 
 const TEST_DEVICE: TloikLaite = {
   tunnus: "test",
@@ -112,38 +116,21 @@ describe(
 
       await assertDeviceDataCount(db, 1);
     });
+
+    test("update data - multiple devices with rows", async () => {
+      const second: TloikLiikennemerkinTila = {
+        tunnus: "test2",
+        voimaan: new Date(),
+        rivit: [{ naytto: 1, rivi: 1, teksti: "second-row1" }],
+        luotettavuus: "12",
+      };
+
+      const tilatiedot: TloikTilatiedot = {
+        liikennemerkit: [TEST_DEVICE_DATA, second],
+      };
+      await JsonUpdateService.updateJsonData(tilatiedot);
+
+      await assertDeviceDataCount(db, 2);
+    });
   }),
 );
-
-function assertActiveDeviceCount(
-  db: DTDatabase,
-  expected: number,
-): Promise<void> {
-  return db
-    .one("select count(*) from device where deleted_date is null")
-    .then((value: Countable) => expect(value.count).toEqual(expected));
-}
-
-function assertDeletedDeviceCount(
-  db: DTDatabase,
-  expected: number,
-): Promise<void> {
-  return db
-    .one("select count(*) from device where deleted_date is not null")
-    .then((value: Countable) => expect(value.count).toEqual(expected));
-}
-
-function assertDeviceDataCount(
-  db: DTDatabase,
-  expected: number,
-): Promise<void> {
-  return db
-    .one("select count(*) from device_data")
-    .then((value: Countable) => expect(value.count).toEqual(expected));
-}
-
-function getUpdatedDate(db: DTDatabase, id: string): Promise<Date> {
-  return db
-    .one("select modified from device where id = $1", [id])
-    .then((value: { modified: Date }) => value.modified);
-}

@@ -80,12 +80,12 @@ export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
   // Use the first element as the base, then merge the rest into it
   return allApis.slice(1).reduce<OpenApiSchema>(
     (acc, curr) => merge(acc, curr),
-    cloneDeep(allApis[0]!), // clone to avoid mutating caller's object
+    cloneDeep(allApis[0] as OpenApiSchema), // clone to avoid mutating caller's object
   );
 }
 
 function methodIsDeprecated(operation: OpenApiOperation): boolean {
-  const deprecationTextMatcher = /(W|w)ill be removed/;
+  const deprecationTextMatcher = /will be removed/i;
   const summaryMatch =
     operation.summary && deprecationTextMatcher.test(operation.summary);
 

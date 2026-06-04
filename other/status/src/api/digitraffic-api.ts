@@ -168,10 +168,7 @@ function checkApiCanBeTestedAndAppendQueryStringToPath(
 
     const operation = pathItem.get;
     // No parameters or all are not required parameters -> ok to call
-    if (
-      !operation.parameters ||
-      !operation.parameters.find((p) => p.required)
-    ) {
+    if (!operation.parameters?.some((p) => p.required)) {
       logger.info({
         method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",
         customPath: path,
@@ -182,7 +179,7 @@ function checkApiCanBeTestedAndAppendQueryStringToPath(
 
     // Can't call api with required parameters that doesn't have default value(s) defined
     if (
-      operation.parameters.find((p) => p.required && !p.schema.default?.length)
+      operation.parameters.some((p) => p.required && !p.schema.default?.length)
     ) {
       logger.info({
         method: "DigitrafficApi.checkCanBeTestedAndGenerateQueryString",

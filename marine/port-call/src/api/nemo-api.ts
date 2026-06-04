@@ -23,7 +23,7 @@ export class NemoApi {
     });
 
     try {
-      const resp = await request(url, {
+      const resp = await request(new URL(url), {
         method: "GET",
         headers: {
           "user-agent": "Digitraffic/undici",

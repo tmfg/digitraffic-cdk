@@ -35,11 +35,9 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
   const situations = parseSituations(datex2);
 
   await inDatabase((db: DTDatabase) => {
-    return db.tx((tx: DTTransaction) => {
-      return tx.batch([
-        saveDatex2(tx, situations),
-        updateLastUpdated(tx, DataType.VS_DATEX2, timestamp),
-      ]);
+    return db.tx(async (tx: DTTransaction) => {
+      await saveDatex2(tx, situations);
+      await updateLastUpdated(tx, DataType.VS_DATEX2, timestamp);
     });
   }).finally(() => {
     logger.info({

@@ -33,21 +33,17 @@ export async function insertDevices(
   db: DTTransaction,
   devices: TloikLaite[],
 ): Promise<void> {
-  await db.tx((t) =>
-    t.batch(
-      devices.map((d) =>
-        db.none(SQL_INSERT_DEVICE, [
-          d.tunnus,
-          d.tyyppi,
-          d.sijainti.tieosoite,
-          d.sijainti.ajosuunta,
-          d.sijainti.ajorata,
-          d.sijainti.e,
-          d.sijainti.n,
-        ]),
-      ),
-    ),
-  );
+  for (const d of devices) {
+    await db.none(SQL_INSERT_DEVICE, [
+      d.tunnus,
+      d.tyyppi,
+      d.sijainti.tieosoite,
+      d.sijainti.ajosuunta,
+      d.sijainti.ajorata,
+      d.sijainti.e,
+      d.sijainti.n,
+    ]);
+  }
 }
 
 const SQL_GET_ALL_DEVICES = `
@@ -72,6 +68,6 @@ export async function removeDevices(
   deviceIds: string[],
 ): Promise<void> {
   if (deviceIds.length > 0) {
-    await Promise.all([db.none(SQL_REMOVE_DEVICES, [deviceIds])]);
+    await db.none(SQL_REMOVE_DEVICES, [deviceIds]);
   }
 }

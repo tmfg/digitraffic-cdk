@@ -15,7 +15,7 @@ export async function handler(
 ): Promise<SseSaveResult> {
   const start = Date.now();
 
-  if (!apiGWRequest || !apiGWRequest.SSE_Reports) {
+  if (!apiGWRequest?.SSE_Reports) {
     logger.error({
       method: "lambda-update-sse-data.handler",
       message: "Empty message content",

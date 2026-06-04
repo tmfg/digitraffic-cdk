@@ -5,6 +5,9 @@ import { getRttiBySituationId } from "../dao/rtti.js";
 
 const clientId = "mqtt-publisher" as const;
 
+const ALLOWED_PROTOCOLS = ["tcp", "mqtt", "mqtts", "ws", "wss", "ssl"] as const;
+type MqttProtocol = (typeof ALLOWED_PROTOCOLS)[number];
+
 const PAYLOAD_TEMPLATE =
   `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2:payload xsi:type="sit:SituationPublication" lang="fi" 
@@ -43,7 +46,15 @@ export async function sendMqttUpdates(
   );
 
   if (rttiData.length > 0) {
-    const client = await connectAsync(url, {
+    const parsedUrl = new URL(url);
+    const protocol = parsedUrl.protocol.replace(":", "");
+    if (!ALLOWED_PROTOCOLS.includes(protocol as MqttProtocol)) {
+      throw new Error(`Unsupported MQTT protocol: ${protocol}`);
+    }
+    const client = await connectAsync({
+      protocol: protocol as MqttProtocol,
+      host: parsedUrl.hostname,
+      port: parsedUrl.port ? parseInt(parsedUrl.port, 10) : 1883,
       username,
       password,
       clean: false,

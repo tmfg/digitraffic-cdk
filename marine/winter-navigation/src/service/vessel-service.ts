@@ -93,7 +93,7 @@ function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
   // If this activity concerns both an assisted vessel and an assisting icebreaker and
   // the current vessel is not the icebreaker, the property assistingVessel is set.
   // In the opposite situation (current vessel is icebreaker), the property assistedVessel is set.
-  if (isVessel && !!a.icebreaker_id) {
+  if (isVessel && a.icebreaker_id) {
     return {
       ...baseActivity,
       assistingVessel: {
@@ -104,7 +104,7 @@ function convertActivity(a: ActivityDTO, v: VesselDTO): Activity {
     };
   }
 
-  if (isIcebreaker && !!a.vessel_id) {
+  if (isIcebreaker && a.vessel_id) {
     return {
       ...baseActivity,
       assistedVessel: {

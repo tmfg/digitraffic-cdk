@@ -1,5 +1,5 @@
-import { Duration } from "aws-cdk-lib";
 import { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Duration } from "aws-cdk-lib";
 
 export type PortactivityConfiguration = StackConfiguration & {
   // these are required

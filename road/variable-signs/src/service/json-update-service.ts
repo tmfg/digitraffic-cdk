@@ -17,17 +17,15 @@ export async function updateJsonData(
   logger.debug(tilatiedot);
 
   await inTransaction(async (db: DTTransaction) => {
-    await Promise.all(
-      tilatiedot.liikennemerkit.map(async (lm) => {
-        const id = await DataDb.insertDeviceData(db, lm);
+    for (const lm of tilatiedot.liikennemerkit) {
+      const id = await DataDb.insertDeviceData(db, lm);
 
-        return lm.rivit
-          ? Promise.all(
-              lm.rivit.map((rivi) => DataDb.insertDeviceDataRows(db, id, rivi)),
-            )
-          : Promise.resolve();
-      }),
-    );
+      if (lm.rivit) {
+        for (const rivi of lm.rivit) {
+          await DataDb.insertDeviceDataRows(db, id, rivi);
+        }
+      }
+    }
   });
 
   logger.info({

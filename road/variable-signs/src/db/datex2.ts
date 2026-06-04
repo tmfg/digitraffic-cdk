@@ -17,17 +17,15 @@ export async function saveDatex2(
   db: DTTransaction,
   situations: Situation[],
 ): Promise<void> {
-  await Promise.allSettled(
-    situations.map((s) =>
-      db.none(PS_INSERT_DATEX2, [
-        s.id,
-        s.datex2,
-        s.effectDate,
-        "SITUATION",
-        "DATEXII_2_2_3",
-      ]),
-    ),
-  );
+  for (const s of situations) {
+    await db.none(PS_INSERT_DATEX2, [
+      s.id,
+      s.datex2,
+      s.effectDate,
+      "SITUATION",
+      "DATEXII_2_2_3",
+    ]);
+  }
 }
 
 const PS_FIND_ALL_ACTIVE = new pgPromise.PreparedStatement({
