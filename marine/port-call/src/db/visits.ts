@@ -55,19 +55,20 @@ export async function upsertVisits(
 ): Promise<DbInsertedUpdated> {
   const method = `VisitsDAO.upsertVisits` satisfies LoggerMethodType;
 
+  if (response.length === 0) {
+    return { inserted: 0, updated: 0 };
+  }
+
   return db
-    .tx<DbInsertedUpdated>((tx) => {
-      return tx
-        .batch<DbInsertedUpdated>(
-          response.map((visit) => upsertVisit(tx, visit)),
-        )
-        .then((results: DbInsertedUpdated[]) => {
-          const inserted = results
-            .map((r) => r.inserted)
-            .reduce((a: number, b: number) => a + b);
-          const updated = results.map((r) => r.updated).reduce((a, b) => a + b);
-          return { inserted: inserted, updated: updated };
-        });
+    .tx<DbInsertedUpdated>(async (tx) => {
+      let inserted = 0;
+      let updated = 0;
+      for (const visit of response) {
+        const result = await upsertVisit(tx, visit);
+        inserted += result.inserted;
+        updated += result.updated;
+      }
+      return { inserted, updated };
     })
     .catch((error: unknown) => {
       logger.error({

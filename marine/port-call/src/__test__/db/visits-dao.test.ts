@@ -34,6 +34,52 @@ describe(
       await assertVisitCount(db, 1);
     });
 
+    describe("upsertVisits", () => {
+      test("inserts multiple visits sequentially without concurrent query error", async () => {
+        const visits = Array.from({ length: 10 }, (_, i) =>
+          createTestVisitWith({ visitId: `BATCH_V${i}` }),
+        );
+
+        const result = await VisitsDAO.upsertVisits(db, visits);
+
+        expect(result.inserted).toBe(10);
+        expect(result.updated).toBe(0);
+        await assertVisitCount(db, 10);
+      });
+
+      test("upsertVisits counts inserts and updates correctly", async () => {
+        const visit1 = createTestVisitWith({
+          visitId: "UV1",
+          status: "Expected to Arrive",
+        });
+        const visit2 = createTestVisitWith({ visitId: "UV2" });
+
+        // First batch: two inserts
+        const first = await VisitsDAO.upsertVisits(db, [visit1, visit2]);
+        expect(first.inserted).toBe(2);
+        expect(first.updated).toBe(0);
+
+        // Second batch: UV1 status changes (triggers DO UPDATE WHERE), UV2 unchanged
+        const visit1Updated = createTestVisitWith({
+          visitId: "UV1",
+          status: "Arrived",
+        });
+        const second = await VisitsDAO.upsertVisits(db, [
+          visit1Updated,
+          visit2,
+        ]);
+        expect(second.inserted).toBe(0);
+        expect(second.updated).toBe(1); // only UV1 status changed
+        await assertVisitCount(db, 2);
+      });
+
+      test("empty response returns zero counts", async () => {
+        const result = await VisitsDAO.upsertVisits(db, []);
+        expect(result.inserted).toBe(0);
+        expect(result.updated).toBe(0);
+      });
+    });
+
     describe("from/to filtering", () => {
       test("no from/to returns all visits", async () => {
         await VisitsDAO.upsertVisit(
