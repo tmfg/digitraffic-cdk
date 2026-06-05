@@ -33,25 +33,41 @@ on:
         required: true
         type: choice
         options: 
-          - "digitraffic-statistics"
           - "aton-faults"
-          - "marinecam"
-          - "port-call"
-          - "portactivity"
-          - "sea-state-estimate"
-          - "shiplight"
-          - "winter-navigation"
           - "counting-site"
+          - "data-dump"
           - "data-upload"
+          - "digitraffic-statistics"
           - "lam-history"
           - "maintenance-tracking"
           - "maintenance-tracking-municipality"
-          - "variable-signs"
-          - "data-dump"
+          - "marinecam"
+          - "port-call"
+          - "portactivity"
           - "rami"
+          - "sea-state-estimate"
+          - "shiplight"
+          - "variable-signs"
+          - "winter-navigation"
           - "yearly-plans"
 
 jobs:
+  log-parameters:
+    if: ${{ github.repository != 'tmfg/digitraffic-cdk' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Log workflow inputs
+        run: |
+          echo "## Workflow Inputs" >> $GITHUB_STEP_SUMMARY
+          echo "| Name | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| actor | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| env | ${{ github.event.inputs.env }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ref | ${{ github.event.inputs.ref }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| config-repo-branch | ${{ github.event.inputs.config-repo-branch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| command | ${{ github.event.inputs.command }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| application | ${{ github.event.inputs.application }} |" >> $GITHUB_STEP_SUMMARY
+
   build_and_deploy:
     if: ${{ github.repository != 'tmfg/digitraffic-cdk' }}
     runs-on: ubuntu-24.04
