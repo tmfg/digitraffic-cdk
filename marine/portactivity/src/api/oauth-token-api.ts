@@ -99,6 +99,6 @@ export class OAuthTokenApi {
         throw new Error(`${message} method=${method} url=${url}`, {
           cause: error,
         });
-      })
+      });
   }
 }

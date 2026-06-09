@@ -36,7 +36,12 @@ export class AwakeAiPortApi {
   private readonly oauthClientId: string;
   private readonly oauthClientSecret: string;
 
-  constructor(url: string, apiKey: string, oauthClientId: string, oauthClientSecret: string) {
+  constructor(
+    url: string,
+    apiKey: string,
+    oauthClientId: string,
+    oauthClientSecret: string,
+  ) {
     this.url = url;
     this.apiKey = apiKey;
     this.oauthClientId = oauthClientId;
@@ -65,9 +70,11 @@ export class AwakeAiPortApi {
       });
 
       const oAuthTokenApi = new OAuthTokenApi({
-        oAuthTokenEndpoint: "https://auth.dev.awake.ai/realms/awake/protocol/openid-connect/token",
+        oAuthTokenEndpoint:
+          "https://auth.dev.awake.ai/realms/awake/protocol/openid-connect/token",
         oAuthClientId: this.oauthClientId,
-        oAuthClientSecret: this.oauthClientSecret});
+        oAuthClientSecret: this.oauthClientSecret,
+      });
 
       const oAuthToken = await oAuthTokenApi.getOAuthToken();
 
