@@ -42,6 +42,7 @@ on:
           - "maintenance-tracking"
           - "maintenance-tracking-municipality"
           - "marinecam"
+          - "os-key-figures"
           - "port-call"
           - "portactivity"
           - "rami"
