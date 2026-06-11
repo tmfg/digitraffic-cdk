@@ -6,10 +6,12 @@ import {
 } from "@aws-sdk/client-ssm";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import type { WebSocket } from "ws";
+import { WebSocket } from "ws";
 import { PortActivityParameterKeys } from "../keys.js";
 import type { Ports } from "../service/portareas.js";
 import type { AwakeAiZoneType } from "./awake-common.js";
+
+import { OAuthTokenApi } from "./oauth-token-api.js";
 
 interface AwakeAiATXMessage {
   msgType: AwakeAiATXEventType;
@@ -109,6 +111,8 @@ const ssm = new SSMClient({});
 export class AwakeAiATXApi {
   private readonly url: string;
   private readonly apiKey: string;
+  private readonly oAuthClientId: string;
+  private readonly oAuthClientSecret: string;
   private readonly webSocketClass: new (
     url: string | URL,
   ) => WebSocket;
@@ -116,10 +120,14 @@ export class AwakeAiATXApi {
   constructor(
     url: string,
     apiKey: string,
+    oAuthClientId: string,
+    oAuthClientSecret: string,
     webSocketClass: new (url: string | URL) => WebSocket,
   ) {
     this.url = url;
     this.apiKey = apiKey;
+    this.oAuthClientId = oAuthClientId;
+    this.oAuthClientSecret = oAuthClientSecret;
     this.webSocketClass = webSocketClass;
   }
 
@@ -129,7 +137,19 @@ export class AwakeAiATXApi {
       PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
     );
 
-    const webSocket = new this.webSocketClass(this.url + this.apiKey);
+    const oAuthTokenApi = new OAuthTokenApi({
+      oAuthTokenEndpoint:
+        "https://auth.dev.awake.ai/realms/awake/protocol/openid-connect/token",
+      oAuthClientId: this.oAuthClientId,
+      oAuthClientSecret: this.oAuthClientSecret,
+    });
+
+    const oAuthToken = await oAuthTokenApi.getOAuthToken();
+
+    const webSocket = new WebSocket(URL, {
+      headers: {"Authorization": `Bearer ${oAuthToken}`}
+    });
+
     webSocket.on("open", () => {
       const startMessage = subscriptionId
         ? AwakeAiATXApi.createResumeMessage(subscriptionId)

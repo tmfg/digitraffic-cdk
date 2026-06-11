@@ -10,4 +10,6 @@ export interface UpdateAwakeAiETXTimestampsSecret extends GenericSecret {
 export interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
   readonly atxurl: string;
   readonly atxauth: string;
+  readonly oAuthClientId: string;
+  readonly oAuthClientSecret: string;
 }

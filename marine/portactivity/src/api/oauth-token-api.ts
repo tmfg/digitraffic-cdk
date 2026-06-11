@@ -58,7 +58,6 @@ export class OAuthTokenApi {
   }
 
   public getOAuthToken(): Promise<OAuthTokenResponse> {
-    const start = Date.now();
     const method = "AutoriApi.getOAuthToken";
 
     if (this.oAuthResponse?.isActive()) {
@@ -88,7 +87,6 @@ export class OAuthTokenApi {
         if (this.oAuthResponse === undefined) {
           throw new Error("Invalid OAuth token");
         }
-        // console.log(this.oAuthResponse);
         return this.oAuthResponse;
       })
       .catch(async (error: Error | HTTPError) => {
