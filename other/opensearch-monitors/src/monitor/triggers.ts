@@ -190,13 +190,17 @@ export function triggerAlways(
   throttleMinutes: number,
   message: string,
 ): OSTrigger {
+  const runbookName = withRunbookName(name, runbookSearchLink);
+  const statusSubject =
+    `{{#ctx.results.0.hits.total.value}}${SlackEmoji.RED_CIRCLE} ${runbookName}{{/ctx.results.0.hits.total.value}}` +
+    `{{^ctx.results.0.hits.total.value}}${SlackEmoji.GREEN_CIRCLE} ${runbookName}{{/ctx.results.0.hits.total.value}}`;
+
   const msg: SlackMessage = {
-    emoji: SlackEmoji.RED_CIRCLE,
-    subject: `${withRunbookName(name, runbookSearchLink)}`,
+    subject: statusSubject,
     message,
   };
   return {
-    name: withRunbookName(name, runbookSearchLink),
+    name: runbookName,
     condition: "true",
     actions: sendAlerts(destinations, msg, throttleMinutes),
   };
