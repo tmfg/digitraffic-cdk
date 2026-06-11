@@ -107,7 +107,7 @@ jobs:
       - name: Check config exists for ${{ github.event.inputs.application }}
         run: |
             export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}"
-            if [ "$INSTALL_CONFIG" == "" ]; then
+            if [ "$INSTALL_CONFIG" == "" ] || [ "$INSTALL_CONFIG" == "null" ]; then
               echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
               echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
 
@@ -187,7 +187,7 @@ jobs:
         env:
           BIN_DIR: ${{ steps.environment.outputs.directory }}/src/bin
         run: |
-            mkdir $BIN_DIR
+            mkdir -p "$BIN_DIR"
 
             if [ "${{ steps.environment.outputs.install_config.allConfigs }}" == "true" ]; then
               cp digitraffic-ci/aws/cdk/marine/config.ts $BIN_DIR/config-marine.ts 
@@ -196,10 +196,10 @@ jobs:
               cp digitraffic-ci/aws/cdk/aviation/config.ts $BIN_DIR/config-aviation.ts 
             else
               # file might not exist, so skipping errors 
-              cp digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts $BIN_DIR/ || true
+              cp "digitraffic-ci/aws/cdk/${{ steps.environment.outputs.dir }}/config.ts" "$BIN_DIR/" || true
             fi;
 
-            cp -r digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/* $BIN_DIR/
+            cp -r "digitraffic-ci/aws/cdk/${{ steps.environment.outputs.directory }}/"* "$BIN_DIR/"
 
       - name: Diff and deploy
         id: deploy
@@ -207,7 +207,7 @@ jobs:
           ENV: ${{ github.event.inputs.env }}
           STACK: ${{ steps.environment.outputs.stack }}
         run: |
-            if [ $ENV == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
+            if [ "$ENV" == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
             # skip environment suffix on stack name if configured
             if [ "true" == "${{ steps.environment.outputs.skip_environment_on_stack_name }}" ]; then
