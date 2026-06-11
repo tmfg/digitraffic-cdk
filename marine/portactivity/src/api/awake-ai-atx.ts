@@ -146,7 +146,7 @@ export class AwakeAiATXApi {
 
     const oAuthToken = await oAuthTokenApi.getOAuthToken();
 
-    const webSocket = new WebSocket(URL, {
+    const webSocket = new WebSocket(this.url, {
       headers: {"Authorization": `Bearer ${oAuthToken}`}
     });
 
