@@ -36,7 +36,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "", "", "",  ws as unknown as typeof WebSocket);
     await api.getATXs(10);
 
     expect(sendMock.mock.calls[0]![0]).toEqual(
@@ -67,7 +67,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "",  "", "", ws as unknown as typeof WebSocket);
 
     await api.getATXs(10);
     await api.getATXs(10);
@@ -94,7 +94,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "", "", "",  ws as unknown as typeof WebSocket);
 
     const atxs = await api.getATXs(10);
 
@@ -115,7 +115,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "", "", "",  ws as unknown as typeof WebSocket);
 
     await expect(api.getATXs(10)).rejects.toEqual("Error");
   });
