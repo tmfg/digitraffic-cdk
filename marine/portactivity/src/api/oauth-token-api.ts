@@ -4,7 +4,7 @@ import type { OAuthSecret } from "./oauth-secret.js";
 
 export const O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS = 3 * 60 * 1000; // 3 minute safety gap to get new token
 
-class OAuthTokenResponse {
+export class OAuthTokenResponse {
   readonly token_type: string;
   readonly expires_in: number;
   readonly expires: Date;
