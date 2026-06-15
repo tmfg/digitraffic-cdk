@@ -1,9 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
+import { OAuthTokenApi, OAuthTokenResponse } from "../../api/oauth-token-api.js";
 import {
   AwakeAiATXApi,
   AwakeAiATXEventType,
-  SUBSCRIPTION_MESSAGE,
+  SUBSCRIPTION_MESSAGE
 } from "../../api/awake-ai-atx.js";
 import { newAwakeATXMessage } from "../testdata.js";
 
@@ -22,6 +23,8 @@ describe("api-awake-ai-atx", () => {
       // assume parameter store to not contain subscriptionId on first call
       .mockResolvedValueOnce(undefined)
       .mockResolvedValue(mockSubscriptionId);
+
+    vi.spyOn(OAuthTokenApi.prototype, "getOAuthToken").mockReturnValue(Promise.resolve(new OAuthTokenResponse("", 0, "")));
 
     const sendMock = vi.fn();
     const ws = vi.fn(
