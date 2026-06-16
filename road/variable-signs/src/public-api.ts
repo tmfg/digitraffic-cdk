@@ -7,6 +7,7 @@ import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { addSimpleServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import type { VariableSignsProperties } from "./variable-signs-cdk-stack.js";
 
 const VARIABLE_SIGN_TAGS_V1 = ["Variable Sign V1"];
 
@@ -36,15 +37,21 @@ export class PublicApi {
 
     this.datex2_35_model = addSimpleServiceModel("Xml35Model", this.restApi);
 
-    this.createV1ResourcePaths();
+    const enableDatex35 = (stack.configuration as VariableSignsProperties)
+      .enableDatex35;
+
+    this.createV1ResourcePaths(enableDatex35);
     this.createDatex233Resource(stack);
     this.createImageResource(stack);
-    this.createSituationsDatex35Resource(stack);
-    this.createStatusesDatex35Resource(stack);
-    this.createControllersDatex35Resource(stack);
+
+    if (enableDatex35) {
+      this.createSituationsDatex35Resource(stack);
+      this.createStatusesDatex35Resource(stack);
+      this.createControllersDatex35Resource(stack);
+    }
   }
 
-  createV1ResourcePaths(): void {
+  createV1ResourcePaths(enableDatex35: boolean): void {
     this.apiResource = this.restApi.root.addResource("api");
 
     const vsResource = this.apiResource.addResource("variable-sign");
@@ -54,19 +61,21 @@ export class PublicApi {
     );
 
     const imagesResource = v1Resource.addResource("images");
+    this.v1ImageResource = imagesResource.addResource("{text}");
 
     this.v1Datex233Resource = v1Resource.addResource("signs.datex2");
-    this.v1SituationsDatex35Resource = v1Resource
-      .addResource("signs")
-      .addResource("datex2-3.5.xml");
-    this.v1StatusesDatex35Resource = v1Resource
-      .addResource("statuses")
-      .addResource("datex2-3.5.xml");
-    this.v1ControllersDatex35Resource = v1Resource
-      .addResource("controllers")
-      .addResource("datex2-3.5.xml");
 
-    this.v1ImageResource = imagesResource.addResource("{text}");
+    if (enableDatex35) {
+      this.v1SituationsDatex35Resource = v1Resource
+        .addResource("signs")
+        .addResource("datex2-3.5.xml");
+      this.v1StatusesDatex35Resource = v1Resource
+        .addResource("statuses")
+        .addResource("datex2-3.5.xml");
+      this.v1ControllersDatex35Resource = v1Resource
+        .addResource("controllers")
+        .addResource("datex2-3.5.xml");
+    }
   }
 
   createImageResource(stack: DigitrafficStack): void {

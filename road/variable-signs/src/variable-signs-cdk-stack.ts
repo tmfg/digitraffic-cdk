@@ -5,8 +5,16 @@ import { Canaries } from "./canaries.js";
 import { IntegrationApi } from "./integration-api.js";
 import { PublicApi } from "./public-api.js";
 
+export interface VariableSignsProperties extends StackConfiguration {
+  readonly enableDatex35: boolean;
+}
+
 export class VariableSignsCdkStack extends DigitrafficStack {
-  constructor(scope: Construct, id: string, configuration: StackConfiguration) {
+  constructor(
+    scope: Construct,
+    id: string,
+    configuration: VariableSignsProperties,
+  ) {
     super(scope, id, configuration);
 
     new IntegrationApi(this);
