@@ -1,10 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
-import { OAuthTokenApi, OAuthTokenResponse } from "../../api/oauth-token-api.js";
 import {
   AwakeAiATXApi,
   AwakeAiATXEventType,
-  SUBSCRIPTION_MESSAGE
+  SUBSCRIPTION_MESSAGE,
 } from "../../api/awake-ai-atx.js";
 import { newAwakeATXMessage } from "../testdata.js";
 
@@ -24,8 +23,6 @@ describe("api-awake-ai-atx", () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValue(mockSubscriptionId);
 
-    vi.spyOn(OAuthTokenApi.prototype, "getOAuthToken").mockResolvedValue(new OAuthTokenResponse("", 0, ""));
-
     const sendMock = vi.fn();
     const ws = vi.fn(
       class {
@@ -39,7 +36,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", "", "",  ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
     await api.getATXs(10);
 
     expect(sendMock.mock.calls[0]![0]).toEqual(
@@ -70,7 +67,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "",  "", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
 
     await api.getATXs(10);
     await api.getATXs(10);
@@ -97,7 +94,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", "", "",  ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
 
     const atxs = await api.getATXs(10);
 
@@ -118,7 +115,7 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", "", "",  ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi("", "", ws as unknown as typeof WebSocket);
 
     await expect(api.getATXs(10)).rejects.toEqual("Error");
   });

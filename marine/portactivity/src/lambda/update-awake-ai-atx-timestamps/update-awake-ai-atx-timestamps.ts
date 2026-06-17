@@ -14,8 +14,6 @@ import { sendMessage } from "../../service/queue-service.js";
 const expectedKeys = [
   PortactivitySecretKeys.AWAKE_ATX_URL,
   PortactivitySecretKeys.AWAKE_ATX_AUTH,
-  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
-  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
 ];
 
 const rdsHolder: RdsHolder = RdsHolder.create();
@@ -37,12 +35,7 @@ export async function handler(__: unknown, context: Context): Promise<void> {
     .then(() => secretHolder.get())
     .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
       const service = new AwakeAiATXService(
-        new AwakeAiATXApi(
-          secret.atxurl,
-          secret.atxauth,
-          secret.oAuthClientId,
-          secret.oAuthClientSecret,
-          WebSocket),
+        new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket),
       );
 
       const timestamps = await service.getATXs(
