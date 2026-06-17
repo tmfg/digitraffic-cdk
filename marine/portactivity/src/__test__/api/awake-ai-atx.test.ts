@@ -24,7 +24,7 @@ describe("api-awake-ai-atx", () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValue(mockSubscriptionId);
 
-    vi.spyOn(OAuthTokenApi.prototype, "getOAuthToken").mockResolvedValue(new OAuthTokenResponse("a", 300, "b"));
+    vi.spyOn(OAuthTokenApi.prototype, "getOAuthToken").mockResolvedValue(new OAuthTokenResponse("", 0, ""));
 
     const sendMock = vi.fn();
     const ws = vi.fn(
