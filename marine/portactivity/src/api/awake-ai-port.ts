@@ -81,7 +81,7 @@ export class AwakeAiPortApi {
       const response = await ky
         .get(url, {
           headers: {
-            Authorization: "Bearer " + oAuthToken.access_token,
+            Authorization: "Bearer XYZ " + oAuthToken.access_token,
             Accept: MediaType.APPLICATION_JSON,
           },
           retry: 0,
