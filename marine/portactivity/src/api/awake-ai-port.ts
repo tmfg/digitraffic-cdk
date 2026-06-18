@@ -88,7 +88,7 @@ export class AwakeAiPortApi {
         })
         .json();
 
-      logger.info("DPO-4655 response OK");
+      logger.info({message: "DPO-4655 response OK"});
       return {
         type: AwakeAiPortResponseType.OK,
         schedule: response as AwakeAiPortSchedule[],
@@ -137,8 +137,8 @@ export class AwakeAiPortApi {
       };
     }
 
-    logger.info("AwakeAiPortApi DPO-4655 testi error: ");
-    logger.info(error.response.status);
+    logger.info({message: "AwakeAiPortApi DPO-4655 testi error: "});
+    logger.info({message: error.response.status});
 
     switch (error.response.status) {
       case 404:
