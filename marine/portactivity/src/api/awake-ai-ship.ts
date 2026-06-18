@@ -32,10 +32,19 @@ export interface AwakeAiShipVoyageSchedule {
 export class AwakeAiETAShipApi {
   private readonly url: string;
   private readonly apiKey: string;
+  private readonly oauthClientId: string;
+  private readonly oauthClientSecret: string;
 
-  constructor(url: string, apiKey: string) {
+  constructor(
+    url: string,
+    apiKey: string,
+    oauthClientId: string,
+    oauthClientSecret: string,
+  ) {
     this.url = url;
     this.apiKey = apiKey;
+    this.oauthClientId = oauthClientId;
+    this.oauthClientSecret = oauthClientSecret;
   }
 
   /**
@@ -54,10 +63,20 @@ export class AwakeAiETAShipApi {
         method: "AwakeAiETAShipApi.getETA",
         message: `calling URL ${url}`,
       });
+
+      const oAuthTokenApi = new OAuthTokenApi({
+        oAuthTokenEndpoint:
+          "https://auth.dev.awake.ai/realms/awake/protocol/openid-connect/token",
+        oAuthClientId: this.oauthClientId,
+        oAuthClientSecret: this.oauthClientSecret,
+      });
+
+      const oAuthToken = await oAuthTokenApi.getOAuthToken();
+
       const response = await ky
         .get(url, {
           headers: {
-            Authorization: this.apiKey,
+            Authorization: `Bearer ${oAuthToken.access_token}`,
             Accept: MediaType.APPLICATION_JSON,
           },
           retry: 0,

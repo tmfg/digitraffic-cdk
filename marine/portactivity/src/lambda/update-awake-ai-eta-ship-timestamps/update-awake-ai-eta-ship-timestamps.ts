@@ -21,7 +21,12 @@ interface SnsETAShip extends Omit<DbETAShip, "eta"> {
 
 const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>(
   "awake",
-  [PortactivitySecretKeys.AWAKE_URL, PortactivitySecretKeys.AWAKE_AUTH],
+  [
+    PortactivitySecretKeys.AWAKE_URL,
+    PortactivitySecretKeys.AWAKE_AUTH,
+    PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
+    PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
+  ],
 );
 
 export const handler = (event: SNSEvent): Promise<void> => {
@@ -38,7 +43,12 @@ export const handler = (event: SNSEvent): Promise<void> => {
   return secretHolder.get().then(async (secret) => {
     if (!service) {
       service = new AwakeAiETAShipService(
-        new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth),
+        new AwakeAiETAShipApi(
+          secret.voyagesurl, 
+          secret.voyagesauth,
+          secret.oAuthClientId,
+          secret.oAuthClientSecret,
+        ),
         enableETBForAllPorts.toLowerCase() === "true",
       );
     }
