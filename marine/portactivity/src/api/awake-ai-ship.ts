@@ -3,6 +3,8 @@ import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky, { HTTPError } from "ky";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 
+import { OAuthTokenApi } from "./oauth-token-api.js";
+
 export enum AwakeAiShipResponseType {
   OK = "OK",
   SHIP_NOT_FOUND = "SHIP_NOT_FOUND",
