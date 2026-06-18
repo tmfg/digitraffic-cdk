@@ -395,7 +395,7 @@ function createVoyageResponse(
 }
 
 function createApi(): AwakeAiETAShipApi {
-  return new AwakeAiETAShipApi("", "");
+  return new AwakeAiETAShipApi("", "", "", "");
 }
 
 function newDbETAShip(
