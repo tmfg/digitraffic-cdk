@@ -316,9 +316,9 @@ function createATXScheduler(stack: Stack): Rule {
   const ruleName = "PortActivity-ATXScheduler";
   return new Rule(stack, ruleName, {
     ruleName,
-    // every 12 minutes
+    // every 15 minutes
     // api occasionally throttles with http 429 using a 10 minute cycle
-    schedule: Schedule.expression("cron(*/12 * * * ? *)"),
+    schedule: Schedule.expression("cron(*/15 * * * ? *)"),
   });
 }
 
