@@ -31,7 +31,17 @@ export interface AwakeAISubscriptionMessage extends AwakeAiATXMessage {
   /**
    * Subscription id, equivalent to session id
    */
-  readonly subscriptionId: string;
+  readonly subscriptionId?: string;
+
+  /**
+   * Status of the subscription (e.g. "active", "failed")
+   */
+  readonly status?: string;
+
+  /**
+   * Error message when status is "failed"
+   */
+  readonly message?: string;
 }
 
 export interface AwakeAIATXTimestampMessage extends AwakeAiATXMessage {
@@ -162,8 +172,16 @@ export class AwakeAiATXApi {
             method: "AwakeAiATXApi.getATXs",
             message: `Received subscription-status: ${messageRaw}`,
           });
-          const receivedSubscriptionId = (message as AwakeAISubscriptionMessage)
-            .subscriptionId;
+          const subscriptionMessage = message as AwakeAISubscriptionMessage;
+          if (subscriptionMessage.status === "failed") {
+            logger.warn({
+              method: "AwakeAiATXApi.getATXs",
+              message: `Subscription resume failed: ${subscriptionMessage.message ?? "unknown reason"}, starting fresh subscription`,
+            });
+            webSocket.send(JSON.stringify(SUBSCRIPTION_MESSAGE));
+            break;
+          }
+          const receivedSubscriptionId = subscriptionMessage.subscriptionId;
           if (
             receivedSubscriptionId &&
             receivedSubscriptionId !== subscriptionId
