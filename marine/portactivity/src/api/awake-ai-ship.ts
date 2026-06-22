@@ -34,9 +34,7 @@ export interface AwakeAiShipVoyageSchedule {
 export class AwakeAiETAShipApi {
   private readonly url: string;
   private readonly apiKey: string;
-  private readonly oAuthTokenEndpoint: string;
-  private readonly oauthClientId: string;
-  private readonly oauthClientSecret: string;
+  private readonly oAuthTokenApi: OAuthTokenApi;
 
   constructor(
     url: string,
@@ -47,9 +45,11 @@ export class AwakeAiETAShipApi {
   ) {
     this.url = url;
     this.apiKey = apiKey;
-    this.oAuthTokenEndpoint = oAuthTokenEndpoint;
-    this.oauthClientId = oauthClientId;
-    this.oauthClientSecret = oauthClientSecret;
+    this.oAuthTokenApi = new OAuthTokenApi({
+      oAuthTokenEndpoint,
+      oAuthClientId: oauthClientId,
+      oAuthClientSecret: oauthClientSecret,
+    });
   }
 
   /**
@@ -69,13 +69,7 @@ export class AwakeAiETAShipApi {
         message: `calling URL ${url}`,
       });
 
-      const oAuthTokenApi = new OAuthTokenApi({
-        oAuthTokenEndpoint: this.oAuthTokenEndpoint,
-        oAuthClientId: this.oauthClientId,
-        oAuthClientSecret: this.oauthClientSecret,
-      });
-
-      const oAuthToken = await oAuthTokenApi.getOAuthToken();
+      const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
 
       const response = await ky
         .get(url, {

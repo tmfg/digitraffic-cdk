@@ -6,7 +6,7 @@ import {
 } from "@aws-sdk/client-ssm";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-import { WebSocket } from "ws";
+import type { WebSocket } from "ws";
 import { PortActivityParameterKeys } from "../keys.js";
 import type { Ports } from "../service/portareas.js";
 import type { AwakeAiZoneType } from "./awake-common.js";
@@ -111,11 +111,10 @@ const ssm = new SSMClient({});
 export class AwakeAiATXApi {
   private readonly url: string;
   private readonly apiKey: string;
-  private readonly oAuthTokenEndpoint: string;
-  private readonly oAuthClientId: string;
-  private readonly oAuthClientSecret: string;
+  private readonly oAuthTokenApi: OAuthTokenApi;
   private readonly webSocketClass: new (
     url: string | URL,
+    options?: object,
   ) => WebSocket;
 
   constructor(
@@ -124,13 +123,15 @@ export class AwakeAiATXApi {
     oAuthTokenEndpoint: string,
     oAuthClientId: string,
     oAuthClientSecret: string,
-    webSocketClass: new (url: string | URL) => WebSocket,
+    webSocketClass: new (url: string | URL, options?: object) => WebSocket,
   ) {
     this.url = url;
     this.apiKey = apiKey;
-    this.oAuthTokenEndpoint = oAuthTokenEndpoint;
-    this.oAuthClientId = oAuthClientId;
-    this.oAuthClientSecret = oAuthClientSecret;
+    this.oAuthTokenApi = new OAuthTokenApi({
+      oAuthTokenEndpoint,
+      oAuthClientId,
+      oAuthClientSecret,
+    });
     this.webSocketClass = webSocketClass;
   }
 
@@ -140,15 +141,9 @@ export class AwakeAiATXApi {
       PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
     );
 
-    const oAuthTokenApi = new OAuthTokenApi({
-      oAuthTokenEndpoint: this.oAuthTokenEndpoint,
-      oAuthClientId: this.oAuthClientId,
-      oAuthClientSecret: this.oAuthClientSecret,
-    });
+    const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
 
-    const oAuthToken = await oAuthTokenApi.getOAuthToken();
-
-    const webSocket = new WebSocket(this.url, {
+    const webSocket = new this.webSocketClass(this.url, {
       headers: { Authorization: `Bearer ${oAuthToken.access_token}` },
     });
 

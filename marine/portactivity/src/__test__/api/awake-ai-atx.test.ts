@@ -1,6 +1,14 @@
-import { describe, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
-import { AwakeAiATXApi, AwakeAiATXEventType } from "../../api/awake-ai-atx.js";
+import {
+  AwakeAiATXApi,
+  AwakeAiATXEventType,
+  SUBSCRIPTION_MESSAGE,
+} from "../../api/awake-ai-atx.js";
+import {
+  OAuthTokenApi,
+  OAuthTokenResponse,
+} from "../../api/oauth-token-api.js";
 import { newAwakeATXMessage } from "../testdata.js";
 
 const NO_OP = vi.fn();
@@ -11,6 +19,9 @@ vi.spyOn(AwakeAiATXApi.prototype, "getFromParameterStore").mockResolvedValue(
   mockSubscriptionId,
 );
 vi.spyOn(AwakeAiATXApi.prototype, "putInParameterStore").mockResolvedValue({});
+vi.spyOn(OAuthTokenApi.prototype, "getOAuthToken").mockResolvedValue(
+  new OAuthTokenResponse("Bearer", 3600, "mock-token"),
+);
 
 describe("api-awake-ai-atx", () => {
   test("getATXs - no existing session subscribes to zone events", async () => {
@@ -40,13 +51,11 @@ describe("api-awake-ai-atx", () => {
       "",
       ws as unknown as typeof WebSocket,
     );
-    /*
     await api.getATXs(10);
 
     expect(sendMock.mock.calls[0]![0]).toEqual(
       JSON.stringify(SUBSCRIPTION_MESSAGE),
     );
-    */
   });
 
   test("getATXs - existing session resumes with subscription id", async () => {
@@ -81,14 +90,12 @@ describe("api-awake-ai-atx", () => {
       ws as unknown as typeof WebSocket,
     );
 
-    /*
     await api.getATXs(10);
     await api.getATXs(10);
 
     expect(sendMock.mock.calls[1]![0]).toEqual(
       JSON.stringify(AwakeAiATXApi.createResumeMessage(subscriptionId)),
     );
-    */
   });
 
   test("getATXs - received ATxs", async () => {
@@ -117,12 +124,10 @@ describe("api-awake-ai-atx", () => {
       ws as unknown as typeof WebSocket,
     );
 
-    /*
     const atxs = await api.getATXs(10);
 
     expect(atxs.length).toBe(1);
     expect(atxs[0]).toMatchObject(atxMessage);
-    */
   });
 
   test("getATXs - error handling", async () => {
@@ -147,8 +152,6 @@ describe("api-awake-ai-atx", () => {
       ws as unknown as typeof WebSocket,
     );
 
-    /*
     await expect(api.getATXs(10)).rejects.toEqual("Error");
-    */
   });
 });

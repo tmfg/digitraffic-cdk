@@ -58,7 +58,7 @@ export class OAuthTokenApi {
   }
 
   public getOAuthToken(): Promise<OAuthTokenResponse> {
-    const method = "AutoriApi.getOAuthToken";
+    const method = "OAuthTokenApi.getOAuthToken";
 
     if (this.oAuthResponse?.isActive()) {
       return Promise.resolve(this.oAuthResponse);
