@@ -1,10 +1,6 @@
-import { describe, expect, test, vi } from "vitest";
+import { describe, test, vi } from "vitest";
 import type { WebSocket } from "ws";
-import {
-  AwakeAiATXApi,
-  AwakeAiATXEventType,
-  SUBSCRIPTION_MESSAGE,
-} from "../../api/awake-ai-atx.js";
+import { AwakeAiATXApi, AwakeAiATXEventType } from "../../api/awake-ai-atx.js";
 import { newAwakeATXMessage } from "../testdata.js";
 
 const NO_OP = vi.fn();
@@ -36,7 +32,14 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", "", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi(
+      "",
+      "",
+      "",
+      "",
+      "",
+      ws as unknown as typeof WebSocket,
+    );
     /*
     await api.getATXs(10);
 
@@ -69,7 +72,14 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", "", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi(
+      "",
+      "",
+      "",
+      "",
+      "",
+      ws as unknown as typeof WebSocket,
+    );
 
     /*
     await api.getATXs(10);
@@ -98,7 +108,14 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", "", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi(
+      "",
+      "",
+      "",
+      "",
+      "",
+      ws as unknown as typeof WebSocket,
+    );
 
     /*
     const atxs = await api.getATXs(10);
@@ -121,7 +138,14 @@ describe("api-awake-ai-atx", () => {
       },
     );
 
-    const api = new AwakeAiATXApi("", "", "", "", ws as unknown as typeof WebSocket);
+    const api = new AwakeAiATXApi(
+      "",
+      "",
+      "",
+      "",
+      "",
+      ws as unknown as typeof WebSocket,
+    );
 
     /*
     await expect(api.getATXs(10)).rejects.toEqual("Error");

@@ -18,6 +18,7 @@ export enum PortactivitySecretKeys {
   ETAS_AUDIENCE = "etas.audience",
   AWAKE_URL = "voyagesurl",
   AWAKE_AUTH = "voyagesauth",
+  AWAKE_OAUTH_TOKEN_ENDPOINT = "oAuthTokenEndpoint",
   AWAKE_OAUTH_CLIENT_ID = "oAuthClientId",
   AWAKE_OAUTH_CLIENT_SECRET = "oAuthClientSecret",
   AWAKE_ATX_URL = "atxurl",

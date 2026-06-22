@@ -28,7 +28,7 @@ describe(
   "service Awake.AI ATx",
   dbTestBase((db: DTDatabase) => {
     function createAiATXApi(): AwakeAiATXApi {
-      return new AwakeAiATXApi("", "", "", "", WebSocket);
+      return new AwakeAiATXApi("", "", "", "", "", WebSocket);
     }
 
     test("getATXs - no portcall found for ATx", async () => {

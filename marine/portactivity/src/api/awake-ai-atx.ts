@@ -111,6 +111,7 @@ const ssm = new SSMClient({});
 export class AwakeAiATXApi {
   private readonly url: string;
   private readonly apiKey: string;
+  private readonly oAuthTokenEndpoint: string;
   private readonly oAuthClientId: string;
   private readonly oAuthClientSecret: string;
   private readonly webSocketClass: new (
@@ -120,12 +121,14 @@ export class AwakeAiATXApi {
   constructor(
     url: string,
     apiKey: string,
+    oAuthTokenEndpoint: string,
     oAuthClientId: string,
     oAuthClientSecret: string,
     webSocketClass: new (url: string | URL) => WebSocket,
   ) {
     this.url = url;
     this.apiKey = apiKey;
+    this.oAuthTokenEndpoint = oAuthTokenEndpoint;
     this.oAuthClientId = oAuthClientId;
     this.oAuthClientSecret = oAuthClientSecret;
     this.webSocketClass = webSocketClass;
@@ -138,8 +141,7 @@ export class AwakeAiATXApi {
     );
 
     const oAuthTokenApi = new OAuthTokenApi({
-      oAuthTokenEndpoint:
-        "https://auth.dev.awake.ai/realms/awake/protocol/openid-connect/token",
+      oAuthTokenEndpoint: this.oAuthTokenEndpoint,
       oAuthClientId: this.oAuthClientId,
       oAuthClientSecret: this.oAuthClientSecret,
     });
@@ -147,7 +149,7 @@ export class AwakeAiATXApi {
     const oAuthToken = await oAuthTokenApi.getOAuthToken();
 
     const webSocket = new WebSocket(this.url, {
-      headers: {"Authorization": `Bearer ${oAuthToken.access_token}`}
+      headers: { Authorization: `Bearer ${oAuthToken.access_token}` },
     });
 
     webSocket.on("open", () => {

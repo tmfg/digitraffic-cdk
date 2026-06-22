@@ -14,6 +14,7 @@ const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 const expectedKeys = [
   PortactivitySecretKeys.AWAKE_URL,
   PortactivitySecretKeys.AWAKE_AUTH,
+  PortactivitySecretKeys.AWAKE_OAUTH_TOKEN_ENDPOINT,
   PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
   PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
 ];
@@ -39,6 +40,7 @@ export function handler(event: SNSEvent): Promise<void> {
           new AwakeAiPortApi(
             secret.voyagesurl,
             secret.voyagesauth,
+            secret.oAuthTokenEndpoint,
             secret.oAuthClientId,
             secret.oAuthClientSecret,
           ),

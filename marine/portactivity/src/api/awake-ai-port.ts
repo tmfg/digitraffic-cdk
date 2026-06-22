@@ -33,17 +33,20 @@ export interface AwakeAiPortResponse {
 export class AwakeAiPortApi {
   private readonly url: string;
   private readonly apiKey: string;
+  private readonly oAuthTokenEndpoint: string;
   private readonly oauthClientId: string;
   private readonly oauthClientSecret: string;
 
   constructor(
     url: string,
     apiKey: string,
+    oAuthTokenEndpoint: string,
     oauthClientId: string,
     oauthClientSecret: string,
   ) {
     this.url = url;
     this.apiKey = apiKey;
+    this.oAuthTokenEndpoint = oAuthTokenEndpoint;
     this.oauthClientId = oauthClientId;
     this.oauthClientSecret = oauthClientSecret;
   }
@@ -70,8 +73,7 @@ export class AwakeAiPortApi {
       });
 
       const oAuthTokenApi = new OAuthTokenApi({
-        oAuthTokenEndpoint:
-          "https://auth.dev.awake.ai/realms/awake/protocol/openid-connect/token",
+        oAuthTokenEndpoint: this.oAuthTokenEndpoint,
         oAuthClientId: this.oauthClientId,
         oAuthClientSecret: this.oauthClientSecret,
       });
@@ -87,11 +89,6 @@ export class AwakeAiPortApi {
           retry: 0,
         })
         .json();
-
-      logger.info({
-        method: "AwakeAiPortApi.getPredictions",
-        message: `DPO-4655 response OK`,
-      });
 
       return {
         type: AwakeAiPortResponseType.OK,
@@ -140,15 +137,6 @@ export class AwakeAiPortApi {
         type: AwakeAiPortResponseType.NO_RESPONSE,
       };
     }
-
-      logger.info({
-        method: "AwakeAiPortApi.getPredictions",
-        message: `AwakeAiPortApi DPO-4655 testi error: `,
-      });
-      logger.info({
-        method: "AwakeAiPortApi.getPredictions",
-        message: `errori: ${error.response.status}`,
-      });
 
     switch (error.response.status) {
       case 404:
