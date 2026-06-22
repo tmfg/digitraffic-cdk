@@ -158,9 +158,16 @@ export class AwakeAiATXApi {
 
       switch (message.msgType) {
         case AwakeAiATXEventType.SUBSCRIPTION_STATUS: {
+          logger.debug({
+            method: "AwakeAiATXApi.getATXs",
+            message: `Received subscription-status: ${messageRaw}`,
+          });
           const receivedSubscriptionId = (message as AwakeAISubscriptionMessage)
             .subscriptionId;
-          if (receivedSubscriptionId !== subscriptionId) {
+          if (
+            receivedSubscriptionId &&
+            receivedSubscriptionId !== subscriptionId
+          ) {
             this.putInParameterStore(
               ssm,
               PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
@@ -176,9 +183,15 @@ export class AwakeAiATXApi {
           }
           break;
         }
-        case AwakeAiATXEventType.EVENT:
-          atxs.push(message as AwakeAIATXTimestampMessage);
+        case AwakeAiATXEventType.EVENT: {
+          const atxEvent = message as AwakeAIATXTimestampMessage;
+          logger.debug({
+            method: "AwakeAiATXApi.getATXs",
+            message: `Received event: mmsi=${atxEvent.mmsi} imo=${atxEvent.imo} zone=${atxEvent.zoneName} zoneEvent=${atxEvent.zoneEventType} eventId=${atxEvent.eventId}`,
+          });
+          atxs.push(atxEvent);
           break;
+        }
         default:
           logger.warn({
             method: "AwakeAiATXApi.getATXs",
