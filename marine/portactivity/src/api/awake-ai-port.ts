@@ -32,22 +32,19 @@ export interface AwakeAiPortResponse {
 
 export class AwakeAiPortApi {
   private readonly url: string;
-  private readonly apiKey: string;
   private readonly oAuthTokenApi: OAuthTokenApi;
 
   constructor(
     url: string,
-    apiKey: string,
     oAuthTokenEndpoint: string,
-    oauthClientId: string,
-    oauthClientSecret: string,
+    oAuthClientId: string,
+    oAuthClientSecret: string,
   ) {
     this.url = url;
-    this.apiKey = apiKey;
     this.oAuthTokenApi = new OAuthTokenApi({
       oAuthTokenEndpoint,
-      oAuthClientId: oauthClientId,
-      oAuthClientSecret: oauthClientSecret,
+      oAuthClientId,
+      oAuthClientSecret,
     });
   }
 

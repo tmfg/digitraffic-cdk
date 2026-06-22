@@ -23,7 +23,6 @@ const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>(
   "awake",
   [
     PortactivitySecretKeys.AWAKE_URL,
-    PortactivitySecretKeys.AWAKE_AUTH,
     PortactivitySecretKeys.AWAKE_OAUTH_TOKEN_ENDPOINT,
     PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
     PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
@@ -46,7 +45,6 @@ export const handler = (event: SNSEvent): Promise<void> => {
       service = new AwakeAiETAShipService(
         new AwakeAiETAShipApi(
           secret.voyagesurl,
-          secret.voyagesauth,
           secret.oAuthTokenEndpoint,
           secret.oAuthClientId,
           secret.oAuthClientSecret,

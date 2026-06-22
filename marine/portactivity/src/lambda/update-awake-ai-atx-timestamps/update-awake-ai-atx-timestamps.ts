@@ -13,7 +13,6 @@ import { sendMessage } from "../../service/queue-service.js";
 
 const expectedKeys = [
   PortactivitySecretKeys.AWAKE_ATX_URL,
-  PortactivitySecretKeys.AWAKE_ATX_AUTH,
   PortactivitySecretKeys.AWAKE_OAUTH_TOKEN_ENDPOINT,
   PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
   PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
@@ -40,7 +39,6 @@ export async function handler(__: unknown, context: Context): Promise<void> {
       const service = new AwakeAiATXService(
         new AwakeAiATXApi(
           secret.atxurl,
-          secret.atxauth,
           secret.oAuthTokenEndpoint,
           secret.oAuthClientId,
           secret.oAuthClientSecret,

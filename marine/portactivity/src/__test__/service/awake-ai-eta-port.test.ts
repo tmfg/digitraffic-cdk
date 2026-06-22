@@ -133,7 +133,7 @@ describe("AwakeAiETAPortService(", () => {
 });
 
 function createApi(): AwakeAiPortApi {
-  return new AwakeAiPortApi("", "", "", "", "");
+  return new AwakeAiPortApi("", "", "", "");
 }
 
 function createEtaResponse(options?: {

@@ -48,7 +48,6 @@ describe("api-awake-ai-atx", () => {
       "",
       "",
       "",
-      "",
       ws as unknown as typeof WebSocket,
     );
     await api.getATXs(10);
@@ -86,7 +85,6 @@ describe("api-awake-ai-atx", () => {
       "",
       "",
       "",
-      "",
       ws as unknown as typeof WebSocket,
     );
 
@@ -120,7 +118,6 @@ describe("api-awake-ai-atx", () => {
       "",
       "",
       "",
-      "",
       ws as unknown as typeof WebSocket,
     );
 
@@ -144,7 +141,6 @@ describe("api-awake-ai-atx", () => {
     );
 
     const api = new AwakeAiATXApi(
-      "",
       "",
       "",
       "",

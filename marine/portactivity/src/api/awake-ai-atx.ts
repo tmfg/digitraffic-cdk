@@ -110,7 +110,6 @@ const ssm = new SSMClient({});
 
 export class AwakeAiATXApi {
   private readonly url: string;
-  private readonly apiKey: string;
   private readonly oAuthTokenApi: OAuthTokenApi;
   private readonly webSocketClass: new (
     url: string | URL,
@@ -119,14 +118,12 @@ export class AwakeAiATXApi {
 
   constructor(
     url: string,
-    apiKey: string,
     oAuthTokenEndpoint: string,
     oAuthClientId: string,
     oAuthClientSecret: string,
     webSocketClass: new (url: string | URL, options?: object) => WebSocket,
   ) {
     this.url = url;
-    this.apiKey = apiKey;
     this.oAuthTokenApi = new OAuthTokenApi({
       oAuthTokenEndpoint,
       oAuthClientId,
