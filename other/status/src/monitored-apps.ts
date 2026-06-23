@@ -17,11 +17,13 @@ export const monitoredApps: MonitoredApp[] = [
       "/api/weather/v1/forecast-sections/forecasts",
     ],
     endpoints: [
+      /*
       {
         name: "Road MQTT",
         url: "wss://tie.digitraffic.fi/mqtt",
         protocol: EndpointProtocol.WebSocket,
       },
+      */
       {
         name: "Road Weathercam",
         url: "https://weathercam.digitraffic.fi/C0460900.jpg",
@@ -83,11 +85,13 @@ export const monitoredApps: MonitoredApp[] = [
     url: "https://meri.digitraffic.fi/swagger/openapi.json",
     excluded: [],
     endpoints: [
+      /*
       {
         name: "Marine MQTT",
         url: "wss://meri.digitraffic.fi/mqtt",
         protocol: EndpointProtocol.WebSocket,
       },
+      */
       {
         name: "Marine Swagger UI",
         url: "https://meri.digitraffic.fi/swagger/",
@@ -203,6 +207,7 @@ export const monitoredApps: MonitoredApp[] = [
       },
     ],
   },
+  /*
   {
     name: TrafficType.AFIR,
     hostPart: "https://afir.digitraffic.fi",
@@ -216,4 +221,5 @@ export const monitoredApps: MonitoredApp[] = [
       },
     ],
   },
+  */
 ];
