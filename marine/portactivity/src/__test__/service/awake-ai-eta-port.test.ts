@@ -16,13 +16,17 @@ import {
   AwakeAiVoyageStatus,
   AwakeAiZoneType,
 } from "../../api/awake-common.js";
+import {
+  OAuthTokenApi,
+  OAuthTokenResponse,
+} from "../../api/oauth-token-api.js";
 import { AwakeAiETAPortService } from "../../service/awake-ai-eta-port.js";
 import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil.js";
 
 describe("AwakeAiETAPortService(", () => {
   test("getAwakeAiTimestamps - no schedule", async () => {
     const api = createApi();
-    const service = new AwakeAiETAPortService(api);
+    const service = new AwakeAiETAPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtaResponse({
       excludeSchedule: true,
       includePortCallPrediction: true,
@@ -38,7 +42,7 @@ describe("AwakeAiETAPortService(", () => {
 
   test("getAwakeAiTimestamps - filter stopped voyages", async () => {
     const api = createApi();
-    const service = new AwakeAiETAPortService(api);
+    const service = new AwakeAiETAPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtaResponse({
       voyageStatus: AwakeAiVoyageStatus.STOPPED,
       includePortCallPrediction: true,
@@ -54,7 +58,7 @@ describe("AwakeAiETAPortService(", () => {
 
   test("getAwakeAiTimestamps - non-ETA", async () => {
     const api = createApi();
-    const service = new AwakeAiETAPortService(api);
+    const service = new AwakeAiETAPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtaResponse({
       predictionType: randomBoolean()
         ? AwakeAiPredictionType.TRAVEL_TIME
@@ -71,7 +75,7 @@ describe("AwakeAiETAPortService(", () => {
 
   test("getAwakeAiTimestamps - 24 hours or closer", async () => {
     const api = createApi();
-    const service = new AwakeAiETAPortService(api);
+    const service = new AwakeAiETAPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtaResponse({
       arrivalTime: subHours(new Date(), getRandomNumber(1, 23)),
       voyageStatus: AwakeAiVoyageStatus.UNDER_WAY,
@@ -89,7 +93,7 @@ describe("AwakeAiETAPortService(", () => {
 
   test("getAwakeAiTimestamps - filter Digitraffic ETA predictions", async () => {
     const api = createApi();
-    const service = new AwakeAiETAPortService(api);
+    const service = new AwakeAiETAPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtaResponse({
       voyageStatus: AwakeAiVoyageStatus.UNDER_WAY,
       predictionType: AwakeAiPredictionType.ETA,
@@ -109,7 +113,7 @@ describe("AwakeAiETAPortService(", () => {
 
   test("getAwakeAiTimestamps - correct with port call prediction", async () => {
     const api = createApi();
-    const service = new AwakeAiETAPortService(api);
+    const service = new AwakeAiETAPortService(api, createOAuthTokenApi());
     vi.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
       createEtaResponse({ includePortCallPrediction: true }),
     );
@@ -121,7 +125,7 @@ describe("AwakeAiETAPortService(", () => {
 
   test("getAwakeAiTimestamps - correct without port call prediction", async () => {
     const api = createApi();
-    const service = new AwakeAiETAPortService(api);
+    const service = new AwakeAiETAPortService(api, createOAuthTokenApi());
     vi.spyOn(AwakeAiPortApi.prototype, "getETAs").mockResolvedValue(
       createEtaResponse({ includePortCallPrediction: true }),
     );
@@ -133,7 +137,19 @@ describe("AwakeAiETAPortService(", () => {
 });
 
 function createApi(): AwakeAiPortApi {
-  return new AwakeAiPortApi("", "", "", "");
+  return new AwakeAiPortApi("");
+}
+
+function createOAuthTokenApi(): OAuthTokenApi {
+  const oAuthTokenApi = new OAuthTokenApi({
+    oAuthTokenEndpoint: "",
+    oAuthClientId: "",
+    oAuthClientSecret: "",
+  });
+  vi.spyOn(oAuthTokenApi, "getOAuthToken").mockResolvedValue(
+    new OAuthTokenResponse("Bearer", 3600, "mock-token"),
+  );
+  return oAuthTokenApi;
 }
 
 function createEtaResponse(options?: {

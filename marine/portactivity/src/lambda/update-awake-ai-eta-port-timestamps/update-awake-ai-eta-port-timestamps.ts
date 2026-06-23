@@ -4,6 +4,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { SNSEvent } from "aws-lambda";
 import { AwakeAiPortApi } from "../../api/awake-ai-port.js";
+import { OAuthTokenApi } from "../../api/oauth-token-api.js";
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
 import type { UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
 import { AwakeAiETAPortService } from "../../service/awake-ai-eta-port.js";
@@ -35,14 +36,13 @@ export function handler(event: SNSEvent): Promise<void> {
       const locode = event.Records[0]?.Sns.Message as unknown as string;
 
       if (!service) {
-        service = new AwakeAiETAPortService(
-          new AwakeAiPortApi(
-            secret.voyagesurl,
-            secret.oAuthTokenEndpoint,
-            secret.oAuthClientId,
-            secret.oAuthClientSecret,
-          ),
-        );
+        const oAuthTokenApi = new OAuthTokenApi({
+          oAuthTokenEndpoint: secret.oAuthTokenEndpoint,
+          oAuthClientId: secret.oAuthClientId,
+          oAuthClientSecret: secret.oAuthClientSecret,
+        });
+        const api = new AwakeAiPortApi(secret.voyagesurl);
+        service = new AwakeAiETAPortService(api, oAuthTokenApi);
       }
       const timestamps = await service.getAwakeAiTimestamps(locode);
 

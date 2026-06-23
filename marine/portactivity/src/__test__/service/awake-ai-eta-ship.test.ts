@@ -20,6 +20,10 @@ import {
   AwakeAiVoyageStatus,
   AwakeAiZoneType,
 } from "../../api/awake-common.js";
+import {
+  OAuthTokenApi,
+  OAuthTokenResponse,
+} from "../../api/oauth-token-api.js";
 import type { DbETAShip } from "../../dao/timestamps.js";
 import { EventSource } from "../../model/eventsource.js";
 import type { Locode } from "../../model/locode.js";
@@ -37,7 +41,7 @@ import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship.js";
 describe("AwakeAiETAShipService", () => {
   test("getAwakeAiTimestamps - creates both ETA and ETB (flag on)", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api, true);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi(), true);
     const ship = newDbETAShip("FIPOR");
     const mmsi = 123456789;
     const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, mmsi);
@@ -52,7 +56,11 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - does not create ETB for unlisted port (flag off)", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api, false);
+    const service = new AwakeAiETAShipService(
+      api,
+      createOAuthTokenApi(),
+      false,
+    );
     const locode = "FIPOR";
     const ship = newDbETAShip(locode);
     const mmsi = 123456789;
@@ -69,7 +77,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - no timestamps when predicted locode differs and ETA is >= 24 h", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip(
       "FIKEK",
       addHours(Date.now(), getRandomInteger(24, 100)),
@@ -85,7 +93,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - timestamps created when predicted locode differs and ETA is < 24 h", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip(
       "FIRAU",
       addHours(Date.now(), getRandomInteger(1, 23)),
@@ -102,7 +110,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - ship not under way", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const mmsi = 123456789;
     const notUnderWayStatuses = [
@@ -123,7 +131,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - not predictable", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     vi.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue({
       type: AwakeAiShipResponseType.OK,
@@ -146,7 +154,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - no predicted voyages", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
     set(response, ["schedule", "predictedVoyages"], []);
@@ -158,7 +166,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - no ETA predictions", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
     set(response, ["schedule", "predictedVoyages", 0, "predictions"], []);
@@ -171,7 +179,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - no predicted destination", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
     unset(response, [
@@ -191,7 +199,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - port outside Finland", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const response = createVoyageResponse("EEMUG", ship.imo, 123456789);
     vi.spyOn(AwakeAiETAShipApi.prototype, "getETA").mockResolvedValue(response);
@@ -202,9 +210,12 @@ describe("AwakeAiETAShipService", () => {
   });
 
   test("getAwakeAiTimestamps - pilotage ETP for ports in list", async () => {
-    const api = createApi();
-    const service = new AwakeAiETAShipService(api);
-    for (const locode of service.publishAsETPDestinations) {
+    for (const locode of new AwakeAiETAShipService(
+      createApi(),
+      createOAuthTokenApi(),
+    ).publishAsETPDestinations) {
+      const api = createApi();
+      const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
       const ship = newDbETAShip(locode);
       const response = createVoyageResponse(locode, ship.imo, 123456789, {
         zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA,
@@ -230,7 +241,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - no pilotage ETP if not in list", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const locode: Locode = "FIHEL";
     const ship = newDbETAShip(locode);
     expect(service.publishAsETPDestinations.includes(locode)).toBe(false);
@@ -246,7 +257,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - port locode override", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api, true);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi(), true);
     const ship = newDbETAShip(
       service.overriddenDestinations[
         getRandomInteger(0, service.overriddenDestinations.length - 1)
@@ -269,7 +280,7 @@ describe("AwakeAiETAShipService", () => {
   test("getAwakeAiTimestamps - destination set explicitly when original ETA is less than 24 h", async () => {
     const locode = "FIKEK";
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip(locode, addHours(Date.now(), 1));
 
     const getETAStub = vi
@@ -278,13 +289,13 @@ describe("AwakeAiETAShipService", () => {
 
     await service.getAwakeAiTimestamps([ship]);
 
-    expect(getETAStub).toHaveBeenCalledWith(ship.imo, locode);
+    expect(getETAStub).toHaveBeenCalledWith("mock-token", ship.imo, locode);
   });
 
   test("getAwakeAiTimestamps - destination not set when original ETA is more than 24 h", async () => {
     const locode = "FIKEK";
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip(locode, addHours(Date.now(), 25));
     const getETAStub = vi
       .spyOn(AwakeAiETAShipApi.prototype, "getETA")
@@ -292,12 +303,12 @@ describe("AwakeAiETAShipService", () => {
 
     await service.getAwakeAiTimestamps([ship]);
 
-    expect(getETAStub).toHaveBeenCalledWith(ship.imo, undefined);
+    expect(getETAStub).toHaveBeenCalledWith("mock-token", ship.imo, undefined);
   });
 
   test("getAwakeAiTimestamps - retry", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const voyageTimestamp = createVoyageResponse(
       ship.locode,
@@ -319,7 +330,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - retry fail", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
     vi.spyOn(AwakeAiETAShipApi.prototype, "getETA")
@@ -334,7 +345,7 @@ describe("AwakeAiETAShipService", () => {
 
   test("getAwakeAiTimestamps - filter Digitraffic ETA predictions", async () => {
     const api = createApi();
-    const service = new AwakeAiETAShipService(api);
+    const service = new AwakeAiETAShipService(api, createOAuthTokenApi());
     const ship = newDbETAShip();
     const voyageTimestamp = createVoyageResponse(
       ship.locode,
@@ -395,7 +406,19 @@ function createVoyageResponse(
 }
 
 function createApi(): AwakeAiETAShipApi {
-  return new AwakeAiETAShipApi("", "", "", "");
+  return new AwakeAiETAShipApi("");
+}
+
+function createOAuthTokenApi(): OAuthTokenApi {
+  const oAuthTokenApi = new OAuthTokenApi({
+    oAuthTokenEndpoint: "",
+    oAuthClientId: "",
+    oAuthClientSecret: "",
+  });
+  vi.spyOn(oAuthTokenApi, "getOAuthToken").mockResolvedValue(
+    new OAuthTokenResponse("Bearer", 3600, "mock-token"),
+  );
+  return oAuthTokenApi;
 }
 
 function newDbETAShip(

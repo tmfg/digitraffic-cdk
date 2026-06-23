@@ -12,6 +12,10 @@ import {
   AwakeATXZoneEventType,
 } from "../../api/awake-ai-atx.js";
 import { AwakeAiZoneType } from "../../api/awake-common.js";
+import {
+  OAuthTokenApi,
+  OAuthTokenResponse,
+} from "../../api/oauth-token-api.js";
 import { EventSource } from "../../model/eventsource.js";
 import type { ApiTimestamp } from "../../model/timestamp.js";
 import { EventType } from "../../model/timestamp.js";
@@ -28,7 +32,19 @@ describe(
   "service Awake.AI ATx",
   dbTestBase((db: DTDatabase) => {
     function createAiATXApi(): AwakeAiATXApi {
-      return new AwakeAiATXApi("", "", "", "", WebSocket);
+      return new AwakeAiATXApi("", WebSocket);
+    }
+
+    function createOAuthTokenApi(): OAuthTokenApi {
+      const oAuthTokenApi = new OAuthTokenApi({
+        oAuthTokenEndpoint: "",
+        oAuthClientId: "",
+        oAuthClientSecret: "",
+      });
+      vi.spyOn(oAuthTokenApi, "getOAuthToken").mockResolvedValue(
+        new OAuthTokenResponse("Bearer", 3600, "mock-token"),
+      );
+      return oAuthTokenApi;
     }
 
     test("getATXs - no portcall found for ATx", async () => {
@@ -37,7 +53,7 @@ describe(
       vi.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
         atxMessage,
       ]);
-      const service = new AwakeAiATXService(api);
+      const service = new AwakeAiATXService(api, createOAuthTokenApi());
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant
 
@@ -56,7 +72,7 @@ describe(
       vi.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
         atxMessage,
       ]);
-      const service = new AwakeAiATXService(api);
+      const service = new AwakeAiATXService(api, createOAuthTokenApi());
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant
 
@@ -100,7 +116,7 @@ describe(
       vi.spyOn(AwakeAiATXApi.prototype, "getATXs").mockResolvedValue([
         atxMessage,
       ]);
-      const service = new AwakeAiATXService(api);
+      const service = new AwakeAiATXService(api, createOAuthTokenApi());
 
       const timestamps = await service.getATXs(0); // timeout is irrelevant
 

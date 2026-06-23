@@ -4,8 +4,6 @@ import ky, { HTTPError } from "ky";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 import { AwakeAiPredictionType } from "./awake-common.js";
 
-import { OAuthTokenApi } from "./oauth-token-api.js";
-
 export enum AwakeAiPortResponseType {
   OK = "OK",
   PORT_NOT_FOUND = "PORT_NOT_FOUND",
@@ -32,20 +30,9 @@ export interface AwakeAiPortResponse {
 
 export class AwakeAiPortApi {
   private readonly url: string;
-  private readonly oAuthTokenApi: OAuthTokenApi;
 
-  constructor(
-    url: string,
-    oAuthTokenEndpoint: string,
-    oAuthClientId: string,
-    oAuthClientSecret: string,
-  ) {
+  constructor(url: string) {
     this.url = url;
-    this.oAuthTokenApi = new OAuthTokenApi({
-      oAuthTokenEndpoint,
-      oAuthClientId,
-      oAuthClientSecret,
-    });
   }
 
   /**
@@ -55,6 +42,7 @@ export class AwakeAiPortApi {
    * @param maxSequenceNo Maximum number of preceding stops in multi-hop predictions.
    */
   async getPredictions(
+    accessToken: string,
     resource: AwakeAiPortResource,
     locode: string,
     predictionType: AwakeAiPredictionType,
@@ -69,12 +57,10 @@ export class AwakeAiPortApi {
         message: `calling URL ${url}`,
       });
 
-      const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
-
       const response = await ky
         .get(url, {
           headers: {
-            Authorization: `Bearer ${oAuthToken.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
             Accept: MediaType.APPLICATION_JSON,
           },
           retry: 0,
@@ -99,10 +85,12 @@ export class AwakeAiPortApi {
   }
 
   async getETAs(
+    accessToken: string,
     locode: string,
     maxSequenceNo: number = 1,
   ): Promise<AwakeAiPortResponse> {
     return this.getPredictions(
+      accessToken,
       AwakeAiPortResource.ARRIVALS,
       locode,
       AwakeAiPredictionType.ETA,
@@ -111,10 +99,12 @@ export class AwakeAiPortApi {
   }
 
   async getETDs(
+    accessToken: string,
     locode: string,
     maxSequenceNo: number = 1,
   ): Promise<AwakeAiPortResponse> {
     return this.getPredictions(
+      accessToken,
       AwakeAiPortResource.DEPARTURES,
       locode,
       AwakeAiPredictionType.ETD,

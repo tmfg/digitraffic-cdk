@@ -11,8 +11,6 @@ import { PortActivityParameterKeys } from "../keys.js";
 import type { Ports } from "../service/portareas.js";
 import type { AwakeAiZoneType } from "./awake-common.js";
 
-import { OAuthTokenApi } from "./oauth-token-api.js";
-
 interface AwakeAiATXMessage {
   msgType: AwakeAiATXEventType;
 }
@@ -120,7 +118,6 @@ const ssm = new SSMClient({});
 
 export class AwakeAiATXApi {
   private readonly url: string;
-  private readonly oAuthTokenApi: OAuthTokenApi;
   private readonly webSocketClass: new (
     url: string | URL,
     options?: object,
@@ -128,23 +125,18 @@ export class AwakeAiATXApi {
 
   constructor(
     url: string,
-    oAuthTokenEndpoint: string,
-    oAuthClientId: string,
-    oAuthClientSecret: string,
     webSocketClass: new (url: string | URL, options?: object) => WebSocket,
   ) {
     this.url = url;
-    this.oAuthTokenApi = new OAuthTokenApi({
-      oAuthTokenEndpoint,
-      oAuthClientId,
-      oAuthClientSecret,
-    });
     this.webSocketClass = webSocketClass;
   }
 
   private static readonly EMPTY_SUBSCRIPTION_ID = "NONE";
 
-  async getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
+  async getATXs(
+    accessToken: string,
+    timeoutMillis: number,
+  ): Promise<AwakeAIATXTimestampMessage[]> {
     const storedSubscriptionId = await this.getFromParameterStore(
       ssm,
       PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
@@ -154,10 +146,8 @@ export class AwakeAiATXApi {
         ? storedSubscriptionId
         : undefined;
 
-    const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
-
     const webSocket = new this.webSocketClass(this.url, {
-      headers: { Authorization: `Bearer ${oAuthToken.access_token}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     webSocket.on("open", () => {

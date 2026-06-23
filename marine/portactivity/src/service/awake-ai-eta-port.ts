@@ -9,6 +9,7 @@ import type {
   AwakeArrivalPortCallPrediction,
 } from "../api/awake-common.js";
 import { AwakeAiPredictionType, AwakeAiZoneType } from "../api/awake-common.js";
+import type { OAuthTokenApi } from "../api/oauth-token-api.js";
 import { EventSource } from "../model/eventsource.js";
 import type { ApiTimestamp } from "../model/timestamp.js";
 import {
@@ -20,9 +21,11 @@ import {
 
 export class AwakeAiETAPortService {
   private readonly api: AwakeAiPortApi;
+  private readonly oAuthTokenApi: OAuthTokenApi;
 
-  constructor(api: AwakeAiPortApi) {
+  constructor(api: AwakeAiPortApi, oAuthTokenApi: OAuthTokenApi) {
     this.api = api;
+    this.oAuthTokenApi = oAuthTokenApi;
   }
 
   private validateArrivalTime(
@@ -68,7 +71,8 @@ export class AwakeAiETAPortService {
   }
 
   async getAwakeAiTimestamps(locode: string): Promise<ApiTimestamp[]> {
-    const resp = await this.api.getETAs(locode);
+    const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
+    const resp = await this.api.getETAs(oAuthToken.access_token, locode);
 
     logger.info({
       method: "AwakeAiETAPortService.getAwakeAiTimestamps",

@@ -8,6 +8,7 @@ import type {
 } from "../api/awake-ai-atx.js";
 import { AwakeATXZoneEventType } from "../api/awake-ai-atx.js";
 import { AwakeAiZoneType } from "../api/awake-common.js";
+import type { OAuthTokenApi } from "../api/oauth-token-api.js";
 import * as TimestampDAO from "../dao/timestamps.js";
 import { EventSource } from "../model/eventsource.js";
 import type { ApiTimestamp } from "../model/timestamp.js";
@@ -15,13 +16,16 @@ import { EventType } from "../model/timestamp.js";
 
 export class AwakeAiATXService {
   private readonly api: AwakeAiATXApi;
+  private readonly oAuthTokenApi: OAuthTokenApi;
 
-  constructor(api: AwakeAiATXApi) {
+  constructor(api: AwakeAiATXApi, oAuthTokenApi: OAuthTokenApi) {
     this.api = api;
+    this.oAuthTokenApi = oAuthTokenApi;
   }
 
   async getATXs(timeoutMillis: number): Promise<ApiTimestamp[]> {
-    const atxs = await this.api.getATXs(timeoutMillis);
+    const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
+    const atxs = await this.api.getATXs(oAuthToken.access_token, timeoutMillis);
     return inDatabase((db: DTDatabase) => {
       const promises = atxs
         .filter((atx) => atx.zoneType === AwakeAiZoneType.BERTH)

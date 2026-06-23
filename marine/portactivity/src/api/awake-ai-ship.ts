@@ -3,8 +3,6 @@ import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky, { HTTPError } from "ky";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 
-import { OAuthTokenApi } from "./oauth-token-api.js";
-
 export enum AwakeAiShipResponseType {
   OK = "OK",
   SHIP_NOT_FOUND = "SHIP_NOT_FOUND",
@@ -33,20 +31,9 @@ export interface AwakeAiShipVoyageSchedule {
 
 export class AwakeAiETAShipApi {
   private readonly url: string;
-  private readonly oAuthTokenApi: OAuthTokenApi;
 
-  constructor(
-    url: string,
-    oAuthTokenEndpoint: string,
-    oAuthClientId: string,
-    oAuthClientSecret: string,
-  ) {
+  constructor(url: string) {
     this.url = url;
-    this.oAuthTokenApi = new OAuthTokenApi({
-      oAuthTokenEndpoint,
-      oAuthClientId,
-      oAuthClientSecret,
-    });
   }
 
   /**
@@ -54,7 +41,11 @@ export class AwakeAiETAShipApi {
    * @param imo Ship IMO
    * @param locode Destination LOCODE. If set, overrides destination prediction.
    */
-  async getETA(imo: number, locode?: string): Promise<AwakeAiShipApiResponse> {
+  async getETA(
+    accessToken: string,
+    imo: number,
+    locode?: string,
+  ): Promise<AwakeAiShipApiResponse> {
     const start = Date.now();
     try {
       let url = `${this.url}/ship/${imo}?predictionMetadata=true`;
@@ -66,12 +57,10 @@ export class AwakeAiETAShipApi {
         message: `calling URL ${url}`,
       });
 
-      const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
-
       const response = await ky
         .get(url, {
           headers: {
-            Authorization: `Bearer ${oAuthToken.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
             Accept: MediaType.APPLICATION_JSON,
           },
           retry: 0,
