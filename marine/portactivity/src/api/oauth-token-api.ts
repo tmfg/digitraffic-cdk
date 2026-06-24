@@ -14,9 +14,11 @@ export class OAuthTokenResponse {
     this.token_type = token_type;
     this.expires_in = expires_in;
     this.access_token = access_token;
-    this.expires = new Date(
-      Date.now() + (expires_in * 1000 - O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS),
+    const expiresInMs = Math.max(
+      0,
+      expires_in * 1000 - O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS,
     );
+    this.expires = new Date(Date.now() + expiresInMs);
   }
 
   static createFromAuthResponse(
