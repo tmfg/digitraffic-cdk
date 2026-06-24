@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:cz="http://datex2.eu/schema/3/controlledZone" version="1" targetNamespace="http://datex2.eu/schema/3/controlledZone" xmlns:com="http://datex2.eu/schema/3/common" xmlns:tro="http://datex2.eu/schema/3/trafficRegulation" xmlns:fac="http://datex2.eu/schema/3/facilities" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/locationReferencing" schemaLocation="DATEXII_3_LocationReferencing.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/facilities" schemaLocation="DATEXII_3_Facilities.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/trafficRegulation" schemaLocation="DATEXII_3_TrafficRegulation.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:complexType name="_ActivationTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="cz:ActivationTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ConditionTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="cz:ConditionTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ControlledZoneTablePublicationVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="cz:ControlledZoneTablePublication" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_ControlledZoneTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="cz:ControlledZoneTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ControlledZoneVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="cz:ControlledZone" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_EnforcementMethodTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="cz:EnforcementMethodTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_PredefinedConditionPublicationVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tro:PredefinedConditionPublication" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_PredefinedConditionVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tro:PredefinedCondition" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_TrafficRegulationVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tro:TrafficRegulation" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ActivationStatus" abstract="true">
+    <xs:annotation>
+      <xs:documentation>An activation status of a controlled zone, traffic regulation, predefined condition or non-predefined condition.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="activationTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The date/time the creation of the Activation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="activationVersionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The date/time of the current version of the Activation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="validity" type="com:Validity" />
+      <xs:element name="_activationStatusExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:simpleType name="ActivationTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Activation types of controlled zones.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="dynamicallyActivated">
+        <xs:annotation>
+          <xs:documentation>The assignment is dynamically activated within in the validity period. The real time status is published elsewhere.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="permanent">
+        <xs:annotation>
+          <xs:documentation>The assignment is permanent within in the validity period.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="AlternativeMobilityOptions">
+    <xs:annotation>
+      <xs:documentation>Information about alternative mobility options.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="description" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Description of the alternative mobility option.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="url" type="com:Url" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>URL to a resource on the internet with further information from the transportation service provider.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_alternativeMobilityOptionsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ConditionTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of specialisations of the Condition class.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="accessCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions for the access of a road or carriageway or lane that cannot be coded by the AccessCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="driverCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions for the driver, e.g. holding a disabled permit that cannot be coded by the DriverCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="locationCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions for the location of a traffic regulation that cannot be coded via the LocationCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="nonVehicularRoadUserCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions for non-vehicular road users that cannot be coded by the NonVehicularRoadUserCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="occupantConditions">
+        <xs:annotation>
+          <xs:documentation>Conditions for the occupants of a vehicle that cannot be coded by the OccupantCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other non-codable condition.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="permitCondition">
+        <xs:annotation>
+          <xs:documentation>Condition for which a permit is required for vehicles with certain characteristics (sometimes restricted to specific locations) that cannot be coded by the PermitCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="registrationCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions for registration before entering a UVAR that cannot be coded by the RegistrationCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="retrofittingCondition">
+        <xs:annotation>
+          <xs:documentation>Class for defining information on retrofitting details that cannot be coded by the RetrofittingCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="roadCondition">
+        <xs:annotation>
+          <xs:documentation>Specification of road types (e.g. motorway, express way, etc.) that cannot be coded by the RoadCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="stickerCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions relating to a sticker that the vehicle must be equipped with that cannot be coded by the StickerCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="validityCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions for time validity of a traffic regulation that cannot be coded by the ValidityCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="vehicleCondition">
+        <xs:annotation>
+          <xs:documentation>Conditions for a vehicle that cannot be coded by the VehicleCondition class.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ControlledZone">
+    <xs:annotation>
+      <xs:documentation>Defines a geographic zone together with an applicable set of regulations, e.g. usable for UVAR (Urban Vehicle Access Regulation) zones.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="name" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The formal name of the controlled zone.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="controlledZoneType" type="cz:_ControlledZoneTypeEnum" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Broad category of the controlled zone.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="description" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Additional description of the restrictions of the zone and its areas.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="recordVersionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Date/time that this version of the zone was last updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="activationType" type="cz:_ActivationTypeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The activation type of the controlled zone.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="status" type="tro:_ActivationStatusEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The activation status of the controlled zone.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="dynamicActivationPublicationSource" type="cz:_ControlledZoneTablePublicationVersionedReference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Reference to the publication where the dynamic activation status of the controlled zone is published.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="controlledZoneSummary" type="cz:ControlledZoneSummary" minOccurs="0" />
+      <xs:element name="trafficRegulationOrder" type="tro:TrafficRegulationOrder" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="controlledZoneRegulation" type="cz:ControlledZoneRegulation" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="tariffInformation" type="fac:Rates" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Information on the tariffs for tickets that permit the entry of the controlled zone. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="alternativeMobilityOptions" type="cz:AlternativeMobilityOptions" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_controlledZoneExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="ControlledZoneActivation">
+    <xs:annotation>
+      <xs:documentation>Class to identify the activation of a dynamic controlled zone as a whole.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cz:ActivationStatus">
+        <xs:sequence>
+          <xs:element name="controlledZoneReference" type="cz:_ControlledZoneVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to the controlled zone to be activated.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_controlledZoneActivationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ControlledZoneRegulation">
+    <xs:annotation>
+      <xs:documentation>A specialisation of a traffic regulation for controlled zones.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tro:TrafficRegulation">
+        <xs:sequence>
+          <xs:element name="enforcementMethodType" type="cz:_EnforcementMethodTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>The enforcement method(s) used to enforce the traffic regulation.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="penalty" type="cz:Penalty" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_controlledZoneRegulationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ControlledZoneSummary">
+    <xs:annotation>
+      <xs:documentation>Collection of general information on the controlled zone.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="cityName" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The name of the city where the controlled zone is located.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="informalName" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The name the controlled zone is generally known by.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="urlForFurtherInformation" type="com:Url" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A Uniform Resource Locator (URL) address pointing to a resource available on the Internet from where further relevant information may be obtained.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="locationForDisplay" type="loc:PointCoordinates" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Coordinates that may be used for visual display of the controlled zone on user interfaces.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_controlledZoneSummaryExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ControlledZoneTable">
+    <xs:annotation>
+      <xs:documentation>A table comprising a number of controlled zone specifications.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="controlledZoneTableName" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The name of the controlled zone table.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="tableVersionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The date/time that this version of the controlled zone table was defined by the supplier.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="informationManager" type="com:InternationalIdentifier" minOccurs="0" />
+      <xs:element name="controlledZone" type="cz:ControlledZone" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Controlled zones. Zones in the uvarZone property should not be duplicated here, so if that property is populated, the controlled zones in this controlledZone property should be only those other than for UVAR.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="uvarZone" type="cz:ControlledZone" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Controlled zones for Urban Vehicle Access Regulations (UVAR).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_controlledZoneTableExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ControlledZoneTablePublication">
+    <xs:annotation>
+      <xs:documentation>A publication defining one or more tables that have entries of controlled zone specifications.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="predefinedConditionPublicationReference" type="cz:_PredefinedConditionPublicationVersionedReference" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Reference to a publication of predefined conditions.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="headerInformation" type="com:HeaderInformation" />
+          <xs:element name="controlledZoneTable" type="cz:ControlledZoneTable" maxOccurs="unbounded" />
+          <xs:element name="_controlledZoneTablePublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="ControlledZoneTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Different types of controlled zones.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="limitedTrafficZone">
+        <xs:annotation>
+          <xs:documentation>Limited traffic zone (LTZ).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="lowEmissionZone">
+        <xs:annotation>
+          <xs:documentation>Low Emission Zone (LEZ).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pedestrianZone">
+        <xs:annotation>
+          <xs:documentation>Pedestrian Zone.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="restrictedParkingZone">
+        <xs:annotation>
+          <xs:documentation>Restricted parking zone.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="zeroEmissionZone">
+        <xs:annotation>
+          <xs:documentation>Zero emission zone (ZEZ).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="DynamicActivationStatusPublication">
+    <xs:annotation>
+      <xs:documentation>Publication of dynamically activated and deactivated access zones, restrictions and exemptions.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="predefinedConditionPublicationReference" type="cz:_PredefinedConditionPublicationVersionedReference" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Reference to a publication of predefined conditions.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="headerInformation" type="com:HeaderInformation" />
+          <xs:element name="activationStatus" type="cz:ActivationStatus" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_dynamicActivationStatusPublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="EnforcementMethodTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of enforcement methods for traffic regulations..</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="camera">
+        <xs:annotation>
+          <xs:documentation>CCTV camera.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="manualStickerInspection">
+        <xs:annotation>
+          <xs:documentation>Manual inspection by humans on valid stickers.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="checkingVehiclePapers">
+        <xs:annotation>
+          <xs:documentation>Manual inspection of the vehicle registration papers.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mobileLicensePlateControls">
+        <xs:annotation>
+          <xs:documentation>Mobile licence plate inspections.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Some other kind of enforcement.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="NonCodableCondition">
+    <xs:annotation>
+      <xs:documentation>Conditions that are not codable by the elements of the Condition model.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tro:Condition">
+        <xs:sequence>
+          <xs:element name="condition" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Specification of a condition that is not codable by the Condition model.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="type" type="cz:_ConditionTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The condition class, for which there is a condition which can not be expressed by the contained model elements.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_nonCodableConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NonPredefinedConditionActivation">
+    <xs:annotation>
+      <xs:documentation>Activation of a non-predefined dynamic condition in a controlled zone.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cz:ActivationStatus">
+        <xs:sequence>
+          <xs:element name="controlledZoneReference" type="cz:_ControlledZoneVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to the controlled zone involved.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="condition" type="tro:Condition" />
+          <xs:element name="_nonPredefinedConditionActivationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Penalty">
+    <xs:annotation>
+      <xs:documentation>Penalty for violating the traffic regulation.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="amountDue" type="tro:AmountOfMoney" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Amount of money due if a violation of the traffic regulation order occurs.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="penaltyDescription" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Further information about the penalty.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_penaltyExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PeriodCondition">
+    <xs:annotation>
+      <xs:documentation>Condition for time periods.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tro:Condition">
+        <xs:sequence>
+          <xs:element name="period" type="com:Period" maxOccurs="unbounded" />
+          <xs:element name="_periodConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PredefinedConditionActivation">
+    <xs:annotation>
+      <xs:documentation>Activation of a predefined condition of a controlled zone.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cz:ActivationStatus">
+        <xs:sequence>
+          <xs:element name="controlledZoneReference" type="cz:_ControlledZoneVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to the controlled zone involved.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="predefinedConditionReference" type="cz:_PredefinedConditionVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to a predefined condition.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_predefinedConditionActivationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RetrofittingCondition">
+    <xs:annotation>
+      <xs:documentation>Information on retrofitting details.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tro:Condition">
+        <xs:sequence>
+          <xs:element name="retrofittingPossible" type="com:Boolean" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Indication whether retrofitting (addition of new technology or features in order to reduce vehicle emissions) is possible.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="urlForFurtherInformation" type="com:Url" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>URL for further information to retrofitting details.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_retrofittingConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TariffCondition">
+    <xs:annotation>
+      <xs:documentation>Conditions relating tariffs for receiving a permit to enter a controlled zone.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tro:Condition">
+        <xs:sequence>
+          <xs:element name="tariffPaid" type="com:Boolean" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A tariff is paid that permits the entry of the controlled zone.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_tariffConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TrafficRegulationActivation">
+    <xs:annotation>
+      <xs:documentation>Class to identify the activation of a dynamic traffic regulation.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="cz:ActivationStatus">
+        <xs:sequence>
+          <xs:element name="trafficRegulationReference" type="cz:_TrafficRegulationVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to the traffic regulation to be activated.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_trafficRegulationActivationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

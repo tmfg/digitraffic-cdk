@@ -1,0 +1,2102 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:aegi="http://datex2.eu/schema/3/afirEnergyInfrastructure" version="3.7" targetNamespace="http://datex2.eu/schema/3/afirEnergyInfrastructure" xmlns:com="http://datex2.eu/schema/3/common" xmlns:afac="http://datex2.eu/schema/3/afirFacilities" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/locationReferencing" schemaLocation="DATEXII_3_LocationReferencing.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/afirFacilities" schemaLocation="DATEXII_3_AfirFacilities.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:complexType name="_AuthenticationAndIdentificationEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:AuthenticationAndIdentificationEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_BioethanolTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:BioethanolTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ChargingModeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:ChargingModeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ChargingPointUsageTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:ChargingPointUsageTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ConnectorFormatTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:ConnectorFormatTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ConnectorTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:ConnectorTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_CurrentTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:CurrentTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_DeliveryUnitEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:DeliveryUnitEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_DieselVehicleTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:DieselVehicleTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ElectricEnergySourceTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:ElectricEnergySourceTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EnergyInfrastructureSiteTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:EnergyInfrastructureSiteTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EnergyInfrastructureTableVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="aegi:EnergyInfrastructureTable" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_EnergyRateReference">
+    <xs:complexContent>
+      <xs:extension base="com:Reference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="aegi:EnergyRate" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_GasConnectorTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:GasConnectorTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_HydrogenFuellingProcessProtocolEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:HydrogenFuellingProcessProtocolEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_HydrogenRefuellingModeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:HydrogenRefuellingModeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_OctaneTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:OctaneTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_PetrolTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:PetrolTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_PriceTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:PriceTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_RatePolicyEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:RatePolicyEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_RefillPointStatusEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:RefillPointStatusEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ServiceTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:ServiceTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_SmartRechargingServicesEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:SmartRechargingServicesEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_VehicleToGridCommunicationTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="aegi:VehicleToGridCommunicationTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="AlternativeFuelsRefillPoint">
+    <xs:annotation>
+      <xs:documentation>A refill point for alternative fules like CNG,LNG,LPG,biogas or hydrogen (liquid or gaseous).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="aegi:RefillPoint">
+        <xs:sequence>
+          <xs:element name="connector" type="aegi:_GasConnectorTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Information on the alternative fuels type connector at the refill point.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="otherConnector" type="com:String" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Any other type of alternative fuels connector.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="hydrogenProcessProtocol" type="aegi:_HydrogenFuellingProcessProtocolEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Information on which protocol is used for the fuelling process for hydrogen.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="renewableSourcesRatio" type="com:Percentage" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Percentage of renewable energy sources for the alternative fluel, to be indicated in %.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="pressure" type="aegi:Bar" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The pressure which is used for gaseous fuel.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_alternativeFuelsRefillPointExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="Ampere">
+    <xs:annotation>
+      <xs:documentation>Ampere.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:Float" />
+  </xs:simpleType>
+  <xs:simpleType name="AuthenticationAndIdentificationEnum">
+    <xs:annotation>
+      <xs:documentation>A table of authentication and/or identification methods.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="activeRFIDChip">
+        <xs:annotation>
+          <xs:documentation>Phone (active RFID chip).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="apps">
+        <xs:annotation>
+          <xs:documentation>Apps</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="calypso">
+        <xs:annotation>
+          <xs:documentation>RFID Calypso.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cashPayment">
+        <xs:annotation>
+          <xs:documentation>No specific authentication by using cash.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="creditCard">
+        <xs:annotation>
+          <xs:documentation>Credit card.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="debitCard">
+        <xs:annotation>
+          <xs:documentation>Debit card.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mifareClassic">
+        <xs:annotation>
+          <xs:documentation>RFID Card / Phone NFC - Mifare Classic.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mifareDesfire">
+        <xs:annotation>
+          <xs:documentation>RFID Card / Phone NFC - Mifare Desfire.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="nfc">
+        <xs:annotation>
+          <xs:documentation>Nearfield communication.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="overTheAir">
+        <xs:annotation>
+          <xs:documentation>Over the air according to ISO 15118-2 and -20.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="phoneDialog">
+        <xs:annotation>
+          <xs:documentation>Phone (dialog with platform).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="phoneSMS">
+        <xs:annotation>
+          <xs:documentation>Phone (SMS).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pinpad">
+        <xs:annotation>
+          <xs:documentation>PINPAD</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="plc">
+        <xs:annotation>
+          <xs:documentation>PLC according to ISO 15118.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prepaidCard">
+        <xs:annotation>
+          <xs:documentation>Prepaid card.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="rfid">
+        <xs:annotation>
+          <xs:documentation>RFID</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="website">
+        <xs:annotation>
+          <xs:documentation>Using a website.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unlimitedAccess">
+        <xs:annotation>
+          <xs:documentation>No authentication/identification required.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="noAccess">
+        <xs:annotation>
+          <xs:documentation>No access granted.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Bar">
+    <xs:annotation>
+      <xs:documentation>A measure of pressure defined in bar.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:Float" />
+  </xs:simpleType>
+  <xs:simpleType name="BioethanolTypeEnum">
+    <xs:annotation>
+      <xs:documentation>A table of different types of petrol with a share of bioethanol.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="superE5">
+        <xs:annotation>
+          <xs:documentation>Petrol with 5% bioethanol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="superE10">
+        <xs:annotation>
+          <xs:documentation>Petrol with 10% bioethanol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="e15">
+        <xs:annotation>
+          <xs:documentation>Petrol with 15% bioethanol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="e85">
+        <xs:annotation>
+          <xs:documentation>Petrol with 85% bioethanol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="e100">
+        <xs:annotation>
+          <xs:documentation>Petrol with 100% bioethanol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The share of bioethanol is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other, less common, types of Petrol with bioethanol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ChargingModeEnum">
+    <xs:annotation>
+      <xs:documentation>Charging mode according to IEC 61851-1 terminology.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="mode1AC1p">
+        <xs:annotation>
+          <xs:documentation>Mode 1, AC 1 phase.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mode1AC3p">
+        <xs:annotation>
+          <xs:documentation>Mode 1, AC 3 phases.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mode2AC1p">
+        <xs:annotation>
+          <xs:documentation>Mode 2, AC 1 phase.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mode2AC3p">
+        <xs:annotation>
+          <xs:documentation>Mode 2, AC 3 phases.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mode3AC3p">
+        <xs:annotation>
+          <xs:documentation>Mode 3, AC 3 phases.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mode4DC">
+        <xs:annotation>
+          <xs:documentation>Mode 4, DC.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="legacyInductive">
+        <xs:annotation>
+          <xs:documentation>Legacy-Inductive</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ccs">
+        <xs:annotation>
+          <xs:documentation>Charging with a combined charging solution (CCS). AC and DC are used simultaneously.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Some other charging mode.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The type of the charging mode is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ChargingPointUsageTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Type of usage for an electric charging point..</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="electricBoat">
+        <xs:annotation>
+          <xs:documentation>Charging of electric boats.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="electricBike">
+        <xs:annotation>
+          <xs:documentation>Charging of E-Bikes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="electricalDevices">
+        <xs:annotation>
+          <xs:documentation>Provides a plug for electrical devices (e.g. shaver, mobile phones, hair dryer, ...).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="electricMotorcycle">
+        <xs:annotation>
+          <xs:documentation>Charging of E-Motorcycles.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="electricVehicle">
+        <xs:annotation>
+          <xs:documentation>Charging of electric vehicles.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="lorryPowerConsumption">
+        <xs:annotation>
+          <xs:documentation>Supply for lorries with power consumption, e.g. for refrigerated goods transports.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="motorhomeOrCaravanSupply">
+        <xs:annotation>
+          <xs:documentation>Supply for motorhomes or caravans.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="overheadLineDrivenVehicles">
+        <xs:annotation>
+          <xs:documentation>The charging point supplies a overhead line, usually connected via pantographs.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other usage for the electric charging stations.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="Connector">
+    <xs:annotation>
+      <xs:documentation>Parameters and description of an interface that is available at the given electric charging point to connect vehicles.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="connectorType" type="aegi:_ConnectorTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Specification of the connector, i.e. the charging interface type.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="otherConnector" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Some other connector / charging interface.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="countryOfDomesticSocket" type="com:CountryCode" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Countries for which the domestic socket is applicable. Only needed if explicit type of a domestic socket is not specified.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="connectorFormat" type="aegi:_ConnectorFormatTypeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Information on the cable type used.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="maxPowerAtSocket" type="aegi:Watt" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Maximum power at the socket in watts.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="voltage" type="aegi:Volt" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Voltage at the connector.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="maximumCurrent" type="aegi:Ampere" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Maximum current in ampere.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="externalIdentifier" type="afac:ExternalIdentifier" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_connectorExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ConnectorFormatTypeEnum">
+    <xs:annotation>
+      <xs:documentation>A list of cable types used during the charging process.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cableMode2">
+        <xs:annotation>
+          <xs:documentation>The connector is an attached cable; the EV users car needs to have a fitting inlet for a mode 2 cable, common for most domestic sockets.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cableMode3">
+        <xs:annotation>
+          <xs:documentation>The connector is an attached cable; the EV users car needs to have a fitting inlet for a mode 3 cable, can be used for Type 1 and Type 2 sockets.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="otherCable">
+        <xs:annotation>
+          <xs:documentation>The connector is an attached cable; the EV users car needs to have a fitting inlet.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="socket">
+        <xs:annotation>
+          <xs:documentation>The connector is a socket; the EV user needs to bring a fitting plug.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ConnectorTypeEnum">
+    <xs:annotation>
+      <xs:documentation>A table of commonly used connectors / charging interfaces.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="chademo">
+        <xs:annotation>
+          <xs:documentation>CHAdeMO, 600 V DC. Used mostly in Japan.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cee3">
+        <xs:annotation>
+          <xs:documentation>CEE3, 230 V, 16 A.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cee5">
+        <xs:annotation>
+          <xs:documentation>CEE5, 400 V, 16-63 A.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="yazaki">
+        <xs:annotation>
+          <xs:documentation>Yazaki, 400 VDC, 125 A, Asian standard.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domestic">
+        <xs:annotation>
+          <xs:documentation>A domestic socket of unspecified type. Applicable countries should be specified in separate attribute.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticAType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type A (mainly used in the USA, Canada, Mexico &amp; Japan).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticBType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type B (mainly used in the USA, Canada &amp; Mexico).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticCType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type C (commonly used in Europe, South America &amp; Asia).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticDType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type D (mainly used in India).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticEType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type E (primarily used in France, Belgium, Poland, Slovakia &amp; Czechia).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticFType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type F (used almost everywhere in Europe &amp; Russia, except for the UK &amp; Ireland).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticGType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type G (mainly used in the United Kingdom, Ireland, Malta, Malaysia, Singapore &amp; the Arabian Peninsula).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticHType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type H (used exclusively in Israel, the West Bank &amp; the Gaza Strip).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticIType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type I (mainly used in Australia, New Zealand, China &amp; Argentina).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticJType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type J (used almost exclusively in Switzerland &amp; Liechtenstein).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticKType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type K (used almost exclusively in Denmark &amp; Greenland).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticLType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type L (used almost exclusively in Italy &amp; Chile).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticMType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type M (mainly used in South Africa).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticNType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type N (used in Brazil and South Africa).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="domesticOType">
+        <xs:annotation>
+          <xs:documentation>Domestic socket type O (used exclusively in Thailand).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec60309x2single16">
+        <xs:annotation>
+          <xs:documentation> IEC 60309-2 Industrial Connector single phase 16 amperes (usually blue).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec60309x2three16">
+        <xs:annotation>
+          <xs:documentation>IEC 60309-2 Industrial Connector three phase 16 amperes (usually red).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec60309x2three32">
+        <xs:annotation>
+          <xs:documentation>IEC 60309-2 Industrial Connector three phase 32 amperes (usually red).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec60309x2three64">
+        <xs:annotation>
+          <xs:documentation>IEC 60309-2 Industrial Connector three phase 64 amperes (usually red).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec62196T1">
+        <xs:annotation>
+          <xs:documentation>IEC 62196 Type 1 "SAE J1772".  Mostly used in USA and Asia.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec62196T1COMBO">
+        <xs:annotation>
+          <xs:documentation>Combo Type 1 based, DC.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec62196T2">
+        <xs:annotation>
+          <xs:documentation>IEC 62196 Type 2 "Mennekes" - 400 V, 16-63 A. Mandatory in Europe; EN 17186 identifier "C".</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec62196T2COMBO">
+        <xs:annotation>
+          <xs:documentation>Combo Type 2 based, DC, Type 2 connector with extension for simultaneous DC-charging.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec62196T3A">
+        <xs:annotation>
+          <xs:documentation>IEC 62196 Type 3A; EN 17186 identifier "D".</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec62196T3C">
+        <xs:annotation>
+          <xs:documentation> IEC 62196 Type 3C "Scame"; EN 17186 identifier "E".</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mcs">
+        <xs:annotation>
+          <xs:documentation>MCS</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pantographBottomUp">
+        <xs:annotation>
+          <xs:documentation>On-board Bottom-up-Pantograph typically for bus charging.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pantographTopDown">
+        <xs:annotation>
+          <xs:documentation>Off-board Top-down-Pantograph typically for bus charging.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="teslaConnectorEurope">
+        <xs:annotation>
+          <xs:documentation>Tesla Connector EU (modification of the Type 2 connector).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="teslaConnectorAmerica">
+        <xs:annotation>
+          <xs:documentation>Tesla connector used in America (Tesla specific).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="teslaR">
+        <xs:annotation>
+          <xs:documentation>Tesla Connector "Roadster"-type (round, 4 pin).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="teslaS">
+        <xs:annotation>
+          <xs:documentation>Tesla Connector "Model-S"-type (oval, 5 pin).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other charging interface.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CurrentTypeEnum">
+    <xs:annotation>
+      <xs:documentation>The type of current (AC/DC).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ac">
+        <xs:annotation>
+          <xs:documentation>Alternating current.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="dc">
+        <xs:annotation>
+          <xs:documentation>Direct current.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DeliveryUnitEnum">
+    <xs:annotation>
+      <xs:documentation>Table with diffrent units in which the delivery is measured.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="litre">
+        <xs:annotation>
+          <xs:documentation>Litre</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="kWh">
+        <xs:annotation>
+          <xs:documentation>Kilowatt hour.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="kg">
+        <xs:annotation>
+          <xs:documentation>Kilogram</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="m3">
+        <xs:annotation>
+          <xs:documentation>Cubic metre.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="imperialGallon">
+        <xs:annotation>
+          <xs:documentation>Imperial gallon (4.54609 litres).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="usGallon">
+        <xs:annotation>
+          <xs:documentation>US gallon (3.785411784 litres).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="gasGallonEquivalent">
+        <xs:annotation>
+          <xs:documentation>The amount of alternative fuel it takes to equal the energy content of one liquid gallon of gasoline. Used mostly in the US.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="DieselRefillPoint">
+    <xs:annotation>
+      <xs:documentation>A refill point for diesel.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="aegi:RefillPoint">
+        <xs:sequence>
+          <xs:element name="dieselVehicleType" type="aegi:_DieselVehicleTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Specifies the type of diesel in terms of the applicable vehicle type.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="cetane" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Diesel's cetane value.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="bioDieselShare" type="com:Percentage" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Share of vegetable oil or animal fat-based diesel fuel.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_dieselRefillPointExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="DieselVehicleTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Car or truck diesel.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="carDiesel">
+        <xs:annotation>
+          <xs:documentation>Diesel for cars.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="truckDiesel">
+        <xs:annotation>
+          <xs:documentation>Diesel for trucks.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ElectricChargingPoint">
+    <xs:annotation>
+      <xs:documentation>Technical infrastructure at a specific location that facilitates electric charging of one vehicle at a time.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="aegi:RefillPoint">
+        <xs:sequence>
+          <xs:element name="currentType" type="aegi:_CurrentTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The type of current (AC/DC).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="usageType" type="aegi:_ChargingPointUsageTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Usage type of the electric charging point.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="vehicleToGridCommunicationType" type="aegi:_VehicleToGridCommunicationTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Type of vehicle to grid communication used.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="numberOfConnectors" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Information on the numberof connectors at this charging point.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="availableVoltage" type="aegi:Volt" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Possible degrees of voltage.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="availableChargingPower" type="aegi:Watt" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Possible degrees of charging power in watts.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="chargingMode" type="aegi:_ChargingModeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Available charging mode.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="smartRechargingServices" type="aegi:_SmartRechargingServicesEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Smart recharging services that are available.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="otherSmartRechargingServices" type="com:MultilingualString" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Other smart recharging services that are available.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="connector" type="aegi:Connector" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specify the connector(s).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_electricChargingPointExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ElectricChargingPointStatus">
+    <xs:annotation>
+      <xs:documentation>Dynamic information on the status of the charging point.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="aegi:RefillPointStatus">
+        <xs:sequence>
+          <xs:element name="remainingChargingTime" type="com:Seconds" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>If known, the approximate remaining charging time for the current vehicle on this refill point can be specified.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="currentVoltage" type="aegi:Volt" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Currently used voltage.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="currentChargingPower" type="aegi:Watt" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The current power in watts.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="nextAvailableChargingSlots" type="com:DateTime" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>One or more points of time in the future, at which the charging point will be available (not occupied and not reserved).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_electricChargingPointStatusExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ElectricEnergy">
+    <xs:annotation>
+      <xs:documentation>An electric energy product that is offered,optional described with its electrical mix and its rates.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="aegi:EnergyProduct">
+        <xs:sequence>
+          <xs:element name="carbonDioxideImpact" type="aegi:GramsPerKilowattHour" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Exhausted carbon dioxide in grams per kilowatt hour.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="nuclearWasteImpact" type="aegi:GramsPerKilowattHour" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Produced nuclear waste in grams per kilowatt hour.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="electricEnergySourceRatio" type="aegi:ElectricEnergySourceRatio" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_electricEnergyExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ElectricEnergySourceRatio">
+    <xs:annotation>
+      <xs:documentation>Ratio for the specified energy source.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="energySource" type="aegi:_ElectricEnergySourceTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>An electric energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="otherEnergySource" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Some other energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="sourceRatioValue" type="com:PercentageValue">
+        <xs:annotation>
+          <xs:documentation>The percentage ratio value of this energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_electricEnergySourceRatioExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ElectricEnergySourceTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Electric energy sources.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="biogas">
+        <xs:annotation>
+          <xs:documentation>Biogas energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="coal">
+        <xs:annotation>
+          <xs:documentation>Coal energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="gas">
+        <xs:annotation>
+          <xs:documentation>Gas energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="nuclear">
+        <xs:annotation>
+          <xs:documentation>Nuclear power sources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="solar">
+        <xs:annotation>
+          <xs:documentation>Solar energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="water">
+        <xs:annotation>
+          <xs:documentation>Water energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="wind">
+        <xs:annotation>
+          <xs:documentation>Wind energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="generalGreen">
+        <xs:annotation>
+          <xs:documentation>All kinds of green energy sources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="generalFossil">
+        <xs:annotation>
+          <xs:documentation>All kinds of fossil power sources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Any other energy source.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="EnergyBasedApplicability">
+    <xs:annotation>
+      <xs:documentation>Price is only valid within the given charging boundaries in kWh.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="fromKWh" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Price is valid from the given amount of kWh.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="toKWh" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Price is valid up to the given amount of kWh.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_energyBasedApplicabilityExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EnergyInfrastructureSite">
+    <xs:annotation>
+      <xs:documentation>A site where vehicles can be supplied with energy,including all buildings,stations,parking spaces and other associated services.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="afac:Facility">
+        <xs:sequence>
+          <xs:element name="typeOfSite" type="aegi:_EnergyInfrastructureSiteTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Specifies the type of the site.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="brand" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The brand of the site.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="exclusiveUsers" type="afac:_UserTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Limitation to a set of users (exclusive).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="preferredUsers" type="afac:_UserTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Users that are preferred at this site (but not exclusive).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="serviceType" type="aegi:ServiceType" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specify the type of service available at a EnergyInfrastructureSite</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="entrance" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Possibility to specify the location of the site's entrance.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="exit" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Possibility to specify the location of the site's exit.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyInfrastructureStation" type="aegi:EnergyInfrastructureStation" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specifications of charging stations on the site.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyDistributor" type="afac:Organisation" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>The distributor of the energy. Valid for all attached EnergyInfrastructureStations.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="mobilityServiceProvider" type="afac:Organisation" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Mobility service providers offering contract-based recharging. Valid for all attached EnergyInfrastructureStations.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="roamingPlatform" type="afac:Organisation" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Supported roaming platforms. Valid for all attached EnergyInfrastructureStations.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_energyInfrastructureSiteExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnergyInfrastructureSiteStatus">
+    <xs:annotation>
+      <xs:documentation>Dynamic information on the status of the energy supplying site.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="afac:FacilityStatus">
+        <xs:sequence>
+          <xs:element name="availableCarParkingPlaces" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Parking places available for cars.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="availableTruckParkingPlaces" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Parking places available for trucks.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyInfrastructureStationStatus" type="aegi:EnergyInfrastructureStationStatus" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specify the status of a charging station with dynamic information.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="serviceType" type="aegi:ServiceType" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>The service type for the site. If no period is given, the currently available service is meant.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_energyInfrastructureSiteStatusExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="EnergyInfrastructureSiteTypeEnum">
+    <xs:annotation>
+      <xs:documentation>The type of an energy infrastructure site.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="inBuilding">
+        <xs:annotation>
+          <xs:documentation>The energy infrastructure site is located inside some building for example in a car park.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="openSpace">
+        <xs:annotation>
+          <xs:documentation>The energy infrastructure site is an open space, for example a parking site.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="onstreet">
+        <xs:annotation>
+          <xs:documentation>The energy infrastructure site is located alongside a street, for example some singular charging stations.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="onCompanySite">
+        <xs:annotation>
+          <xs:documentation>The energy infrastructure site is located on a company site.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other types of energy infrastructure sites.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="EnergyInfrastructureStation">
+    <xs:annotation>
+      <xs:documentation>A collection of associated refill points (which can be of different type). An example would be a fuel dispenser that serves different types of fuel. Often the vehicle space of the station is shared between the different refill points.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="afac:Facility">
+        <xs:sequence>
+          <xs:element name="totalMaximumPower" type="aegi:Watt" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The total maximum power of the station.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="authenticationAndIdentificationMethods" type="aegi:_AuthenticationAndIdentificationEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Information on what methods of identification and/or authentication are accepted.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="numberOfRefillPoints" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Number of refill points that can be used at the same time in this energy infrastructure station.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="userInterfaceLanguage" type="com:Language" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Languages, in which a user interface is available.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="renewableSources" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Specifies, if the energy sources (e.g. hydrogen or liquid methane) are 100 % renewable in accordance with rules established under Directive (EU) 2018/2001 and relevant secondary legislation (EU Guarantee of Origin (GO) scheme).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyDistributor" type="afac:Organisation" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>The distributor of the energy.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="mobilityServiceProvider" type="afac:Organisation" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Mobility service providers offering contract-based recharging</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="roamingPlatform" type="afac:Organisation" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Supported roaming platforms</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="hydrogen" type="aegi:Hydrogen" minOccurs="0" />
+          <xs:element name="serviceType" type="aegi:ServiceType" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specify the type of service available at the EnergyInfrastructureStation.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="refillPoint" type="aegi:RefillPoint" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specifications of refill points at a charging station. Note that the refillPointIndex must be unique within the complete site!</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyProduct" type="aegi:EnergyProduct" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_energyInfrastructureStationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnergyInfrastructureStationStatus">
+    <xs:annotation>
+      <xs:documentation>Dynamic information on the status of the station.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="afac:FacilityStatus">
+        <xs:sequence>
+          <xs:element name="isAvailable" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Information whether the specific station is available or not. It might be unavailable for example because of a fault, damage or maintenance. It does not inform, if the corresponding refill points are currently occupied or not.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="limitedHydrogenAmount" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Indication about limited amount of hydrogen available (less than 100 kg) in the refuelling station.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="refillPointStatus" type="aegi:RefillPointStatus" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specify the status of a refill point with dynamic information.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="serviceType" type="aegi:ServiceType" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>The service type for the station. If no period is given, the currently available service is meant.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyRateUpdate" type="aegi:EnergyRateUpdate" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_energyInfrastructureStationStatusExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnergyInfrastructureStatusPublication">
+    <xs:annotation>
+      <xs:documentation>Dynamic information on the status of energy supplying sites.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="tableReference" type="aegi:_EnergyInfrastructureTableVersionedReference" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Reference to static tables containing the sites referenced in this publication.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="headerInformation" type="com:HeaderInformation" minOccurs="0" />
+          <xs:element name="energyInfrastructureSiteStatus" type="aegi:EnergyInfrastructureSiteStatus" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_energyInfrastructureStatusPublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnergyInfrastructureTable">
+    <xs:annotation>
+      <xs:documentation>A table of sites where vehicles can be supplied with energy.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="tableName" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The name of the Energy Infrastructure Table.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="energyInfrastructureSite" type="aegi:EnergyInfrastructureSite" maxOccurs="unbounded" />
+      <xs:element name="_energyInfrastructureTableExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="EnergyInfrastructureTablePublication">
+    <xs:annotation>
+      <xs:documentation>A publication of static information on the infrastructure for vehicle energy supply.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="headerInformation" type="com:HeaderInformation" minOccurs="0" />
+          <xs:element name="energyInfrastructureTable" type="aegi:EnergyInfrastructureTable" maxOccurs="unbounded" />
+          <xs:element name="_energyInfrastructureTablePublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnergyPrice">
+    <xs:annotation>
+      <xs:documentation>A price definition for energy refueling. All prices (of a rate) with the same group index belong together (for example base price AND price per kWh). Prices with a different group index are alternative to each other (for example price per minute OR flat r</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="priceGroupIndex" type="com:NonNegativeInteger" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>All prices (of a rate) with the same group index belong together (for example base price AND price per kWh). Prices with a different group index are alternative to each other (for example price per minute OR flat rate instead).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="priceType" type="aegi:_PriceTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The type of price for the energy supply.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="value" type="afac:AmountOfMoney" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The price for the energy according to the price type.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="priceCap" type="afac:AmountOfMoney" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>An upper cap for this price which will be charged at maximum.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="taxIncluded" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>[TRUE] Indication that tax to be applied is included [FALSE] indicates that the tax is added additionally to the total.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="taxRate" type="com:Percentage" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The percentage rate of tax to be applied.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="additionalInformation" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Free text field for additional information regarding the price.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="overallPeriod" type="com:OverallPeriod" minOccurs="0" />
+      <xs:element name="timeBasedApplicability" type="aegi:TimeBasedApplicability" minOccurs="0" />
+      <xs:element name="energyBasedApplicability" type="aegi:EnergyBasedApplicability" minOccurs="0" />
+      <xs:element name="_energyPriceExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EnergyProduct">
+    <xs:annotation>
+      <xs:documentation>Specification of an energy product that is offered. It can be applied to all types of energy sources.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="energyProductName" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A name for this energy product.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="isGreenEnergy" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>True if 100% from regenerative sources (CO2 and nuclear waste is zero).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="energyRateByReference" type="aegi:_EnergyRateReference" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Specifies one ore more rates for this type of energy by reference to exisiting EnergyRate specification.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="energyProductInformation" type="com:Url" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Further information on this energy product provided by a web link.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="renewableEnergyEvidence" type="com:Url" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Proofs on the sources of renewable energy for this energy product provided by a web link.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="mobilityServiceProvider" type="afac:Organisation" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Mobility service providers offering contract-based recharging</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="energyRate" type="aegi:EnergyRate" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_energyProductExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EnergyRate">
+    <xs:annotation>
+      <xs:documentation>A rate dedicated for the energy product.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ratePolicy" type="aegi:_RatePolicyEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indication if contract based or ad hoc price.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastUpdated" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The date/time at which this information was last updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="applicableCurrency" type="afac:CurrencyCode" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A general information on the applicable monetary currency.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="rateName" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A name for this rate, for example the name of the specific energy contract.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="combinationWithParkingFee" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indicates whether vehicle charging and parking are included in one combined fee.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="maximumDeliveryFee" type="afac:AmountOfMoney" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A maximum delivery fee.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="minimumDeliveryFee" type="afac:AmountOfMoney" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A minimum delivery fee.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="discount" type="com:Percentage" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Discount indicated in %.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="additionalInformation" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Free text field for additional information regarding the energy rates.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="payment" type="afac:Payment" minOccurs="0" />
+      <xs:element name="energyPrice" type="aegi:EnergyPrice" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="overallPeriod" type="com:OverallPeriod" minOccurs="0" />
+      <xs:element name="_energyRateExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="EnergyRateUpdate">
+    <xs:annotation>
+      <xs:documentation>Updates a rate defined in the static part of the model.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="lastUpdated" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The date/time at which this information was last updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="energyRateReference" type="aegi:_EnergyRateReference" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Specifies the EnergyRate that is updated here.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="additionalInformation" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Free text field for additional information regarding the energy rates.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="energyPrice" type="aegi:EnergyPrice" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_energyRateUpdateExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="GasConnectorTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Available connectors that serve differen types of gas.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="gaseousHydrogen">
+        <xs:annotation>
+          <xs:documentation>Gaseous hydrogen.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="liquidHydrogen">
+        <xs:annotation>
+          <xs:documentation>Liquid hydrogen.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cng">
+        <xs:annotation>
+          <xs:documentation>CNG (Compressed Natural Gas).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="lng">
+        <xs:annotation>
+          <xs:documentation>LNG (Liquefied Natural Gas).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="lpg">
+        <xs:annotation>
+          <xs:documentation>LPG (Liquefied Petroleum Gas).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="biogas">
+        <xs:annotation>
+          <xs:documentation>A mixture of different gases produced by the breakdown of organic matter.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The type of gas connector is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GramsPerKilowattHour">
+    <xs:annotation>
+      <xs:documentation>Grams per kWh (e.g. for carbon dioxide impact).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:Float" />
+  </xs:simpleType>
+  <xs:complexType name="Hydrogen">
+    <xs:annotation>
+      <xs:documentation>Information for hydrogen stations.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="refuellingMode" type="aegi:_HydrogenRefuellingModeEnum" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Definition of the available refill solutions for hydrogen.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="cumulativeCapacityperDay" type="aegi:KilogramPerDay" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indication of the cumulative capacity per day (expressed in kg/day) of a hydrogen refuelling station.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_hydrogenExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="HydrogenFuellingProcessProtocolEnum">
+    <xs:annotation>
+      <xs:documentation>A table with different types of protocols that are used during the hydron fuelling process.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="saej2601v2010">
+        <xs:annotation>
+          <xs:documentation>Protocol according to SAE J2601 standard, version from 2010.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="saej2601v2014">
+        <xs:annotation>
+          <xs:documentation>Protocol according to SAE J2601 standard, version from 2014.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="saej2601v2016">
+        <xs:annotation>
+          <xs:documentation>Protocol according to SAE J2601 standard, version from 2016.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mcMethod">
+        <xs:annotation>
+          <xs:documentation>Protocol according to the MC method.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The protocol is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HydrogenRefuellingModeEnum">
+    <xs:annotation>
+      <xs:documentation>A table of different refilling solutions for hydrogen.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="gaseousHydrogen350barCar">
+        <xs:annotation>
+          <xs:documentation>Gaseous hydrogen with 350 bar pressure for cars.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="gaseousHydrogen350barTruck">
+        <xs:annotation>
+          <xs:documentation>Gaseous hydrogen with 350 bar pressure for trucks.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="gaseousHydrogen700barCar">
+        <xs:annotation>
+          <xs:documentation>Gaseous hydrogen with 700 bar pressure for cars.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="gaseousHydrogen700barTruck">
+        <xs:annotation>
+          <xs:documentation>Gaseous hydrogen with 700 bar pressure for trucks.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="liquidHydrogen">
+        <xs:annotation>
+          <xs:documentation>Liquid hydrogen.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cryoCompressedHydrogren">
+        <xs:annotation>
+          <xs:documentation>Cryo-compressed hydrogen.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The type of hydrogen is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other hydrogen solution, especially another pressure.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KilogramPerDay">
+    <xs:annotation>
+      <xs:documentation>Kilogram per day (e.g. for hydrogen supply).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:Float" />
+  </xs:simpleType>
+  <xs:simpleType name="OctaneTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of octane rating.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="octane95">
+        <xs:annotation>
+          <xs:documentation>Petrol with an octane rating of 95.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="octane98">
+        <xs:annotation>
+          <xs:documentation>Petrol with an octane rating of 98.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other types of petrol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PetrolRefillPoint">
+    <xs:annotation>
+      <xs:documentation>A refill point for petrol.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="aegi:RefillPoint">
+        <xs:sequence>
+          <xs:element name="petrolType" type="aegi:_PetrolTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Leaded or unleaded petrol.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="octaneType" type="aegi:_OctaneTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Petrol's octane rating.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="octane" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Petrol's octane value.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="bioethanolShare" type="com:Percentage" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Share of bioethanol in petrol (typically 5% or 10%).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="bioethanolType" type="aegi:_BioethanolTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Listing of common types of petrol with bioethanol.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_petrolRefillPointExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="PetrolTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Leaded or unleaded petrol.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="leaded">
+        <xs:annotation>
+          <xs:documentation>Leaded petrol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unleaded">
+        <xs:annotation>
+          <xs:documentation>Unleaded petrol.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PlannedRefillPointStatus">
+    <xs:annotation>
+      <xs:documentation>Planned status information for a refill point,for example reservatons.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="status" type="aegi:_RefillPointStatusEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Status of the refill point.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="overallPeriod" type="com:OverallPeriod" />
+      <xs:element name="_plannedRefillPointStatusExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="PriceTypeEnum">
+    <xs:annotation>
+      <xs:documentation>The type of price for energy.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="pricePerMinute">
+        <xs:annotation>
+          <xs:documentation>The given price is per minute of charging.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pricePerKg">
+        <xs:annotation>
+          <xs:documentation>The given price is per kilogram of gas.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pricePerKWh">
+        <xs:annotation>
+          <xs:documentation>The given price is per kWh of electric energy.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="basePrice">
+        <xs:annotation>
+          <xs:documentation>The given price is a base price, which has to be added.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="flatRate">
+        <xs:annotation>
+          <xs:documentation>The given price is a flatrate price, independent of the fueled amunt.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="free">
+        <xs:annotation>
+          <xs:documentation>Charging or refueling is free.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other method of pricing.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RatePolicyEnum">
+    <xs:annotation>
+      <xs:documentation>Contract based or ad hoc prices for energy.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="contract">
+        <xs:annotation>
+          <xs:documentation>A contract defines the pricing.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="adHoc">
+        <xs:annotation>
+          <xs:documentation>Prices are for ad hoc refueling.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="RefillPoint" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Technical infrastructure at a specific location that facilitates an energy refilling process being connected to max. one vehicle at a time.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="afac:Facility">
+        <xs:sequence>
+          <xs:element name="deliveryUnit" type="aegi:_DeliveryUnitEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Measurement unit that is used for delivery and accounting the energy provided at this refill point.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="maximumDeliveryAmount" type="aegi:Units" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Maximum delivery amount.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="minimumDeliveryAmount" type="aegi:Units" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Minimum delivery amount.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="modelType" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A description of the refill point model type.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="reservation" type="afac:_ReservationTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Information regarding options for reservation of a time frame.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyProduct" type="aegi:EnergyProduct" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_refillPointExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RefillPointStatus">
+    <xs:annotation>
+      <xs:documentation>Dynamic information on the status of the refill point.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="afac:FacilityStatus">
+        <xs:sequence>
+          <xs:element name="status" type="aegi:_RefillPointStatusEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Status of the refill point.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="unitsInStock" type="aegi:Units" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Amount of delivery units still in stock (with delivery units as defined in the static information model).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="energyRateUpdate" type="aegi:EnergyRateUpdate" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="waitingTime" type="afac:DurationValue" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Estimated waiting time for customers without reservation</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="plannedRefillPointStatus" type="aegi:PlannedRefillPointStatus" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_refillPointStatusExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="RefillPointStatusEnum">
+    <xs:annotation>
+      <xs:documentation>The status of a refill point.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="available">
+        <xs:annotation>
+          <xs:documentation>The refill point is not occupied, has got enough energy resources and can be used.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="blocked">
+        <xs:annotation>
+          <xs:documentation>The refill point is not accessible because of a physical barrier, e.g. a car.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="charging">
+        <xs:annotation>
+          <xs:documentation>The refill point is currently in use for charging.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="faulted">
+        <xs:annotation>
+          <xs:documentation>The refill point has got a fault.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="inoperative">
+        <xs:annotation>
+          <xs:documentation>The refill point is not yet active or it is no longer available (deleted).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="occupied">
+        <xs:annotation>
+          <xs:documentation>The refill point is in use, this might include vehicle charging activity.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="outOfOrder">
+        <xs:annotation>
+          <xs:documentation>The refill point is currently out of order.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="outOfStock">
+        <xs:annotation>
+          <xs:documentation>The refill point is out of stock, i.e. energy resources are empty.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="planned">
+        <xs:annotation>
+          <xs:documentation>The refill point is planned, will be operating soon.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="removed">
+        <xs:annotation>
+          <xs:documentation>The refill point was discontinued/removed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="reserved">
+        <xs:annotation>
+          <xs:documentation>The refill point is reserved by a customer, i.e. it is not available for other users right now.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unavailable">
+        <xs:annotation>
+          <xs:documentation>There is no energy available at this refill point. This could be because of a failure or damage or a longer lasting delivery failure (note that there is a literal 'outOfStock' for a short-term shortage).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The status of the refill point is unknown (can also be offline).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ServiceType">
+    <xs:annotation>
+      <xs:documentation>A specification of service types for the fuelling/charging and payment process.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="serviceType" type="aegi:_ServiceTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Information on different service types for the fuelling/charging and payment process.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="overallPeriod" type="com:OverallPeriod" minOccurs="0" />
+      <xs:element name="_serviceTypeExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ServiceTypeEnum">
+    <xs:annotation>
+      <xs:documentation>A table of different service levels to be expected for fuelling/charging and payment.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="fullService">
+        <xs:annotation>
+          <xs:documentation>Full fuelling service carried out by an employee.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="physicalAttendance">
+        <xs:annotation>
+          <xs:documentation>Presence of physical persons attending the recharging or refuelling station.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="selfService">
+        <xs:annotation>
+          <xs:documentation>Self-service for fuelling.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unattended">
+        <xs:annotation>
+          <xs:documentation>Unattended station, fuelling and payment to be done without assistance.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SmartRechargingServicesEnum">
+    <xs:annotation>
+      <xs:documentation>Smart recharging services.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="remoteMonitoring">
+        <xs:annotation>
+          <xs:documentation>Remote monitoring and control recharging (e.g. by app).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="powerOptimisationByUser">
+        <xs:annotation>
+          <xs:documentation>User preference configuration for recharging power optimization.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="bidirectionalRecharging">
+        <xs:annotation>
+          <xs:documentation>Bidirectional charging.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="plugAndCharge">
+        <xs:annotation>
+          <xs:documentation>Possibility of conducting automatic authentication and authorisation of the recharging session an the basis of a contract-based payment concluded between the end user and the mobility service provider in a recharging point as defined in ISO 15118-2 and -2</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="TimeBasedApplicability">
+    <xs:annotation>
+      <xs:documentation>Price is only valid within the given charging time boundaries in minutes.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="fromMinute" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Price is valid from the given minute.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="toMinute" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Price is valid up to the given minute.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_timeBasedApplicabilityExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="Units">
+    <xs:annotation>
+      <xs:documentation>Allows to specify amounts in generic terms of a Unit,which can be one of the elements in DeliveryUnitEnum.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:Float" />
+  </xs:simpleType>
+  <xs:simpleType name="VehicleToGridCommunicationTypeEnum">
+    <xs:annotation>
+      <xs:documentation>A list of communication types for communication between vehicles and the grid.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="none">
+        <xs:annotation>
+          <xs:documentation>No communication between vehicle and the grid.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iso15118">
+        <xs:annotation>
+          <xs:documentation>Communication according to ISO15118-20.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="iec619802">
+        <xs:annotation>
+          <xs:documentation>Communication according to IEC/TS 61980-2.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Communication according to other guidelines/specifications.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The type of communication is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Volt">
+    <xs:annotation>
+      <xs:documentation>Volt.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:Float" />
+  </xs:simpleType>
+  <xs:simpleType name="Watt">
+    <xs:annotation>
+      <xs:documentation>Watt.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:Float" />
+  </xs:simpleType>
+</xs:schema>

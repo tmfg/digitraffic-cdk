@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:d2="http://datex2.eu/schema/3/d2Payload" version="3.5" targetNamespace="http://datex2.eu/schema/3/d2Payload" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:fac="http://datex2.eu/schema/3/facilities" xmlns:fst="http://datex2.eu/schema/3/faultAndStatus" xmlns:roa="http://datex2.eu/schema/3/roadTrafficData" xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:vms="http://datex2.eu/schema/3/vms" xmlns:prk="http://datex2.eu/schema/3/parking" xmlns:tmp="http://datex2.eu/schema/3/trafficManagementPlan" xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced" xmlns:comx="http://datex2.eu/schema/3/commonExtension" xmlns:locx="http://datex2.eu/schema/3/locationExtension" xmlns:ubx="http://datex2.eu/schema/3/urbanExtensions" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/urbanExtensions" schemaLocation="DATEXII_3_UrbanExtensions.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/locationExtension" schemaLocation="DATEXII_3_LocationExtension.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/commonExtension" schemaLocation="DATEXII_3_CommonExtension.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/reroutingManagementEnhanced" schemaLocation="DATEXII_3_ReroutingManagementEnhanced.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/trafficManagementPlan" schemaLocation="DATEXII_3_TrafficManagementPlan.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/parking" schemaLocation="DATEXII_3_Parking.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/vms" schemaLocation="DATEXII_3_Vms.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/situation" schemaLocation="DATEXII_3_Situation.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/roadTrafficData" schemaLocation="DATEXII_3_RoadTrafficData.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/faultAndStatus" schemaLocation="DATEXII_3_FaultAndStatus.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/facilities" schemaLocation="DATEXII_3_Facilities.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/locationReferencing" schemaLocation="DATEXII_3_LocationReferencing.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:element name="payload" type="com:PayloadPublication">
+    <xs:unique name="_payloadOperatingHoursSpecificationConstraint">
+      <xs:selector xpath=".//fac:operatingHoursSpecification" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadVmsControllerConstraint">
+      <xs:selector xpath=".//vms:vmsController" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadDeviceFaultConstraint">
+      <xs:selector xpath=".//fst:deviceFault" />
+      <xs:field xpath="@id" />
+    </xs:unique>
+    <xs:unique name="_payloadOperatingHoursTableConstraint">
+      <xs:selector xpath=".//fac:operatingHoursTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadSituationRecordConstraint">
+      <xs:selector xpath=".//sit:situationRecord" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadScenarioConstraint">
+      <xs:selector xpath=".//tmp:scenario" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadParkingRouteDetailsConstraint">
+      <xs:selector xpath=".//prk:parkingRouteDetails" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadParkingTableConstraint">
+      <xs:selector xpath=".//prk:parkingTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadPtScheduleConstraint">
+      <xs:selector xpath=".//rer:ptSchedule" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadSituationConstraint">
+      <xs:selector xpath=".//sit:situation" />
+      <xs:field xpath="@id" />
+    </xs:unique>
+    <xs:unique name="_payloadOrganisationSpecificationConstraint">
+      <xs:selector xpath=".//fac:organisationSpecification" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadMeasureDefinitionConstraint">
+      <xs:selector xpath=".//tmp:measureDefinition" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadDeviceTableConstraint">
+      <xs:selector xpath=".//fst:deviceTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadFacilityObjectConstraint">
+      <xs:selector xpath=".//fac:facilityObject" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadMeasurementSiteConstraint">
+      <xs:selector xpath=".//roa:measurementSite" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadPublicTransportScheduleConstraint">
+      <xs:selector xpath=".//prk:publicTransportSchedule" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadDeviceConstraint">
+      <xs:selector xpath=".//fst:device" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadOperatorDefinedPlaceConstraint">
+      <xs:selector xpath=".//prk:operatorDefinedPlace" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadOrganisationTableConstraint">
+      <xs:selector xpath=".//fac:organisationTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadTmplanTableConstraint">
+      <xs:selector xpath=".//tmp:tmplanTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadPredefinedLocationGroupConstraint">
+      <xs:selector xpath=".//loc:predefinedLocationGroup" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadPredefinedLocationConstraint">
+      <xs:selector xpath=".//loc:predefinedLocation" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadRateTableConstraint">
+      <xs:selector xpath=".//fac:rateTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadStrategyDefinitionConstraint">
+      <xs:selector xpath=".//tmp:strategyDefinition" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadTmplanOperationConstraint">
+      <xs:selector xpath=".//tmp:tmplanOperation" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadRateMatrixConstraint">
+      <xs:selector xpath=".//fac:rateMatrix" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadActionDefinitionConstraint">
+      <xs:selector xpath=".//tmp:actionDefinition" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadCompositeMeasureConstraint">
+      <xs:selector xpath=".//tmp:compositeMeasure" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadMeasurementSiteTableConstraint">
+      <xs:selector xpath=".//roa:measurementSiteTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadPredefinedItineraryConstraint">
+      <xs:selector xpath=".//loc:predefinedItinerary" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+    <xs:unique name="_payloadVmsControllerTableConstraint">
+      <xs:selector xpath=".//vms:vmsControllerTable" />
+      <xs:field xpath="@id" />
+      <xs:field xpath="@version" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

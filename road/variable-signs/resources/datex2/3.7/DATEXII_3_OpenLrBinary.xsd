@@ -1,0 +1,24 @@
+<?xml  version='1.0' encoding='utf-8' ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   xmlns:olrb="http://datex2.eu/schema/3/openLrBinary"
+		   version="3.7"
+		   targetNamespace="http://datex2.eu/schema/3/openLrBinary">
+	<xs:element name="LinearLocationExtended" type="olrb:LinearLocationExtended"/>
+	<xs:complexType name="LinearLocationExtended">
+		<xs:sequence>
+			<xs:element name="OpenlrBinaryLocation" type="olrb:OpenlrBinaryLocation" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="OpenlrBinaryLocation" type="olrb:OpenlrBinaryLocation"/>
+	<xs:complexType name="OpenlrBinaryLocation">
+		<xs:sequence>
+			<xs:element name="openLrBinary" type="xs:base64Binary" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="PointLocationExtended" type="olrb:PointLocationExtended"/>
+	<xs:complexType name="PointLocationExtended">
+		<xs:sequence>
+			<xs:element name="OpenlrBinaryLocation" type="olrb:OpenlrBinaryLocation" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

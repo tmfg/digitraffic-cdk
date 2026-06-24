@@ -1,0 +1,1076 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:fst="http://datex2.eu/schema/3/faultAndStatus" version="3.5" targetNamespace="http://datex2.eu/schema/3/faultAndStatus" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:comx="http://datex2.eu/schema/3/commonExtension" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/commonExtension" schemaLocation="DATEXII_3_CommonExtension.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/locationReferencing" schemaLocation="DATEXII_3_LocationReferencing.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:complexType name="_DeviceComponentEnum">
+    <xs:simpleContent>
+      <xs:extension base="fst:DeviceComponentEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_DeviceHealthEnum">
+    <xs:simpleContent>
+      <xs:extension base="fst:DeviceHealthEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_DeviceTableVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="fst:DeviceTable" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_DeviceTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="fst:DeviceTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_DeviceVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="fst:Device" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_FaultImpactOnDataEnum">
+    <xs:simpleContent>
+      <xs:extension base="fst:FaultImpactOnDataEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_FaultTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="fst:FaultTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_MeasurementSiteTableVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="roa:MeasurementSiteTable" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_MeasurementSiteVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="roa:MeasurementSite" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_OperationalDeviceStateEnum">
+    <xs:simpleContent>
+      <xs:extension base="fst:OperationalDeviceStateEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_PowerSourceEnum">
+    <xs:simpleContent>
+      <xs:extension base="fst:PowerSourceEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_VmsControllerTableVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="vms:VmsControllerTable" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_VmsControllerVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="vms:VmsController" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AllFaultsOfSingleDevice">
+    <xs:annotation>
+      <xs:documentation>A collection of all current faults of a service fulfilled by a single device. An empty structure means that there are no faults reported for the device.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="operatingProperlySince" type="com:DateTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Time, since when the device is working properly (without fault).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="deviceReference" type="fst:DeviceReference" />
+      <xs:element name="deviceFault" type="fst:DeviceFault" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_allFaultsOfSingleDeviceExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CatalogueInformation">
+    <xs:annotation>
+      <xs:documentation>A reference to specific additional information by means of a predefined element out of a catalogue. The type of reference information depends on the data structure this class is aggregated to.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="catalogueReferenceByOID" type="fst:ObjectIdentifier" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The reference to a catalogue by its OID according to ISO/IEC 8824-1:2015 using the dot-notation (example: "1.2.250.1").</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="catalogueElement" type="com:String" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A reference to a specific element within the specified catalogue. The notation of this reference also depends on the specified catalogue.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_catalogueInformationExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Component">
+    <xs:annotation>
+      <xs:documentation>Components of a device which have some special interest such as having status and faults of their own</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fst:Device">
+        <xs:sequence>
+          <xs:element name="componentType" type="fst:_DeviceComponentEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Type of device component</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_componentExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Device">
+    <xs:annotation>
+      <xs:documentation>Static information about a logical device that delivers a service. A device can announce itself, or the information can be enriched by operators.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="typeOfDevice" type="fst:_DeviceTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Information about the type of the device.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastUpdateOfDeviceInformation" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Time of the last update of the device information, i.e. the time of the information in this class was last updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="externalDeviceId" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>An external id or name for the device.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastDeviceCheck" type="com:DateTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The time the device was last checked. It depends on local policies, if this is a physical check or just an online check.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="softwareVersion" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Information on the current software version of the device.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="softwareVersionDate" type="com:DateTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Information on the date of the current software version of the device.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="additionalDeviceInformation" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Any additional device information.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ipAddress" type="comx:IpAddress" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>IP address associated with the device</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="portNumber" type="comx:PortNumber" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Primary TCP or UDP port number associated with device</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="accountableAuthority" type="com:InternationalIdentifier" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Information about the authority accountable for this device. Use this attribute only in case it differs from the accountable authority of the table of devices or the information manager declared within the PayloadPublication.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="pointLocation" type="loc:PointLocation" />
+      <xs:element name="physicalDeviceDetails" type="fst:PhysicalDeviceDetails" minOccurs="0" />
+      <xs:element name="component" type="fst:Component" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Components of this device which have some special interest such as having status and faults of their own</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="dependsOn" type="fst:DeviceReference" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Other devices (other than components of this device) whose services this device depends in order to deliver its service</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_deviceExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:simpleType name="DeviceComponentEnum">
+    <xs:annotation>
+      <xs:documentation>Type of component of a device</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ambientLightMonitor">
+        <xs:annotation>
+          <xs:documentation>Ambient light monitor</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cabinet">
+        <xs:annotation>
+          <xs:documentation>Cabinet providing housing for equipment</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="communicationsEquipment">
+        <xs:annotation>
+          <xs:documentation>Communuications equipment</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="controller">
+        <xs:annotation>
+          <xs:documentation>A device controller</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="display">
+        <xs:annotation>
+          <xs:documentation>A display of a device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="fan">
+        <xs:annotation>
+          <xs:documentation>Fan for device cooling</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="generalPurposeIoPort">
+        <xs:annotation>
+          <xs:documentation>General-purpose I/O port</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="heater">
+        <xs:annotation>
+          <xs:documentation>Heater to maintain operational temperature for a device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="powerSupply">
+        <xs:annotation>
+          <xs:documentation>Power supply for a device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="processor">
+        <xs:annotation>
+          <xs:documentation>Processor component of a device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="sensor">
+        <xs:annotation>
+          <xs:documentation>Sensor component of a device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other type of device component</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="DeviceFault">
+    <xs:annotation>
+      <xs:documentation>Information about a fault relating to a specific device</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:Fault">
+        <xs:sequence>
+          <xs:element name="faultType" type="fst:_FaultTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The type of fault.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="faultInstructions" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Instructions to rectify this fault.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="faultImpactOnData" type="fst:_FaultImpactOnDataEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>The impact on data of this fault.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="faultComponent" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Identity of the component (if any), in which the fault occurred.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="faultComponentType" type="fst:_DeviceComponentEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The fault comes from a component of this device, of the identified component type.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="faultObjectInformation" type="fst:CatalogueInformation" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>A reference to specific additional information on the fault by referencing a predefined element out of some catalogue.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_deviceFaultExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="DeviceHealthEnum">
+    <xs:annotation>
+      <xs:documentation>This enumeration provides information on the health status of a device, in terms of its ability to provide its functional service.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ok">
+        <xs:annotation>
+          <xs:documentation>The device is working properly according to its specified requirements.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="notOk">
+        <xs:annotation>
+          <xs:documentation>The device is not working properly according to its specified requirements. A reference to a fault may be provided.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="functionalityPartlyOk">
+        <xs:annotation>
+          <xs:documentation>Some specific functionality of the device is working properly according to its specified requirements, but some other is not.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intermittentlyOk">
+        <xs:annotation>
+          <xs:documentation>The device is sometimes working properly according to its specified requirements, but on occasions is not. A reference to a fault may be provided.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="alarm">
+        <xs:annotation>
+          <xs:documentation>There is an indication of a fault danger or some other undesirable effects. An example might be an environmental alarm, for instance the device-temperature being above a certain threshold.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="notResponding">
+        <xs:annotation>
+          <xs:documentation>The device does not respond on calling. Nevertheless it can be possible, that the device still sends data. Normally this information is gathered from a system trigger or log trace, which is acknowledged and recorded by an operator.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="offline">
+        <xs:annotation>
+          <xs:documentation>The device is not connected or cannot be contacted. A reference to a fault may be provided. Usually, this information is  generated by an operator.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The status of the device is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="DevicePower">
+    <xs:annotation>
+      <xs:documentation>Power source for a device</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="health" type="fst:_DeviceHealthEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Health of the power supply</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="sourceType" type="fst:_PowerSourceEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Type of power supply</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_devicePowerExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DevicePublication">
+    <xs:annotation>
+      <xs:documentation>This publication provides static information about devices, including its point-location. It can be used in case no specific publication for the type of device is available or suitable. Fault- and StatusPublication can reference to the specified devices.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="headerInformation" type="com:HeaderInformation" />
+          <xs:element name="device" type="fst:Device" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="deviceTable" type="fst:DeviceTable" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_devicePublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeviceReference" abstract="true">
+    <xs:annotation>
+      <xs:documentation>A reference to a single device, either by using the VMS-structure or the MeasurementSitePublication structure or the DevicePublication structure.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:GlobalReference">
+        <xs:sequence>
+          <xs:element name="_deviceReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeviceTable">
+    <xs:annotation>
+      <xs:documentation>A table of devices grouped by any logical criteria, e.g. all traffic lights within a certain administrative area.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="deviceTableName" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The name of the table of devices.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="accountableAuthority" type="com:InternationalIdentifier" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Information about the authority accountable for this table of devices. Use this attribute only in case it differs from the information manager declared within the PayloadPublication.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="device" type="fst:Device" maxOccurs="unbounded" />
+      <xs:element name="_deviceTableExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="DeviceTableReference" abstract="true">
+    <xs:annotation>
+      <xs:documentation>A reference to a device table, either by using the VMS- or the MeasurementSitePublication structure or the DevicePublication structure.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:GlobalReference">
+        <xs:sequence>
+          <xs:element name="_deviceTableReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="DeviceTypeEnum">
+    <xs:annotation>
+      <xs:documentation>This enumeration provides information on types of field devices.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="accessControl">
+        <xs:annotation>
+          <xs:documentation>Access control equipment</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="camera">
+        <xs:annotation>
+          <xs:documentation>camera</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="fireDetection">
+        <xs:annotation>
+          <xs:documentation>Fire detection device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="firefightingDevice">
+        <xs:annotation>
+          <xs:documentation>Firefighting device such as a sprinkler system</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="itsStation">
+        <xs:annotation>
+          <xs:documentation>An ITS station unit as defined in ISO 21217</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="lighting">
+        <xs:annotation>
+          <xs:documentation>Illumination device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="meteorological">
+        <xs:annotation>
+          <xs:documentation>Meteorological equipment</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="roadsideTelephone">
+        <xs:annotation>
+          <xs:documentation>roadside emergency telephone</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="tollingDevice">
+        <xs:annotation>
+          <xs:documentation>Device used for road tolling</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="trafficDetector">
+        <xs:annotation>
+          <xs:documentation>A device that detects vehicles</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ventilation">
+        <xs:annotation>
+          <xs:documentation>Ventilation device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkingGuidance">
+        <xs:annotation>
+          <xs:documentation>A device offering parking guidance</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkingManagement">
+        <xs:annotation>
+          <xs:documentation>A device involved in parking management</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="roadsideEquipment">
+        <xs:annotation>
+          <xs:documentation>Roadside equipment</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="trafficSignal">
+        <xs:annotation>
+          <xs:documentation>A traffic signal (controller and potentially multiple traffic lights)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="transportLink">
+        <xs:annotation>
+          <xs:documentation>An instrumented transport link, considered as a single data service</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="transportRoute">
+        <xs:annotation>
+          <xs:documentation>An instrumented transport route, considered as a single data service</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="tunnel">
+        <xs:annotation>
+          <xs:documentation>A tunnel device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="vehicle">
+        <xs:annotation>
+          <xs:documentation>A vehicle in its role as a connected communicating device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="vms">
+        <xs:annotation>
+          <xs:documentation>A variable message sign</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Some other device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FaultImpactOnDataEnum">
+    <xs:annotation>
+      <xs:documentation>This enumeration provides information on the impact on data of a fault.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="downloadFailed">
+        <xs:annotation>
+          <xs:documentation>A download failed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intermittentData">
+        <xs:annotation>
+          <xs:documentation>Data is transmitted intermittently, i.e. not continuously.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="noData">
+        <xs:annotation>
+          <xs:documentation>There is no data transmitted.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unreliableData">
+        <xs:annotation>
+          <xs:documentation>The data is unreliable.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unspecified">
+        <xs:annotation>
+          <xs:documentation>The impact on data of the fault is not specified.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="FaultPublication">
+    <xs:annotation>
+      <xs:documentation>A publication containing fault information of devices or of tables of devices.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="headerInformation" type="com:HeaderInformation" />
+          <xs:element name="allFaultsOfSingleDevice" type="fst:AllFaultsOfSingleDevice" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="faultsOfAllDevicesFromTable" type="fst:FaultsOfAllDevicesFromTable" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_faultPublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FaultsOfAllDevicesFromTable">
+    <xs:annotation>
+      <xs:documentation>Fault information for a table of devices.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="deviceTableReference" type="fst:DeviceTableReference" />
+      <xs:element name="allFaultsOfSingleDevice" type="fst:AllFaultsOfSingleDevice" maxOccurs="unbounded" />
+      <xs:element name="_faultsOfAllDevicesFromTableExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="FaultTypeEnum">
+    <xs:annotation>
+      <xs:documentation>This enumeration provides information on types of faults.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="internalCommunicationFault">
+        <xs:annotation>
+          <xs:documentation>Device may be connected but has a communications fault that may prevent a required communication function performing within specified requirements. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="componentFault">
+        <xs:annotation>
+          <xs:documentation>A fault located in a component of the device (other components could still work well).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="configurationError">
+        <xs:annotation>
+          <xs:documentation>An error in the configuration or supply data of the device.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="disconnected">
+        <xs:annotation>
+          <xs:documentation>The device or component has no connection</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="electronicsFault">
+        <xs:annotation>
+          <xs:documentation>A fault in the electronics part of the device.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="generalSystemError">
+        <xs:annotation>
+          <xs:documentation>A general system error.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="hardwareFault">
+        <xs:annotation>
+          <xs:documentation>A hardware-related fault.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="controlFault">
+        <xs:annotation>
+          <xs:documentation>An invalid state was called by the control unit.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intermittentlyWorking">
+        <xs:annotation>
+          <xs:documentation>The device or component cannot always perform its tasks as required.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mechanicalFault">
+        <xs:annotation>
+          <xs:documentation>A fault of a mechanical part of the device.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="notWorking">
+        <xs:annotation>
+          <xs:documentation>The device or component cannot perform its tasks.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="operatingSystemFault">
+        <xs:annotation>
+          <xs:documentation>A fault in the operating system of the device.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="powerFailure">
+        <xs:annotation>
+          <xs:documentation>There is no power supply for the device or component.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="securityFault">
+        <xs:annotation>
+          <xs:documentation>A fault that causes a security issue or harms security related services.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="softwareFault">
+        <xs:annotation>
+          <xs:documentation>A software-related fault.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="synchronizationFault">
+        <xs:annotation>
+          <xs:documentation>Fault in the process of synchronisation with the device</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="timeOrClockFault">
+        <xs:annotation>
+          <xs:documentation>The device clock does not work properly or reports inconsistent time keeping.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unspecifiedFault">
+        <xs:annotation>
+          <xs:documentation>The fault cannot be specified.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknownFault">
+        <xs:annotation>
+          <xs:documentation>The fault is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="otherFault">
+        <xs:annotation>
+          <xs:documentation>The fault is not included in this enumeration.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="GeneralDeviceReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a device of any type.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fst:DeviceReference">
+        <xs:sequence>
+          <xs:element name="deviceReference" type="fst:_DeviceVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a device of any type.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_generalDeviceReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GeneralDeviceTableReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a table of devices of any type.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fst:DeviceTableReference">
+        <xs:sequence>
+          <xs:element name="deviceTableReference" type="fst:_DeviceTableVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a table of devices of any type.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_generalDeviceTableReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MeasurementSiteReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a measurement site.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fst:DeviceReference">
+        <xs:sequence>
+          <xs:element name="measurementSiteReference" type="fst:_MeasurementSiteVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a measurement site.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_measurementSiteReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MeasurementSiteTableReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a measurement site table.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fst:DeviceTableReference">
+        <xs:sequence>
+          <xs:element name="measurementSiteTableReference" type="fst:_MeasurementSiteTableVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a measurement site table.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_measurementSiteTableReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="ObjectIdentifier">
+    <xs:annotation>
+      <xs:documentation>An OID according to ISO/IEC 9834-1:2012 and ISO/IEC 8824-1:2015 using the dot-notation. Example: (1.3.162) points to CEN. The presentation in ASN.1 would be: {iso(1) identified-organization(3) cen(162)}.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:String" />
+  </xs:simpleType>
+  <xs:simpleType name="OperationalDeviceStateEnum">
+    <xs:annotation>
+      <xs:documentation>This enumeration provides information on the operational state of a device.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="maintenanceMode">
+        <xs:annotation>
+          <xs:documentation>The device is undergoing maintenance activities and is not available for operational use.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="on">
+        <xs:annotation>
+          <xs:documentation>The device is powered on and ready to act</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="off">
+        <xs:annotation>
+          <xs:documentation>The device is powered off.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="powerSafeMode">
+        <xs:annotation>
+          <xs:documentation>The device is in a special mode to save power until full functionality is needed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="specialMode">
+        <xs:annotation>
+          <xs:documentation>The device is operating in some special mode (for example traffic lights being in a night mode).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="temporarilyDeactivated">
+        <xs:annotation>
+          <xs:documentation>The device is set out of operation for limited time.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="permanentlyDeactivated">
+        <xs:annotation>
+          <xs:documentation>The device is set out of order and will not be reactivated.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="unknown">
+        <xs:annotation>
+          <xs:documentation>The operational status is unknown.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="OperationalState">
+    <xs:annotation>
+      <xs:documentation>Information about the operational state in which a device has been placed.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="operationalDeviceState" type="fst:_OperationalDeviceStateEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The operational state into which the device has been placed.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="stateDescription" type="com:MultilingualString" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A description of the operational state.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastStateChange" type="com:DateTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The time at which the last operational state change occurred.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastStateUpdate" type="com:DateTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The time the operational state information was last updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="operationalStateCatalogueInformation" type="fst:CatalogueInformation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>A reference to specific additional information on the operational state by referencing a predefined element out of some catalogue.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_operationalStateExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PhysicalDeviceDetails">
+    <xs:annotation>
+      <xs:documentation>Details of a specific physical device</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="barcode" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>textual equivalent of the content on the machine-readable barcode for this device</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="installationDate" type="com:Date" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>date that this device was installed</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="manufactureDate" type="com:Date" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>date that this device was manufactured</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="manufacturer" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>the identity of the manufacturer of this device</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="model" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>model of device</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="name" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>name of the individual device</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="serialNumber" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>serial number of this device</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="stockCode" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>number or text used to identify this kind of device in stock</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_physicalDeviceDetailsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="PowerSourceEnum">
+    <xs:annotation>
+      <xs:documentation>Type of power source</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="battery">
+        <xs:annotation>
+          <xs:documentation>Power by battery</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="generator">
+        <xs:annotation>
+          <xs:documentation>Power by generator</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="hydro">
+        <xs:annotation>
+          <xs:documentation>hydro power source e.g. local micro-hydro generator</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mains">
+        <xs:annotation>
+          <xs:documentation>Power from mains supply</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="solar">
+        <xs:annotation>
+          <xs:documentation>Solar power</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="wind">
+        <xs:annotation>
+          <xs:documentation>Wind power</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="Status">
+    <xs:annotation>
+      <xs:documentation>Status and operational state information for the service from a single device.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="health" type="fst:_DeviceHealthEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Health of the device in terms of its ability to provide its service.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="statusDescription" type="com:MultilingualString" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A description of the device status.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastStatusChange" type="com:DateTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The time at which the last status change occurred.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastStatusUpdate" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The time the status information was last updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="relatedFault" type="com:VersionedReference" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A reference to one or more faults that recently occurred on this device (and are not yet cleared).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="deviceReference" type="fst:DeviceReference" />
+      <xs:element name="operationalState" type="fst:OperationalState" minOccurs="0" />
+      <xs:element name="statusCatalogueInformation" type="fst:CatalogueInformation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>A reference to specific additional information on the device status by referencing a predefined element out of some catalogue.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="devicePower" type="fst:DevicePower" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_statusExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StatusOfAllDevicesFromTable">
+    <xs:annotation>
+      <xs:documentation>Status information for a table of devices.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="deviceTableReference" type="fst:DeviceTableReference" />
+      <xs:element name="status" type="fst:Status" maxOccurs="unbounded" />
+      <xs:element name="_statusOfAllDevicesFromTableExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StatusPublication">
+    <xs:annotation>
+      <xs:documentation>A publication containing status information of devices or of tables of devices.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="headerInformation" type="com:HeaderInformation" />
+          <xs:element name="status" type="fst:Status" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="statusOfAllDevicesFromTable" type="fst:StatusOfAllDevicesFromTable" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_statusPublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="VmsUnitReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a VMS unit record.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fst:DeviceReference">
+        <xs:sequence>
+          <xs:element name="vmsUnitReference" type="fst:_VmsControllerVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a VMS controller record.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_vmsUnitReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="VmsUnitTableReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a VMS table.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fst:DeviceTableReference">
+        <xs:sequence>
+          <xs:element name="vmsUnitTableReference" type="fst:_VmsControllerTableVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a VMS controller table.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_vmsUnitTableReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

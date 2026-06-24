@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:ubx="http://datex2.eu/schema/3/urbanExtensions" version="02-00-00" targetNamespace="http://datex2.eu/schema/3/urbanExtensions" xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:com="http://datex2.eu/schema/3/common" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/situation" schemaLocation="DATEXII_3_Situation.xsd" />
+  <xs:complexType name="_NonVehicularRoadUserTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="ubx:NonVehicularRoadUserTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_StreetWorksTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="ubx:StreetWorksTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="AccidentExtendedUrban">
+    <xs:annotation>
+      <xs:documentation>Extension to accident class.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="groupOfNonVehicularRoadUsersInvolved" type="ubx:GroupOfNonVehicularRoadUsersInvolved" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ClassifiedDelay">
+    <xs:annotation>
+      <xs:documentation>A delay valid for vehicles with specific characteristics.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="delays" type="sit:Delays" />
+      <xs:element name="vehicleCharacteristics" type="com:VehicleCharacteristics" />
+      <xs:element name="_classifiedDelayExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GroupOfNonVehicularRoadUsersInvolved">
+    <xs:annotation>
+      <xs:documentation>Group of involved road users who are not users of vehicles (e.g. pedestrians).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="numberOfNonVehicularRoadUsers" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The number of non-vehicular road users.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="injuryStatusType" type="sit:_InjuryStatusTypeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The injury status of road users who are not users of vehicles involved.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="nonVehicularRoadUsers" type="ubx:NonVehicularRoadUsers" minOccurs="0" />
+      <xs:element name="_groupOfNonVehicularRoadUsersInvolvedExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ImpactExtendedUrban">
+    <xs:annotation>
+      <xs:documentation>Extension for impact class.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="classifiedDelay" type="ubx:ClassifiedDelay" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NetworkManagementExtendedUrban">
+    <xs:annotation>
+      <xs:documentation>Extension for network management.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="forNonMotorisedRoadUsers" type="ubx:NonVehicularRoadUsers" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NonVehicularRoadUsers">
+    <xs:annotation>
+      <xs:documentation>Road users who are not users of vehicles (e.g. pedestrians)</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="nonVehicularRoadUser" type="ubx:_NonVehicularRoadUserTypeEnum" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A road user that does not use a vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_nonVehicularRoadUsersExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="NonVehicularRoadUserTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Road users that do not use a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="pedestrian">
+        <xs:annotation>
+          <xs:documentation>A pedestrian.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="skater">
+        <xs:annotation>
+          <xs:documentation>A person using a skateboard or similar.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="animalUnderGuidance">
+        <xs:annotation>
+          <xs:documentation>An animal that is guided, singly or in herds or flocks or draught or pack or saddled animal on a road.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Non-vehicular road user other than specified.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="StreetWorks">
+    <xs:annotation>
+      <xs:documentation>Non-highway related infrastructure or maintenance works on or close to the road.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="streetWorksType" type="ubx:_StreetWorksTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The type of the non-highway related infrastructure or maintenance works on or close to the road.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="StreetWorksTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of non-highway related infrastructure or maintenance works on or close to the road.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="buildingWork">
+        <xs:annotation>
+          <xs:documentation>Work at a building that affects road users. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="trenchingWork">
+        <xs:annotation>
+          <xs:documentation>Trenching works that affect road users. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="utilityWork">
+        <xs:annotation>
+          <xs:documentation>Works for utility installation and/or maintenance that affect road users.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

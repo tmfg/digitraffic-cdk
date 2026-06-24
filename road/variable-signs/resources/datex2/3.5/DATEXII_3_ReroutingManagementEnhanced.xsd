@@ -1,0 +1,987 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced" version="00-05-00" targetNamespace="http://datex2.eu/schema/3/reroutingManagementEnhanced" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:fac="http://datex2.eu/schema/3/facilities" xmlns:roa="http://datex2.eu/schema/3/roadTrafficData" xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/situation" schemaLocation="DATEXII_3_Situation.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/roadTrafficData" schemaLocation="DATEXII_3_RoadTrafficData.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/facilities" schemaLocation="DATEXII_3_Facilities.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/locationReferencing" schemaLocation="DATEXII_3_LocationReferencing.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:complexType name="_CapacityManagementActionEnum">
+    <xs:simpleContent>
+      <xs:extension base="rer:CapacityManagementActionEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_CapacityManagementMeasureEnum">
+    <xs:simpleContent>
+      <xs:extension base="rer:CapacityManagementMeasureEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ConditionOperator">
+    <xs:simpleContent>
+      <xs:extension base="rer:ConditionOperator">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_FacilityTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="rer:FacilityTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_PublicTransportTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="rer:PublicTransportTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_PublicTransportVehicleType">
+    <xs:simpleContent>
+      <xs:extension base="rer:PublicTransportVehicleType">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ReroutingAdviceTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="rer:ReroutingAdviceTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ReroutingTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="rer:ReroutingTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="BasicAllocation">
+    <xs:annotation>
+      <xs:documentation>Specifiying allocation by using a basic set of Conditions, but without using the TrafficRegulations namespace </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:RouteAllocation">
+        <xs:sequence>
+          <xs:element name="condition" type="rer:Condition" />
+          <xs:element name="_basicAllocationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CapacityManagement">
+    <xs:annotation>
+      <xs:documentation>One or more capacity management measures without specifying a specific route</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="name" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A given name for the specific capacity management.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="capacityManagementMeasure" type="rer:CapacityManagementMeasure" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CapacityManagementActionEnum">
+    <xs:annotation>
+      <xs:documentation>Types of capacity management actions.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="additionalParkingBan">
+        <xs:annotation>
+          <xs:documentation>A temporary additional parking ban or restriction shall be implemented, for example to improve traffic flow on the route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="alteredSignalPhasing">
+        <xs:annotation>
+          <xs:documentation>Traffic signal phases are altered (i.e. different sequence or timing to the normal signal phases).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="alternatedSignalisedTraffic">
+        <xs:annotation>
+          <xs:documentation>Alternated signalised traffic</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="closedEntry">
+        <xs:annotation>
+          <xs:documentation>Closed entry</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="closedExit">
+        <xs:annotation>
+          <xs:documentation>Closed exit</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="closedLanes">
+        <xs:annotation>
+          <xs:documentation>Closed lanes</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="modifiedCycleLength">
+        <xs:annotation>
+          <xs:documentation>The cycle time of specific traffic signals is modified.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="modifiedGreenPeriod">
+        <xs:annotation>
+          <xs:documentation>Green period of traffic signals is modified (extended or reduced).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="oneDirectionTraffic">
+        <xs:annotation>
+          <xs:documentation>One direction traffic</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="oneDirectionTrafficReversed">
+        <xs:annotation>
+          <xs:documentation>One direction traffic reversed</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="openedExtraLane">
+        <xs:annotation>
+          <xs:documentation>Indicates that one or more extra lanes are opened.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="reducingLocalAccess">
+        <xs:annotation>
+          <xs:documentation>Local access is restricted (e.g. because of an event).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="synchronizedTrafficSignals">
+        <xs:annotation>
+          <xs:documentation>Linked timing of a sequence of traffic signals on a specific route to improve passage through the traffic signals as a group, e.g. a green wave.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Some other traffic management in operation.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="CapacityManagementMeasure">
+    <xs:annotation>
+      <xs:documentation>A traffic management measure, possibly with concrete actions, which leads to an intended change (increase or decrease) of capacity for the specific route.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="measure" type="rer:_CapacityManagementMeasureEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The type of the capacity management measure</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="action" type="rer:_CapacityManagementActionEnum" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Actions that belong to the capacity management measure</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="description" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A description of the capacity management measure and its actions</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="defaultGreenTimeAdjustment" type="com:Seconds" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Additional or reduced traffic signal green time as standard value for all traffic signals on the specified route. Each traffic signal can overwrite this value.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="defaultCycleLength" type="com:Seconds" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The default cycle time to complete one full sequence of the operation of traffic signals along a specified route.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="recommendedSpeed" type="com:KilometresPerHour" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Advice for the optimal vehicle speed, for example in case of a green wave.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="affectedLocation" type="loc:LocationReference" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>If the affected location for the capacity measure is not already sufficiently specified in the enclosing objects, this property can be used to define it.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="trafficSignal" type="rer:TrafficSignal" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Traffic signal as part of a group of traffic signals that the management applies to.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_capacityManagementMeasureExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CapacityManagementMeasureEnum">
+    <xs:annotation>
+      <xs:documentation>Types of capacity management measures.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="accessMeasures">
+        <xs:annotation>
+          <xs:documentation>A temporary additional parking ban or restriction shall be implemented, for example to improve traffic flow on the route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="capacityIncrease">
+        <xs:annotation>
+          <xs:documentation>Enhanced capacity</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="capacityReduction">
+        <xs:annotation>
+          <xs:documentation>Reduced capacity</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="inflowReduction">
+        <xs:annotation>
+          <xs:documentation>Reduce the inflow</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="outflowIncrease">
+        <xs:annotation>
+          <xs:documentation>Increase the outflow</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkingMeasures">
+        <xs:annotation>
+          <xs:documentation>A temporary additional parking ban or restriction shall be implemented, for example to improve traffic flow on the route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="signalMeasures">
+        <xs:annotation>
+          <xs:documentation>A temporary additional parking ban or restriction shall be implemented, for example to improve traffic flow on the route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Some other traffic management in operation.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="Condition" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Abstract class that specifies a condition for applicabilities or exemptions of a traffic regulation.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="negate" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>If set to true means that the entire condition shall be negated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_conditionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ConditionOperator">
+    <xs:annotation>
+      <xs:documentation>The logical operator to be used in a test of conditions.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="or">
+        <xs:annotation>
+          <xs:documentation>The OR logical operator – a logical operation to determine if any.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="xor">
+        <xs:annotation>
+          <xs:documentation>The XOR logical operator - a logical operation that outputs true only.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="and">
+        <xs:annotation>
+          <xs:documentation>The AND logical operator – a logical operation to determine if all.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ConditionSet">
+    <xs:annotation>
+      <xs:documentation>Groups a number of conditions into a condition set.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:Condition">
+        <xs:sequence>
+          <xs:element name="operator" type="rer:_ConditionOperator" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Specifies the operator to be applied between the conditions in the set.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="conditions" type="rer:Condition" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Specifies the conditions that are present in the set</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_conditionSetExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DetailedAllocation">
+    <xs:annotation>
+      <xs:documentation>Allocation using the full Condition model of namespace TrafficRegulations </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:RouteAllocation">
+        <xs:sequence>
+          <xs:element name="_detailedAllocationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="FacilityTypeEnum">
+    <xs:annotation>
+      <xs:documentation>A collection of different facilities a route might lead to.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="carPark">
+        <xs:annotation>
+          <xs:documentation>A car park</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parking">
+        <xs:annotation>
+          <xs:documentation>An area for parking</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="publicTransport">
+        <xs:annotation>
+          <xs:documentation>A public transport station or hub</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkAndDrive">
+        <xs:annotation>
+          <xs:documentation>Parking for users that share their cars</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkAndRide">
+        <xs:annotation>
+          <xs:documentation>Parking for public transport users.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkAndCycle">
+        <xs:annotation>
+          <xs:documentation>A parking site for people who continue their journey by bike.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkAndWalk">
+        <xs:annotation>
+          <xs:documentation>A parking site for people who continue to walk.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="kissAndRide">
+        <xs:annotation>
+          <xs:documentation>Parking site with possibility for very short parking to drop off (or drop on) passengers for public transport.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="liftshare">
+        <xs:annotation>
+          <xs:documentation>A parking site for people who are sharing their cars.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="carSharing">
+        <xs:annotation>
+          <xs:documentation>A parking site for people who are sharing cars organised by a car sharing company..</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="restArea">
+        <xs:annotation>
+          <xs:documentation>The parking site is associated with a rest area, i.e. people can relax some time outside their car there. Note that the presence of some bench, picnic place or toilet is already sufficient; there is no need for a restaurant or a building.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="serviceArea">
+        <xs:annotation>
+          <xs:documentation>The parking site is associated with a service area.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="eventParking">
+        <xs:annotation>
+          <xs:documentation>Parking is associated with an event. Use 'eventParkingType'  to specify the event.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="dropOff">
+        <xs:annotation>
+          <xs:documentation>The parking site or space(s) are designed for drop off only.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="overnightParking">
+        <xs:annotation>
+          <xs:documentation>The parking site or space(s) are designed for overnight parking. Note that the absence of this scenario does not automatically mean a prohibition of overnight parking. See also PermitsAndProhibitions.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pointOfInterest">
+        <xs:annotation>
+          <xs:documentation>A specific point of interest.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Some other usage scenario.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="OccupantCondition">
+    <xs:annotation>
+      <xs:documentation>Conditions for the occupants of a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:Condition">
+        <xs:sequence>
+          <xs:element name="disabledWithPermit" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Occupant is disabled with permit.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="numberOfOccupants" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Total number of occupants including the driver.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_occupantConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="PriorityIndex">
+    <xs:annotation>
+      <xs:documentation>A priority index for routes with 0 = no priority; up to 10 = highest priority.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:NonNegativeInteger">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PtSchedule">
+    <xs:annotation>
+      <xs:documentation>A rough schedule for one or more public transport lines from this stop</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="lastUpdated" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The timestamp of the latest update of this information.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="line" type="com:String" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Line or multiple lines for which this schedule is valid</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="nextDepartures" type="com:Time" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>The next departures for this line / these lines</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="destination" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A destination that can be reached from this stop</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="interval" type="com:Seconds" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The interval for reaching the destination from this stop</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="travelTimeToDestination" type="com:Seconds" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The travel time to reach the destination from this stop</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ptType" type="rer:_PublicTransportTypeEnum" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>The type of public transport</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ptVehicleType" type="rer:_PublicTransportVehicleType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The type of public transport vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ptVehicleName" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A name of the specific vehicle type, for example "Railjet".</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ptOperator" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Information about the operator of this public transport.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="validity" type="com:Validity" minOccurs="0" />
+      <xs:element name="_ptScheduleExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:simpleType name="PublicTransportTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Special measures in the context of public transport.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="freePublicTransport">
+        <xs:annotation>
+          <xs:documentation>Use of public transport is free at all.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="nonFreePublicTransport">
+        <xs:annotation>
+          <xs:documentation>For the use of this public transport a fee must be paid / a ticket must be purchased</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="onDemandTraffic">
+        <xs:annotation>
+          <xs:documentation>This service is running only on demand</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="railReplacementService">
+        <xs:annotation>
+          <xs:documentation>There is a replacement service for rail traffic in place, usually served by buses.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="shuttleService">
+        <xs:annotation>
+          <xs:documentation>Shuttle services are in place, usually to reach a specific destination or event.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PublicTransportVehicleType">
+    <xs:annotation>
+      <xs:documentation>Types of public transport vehicles</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="bus">
+        <xs:annotation>
+          <xs:documentation>A bus</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="coach">
+        <xs:annotation>
+          <xs:documentation>A coach</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="miniBus">
+        <xs:annotation>
+          <xs:documentation>A small bus</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="subway">
+        <xs:annotation>
+          <xs:documentation>A subway</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="taxi">
+        <xs:annotation>
+          <xs:documentation>A taxi</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="train">
+        <xs:annotation>
+          <xs:documentation>A train</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="tram">
+        <xs:annotation>
+          <xs:documentation>A tram</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ReroutingAdviceTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Advices related to rerouting.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="doNotFollowDiversionSigns">
+        <xs:annotation>
+          <xs:documentation>Do not follow diversion signs.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="doNotUseEntry">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is not to use the specified entry onto the identified road to commence the alternative route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="doNotUseExit">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is not to use the specified exit from the identified road to commence the alternative route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="doNotUseIntersectionOrJunction">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is not to use the specified intersection or junction.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="followDiversionSigns">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is to follow the diversion signs.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="followLocalDiversion">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is to follow local diversion.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="followSpecialMarkers">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is to follow the special diversion markers.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="useEntry">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is to use the specified entry onto the identified road to commence the alternative route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="useExit">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is to use the specified exit from the identified road to commence the alternative route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="useIntersectionOrJunction">
+        <xs:annotation>
+          <xs:documentation>Rerouted traffic is to use the specified intersection or junction to commence the alternative route.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ReroutingManagementEnhanced">
+    <xs:annotation>
+      <xs:documentation>Description of one or more alternative routes (and additional measures) which are differentiated from the original route that may be congested, blocked or closed.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="name" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A given name for the specific route management.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="type" type="rer:_ReroutingTypeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The type of rerouting.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="bindingTrafficRegulation" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indicates that the rerouting information is a binding traffic regulation (i.e. shall be followed).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="preventiveMeasure" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indicates an action that is taken in advance (e.g. before an incident or traffic disruption occurs).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="routingOrigin" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A location serving as a geo-filter for routing itineraries that have their starting point within this location and for which this rerouting management should become applicable.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="routingThrough" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A location serving as a geo-filter for routing itineraries that touch or pass through this location and for which this rerouting management should become applicable.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="routingDestination" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A location serving as a geo-filter for routing itineraries that have their end point within this location and for which this rerouting management should become applicable.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="originalRoute" type="rer:RouteDescription" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>The original route, for which alternative routes are specified, which may be congested, blocked or closed.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="alternativeRoute" type="rer:RouteDescription" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>An alternative route on the transport network that provides a functionally equivalent but distinct route from the original route.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ReroutingTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of rerouting management.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="alternative">
+        <xs:annotation>
+          <xs:documentation>A general alternative rerouting.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="kpiForNavigationServices">
+        <xs:annotation>
+          <xs:documentation>A rerouting for navigation services to match defined key performance indicators, for example reduce of traffic.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkAndRide">
+        <xs:annotation>
+          <xs:documentation>A rerouting in combination with park &amp; ride.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="parkingGuidance">
+        <xs:annotation>
+          <xs:documentation>A parking guidance rerouting.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="strategyConform">
+        <xs:annotation>
+          <xs:documentation>A strategy conform rerouting.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="urbanCompatible">
+        <xs:annotation>
+          <xs:documentation>An urban compatible rerouting.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="RouteAllocation">
+    <xs:annotation>
+      <xs:documentation>Supports the allocation of traffic by proportion for a specific route against other alternative routes that perform the same functional purpose. This may also include the original route.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="routeProportion" type="com:Percentage" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The weight of this specific route against other alternative routes (and possibly the original route) that have identical specific applied characteristics in their route allocation. Those sets of weights should always sum up to 100%.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="reroutingAdvice" type="rer:_ReroutingAdviceTypeEnum" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Type of rerouting advice instigated by operator.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="complianceOptionOverride" type="sit:_ComplianceOptionEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Override the compliance option for the specific route to make it mandatory or advisory.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="routeEffectivlyClosedForAllocation" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>For the specification given in this particular allocation set, the route is closed.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_routeAllocationExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RouteDescription">
+    <xs:annotation>
+      <xs:documentation>Description of a route (original/alternatives), the location of which is defined by an Itinerary.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="nameOfRoute" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Human oriented name or identifier for the route for better usability.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="routeClosed" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Whether the route is closed for all kind of traffic</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="isPublicTransportRoute" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indication, if the route itself is a public transport route. A schedule may be offered.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="troReference" type="com:VersionedReference" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>A reference to a coresponding traffic regulation order</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="priorityIndex" type="rer:PriorityIndex" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A priority index for this route. 0 = no priority; up to 10 = highest priority.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="capacityAvailable" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indicates that capacities are still available on this route (or not).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="signedRerouting" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indication of whether the rerouting is signed with road traffic signs.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="entry" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The specified entry on to a road, not forming part of the original route, at which the alternative route commences.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="exit" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The specified exit from the normal route/road at which this specific alternative route commences.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="roadOrJunctionNumber" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The intersecting road or the junction at which this specific alternative route commences.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="trafficConstriction" type="sit:_TrafficConstrictionTypeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Traffic constriction for this route.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="routeLength" type="com:MetresAsNonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The length of the route.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="itinerary" type="loc:Itinerary" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Group of one or more physically separate locations arranged as an ordered set that defines a route (SOURCE: EN16157-2)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="routeAllocation" type="rer:RouteAllocation" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="specificDestinationFacility" type="rer:SpecificDestinationFacility" minOccurs="0" />
+      <xs:element name="ptRouteSchedule" type="rer:PtSchedule" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Public transport route schedule for the associated RouteDescription</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="capacityManagementMeasure" type="rer:CapacityManagementMeasure" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="supplementaryPositionalDescription" type="loc:SupplementaryPositionalDescription" minOccurs="0" />
+      <xs:element name="abnormalTraffic" type="sit:AbnormalTraffic" minOccurs="0" />
+      <xs:element name="routeDelays" type="sit:Delays" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Details of the delays on this specific route. It is recommended to only use one of the optional attributes to avoid confusion.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="trafficStatus" type="roa:TrafficStatusValue" minOccurs="0" />
+      <xs:element name="travelTimeData" type="roa:TravelTimeData" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_routeDescriptionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SpecificDestinationFacility">
+    <xs:annotation>
+      <xs:documentation>A specifric facility as a destination for the routing/rerouting.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="fac:Facility">
+        <xs:sequence>
+          <xs:element name="type" type="rer:_FacilityTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The type of this specific destination facility.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="otherSpecificDestinationFacility" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A specific destination facility for this route using a free text.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeParking" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Indication whether parking is for free or not at this facility.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ptSchedule" type="rer:PtSchedule" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element name="_specificDestinationFacilityExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TrafficSignal">
+    <xs:annotation>
+      <xs:documentation>Road equipment for controlling traffic with a set of automatically operated lights of different colours.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="externalId" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>An external identifier to identify the traffic signal.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="greenTimeAdjustmentOverride" type="com:Seconds" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Additional or reduced green time for this traffic signal. Overwrites the default value.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="cycleLengthOverride" type="com:Seconds" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The cycle time for this traffic signal. Overwrites the default value.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="signalGroup" type="com:Reference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Corresponding signal group object described in more detail externally,</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="notionalMidPoint" type="loc:PointLocation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Abstracted location representing a singular reference location for all traffic signals at a single intersection (usually its midpoint or helpwise the horizontal midpoint of the corresponding stop line).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_trafficSignalExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="index" type="com:Integer" use="required">
+      <xs:annotation>
+        <xs:documentation>An index to assign a fixed order for multiple elements of this type.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="TrafficTypeCondition">
+    <xs:annotation>
+      <xs:documentation>Conditions for traffic types</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:Condition">
+        <xs:sequence>
+          <xs:element name="trafficType" type="sit:_TrafficTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Exclduing certain types of traffic.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_trafficTypeConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UserCondition">
+    <xs:annotation>
+      <xs:documentation>Conditions depending on specific users</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:Condition">
+        <xs:sequence>
+          <xs:element name="users" type="fac:_UserTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>A restriction for certain users.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_userConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ValidityCondition">
+    <xs:annotation>
+      <xs:documentation>Conditions for time validity of a traffic regulation.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:Condition">
+        <xs:sequence>
+          <xs:element name="validity" type="com:Validity" />
+          <xs:element name="_validityConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="VehicleCondition">
+    <xs:annotation>
+      <xs:documentation>Conditions for a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="rer:Condition">
+        <xs:sequence>
+          <xs:element name="vehicleCharacteristics" type="com:VehicleCharacteristics" />
+          <xs:element name="_vehicleConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

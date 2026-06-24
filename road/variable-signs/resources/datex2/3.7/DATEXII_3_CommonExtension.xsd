@@ -1,0 +1,1102 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:comx="http://datex2.eu/schema/3/commonExtension" version="3.7" targetNamespace="http://datex2.eu/schema/3/commonExtension" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:tro="http://datex2.eu/schema/3/trafficRegulation" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/trafficRegulation" schemaLocation="DATEXII_3_TrafficRegulation.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/locationReferencing" schemaLocation="DATEXII_3_LocationReferencing.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:complexType name="_ApplicableDaysWithinMonthEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:ApplicableDaysWithinMonthEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EmissionTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:EmissionTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EngineTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:EngineTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EuBodyworkCodeEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:EuBodyworkCodeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EuBodyworkSupplementaryDigit">
+    <xs:simpleContent>
+      <xs:extension base="comx:EuBodyworkSupplementaryDigit">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EuSpecialPurposeVehicleEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:EuSpecialPurposeVehicleEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_EuVehicleCategoryEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:EuVehicleCategoryEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_FuzzyTimeEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:FuzzyTimeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_OwnerTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:OwnerTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_PowerUnitOfMeasureEnum">
+    <xs:simpleContent>
+      <xs:extension base="comx:PowerUnitOfMeasureEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name="ADRClass">
+    <xs:annotation>
+      <xs:documentation>Specification of classes of dangerous goods according to ADR.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:String">
+      <xs:pattern value="[1-9]|[4-6].[1-2]|4.3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="AgeCharacteristic">
+    <xs:annotation>
+      <xs:documentation>Characteristics depending on vehicle age.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="comparisonOperator" type="com:_ComparisonOperatorEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The operator to be used in the vehicle characteristic comparison operation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="yearOfFirstRegistration" type="com:Year" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Year of first registration of the vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="yearOfLastRegistration" type="com:Year" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The year in which the car was last registered on the current owner.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="vehicleAge" type="comx:NonNegativeIntegerComparison" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>The age of the vehicle in years based on the date of first registration.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_ageCharacteristicExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ApplicableDaysWithinMonthEnum">
+    <xs:annotation>
+      <xs:documentation>Types of days within a month.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="daysFromOneToFifteen">
+        <xs:annotation>
+          <xs:documentation>Days from the first of the month to the fifteenth.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="daysFromSixteenToThirtyOne">
+        <xs:annotation>
+          <xs:documentation>Days from the sixteenth of the month to the thirty-first.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="evenDay">
+        <xs:annotation>
+          <xs:documentation>Days of a month with an even date.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="oddDay">
+        <xs:annotation>
+          <xs:documentation>Days of a month with an odd date.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="DangerousGoodsExtended">
+    <xs:annotation>
+      <xs:documentation>Extension of dangerous goods class.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:HazardousMaterials">
+        <xs:sequence>
+          <xs:element name="adrClassValue" type="comx:ADRClass" minOccurs="0" maxOccurs="13">
+            <xs:annotation>
+              <xs:documentation>The class of the dangerous good according to ADR.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_dangerousGoodsExtendedExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DayWeekMonthExtended">
+    <xs:annotation>
+      <xs:documentation>Extension of class DayWeekMonth.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="applicableDaysWithinMonth" type="comx:_ApplicableDaysWithinMonthEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Applicable days within month.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EmissionsExtension">
+    <xs:annotation>
+      <xs:documentation>An extension for the Emissions class to provide a comparison operator.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="comparisonOperator" type="com:_ComparisonOperatorEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A comparison operator for the applicable emission classifications in correspondence to the specified value. The comparison applies to the Roman- or Arabic-numbered portion (e.g. euro6 &gt; euro5b), but not crosswise (e.g. euro6 cannot be compared to euroV).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="EmissionTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of emissions.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="co2">
+        <xs:annotation>
+          <xs:documentation>Carbon dioxide.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="nox">
+        <xs:annotation>
+          <xs:documentation>Nitrogen oxides.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pm">
+        <xs:annotation>
+          <xs:documentation>Particulate matter.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="EnginePowerCharacteristics">
+    <xs:annotation>
+      <xs:documentation>Characteristics of the engine power of a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="comparisonOperator" type="com:_ComparisonOperatorEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The operator to be used in the vehicle characteristic comparison operation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="enginePower" type="com:Float" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The engine power value of the vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="unitOfMeasure" type="comx:_PowerUnitOfMeasureEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The unit in which the engine power is specified.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_enginePowerCharacteristicsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="EngineTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of vehicle engines.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="electricMotor">
+        <xs:annotation>
+          <xs:documentation>Electric motor.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="hybrid">
+        <xs:annotation>
+          <xs:documentation>Vehicle motor has multiple sources of energy (e.g., plug-in hybrid electric vehicle).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="internalCombustionEngine">
+        <xs:annotation>
+          <xs:documentation>Internal combustion engine.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>Other than as defined in this enumeration.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EuBodyworkCodeEnum">
+    <xs:annotation>
+      <xs:documentation>Bodywork codes according to REGULATION (EU) 2018/858.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="aa">
+        <xs:annotation>
+          <xs:documentation>Saloon - A vehicle defined in term 3.1.1.1 of international standard ISO 3833:1977, fitted with at least four side windows.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ab">
+        <xs:annotation>
+          <xs:documentation>Hatchback - A saloon as defined in REGULATION (EU) 2018/858 Annex 1 Part C Ref. 2.1 with a hatch at the rear end of the vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ac">
+        <xs:annotation>
+          <xs:documentation>Station wagon - A vehicle defined in term 3.1.1.4 of international standard ISO 3833:1977.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ad">
+        <xs:annotation>
+          <xs:documentation>Coupé - A vehicle defined in term 3.1.1.5 of international standard ISO 3833:1977.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ae">
+        <xs:annotation>
+          <xs:documentation>Convertible - A vehicle defined in terms No 3.1.1.6 of international standard ISO 3833:1977. However, a convertible may have no door.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="af">
+        <xs:annotation>
+          <xs:documentation>Multi-purpose - A vehicle other than AG and those mentioned in AA to AE in tended for carrying persons and their luggage or occasionally goods, in a single compartment.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ag">
+        <xs:annotation>
+          <xs:documentation>Truck station wagon-Vehicle defined in term No 3.1.1.4.1 of ISO 3833:1977. The luggage compartment must be compl. sepated from the passenger compartment. And the ref. point of the driver's seating pos. must be min. 750mm above the surface supp. the veh.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ba">
+        <xs:annotation>
+          <xs:documentation>Lorry - A vehicle that is designed and constructed exclusively or principally for conveying goods. It may also tow a trailer.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="bb">
+        <xs:annotation>
+          <xs:documentation>Van - A lorry with the compartment where the driver is located and cargo area within a single unit.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="bc">
+        <xs:annotation>
+          <xs:documentation>Tractor unit for semi-trailer - A towing vehicle that is designed and constructed exclusively or principally to tow semi-trailers.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="bd">
+        <xs:annotation>
+          <xs:documentation>Road tractor - A towing vehicle that is designed and constructed exclusively to tow trailers other than semi-trailers.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="be">
+        <xs:annotation>
+          <xs:documentation>Pick-up truck - A vehicle of a maximum mass not exceeding 3 500 kg in which the seating positions and the cargo area are not located in a single compartment.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="bx">
+        <xs:annotation>
+          <xs:documentation>Chassis-cab or chassis-cowl - An incomplete vehicle with just a cabin (complete or partial), chassis rails, power train, axles, which is intended to be completed with bodywork, customised to the needs of the transport operator.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ca">
+        <xs:annotation>
+          <xs:documentation>Single-deck vehicle - A vehicle where the spaces provided for persons are arranged in a single level or in a way that they do not constitute two superimposed levels. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cb">
+        <xs:annotation>
+          <xs:documentation>Double-deck vehicle - A vehicle defined in paragraph 2.1.6 of UN Regulation No 107.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cc">
+        <xs:annotation>
+          <xs:documentation>Single-deck articulated vehicle - A vehicle defined in paragraph 2.1.3 of UN Regulation No 107 with a single deck.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cd">
+        <xs:annotation>
+          <xs:documentation>Double-deck articulated vehicle - A vehicle defined in paragraph 2.1.3.1 of UN Regulation No 107.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ce">
+        <xs:annotation>
+          <xs:documentation>Low-floor single-deck vehicle - A vehicle defined in paragraph 2.1.4 of UN Regulation No 107 with a single deck.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cf">
+        <xs:annotation>
+          <xs:documentation>Low-floor double-deck vehicle - A vehicle defined in paragraph 2.1.4 of UN Regulation No 107 with a double deck.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cg">
+        <xs:annotation>
+          <xs:documentation>Articulated low-floor single-deck vehicle - A vehicle that combines the technical features of codes CC and CE.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ch">
+        <xs:annotation>
+          <xs:documentation>Articulated low-floor double-deck vehicle - A vehicle that combines the technical features of codes CD and CF.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ci">
+        <xs:annotation>
+          <xs:documentation>Open top single deck vehicle - A vehicle with partial roof or without roof.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cj">
+        <xs:annotation>
+          <xs:documentation>Open top double deck vehicle - A vehicle without roof over all or part of its upper deck.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cx">
+        <xs:annotation>
+          <xs:documentation>Bus chassis - An incomplete vehicle with just chassis rails or tube assembly, power train, axles, that is intended to be completed with bodywork, customised to the needs of the transport operator.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="da">
+        <xs:annotation>
+          <xs:documentation>Semi-trailer-Trailer that is des. and constr. to be coupled to a tractor unit or converter dolly and to impose a subst. vertical load on the towing vehicle or converter dolly. The coupling for a vehicle comb. shall consist of a king pin and a fifth wheel.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="db">
+        <xs:annotation>
+          <xs:documentation>Drawbar trailer-Trailer having at least two axles, with at least one is a steered axle:(a)equipped with a towing device which can move vertically (in relation to trailer); (b)that transmits less than 100daN as static vertical load to the towing vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="dc">
+        <xs:annotation>
+          <xs:documentation>Centre-axle trailer- see definition in REGULATION (EU) 2018/858 Annex 1 Part C Ref. 5.3.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="de">
+        <xs:annotation>
+          <xs:documentation>Rigid drawbar trailer- see definition in REGULATION (EU) 2018/858 Annex 1 Part C Ref. 5.4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EuBodyworkSupplementaryDigit">
+    <xs:annotation>
+      <xs:documentation>The supplementary digit of a bodywork codes according to REGULATION (EU) 2018/858.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="digit01">
+        <xs:annotation>
+          <xs:documentation>Flat bed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit02">
+        <xs:annotation>
+          <xs:documentation>Drop-side.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit03">
+        <xs:annotation>
+          <xs:documentation>Box body.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit04">
+        <xs:annotation>
+          <xs:documentation>Conditioned body with insulated walls and equipment to maintain the interior temperature.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit05">
+        <xs:annotation>
+          <xs:documentation>Conditioned body with insulated walls but without equipment to maintain the interior temperature.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit06">
+        <xs:annotation>
+          <xs:documentation> Curtain-sided.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit07">
+        <xs:annotation>
+          <xs:documentation>Swap body (interchangeable superstructure).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit08">
+        <xs:annotation>
+          <xs:documentation>Container carrier.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit09">
+        <xs:annotation>
+          <xs:documentation>Vehicles fitted with hook lift.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit10">
+        <xs:annotation>
+          <xs:documentation>Tipper.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit11">
+        <xs:annotation>
+          <xs:documentation>Tank.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit12">
+        <xs:annotation>
+          <xs:documentation>Tank intended for transport of dangerous goods.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit13">
+        <xs:annotation>
+          <xs:documentation>Livestock carrier.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit14">
+        <xs:annotation>
+          <xs:documentation>Vehicle transporter.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit15">
+        <xs:annotation>
+          <xs:documentation>Concrete mixer.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit16">
+        <xs:annotation>
+          <xs:documentation>Concrete pump vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit17">
+        <xs:annotation>
+          <xs:documentation>Timber.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit18">
+        <xs:annotation>
+          <xs:documentation>Refuse collection vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit19">
+        <xs:annotation>
+          <xs:documentation>Street sweeper, cleansing and drain clearing.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit20">
+        <xs:annotation>
+          <xs:documentation>Compressor.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit21">
+        <xs:annotation>
+          <xs:documentation>Boat carrier.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit22">
+        <xs:annotation>
+          <xs:documentation>Glider carrier.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit23">
+        <xs:annotation>
+          <xs:documentation>Vehicles for retail or display purposes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit24">
+        <xs:annotation>
+          <xs:documentation>Recovery vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit25">
+        <xs:annotation>
+          <xs:documentation>Ladder vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit26">
+        <xs:annotation>
+          <xs:documentation>Crane lorry (other than a mobile crane as defined in point 5.7 of Part A)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit27">
+        <xs:annotation>
+          <xs:documentation>Aerial work platform vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit28">
+        <xs:annotation>
+          <xs:documentation>Digger derrick vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit29">
+        <xs:annotation>
+          <xs:documentation>Low floor trailer.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit30">
+        <xs:annotation>
+          <xs:documentation>Glazing transporter.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit31">
+        <xs:annotation>
+          <xs:documentation>Fire engine.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="digit99">
+        <xs:annotation>
+          <xs:documentation>Bodywork that is not included in this list.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EuSpecialPurposeVehicleEnum">
+    <xs:annotation>
+      <xs:documentation>Vehicle purpose according to EU legislation.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="motorCaravan">
+        <xs:annotation>
+          <xs:documentation>Special purpose M category vehicle constructed to include living accommodation which contains at least the following equipment: seats and table, sleeping accommodation, cooking facilities and storage facilities.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="armouredVehicle">
+        <xs:annotation>
+          <xs:documentation>Vehicle intended for the protection of conveyed passengers and/or goods and complying with armour plating anti-bullet requirements.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ambulance">
+        <xs:annotation>
+          <xs:documentation>A motor vehicle of category M intended for the transport of sick or injured people and having special equipment for such purpose.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="hearse">
+        <xs:annotation>
+          <xs:documentation>A motor vehicle of category M intended for the transport of deceased people and having special equipment for such purpose.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="trailerCaravan">
+        <xs:annotation>
+          <xs:documentation>Trailer caravan ee ISO Standard 3833-77, term No 3.2.1.3.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mobileCrane">
+        <xs:annotation>
+          <xs:documentation>Special purpose vehicle of category N3, not fitted for the carriage of goods, provided with a crane whose lifting moment is equal to or higher than 400 kNm.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="otherSpecialPurposeVehicle">
+        <xs:annotation>
+          <xs:documentation>Other special purpose vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="wheelChairAccessibleVehicle">
+        <xs:annotation>
+          <xs:documentation>Wheel chair accessible vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EuVehicleCategoryEnum">
+    <xs:annotation>
+      <xs:documentation>Vehicle categories according to EU legislation.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="l1">
+        <xs:annotation>
+          <xs:documentation>Light two-wheel powered vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="l2">
+        <xs:annotation>
+          <xs:documentation>Three-wheel moped.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="l3">
+        <xs:annotation>
+          <xs:documentation>Two-wheel motorcycle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="l4">
+        <xs:annotation>
+          <xs:documentation>Two-wheel motorcycle with side-car.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="l5">
+        <xs:annotation>
+          <xs:documentation>Powered tricycle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="l6">
+        <xs:annotation>
+          <xs:documentation>Light quadricycle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="l7">
+        <xs:annotation>
+          <xs:documentation>Heavy quadricycle.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="m">
+        <xs:annotation>
+          <xs:documentation>Motor vehicles with at least four wheels designed and constructed for the carriage of passengers.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="r1">
+        <xs:annotation>
+          <xs:documentation>Trailers, the sum of the technically permissible masses per axle of which does not exceed 1,500 kg.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="r2">
+        <xs:annotation>
+          <xs:documentation>Trailers, the sum of the technically permissible masses per axle of which exceeds 1,500 kg but does not exceed 3,500 kg.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="r3">
+        <xs:annotation>
+          <xs:documentation>Trailers, the sum of the technically permissible masses per axle of which exceeds 3,500 kg but does not exceed 21,000 kg.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="r4">
+        <xs:annotation>
+          <xs:documentation>Trailers, the sum of the technically permissible masses per axle of which exceeds 21,000 kg.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="t1">
+        <xs:annotation>
+          <xs:documentation>Wheeled tractors with the closest axle to the driver having a minimum track width of not less than 1,500 mm; with an unladen mass in running order of more than 600 kg and with a ground clearance of not more than 1,000 mm.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="t2">
+        <xs:annotation>
+          <xs:documentation>Vehicle category t2 according to Regulation (EU) No 167/2013.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="t3">
+        <xs:annotation>
+          <xs:documentation>Wheeled tractors with unladen mass in running order of not more than 600 kg.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="t4">
+        <xs:annotation>
+          <xs:documentation>Special purpose wheeled tractors with a maximum design speed of not more than 40 km/h.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="t41">
+        <xs:annotation>
+          <xs:documentation>Category T4.1: High clearance tractors.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="t42">
+        <xs:annotation>
+          <xs:documentation>Category T4.2: Extra-wide tractors.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="t43">
+        <xs:annotation>
+          <xs:documentation>Category T4.3: Low clearance tractors.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="m1">
+        <xs:annotation>
+          <xs:documentation>Vehicles designed and constructed for the carriage of passengers and comprising no more than eight seats in addition to the driver’s seat.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="m2">
+        <xs:annotation>
+          <xs:documentation>Vehicles designed and constructed for the carriage of passengers, comprising more than eight seats in addition to the driver’s seat, and having a maximum mass not exceeding 5 tonnes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="m3">
+        <xs:annotation>
+          <xs:documentation>Vehicles designed and constructed for the carriage of passengers, comprising more than eight seats in addition to the driver’s seat, and having a maximum mass exceeding 5 tonnes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="n">
+        <xs:annotation>
+          <xs:documentation>Motor vehicles with at least four wheels designed and constructed for the carriage of goods.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="n1">
+        <xs:annotation>
+          <xs:documentation>Vehicles designed and constructed for the carriage of goods and having a maximum mass not exceeding 3,5 tonnes</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="n2">
+        <xs:annotation>
+          <xs:documentation>Vehicles designed and constructed for the carriage of goods and having a maximum mass exceeding 3,5 tonnes but not exceeding 12 tonnes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="n3">
+        <xs:annotation>
+          <xs:documentation>Vehicles designed and constructed for the carriage of goods and having a maximum mass exceeding 12 tonnes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="o">
+        <xs:annotation>
+          <xs:documentation>Trailers (including semi-trailers).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="o1">
+        <xs:annotation>
+          <xs:documentation>Trailers with a maximum mass not exceeding 0,75 tonnes</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="o2">
+        <xs:annotation>
+          <xs:documentation>Trailers with a maximum mass exceeding 0,75 tonnes but not exceeding 3,5 tonnes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="o3">
+        <xs:annotation>
+          <xs:documentation>Trailers with a maximum mass exceeding 3,5 tonnes but not exceeding 10 tonnes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="o4">
+        <xs:annotation>
+          <xs:documentation>Trailers with a maximum mass exceeding 10 tonnes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="r">
+        <xs:annotation>
+          <xs:documentation>Agricultural trailer: any agricultural or forestry vehicle intended mainly to be towed by a tractor and intended mainly to carry loads or process materials. The ratio of the techn. permissible max. laden to unladen mass is equal to or greater than 3.0.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="FuzzyPeriod">
+    <xs:annotation>
+      <xs:documentation>Fuzzy periods of a day.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="beginOrDuration" type="comx:_FuzzyTimeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Begin or duration of fuzzy time period.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="endOrDuration" type="comx:_FuzzyTimeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>End or duration of fuzzy time period.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_fuzzyPeriodExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="FuzzyTimeEnum">
+    <xs:annotation>
+      <xs:documentation>Enumeration for fuzzy time periods.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="dawn">
+        <xs:annotation>
+          <xs:documentation>Local time of dawn.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="sunset">
+        <xs:annotation>
+          <xs:documentation>Local time of sunset.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="GrossTrailerWeightCharacteristics">
+    <xs:annotation>
+      <xs:documentation>Gross weight characteristic of a trailer of a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="comparisonOperator" type="com:_ComparisonOperatorEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The operator to be used in the trailer characteristic comparison operation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="grossTrailerWeight" type="com:Tonnes" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The gross weight of the vehicle and its load, including any trailers.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="typeOfWeight" type="com:_WeightTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The meaning of the weight value.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_grossTrailerWeightCharacteristicsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="IpAddress">
+    <xs:annotation>
+      <xs:documentation>Internet Protocol (IP) network address</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:String">
+      <xs:pattern value="((1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}(1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="NonNegativeIntegerComparison">
+    <xs:annotation>
+      <xs:documentation>A comparison to a non negative integer value.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="comparisonOperator" type="com:_ComparisonOperatorEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A comparison operator.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="value" type="com:NonNegativeInteger" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The value for the comparison.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_nonNegativeIntegerComparisonExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NumberPlateCharacteristics">
+    <xs:annotation>
+      <xs:documentation>Characteristics of the numberplate of a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="countryOfRegistration" type="com:CountryCode" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The country in which the vehicle is registered.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="startOfNumericCode" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The start of the numeric code on the number plate.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_numberPlateCharacteristicsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NumericalEmissionValues">
+    <xs:annotation>
+      <xs:documentation>Numerical emission values of vehicles.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="emissionType" type="comx:_EmissionTypeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Type of emission.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="value" type="com:Float" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Value of emission in g/km.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="comparisonOperator" type="com:_ComparisonOperatorEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The operator to be used in the vehicle characteristic comparison operation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_numericalEmissionValuesExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OwnerCharacteristic">
+    <xs:annotation>
+      <xs:documentation>Characteristics of the owner of a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ownerType" type="comx:_OwnerTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Type of the owner of the vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="locationOfResidency" type="loc:LocationReference" minOccurs="0" />
+      <xs:element name="_ownerCharacteristicExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="OwnerTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Types of vehicle owners.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="localBusiness">
+        <xs:annotation>
+          <xs:documentation>A legal person which is not human, but has the right to be owner of a vehicle and is located close to the specified area.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ownerOfLocalProperty">
+        <xs:annotation>
+          <xs:documentation>A natural person which is owner of property in the specified area.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="permanentResident">
+        <xs:annotation>
+          <xs:documentation>A natural person with permanent residence in the specified area.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PeriodExtended">
+    <xs:annotation>
+      <xs:documentation>Extension class for Period.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="fuzzyPeriod" type="comx:FuzzyPeriod" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="PortNumber">
+    <xs:annotation>
+      <xs:documentation>Port number for TCP or UDP.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="com:NonNegativeInteger">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="65535" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PowerUnitOfMeasureEnum">
+    <xs:annotation>
+      <xs:documentation>Units for measuring power.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="kilowatt">
+        <xs:annotation>
+          <xs:documentation>Power expressed in kilowatt.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="horsepower">
+        <xs:annotation>
+          <xs:documentation>Power expressed in horsepower.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="RegulatedCharacteristics">
+    <xs:annotation>
+      <xs:documentation>Characteristics as defined in EU and or national regulations.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="euVehicleCategory" type="comx:_EuVehicleCategoryEnum" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Vehicle categories as defined in EU Directive 2007/46/EG and Regulation (EU) No 168/2013.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="euSpecialPurposeVehicle" type="comx:_EuSpecialPurposeVehicleEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>vehicle purpose as defined in EU Directive 2007/46/EG</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="nationalSpecialPurposeVehicle" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>vehicle purpose as defined by national regulation</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="offroadVehicle" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>An off-road vehicle that belongs to either category M or N having specific technical features which permit its use on or off normal roads. The letter 'G' is added as a suffix to the letter and numeral identifying the vehicle category.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="specialPurposeVehicle" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The vehicle is a special purpose vehicle (the suffix S is added to the vehicle category).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="euBodyworkCode" type="comx:_EuBodyworkCodeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Type of bodywork according to REGULATION (EU) 2018/858.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="euBodyworkSupplementaryDigit" type="comx:_EuBodyworkSupplementaryDigit" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Supplementary digits for a type of bodywork according to REGULATION (EU) 2018/858.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_regulatedCharacteristicsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Speed">
+    <xs:annotation>
+      <xs:documentation>Specification of a speed.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="numericValue" type="com:Decimal" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Numeric value of the speed.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="unitOfMeasure" type="tro:_UnitOfSpeedEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The unit of measure of the specified speed.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_speedExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TrailerCharacteristics">
+    <xs:annotation>
+      <xs:documentation>The characteristics of a trailer e.g. gross weight of trailer.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="grossTrailerWeightCharacteristics" type="comx:GrossTrailerWeightCharacteristics" minOccurs="0" maxOccurs="2">
+        <xs:annotation>
+          <xs:documentation>Gross trailer weight characteristics.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_trailerCharacteristicsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="VehicleCharacteristicsExtended">
+    <xs:annotation>
+      <xs:documentation>Extension class for vehicle characteristics.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="engineType" type="comx:_EngineTypeEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The engine type of the vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ageCharacteristic" type="comx:AgeCharacteristic" minOccurs="0" maxOccurs="2" />
+      <xs:element name="maximumDesignSpeed" type="comx:Speed" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>The speed which the vehicle is incapable, by reason of its construction, of exceeding on the level under its own power when fully laden.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="trailerCharacteristics" type="comx:TrailerCharacteristics" minOccurs="0" />
+      <xs:element name="hazardousMaterials" type="com:HazardousMaterials" minOccurs="0" />
+      <xs:element name="ownerCharacteristic" type="comx:OwnerCharacteristic" minOccurs="0" />
+      <xs:element name="numberPlateCharacteristics" type="comx:NumberPlateCharacteristics" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Characteristics of the number plate of a vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="enginePowerCharacteristics" type="comx:EnginePowerCharacteristics" minOccurs="0" maxOccurs="2" />
+      <xs:element name="numericalEmissionValues" type="comx:NumericalEmissionValues" minOccurs="0" maxOccurs="2" />
+      <xs:element name="vehicleRegistrationCharacteristics" type="comx:VehicleRegistrationCharacteristics" minOccurs="0" />
+      <xs:element name="regulatedCharacteristics" type="comx:RegulatedCharacteristics" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="VehicleRegistrationCharacteristics">
+    <xs:annotation>
+      <xs:documentation>Characteristics of the registration of a vehicle.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="registeredHistoricVehicle" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The vehicle is registered as a historic vehicle.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_vehicleRegistrationCharacteristicsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

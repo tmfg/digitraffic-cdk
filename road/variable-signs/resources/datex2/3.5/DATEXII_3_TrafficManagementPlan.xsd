@@ -1,0 +1,1131 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:tmp="http://datex2.eu/schema/3/trafficManagementPlan" version="02-00-00" targetNamespace="http://datex2.eu/schema/3/trafficManagementPlan" xmlns:vms="http://datex2.eu/schema/3/vms" xmlns:com="http://datex2.eu/schema/3/common" xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:rer="http://datex2.eu/schema/3/reroutingManagementEnhanced" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://datex2.eu/schema/3/reroutingManagementEnhanced" schemaLocation="DATEXII_3_ReroutingManagementEnhanced.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/locationReferencing" schemaLocation="DATEXII_3_LocationReferencing.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/situation" schemaLocation="DATEXII_3_Situation.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/common" schemaLocation="DATEXII_3_Common.xsd" />
+  <xs:import namespace="http://datex2.eu/schema/3/vms" schemaLocation="DATEXII_3_Vms.xsd" />
+  <xs:complexType name="_ActionDefinitionVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tmp:ActionDefinition" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_MeasureDefinitionVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tmp:MeasureDefinition" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_OrganisationReference">
+    <xs:complexContent>
+      <xs:extension base="com:Reference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="fac:Organisation" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_ResponseEffectTypeEnum">
+    <xs:simpleContent>
+      <xs:extension base="tmp:ResponseEffectTypeEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ResponseStageEnum">
+    <xs:simpleContent>
+      <xs:extension base="tmp:ResponseStageEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_ScenarioVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tmp:Scenario" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_SituationRecordVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="sit:SituationRecord" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_StrategyDefinitionVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tmp:StrategyDefinition" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_StrategyVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tmp:Strategy" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="_TmplanOperationStatusEnum">
+    <xs:simpleContent>
+      <xs:extension base="tmp:TmplanOperationStatusEnum">
+        <xs:attribute name="_extendedValue" type="xs:string" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="_TmplanTableVersionedReference">
+    <xs:complexContent>
+      <xs:extension base="com:VersionedReference">
+        <xs:attribute name="targetClass" type="xs:string" use="required" fixed="tmp:TmplanTable" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Action" abstract="true">
+    <xs:annotation>
+      <xs:documentation>A single atomic traffic management action or ITS service that can be performed by a road operator or other ITS service provider.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="versionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Time stamp indicating when this version of the measure was created or updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_actionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ActionByReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a Traffic Management Plan action.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Action">
+        <xs:sequence>
+          <xs:element name="actionReference" type="tmp:_ActionDefinitionVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a Traffic Management Plan action.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_actionByReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ActionDefinition">
+    <xs:annotation>
+      <xs:documentation>Element of a Traffic Management Plan table which refers to the definition of an action.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Action">
+        <xs:sequence>
+          <xs:element name="externalIdentification" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>An external identifier for an action defined shared between data supplier and recepient during the Traffic Management Plan design phase.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="description" type="com:MultilingualString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Description of the action in natural language.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="actionImplementer" type="com:InternationalIdentifier" minOccurs="0" />
+          <xs:element name="operatorActionDefinition" type="tmp:OperatorActionDefinition" minOccurs="0" />
+          <xs:element name="activationDelay" type="tmp:ActivationDelay" minOccurs="0" />
+          <xs:element name="_actionDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="version" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ActivationConditions">
+    <xs:annotation>
+      <xs:documentation>Conditions governing the activation of a traffic management response element</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="automaticallyApproved" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Whether the association traffic management response element shall be automatically approved for implementation when the specified sccenario occurs and any specified trigger conditions are met. If false then manual approval is needed before implementation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="automaticallyImplemented" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Whether the associated traffic management response element is automatically implemented (after acceptance). If false, further triggering will be needed to fully implement the response.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="automaticallyDeactivated" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Whether the traffic management response elements that have been implemented are automatically deactivated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="activationDelay" type="tmp:ActivationDelay" minOccurs="0" />
+      <xs:element name="activationTrigger" type="tmp:TriggerCondition" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>conditions that trigger activation</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="deactivationTrigger" type="tmp:TriggerCondition" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>conditions that trigger deactivation</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_activationConditionsExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ActivationDelay">
+    <xs:annotation>
+      <xs:documentation>Intentional delays between trigger condition being met and a traffic management action or measure being implemented or deactivated.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="activationDelay" type="com:Seconds" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Intentional delay between trigger condition being met and a traffic management action or measure being implemented</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="deactivationDelay" type="com:Seconds" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Intentional delay between trigger condition being met and a traffic management action or measure being deactivated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_activationDelayExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CompositeMeasure">
+    <xs:annotation>
+      <xs:documentation>Measure that consists of a number of Measures</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Measure">
+        <xs:sequence>
+          <xs:element name="measure" type="tmp:Measure" minOccurs="2" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Measures that make up the composite measure. Where processing order is important and is not entailed by specified timing, the collection of Measure objects should be ordered to indicate processing order.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_compositeMeasureExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="version" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Condition" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Specifies a condition, which may be simple or compound</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="_conditionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GeneralInstructionOrMessageToRoadUsersDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a general instruction or message to road users</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="generalInstructionToRoadUsersType" type="sit:_GeneralInstructionToRoadUsersTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>General instruction that is issued by the network/road operator which is applicable to drivers and sometimes passengers.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="generalMessageToRoadUsers" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>General message that is issued by the network/road operator which is applicable to drivers and sometimes passengers, e.g. details about an amber alert (missing or abducted child alert).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_generalInstructionOrMessageToRoadUsersDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GeneralNetworkManagementDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a general network management action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="generalNetworkManagementType" type="sit:_GeneralNetworkManagementTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The type of traffic management action instigated by the network/road operator.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="trafficManuallyDirectedBy" type="sit:_PersonCategoryEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Type of person that is manually directing traffic (applicable if generalNetworkManagementType is set to "trafficBeingManuallyDirected").</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_generalNetworkManagementDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ImpactKind">
+    <xs:annotation>
+      <xs:documentation>The kind of impact on traffic.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="capacityReduced" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Whether the capacity of the affected section would be reduced by the related scenario or situation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="impactDetail" type="sit:Impact" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Further details of the kind of impact.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_impactKindExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Measure" abstract="true">
+    <xs:annotation>
+      <xs:documentation>A compound ITS service or set of one or more actions that can be performed by a road operator or other ITS service provider, and which work together to achieve an overall effect on traffic.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="versionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Time stamp indicating when this version of the measure was created or updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_measureExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MeasureByReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a Traffic Management Plan measure.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Measure">
+        <xs:sequence>
+          <xs:element name="measureReference" type="tmp:_MeasureDefinitionVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a Traffic Management Plan measure.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_measureByReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MeasureDefinition">
+    <xs:annotation>
+      <xs:documentation>Element of a Traffic Management Plan table which refers to the definition of a measure.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Measure">
+        <xs:sequence>
+          <xs:element name="externalIdentification" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>An external identifier for a measure defined shared between data supplier and recipient during the Traffic Management Plan design phase.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="description" type="com:MultilingualString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Description of the measure in natural language.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="responsibleRoadOperator" type="tmp:_OrganisationReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Road operator responsible for performing the measure</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="shortName" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Short human readable name for the Measure</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="action" type="tmp:Action" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Actions that make up the measure. Where processing order is important and is not entailed by specified timing, the collection of Action objects should be ordered to indicate processing order.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="responseType" type="tmp:ResponseType" minOccurs="0" />
+          <xs:element name="activationConditions" type="tmp:ActivationConditions" minOccurs="0" />
+          <xs:element name="_measureDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="version" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NetworkManagementDefinition" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Definition of a kind of network management action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:OperatorActionDefinition">
+        <xs:sequence>
+          <xs:element name="complianceOption" type="sit:_ComplianceOptionEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines whether the network management instruction or the control resulting from a network management action is advisory or mandatory.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="applicableForTrafficDirection" type="loc:_DirectionEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>The ultimate traffic direction to which the network management is applicable.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="applicableForTrafficType" type="sit:_TrafficTypeEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>The type of traffic to which the network management is applicable.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="placesAtWhichApplicable" type="sit:_PlacesEnum" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Places, in generic terms, at which the network management applies.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="automaticallyInitiated" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines whether the network management is initiated by an automatic system.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="forVehiclesWithCharacteristicsOf" type="com:VehicleCharacteristics" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>Characteristics of vehicles to which the network management applies</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_networkManagementDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NonPredefinedAction">
+    <xs:annotation>
+      <xs:documentation>An action needed to implement a non-predefined Traffic Management Plan scenario and/or strategy.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="nonPredefinedActionDescription" type="com:MultilingualString" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Description of the action needed to implement a specific non-predefined strategy.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="nonPredefinedActionId" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The common reference to an external identifier for a non-predefined action among, shared between data supplier and recepient, defined during the Traffic Management Plan design phase</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="actionImplementingSituationRecord" type="tmp:_SituationRecordVersionedReference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Reference to a SituationRecord which has been created to implement the requested action by the action implementer.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="internationalIdentifier" type="com:InternationalIdentifier" />
+      <xs:element name="operatorActionDefinition" type="tmp:OperatorActionDefinition" minOccurs="0" />
+      <xs:element name="_nonPredefinedActionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NonPredefinedTmplanOperation">
+    <xs:annotation>
+      <xs:documentation>Operational status of a non-predefined Traffic Management Plan.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:TmplanOperation">
+        <xs:sequence>
+          <xs:element name="nonPredefinedScenarioDescription" type="com:MultilingualString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Description of the non-predefined scenario in natural language</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="nonPredefinedScenarioId" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>An identifier to be used as a common reference for the non-predefined scenario shared between data supplier and recepient.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="nonPredefinedStrategyDescription" type="com:MultilingualString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Description of the non-predefined strategy in natural language.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="nonPredefinedStrategyId" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The common reference to an external identifier for the non-predefined strategy shared between data supplier and recepient.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="nonPredefinedAction" type="tmp:NonPredefinedAction" maxOccurs="unbounded" />
+          <xs:element name="_nonPredefinedTmplanOperationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OperatorActionDefinition" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Definition of a kind of action affecting road operation, which can be taken by an authorised operator.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="targetLocation" type="loc:LocationReference" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Location that is the target of the operator action</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_operatorActionDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OperatorActionExtendedTmplan">
+    <xs:annotation>
+      <xs:documentation>Extension class for OperatorAction.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="tmplanImplementingAction" type="tmp:TmplanImplementingAction" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PredefinedAction">
+    <xs:annotation>
+      <xs:documentation>Information about predefined action in Traffic Management Plan activation.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="actionImplementingSituationRecord" type="tmp:_SituationRecordVersionedReference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Reference to a situationRecord which has been created to implement the requested action by the action implementer.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="predefinedActionReference" type="tmp:_ActionDefinitionVersionedReference" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The reference to the specific action defined in a predefined Traffic Management Plan for which the situation record is an implementation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_predefinedActionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PredefinedMeasureSelected">
+    <xs:annotation>
+      <xs:documentation>Reference to the specific measure chosen to implement the requested Traffic Management Plan strategy.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="predefinedMeasureReference" type="tmp:_MeasureDefinitionVersionedReference" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Reference to the specific Measure chosen to implement the requested Traffic Management Plan strategy.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="predefinedAction" type="tmp:PredefinedAction" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_predefinedMeasureSelectedExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PredefinedTmplanOperation">
+    <xs:annotation>
+      <xs:documentation>Operation status of a predefined Traffic Management Plan.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:TmplanOperation">
+        <xs:sequence>
+          <xs:element name="tmplanTableReference" type="tmp:_TmplanTableVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to the Traffic Management Plan table which defines the Traffic Management Plan design information and references.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="predefinedScenarioReference" type="tmp:_ScenarioVersionedReference" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to a predefined Traffic Management Plan scenario which requires the current Traffic Management Plan activation.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="predefinedStrategyReference" type="tmp:_StrategyVersionedReference" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Reference to the predefined Traffic Management Plan strategy which is requested or implemented.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="predefinedMeasureSelected" type="tmp:PredefinedMeasureSelected" minOccurs="0" />
+          <xs:element name="problemLocationOverride" type="loc:LocationReference" minOccurs="0" />
+          <xs:element name="_predefinedTmplanOperationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReroutingManagementDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a rerouting action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="name" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A given name for the specific route management.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="type" type="rer:_ReroutingTypeEnum" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The type of rerouting.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="bindingTrafficRegulation" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Indicates that the rerouting information is a binding traffic regulation (i.e. shall be followed).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="preventiveMeasure" type="com:Boolean" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Indicates an action that is taken in advance (e.g. before an incident or traffic disruption occurs).</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="routingOrigin" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>A location serving as a geo-filter for routing itineraries that have their starting point within this location and for which this rerouting management should become applicable.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="routingThrough" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>A location serving as a geo-filter for routing itineraries that touch or pass through this location and for which this rerouting management should become applicable.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="routingDestination" type="loc:Location" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>A location serving as a geo-filter for routing itineraries that have their end point within this location and for which this rerouting management should become applicable.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="originalRoute" type="rer:RouteDescription" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>The original route, for which alternative routes are specified, which may be congested, blocked or closed.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="alternativeRoute" type="rer:RouteDescription" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>An alternative route on the transport network that provides a functionally equivalent but distinct route from the original route.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_reroutingManagementDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="ResponseEffectTypeEnum">
+    <xs:annotation>
+      <xs:documentation>Type of effect that a traffic management response is intended to have.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="capacityIncrease">
+        <xs:annotation>
+          <xs:documentation>the effect that is to increase flow capacity of a section of road</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="inflowReduction">
+        <xs:annotation>
+          <xs:documentation>the effect that is to reduce inflow to a section of road</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="outflowIncrease">
+        <xs:annotation>
+          <xs:documentation>the effect that is to increase the outflow from a section of road</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prewarning">
+        <xs:annotation>
+          <xs:documentation>the effect that is the provision of prior warning that traffic-affecting conditions or actions will occur</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="rerouting">
+        <xs:annotation>
+          <xs:documentation>the effect that is rerouting</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ResponseStageEnum">
+    <xs:annotation>
+      <xs:documentation>Stage at which response is used</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="prewarning">
+        <xs:annotation>
+          <xs:documentation>advanced notifcation of traffic-affecting conditions or actions</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="basic">
+        <xs:annotation>
+          <xs:documentation>used immediately in response to the scenario being active</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="trafficCondition">
+        <xs:annotation>
+          <xs:documentation>further response conditionally activated when needed due to the evolving traffic condition</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ResponseType">
+    <xs:annotation>
+      <xs:documentation>Classifications of traffic management response type</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="effect" type="tmp:_ResponseEffectTypeEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Intended effect of the associated response element(s).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="stage" type="tmp:_ResponseStageEnum" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Stage at which the associated response is used.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_responseTypeExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RoadOrCarriagewayOrLaneManagementDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a road or carriageway or lane management action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="roadOrCarriagewayOrLaneManagementType" type="sit:_RoadOrCarriagewayOrLaneManagementTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Type of road, carriageway or lane management action instigated by operator.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="minimumCarOccupancy" type="com:NonNegativeInteger" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>The minimum number of persons required in a vehicle in order for it to be allowed to transit the specified road section.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_roadOrCarriagewayOrLaneManagementDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoadsideAssistanceDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a roadside assistance action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:OperatorActionDefinition">
+        <xs:sequence>
+          <xs:element name="roadsideAssistanceType" type="sit:_RoadsideAssistanceTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Indicates the nature of the road side assistance that will be, is or has been provided.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_roadsideAssistanceDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Scenario">
+    <xs:annotation>
+      <xs:documentation>Predefined kind of road network situation with potential impact that would lead road operators to initiate traffic management. Identifies a subset of possible traffic situations. May be arbitrarily specific yet not fixed to a specific instance in time.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="externalIdentification" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>An external identifier for a Traffic Management Plan scenario, defined during the Traffic Management Plan design phase.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="versionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Time stamp indicating when this version of the scenario was created or updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="description" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Description of Traffic Management Plan scenario in natural language.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="situationType" type="sit:_CauseTypeEnum" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>The type(s) of situation that this scenario represents</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="emergencyServicesAccessibility" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Description of whether and how the emergency services can still use the road network in this scenario</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="name" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Human-readable name for the Scenario</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="scenarioDirector" type="tmp:_OrganisationReference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Organisation responsible for directing the scenario</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="situationFilter" type="com:String" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Filter expressions for traffic related situations to trigger this scenario. The filter language/expressions have to be defined individually.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="strategy" type="tmp:Strategy" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Traffic anagement strategies in response to the scenario. Where processing order is important and is not entailed by timing specifications, the collection of Strategy objects should be ordered to indicate processing order.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="impactKind" type="tmp:ImpactKind" minOccurs="0" />
+      <xs:element name="problemLocation" type="loc:LocationReference" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Location of the problem in this scenario</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="scheduledScenarioValidity" type="com:OverallPeriod" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>the time period(s) in which the scenario applies</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="situationTypeDetail" type="sit:DetailedCauseType" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>The specific kind(s) of situation which the scenario represents.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_scenarioExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="SignSetting">
+    <xs:annotation>
+      <xs:documentation>An operator action that sets the status of a VMS unit.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="signSettingDefinition" type="tmp:SignSettingDefinition" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SignSettingDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a sign setting action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="setting" type="vms:VmsControllerStatus" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>The setting to be made</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_signSettingDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpeedManagementDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a speed management action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="speedManagementType" type="sit:_SpeedManagementTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Type of speed management action instigated by operator.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="temporarySpeedLimit" type="com:KilometresPerHour" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Temporary limit defining the maximum advisory or mandatory speed of vehicles.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_speedManagementDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Strategy" abstract="true">
+    <xs:annotation>
+      <xs:documentation>A coherent set of one or more traffic management measures that aims to achieve some overall effect in response to a traffic management scenario.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="versionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Time stamp indicating when this version of the strategy was created or updated.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_strategyExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StrategyByReference">
+    <xs:annotation>
+      <xs:documentation>A reference to a Traffic Management Plan strategy.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Strategy">
+        <xs:sequence>
+          <xs:element name="strategyReference" type="tmp:_StrategyDefinitionVersionedReference" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A reference to a Traffic Management Plan strategy.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_strategyByReferenceExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StrategyDefinition">
+    <xs:annotation>
+      <xs:documentation>Element of a Traffic Management Plan table which refers to the definition of a strategy.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Strategy">
+        <xs:sequence>
+          <xs:element name="externalIdentification" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>An external identifier for a strategy defined shared between data supplier and recipient during the Traffic Management Plan design phase.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="description" type="com:MultilingualString" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Description of the strategy in natural language.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="shortName" type="com:String" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Short human readable name</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="priority" type="com:Integer" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Priority of this strategy compared to all other strategies that may exist. The higher the number, the higher the priority.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="strategyMeasure" type="tmp:StrategyMeasure" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>A Measure and how it is to be used in this strategy. Where processing order is important and this is not entailed by specified timing, the collection of StrategyMeasure objects should be ordered to indicate processing order.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="responseType" type="tmp:ResponseType" minOccurs="0" />
+          <xs:element name="overallActivation" type="tmp:ActivationConditions" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>conditions for the activation of the Strategy overall</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_strategyDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="version" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StrategyMeasure">
+    <xs:annotation>
+      <xs:documentation>A measure and how it is to be used within context of a strategy</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="processingIndex" type="com:Integer" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Indicates the order of processing of Measures within a Strategy. When implementing the Strategy, the Measure for a StrategyMeasure with a low processing index should be processed before that for a StrategyMeasure with a higher processing index.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="essentialForStrategy" type="com:Boolean" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Whether the Measure is essential for this Strategy, i.e. whether if the Measure cannot be implemented then the Stragegy shall not be implemented (or if running, shall not continue).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="activationConditions" type="tmp:ActivationConditions" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Activation conditions for the measure within the associated strategy. For that strategy only, these take precedence over any activation conditions specified by the Measure.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="measure" type="tmp:Measure" />
+      <xs:element name="_strategyMeasureExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TmplanImplementingAction">
+    <xs:annotation>
+      <xs:documentation>Represents the information of an OperatorAction which has been implemented or is planned based on a Traffic Management Plan activation request.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="nonPredefinedActionIdReference" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The common reference to an external identifier for a non-predefined action, shared between data supplier and recepient, defined during the Traffic Management Plan design phase.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="predefinedActionReference" type="tmp:_ActionDefinitionVersionedReference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The reference to the specific action defined in a predefined Traffic Management Plan for which the SituationRecord is an implementation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="predefinedMeasureReference" type="tmp:_MeasureDefinitionVersionedReference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The reference to the specific measure chosen to be implemented.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="predefinedStrategyReference" type="tmp:_StrategyDefinitionVersionedReference" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Reference to a strategy chosen to be implemented.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_tmplanImplementingActionExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TmplanOperation" abstract="true">
+    <xs:annotation>
+      <xs:documentation>The operation status in the lifecycle of a specific real-time Traffic Management Plan which is needed to manage after some scenario is running in the road network.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="creationTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Creation time of the Traffic Management Plan life cycle, i.e. the time when either an agreement or an implementation was requested.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="expiryTime" type="com:DateTime" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A timestamp after which the Traffic Management Plan is no further to be implemented.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="status" type="tmp:_TmplanOperationStatusEnum" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>The operational status of the Traffic Management Plan.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="statusReason" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Textual description for the reason of the current Traffic Management Plan operation status.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="versionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Timestamp for this current version of the operational status.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="involvedRoadOperatorConsensusRate" type="com:Percentage" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Ratio of agreement to participation of all partners affected by the TMP in the coordination process. Partners are those organisations whose approval is required to enact the TMP.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="headerInformation" type="com:HeaderInformation" />
+      <xs:element name="_tmplanOperationExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="TmplanOperationPublication">
+    <xs:annotation>
+      <xs:documentation>Publication to define a Traffic Management Plan operation.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="tmplanOperation" type="tmp:TmplanOperation" maxOccurs="unbounded" />
+          <xs:element name="_tmplanOperationPublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="TmplanOperationStatusEnum">
+    <xs:annotation>
+      <xs:documentation>The status of operation for a Traffic Management Plan.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="scheduled">
+        <xs:annotation>
+          <xs:documentation>The plan is scheduled for operation</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="schedulingAborted">
+        <xs:annotation>
+          <xs:documentation>Scheduling of the plan has been aborted</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="schedulingRejected">
+        <xs:annotation>
+          <xs:documentation>Proposed scheduling of the plan has been rejected</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="schedulingRequested">
+        <xs:annotation>
+          <xs:documentation>Scheduling of this plan is proposed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="_extended" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="TmplanTable">
+    <xs:annotation>
+      <xs:documentation>A set of consistent Traffic Management Plan information agreed among implementers when designing a Traffic Management Plan.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="externalIdentification" type="com:String" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Identification of the Traffic Management Plan table.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="versionTime" type="com:DateTime" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Time stamp of this version of the Traffic Management Plan table.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="description" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>A description for the Traffic Management Plan.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="scenario" type="tmp:Scenario" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="measure" type="tmp:Measure" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="action" type="tmp:Action" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="_tmplanTableExtension" type="com:_ExtensionType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="TmplanTablePublication">
+    <xs:annotation>
+      <xs:documentation>Publication to convey information about static definition of Traffic Management Plan related information defined at design phase.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="com:PayloadPublication">
+        <xs:sequence>
+          <xs:element name="headerInformation" type="com:HeaderInformation" />
+          <xs:element name="tmplanTable" type="tmp:TmplanTable" maxOccurs="unbounded" />
+          <xs:element name="_tmplanTablePublicationExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TrafficSignalSettingDefinition">
+    <xs:annotation>
+      <xs:documentation>Action to affect traffic signals (of the red/amber/green variety)</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="setting" type="com:String" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Definition of the setting. This may be the identifier of a preset timing plan or command, or even a complete definition using an agreed expression language.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_trafficSignalSettingDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TriggerCondition">
+    <xs:annotation>
+      <xs:documentation>Specifies a condition for triggering traffic management - either to activate or deactivate</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:Condition">
+        <xs:sequence>
+          <xs:element name="triggerDefinition" type="com:String" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A formal or informal definition of a trigger condition, either human readable or machine-interpretable. If the definition is machine interpretable, the expression language should be specified in documention of the service publishing the conditions.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="description" type="com:MultilingualString" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Human-readable description of the trigger</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_triggerConditionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WinterDrivingManagementDefinition">
+    <xs:annotation>
+      <xs:documentation>Definition of a winter driving management action</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tmp:NetworkManagementDefinition">
+        <xs:sequence>
+          <xs:element name="winterEquipmentManagementType" type="com:_WinterEquipmentManagementTypeEnum" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Type of winter equipment management action instigated by operator.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="_winterDrivingManagementDefinitionExtension" type="com:_ExtensionType" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>
