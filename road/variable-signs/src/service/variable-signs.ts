@@ -237,7 +237,7 @@ function createD2LogicalModel223(
 
 // Extra namespace declarations added in Datex II 3.7
 const DATEX2_37_EXTRA_NAMESPACES =
-  `\n    xmlns:afac="http://datex2.eu/schema/3/afirFacilities"` +
+  `    xmlns:afac="http://datex2.eu/schema/3/afirFacilities"` +
   `\n    xmlns:aegi="http://datex2.eu/schema/3/afirEnergyInfrastructure"` +
   `\n    xmlns:tro="http://datex2.eu/schema/3/trafficRegulation"` +
   `\n    xmlns:cz="http://datex2.eu/schema/3/controlledZone"` +
