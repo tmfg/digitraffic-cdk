@@ -6,7 +6,8 @@ import { IntegrationApi } from "./integration-api.js";
 import { PublicApi } from "./public-api.js";
 
 export interface VariableSignsProperties extends StackConfiguration {
-  readonly enableDatex35: boolean;
+  readonly enableDatexII35: boolean;
+  readonly enableDatexII37: boolean;
 }
 
 export class VariableSignsCdkStack extends DigitrafficStack {

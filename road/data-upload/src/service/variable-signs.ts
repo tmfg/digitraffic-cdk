@@ -6,7 +6,8 @@ import type { DataIncomingDb } from "../dao/data.js";
 import { getNewData, updateStatus } from "../dao/data.js";
 import { updateDatex2 } from "../dao/variable-signs.js";
 import { Datex2Version, SOURCES, TYPES } from "../model/types.js";
-import { parseDatex } from "./vs-datex2-35-parser.js";
+import { parseDatex35 } from "./vs-datex2-35-parser.js";
+import { parseDatex37 } from "./vs-datex2-37-parser.js";
 import { parseSituations223 } from "./vs-datex2-223-parser.js";
 
 export type DatexType = "SITUATION" | "CONTROLLER_STATUS" | "CONTROLLER";
@@ -51,8 +52,10 @@ async function handleVariableSign(
   const method = "VariableSignsService.handleVariableSign";
   let updated223Count = 0;
   let updated35Count = 0;
+  let updated37Count = 0;
   let error223Count = 0;
   let error35Count = 0;
+  let error37Count = 0;
   let unknownCount = 0;
   const xml = data.data;
   const started = Date.now();
@@ -93,7 +96,7 @@ async function handleVariableSign(
     }
 
     case Datex2Version["3.5"]: {
-      const datexFiles = await parseDatex(xml);
+      const datexFiles = await parseDatex35(xml);
 
       if (datexFiles.length === 0) {
         logger.debug(`No datex files parsed from ${data.data_id}!`);
@@ -120,6 +123,35 @@ async function handleVariableSign(
 
       break;
     }
+
+    case Datex2Version["3.7"]: {
+      const datexFiles37 = await parseDatex37(xml);
+
+      if (datexFiles37.length === 0) {
+        logger.debug(`No datex files parsed from ${data.data_id}!`);
+      }
+
+      await Promise.allSettled(
+        datexFiles37.map(async (df) => {
+          updated37Count++;
+          try {
+            await updateDatex2(
+              db,
+              df.id,
+              data.version,
+              df.type,
+              df.datex2,
+              df.effectDate,
+            );
+          } catch (error) {
+            logException(logger, error);
+            error37Count++;
+          }
+        }),
+      );
+
+      break;
+    }
     default:
       unknownCount++;
       logger.error({
@@ -140,6 +172,13 @@ async function handleVariableSign(
     customDatexVersion: Datex2Version["3.5"],
     customUpdatedCount: updated35Count,
     customErrorCount: error35Count,
+  });
+
+  logger.info({
+    method,
+    customDatexVersion: Datex2Version["3.7"],
+    customUpdatedCount: updated37Count,
+    customErrorCount: error37Count,
   });
 
   logger.info({

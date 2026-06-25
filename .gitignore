@@ -79,4 +79,8 @@
 
 # Always ignored at last
 .DS_Store
+
+# VS Code workspace settings (shared editor config)
+!/.vscode/
+!/.vscode/settings.json
 tools/vitest/node_modules

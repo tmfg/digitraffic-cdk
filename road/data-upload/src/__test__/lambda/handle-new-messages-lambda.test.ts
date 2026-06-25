@@ -79,5 +79,21 @@ describe(
       await assertDataCount(db, 1, "PROCESSED");
       await assertVsDatex2Count(db, 2);
     });
+
+    test("handle one vs 3.7 metadata", async () => {
+      await insertData(
+        db,
+        "test123",
+        SOURCES.API,
+        Datex2Version["3.7"],
+        TYPES.VMS_DATEX2_METADATA_XML,
+        TEST_DATEX2_VMS_TABLE_PUBLICATION,
+      );
+      await assertDataCount(db, 1, "NEW");
+
+      await getResponseFromLambda();
+      await assertDataCount(db, 1, "PROCESSED");
+      await assertVsDatex2Count(db, 2);
+    });
   }),
 );

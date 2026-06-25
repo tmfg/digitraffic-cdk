@@ -90,7 +90,8 @@
         "common/config/rush/*.json",
         "**/rig.json",
         "**/config/*.json",
-        "**/tsconfig-esm.json"
+        "**/tsconfig-esm.json",
+        ".vscode/*.json"
       ],
       "json": {
         "parser": {

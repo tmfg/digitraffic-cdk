@@ -23,7 +23,6 @@ interface SituationPublication {
 
 interface VmsControllerStatus {
   "vms:vmsControllerReference": IdentityAttribute[];
-
   "vms:statusUpdateTime": Date[];
 }
 
@@ -32,7 +31,7 @@ interface VmsControllerTable {
   "vms:vmsController": VmsController[];
 }
 
-export interface Datex35File {
+export interface Datex37File {
   "sit:situationPublication": SituationPublication;
   "d2:payload": {
     $: {
@@ -45,8 +44,8 @@ export interface Datex35File {
   };
 }
 
-export async function parseDatex35(datex2: string): Promise<DatexFile[]> {
-  const xml = (await parseStringPromise(datex2)) as Datex35File;
+export async function parseDatex37(datex2: string): Promise<DatexFile[]> {
+  const xml = (await parseStringPromise(datex2)) as Datex37File;
 
   logger.debug(`xml ${JSON.stringify(xml)}`);
 
@@ -73,7 +72,7 @@ function getSituations(publication: SituationPublication): DatexFile[] {
   return publication["sit:situation"].map(parseSituation);
 }
 
-function getType(datex2: Datex35File): DatexType {
+function getType(datex2: Datex37File): DatexType {
   if (!datex2) {
     throw new Error("unknown datex type");
   }

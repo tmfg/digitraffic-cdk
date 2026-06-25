@@ -1,7 +1,7 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
-import { findStatusesDatex2_35 } from "../../service/variable-signs.js";
+import { findControllersDatex2_37 } from "../../service/variable-signs.js";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -10,13 +10,13 @@ export const handler = () => {
 
   return proxyHolder
     .setCredentials()
-    .then(() => findStatusesDatex2_35())
+    .then(() => findControllersDatex2_37())
     .then(([datex, lastModified]) =>
       LambdaResponseBuilder.create(datex).withTimestamp(lastModified).build(),
     )
     .finally(() => {
       logger.info({
-        method: "GetStatusesDatex2-35.handler",
+        method: "GetControllersDatex2-37.handler",
         tookMs: Date.now() - start,
       });
     });

@@ -12,6 +12,7 @@ export const TYPES = {
 export type DataStatus = "NEW" | "FAILED" | "PROCESSED";
 
 export const Datex2Version = {
-  "3.5": "DATEXII_3_5",
   "2.2.3": "DATEXII_2_2_3",
+  "3.5": "DATEXII_3_5",
+  "3.7": "DATEXII_3_7",
 } as const;

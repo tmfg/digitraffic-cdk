@@ -13,6 +13,7 @@ import { createInternalLambdas } from "./internal-lambas.js";
 
 export interface DataUploadConfiguration extends StackConfiguration {
   readonly rttiTopicArn?: string;
+  readonly sendMqtt?: boolean;
 }
 
 export class DataUploadStack extends DigitrafficStack {
@@ -30,7 +31,12 @@ export class DataUploadStack extends DigitrafficStack {
       this.createRttiSqsReader(configuration.rttiTopicArn);
     }
 
-    createInternalLambdas(this, dataQueue, mqttQueue);
+    createInternalLambdas(
+      this,
+      dataQueue,
+      mqttQueue,
+      configuration.sendMqtt !== false,
+    );
 
     new IntegrationApi(this, dataQueue);
   }

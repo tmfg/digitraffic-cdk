@@ -18,3 +18,9 @@
 !/src/__test__/**/*.xml
 /src/bin
 
+!/resources/
+!/resources/**/
+!/resources/**/*.xsd
+!/resources/**/*.md
+!/resources/**/*.sel
+!/resources/**/*.log

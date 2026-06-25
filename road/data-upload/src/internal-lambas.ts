@@ -10,11 +10,16 @@ export function createInternalLambdas(
   stack: DigitrafficStack,
   dataQueue: Queue,
   mqttQueue: Queue,
+  sendMqtt: boolean,
 ): void {
   const deleteLambda = createDeleteOldData(stack);
   Scheduler.everyHour(stack, "DeleteOldMessagesRule", deleteLambda);
 
-  const handleNewMessages = createHandleNewMessagesLambda(stack, mqttQueue);
+  const handleNewMessages = createHandleNewMessagesLambda(
+    stack,
+    mqttQueue,
+    sendMqtt,
+  );
   dataQueue.grantConsumeMessages(handleNewMessages);
   mqttQueue.grantSendMessages(handleNewMessages);
 
@@ -50,10 +55,13 @@ function createMqttSendLambda(stack: DigitrafficStack): AwsFunction {
 function createHandleNewMessagesLambda(
   stack: DigitrafficStack,
   mqttQueue: Queue,
+  sendMqtt: boolean,
 ): AwsFunction {
-  return FunctionBuilder.create(stack, "handle-new-messages")
-    .withEnvironment({
+  const builder = FunctionBuilder.create(stack, "handle-new-messages");
+  if (sendMqtt) {
+    builder.withEnvironment({
       MQTT_QUEUE_URL: mqttQueue.queueUrl,
-    })
-    .build();
+    });
+  }
+  return builder.build();
 }

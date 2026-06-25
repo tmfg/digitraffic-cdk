@@ -1,5 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { InputError } from "@digitraffic/common/dist/types/input-error";
 import * as TextConverterService from "../../service/text-converter.js";
 
@@ -11,22 +11,20 @@ interface GetSignImageEvent {
  * Update IMPLEMENTATION_LAST_MODIFIED when ever making changes to implementation.
  */
 const IMPLEMENTATION_LAST_MODIFIED = new Date("2022-11-24T00:00:00Z");
-export const handler = async (
-  event: GetSignImageEvent,
-): Promise<LambdaResponse> => {
+export const handler = async (event: GetSignImageEvent) => {
   const start = Date.now();
   const text = event.text;
 
   try {
     return Promise.resolve(
-      LambdaResponse.ok(
-        TextConverterService.convertTextToSvg(text),
-      ).withTimestamp(IMPLEMENTATION_LAST_MODIFIED),
+      LambdaResponseBuilder.create(TextConverterService.convertTextToSvg(text))
+        .withTimestamp(IMPLEMENTATION_LAST_MODIFIED)
+        .build(),
     );
   } catch (e) {
     // bad user input -> 400
     if (e instanceof InputError) {
-      return Promise.resolve(LambdaResponse.badRequest(e.message));
+      return Promise.resolve(LambdaResponseBuilder.badRequest(e.message));
     }
 
     logger.error({
@@ -36,7 +34,7 @@ export const handler = async (
     });
 
     // other errors -> 500
-    return Promise.resolve(LambdaResponse.internalError());
+    return Promise.resolve(LambdaResponseBuilder.internalError());
   } finally {
     logger.info({
       method: "GetSignImage.handler",

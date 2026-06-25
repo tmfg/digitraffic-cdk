@@ -78,7 +78,10 @@ async function handleRtti(db: DTDatabase, data: DataIncomingDb) {
             QueueUrl: SQS_URL.value,
           });
         } else {
-          logger.debug("Skipping MQTT message sending, no SQS URL configured");
+          logger.info({
+            method,
+            message: "Skipping MQTT message sending, no SQS URL configured",
+          });
         }
       } catch (error) {
         logException(logger, error);
