@@ -19,7 +19,7 @@ idna = "3.15"
 moto = {version = "5.1.22", extras = ["s3"]}
 requests-mock = "1.12.1"
 # Transitive dependencies of moto
-cryptography = "46.0.7"
+cryptography = "48.0.1"
 boto3 = "1.42.92"
 botocore = "1.42.92"
 s3transfer = "0.16.0"
