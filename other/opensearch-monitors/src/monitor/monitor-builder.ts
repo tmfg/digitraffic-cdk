@@ -27,6 +27,18 @@ import {
   triggerWhenSumOutside,
 } from "./triggers.js";
 
+/**
+ * Utilities and a fluent builder for composing OpenSearch monitor definitions.
+ *
+ * The builder combines:
+ * - query filters (`and`/`not`) and environment scoping
+ * - a rolling time window (`rangeInMinutes` with optional delayed end)
+ * - optional aggregations
+ * - exactly one trigger condition/action set
+ *
+ * `build()` returns the final `OSMonitor` payload consumed by monitor deployment.
+ */
+
 export type OsDomain =
   | "marine"
   | "road"
@@ -193,6 +205,12 @@ function getThrottle(config: MonitorConfig): number {
 }
 
 export class OsMonitorBuilder {
+  /**
+   * Builds a single OpenSearch monitor from `MonitorConfig` + fluent query/trigger steps.
+   *
+   * By default the trigger is "line count more than 0" until replaced by methods
+   * like `notInRange`, `sum`, `moreThan`, or `always`.
+   */
   readonly config: MonitorConfig;
 
   readonly name: string;
@@ -350,6 +368,7 @@ export class OsMonitorBuilder {
   }
 
   sum(field: string, betweenLower: number, betweenUpper: number): this {
+    // Keep MB aggregation for trigger comparison and legacy compatibility.
     this.aggs[`sum_${field}`] = {
       scripted_metric: {
         init_script: "state.responses = ['total': 0L]",
@@ -357,6 +376,17 @@ export class OsMonitorBuilder {
         combine_script: "state.responses",
         reduce_script:
           "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000));",
+      },
+    };
+
+    // Additional GB aggregation used by alert subjects for easier comparison.
+    this.aggs[`sum_${field}_gb`] = {
+      scripted_metric: {
+        init_script: "state.responses = ['total': 0L]",
+        map_script: "state.responses.total+= doc['bytes'].value",
+        combine_script: "state.responses",
+        reduce_script:
+          "def sum = ['total': 0L]; for (responses in states) { sum.total += responses['total']; } return (sum.total / (1000*1000*1000));",
       },
     };
 
@@ -387,6 +417,7 @@ export class OsMonitorBuilder {
   }
 
   build(): OSMonitor {
+    // Build a rolling time-window query: now-rangeInMinutes .. now (or delayed end).
     return {
       name: this.name,
       cron: this.cron,

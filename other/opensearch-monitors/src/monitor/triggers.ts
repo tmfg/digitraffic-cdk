@@ -129,10 +129,12 @@ function buildSumRangeSubject(
   name: string,
   runbookSearchLink: string,
   field: string,
-  lower: number,
-  upper: number,
+  lowerMb: number,
+  upperMb: number,
 ): string {
-  return `${withRunbookName(name, runbookSearchLink)} should be between ${lower} MB and ${upper} MB, was {{ctx.results.0.aggregations.sum_${field}.value}} MB`;
+  const lowerGb = lowerMb / 1000;
+  const upperGb = upperMb / 1000;
+  return `${withRunbookName(name, runbookSearchLink)} should be between ${lowerGb} GB and ${upperGb} GB (${lowerMb} MB and ${upperMb} MB), was {{ctx.results.0.aggregations.sum_${field}_gb.value}} GB ({{ctx.results.0.aggregations.sum_${field}.value}} MB)`;
 }
 
 export function triggerWhenSumOutside(
