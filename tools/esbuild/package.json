@@ -21,7 +21,7 @@
     "test": "echo 'No tests implemented'"
   },
   "dependencies": {
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "globby": "16.2.0"
   },
   "devDependencies": {

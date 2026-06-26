@@ -43,7 +43,7 @@
     "@vitest/coverage-v8": "4.1.6",
     "aws-cdk": "2.1122.0",
     "es-toolkit": "1.46.1",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "typescript": "5.9.3",
     "vitest": "4.1.6"
   }

@@ -61,7 +61,7 @@
     "@types/node": "24.12.2",
     "@vitest/coverage-v8": "4.1.6",
     "aws-cdk": "2.1122.0",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "parallelshell": "3.0.2",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",

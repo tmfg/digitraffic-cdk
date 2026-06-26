@@ -47,7 +47,7 @@
     "@vitest/coverage-v8": "4.1.6",
     "aws-cdk": "2.1122.0",
     "dotenv": "17.4.2",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "nock": "15.0.0",
     "node-mocks-http": "1.17.2",
     "parallelshell": "3.0.2",

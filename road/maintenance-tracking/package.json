@@ -46,7 +46,7 @@
     "@types/sinon": "21.0.1",
     "@vitest/coverage-v8": "4.1.6",
     "aws-cdk": "2.1122.0",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "parallelshell": "3.0.2",
     "sinon": "22.0.0",
     "typescript": "5.9.3",
