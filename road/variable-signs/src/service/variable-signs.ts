@@ -3,8 +3,7 @@ import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { findAll } from "../db/datex2.js";
 import { isProductionMessage } from "./filtering-service.js";
 
-const DATEX2_223_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<d2LogicalModel modelBaseVersion="2"
+const DATEX2_223_TEMPLATE = `<d2LogicalModel modelBaseVersion="2"
                 xsi:schemaLocation="http://datex2.eu/schema/2/2_0 https://tie.digitraffic.fi/schemas/datex2/DATEXIISchema_2_2_3_with_definitions_FI.xsd"
                 xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <exchange>
@@ -24,8 +23,7 @@ const DATEX2_223_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="ye
 </d2LogicalModel>
 `;
 
-const DATEX2_SITUATION_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sit:situationPublication lang="fi" modelBaseVersion="3" 
+const DATEX2_SITUATION_PUBLICATION_35_TEMPLATE = `<sit:situationPublication lang="fi" modelBaseVersion="3" 
     xmlns:com="http://datex2.eu/schema/3/common"
 	  xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
     xmlns:roa="http://datex2.eu/schema/3/roadTrafficData"
@@ -50,8 +48,7 @@ const DATEX2_SITUATION_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="
 </sit:situationPublication>
 `;
 
-const DATEX2_VMS_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<d2:payload xsi:type="vms:VmsPublication"
+const DATEX2_VMS_PUBLICATION_35_TEMPLATE = `<d2:payload xsi:type="vms:VmsPublication"
     xmlns:com="http://datex2.eu/schema/3/common"
     xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
     xmlns:roa="http://datex2.eu/schema/3/roadTrafficData"
@@ -80,8 +77,7 @@ const DATEX2_VMS_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"
     STATUSES
 </d2:payload>`;
 
-const DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<d2:payload xsi:type="vms:VmsTablePublication"
+const DATEX2_VMS_TABLE_PUBLICATION_35_TEMPLATE = `<d2:payload xsi:type="vms:VmsTablePublication"
     xmlns:com="http://datex2.eu/schema/3/common"
     xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
     xmlns:roa="http://datex2.eu/schema/3/roadTrafficData"
