@@ -19,15 +19,14 @@ export function create(
   udotSqs: Queue,
   dlq: Queue,
   dlqBucketName: string,
-  dbWriterHost: string,
 ): void {
   const dlqBucket = createDLQBucket(stack, dlqBucketName);
-  createProcessRosmQueueLambda(stack, rosmSqs, dlq, dbWriterHost);
-  createProcessSmQueueLambda(stack, smSqs, udotSqs, dlq, dbWriterHost);
-  createProcessUdotQueueLambda(stack, udotSqs, dlq, dbWriterHost);
+  createProcessRosmQueueLambda(stack, rosmSqs, dlq);
+  createProcessSmQueueLambda(stack, smSqs, udotSqs, dlq);
+  createProcessUdotQueueLambda(stack, udotSqs, dlq);
   createProcessDLQLambda(stack, dlq, dlqBucket);
 
-  createDeleteOldDataLambda(stack, dbWriterHost);
+  createDeleteOldDataLambda(stack);
 }
 
 function createDLQBucket(stack: DigitrafficStack, bucketName: string): Bucket {
@@ -41,13 +40,11 @@ function createProcessRosmQueueLambda(
   stack: DigitrafficStack,
   queue: Queue,
   dlq: Queue,
-  dbWriterHost: string,
 ): MonitoredFunction {
   const lambdaEnv = {
     ...(stack.configuration.secretId && {
       SECRET_ID: stack.configuration.secretId,
     }),
-    DB_URI: dbWriterHost,
     DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
   };
@@ -74,13 +71,11 @@ function createProcessSmQueueLambda(
   smQueue: Queue,
   udotQueue: Queue,
   dlq: Queue,
-  dbWriterHost: string,
 ): MonitoredFunction {
   const lambdaEnv = {
     ...(stack.configuration.secretId && {
       SECRET_ID: stack.configuration.secretId,
     }),
-    DB_URI: dbWriterHost,
     DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
     [RamiEnvKeys.UDOT_SQS_URL]: udotQueue.queueUrl,
@@ -114,13 +109,11 @@ function createProcessUdotQueueLambda(
   stack: DigitrafficStack,
   queue: Queue,
   dlq: Queue,
-  dbWriterHost: string,
 ): MonitoredFunction {
   const lambdaEnv = {
     ...(stack.configuration.secretId && {
       SECRET_ID: stack.configuration.secretId,
     }),
-    DB_URI: dbWriterHost,
     DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
   };
@@ -146,15 +139,11 @@ function createProcessUdotQueueLambda(
   return processQueueLambda;
 }
 
-function createDeleteOldDataLambda(
-  stack: DigitrafficStack,
-  dbWriterHost: string,
-): MonitoredFunction {
+function createDeleteOldDataLambda(stack: DigitrafficStack): MonitoredFunction {
   const lambdaEnv = {
     ...(stack.configuration.secretId && {
       SECRET_ID: stack.configuration.secretId,
     }),
-    DB_URI: dbWriterHost,
     DB_APPLICATION: "avoindata",
   };
   const deleteOldDataLambda = MonitoredDBFunction.create(

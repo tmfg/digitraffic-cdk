@@ -12,8 +12,6 @@ import { PublicApi } from "./public-api.js";
 export interface RamiConfiguration extends StackConfiguration {
   readonly dlqBucketName: string;
   readonly dlqNotificationDuration?: Duration;
-  readonly dbWriterHost: string;
-  readonly dbReaderHost: string;
 }
 export class RamiStack extends DigitrafficStack {
   constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
@@ -33,10 +31,9 @@ export class RamiStack extends DigitrafficStack {
       udotSqs,
       dlq,
       configuration.dlqBucketName,
-      configuration.dbWriterHost,
     );
 
-    const publicApi = new PublicApi(this, configuration.dbReaderHost);
+    const publicApi = new PublicApi(this);
     publicApi.publicApi.exportEndpoint();
     if (!this.secret) throw new Error("secret not found");
     Canaries.create(this, dlq, publicApi, this.secret);

@@ -12,17 +12,12 @@ interface MysqlOpts {
   database: string;
 }
 
-/** Lambda environment variable names */
 export enum DatabaseEnvironmentKeys {
+  DB_USER = "DB_USER",
+  DB_PASS = "DB_PASS",
   DB_URI = "DB_URI",
   DB_RO_URI = "DB_RO_URI",
   DB_APPLICATION = "DB_APPLICATION",
-}
-
-/** Keys in the RDS secret (Secrets Manager) */
-enum RdsSecretKeys {
-  DB_USERNAME = "username",
-  DB_PASSWORD = "password",
 }
 
 const pool = await initMysqlDbConnection();
@@ -91,14 +86,22 @@ export async function inDatabase<T>(
 }
 
 export async function getOpts(): Promise<MysqlOpts> {
-  const secretId = getEnvVariable("SECRET_ID");
   return {
-    host: await getFromEnvOrSecret(DatabaseEnvironmentKeys.DB_URI, secretId),
-    user: await getFromEnvOrSecret(RdsSecretKeys.DB_USERNAME, secretId),
-    password: await getFromEnvOrSecret(RdsSecretKeys.DB_PASSWORD, secretId),
+    host: await getFromEnvOrSecret(
+      DatabaseEnvironmentKeys.DB_URI,
+      getEnvVariable("SECRET_ID"),
+    ),
+    user: await getFromEnvOrSecret(
+      DatabaseEnvironmentKeys.DB_USER,
+      getEnvVariable("SECRET_ID"),
+    ),
+    password: await getFromEnvOrSecret(
+      DatabaseEnvironmentKeys.DB_PASS,
+      getEnvVariable("SECRET_ID"),
+    ),
     database: await getFromEnvOrSecret(
       DatabaseEnvironmentKeys.DB_APPLICATION,
-      secretId,
+      getEnvVariable("SECRET_ID"),
     ),
   };
 }
