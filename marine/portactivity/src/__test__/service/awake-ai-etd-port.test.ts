@@ -16,13 +16,17 @@ import {
   AwakeAiVoyageStatus,
   AwakeAiZoneType,
 } from "../../api/awake-common.js";
+import {
+  OAuthTokenApi,
+  OAuthTokenResponse,
+} from "../../api/oauth-token-api.js";
 import { AwakeAiETDPortService } from "../../service/awake-ai-etd-port.js";
 import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil.js";
 
 describe("AwakeAiETDPortService", () => {
   test("getAwakeAiTimestamps - filter Digitraffic ETD predictions", async () => {
     const api = createApi();
-    const service = new AwakeAiETDPortService(api);
+    const service = new AwakeAiETDPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtdResponse({
       voyageStatus: AwakeAiVoyageStatus.UNDER_WAY,
       predictionType: AwakeAiPredictionType.ETD,
@@ -41,7 +45,7 @@ describe("AwakeAiETDPortService", () => {
 
   test("getAwakeAiTimestamps - filter departure times in the past", async () => {
     const api = createApi();
-    const service = new AwakeAiETDPortService(api);
+    const service = new AwakeAiETDPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtdResponse({
       voyageStatus: AwakeAiVoyageStatus.UNDER_WAY,
       predictionType: AwakeAiPredictionType.ETD,
@@ -61,7 +65,7 @@ describe("AwakeAiETDPortService", () => {
 
   test("getAwakeAiTimestamps - filter non-ETD predictions", async () => {
     const api = createApi();
-    const service = new AwakeAiETDPortService(api);
+    const service = new AwakeAiETDPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtdResponse({
       predictionType: randomBoolean()
         ? AwakeAiPredictionType.ETA
@@ -78,7 +82,7 @@ describe("AwakeAiETDPortService", () => {
 
   test("getAwakeAiTimestamps - filter stopped voyages", async () => {
     const api = createApi();
-    const service = new AwakeAiETDPortService(api);
+    const service = new AwakeAiETDPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtdResponse({
       voyageStatus: AwakeAiVoyageStatus.STOPPED,
     });
@@ -93,7 +97,7 @@ describe("AwakeAiETDPortService", () => {
 
   test("getAwakeAiTimestamps - no schedule", async () => {
     const api = createApi();
-    const service = new AwakeAiETDPortService(api);
+    const service = new AwakeAiETDPortService(api, createOAuthTokenApi());
     const voyageTimestamp = createEtdResponse({
       excludeSchedule: true,
     });
@@ -108,7 +112,19 @@ describe("AwakeAiETDPortService", () => {
 });
 
 function createApi(): AwakeAiPortApi {
-  return new AwakeAiPortApi("", "");
+  return new AwakeAiPortApi("");
+}
+
+function createOAuthTokenApi(): OAuthTokenApi {
+  const oAuthTokenApi = new OAuthTokenApi({
+    oAuthTokenEndpoint: "",
+    oAuthClientId: "",
+    oAuthClientSecret: "",
+  });
+  vi.spyOn(oAuthTokenApi, "getOAuthToken").mockResolvedValue(
+    new OAuthTokenResponse("Bearer", 3600, "mock-token"),
+  );
+  return oAuthTokenApi;
 }
 
 function createEtdResponse(options?: {

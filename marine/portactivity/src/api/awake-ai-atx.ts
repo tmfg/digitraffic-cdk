@@ -29,7 +29,17 @@ export interface AwakeAISubscriptionMessage extends AwakeAiATXMessage {
   /**
    * Subscription id, equivalent to session id
    */
-  readonly subscriptionId: string;
+  readonly subscriptionId?: string;
+
+  /**
+   * Status of the subscription (e.g. "active", "failed")
+   */
+  readonly status?: string;
+
+  /**
+   * Error message when status is "failed"
+   */
+  readonly message?: string;
 }
 
 export interface AwakeAIATXTimestampMessage extends AwakeAiATXMessage {
@@ -108,28 +118,38 @@ const ssm = new SSMClient({});
 
 export class AwakeAiATXApi {
   private readonly url: string;
-  private readonly apiKey: string;
   private readonly webSocketClass: new (
     url: string | URL,
+    options?: object,
   ) => WebSocket;
 
   constructor(
     url: string,
-    apiKey: string,
-    webSocketClass: new (url: string | URL) => WebSocket,
+    webSocketClass: new (url: string | URL, options?: object) => WebSocket,
   ) {
     this.url = url;
-    this.apiKey = apiKey;
     this.webSocketClass = webSocketClass;
   }
 
-  async getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
-    const subscriptionId = await this.getFromParameterStore(
+  private static readonly EMPTY_SUBSCRIPTION_ID = "NONE";
+
+  async getATXs(
+    accessToken: string,
+    timeoutMillis: number,
+  ): Promise<AwakeAIATXTimestampMessage[]> {
+    const storedSubscriptionId = await this.getFromParameterStore(
       ssm,
       PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
     );
+    const subscriptionId =
+      storedSubscriptionId !== AwakeAiATXApi.EMPTY_SUBSCRIPTION_ID
+        ? storedSubscriptionId
+        : undefined;
 
-    const webSocket = new this.webSocketClass(this.url + this.apiKey);
+    const webSocket = new this.webSocketClass(this.url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
     webSocket.on("open", () => {
       const startMessage = subscriptionId
         ? AwakeAiATXApi.createResumeMessage(subscriptionId)
@@ -144,27 +164,45 @@ export class AwakeAiATXApi {
 
       switch (message.msgType) {
         case AwakeAiATXEventType.SUBSCRIPTION_STATUS: {
-          const receivedSubscriptionId = (message as AwakeAISubscriptionMessage)
-            .subscriptionId;
-          if (receivedSubscriptionId !== subscriptionId) {
+          logger.debug({
+            method: "AwakeAiATXApi.getATXs",
+            message: `Received subscription-status: ${messageRaw}`,
+          });
+          const subscriptionMessage = message as AwakeAISubscriptionMessage;
+          if (subscriptionMessage.status === "failed") {
+            logger.warn({
+              method: "AwakeAiATXApi.getATXs",
+              message: `Subscription resume failed: ${subscriptionMessage.message ?? "unknown reason"}, clearing stale subscription ID`,
+            });
+            this.putInParameterStore(
+              ssm,
+              PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
+              AwakeAiATXApi.EMPTY_SUBSCRIPTION_ID,
+            ).catch((error) => logException(logger, error));
+            break;
+          }
+          const receivedSubscriptionId = subscriptionMessage.subscriptionId;
+          if (
+            receivedSubscriptionId &&
+            receivedSubscriptionId !== subscriptionId
+          ) {
             this.putInParameterStore(
               ssm,
               PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
               receivedSubscriptionId,
-            )
-              .then(() =>
-                logger.info({
-                  method: "AwakeAiATXApi.getATXs",
-                  message: `Updated subscriptionId to ${receivedSubscriptionId}`,
-                }),
-              )
-              .catch((error) => logException(logger, error));
+            ).catch((error) => logException(logger, error));
           }
           break;
         }
-        case AwakeAiATXEventType.EVENT:
-          atxs.push(message as AwakeAIATXTimestampMessage);
+        case AwakeAiATXEventType.EVENT: {
+          const atxEvent = message as AwakeAIATXTimestampMessage;
+          logger.debug({
+            method: "AwakeAiATXApi.getATXs",
+            message: `Received event: mmsi=${atxEvent.mmsi} imo=${atxEvent.imo} zone=${atxEvent.zoneName} zoneType=${atxEvent.zoneType} zoneEvent=${atxEvent.zoneEventType} eventId=${atxEvent.eventId}`,
+          });
+          atxs.push(atxEvent);
           break;
+        }
         default:
           logger.warn({
             method: "AwakeAiATXApi.getATXs",
@@ -206,10 +244,10 @@ export class AwakeAiATXApi {
     try {
       const command = new GetParameterCommand({ Name: parameterName });
       const response = await ssm.send(command);
-      return Promise.resolve(response.Parameter?.Value);
-    } catch (error: unknown) {
+      return response.Parameter?.Value;
+    } catch (error) {
       logException(logger, error);
-      return Promise.reject();
+      return undefined;
     }
   }
 

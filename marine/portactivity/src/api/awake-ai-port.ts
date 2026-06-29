@@ -30,11 +30,9 @@ export interface AwakeAiPortResponse {
 
 export class AwakeAiPortApi {
   private readonly url: string;
-  private readonly apiKey: string;
 
-  constructor(url: string, apiKey: string) {
+  constructor(url: string) {
     this.url = url;
-    this.apiKey = apiKey;
   }
 
   /**
@@ -44,6 +42,7 @@ export class AwakeAiPortApi {
    * @param maxSequenceNo Maximum number of preceding stops in multi-hop predictions.
    */
   async getPredictions(
+    accessToken: string,
     resource: AwakeAiPortResource,
     locode: string,
     predictionType: AwakeAiPredictionType,
@@ -57,15 +56,17 @@ export class AwakeAiPortApi {
         method: "AwakeAiPortApi.getPredictions",
         message: `calling URL ${url}`,
       });
+
       const response = await ky
         .get(url, {
           headers: {
-            Authorization: this.apiKey,
+            Authorization: `Bearer ${accessToken}`,
             Accept: MediaType.APPLICATION_JSON,
           },
           retry: 0,
         })
         .json();
+
       return {
         type: AwakeAiPortResponseType.OK,
         schedule: response as AwakeAiPortSchedule[],
@@ -84,10 +85,12 @@ export class AwakeAiPortApi {
   }
 
   async getETAs(
+    accessToken: string,
     locode: string,
     maxSequenceNo: number = 1,
   ): Promise<AwakeAiPortResponse> {
     return this.getPredictions(
+      accessToken,
       AwakeAiPortResource.ARRIVALS,
       locode,
       AwakeAiPredictionType.ETA,
@@ -96,10 +99,12 @@ export class AwakeAiPortApi {
   }
 
   async getETDs(
+    accessToken: string,
     locode: string,
     maxSequenceNo: number = 1,
   ): Promise<AwakeAiPortResponse> {
     return this.getPredictions(
+      accessToken,
       AwakeAiPortResource.DEPARTURES,
       locode,
       AwakeAiPredictionType.ETD,
@@ -113,6 +118,7 @@ export class AwakeAiPortApi {
         type: AwakeAiPortResponseType.NO_RESPONSE,
       };
     }
+
     switch (error.response.status) {
       case 404:
         return {

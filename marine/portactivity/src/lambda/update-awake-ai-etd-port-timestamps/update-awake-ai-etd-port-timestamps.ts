@@ -4,6 +4,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { SNSEvent } from "aws-lambda";
 import { AwakeAiPortApi } from "../../api/awake-ai-port.js";
+import { OAuthTokenApi } from "../../api/oauth-token-api.js";
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
 import type { UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
 import { AwakeAiETDPortService } from "../../service/awake-ai-etd-port.js";
@@ -13,7 +14,9 @@ const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 const expectedKeys = [
   PortactivitySecretKeys.AWAKE_URL,
-  PortactivitySecretKeys.AWAKE_AUTH,
+  PortactivitySecretKeys.AWAKE_OAUTH_TOKEN_ENDPOINT,
+  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
+  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
 ];
 
 const rdsHolder = RdsHolder.create();
@@ -33,9 +36,13 @@ export function handler(event: SNSEvent): Promise<void> {
       const locode = event.Records[0]?.Sns.Message as unknown as string;
 
       if (!service) {
-        service = new AwakeAiETDPortService(
-          new AwakeAiPortApi(secret.voyagesurl, secret.voyagesauth),
-        );
+        const oAuthTokenApi = new OAuthTokenApi({
+          oAuthTokenEndpoint: secret.oAuthTokenEndpoint,
+          oAuthClientId: secret.oAuthClientId,
+          oAuthClientSecret: secret.oAuthClientSecret,
+        });
+        const api = new AwakeAiPortApi(secret.voyagesurl);
+        service = new AwakeAiETDPortService(api, oAuthTokenApi);
       }
       const timestamps = await service.getAwakeAiTimestamps(locode);
 

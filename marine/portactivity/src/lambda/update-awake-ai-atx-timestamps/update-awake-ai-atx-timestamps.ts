@@ -6,6 +6,7 @@ import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { Context } from "aws-lambda";
 import WebSocket from "ws";
 import { AwakeAiATXApi } from "../../api/awake-ai-atx.js";
+import { OAuthTokenApi } from "../../api/oauth-token-api.js";
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
 import type { UpdateAwakeAiATXTimestampsSecret } from "../../model/secret.js";
 import { AwakeAiATXService } from "../../service/awake-ai-atx.js";
@@ -13,7 +14,9 @@ import { sendMessage } from "../../service/queue-service.js";
 
 const expectedKeys = [
   PortactivitySecretKeys.AWAKE_ATX_URL,
-  PortactivitySecretKeys.AWAKE_ATX_AUTH,
+  PortactivitySecretKeys.AWAKE_OAUTH_TOKEN_ENDPOINT,
+  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
+  PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
 ];
 
 const rdsHolder: RdsHolder = RdsHolder.create();
@@ -34,9 +37,13 @@ export async function handler(__: unknown, context: Context): Promise<void> {
     .setCredentials()
     .then(() => secretHolder.get())
     .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
-      const service = new AwakeAiATXService(
-        new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket),
-      );
+      const oAuthTokenApi = new OAuthTokenApi({
+        oAuthTokenEndpoint: secret.oAuthTokenEndpoint,
+        oAuthClientId: secret.oAuthClientId,
+        oAuthClientSecret: secret.oAuthClientSecret,
+      });
+      const api = new AwakeAiATXApi(secret.atxurl, WebSocket);
+      const service = new AwakeAiATXService(api, oAuthTokenApi);
 
       const timestamps = await service.getATXs(
         context.getRemainingTimeInMillis() - SQS_SEND_TIME,

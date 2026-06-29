@@ -31,11 +31,9 @@ export interface AwakeAiShipVoyageSchedule {
 
 export class AwakeAiETAShipApi {
   private readonly url: string;
-  private readonly apiKey: string;
 
-  constructor(url: string, apiKey: string) {
+  constructor(url: string) {
     this.url = url;
-    this.apiKey = apiKey;
   }
 
   /**
@@ -43,7 +41,11 @@ export class AwakeAiETAShipApi {
    * @param imo Ship IMO
    * @param locode Destination LOCODE. If set, overrides destination prediction.
    */
-  async getETA(imo: number, locode?: string): Promise<AwakeAiShipApiResponse> {
+  async getETA(
+    accessToken: string,
+    imo: number,
+    locode?: string,
+  ): Promise<AwakeAiShipApiResponse> {
     const start = Date.now();
     try {
       let url = `${this.url}/ship/${imo}?predictionMetadata=true`;
@@ -54,10 +56,11 @@ export class AwakeAiETAShipApi {
         method: "AwakeAiETAShipApi.getETA",
         message: `calling URL ${url}`,
       });
+
       const response = await ky
         .get(url, {
           headers: {
-            Authorization: this.apiKey,
+            Authorization: `Bearer ${accessToken}`,
             Accept: MediaType.APPLICATION_JSON,
           },
           retry: 0,

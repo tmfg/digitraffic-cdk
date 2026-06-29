@@ -4,6 +4,7 @@ import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import type { SNSEvent } from "aws-lambda";
 import { parseISO } from "date-fns";
 import { AwakeAiETAShipApi } from "../../api/awake-ai-ship.js";
+import { OAuthTokenApi } from "../../api/oauth-token-api.js";
 import type { DbETAShip } from "../../dao/timestamps.js";
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys.js";
 import type { UpdateAwakeAiETXTimestampsSecret } from "../../model/secret.js";
@@ -21,7 +22,12 @@ interface SnsETAShip extends Omit<DbETAShip, "eta"> {
 
 const secretHolder = SecretHolder.create<UpdateAwakeAiETXTimestampsSecret>(
   "awake",
-  [PortactivitySecretKeys.AWAKE_URL, PortactivitySecretKeys.AWAKE_AUTH],
+  [
+    PortactivitySecretKeys.AWAKE_URL,
+    PortactivitySecretKeys.AWAKE_OAUTH_TOKEN_ENDPOINT,
+    PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_ID,
+    PortactivitySecretKeys.AWAKE_OAUTH_CLIENT_SECRET,
+  ],
 );
 
 export const handler = (event: SNSEvent): Promise<void> => {
@@ -37,8 +43,15 @@ export const handler = (event: SNSEvent): Promise<void> => {
 
   return secretHolder.get().then(async (secret) => {
     if (!service) {
+      const oAuthTokenApi = new OAuthTokenApi({
+        oAuthTokenEndpoint: secret.oAuthTokenEndpoint,
+        oAuthClientId: secret.oAuthClientId,
+        oAuthClientSecret: secret.oAuthClientSecret,
+      });
+      const api = new AwakeAiETAShipApi(secret.voyagesurl);
       service = new AwakeAiETAShipService(
-        new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth),
+        api,
+        oAuthTokenApi,
         enableETBForAllPorts.toLowerCase() === "true",
       );
     }

@@ -12,6 +12,7 @@ import type {
   AwakeAiVoyageEtaPrediction,
 } from "../api/awake-common.js";
 import { AwakeAiVoyageStatus, AwakeAiZoneType } from "../api/awake-common.js";
+import type { OAuthTokenApi } from "../api/oauth-token-api.js";
 import type { DbETAShip } from "../dao/timestamps.js";
 import { EventSource } from "../model/eventsource.js";
 import type { Locode } from "../model/locode.js";
@@ -33,6 +34,7 @@ interface AwakeAiETAResponseAndShip {
 
 export class AwakeAiETAShipService {
   private readonly api: AwakeAiETAShipApi;
+  private readonly oAuthTokenApi: OAuthTokenApi;
 
   readonly overriddenDestinations: readonly Locode[] = [
     "FIHEL",
@@ -54,8 +56,13 @@ export class AwakeAiETAShipService {
 
   readonly enableETBForAllPorts: boolean;
 
-  constructor(api: AwakeAiETAShipApi, enableETBForAllPorts: boolean = false) {
+  constructor(
+    api: AwakeAiETAShipApi,
+    oAuthTokenApi: OAuthTokenApi,
+    enableETBForAllPorts: boolean = false,
+  ) {
     this.api = api;
+    this.oAuthTokenApi = oAuthTokenApi;
     this.enableETBForAllPorts = enableETBForAllPorts;
   }
 
@@ -101,7 +108,10 @@ export class AwakeAiETAShipService {
     });
     const locode = diffHours < 24 ? ship.locode : undefined;
 
-    const response = await retry(() => this.api.getETA(ship.imo, locode), 1);
+    const response = await retry(async () => {
+      const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
+      return this.api.getETA(oAuthToken.access_token, ship.imo, locode);
+    }, 1);
 
     logger.info({
       method: "AwakeAiETAShipService.getAwakeAiTimestamps",

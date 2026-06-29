@@ -2,6 +2,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { isBefore, parseISO } from "date-fns";
 import type { AwakeAiPortApi } from "../api/awake-ai-port.js";
 import { AwakeAiZoneType } from "../api/awake-common.js";
+import type { OAuthTokenApi } from "../api/oauth-token-api.js";
 import { EventSource } from "../model/eventsource.js";
 import type { ApiTimestamp } from "../model/timestamp.js";
 import {
@@ -13,9 +14,11 @@ import {
 
 export class AwakeAiETDPortService {
   private readonly api: AwakeAiPortApi;
+  private readonly oAuthTokenApi: OAuthTokenApi;
 
-  constructor(api: AwakeAiPortApi) {
+  constructor(api: AwakeAiPortApi, oAuthTokenApi: OAuthTokenApi) {
     this.api = api;
+    this.oAuthTokenApi = oAuthTokenApi;
   }
 
   private departureTimeInThePast(date: string): boolean {
@@ -23,7 +26,8 @@ export class AwakeAiETDPortService {
   }
 
   async getAwakeAiTimestamps(locode: string): Promise<ApiTimestamp[]> {
-    const resp = await this.api.getETDs(locode);
+    const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
+    const resp = await this.api.getETDs(oAuthToken.access_token, locode);
 
     logger.info({
       method: "AwakeAiETDPortService.getAwakeAiTimestamps",
