@@ -47,22 +47,22 @@ describe(
     async function updateLatestAndInsertData(
       reports: TheItemsSchema[],
     ): Promise<void> {
+      // Sequential awaits: t.batch over pre-invoked queries runs them
+      // concurrently on one connection, triggering the pg deprecation warning.
       // Update latest records to false
-      await db.tx((t) => {
-        const promises: Promise<null>[] = reports.map((report) =>
-          SseDb.updateLatestSiteToFalse(t, report.Site.SiteNumber),
-        );
-        return t.batch(promises);
+      await db.tx(async (t) => {
+        for (const report of reports) {
+          await SseDb.updateLatestSiteToFalse(t, report.Site.SiteNumber);
+        }
       });
       // Insert new latest records
-      await db.tx((t) => {
-        const promises: Promise<null>[] = reports.map((report) =>
-          SseDb.insertSseReportData(
+      await db.tx(async (t) => {
+        for (const report of reports) {
+          await SseDb.insertSseReportData(
             t,
             SseUpdateService.convertToDbSseReport(report),
-          ),
-        );
-        return t.batch(promises);
+          );
+        }
       });
     }
   }),

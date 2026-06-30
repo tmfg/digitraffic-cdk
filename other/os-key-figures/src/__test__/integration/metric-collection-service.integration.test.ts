@@ -60,6 +60,7 @@ describe("Integration Tests: MetricCollectionService.collectAndPersist", () => {
     // Set up MySQL connection for verification
     mysqlConnection = mysql.createConnection({
       host: TEST_CONFIG.mysql.host,
+      port: TEST_CONFIG.mysql.port,
       user: TEST_CONFIG.mysql.user,
       password: TEST_CONFIG.mysql.password,
       database: TEST_CONFIG.mysql.database,
@@ -68,6 +69,7 @@ describe("Integration Tests: MetricCollectionService.collectAndPersist", () => {
     // Create metric store
     metricStore = new MySqlMetricStore({
       host: TEST_CONFIG.mysql.host,
+      port: TEST_CONFIG.mysql.port,
       user: TEST_CONFIG.mysql.user,
       password: TEST_CONFIG.mysql.password,
       database: TEST_CONFIG.mysql.database,

@@ -218,6 +218,8 @@ describe(
         (p) => p[1],
       ) as PortAreaDetails[];
       await db.tx(async (t) => {
+        // Sequential awaits: parallel queries on one transaction connection
+        // trigger the pg "client is already executing a query" warning.
         for (const pc of portCalls) {
           await insertPortCall(t, pc);
         }

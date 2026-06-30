@@ -17,21 +17,22 @@ export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
 }
 
 async function truncate(db: DTDatabase): Promise<void> {
-  //return;
-  await db.tx((t) => {
-    return t.batch([
-      t.none("DELETE FROM wn_location"),
-      t.none("DELETE FROM wn_restriction"),
-      t.none("DELETE FROM wn_vessel"),
-      t.none("DELETE FROM wn_activity"),
-      t.none("DELETE FROM wn_source"),
-      t.none("DELETE FROM wn_queue"),
-      t.none("DELETE FROM wn_dirway"),
-      t.none("DELETE FROM wn_dirwaypoint"),
-      t.none("DELETE FROM wn_port_suspension"),
-      t.none("DELETE FROM wn_port_suspension_location"),
-    ]);
-  });
+  // Run all DELETEs as a single multi-statement query. Building an array of
+  // already-invoked t.none(...) promises (e.g. via t.batch) fires every query
+  // concurrently on the same connection, which triggers the pg
+  // "client is already executing a query" deprecation warning.
+  await db.none(
+    `DELETE FROM wn_location;
+     DELETE FROM wn_restriction;
+     DELETE FROM wn_vessel;
+     DELETE FROM wn_activity;
+     DELETE FROM wn_source;
+     DELETE FROM wn_queue;
+     DELETE FROM wn_dirway;
+     DELETE FROM wn_dirwaypoint;
+     DELETE FROM wn_port_suspension;
+     DELETE FROM wn_port_suspension_location;`,
+  );
 }
 
 export async function assertCountFromTable(

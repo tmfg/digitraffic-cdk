@@ -15,20 +15,25 @@ const rdsHolder = RdsHolder.create();
 
 export function handlerFn(): (
   event: SQSEvent,
-  // biome-ignore lint/suspicious/noConfusingVoidType: Promise.resolve() returns void
-) => Promise<PromiseSettledResult<void | UpdatedTimestamp>[]> {
+) => Promise<PromiseSettledResult<undefined | UpdatedTimestamp>[]> {
   return (event: SQSEvent) => {
     return rdsHolder.setCredentials().then(() => {
-      return inDatabase((db: DTDatabase) => {
-        return Promise.allSettled(
-          event.Records.map(async (r) => {
-            const partial = JSON.parse(r.body) as Partial<ApiTimestamp>;
-            const start = Date.now();
-            logger.debug({
-              method: "ProcessQueue.handler",
-              message: `processing timestamp ${JSON.stringify(partial)}`,
-            });
+      return inDatabase(async (db: DTDatabase) => {
+        // Sequential processing: each record runs queries on the same single
+        // pg connection. Parallelizing (Promise.all) triggers the pg
+        // "client is already executing a query" deprecation warning.
+        const results: PromiseSettledResult<undefined | UpdatedTimestamp>[] =
+          [];
 
+        for (const r of event.Records) {
+          const partial = JSON.parse(r.body) as Partial<ApiTimestamp>;
+          const start = Date.now();
+          logger.debug({
+            method: "ProcessQueue.handler",
+            message: `processing timestamp ${JSON.stringify(partial)}`,
+          });
+
+          try {
             const timestamp = await validateTimestamp(partial, db);
 
             if (!timestamp) {
@@ -36,34 +41,40 @@ export function handlerFn(): (
                 method: "ProcessQueue.handler",
                 message: "timestamp did not pass validation",
               });
-              // resolve so this gets removed from the queue
-              return Promise.resolve();
+              results.push({ status: "fulfilled", value: undefined });
+              continue;
             }
-            const saveTimestampPromise = saveTimestamp(timestamp, db);
-            saveTimestampPromise
-              .then((value) => {
-                if (value) {
-                  logger.debug({
-                    method: "ProcessQueue.handler",
-                    message: "update successful",
-                  });
-                } else {
-                  logger.debug({
-                    method: "ProcessQueue.handler",
-                    message: "update conflict or failure",
-                  });
-                }
-              })
-              .catch((error) => {
-                logException(logger, error);
+
+            const value = await saveTimestamp(timestamp, db);
+
+            if (value) {
+              logger.debug({
+                method: "ProcessQueue.handler",
+                message: "update successful",
               });
+            } else {
+              logger.debug({
+                method: "ProcessQueue.handler",
+                message: "update conflict or failure",
+              });
+            }
+
+            results.push({ status: "fulfilled", value });
+          } catch (error) {
+            logException(logger, error);
+            results.push({
+              status: "rejected",
+              reason: error,
+            });
+          } finally {
             logger.debug({
               method: "ProcessQueue.handler",
               tookMs: Date.now() - start,
             });
-            return saveTimestampPromise;
-          }),
-        );
+          }
+        }
+
+        return results;
       });
     });
   };

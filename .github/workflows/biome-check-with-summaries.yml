@@ -33,7 +33,9 @@ jobs:
       - name: Setup Biome
         uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
         with:
-          version: latest
+          # Auto-detect version from rush-command-line-tools/package.json so CI
+          # matches the workspace-pinned Biome instead of drifting with "latest".
+          working-dir: common/autoinstallers/rush-command-line-tools
 
       - name: Run Biome per subdirectory
         run: |

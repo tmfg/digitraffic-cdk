@@ -64,6 +64,7 @@ describe("Integration Tests: Refactored Architecture", () => {
     // Set up MySQL connection
     mysqlConnection = mysql.createConnection({
       host: TEST_CONFIG.mysql.host,
+      port: TEST_CONFIG.mysql.port,
       user: TEST_CONFIG.mysql.user,
       password: TEST_CONFIG.mysql.password,
       database: TEST_CONFIG.mysql.database,

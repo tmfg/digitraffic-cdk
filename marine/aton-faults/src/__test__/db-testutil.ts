@@ -292,11 +292,12 @@ export async function assertFaultCount(
 }
 
 export async function insert(db: DTDatabase, faults: DbFault[]): Promise<void> {
-  await db.tx((t) => {
-    return t.batch(
-      faults.map((f: DbFault): Promise<null> => {
-        return t.none(
-          `
+  await db.tx(async (t) => {
+    // Sequential awaits: t.batch over pre-invoked queries runs them
+    // concurrently on one connection, triggering the pg deprecation warning.
+    for (const f of faults) {
+      await t.none(
+        `
                 insert into aton_fault(id,
                                        entry_timestamp,
                                        fixed_timestamp,
@@ -330,26 +331,25 @@ export async function insert(db: DTDatabase, faults: DbFault[]): Promise<void> {
                         $15,
                         ST_GEOMFROMTEXT($16))
             `,
-          [
-            f.id,
-            f.entry_timestamp,
-            f.fixed_timestamp,
-            f.state,
-            f.aton_fault_type,
-            f.domain,
-            f.fixed,
-            f.aton_id,
-            f.aton_name_fi,
-            f.aton_name_sv,
-            f.aton_type,
-            f.fairway_number,
-            f.fairway_name_fi,
-            f.fairway_name_sv,
-            f.area_number,
-            f.geometry,
-          ],
-        );
-      }),
-    );
+        [
+          f.id,
+          f.entry_timestamp,
+          f.fixed_timestamp,
+          f.state,
+          f.aton_fault_type,
+          f.domain,
+          f.fixed,
+          f.aton_id,
+          f.aton_name_fi,
+          f.aton_name_sv,
+          f.aton_type,
+          f.fairway_number,
+          f.fairway_name_fi,
+          f.fairway_name_sv,
+          f.area_number,
+          f.geometry,
+        ],
+      );
+    }
   });
 }

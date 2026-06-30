@@ -25,6 +25,9 @@ python3 -m venv "$WORK_DIR/venv"
 source "$WORK_DIR/venv/bin/activate"
 
 echo "Installing dependencies into layer..."
+# Upgrade pip to a version at least 7 days old, matching the cooldown policy from update-deps.sh
+# Pin to 26.0 (released ~June 19, 2026, within 7-day cooldown as of June 26)
+pip install --quiet --upgrade "pip>=26.0,<27"
 pip install --quiet --target "$WORK_DIR/python/" -r "$WORK_DIR/requirements.txt"
 
 deactivate

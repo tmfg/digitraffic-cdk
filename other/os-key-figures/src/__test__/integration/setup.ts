@@ -25,6 +25,9 @@ export const TEST_CONFIG = {
   },
   mysql: {
     host: "localhost",
+    // Dedicated host port mapped in docker-compose.yml (13306 -> container 3306)
+    // to avoid colliding with other local MySQL containers (e.g. the rail DB on 3306).
+    port: 13306,
     database: "key_figures_test",
     user: "test",
     password: "test",

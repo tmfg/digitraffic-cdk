@@ -2,10 +2,7 @@ import { TZDate } from "@date-fns/tz";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { inDatabase } from "@digitraffic/common/dist/database/database";
-import type {
-  AwakeAIATXTimestampMessage,
-  AwakeAiATXApi,
-} from "../api/awake-ai-atx.js";
+import type { AwakeAiATXApi } from "../api/awake-ai-atx.js";
 import { AwakeATXZoneEventType } from "../api/awake-ai-atx.js";
 import { AwakeAiZoneType } from "../api/awake-common.js";
 import type { OAuthTokenApi } from "../api/oauth-token-api.js";
@@ -26,66 +23,69 @@ export class AwakeAiATXService {
   async getATXs(timeoutMillis: number): Promise<ApiTimestamp[]> {
     const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
     const atxs = await this.api.getATXs(oAuthToken.access_token, timeoutMillis);
-    return inDatabase((db: DTDatabase) => {
-      const promises = atxs
-        .filter((atx) => atx.zoneType === AwakeAiZoneType.BERTH)
-        .map(async (atx: AwakeAIATXTimestampMessage) => {
-          // pick the first supported LOCODE
-          if (atx.locodes.length > 1) {
-            logger.warn({
-              method: "AwakeAiATXService.getATXs",
-              message: `More than one locode for timestamp! IMO ${atx.imo} locodes ${JSON.stringify(
-                atx.locodes,
-              )}`,
-            });
-          } else if (!atx.locodes.length) {
-            logger.error({
-              method: "AwakeAiATXService.getATXs",
-              message: `No locode for timestamp! IMO ${atx.imo}`,
-            });
-          }
-          const port = atx.locodes[0] as unknown as string;
-          const eventType =
-            atx.zoneEventType === AwakeATXZoneEventType.ARRIVAL
-              ? EventType.ATA
-              : EventType.ATD;
-          const eventTime = new TZDate(atx.eventTimestamp);
-
-          const portcallId = await TimestampDAO.findPortcallId(
-            db,
-            port,
-            eventType,
-            eventTime,
-            atx.mmsi,
-            atx.imo,
-          );
-
-          if (portcallId) {
-            return {
-              eventType,
-              eventTime: atx.eventTimestamp,
-              recordTime: atx.eventTimestamp,
-              source: EventSource.AWAKE_AI,
-              ship: {
-                imo: atx.imo,
-                mmsi: atx.mmsi,
-              },
-              location: {
-                port,
-              },
-              portcallId,
-            } as ApiTimestamp;
-          } else {
-            logger.warn({
-              method: "AwakeAiATXService.getATXs",
-              message: `no portcall found for ${atx.zoneEventType} IMO ${atx.imo}`,
-            });
-            return null;
-          }
-        });
-      return Promise.all(promises).then((timestamps) =>
-        timestamps.filter((timestamp) => !!timestamp),
+    return inDatabase(async (db: DTDatabase) => {
+      const timestamps: ApiTimestamp[] = [];
+      const berthAtxs = atxs.filter(
+        (atx) => atx.zoneType === AwakeAiZoneType.BERTH,
       );
+
+      // Sequential awaits: parallel queries on one pg connection trigger the
+      // "client is already executing a query" deprecation warning.
+      for (const atx of berthAtxs) {
+        // pick the first supported LOCODE
+        if (atx.locodes.length > 1) {
+          logger.warn({
+            method: "AwakeAiATXService.getATXs",
+            message: `More than one locode for timestamp! IMO ${atx.imo} locodes ${JSON.stringify(
+              atx.locodes,
+            )}`,
+          });
+        } else if (!atx.locodes.length) {
+          logger.error({
+            method: "AwakeAiATXService.getATXs",
+            message: `No locode for timestamp! IMO ${atx.imo}`,
+          });
+        }
+        const port = atx.locodes[0] as unknown as string;
+        const eventType =
+          atx.zoneEventType === AwakeATXZoneEventType.ARRIVAL
+            ? EventType.ATA
+            : EventType.ATD;
+        const eventTime = new TZDate(atx.eventTimestamp);
+
+        const portcallId = await TimestampDAO.findPortcallId(
+          db,
+          port,
+          eventType,
+          eventTime,
+          atx.mmsi,
+          atx.imo,
+        );
+
+        if (portcallId) {
+          timestamps.push({
+            eventType,
+            eventTime: atx.eventTimestamp,
+            recordTime: atx.eventTimestamp,
+            source: EventSource.AWAKE_AI,
+            ship: {
+              imo: atx.imo,
+              mmsi: atx.mmsi,
+            },
+            location: {
+              port,
+            },
+            portcallId,
+          } as ApiTimestamp);
+        } else {
+          logger.warn({
+            method: "AwakeAiATXService.getATXs",
+            message: `no portcall found for ${atx.zoneEventType} IMO ${atx.imo}`,
+          });
+        }
+      }
+
+      return timestamps;
     });
   }
 }

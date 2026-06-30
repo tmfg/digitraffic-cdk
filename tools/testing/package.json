@@ -15,7 +15,8 @@
   "scripts": {
     "build": "heft build --clean",
     "build:watch": "heft build-watch --clean",
-    "ci:test": "echo 'No tests implemented'"
+    "ci:test": "echo 'No tests implemented'",
+    "test": "echo 'No tests implemented'"
   },
   "dependencies": {
     "madge": "8.0.0"
@@ -23,14 +24,14 @@
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@digitraffic/common": "2026.4.28-1",
-    "@rushstack/heft": "1.2.17",
+    "@digitraffic/common": "2026.5.27-1",
+    "@rushstack/heft": "1.2.19",
     "@types/madge": "5.0.3",
     "@types/node": "24.12.2",
-    "@vitest/coverage-v8": "4.1.6",
+    "@vitest/coverage-v8": "4.1.9",
     "esbuild": "0.28.1",
-    "rollup": "4.60.4",
+    "rollup": "4.62.2",
     "typescript": "5.9.3",
-    "vitest": "4.1.6"
+    "vitest": "4.1.9"
   }
 }

@@ -25,22 +25,22 @@ const PS_UPDATE_QUEUES = new pgPromise.PreparedStatement({
   text: SQL_UPDATE_QUEUES,
 });
 
-export function saveAllQueues(
+export async function saveAllQueues(
   db: DTDatabase,
   queues: ApiData<Queue>[],
-): Promise<unknown> {
-  return Promise.all(
-    queues.map(async (q) => {
-      return db.any(PS_UPDATE_QUEUES, [
-        q.id,
-        q.icebreaker_id,
-        q.vessel_id,
-        q.start_time,
-        q.end_time,
-        q.order_num,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const q of queues) {
+    await db.any(PS_UPDATE_QUEUES, [
+      q.id,
+      q.icebreaker_id,
+      q.vessel_id,
+      q.start_time,
+      q.end_time,
+      q.order_num,
+    ]);
+  }
 }
 
 export async function getQueues(db: DTDatabase): Promise<Queue[]> {

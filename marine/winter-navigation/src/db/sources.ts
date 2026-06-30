@@ -25,22 +25,22 @@ const PS_UPDATE_SOURCES = new pgPromise.PreparedStatement({
   text: SQL_UPDATE_SOURCES,
 });
 
-export function saveAllSources(
+export async function saveAllSources(
   db: DTDatabase,
   sources: ApiData<Source>[],
-): Promise<unknown> {
-  return Promise.all(
-    sources.map(async (s) => {
-      return db.any(PS_UPDATE_SOURCES, [
-        s.id,
-        s.name,
-        s.shortname,
-        s.nationality,
-        s.type,
-        s.vessel_id,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const s of sources) {
+    await db.any(PS_UPDATE_SOURCES, [
+      s.id,
+      s.name,
+      s.shortname,
+      s.nationality,
+      s.type,
+      s.vessel_id,
+    ]);
+  }
 }
 
 export async function getSources(db: DTDatabase): Promise<Source[]> {

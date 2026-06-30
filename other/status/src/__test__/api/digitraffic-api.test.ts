@@ -1,5 +1,6 @@
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
-import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import type { Input, Options, ResponsePromise } from "ky";
+import ky from "ky";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { PathItem } from "../../api/digitraffic-api.js";
 import { DigitrafficApi } from "../../api/digitraffic-api.js";

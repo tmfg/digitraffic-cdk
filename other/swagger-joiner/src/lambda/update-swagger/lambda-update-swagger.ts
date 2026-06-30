@@ -10,7 +10,8 @@ import {
   getEnvVariable,
   getEnvVariableOrElse,
 } from "@digitraffic/common/dist/utils/utils";
-import ky, { type Options } from "ky";
+import type { Options } from "ky";
+import ky from "ky";
 import { exportSwaggerApi, fixApiGatewayNullable } from "../../apigw-utils.js";
 import { UPDATE_SWAGGER_KEYS } from "../../model/keys.js";
 import type { HttpMethod } from "../../swagger-utils.js";

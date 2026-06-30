@@ -27,10 +27,12 @@ services:
       MYSQL_DATABASE: key_figures_test
       MYSQL_USER: test
       MYSQL_PASSWORD: test
-    ports:
-      - "3306:3306"
     volumes:
       - ./mysql-init:/docker-entrypoint-initdb.d
+    ports:
+      # Dedicated host port (not 3306) to avoid colliding with other local
+      # MySQL containers, e.g. the rail domain DB (dbrail) which publishes 3306.
+      - "13306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 5s

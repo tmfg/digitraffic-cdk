@@ -91,21 +91,21 @@ const PS_GET_LOCATIONS = new pgPromise.PreparedStatement({
 export async function saveAllLocations(
   db: DTDatabase,
   locations: ApiData<Location>[],
-): Promise<unknown> {
-  return Promise.all(
-    locations.map(async (l) => {
-      return db.any(PS_UPDATE_LOCATIONS, [
-        l.id,
-        l.name,
-        l.type,
-        l.locode_list,
-        l.nationality,
-        l.latitude,
-        l.longitude,
-        l.winterport,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const l of locations) {
+    await db.any(PS_UPDATE_LOCATIONS, [
+      l.id,
+      l.name,
+      l.type,
+      l.locode_list,
+      l.nationality,
+      l.latitude,
+      l.longitude,
+      l.winterport,
+    ]);
+  }
 }
 
 export async function getLocation(

@@ -22,29 +22,29 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.4.28-1",
+    "@digitraffic/common": "2026.5.27-1",
     "@rgrove/parse-xml": "4.2.0",
-    "aws-cdk-lib": "2.254.0",
+    "aws-cdk-lib": "2.260.0",
     "constructs": "10.6.0",
-    "pg-native": "3.7.0",
+    "pg-native": "3.8.0",
     "pg-promise": "12.6.2"
   },
   "devDependencies": {
-    "@aws-sdk/client-api-gateway": "3.1047.0",
+    "@aws-sdk/client-api-gateway": "3.1073.0",
     "@digitraffic-cdk/cdk-rig": "workspace:*",
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.2.17",
-    "@types/aws-lambda": "8.10.161",
+    "@rushstack/heft": "1.2.19",
+    "@types/aws-lambda": "8.10.162",
     "@types/node": "24.12.2",
     "@types/xml2js": "0.4.14",
-    "@vitest/coverage-v8": "4.1.6",
-    "aws-cdk": "2.1122.0",
+    "@vitest/coverage-v8": "4.1.9",
+    "aws-cdk": "2.1128.0",
     "esbuild": "0.28.1",
     "parallelshell": "3.0.2",
     "spex": "4.1.0",
     "typescript": "5.9.3",
-    "vitest": "4.1.6"
+    "vitest": "4.1.9"
   }
 }

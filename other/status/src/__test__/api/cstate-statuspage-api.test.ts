@@ -2,7 +2,8 @@ import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { add, sub } from "date-fns";
-import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import type { Input, Options, ResponsePromise } from "ky";
+import ky from "ky";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type {
   ActiveMaintenance,

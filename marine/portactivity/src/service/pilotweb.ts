@@ -1,5 +1,8 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type {
+  DTDatabase,
+  DTTransaction,
+} from "@digitraffic/common/dist/database/database";
 import { inDatabase } from "@digitraffic/common/dist/database/database";
 import * as PilotwebAPI from "../api/pilotweb.js";
 import * as PilotagesDAO from "../dao/pilotages.js";
@@ -99,47 +102,50 @@ async function convertUpdatedTimestamps(
   db: DTDatabase,
   newAndUpdated: Pilotage[],
 ): Promise<ApiTimestamp[]> {
+  // Use db.tx() to handle multiple database queries properly
   return (
-    await Promise.all(
-      newAndUpdated.map(
-        async (p: Pilotage): Promise<ApiTimestamp | undefined> => {
-          const base = createApiTimestamp(p);
+    await db.tx(async (t) => {
+      // Sequential awaits: parallel queries on one transaction connection
+      // trigger the pg "client is already executing a query" deprecation warning.
+      const results: (ApiTimestamp | undefined)[] = [];
+      for (const p of newAndUpdated) {
+        const base = createApiTimestamp(p);
 
-          if (base) {
-            const location = LocationConverter.convertLocation(p.route);
-            const portcallId = await getPortCallId(db, p, location);
+        if (base) {
+          const location = LocationConverter.convertLocation(p.route);
+          const portcallId = await getPortCallId(t, p, location);
 
-            if (portcallId) {
-              return {
-                ...base,
-                ...{
-                  recordTime: p.scheduleUpdated,
-                  source: EventSource.PILOTWEB,
-                  sourceId: p.id.toString(),
-                  ship: {
-                    mmsi: p.vessel.mmsi,
-                    imo: p.vessel.imo,
-                  },
-                  location,
-                  portcallId,
+          if (portcallId) {
+            results.push({
+              ...base,
+              ...{
+                recordTime: p.scheduleUpdated,
+                source: EventSource.PILOTWEB,
+                sourceId: p.id.toString(),
+                ship: {
+                  mmsi: p.vessel.mmsi,
+                  imo: p.vessel.imo,
                 },
-              } as ApiTimestamp;
-            }
-
+                location,
+                portcallId,
+              },
+            } as ApiTimestamp);
+          } else {
             logger.info({
               method: "PilotwebService.convertUpdatedTimestamps",
               message: `skipping pilotage ${p.id}, missing portcallId`,
             });
           }
-          return undefined;
-        },
-      ),
-    )
+        }
+      }
+
+      return results;
+    })
   ).filter((x) => !!x);
 }
 
 function getPortCallId(
-  db: DTDatabase,
+  db: DTDatabase | DTTransaction,
   p: Pilotage,
   location: Location,
 ): Promise<number | undefined> {

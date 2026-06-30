@@ -1,5 +1,8 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import type { DTDatabase } from "@digitraffic/common/dist/database/database";
+import type {
+  DTDatabase,
+  DTTransaction,
+} from "@digitraffic/common/dist/database/database";
 import pgPromise from "pg-promise";
 import type { Pilotage } from "../model/pilotage.js";
 import type { Location } from "../model/timestamp.js";
@@ -73,7 +76,7 @@ interface DbPortcallId {
 export type TimestampMap = Map<number, Date>;
 
 export async function findPortCallId(
-  db: DTDatabase,
+  db: DTDatabase | DTTransaction,
   pilotage: Pilotage,
   location: Location,
 ): Promise<number | undefined> {
@@ -130,11 +133,13 @@ export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
 export function updatePilotages(
   db: DTDatabase,
   pilotages: Pilotage[],
-): Promise<unknown> {
+): Promise<void> {
   if (pilotages.length > 0) {
-    return Promise.all(
-      pilotages.map((pilotage) =>
-        db.none(UPSERT_PILOTAGES_SQL, {
+    return db.tx(async (tx) => {
+      // Sequential awaits: parallel queries on one transaction connection
+      // trigger the pg "client is already executing a query" deprecation warning.
+      for (const pilotage of pilotages) {
+        await tx.none(UPSERT_PILOTAGES_SQL, {
           id: pilotage.id,
           vesselImo: pilotage.vessel.imo,
           vesselMmsi: pilotage.vessel.mmsi,
@@ -149,12 +154,12 @@ export function updatePilotages(
           routeStartBerth: pilotage.route.start.berth?.code,
           routeEnd: pilotage.route.end.code,
           routeEndBerth: pilotage.route.end.berth?.code,
-        }),
-      ),
-    );
+        });
+      }
+    });
   }
 
-  return Promise.resolve();
+  return Promise.resolve(undefined);
 }
 
 export function deletePilotages(

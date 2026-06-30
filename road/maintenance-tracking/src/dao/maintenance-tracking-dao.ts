@@ -51,17 +51,18 @@ export function insertMaintenanceTrackingObservationData(
   db: DTDatabase,
   observations: DbObservationData[],
 ): Promise<(DbNumberId | undefined)[]> {
-  return db.tx((t) => {
-    return t.batch(
-      observations.map((observation) =>
-        db
-          .oneOrNone<DbNumberId | undefined>(
-            UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
-            observation,
-          )
-          .then((result) => (result === null ? undefined : result)),
-      ),
-    );
+  return db.tx(async (t) => {
+    // Sequential awaits: t.batch over pre-invoked queries runs them
+    // concurrently on one connection, triggering the pg deprecation warning.
+    const results: (DbNumberId | undefined)[] = [];
+    for (const observation of observations) {
+      const result = await t.oneOrNone<DbNumberId | undefined>(
+        UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
+        observation,
+      );
+      results.push(result === null ? undefined : result);
+    }
+    return results;
   });
 }
 
@@ -95,17 +96,17 @@ export async function cleanMaintenanceTrackingData(
   hoursToKeep: number,
 ): Promise<void> {
   await db.tx(async (t) => {
-    const cleanUpQuery = t.none(
-      PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS,
-      [hoursToKeep],
-    );
-    const deleteQuery = t.none(
-      PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS,
-      [hoursToKeep],
-    );
     // These should and must be run in given order https://github.com/vitaly-t/pg-promise/issues/307
+    // Sequential awaits: a single connection can only run one query at a time;
+    // t.batch over pre-invoked queries runs them concurrently (order not
+    // guaranteed) and triggers the pg deprecation warning.
     try {
-      await t.batch([cleanUpQuery, deleteQuery]);
+      await t.none(PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS, [
+        hoursToKeep,
+      ]);
+      await t.none(PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS, [
+        hoursToKeep,
+      ]);
     } catch (error) {
       logger.error({
         method: "MaintenanceTrackingDao.cleanMaintenanceTrackingData",

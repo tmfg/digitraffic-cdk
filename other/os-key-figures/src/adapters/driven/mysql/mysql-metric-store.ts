@@ -11,6 +11,7 @@ const DUPLICATES_TABLE_NAME = "duplicates";
  */
 export interface MySqlMetricStoreConfig {
   readonly host: string;
+  readonly port?: number;
   readonly user: string;
   readonly password: string;
   readonly database: string;
@@ -25,6 +26,7 @@ export class MySqlMetricStore implements ForPersistingMetrics {
   constructor(config: MySqlMetricStoreConfig) {
     this.connection = mysql.createConnection({
       host: config.host,
+      port: config.port,
       user: config.user,
       password: config.password,
       database: config.database,

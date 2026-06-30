@@ -70,12 +70,14 @@ export function upsertContract(
   });
 }
 
-export function upsertContracts(
+export async function upsertContracts(
   db: DTDatabase,
   dbContracts: DbDomainContract[],
 ): Promise<(DbTextId | undefined)[]> {
   try {
-    return db.tx((t) => {
+    // `return await` (not bare `return`) so the surrounding try/catch also
+    // catches async rejections from the transaction, not just sync errors.
+    return await db.tx(async (t) => {
       const upsertContractFn = (
         contract: DbDomainContract,
       ): Promise<DbTextId | null> => {
@@ -91,11 +93,15 @@ export function upsertContracts(
           ],
         );
       };
-      return t
-        .batch(dbContracts.map(upsertContractFn))
-        .then((result) =>
-          result.map((value) => (value === null ? undefined : value)),
-        );
+      // Sequential awaits: t.batch over pre-invoked queries runs them
+      // concurrently on one connection, triggering the pg
+      // "client is already executing a query" deprecation warning.
+      const result: (DbTextId | undefined)[] = [];
+      for (const contract of dbContracts) {
+        const value = await upsertContractFn(contract);
+        result.push(value === null ? undefined : value);
+      }
+      return result;
     });
   } catch (e) {
     logger.error({
@@ -152,7 +158,7 @@ export function upsertTaskMappings(
   db: DTDatabase,
   dbTaskMapping: DbDomainTaskMapping[],
 ): Promise<(DbTextId | undefined)[]> {
-  return db.tx((t) => {
+  return db.tx(async (t) => {
     const upsertTaskMapping = (
       taskMapping: DbDomainTaskMapping,
     ): Promise<DbTextId | undefined> => {
@@ -168,7 +174,13 @@ export function upsertTaskMappings(
         )
         .then((result) => (result === null ? undefined : result));
     };
-    return t.batch(dbTaskMapping.map(upsertTaskMapping));
+    // Sequential awaits: t.batch over pre-invoked queries runs them
+    // concurrently on one connection, triggering the pg deprecation warning.
+    const results: (DbTextId | undefined)[] = [];
+    for (const taskMapping of dbTaskMapping) {
+      results.push(await upsertTaskMapping(taskMapping));
+    }
+    return results;
   });
 }
 
@@ -345,7 +357,12 @@ export async function insertMaintenanceTracking(
         throw error;
       });
   };
-  return tx.batch(tracking.tasks.map(insertHarjaTask)).then(() => mtId);
+  // Sequential awaits: tx.batch over pre-invoked queries runs them
+  // concurrently on one connection, triggering the pg deprecation warning.
+  for (const harjaTask of tracking.tasks) {
+    await insertHarjaTask(harjaTask);
+  }
+  return mtId;
 }
 
 const PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE =

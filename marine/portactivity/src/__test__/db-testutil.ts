@@ -82,11 +82,13 @@ export async function insert(
   db: DTDatabase | DTTransaction,
   timestamps: ApiTimestamp[],
 ): Promise<void> {
-  await db.tx((t) => {
-    return t.batch(
-      timestamps.map((e) => {
-        return t.none(
-          `
+  await db.tx(async (t) => {
+    // Sequential awaits: building an array of already-invoked t.none(...)
+    // promises (t.batch) fires every query concurrently on the same connection,
+    // triggering the pg "client is already executing a query" deprecation warning.
+    for (const e of timestamps) {
+      await t.none(
+        `
                 INSERT INTO port_call_timestamp(
                     event_type,
                     event_time,
@@ -121,10 +123,9 @@ export async function insert(
                     $15
                 )
             `,
-          TimestampsDb.createUpdateValues(e),
-        );
-      }),
-    );
+        TimestampsDb.createUpdateValues(e),
+      );
+    }
   });
 }
 

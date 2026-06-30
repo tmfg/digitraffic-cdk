@@ -56,33 +56,33 @@ const PS_GET_DIRWAYS = new pgPromise.PreparedStatement({
   text: SQL_GET_DIRWAYS,
 });
 
-export function saveAllDirways(
+export async function saveAllDirways(
   db: DTDatabase,
   dirways: ApiData<Dirway>[],
-): Promise<unknown> {
-  return Promise.all(
-    dirways.map(async (d) => {
-      return db.any(PS_UPDATE_DIRWAYS, [d.id, d.name, d.description]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const d of dirways) {
+    await db.any(PS_UPDATE_DIRWAYS, [d.id, d.name, d.description]);
+  }
 }
 
-export function saveAllDirwaypoints(
+export async function saveAllDirwaypoints(
   db: DTDatabase,
   dirwaypoints: ApiData<Dirwaypoint>[],
-): Promise<unknown> {
-  return Promise.all(
-    dirwaypoints.map(async (d) => {
-      return db.any(PS_UPDATE_DIRWAYPOINTS, [
-        d.id,
-        d.dirway_id,
-        d.order_num,
-        d.name,
-        d.latitude,
-        d.longitude,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const d of dirwaypoints) {
+    await db.any(PS_UPDATE_DIRWAYPOINTS, [
+      d.id,
+      d.dirway_id,
+      d.order_num,
+      d.name,
+      d.latitude,
+      d.longitude,
+    ]);
+  }
 }
 
 export async function getDirways(db: DTDatabase): Promise<DirwayDTO[]> {

@@ -69,32 +69,6 @@ export async function processUdotMessage(
   }
 }
 
-function _logRowNotFound(
-  message: UnknownDelayOrTrackMessage,
-  datarow: UnknownDelayOrTrack,
-  rows: TimeTableRow[],
-): void {
-  logger.info({
-    method: "ProcessUdotMessageService.processUdotMessage",
-    message: `Could not find attapId for ${message.trainNumber} row ${JSON.stringify(
-      datarow,
-    )}`,
-  });
-
-  const row = rows.find(
-    (r) =>
-      r.station_short_code === datarow.stationShortCode &&
-      r.type === datarow.type,
-  );
-
-  if (row) {
-    logger.info({
-      method: "ProcessUdotMessageService.processUdotMessage",
-      message: `Candidate ${JSON.stringify(row)}`,
-    });
-  }
-}
-
 function findAttapId(
   rows: TimeTableRow[],
   datarow: UnknownDelayOrTrack,

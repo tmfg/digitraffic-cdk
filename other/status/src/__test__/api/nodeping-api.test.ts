@@ -1,6 +1,7 @@
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { randomString } from "@digitraffic/common/dist/test/testutils";
-import ky, { type Input, type Options, type ResponsePromise } from "ky";
+import type { Input, Options, ResponsePromise } from "ky";
+import ky from "ky";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import type {
   NodePingCheck,

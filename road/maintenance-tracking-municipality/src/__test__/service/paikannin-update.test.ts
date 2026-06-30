@@ -175,6 +175,10 @@ describe(
 
       mockGetWorkEventsApiResponse([route1d]);
       await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
+      // Capture the time right after the update so the DATA_CHECKED timestamp
+      // (set to now() during the update) is compared against a close reference,
+      // independent of how long the preceding setup/update cycles took.
+      const updateTime = Date.now();
 
       const trackings = await findAllTrackings(db, DOMAIN_1);
 
@@ -194,7 +198,7 @@ describe(
       expect(checked).toBeTruthy();
 
       if (checked) {
-        Asserter.assertToBeCloseTo(checked.getTime(), past0.getTime(), 900);
+        Asserter.assertToBeCloseTo(checked.getTime(), updateTime, 900);
       } else {
         fail("checked was null");
       }

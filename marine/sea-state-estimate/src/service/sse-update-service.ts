@@ -23,16 +23,14 @@ export function saveSseData(
       try {
         const dbSseSseReport = convertToDbSseReport(report);
         await db
-          .tx((t) => {
-            return t.batch([
-              SseDb.updateLatestSiteToFalse(t, dbSseSseReport.siteNumber),
-              SseDb.insertSseReportData(t, dbSseSseReport),
-              LastUpdatedDB.updateUpdatedTimestamp(
-                t,
-                SSE_DATA_DATA_TYPE,
-                new Date(),
-              ),
-            ]);
+          .tx(async (t) => {
+            await SseDb.updateLatestSiteToFalse(t, dbSseSseReport.siteNumber);
+            await SseDb.insertSseReportData(t, dbSseSseReport);
+            await LastUpdatedDB.updateUpdatedTimestamp(
+              t,
+              SSE_DATA_DATA_TYPE,
+              new Date(),
+            );
           })
           .then(() => {
             saved++;

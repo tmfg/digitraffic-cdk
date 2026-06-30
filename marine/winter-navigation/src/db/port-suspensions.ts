@@ -36,36 +36,36 @@ const PS_UPDATE_SUSPENSION_LOCATIONS = new pgPromise.PreparedStatement({
   text: SQL_UPDATE_SUSPENSION_LOCATIONS,
 });
 
-export function saveAllPortSuspensions(
+export async function saveAllPortSuspensions(
   db: DTDatabase,
   suspensions: ApiData<Suspension>[],
-): Promise<unknown> {
-  return Promise.all(
-    suspensions.map(async (s) => {
-      return db.any(PS_UPDATE_SUSPENSIONS, [
-        s.id,
-        s.start_time,
-        s.end_time,
-        s.prenotification,
-        s.ports_closed,
-        s.due_to,
-        s.specifications,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const s of suspensions) {
+    await db.any(PS_UPDATE_SUSPENSIONS, [
+      s.id,
+      s.start_time,
+      s.end_time,
+      s.prenotification,
+      s.ports_closed,
+      s.due_to,
+      s.specifications,
+    ]);
+  }
 }
 
-export function saveAllPortSuspensionLocations(
+export async function saveAllPortSuspensionLocations(
   db: DTDatabase,
   locations: ApiData<PortSuspensionLocation>[],
-): Promise<unknown> {
-  return Promise.all(
-    locations.map(async (l) => {
-      return db.any(PS_UPDATE_SUSPENSION_LOCATIONS, [
-        l.id,
-        l.suspension_id,
-        l.location_id,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const l of locations) {
+    await db.any(PS_UPDATE_SUSPENSION_LOCATIONS, [
+      l.id,
+      l.suspension_id,
+      l.location_id,
+    ]);
+  }
 }

@@ -112,6 +112,7 @@ describe("OAuthTokenApi", () => {
 
   function mockKyPost(responseBody: object) {
     vi.mocked(ky.post).mockReturnValue({
+      // biome-ignore lint/suspicious/noThenProperty: intentional mock of thenable interface
       then: (onFulfilled: (response: unknown) => unknown) =>
         Promise.resolve(
           onFulfilled({ json: () => Promise.resolve(responseBody) }),

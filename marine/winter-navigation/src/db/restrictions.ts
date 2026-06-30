@@ -27,21 +27,21 @@ const PS_GET_RESTRICTIONS = new pgPromise.PreparedStatement({
   text: SQL_GET_RESTRICTIONS,
 });
 
-export function saveAllRestrictions(
+export async function saveAllRestrictions(
   db: DTDatabase,
   restrictions: ApiData<Restriction>[],
-): Promise<unknown> {
-  return Promise.all(
-    restrictions.map(async (r) => {
-      return db.any(PS_UPDATE_RESTRICTIONS, [
-        r.id,
-        r.location_id,
-        r.text_compilation,
-        r.start_time,
-        r.end_time,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const r of restrictions) {
+    await db.any(PS_UPDATE_RESTRICTIONS, [
+      r.id,
+      r.location_id,
+      r.text_compilation,
+      r.start_time,
+      r.end_time,
+    ]);
+  }
 }
 export async function getRestrictions(
   db: DTDatabase,

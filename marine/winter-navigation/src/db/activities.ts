@@ -31,24 +31,24 @@ const PS_GET_ACTIVITIES = new pgPromise.PreparedStatement({
   text: SQL_GET_ACTIVITIES,
 });
 
-export function saveAllActivities(
+export async function saveAllActivities(
   db: DTDatabase,
   activities: ApiData<Activity>[],
-): Promise<unknown> {
-  return Promise.all(
-    activities.map(async (a) => {
-      return db.any(PS_UPDATE_ACTIVITIES, [
-        a.id,
-        a.icebreaker_id,
-        a.vessel_id,
-        a.type,
-        a.reason,
-        a.public_comment,
-        a.start_time,
-        a.end_time,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits: parallel queries on one pg connection trigger the
+  // "client is already executing a query" deprecation warning.
+  for (const a of activities) {
+    await db.any(PS_UPDATE_ACTIVITIES, [
+      a.id,
+      a.icebreaker_id,
+      a.vessel_id,
+      a.type,
+      a.reason,
+      a.public_comment,
+      a.start_time,
+      a.end_time,
+    ]);
+  }
 }
 
 export async function getActivities(db: DTDatabase): Promise<Activity[]> {

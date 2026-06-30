@@ -117,9 +117,15 @@ export function saveTimestamps(
   timestamps: ApiTimestamp[],
 ): Promise<(DbUpdatedTimestamp | undefined)[]> {
   return inDatabase((db: DTDatabase) => {
-    return db.tx((t) =>
-      t.batch(timestamps.map((timestamp) => doSaveTimestamp(t, timestamp))),
-    );
+    return db.tx(async (t) => {
+      // Sequential awaits: parallel queries on one transaction connection
+      // trigger the pg "client is already executing a query" deprecation warning.
+      const results: (DbUpdatedTimestamp | undefined)[] = [];
+      for (const timestamp of timestamps) {
+        results.push(await doSaveTimestamp(t, timestamp));
+      }
+      return results;
+    });
   });
 }
 
@@ -153,9 +159,11 @@ async function removeOldTimestamps(
           .map((e) => e.id)
           .toString()}`,
       });
-      await tx.batch(
-        timestampsAnotherLocode.map((e) => TimestampsDB.deleteById(tx, e.id)),
-      );
+      // Sequential awaits: parallel queries on one transaction connection
+      // trigger the pg "client is already executing a query" deprecation warning.
+      for (const e of timestampsAnotherLocode) {
+        await TimestampsDB.deleteById(tx, e.id);
+      }
     }
   }
   return timestampsAnotherLocode;

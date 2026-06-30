@@ -298,23 +298,24 @@ const PS_GET_VESSELS = new pgPromise.PreparedStatement({
   text: SQL_GET_VESSELS,
 });
 
-export function saveAllVessels(
+export async function saveAllVessels(
   db: DTDatabase,
   vessels: ApiData<Vessel>[],
-): Promise<unknown> {
-  return Promise.all(
-    vessels.map(async (v) => {
-      return db.any(PS_UPDATE_VESSELS, [
-        v.id,
-        v.name,
-        v.callsign,
-        v.shortcode,
-        v.imo,
-        v.mmsi,
-        v.type,
-      ]);
-    }),
-  );
+): Promise<void> {
+  // Sequential awaits on purpose: a single pg connection can only run one
+  // query at a time. Parallelizing (Promise.all) triggers the pg
+  // "client is already executing a query" deprecation warning.
+  for (const v of vessels) {
+    await db.any(PS_UPDATE_VESSELS, [
+      v.id,
+      v.name,
+      v.callsign,
+      v.shortcode,
+      v.imo,
+      v.mmsi,
+      v.type,
+    ]);
+  }
 }
 
 export async function getVessel(
