@@ -12,6 +12,7 @@ These overrides use version range selectors to only affect vulnerable versions, 
 
 - `ajv@>=7.0.0-alpha.0 <8.18.0` → `8.18.0`: Fix ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6)
 - `fast-xml-parser@<5.7.0` → `5.7.0`: Fix stack overflow, entity bypass, and XML Comment/CDATA injection vulnerabilities (GHSA-fj3w-jwp8-x2g3, GHSA-m7jm-9gc2-mpf2, GHSA-jmr7-xgp7-cmfj, GHSA-8gc5-j5rx-235r, GHSA-jp2q-39xq-3w4g, GHSA-gh4j-gqv2-49f6 / CVE-2026-41650)
+- `postcss@<8.5.10` → `8.5.10`: Fix line return parsing vulnerability (GHSA-7fh8-49v4-4j4r / CVE-2023-44270)
 
 ### How to Check If Overrides Can Be Removed
 1. **Check Upstream Dependencies:**

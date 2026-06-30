@@ -12,16 +12,23 @@ const RDS_SECRET_KEYS = Object.values(RdsSecretKey);
 export class RdsHolder {
   private readonly secretHolder: SecretHolder<RdsSecret>;
 
-  constructor(secretId: string) {
-    this.secretHolder = new SecretHolder<RdsSecret>(
-      secretId,
-      "",
-      RDS_SECRET_KEYS,
-    );
+  private constructor(secretHolder: SecretHolder<RdsSecret>) {
+    this.secretHolder = secretHolder;
   }
 
-  static create(): RdsHolder {
-    return new RdsHolder(getEnvVariable("SECRET_ID"));
+  static create(rdsHolder: SecretHolder<RdsSecret>): RdsHolder;
+  static create(): RdsHolder;
+
+  static create(secretHolder?: SecretHolder<RdsSecret>): RdsHolder {
+    const holder =
+      secretHolder ??
+      new SecretHolder<RdsSecret>(
+        getEnvVariable("SECRET_ID"),
+        "",
+        RDS_SECRET_KEYS,
+      );
+
+    return new RdsHolder(holder);
   }
 
   public async setCredentials(): Promise<void> {

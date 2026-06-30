@@ -1,0 +1,11 @@
+{
+  "biome.lsp.bin": "./node_modules/.bin/biome",
+  "editor.formatOnSave": true,
+  // TODO: Re-enable after Biome VS Code extension save/codeAction timeout bug is fixed.
+  // Ref: https://github.com/biomejs/biome-vscode/issues/1082
+  // "editor.codeActionsOnSave": {
+  // 	"source.fixAll.biome": "explicit",
+  // 	"source.organizeImports.biome": "explicit"
+  // },
+  "editor.defaultFormatter": "biomejs.biome"
+}

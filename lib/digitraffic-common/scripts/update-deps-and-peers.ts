@@ -18,6 +18,9 @@ type PackageJson = {
   engines?: {
     node?: string;
   };
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
 };
 
@@ -159,14 +162,20 @@ const updateUseNodeVersionInNpmrc = async (
 
 const EXCLUDED_PACKAGES = ["typescript", "@types/node"];
 
-// Step 1: Update normal dependency blocks to the newest versions.
-run(["up", "--latest", ...EXCLUDED_PACKAGES.flatMap((pkg) => ["--ignore", pkg])]);
-
 const packageJsonText = readFileSync(
   new URL("../package.json", import.meta.url),
   "utf8",
 );
 const packageJson = JSON.parse(packageJsonText) as PackageJson;
+
+// Step 1: Update normal dependency blocks to the newest versions.
+// pnpm 10 removed --ignore; explicitly list all packages to update except excluded ones.
+const allDeps = [
+  ...Object.keys(packageJson.dependencies ?? {}),
+  ...Object.keys(packageJson.devDependencies ?? {}),
+  ...Object.keys(packageJson.optionalDependencies ?? {}),
+].filter((pkg) => !EXCLUDED_PACKAGES.includes(pkg));
+run(["up", "--latest", ...allDeps]);
 const peerDependencyNames = Object.keys(packageJson.peerDependencies ?? {});
 
 if (peerDependencyNames.length === 0) {

@@ -49,12 +49,14 @@ To update all dependencies to the latest versions:
 
 ```bash
 pnpm up --latest
+pnpm audit # -> fix high
 ```
 
 To update both normal dependencies and `peerDependencies` in one command, use:
 
 ```bash
 pnpm deps:update-all
+pnpm audit # -> fix high
 ```
 
 What `pnpm deps:update-all` does:

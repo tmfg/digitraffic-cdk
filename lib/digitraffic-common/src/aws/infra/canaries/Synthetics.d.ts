@@ -1,6 +1,6 @@
 declare module "Synthetics" {
-  import { type RequestOptions } from "node:http";
   import type { IncomingMessage } from "node:http";
+  import { type RequestOptions } from "node:http";
 
   interface SyntheticsConfiguration {
     withIncludeRequestBody: (value: boolean) => SyntheticsConfiguration;

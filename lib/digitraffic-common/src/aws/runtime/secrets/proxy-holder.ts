@@ -12,16 +12,25 @@ const RDS_PROXY_SECRET_KEYS = Object.values(RdsProxySecretKey);
 export class ProxyHolder {
   private readonly secretHolder: SecretHolder<RdsProxySecret>;
 
-  constructor(secretId: string) {
-    this.secretHolder = new SecretHolder<RdsProxySecret>(
-      secretId,
-      "",
-      RDS_PROXY_SECRET_KEYS,
-    );
+  private constructor(secretHolder: SecretHolder<RdsProxySecret>) {
+    this.secretHolder = secretHolder;
   }
 
-  static create(): ProxyHolder {
-    return new ProxyHolder(getEnvVariable("SECRET_ID"));
+  /** Creates a new instance of ProxyHolder from given SecretHolder. */
+  static create(secretHolder: SecretHolder<RdsProxySecret>): ProxyHolder;
+  /** Creates a new instance of ProxyHolder with a new default SecretHolder(using env variable SECRET_ID). */
+  static create(): ProxyHolder;
+
+  static create(secretHolder?: SecretHolder<RdsProxySecret>): ProxyHolder {
+    const holder =
+      secretHolder ??
+      new SecretHolder<RdsProxySecret>(
+        getEnvVariable("SECRET_ID"),
+        "",
+        RDS_PROXY_SECRET_KEYS,
+      );
+
+    return new ProxyHolder(holder);
   }
 
   public async setCredentials(): Promise<void> {

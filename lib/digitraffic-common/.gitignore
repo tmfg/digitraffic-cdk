@@ -39,3 +39,7 @@
 !scripts/**/*.sh
 !scripts/**/*.ts
 
+# VS Code workspace settings (shared editor config)
+!/.vscode/
+!/.vscode/settings.json
+

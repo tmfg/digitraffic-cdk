@@ -23,12 +23,17 @@ function getHandler(builder: FunctionBuilder): string {
 describe("FunctionBuilder.withAssetCode", () => {
   test("uses lambdaName as default path", () => {
     const stack = createStack();
-    const builder = FunctionBuilder.create(stack, "feature/subfeature/lambda-implementation");
+    const builder = FunctionBuilder.create(
+      stack,
+      "feature/subfeature/lambda-implementation",
+    );
 
     const code = getCode(builder);
 
     expect(code).toBeInstanceOf(AssetCode);
-    expect(code.path).toBe("dist/lambda/feature/subfeature/lambda-implementation");
+    expect(code.path).toBe(
+      "dist/lambda/feature/subfeature/lambda-implementation",
+    );
   });
 
   test("uses custom path when provided", () => {
@@ -40,14 +45,21 @@ describe("FunctionBuilder.withAssetCode", () => {
 
     const code = getCode(builder);
 
-    expect(code.path).toBe("dist/lambda/feature/subfeature/lambda-implementation");
+    expect(code.path).toBe(
+      "dist/lambda/feature/subfeature/lambda-implementation",
+    );
   });
 
   test("returns this for chaining when called without exclude", () => {
     const stack = createStack();
-    const builder = FunctionBuilder.create(stack, "feature/subfeature/lambda-implementation");
+    const builder = FunctionBuilder.create(
+      stack,
+      "feature/subfeature/lambda-implementation",
+    );
 
-    expect(builder.withAssetCode("feature/subfeature/lambda-implementation")).toBe(builder);
+    expect(
+      builder.withAssetCode("feature/subfeature/lambda-implementation"),
+    ).toBe(builder);
   });
 
   test("accepts exclude list and uses correct path", () => {

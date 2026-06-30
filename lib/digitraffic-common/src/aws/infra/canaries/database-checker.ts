@@ -2,7 +2,6 @@ import synthetics from "Synthetics";
 import type { DTDatabase } from "../../../database/database.js";
 import { inDatabaseReadonly } from "../../../database/database.js";
 import type { Countable } from "../../../database/models.js";
-import { getEnvVariable } from "../../../utils/utils.js";
 import { logger } from "../../runtime/dt-logger-default.js";
 import { ProxyHolder } from "../../runtime/secrets/proxy-holder.js";
 import { RdsHolder } from "../../runtime/secrets/rds-holder.js";
@@ -94,14 +93,12 @@ export class DatabaseCountChecker {
 
   static createForProxy(): DatabaseCountChecker {
     return new DatabaseCountChecker(() =>
-      new ProxyHolder(getEnvVariable("SECRET_ID")).setCredentials(),
+      ProxyHolder.create().setCredentials(),
     );
   }
 
   static createForRds(): DatabaseCountChecker {
-    return new DatabaseCountChecker(() =>
-      new RdsHolder(getEnvVariable("SECRET_ID")).setCredentials(),
-    );
+    return new DatabaseCountChecker(() => RdsHolder.create().setCredentials());
   }
 
   /**
