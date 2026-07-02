@@ -35,6 +35,7 @@ export class DigitrafficCanary extends Canary {
       },
       canaryName,
       schedule: params.schedule ?? Schedule.rate(Duration.minutes(15)),
+      provisionedResourceCleanup: true
     });
 
     this.artifactsBucket.grantWrite(role);
