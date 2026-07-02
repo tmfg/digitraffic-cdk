@@ -58,6 +58,8 @@ export type AlertField = "alert.id" | "alert.correlation_id.keyword";
 // prettier-ignore
 export type DefaultPythonField = "filename.keyword" | "funcName.keyword";
 
+export type GtfsField = "gtfsFileName" | "entityCount";
+
 export type OSLogField =
   | DefaultField
   | DefaultJavaField
@@ -67,7 +69,8 @@ export type OSLogField =
   | NginxField
   | CloudfrontField
   | HttpUserAgentField
-  | AlertField;
+  | AlertField
+  | GtfsField;
 
 export enum Bytes {
   KILO = 1000 * 1000,

@@ -57,6 +57,7 @@ export interface MonitorConfig {
   env: string;
   index: string;
   cron: string;
+  /// 60*12 is max supported range!
   rangeInMinutes: number;
   delayInMinutes?: number;
   phrases: Query[];
