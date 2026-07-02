@@ -22,7 +22,8 @@ const PS_DELETE_OLD_DATA = new pgPromise.PreparedStatement({
 
 const SQL_NEW_DATA = `select data_id, source, version, type, data
 from data_incoming
-where source = $1 and type in ($2:csv) and status = 'NEW'`;
+where source = $1 and type in ($2:csv) and status = 'NEW'
+order by created_at`;
 
 export async function insertData(
   db: DTDatabase,
