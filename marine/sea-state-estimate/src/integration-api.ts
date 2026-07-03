@@ -8,7 +8,7 @@ import {
   RESPONSE_200_OK,
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
-import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
@@ -35,7 +35,7 @@ export function createIntegrationApiAndHandlerLambda(
   secret: ISecret,
   stack: DigitrafficStack,
 ): void {
-  const integrationApi: RestApi = createRestApi(
+  const integrationApi = new DigitrafficRestApi(
     stack,
     "SSE-Integration",
     "SSE Data Integration API",
@@ -62,10 +62,8 @@ export function createIntegrationApiAndHandlerLambda(
   );
   secret.grantRead(updateSseDataLambda);
 
-  createDefaultUsagePlan(
-    integrationApi,
-    "SSE - Sea State Estimate Integration",
-  );
+  integrationApi.createUsagePlanV2("SSE - Sea State Estimate Integration");
+  integrationApi.exportEndpoint();
 }
 
 function createUpdateSseApiGatewayResource(integrationApi: RestApi): Resource {
