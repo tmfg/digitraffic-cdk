@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout cdk repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Checkout ${{ matrix.domain }} repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: tmfg/digitraffic-${{ matrix.domain }}
           fetch-depth: 2
@@ -76,7 +76,7 @@ jobs:
         domain: [other, aviation]
     steps:
       - name: Checkout cdk repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
       - name: Install Node 24

@@ -85,12 +85,12 @@ jobs:
           echo 'Using ref ${{ github.event.inputs.ref }}' >> $GITHUB_STEP_SUMMARY
           echo 'Using ci ${{ github.event.inputs.config-repo-branch }}' >> $GITHUB_STEP_SUMMARY
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.ref }}
 
       - name: Checkout CI-repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ secrets.CONFIG_REPO_NAME }}
           ssh-key: ${{ secrets.CONFIG_REPO_SSH_KEY }}

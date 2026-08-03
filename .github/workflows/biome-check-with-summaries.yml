@@ -20,7 +20,7 @@ jobs:
     steps:
       # 1. Checkout full repo
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0  # fetch full history so all files exist
           ref: ${{ github.ref }} # ensure the branch tip is checked out
