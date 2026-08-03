@@ -38,10 +38,10 @@
   "dependencies": {
     "@aws-sdk/client-api-gateway": "3.1073.0",
     "@aws-sdk/client-s3": "3.1073.0",
-    "@digitraffic/common": "2026.5.27-1",
+    "@digitraffic/common": "2026.8.3-1",
     "aws-cdk-lib": "2.260.0",
     "constructs": "10.6.0",
-    "es-toolkit": "1.47.1",
+    "es-toolkit": "1.49.0",
     "ky": "2.0.2",
     "zod": "4.4.3"
   },
