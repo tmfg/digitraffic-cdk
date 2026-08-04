@@ -62,11 +62,18 @@ export class PrivateApi {
         binaryMediaTypes: [MediaType.IMAGE_JPEG],
       },
     );
-    this.restApi.createUsagePlan("Marinecam Api Key", "Marinecam Usage Plan");
+    const apiKeyId = this.restApi.createUsagePlan(
+      "Marinecam Api Key",
+      "Marinecam Usage Plan",
+    );
     this.restApi.createUsagePlan(
       "Marinecam Api Key 2",
       "Marinecam Usage Plan 2",
     );
+    this.restApi.exportEndpoint({
+      apiKeyId,
+      exportName: stack.configuration.shortName,
+    });
 
     const readImageRole = this.createReadImageRole();
 

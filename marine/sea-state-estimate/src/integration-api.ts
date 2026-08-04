@@ -10,7 +10,6 @@ import {
 import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
   BAD_REQUEST_MESSAGE,
   ERROR_MESSAGE,
