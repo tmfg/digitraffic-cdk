@@ -30,7 +30,7 @@
     "es-toolkit": "1.49.0",
     "pg-native": "3.8.0",
     "pg-promise": "12.6.2",
-    "undici": "8.5.0",
+    "undici": "8.9.0",
     "zod": "4.4.3"
   },
   "devDependencies": {
