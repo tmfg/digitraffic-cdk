@@ -20,6 +20,7 @@ export class IntegrationApi {
     this.createDatex2V1Handler(stack, d2Queue);
 
     this.restApi.createUsagePlanV2("Integration API");
+    this.restApi.exportEndpoint();
   }
 
   createResourcePaths(): void {

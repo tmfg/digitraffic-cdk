@@ -22,10 +22,12 @@ export class IntegrationApi {
     this.createJsonDataV1Handler(stack);
     this.createJsonMetadataV1Handler(stack);
 
-    this.restApi.createUsagePlan(
+    const apiKeyId = this.restApi.createUsagePlan(
       "Integration API key",
       "Integration Usage Plan",
     );
+    const exportName = "VS-INTEGRATION";
+    this.restApi.exportEndpoint({ apiKeyId, exportName });
   }
 
   createResourcePaths(): void {

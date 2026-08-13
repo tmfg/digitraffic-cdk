@@ -139,6 +139,20 @@ export class Behavior {
       .withAllowAllMethods();
   }
 
+  /**
+   * Creates a new Behavior for an API Gateway integration with the given path and endpoint metadata.
+   * Does not add api key!
+   */
+  public static apiGatewayIntegration(
+    path: string,
+    endpoint: EndpointMetadata,
+  ): Behavior {
+    return new Behavior(
+      path,
+      Origin.apiGateway(endpoint.endpointUrl),
+    ).withAllowAllMethods();
+  }
+
   public static mqtt(originUrl: string): Behavior {
     return new Behavior("mqtt*", Origin.http(originUrl));
   }
