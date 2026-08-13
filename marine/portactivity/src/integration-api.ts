@@ -37,7 +37,12 @@ export function create(queue: Queue, stack: DigitrafficStack): void {
     ),
   );
   createUpdateTimestampResource(stack, integrationApi, queue, timestampModel);
-  createUsagePlan(integrationApi);
+  const apiKeyId = createUsagePlan(integrationApi);
+
+  integrationApi.exportEndpoint({
+    apiKeyId,
+    exportName: "PORTACTIVITY-INTEGRATION",
+  });
 }
 
 function createUpdateTimestampResource(
@@ -77,7 +82,7 @@ function createUpdateTimestampResource(
   );
 }
 
-function createUsagePlan(integrationApi: RestApi): void {
+function createUsagePlan(integrationApi: RestApi): string {
   const apiKey = integrationApi.addApiKey("Port Activity Integration API key");
   const plan = integrationApi.addUsagePlan(
     "Port Activity Integration Usage Plan",
@@ -89,4 +94,6 @@ function createUsagePlan(integrationApi: RestApi): void {
     stage: integrationApi.deploymentStage,
   });
   plan.addApiKey(apiKey);
+
+  return apiKey.keyId;
 }

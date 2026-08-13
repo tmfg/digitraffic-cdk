@@ -53,6 +53,11 @@ export class PublicApi {
       "PortActivity timestamps Usage Plan",
     ).keyId;
 
+    this.publicApi.exportEndpoint({
+      apiKeyId: this.apiKeyId,
+      exportName: "PORTACTIVITY",
+    });
+
     const validator = addDefaultValidator(this.publicApi);
 
     const shipModel = addServiceModel("ShipModel", this.publicApi, ShipSchema);
