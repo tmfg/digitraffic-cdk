@@ -39,6 +39,8 @@ export class PublicApi {
 
     this.apiKeyId = createDefaultUsagePlan(this.publicApi, apiName).keyId;
     this.publicApi.apiKeyIds.push(this.apiKeyId);
+    this.publicApi.exportEndpoint();
+
     const validator = addDefaultValidator(this.publicApi);
 
     const passengerInformationMessagesModel = this.createServiceModels(

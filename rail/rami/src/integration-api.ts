@@ -40,6 +40,10 @@ export class IntegrationApi {
 
     this.apiKeyId = createDefaultUsagePlan(this.integrationApi, apiName).keyId;
     this.integrationApi.apiKeyIds.push(this.apiKeyId);
+    this.integrationApi.exportEndpoint({
+      apiKeyId: this.apiKeyId,
+      exportName: "RAMI-INTEGRATION",
+    });
 
     const resource = this.integrationApi.root
       .addResource("api")
