@@ -36,14 +36,14 @@ async function getResponseFromLambda(
 describe(
   "get-values-lambda",
   dbTestBase((db: DTDatabase) => {
-    test.each([
-      "2024-13-33",
-      "2024-08-08T16:44:04Z",
-    ])("should fail when date is %s", async (date) => {
-      const response = await getResponseFromLambda({ date });
+    test.each(["2024-13-33", "2024-08-08T16:44:04Z"])(
+      "should fail when date is %s",
+      async (date) => {
+        const response = await getResponseFromLambda({ date });
 
-      new ExpectResponse(response).expectStatus(400);
-    });
+        new ExpectResponse(response).expectStatus(400);
+      },
+    );
 
     test("get values - wrong parameters", async () => {
       const response = await getResponseFromLambda({ foo: "bar" });

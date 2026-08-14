@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -e # Fail on error
 CONCURRENCY=0
-# https://github.com/aws/aws-cdk/releases
-CDK_VERSION=2.1126.0
+
+# Check version from https://www.npmjs.com/package/aws-cdk?activeTab=versions
+# With 7 day cooldown
+CDK_VERSION=2.1134.0
 
 # This script tries to do diff or deploy for cdk stack in given environment
 echo "Required parameters: <app>-<env> <diff|deploy> [stackName]"
@@ -12,7 +14,7 @@ FULL_ENV=${1:-"NONE"}
 echo "<app>-<env>: ${FULL_ENV}"
 
 SCRIPT_DIR=$(dirname "$0")
-. ${SCRIPT_DIR}/cdk-env.conf ${FULL_ENV}
+. "${SCRIPT_DIR}/cdk-env.conf" "${FULL_ENV}"
 
 OPERATION=${2:-"NONE"}
 STACK_NAME=${3:-"NONE"}
@@ -33,31 +35,30 @@ esac
 echo
 
 
-# Usage: requireCmd <command> '<install command>'
-# Example: requireCmd git 'brew install git'
-# Example open jdk 11: requireCmd $(/usr/libexec/java_home -v 11.0)/bin/java 'brew tap AdoptOpenJDK/openjdk && brew cask install adoptopenjdk11'
+# Usage: requireCmd <command> <install command> [args...]
+# Example: requireCmd git brew install git
+# Example open jdk 11: requireCmd $(/usr/libexec/java_home -v 11.0)/bin/java brew install --cask adoptopenjdk11
 requireCmd() {
-    cmd=$1
+    local cmd=$1
     shift
-    command -v "${cmd}" >/dev/null 2>&1 || { echo >&2 "I require command ${cmd} is not installed.  Installing."; eval "$@"; }
+    command -v "${cmd}" >/dev/null 2>&1 || { echo >&2 "Command ${cmd} is not installed. Installing..."; "$@"; }
 }
 # We need gsed command
-requireCmd gsed 'brew install gnu-sed'
+requireCmd gsed brew install gnu-sed
 
 # Try to find app properties .ts -file in bin dir of working dir
 EXECUTE_DIR=$(pwd)
-ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/src/bin/*-app.ts" )
+ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR"/src/bin/*-app.ts )
 # Take first .ts file and assume it is the app config file
 APP_TS=${ALL_TS_FILES_IN_BIN[0]}
-echo Found app config: $APP_TS
+echo "Found app config: ${APP_TS}"
 echo
 # Get stack name (take first match ie. grep -i 'new ' <the-file> | grep -i marineprod |  cut -d "'" -f2 | head -1
 # sed replaces single quotes (old way) with double quotes (new way)
 if [[ "${STACK_NAME}" == "NONE" ]]; then
-    REGEX="\"[A-Za-z0-9-]*${DT_PROJECT}[A-Za-z0-9-]*${DT_PROJECT_ENV}[A-Za-z0-9-]*\"";
-    echo "REGEX=${REGEX}"
+    echo "REGEX=\"[A-Za-z0-9-]*${DT_PROJECT}[A-Za-z0-9-]*${DT_PROJECT_ENV}[A-Za-z0-9-]*\""
     # Take first line of grep match and strip off double quotes
-    STACK=$(grep -Ei ${REGEX} ${APP_TS} |  cut -d '"' -f2 | head -1)
+    STACK=$(grep -Ei "\"[A-Za-z0-9-]*${DT_PROJECT}[A-Za-z0-9-]*${DT_PROJECT_ENV}[A-Za-z0-9-]*\"" "${APP_TS}" | cut -d '"' -f2 | head -1)
 else
     STACK=${STACK_NAME}
 fi
@@ -76,9 +77,9 @@ DO_OPERATION=false
 if [[ "${OPERATION}" == "diff" ]]; then
     DO_OPERATION=true
 else
-    read -p "Are you sure you wanna run: npx --yes cdk@${CDK_VERSION} ${OPERATION} ${STACK}? " -n 1 -r
+    read -p "Are you sure you wanna run: npx --yes aws-cdk@${CDK_VERSION} ${OPERATION} ${STACK}? " -n 1 -r
     echo    # move to a new line
-    if [[ $REPLY =~ ^[Yy]$ ]]
+    if [[ "$REPLY" =~ ^[Yy]$ ]]
     then
         DO_OPERATION=true
     fi
@@ -88,30 +89,30 @@ if [[ "${DO_OPERATION}" == true ]]
 then
   echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo
-  echo "npx --yes cdk@${CDK_VERSION} ${OPERATION} ${STACK}"
+  echo "npx --yes aws-cdk@${CDK_VERSION} ${OPERATION} ${STACK}"
   echo
 
   if [[ "${OPERATION}" == "diff" ]]
   then
       CDK_OUT=/tmp/cdk-out-${STACK}
-      # rushx cdk ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
+      # npx aws-cdk@${CDK_VERSION} ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
       # Use script too capture command output and save it to file
-      script ${CDK_OUT}.txt rushx cdk  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+      script "${CDK_OUT}.txt" npx --yes "aws-cdk@${CDK_VERSION}" "${OPERATION}" "${STACK}" --debug --concurrency="${CONCURRENCY}"
 
       read -p "Do you wanna see formatted diff in browser? " -n 1 -r
       echo    # move to a new line
-      if [[ $REPLY =~ ^[Yy]$ ]]
+      if [[ "$REPLY" =~ ^[Yy]$ ]]
       then
         SKIP_LINES_PATTERN="pnpm\|dlx-\|Downloading"
-        # first egrep takes lines without green, gsed removes ansi colour codes and last grep removes unwanted lines
-        egrep -v '\x1b\[32m' ${CDK_OUT}.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > ${CDK_OUT}-old.txt
-        # first egrep takes lines without red, gsed removes ansi colour codes and last grep removes unwanted lines
-        egrep -v '\x1b\[31m' ${CDK_OUT}.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > ${CDK_OUT}-new.txt
+        # first grep takes lines without green, gsed removes ansi colour codes and last grep removes unwanted lines
+        grep -E -v '\x1b\[32m' "${CDK_OUT}.txt" | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > "${CDK_OUT}-old.txt"
+        # first grep takes lines without red, gsed removes ansi colour codes and last grep removes unwanted lines
+        grep -E -v '\x1b\[31m' "${CDK_OUT}.txt" | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > "${CDK_OUT}-new.txt"
         # Make a diff with full context and convert it to html
-        diff -u -U 1000000 ${CDK_OUT}-old.txt ${CDK_OUT}-new.txt | npx --yes diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
+        diff -u -U 1000000 "${CDK_OUT}-old.txt" "${CDK_OUT}-new.txt" | npx --yes diff2html-cli@5.2.15 -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
       fi
     else
-        rushx cdk ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+        npx --yes "aws-cdk@${CDK_VERSION}" "${OPERATION}" "${STACK}" --debug --concurrency="${CONCURRENCY}"
     fi
 fi
 

@@ -81,11 +81,11 @@ describe("autori-utils-service-test", () => {
     expect(fixedRoute[0]?.geography?.features.length).toEqual(1);
     expect(fixedRoute[1]?.geography?.features.length).toEqual(1);
     expect(
-      (fixedRoute[0]?.geography?.features[0]?.geometry as LineString)
+      (fixedRoute[0]!.geography!.features[0]!.geometry as LineString)
         .coordinates.length,
     ).toEqual(10);
     expect(
-      (fixedRoute[1]?.geography?.features[0]?.geometry as LineString)
+      (fixedRoute[1]!.geography!.features[0]!.geometry as LineString)
         .coordinates.length,
     ).toEqual(15);
   });
@@ -105,7 +105,7 @@ describe("autori-utils-service-test", () => {
     expect(fixedRoute[0]?.geography?.features.length).toEqual(1);
 
     expect(
-      (fixedRoute[0]?.geography?.features[0]?.geometry as LineString)
+      (fixedRoute[0]!.geography!.features[0]!.geometry as LineString)
         .coordinates.length,
     ).toEqual(10);
   });
@@ -124,7 +124,7 @@ describe("autori-utils-service-test", () => {
 
     const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
     expect(groups.length).toEqual(1);
-    expect((groups[0]?.geometry as LineString).coordinates.length).toEqual(20);
+    expect((groups[0]!.geometry as LineString).coordinates.length).toEqual(20);
   });
 
   test("groupEventsToIndividualGeometries split when big jump", () => {
@@ -137,8 +137,8 @@ describe("autori-utils-service-test", () => {
 
     const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
     expect(groups.length).toEqual(2);
-    expect((groups[0]?.geometry as LineString).coordinates.length).toEqual(10);
-    expect((groups[1]?.geometry as LineString).coordinates.length).toEqual(8);
+    expect((groups[0]!.geometry as LineString).coordinates.length).toEqual(10);
+    expect((groups[1]!.geometry as LineString).coordinates.length).toEqual(8);
   });
 
   test("groupEventsToIndividualGeometries split to point", () => {
@@ -151,9 +151,9 @@ describe("autori-utils-service-test", () => {
 
     const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
     expect(groups.length).toEqual(2);
-    expect((groups[0]?.geometry as Point).coordinates.length).toEqual(3); // Just point [x,y,z]
+    expect((groups[0]!.geometry as Point).coordinates.length).toEqual(3); // Just point [x,y,z]
     expect(groups[0]?.geometry.type).toEqual("Point"); // Just point [x,y]
-    expect((groups[1]?.geometry as LineString).coordinates.length).toEqual(17);
+    expect((groups[1]!.geometry as LineString).coordinates.length).toEqual(17);
   });
 
   test("isOverTimeLimit", () => {
@@ -303,9 +303,12 @@ describe("autori-utils-service-test", () => {
         [HARJA_BRUSHING, HARJA_SALTING],
       );
 
+    // Expect tracking to be defined
+    expect(tracking).toBeDefined();
+
     // Expect all geometries to be found
     expect(
-      (tracking?.geometry as GeoJsonLineString).coordinates.length,
+      (tracking!.geometry as GeoJsonLineString).coordinates.length,
     ).toEqual(geometry.coordinates.length); // same as geometries count
 
     const ls = tracking?.geometry as GeoJsonLineString;

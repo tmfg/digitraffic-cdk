@@ -24,12 +24,12 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.2.19",
+    "@rushstack/heft": "1.2.22",
     "@types/node": "24.12.2",
-    "@vitest/coverage-v8": "4.1.9",
-    "aws-cdk": "2.1128.0",
+    "@vitest/coverage-v8": "4.1.10",
+    "aws-cdk": "2.1134.0",
     "esbuild": "0.28.1",
     "typescript": "5.9.3",
-    "vitest": "4.1.9"
+    "vitest": "4.1.10"
   }
 }

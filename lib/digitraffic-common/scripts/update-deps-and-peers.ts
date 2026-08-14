@@ -22,6 +22,11 @@ type PackageJson = {
   devDependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+  pnpm?: {
+    updateConfig?: {
+      ignoredPackages?: string[];
+    };
+  };
 };
 
 type NodeRelease = {
@@ -160,22 +165,32 @@ const updateUseNodeVersionInNpmrc = async (
   console.log(`Updated use-node-version to ${latestAllowed}.`);
 };
 
-const EXCLUDED_PACKAGES = ["typescript", "@types/node"];
-
 const packageJsonText = readFileSync(
   new URL("../package.json", import.meta.url),
   "utf8",
 );
 const packageJson = JSON.parse(packageJsonText) as PackageJson;
 
+// Packages to skip during updates — read from pnpm.updateConfig.ignoredPackages
+// in package.json so there is a single source of truth.
+const EXCLUDED_PACKAGES = packageJson.pnpm?.updateConfig?.ignoredPackages ?? [];
+
 // Step 1: Update normal dependency blocks to the newest versions.
 // pnpm 10 removed --ignore; explicitly list all packages to update except excluded ones.
+// Guard: if allDeps is empty, skip — running `pnpm up --latest` with no args would
+// update everything, including excluded packages.
 const allDeps = [
   ...Object.keys(packageJson.dependencies ?? {}),
   ...Object.keys(packageJson.devDependencies ?? {}),
   ...Object.keys(packageJson.optionalDependencies ?? {}),
 ].filter((pkg) => !EXCLUDED_PACKAGES.includes(pkg));
-run(["up", "--latest", ...allDeps]);
+
+if (allDeps.length === 0) {
+  console.log("No packages to update (all are excluded). Skipping pnpm up.");
+} else {
+  run(["up", "--latest", ...allDeps]);
+}
+
 const peerDependencyNames = Object.keys(packageJson.peerDependencies ?? {});
 
 if (peerDependencyNames.length === 0) {
@@ -184,10 +199,17 @@ if (peerDependencyNames.length === 0) {
 }
 
 // Step 2: Update peerDependencies explicitly and keep exact versions.
+// Guard: if all peer deps are excluded, skip — running `pnpm add --save-peer --save-exact`
+// with no args would fail.
 const peerPackagesAtLatest = peerDependencyNames
   .filter((name) => !EXCLUDED_PACKAGES.includes(name))
   .map((name) => `${name}@latest`);
-run(["add", "--save-peer", "--save-exact", ...peerPackagesAtLatest]);
+
+if (peerPackagesAtLatest.length === 0) {
+  console.log("All peerDependencies are excluded. Skipping peer update.");
+} else {
+  run(["add", "--save-peer", "--save-exact", ...peerPackagesAtLatest]);
+}
 
 // Step 3: Keep .npmrc use-node-version up to date using the same cooldown window.
 await updateUseNodeVersionInNpmrc(packageJson);

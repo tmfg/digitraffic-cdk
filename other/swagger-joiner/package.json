@@ -36,12 +36,12 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aws-sdk/client-api-gateway": "3.1073.0",
-    "@aws-sdk/client-s3": "3.1073.0",
-    "@digitraffic/common": "2026.8.3-1",
-    "aws-cdk-lib": "2.260.0",
-    "constructs": "10.6.0",
-    "es-toolkit": "1.49.0",
+    "@aws-sdk/client-api-gateway": "3.1098.0",
+    "@aws-sdk/client-s3": "3.1098.0",
+    "@digitraffic/common": "2026.8.6-1",
+    "aws-cdk-lib": "2.262.2",
+    "constructs": "10.7.2",
+    "es-toolkit": "1.50.0",
     "ky": "2.0.2",
     "zod": "4.4.3"
   },
@@ -50,13 +50,13 @@
     "@digitraffic-cdk/esbuild": "workspace:*",
     "@digitraffic-cdk/testing": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/heft": "1.2.19",
+    "@rushstack/heft": "1.2.22",
     "@types/aws-lambda": "8.10.162",
     "@types/node": "24.12.2",
-    "@vitest/coverage-v8": "4.1.9",
-    "aws-cdk": "2.1128.0",
+    "@vitest/coverage-v8": "4.1.10",
+    "aws-cdk": "2.1134.0",
     "esbuild": "0.28.1",
     "typescript": "5.9.3",
-    "vitest": "4.1.9"
+    "vitest": "4.1.10"
   }
 }

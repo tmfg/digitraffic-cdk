@@ -10,8 +10,8 @@
     "test": "echo 'No tests implemented'"
   },
   "dependencies": {
-    "@rushstack/heft": "1.2.19",
-    "@rushstack/heft-typescript-plugin": "1.3.14",
+    "@rushstack/heft": "1.2.22",
+    "@rushstack/heft-typescript-plugin": "1.3.17",
     "typescript": "5.9.3"
   }
 }
