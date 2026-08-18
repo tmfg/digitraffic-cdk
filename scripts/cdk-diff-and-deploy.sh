@@ -95,9 +95,9 @@ then
   if [[ "${OPERATION}" == "diff" ]]
   then
       CDK_OUT=/tmp/cdk-out-${STACK}
-      # npx aws-cdk@${CDK_VERSION} ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
       # Use script too capture command output and save it to file
-      script "${CDK_OUT}.txt" npx --yes "aws-cdk@${CDK_VERSION}" "${OPERATION}" "${STACK}" --debug --concurrency="${CONCURRENCY}"
+      # NOTE: --concurrency is a "cdk deploy"-only option, not supported by "cdk diff"
+      script "${CDK_OUT}.txt" npx --yes "aws-cdk@${CDK_VERSION}" "${OPERATION}" "${STACK}" --debug
 
       read -p "Do you wanna see formatted diff in browser? " -n 1 -r
       echo    # move to a new line
