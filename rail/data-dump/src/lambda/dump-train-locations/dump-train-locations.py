@@ -27,7 +27,7 @@ def checkThatJsonHasValuesRequiredByGeoJson(oldJsonRow):
       return False
 
     return True
-  else
+  else:
     return False
 
 def createGeoJsonFeaturePart(oldJsonRow):
