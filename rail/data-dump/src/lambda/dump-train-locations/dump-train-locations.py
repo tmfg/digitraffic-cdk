@@ -49,9 +49,6 @@ def createGeoJsonFeaturePart(oldJsonRow):
         }
     }
 
-def checkThatJsonHasValuesRequiredByGeoJson(oldJsonRow):
-
-
 @logger.inject_lambda_context
 def lambda_handler(event, context):
     logger.info('Cleaning tmp')
