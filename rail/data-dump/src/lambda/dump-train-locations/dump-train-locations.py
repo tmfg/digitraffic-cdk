@@ -14,7 +14,7 @@ HEADERS = {'Digitraffic-User': 'internal-digitraffic-data-dump'}
 def getDictionaryValueIfKeyExists(dictionaryKey, oldJsonRow):
   if dictionaryKey in oldJsonRow.keys():
     return oldJsonRow[dictionaryKey]
-  else
+  else:
     return None
 
 def checkThatJsonHasValuesRequiredByGeoJson(oldJsonRow):
