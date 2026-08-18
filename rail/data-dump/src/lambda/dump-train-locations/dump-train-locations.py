@@ -41,11 +41,11 @@ def createGeoJsonFeaturePart(oldJsonRow):
             },
         "properties":
         {
-            "accuracy": getDictionaryValueIfKeyExists("accuracy", oldJsonRow)
-            "speed": getDictionaryValueIfKeyExists("speed", oldJsonRow)
-            "trainNumber": getDictionaryValueIfKeyExists("trainNumber", oldJsonRow)
-            "departureDate": getDictionaryValueIfKeyExists("departureDate", oldJsonRow)
-            "timestamp": getDictionaryValueIfKeyExists("timestamp", oldJsonRow)
+            "accuracy": getDictionaryValueIfKeyExists("accuracy", oldJsonRow),
+            "speed": getDictionaryValueIfKeyExists("speed", oldJsonRow),
+            "trainNumber": getDictionaryValueIfKeyExists("trainNumber", oldJsonRow),
+            "departureDate": getDictionaryValueIfKeyExists("departureDate", oldJsonRow),
+            "timestamp": getDictionaryValueIfKeyExists("timestamp", oldJsonRow),
         }
     }
 
