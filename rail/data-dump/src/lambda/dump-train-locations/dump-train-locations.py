@@ -11,6 +11,25 @@ logger = Logger(service="data-dump-train-locations")
 
 HEADERS = {'Digitraffic-User': 'internal-digitraffic-data-dump'}
 
+def createGeoJsonFeaturePart(oldJsonRow):
+    return {
+        "type": "Feature",
+        "geometry":
+            {
+                "type": oldJsonRow["location"]["type"],
+                "coordinates": [oldJsonRow["location"]["coordinates"][0],
+                                oldJsonRow["location"]["coordinates"][1]]
+            },
+        "properties":
+        {
+            "accuracy": oldJsonRow["accuracy"],
+            "speed": oldJsonRow["speed"],
+            "trainNumber": oldJsonRow["trainNumber"],
+            "departureDate": oldJsonRow["departureDate"],
+            "timestamp": oldJsonRow["timestamp"],
+        }
+    }
+
 @logger.inject_lambda_context
 def lambda_handler(event, context):
     logger.info('Cleaning tmp')
@@ -55,7 +74,9 @@ def writeTrainLocationsToFile(departureDate):
     # Write locations incrementally — stream each train's locations directly to file
     # instead of accumulating millions of records in memory
     with open(filePath, 'w') as f:
-        f.write('[')
+        f.write('{')
+        f.write('"type": "FeatureCollection",')
+        f.write('"Features": [')
         first = True
         for i, trainNumber in enumerate(trainNumbers):
             if (i + 1) % 50 == 0 or i == 0:
@@ -66,10 +87,12 @@ def writeTrainLocationsToFile(departureDate):
             for loc in locations:
                 if not first:
                     f.write(',')
-                json.dump(loc, f)
+                locationGeoJson = createGeoJsonFeaturePart(loc)
+                json.dump(locationGeoJson, f)
                 first = False
                 recordCount += 1
         f.write(']')
+        f.write('}')
 
     logger.info('Wrote location records', count=recordCount, file_path=filePath)
 
