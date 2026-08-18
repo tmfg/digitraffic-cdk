@@ -11,6 +11,25 @@ logger = Logger(service="data-dump-train-locations")
 
 HEADERS = {'Digitraffic-User': 'internal-digitraffic-data-dump'}
 
+def getDictionaryValueIfKeyExists(dictionaryKey, oldJsonRow):
+  if dictionaryKey in oldJsonRow.keys():
+    return oldJsonRow[dictionaryKey]
+  else
+    return None
+
+def checkThatJsonHasValuesRequiredByGeoJson(oldJsonRow):
+  if 'location' in oldJsonRow.keys():
+    if not 'type' in oldJsonRow['location'].keys():
+      return False
+    if not 'coordinates' in oldJsonRow['location'].keys():
+      return False
+    if not len(oldJsonRow['coordinates']) == 2:
+      return False
+
+    return True
+  else
+    return False
+
 def createGeoJsonFeaturePart(oldJsonRow):
     return {
         "type": "Feature",
@@ -22,13 +41,16 @@ def createGeoJsonFeaturePart(oldJsonRow):
             },
         "properties":
         {
-            "accuracy": oldJsonRow["accuracy"],
-            "speed": oldJsonRow["speed"],
-            "trainNumber": oldJsonRow["trainNumber"],
-            "departureDate": oldJsonRow["departureDate"],
-            "timestamp": oldJsonRow["timestamp"],
+            "accuracy": getDictionaryValueIfKeyExists("accuracy", oldJsonRow)
+            "speed": getDictionaryValueIfKeyExists("speed", oldJsonRow)
+            "trainNumber": getDictionaryValueIfKeyExists("trainNumber", oldJsonRow)
+            "departureDate": getDictionaryValueIfKeyExists("departureDate", oldJsonRow)
+            "timestamp": getDictionaryValueIfKeyExists("timestamp", oldJsonRow)
         }
     }
+
+def checkThatJsonHasValuesRequiredByGeoJson(oldJsonRow):
+
 
 @logger.inject_lambda_context
 def lambda_handler(event, context):
@@ -87,8 +109,11 @@ def writeTrainLocationsToFile(departureDate):
             for loc in locations:
                 if not first:
                     f.write(',')
-                locationGeoJson = createGeoJsonFeaturePart(loc)
-                json.dump(locationGeoJson, f)
+                if checkThatJsonHasValuesRequiredByGeoJson(loc):
+                  locationGeoJson = createGeoJsonFeaturePart(loc)
+                  json.dump(locationGeoJson, f)
+                else:
+                  json.dump(loc, f)
                 first = False
                 recordCount += 1
         f.write(']')
