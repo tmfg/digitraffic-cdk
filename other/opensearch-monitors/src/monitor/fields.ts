@@ -16,7 +16,8 @@ export type DefaultLambdaField =
   | "lambdaName"
   | "method"
   | "runtime"
-  | "record.status";
+  | "record.status"
+  | "error";
 
 // prettier-ignore
 export type AppField =
