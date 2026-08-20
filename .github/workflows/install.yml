@@ -187,6 +187,9 @@ jobs:
         with:
           version: 10
 
+      - name: Install Poetry
+        run: pipx install poetry==2.3.2
+
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
 
