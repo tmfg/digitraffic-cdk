@@ -23,7 +23,7 @@ def checkThatJsonHasValuesRequiredByGeoJson(oldJsonRow):
       return False
     if not 'coordinates' in oldJsonRow['location'].keys():
       return False
-    if not len(oldJsonRow['coordinates']) == 2:
+    if not len(oldJsonRow['location']['coordinates']) == 2:
       return False
 
     return True
