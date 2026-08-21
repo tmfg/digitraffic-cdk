@@ -1,7 +1,6 @@
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
   addDefaultValidator,
   addServiceModel,
@@ -37,7 +36,7 @@ export function createIntegrationApiAndHandlerLambda(
   stackConfiguration: MaintenanceTrackingStackConfiguration,
   stack: DigitrafficStack,
 ): void {
-  const integrationApi = createRestApi(
+  const integrationApi = new DigitrafficRestApi(
     stack,
     "MaintenanceTracking-Integration",
     "Maintenance Tracking Integration API",
@@ -54,7 +53,11 @@ export function createIntegrationApiAndHandlerLambda(
     stackConfiguration,
     stack,
   );
-  createDefaultUsagePlan(integrationApi, "Maintenance Tracking Integration");
+  integrationApi.createUsagePlanV2("Maintenance Tracking Integration");
+  integrationApi.exportEndpoint({
+    apiKeyId: integrationApi.apiKeyIds[0],
+    exportName: "MT-INTEGRATION",
+  });
 }
 
 function addServiceModelToIntegrationApi(integrationApi: RestApi): void {
