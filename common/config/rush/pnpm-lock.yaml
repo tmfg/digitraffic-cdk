@@ -401,8 +401,8 @@ importers:
         specifier: 12.7.0
         version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
       undici:
-        specifier: 8.9.0
-        version: 8.9.0
+        specifier: 8.10.0
+        version: 8.10.0
       xml2js:
         specifier: 0.6.2
         version: 0.6.2
@@ -6638,6 +6638,10 @@ packages:
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
+  undici@8.10.0:
+    resolution: {integrity: sha512-HvltHd7avK13QIw/oLe4qoOLyoVSoafqJ2jYOrtMRBkbYT31eiBQ8O0ehRKZiEZCMEyLFQNIADpgCWC5fALvYQ==}
+    engines: {node: '>=22.19.0'}
+
   undici@8.9.0:
     resolution: {integrity: sha512-aWZpUj7XoGonMClx4gdDRfgBjqeA+F473aDmROQQbM9n6PRfK/u1q/a0X4wMTgcHfT8H6fpbt98PFuDUwFg2YA==}
     engines: {node: '>=22.19.0'}
@@ -12266,6 +12270,8 @@ snapshots:
   undici-types@7.16.0: {}
 
   undici-types@7.18.2: {}
+
+  undici@8.10.0: {}
 
   undici@8.9.0: {}
 
