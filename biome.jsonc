@@ -21,6 +21,8 @@
       "!**/output",
       "!**/temp",
       "!tmp",
+      // Exclude generated source files; their formatting is controlled by the generator.
+      "!**/src/generated",
       // Exclude projects lib folders
       "!aviation/**/lib",
       "!marine/**/lib",

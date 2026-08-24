@@ -9,18 +9,8 @@ export type TheSitenameSchema = string;
 export type TheSitenumberSchema = number;
 export type TheSiteTypeSchema = "FIXED" | "FLOATING";
 export type TheLastUpdateSchema = string;
-export type TheSeastateSchema =
-  | "CALM"
-  | "LIGHT"
-  | "MODERATE"
-  | "BREEZE"
-  | "GALE"
-  | "STORM";
-export type TheTrendSchema =
-  | "UNKNOWN"
-  | "NO_CHANGE"
-  | "ASCENDING"
-  | "DESCENDING";
+export type TheSeastateSchema = "CALM" | "LIGHT" | "MODERATE" | "BREEZE" | "GALE" | "STORM";
+export type TheTrendSchema = "UNKNOWN" | "NO_CHANGE" | "ASCENDING" | "DESCENDING";
 export type TheWindwavedirSchema = number;
 export type TheConfidenceSchema = "POOR" | "MODERATE" | "GOOD";
 export type TheTemperatureSchema = number;
