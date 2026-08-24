@@ -1,0 +1,40 @@
+{
+  "name": "roadnetwork",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "heft build --clean",
+    "build:watch": "heft build-watch --clean",
+    "cdk": "cdk",
+    "cdk-deploy-road-prod": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-prod deploy RoadnetworkProd",
+    "cdk-deploy-road-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-test deploy RoadnetworkTest",
+    "cdk-diff-road-prod": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-prod diff RoadnetworkProd",
+    "cdk-diff-road-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh road-test diff RoadnetworkTest",
+    "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml",
+    "clean": "rimraf dist cdk.out",
+    "clean:force": "rimraf dist cdk.out node_modules",
+    "serve:website:local": "npx serve@14.2.6 src/website -l 8080",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test-data:create": "bash ../../scripts/roadnetwork-pagination-test-data.sh create",
+    "test-data:delete": "bash ../../scripts/roadnetwork-pagination-test-data.sh delete"
+  },
+  "dependencies": {
+    "@digitraffic/common": "2026.8.6-1",
+    "aws-cdk-lib": "2.262.2",
+    "constructs": "10.7.2"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/cdk-rig": "workspace:*",
+    "@digitraffic-cdk/testing": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/heft": "1.2.22",
+    "@types/node": "24.12.2",
+    "@vitest/coverage-v8": "4.1.10",
+    "aws-cdk": "2.1134.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}

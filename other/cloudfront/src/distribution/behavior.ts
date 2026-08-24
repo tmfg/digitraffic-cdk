@@ -315,13 +315,56 @@ export class Behavior {
     return this;
   }
 
-  public withRemovePathFunction(count: number): Behavior {
+  /**
+   * Strips leading path parts before the request reaches the origin.
+   *
+   * Use when the public path carries a prefix the origin does not know about, typically an S3
+   * bucket served under a subpath. With `pathPartsToRemove = 1`:
+   * `/tmc/certified/data.zip` -> object key `certified/data.zip`.
+   *
+   * @param pathPartsToRemove how many leading path segments to drop, one per prefix level
+   */
+  public withRemovePathFunction(pathPartsToRemove: number): Behavior {
     this.addFunction(
       FunctionEventType.VIEWER_REQUEST,
       FunctionType.PATH_REWRITE,
     );
 
-    this.lambdaConfig.parameters.pathRemoveCount = count;
+    this.lambdaConfig.parameters.pathRemoveCount = pathPartsToRemove;
+
+    return this;
+  }
+
+  /**
+   * Removes leading URI path segments and serves `index.html` for directory requests.
+   *
+   * Use when an S3 bucket is published below a CloudFront path prefix and the bucket also hosts
+   * a static browser for that prefix. The viewer request function first removes the configured
+   * number of leading URI path segments, usually the public CloudFront prefix, before the request
+   * reaches S3. If the remaining path ends in `/`, it appends `index.html` so directory navigation
+   * loads the static page.
+   *
+   * S3 `ListObjectsV2` requests are the exception: when the query string contains `list-type=2`,
+   * the request is passed to S3 without appending `index.html`. This lets the static browser call
+   * the bucket listing API on the same public path.
+   *
+   * With `pathPartsToRemove = 1`, the leading `/roadnetwork` segment is removed:
+   * - `/roadnetwork/assets/app.js` -> object key `assets/app.js`
+   * - `/roadnetwork/latest/data.zip` -> object key `latest/data.zip`
+   * - `/roadnetwork/` -> object key `index.html`
+   * - `/roadnetwork/latest/` -> object key `latest/index.html`
+   * - `/roadnetwork/?list-type=2&delimiter=/&prefix=latest/` -> S3 bucket listing request for
+   *   prefix `latest/`
+   *
+   * @param pathPartsToRemove how many leading URI path segments to remove, one per prefix level
+   */
+  public withDirectoryIndexFunction(pathPartsToRemove: number): Behavior {
+    this.addFunction(
+      FunctionEventType.VIEWER_REQUEST,
+      FunctionType.DIRECTORY_INDEX,
+    );
+
+    this.lambdaConfig.parameters.pathRemoveCount = pathPartsToRemove;
 
     return this;
   }

@@ -17,6 +17,7 @@ export class WafRules {
   readonly perIpAndQueryWithHeader?: number;
   readonly perIpAndQueryWithoutHeader?: number;
   readonly perIpAndQueryWithoutHeaderByPath?: PathLimit;
+  readonly perIpAndQueryWithoutHeaderExcludedPath?: RegExp;
 
   readonly isCountOnly?: boolean;
 
@@ -30,6 +31,7 @@ export class WafRules {
     perIpAndQueryWithoutHeaderByPath?: PathLimit,
     excludedRules?: ExcludedAWSRules,
     isCountOnly: boolean = false,
+    perIpAndQueryWithoutHeaderExcludedPath?: RegExp,
   ) {
     if (
       !isCountOnly &&
@@ -44,6 +46,8 @@ export class WafRules {
     this.perIpAndQueryWithHeader = perIpAndQueryWithHeader;
     this.perIpAndQueryWithoutHeader = perIpAndQueryWithoutHeader;
     this.perIpAndQueryWithoutHeaderByPath = perIpAndQueryWithoutHeaderByPath;
+    this.perIpAndQueryWithoutHeaderExcludedPath =
+      perIpAndQueryWithoutHeaderExcludedPath;
     this.excludedRules = excludedRules;
     this.isCountOnly = isCountOnly;
   }
@@ -74,6 +78,7 @@ export class WafRules {
     perIpAndQueryWithoutHeader?: number,
     perIpAndQueryWithoutHeaderByPath?: PathLimit,
     excludedRules?: ExcludedAWSRules,
+    perIpAndQueryWithoutHeaderExcludedPath?: RegExp,
   ): WafRules {
     WafRules.checkLimits(
       perIpWithHeader,
@@ -91,6 +96,8 @@ export class WafRules {
       perIpAndQueryWithoutHeader,
       perIpAndQueryWithoutHeaderByPath,
       excludedRules,
+      false,
+      perIpAndQueryWithoutHeaderExcludedPath,
     );
   }
 

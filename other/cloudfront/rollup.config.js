@@ -32,6 +32,7 @@ const excludeTerser = [
   "function-rewrite-uri",
   "function-redirect",
   "function-index-html",
+  "function-directory-index",
 ];
 
 export default inputs.map((input) => {

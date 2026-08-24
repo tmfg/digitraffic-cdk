@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Road Network -aineistot | Digitraffic</title>
+    <link
+      rel="icon"
+      href="https://www.digitraffic.fi/favicon.ico"
+      type="image/x-icon"
+    >
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="logo" href="https://www.digitraffic.fi/">
+        <img src="assets/fintraffic-logo.svg" alt="Fintraffic" height="28">
+        <span>Digitraffic</span>
+      </a>
+      <nav class="lang">
+        <a href="?lang=fi" data-lang-link="fi">FI</a>
+        <a href="?lang=en" data-lang-link="en">EN</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Finnish defaults are shown before app.js runs and when Finnish is selected. -->
+      <h1 data-i18n="title">Road Network -aineistot</h1>
+      <p class="intro" data-i18n="intro">
+        Ladattavat Road Network -aineistojulkaisut.
+      </p>
+
+      <nav class="breadcrumb" id="breadcrumb" aria-label="Breadcrumb"></nav>
+
+      <table class="listing">
+        <thead>
+          <tr>
+            <th scope="col">
+              <button
+                class="sort-button"
+                type="button"
+                data-sort-key="name"
+                data-i18n="colName"
+              >
+                Nimi
+              </button>
+            </th>
+            <th scope="col" class="right">
+              <button
+                class="sort-button"
+                type="button"
+                data-sort-key="size"
+                data-i18n="colSize"
+              >
+                Koko
+              </button>
+            </th>
+            <th scope="col">
+              <button
+                class="sort-button"
+                type="button"
+                data-sort-key="modified"
+                data-i18n="colModified"
+              >
+                Muokattu
+              </button>
+            </th>
+            <th scope="col" data-i18n="actions">Toiminnot</th>
+          </tr>
+        </thead>
+        <tbody id="listing"></tbody>
+      </table>
+
+      <nav class="pagination" id="pagination" aria-label="Pagination" hidden>
+        <button type="button" id="previous-page" data-i18n="previous">
+          Edellinen
+        </button>
+        <span class="page-numbers" id="page-numbers"></span>
+        <button type="button" id="next-page" data-i18n="next">Seuraava</button>
+      </nav>
+
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-top">
+        <img src="assets/fintraffic-logo.svg" alt="Fintraffic" height="24">
+        <a href="https://www.fintraffic.fi/">fintraffic.fi</a>
+      </div>
+      <p>
+        <a href="https://www.digitraffic.fi/">Digitraffic</a>
+      </p>
+    </footer>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>

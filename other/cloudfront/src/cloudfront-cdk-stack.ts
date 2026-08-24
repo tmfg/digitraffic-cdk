@@ -405,7 +405,11 @@ export class CloudfrontCdkStack extends Stack {
         case FunctionType.PATH_REWRITE: {
           const pathRemoveCount =
             behavior.lambdaConfig.parameters.pathRemoveCount;
-          if (!pathRemoveCount) throw new Error("Missing pathRemoveCount");
+          if (!pathRemoveCount) {
+            throw new Error(
+              `${behavior.behaviorPath}: withRemovePathFunction() needs the number of leading path parts to remove`,
+            );
+          }
 
           functionVersion =
             this._edgeFunctionFactory.getPathRewriteFunction(pathRemoveCount);
@@ -417,6 +421,23 @@ export class CloudfrontCdkStack extends Stack {
           functionVersion = this._edgeFunctionFactory.getHttpHeadersFunction();
 
           break;
+
+        case FunctionType.DIRECTORY_INDEX: {
+          const pathRemoveCount =
+            behavior.lambdaConfig.parameters.pathRemoveCount;
+          if (!pathRemoveCount) {
+            throw new Error(
+              `${behavior.behaviorPath}: withDirectoryIndexFunction() needs the number of leading path parts to remove`,
+            );
+          }
+
+          functionVersion =
+            this._edgeFunctionFactory.getDirectoryIndexFunction(
+              pathRemoveCount,
+            );
+
+          break;
+        }
       }
 
       functions.push({

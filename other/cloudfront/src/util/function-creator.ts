@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import {
   Function as CloudfrontFunction,
@@ -10,6 +11,7 @@ export enum FunctionType {
   INDEX_HTML,
   REDIRECT,
   PATH_REWRITE,
+  DIRECTORY_INDEX,
   HTTP_HEADERS,
 }
 
@@ -22,6 +24,10 @@ function readFunctionBody(fileName: string): string {
   }
 
   return body.toString();
+}
+
+function shortHash(value: string): string {
+  return createHash("sha256").update(value).digest("hex").substring(0, 8);
 }
 
 export function createIndexHtml(scope: Construct): CloudfrontFunction {
@@ -39,7 +45,12 @@ export function createRedirectFunction(
     redirectUrl,
   );
 
-  return createCloudfrontFunction(scope, "redirect-function", body);
+  // A stack can hold several redirect behaviors, each with its own target url.
+  return createCloudfrontFunction(
+    scope,
+    `redirect-function-${shortHash(redirectUrl)}`,
+    body,
+  );
 }
 
 export function createPathRewriteFunction(
@@ -64,6 +75,21 @@ export function createHttpHeadersFunction(
   const body = readFunctionBody("dist/lambda/function-http-headers.cjs");
 
   return createCloudfrontFunction(scope, "http-headers-function", body);
+}
+
+export function createDirectoryIndexFunction(
+  scope: Construct,
+  pathRemoveCount: number,
+): CloudfrontFunction {
+  const body = readFunctionBody(
+    "dist/lambda/function-directory-index.cjs",
+  ).replace(/EXT_PATHS_TO_REMOVE/gi, pathRemoveCount.toString());
+
+  return createCloudfrontFunction(
+    scope,
+    `directory-index-function-${pathRemoveCount}`,
+    body,
+  );
 }
 
 // let's make a chain of dependencies from the functions, as AWS won't allow deploying many functions at the same time!

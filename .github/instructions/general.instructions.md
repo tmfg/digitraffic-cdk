@@ -48,6 +48,12 @@ Each CDK project follows this standard structure:
 
 Larger projects may also have: `internal-lambdas.ts`, `public-api.ts`, `integration-api.ts`, `canaries.ts`, `keys.ts`, `app-props.ts`, `esbuild.ts`, `api/`, `canaries/`.
 
+## Environment identifiers
+
+Real AWS account ids, CloudFront distribution ids, ARNs and other environment-specific
+identifiers belong only in `src/bin/` (hard-linked from the CI repo). Never put them in
+source, tests, READMEs or comments — use placeholders there.
+
 ## Building a project
 
 A project can be built with rush in the project directory:

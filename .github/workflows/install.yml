@@ -46,6 +46,7 @@ on:
           - "port-call"
           - "portactivity"
           - "rami"
+          - "roadnetwork"
           - "sea-state-estimate"
           - "shiplight"
           - "variable-signs"

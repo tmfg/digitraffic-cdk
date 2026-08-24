@@ -12,11 +12,13 @@ import type { CloudfrontEvent } from "../../lambda/function-events.js";
 export function createCloudfrontEvent(
   uri: string,
   method: string = "GET",
+  querystring: CloudfrontEvent["request"]["querystring"] = {},
 ): CloudfrontEvent {
   return {
     request: {
       uri,
       method,
+      querystring,
     },
     response: {
       statusCode: 200,

@@ -27,7 +27,10 @@ export function createWebAcl(
         .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
         .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
         .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
-        .withThrottleAnonymousUserIpAndUriPath(rules.perIpAndQueryWithoutHeader)
+        .withThrottleAnonymousUserIpAndUriPath(
+          rules.perIpAndQueryWithoutHeader,
+          rules.perIpAndQueryWithoutHeaderExcludedPath,
+        )
         .withThrottleAnonymousUserIpByUriPath(
           rules.perIpAndQueryWithoutHeaderByPath?.limit,
           rules.perIpAndQueryWithoutHeaderByPath?.path,

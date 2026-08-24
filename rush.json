@@ -240,6 +240,12 @@
       "tags": ["cdk", "road"]
     },
     {
+      "packageName": "roadnetwork",
+      "projectFolder": "road/roadnetwork",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "road"]
+    },
+    {
       "packageName": "variable-signs",
       "projectFolder": "road/variable-signs",
       "decoupledLocalDependencies": ["@digitraffic/common"],
