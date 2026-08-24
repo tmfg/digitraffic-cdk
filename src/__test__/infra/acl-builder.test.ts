@@ -71,6 +71,31 @@ describe("acl-builder tests", () => {
     }
   });
 
+  test("anonymous uri-path throttle can exclude a path", () => {
+    const acl = createBuilder()
+      .withThrottleAnonymousUserIpAndUriPath(100, /^\/roadnetwork\//)
+      .build();
+    const rule = (acl.rules as Array<CfnWebACL.RuleProperty>)[0];
+    const statement = rule?.statement as CfnWebACL.StatementProperty;
+    const rateBased =
+      statement.rateBasedStatement as CfnWebACL.RateBasedStatementProperty;
+    const scopeDown = rateBased.scopeDownStatement;
+    const scopeDownStatement = scopeDown as CfnWebACL.StatementProperty;
+    const andStatement =
+      scopeDownStatement.andStatement as CfnWebACL.AndStatementProperty;
+    const scopeDownStatements = (andStatement.statements ??
+      []) as CfnWebACL.StatementProperty[];
+    const excludedStatement = scopeDownStatements[1]!;
+    const excludedPathStatement =
+      excludedStatement.notStatement as CfnWebACL.NotStatementProperty;
+    const regexMatchStatement = (
+      excludedPathStatement.statement as CfnWebACL.StatementProperty
+    ).regexMatchStatement as CfnWebACL.RegexMatchStatementProperty;
+
+    expect(scopeDownStatements).toHaveLength(2);
+    expect(regexMatchStatement.regexString).toBe("^\\/roadnetwork\\/");
+  });
+
   test("Cannot define two rules with the same name", () => {
     expect(() =>
       createBuilder()

@@ -145,6 +145,17 @@ export class AclBuilder {
     return this;
   }
 
+  /**
+   * Adds a rate-based WAF rule for either blocking or counting requests.
+   *
+   * @param name WAF rule name and CloudWatch metric name.
+   * @param limit Maximum requests allowed in the WAF evaluation window.
+   * @param isHeaderRequired Whether the rule applies when the digitraffic-user header is present.
+   * @param isBasedOnIpAndUriPath Whether requests are aggregated by IP address and URI path.
+   * @param customResponseBodyKey Custom response body key; when provided, matching requests are blocked instead of counted.
+   * @param path Optional URI path pattern that limits which requests are included.
+   * @param excludedPath Optional URI path pattern that excludes matching requests from the rule.
+   */
   withThrottleRule(
     name: string,
     limit: number,
@@ -152,6 +163,7 @@ export class AclBuilder {
     isBasedOnIpAndUriPath: boolean,
     customResponseBodyKey?: string,
     path?: RegExp,
+    excludedPath?: RegExp,
   ): this {
     const isBlockRule = !!customResponseBodyKey;
     const rules = isBlockRule ? this._blockRules : this._countRules;
@@ -180,6 +192,7 @@ export class AclBuilder {
         isHeaderRequired,
         isBasedOnIpAndUriPath,
         path,
+        excludedPath,
       ),
     });
 
@@ -264,7 +277,18 @@ export class AclBuilder {
     );
   }
 
-  withThrottleAnonymousUserIpAndUriPath(limit: number | undefined): this {
+  /**
+   * Throttles anonymous requests by IP address and URI path.
+   *
+   * Existing callers that omit `excludedPath` retain the previous behavior.
+   *
+   * @param limit Maximum requests allowed for each IP and URI path combination.
+   * @param excludedPath Optional URI path pattern excluded from this throttle rule.
+   */
+  withThrottleAnonymousUserIpAndUriPath(
+    limit: number | undefined,
+    excludedPath?: RegExp,
+  ): this {
     if (limit === undefined) {
       return this;
     }
@@ -276,6 +300,8 @@ export class AclBuilder {
       false,
       true,
       customResponseBodyKey,
+      undefined,
+      excludedPath,
     );
   }
 
@@ -446,13 +472,24 @@ function notStatement(
   };
 }
 
+/**
+ * Creates the scope-down and rate-based statement used by a throttle rule.
+ *
+ * @param limit Maximum requests allowed in the WAF evaluation window.
+ * @param isHeaderRequired Whether the statement matches requests with the digitraffic-user header.
+ * @param isBasedOnIpAndUriPath Whether requests are aggregated by IP address and URI path.
+ * @param path Optional URI path pattern that limits which requests are included.
+ * @param excludedPath Optional URI path pattern that is explicitly excluded from the statement.
+ */
 function createThrottleStatement(
   limit: number,
   isHeaderRequired: boolean,
   isBasedOnIpAndUriPath: boolean,
   path?: RegExp,
+  excludedPath?: RegExp,
 ): CfnWebACL.StatementProperty {
-  // this statement matches empty digitraffic-user -header
+  // Matches requests with a non-empty digitraffic-user header. For anonymous
+  // requests, the inverted statement matches requests without the header.
   const matchStatement: CfnWebACL.StatementProperty = {
     sizeConstraintStatement: {
       comparisonOperator: isHeaderRequired ? "GT" : "GE",
@@ -487,6 +524,27 @@ function createThrottleStatement(
     scopeDownStatement = {
       andStatement: {
         statements: [scopeDownStatement, pathMatchStatement],
+      },
+    };
+  }
+
+  if (excludedPath) {
+    const excludedPathMatchStatement: CfnWebACL.StatementProperty = {
+      regexMatchStatement: {
+        fieldToMatch: {
+          uriPath: {},
+        },
+        regexString: excludedPath.source,
+        textTransformations: [{ priority: 0, type: "NONE" }],
+      },
+    };
+
+    scopeDownStatement = {
+      andStatement: {
+        statements: [
+          scopeDownStatement,
+          notStatement(excludedPathMatchStatement),
+        ],
       },
     };
   }
