@@ -22,10 +22,30 @@ BUCKET_NAME = "test-bucket"
 REGION = "eu-west-1"
 API_BASE = "https://rata.digitraffic.fi/api/v1"
 
-MOCK_TRAINS = [{"trainNumber": 101}, {"trainNumber": 102}]
+MOCK_TRAINS = [{"trainNumber": 101}, {"trainNumber": 102}, {"trainNumber": 103}, {"trainNumber": 104}]
 MOCK_LOCATIONS_101 = [{"trainNumber": 101, "location": {"x": 1}}]
 MOCK_LOCATIONS_102 = [{"trainNumber": 102, "location": {"x": 2}}]
-MOCK_LOCATIONS_103 = [{"trainNumber": 101, "location": {"x": 1}}]
+MOCK_LOCATIONS_103 = {
+  "accuracy": 0,
+  "location": {
+    "type": "Point",
+    "coordinates": (1, 2)
+  },
+  "speed": 3,
+  "trainNumber": 101,
+  "departureDate": date(2026, 5, 11)
+}
+MOCK_LOCATIONS_104 = {
+  "accuracy": 4,
+  "location": {
+    "type": "Point",
+    "coordinates": (5, 6)
+  },
+  "speed": 7,
+  "trainNumber": 102,
+  "departureDate": date(2026, 11, 5)
+}
+
 
 class TestDumpTrainLocations(unittest.TestCase):
 
@@ -98,8 +118,8 @@ class TestDumpTrainLocations(unittest.TestCase):
 
             with rm.Mocker() as m:
                 m.get(f"{API_BASE}/trains/2025-12-31", json=MOCK_TRAINS)
-                m.get(f"{API_BASE}/train-locations/2025-12-31/101", json=MOCK_LOCATIONS_101)
-                m.get(f"{API_BASE}/train-locations/2025-12-31/102", json=MOCK_LOCATIONS_102)
+                m.get(f"{API_BASE}/train-locations/2025-12-31/101", json=MOCK_LOCATIONS_103)
+                m.get(f"{API_BASE}/train-locations/2025-12-31/102", json=MOCK_LOCATIONS_104)
 
                 with patch.dict(os.environ, {"DUMP_BUCKET_NAME": BUCKET_NAME}):
                     # When
@@ -129,9 +149,9 @@ class TestDumpTrainLocations(unittest.TestCase):
                     data = json.load(f)
                     self.assertIsInstance(data, list)
                     self.assertEqual(len(data), 2)
-                    self.assertEqual(data[0], MOCK_LOCATIONS_101[0])
-                    self.assertEqual(data[1], MOCK_LOCATIONS_102[0])
-            
+                    self.assertEqual(data[0], MOCK_LOCATIONS_103[0])
+                    self.assertEqual(data[1], MOCK_LOCATIONS_104[0])
+
     def test_fails_on_location_fetch_error(self):
         """
         Given: Event specifies date "2026-03-13",
