@@ -18,14 +18,21 @@ const leadingPathSegmentsToRemove = Number.parseInt("EXT_PATHS_TO_REMOVE", 10);
  */
 export function handler(
   event: CloudfrontEvent,
-  leadingPathSegmentsToRemoveCount = leadingPathSegmentsToRemove,
+  leadingPathSegmentsToRemoveCount?: number,
 ): CloudfrontEvent["request"] {
+  const pathSegmentsToRemove =
+    leadingPathSegmentsToRemoveCount === undefined
+      ? leadingPathSegmentsToRemove
+      : leadingPathSegmentsToRemoveCount;
   const request = event.request;
-  const uri = removePathParts(request.uri, leadingPathSegmentsToRemoveCount);
-  const isListObjectsRequest = request.querystring["list-type"]?.value === "2";
+  const uri = removePathParts(request.uri, pathSegmentsToRemove);
+  const querystring = request.querystring || {};
+  const listType = querystring["list-type"];
+  const isListObjectsRequest = !!listType && listType.value === "2";
+  const endsWithSlash = uri.length > 0 && uri.charAt(uri.length - 1) === "/";
 
   request.uri =
-    uri.endsWith("/") && !isListObjectsRequest ? `${uri}index.html` : uri;
+    endsWithSlash && !isListObjectsRequest ? `${uri}index.html` : uri;
 
   return request;
 }

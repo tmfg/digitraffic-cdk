@@ -42,3 +42,12 @@ test("directory request with a language query gets index.html", () => {
 
   expect(request.uri).toEqual("/index.html");
 });
+
+test("directory request without querystring gets index.html", () => {
+  const event = createCloudfrontEvent("/roadnetwork/");
+  delete (event.request as { querystring?: unknown }).querystring;
+
+  const request = handler(event, LEADING_PATH_SEGMENTS_TO_REMOVE);
+
+  expect(request.uri).toEqual("/index.html");
+});
