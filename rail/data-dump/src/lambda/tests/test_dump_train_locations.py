@@ -33,7 +33,7 @@ MOCK_LOCATIONS_103 = {
   },
   "speed": 3,
   "trainNumber": 101,
-  "departureDate": date(2026, 5, 11)
+  "departureDate": str(date(2026, 5, 11))
 }
 MOCK_LOCATIONS_104 = {
   "accuracy": 4,
@@ -43,7 +43,7 @@ MOCK_LOCATIONS_104 = {
   },
   "speed": 7,
   "trainNumber": 102,
-  "departureDate": date(2026, 11, 5)
+  "departureDate": str(date(2026, 11, 5))
 }
 
 
