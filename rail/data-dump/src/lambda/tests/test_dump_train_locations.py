@@ -25,7 +25,7 @@ API_BASE = "https://rata.digitraffic.fi/api/v1"
 MOCK_TRAINS = [{"trainNumber": 101}, {"trainNumber": 102}, {"trainNumber": 103}, {"trainNumber": 104}]
 MOCK_LOCATIONS_101 = [{"trainNumber": 101, "location": {"x": 1}}]
 MOCK_LOCATIONS_102 = [{"trainNumber": 102, "location": {"x": 2}}]
-MOCK_LOCATIONS_103 = {
+MOCK_LOCATIONS_103 = [{
   "accuracy": 0,
   "location": {
     "type": "Point",
@@ -34,8 +34,8 @@ MOCK_LOCATIONS_103 = {
   "speed": 3,
   "trainNumber": 101,
   "departureDate": str(date(2026, 5, 11))
-}
-MOCK_LOCATIONS_104 = {
+}]
+MOCK_LOCATIONS_104 = [{
   "accuracy": 4,
   "location": {
     "type": "Point",
@@ -44,7 +44,7 @@ MOCK_LOCATIONS_104 = {
   "speed": 7,
   "trainNumber": 102,
   "departureDate": str(date(2026, 11, 5))
-}
+}]
 
 
 class TestDumpTrainLocations(unittest.TestCase):
