@@ -118,8 +118,8 @@ class TestDumpTrainLocations(unittest.TestCase):
 
             with rm.Mocker() as m:
                 m.get(f"{API_BASE}/trains/2025-12-31", json=MOCK_TRAINS)
-                m.get(f"{API_BASE}/train-locations/2025-12-31/101", json=MOCK_LOCATIONS_103)
-                m.get(f"{API_BASE}/train-locations/2025-12-31/102", json=MOCK_LOCATIONS_104)
+                m.get(f"{API_BASE}/train-locations/2025-12-31/103", json=MOCK_LOCATIONS_103)
+                m.get(f"{API_BASE}/train-locations/2025-12-31/104", json=MOCK_LOCATIONS_104)
 
                 with patch.dict(os.environ, {"DUMP_BUCKET_NAME": BUCKET_NAME}):
                     # When
