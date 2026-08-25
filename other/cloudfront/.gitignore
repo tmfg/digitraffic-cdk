@@ -11,6 +11,9 @@
 !/esbuild.ts
 !/vite.config.ts
 
+!/scripts/
+!/scripts/*.js
+
 !/config/
 !/config/*.json
 !/src/

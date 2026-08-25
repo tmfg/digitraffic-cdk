@@ -967,7 +967,13 @@ importers:
       '@aws-sdk/client-api-gateway':
         specifier: 3.1098.0
         version: 3.1098.0
+      '@aws-sdk/client-cloudfront':
+        specifier: 3.1098.0
+        version: 3.1098.0
       '@aws-sdk/client-ssm':
+        specifier: 3.1098.0
+        version: 3.1098.0
+      '@aws-sdk/client-sts':
         specifier: 3.1098.0
         version: 3.1098.0
       '@digitraffic-cdk/cdk-rig':
@@ -2549,6 +2555,10 @@ packages:
 
   '@aws-sdk/client-api-gateway@3.1098.0':
     resolution: {integrity: sha512-aWDFcvI88vYeR+tuEfDAKEKobh2IygFuiBAY3oyQPQudqCDctUUi59LaFMSniD2ZevKoVJBE0XGXNNEx0YXsBw==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/client-cloudfront@3.1098.0':
+    resolution: {integrity: sha512-EchLXBYT4qNjKCO7L53uLDfb8bcbg9l/9YOeahrGH3zVpn48ijcLXbWRfTa5mKfXMFiCpclNvqzYU4o0xf8zAw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/client-s3@3.1098.0':
@@ -6959,6 +6969,17 @@ snapshots:
       '@aws-sdk/core': 3.977.6
       '@aws-sdk/credential-provider-node': 3.972.78
       '@aws-sdk/middleware-sdk-api-gateway': 3.972.26
+      '@aws-sdk/types': 3.974.2
+      '@smithy/core': 3.31.1
+      '@smithy/fetch-http-handler': 5.6.13
+      '@smithy/node-http-handler': 4.9.13
+      '@smithy/types': 4.16.1
+      tslib: 2.8.1
+
+  '@aws-sdk/client-cloudfront@3.1098.0':
+    dependencies:
+      '@aws-sdk/core': 3.977.6
+      '@aws-sdk/credential-provider-node': 3.972.78
       '@aws-sdk/types': 3.974.2
       '@smithy/core': 3.31.1
       '@smithy/fetch-http-handler': 5.6.13

@@ -59,6 +59,18 @@ aws s3 rm s3://<bucket-name>/latest/test.txt --profile <aws-profile>
 Publisher access is limited to `latest/`, `releases/` and `digiroad/`. The website files, such as
 `index.html`, are intentionally not readable or writable by the publisher account.
 
+## Inspecting bucket contents
+
+List every object in the bucket, including nested release folders:
+
+```bash
+export AWS_PROFILE=<aws-profile>
+aws s3 ls s3://<bucket-name>/ --recursive --human-readable --summarize
+```
+
+Use the environment-specific bucket name and AWS profile from the private deployment
+configuration; keep them as placeholders in documentation and commands you share.
+
 ## Versioning
 
 Versioning is enabled because publishers have delete rights, and noncurrent versions
