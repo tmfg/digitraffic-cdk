@@ -25,7 +25,7 @@ API_BASE = "https://rata.digitraffic.fi/api/v1"
 MOCK_TRAINS = [{"trainNumber": 101}, {"trainNumber": 102}]
 MOCK_LOCATIONS_101 = [{"trainNumber": 101, "location": {"x": 1}}]
 MOCK_LOCATIONS_102 = [{"trainNumber": 102, "location": {"x": 2}}]
-
+MOCK_LOCATIONS_103 = [{"trainNumber": 101, "location": {"x": 1}}]
 
 class TestDumpTrainLocations(unittest.TestCase):
 
@@ -127,14 +127,11 @@ class TestDumpTrainLocations(unittest.TestCase):
 
                 with zf.open(filenames[0]) as f:
                     data = json.load(f)
-                    '''
-                    TODO refactor tests
                     self.assertIsInstance(data, list)
                     self.assertEqual(len(data), 2)
                     self.assertEqual(data[0], MOCK_LOCATIONS_101[0])
                     self.assertEqual(data[1], MOCK_LOCATIONS_102[0])
-                    '''
-
+            
     def test_fails_on_location_fetch_error(self):
         """
         Given: Event specifies date "2026-03-13",
