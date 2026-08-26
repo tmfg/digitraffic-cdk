@@ -145,6 +145,7 @@ class TestDumpTrainLocations(unittest.TestCase):
                     data = json.load(f)
                     self.assertIsInstance(data, dict)
                     self.assertEqual(len(data['Features']), 2)
+                    self.assertEqual(MOCK_LOCATIONS_101[0]["trainNumber"], data['Features'][0]['Properties']['trainNumber'])
 
     def test_fails_on_location_fetch_error(self):
         """
