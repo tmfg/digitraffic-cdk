@@ -63,13 +63,16 @@ def lambda_handler(event, context):
         dateToProcess = date.today() - timedelta(2)
         logger.info('Using default date (2 days ago)', date=str(dateToProcess))
 
-    writeTrainLocationsToFile(dateToProcess)
+    if writeTrainLocationsToFile(dateToProcess):
+      logger.info('GPS archiving complete')
 
-    logger.info('GPS archiving complete')
-
-    return {
-        'statusCode': 200
-    }
+      return {
+          'statusCode': 200
+      }
+    else:
+      return {
+        'statusCode': 400
+      }
 
 def getTrainNumbers(departureDate):
     logger.info('Fetching train numbers', departure_date=str(departureDate))
@@ -110,7 +113,7 @@ def writeTrainLocationsToFile(departureDate):
                   locationGeoJson = createGeoJsonFeaturePart(loc)
                   json.dump(locationGeoJson, f)
                 else:
-                  json.dump(loc, f)
+                  return False
                 first = False
                 recordCount += 1
         f.write(']')
@@ -134,3 +137,4 @@ def writeTrainLocationsToFile(departureDate):
 
     s3.upload_file(s3_filePath, bucket_name, s3_fileName)
 
+    return True
