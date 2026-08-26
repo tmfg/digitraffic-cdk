@@ -144,7 +144,7 @@ class TestDumpTrainLocations(unittest.TestCase):
                 with zf.open(filenames[0]) as f:
                     data = json.load(f)
                     self.assertIsInstance(data, dict)
-                    self.assertEqual(len(data['Features']), 2)
+                    self.assertEqual(len(data['features']), 2)
                     self.assertEqual(MOCK_LOCATIONS_101[0]["trainNumber"], data['features'][0]['properties']['trainNumber'])
 
     def test_fails_on_location_fetch_error(self):
