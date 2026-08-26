@@ -98,7 +98,7 @@ def writeTrainLocationsToFile(departureDate):
     with open(filePath, 'w') as f:
         f.write('{')
         f.write('"type": "FeatureCollection",')
-        f.write('"Features": [')
+        f.write('"features": [')
         first = True
         for i, trainNumber in enumerate(trainNumbers):
             if (i + 1) % 50 == 0 or i == 0:
