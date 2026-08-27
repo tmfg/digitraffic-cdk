@@ -1,25 +1,32 @@
 "use strict";
 
 /**
- * Bucket listing page for the Road Network datasets.
+ * Bucket listing page for an S3 bucket exposed under a CloudFront path prefix.
  *
  * Lists the bucket live through the S3 ListObjectsV2 rest api, which CloudFront exposes on the
  * same path as the files themselves. The current directory is kept in the url hash, so the
  * page never reloads while browsing.
+ *
+ * Reads its per-site configuration from the global `LISTING_CONFIG`, which must be set by a
+ * small `config.js` loaded before this script. See `createListingWebsiteSources()` in
+ * `other/s3-listing-website/src/index.ts` for the config contract and how it is deployed
+ * alongside this engine.
  */
 
+const config = window.LISTING_CONFIG;
+
 /** Served under this path by CloudFront; the S3 origin strips the first path segment. */
-const BASE_PATH = "/roadnetwork/";
+const BASE_PATH = config.basePath;
 
 /** Site assets live in the same bucket as the data and must not show up in the listing. */
-const HIDDEN_KEYS = ["index.html", ".keep"];
+const HIDDEN_KEYS = ["index.html", ".keep", ...(config.hiddenKeys ?? [])];
 const HIDDEN_PREFIXES = ["assets/"];
 
-const MESSAGES = {
+/** UI strings shared by every site; only `title` and `intro` are expected to be overridden. */
+const DEFAULT_MESSAGES = {
   fi: {
-    title: "Road Network -aineistot",
-    intro:
-      "Ladattavat Road Network -aineistojulkaisut. latest/-kansio sisältää aina viimeisimmän julkaistun Road Network -aineiston. releases/-kansioon tallennetaan Road Network -aikaiset aineistojulkaisut vuodesta 2027 alkaen, joten kansio on alkuvaiheessa tyhjä. digiroad/-kansio sisältää Digiroadin vuoden 2026 aineistojulkaisut.",
+    title: "Aineistot",
+    intro: "Ladattavat aineistot.",
     colName: "Nimi",
     colSize: "Koko",
     colModified: "Muokattu",
@@ -38,9 +45,8 @@ const MESSAGES = {
     error: "Sisällön hakeminen epäonnistui.",
   },
   en: {
-    title: "Road Network datasets",
-    intro:
-      "Downloadable Road Network dataset releases. The latest/ folder always contains the most recently published Road Network dataset. The releases/ folder stores Road Network-era dataset releases starting from 2027, so the folder is empty in the initial phase. The digiroad/ folder contains Digiroad dataset releases from 2026.",
+    title: "Datasets",
+    intro: "Downloadable datasets.",
     colName: "Name",
     colSize: "Size",
     colModified: "Modified",
@@ -60,6 +66,21 @@ const MESSAGES = {
   },
 };
 
+/** Merges the site's `title`/`intro` overrides onto the shared defaults, per language. */
+function mergeMessages(defaults, overrides) {
+  return Object.fromEntries(
+    Object.entries(defaults).map(([language, messages]) => [
+      language,
+      { ...messages, ...overrides?.[language] },
+    ]),
+  );
+}
+
+const MESSAGES = mergeMessages(DEFAULT_MESSAGES, config.messages);
+
+/** Only used behind `?mock=1` for local preview; never fetched from S3 in that mode. */
+const MOCK_LISTING = config.mockListing ?? {};
+
 const urlParams = new URLSearchParams(window.location.search);
 const MOCK_MODE =
   urlParams.get("mock") === "1" || hashQueryParams().get("mock") === "1";
@@ -68,72 +89,6 @@ let sortKey = "name";
 let sortDirection = "desc";
 let currentPage = pageFromUrl();
 let renderGeneration = 0;
-
-const MOCK_RELEASE_COUNT = 421;
-const MOCK_RELEASE_FOLDERS = Array.from(
-  { length: MOCK_RELEASE_COUNT },
-  (_, index) => `releases/2020_${String(index + 1).padStart(3, "0")}/`,
-);
-
-const MOCK_LISTING = {
-  "": {
-    folders: ["latest/", "releases/", "digiroad/"],
-    files: [],
-  },
-  "latest/": {
-    folders: [],
-    files: [
-      {
-        key: "latest/road-network-2027_1.zip",
-        size: 734003200,
-        modified: "2026-08-20T08:15:00.000Z",
-      },
-      {
-        key: "latest/README.txt",
-        size: 1840,
-        modified: "2026-08-20T08:15:00.000Z",
-      },
-    ],
-  },
-  "releases/": {
-    folders: MOCK_RELEASE_FOLDERS,
-    files: [],
-  },
-  "releases/2027_1/": {
-    folders: [],
-    files: [
-      {
-        key: "releases/2027_1/road-network-2027_1.zip",
-        size: 734003200,
-        modified: "2026-08-20T08:15:00.000Z",
-      },
-    ],
-  },
-  "digiroad/": {
-    folders: ["digiroad/2026_1/", "digiroad/2026_2/"],
-    files: [],
-  },
-  "digiroad/2026_1/": {
-    folders: [],
-    files: [
-      {
-        key: "digiroad/2026_1/digiroad-2026_1.zip",
-        size: 629145600,
-        modified: "2026-04-15T06:20:00.000Z",
-      },
-    ],
-  },
-  "digiroad/2026_2/": {
-    folders: [],
-    files: [
-      {
-        key: "digiroad/2026_2/digiroad-2026_2.zip",
-        size: 681574400,
-        modified: "2026-09-10T06:20:00.000Z",
-      },
-    ],
-  },
-};
 
 /** Language from `?lang=`, falling back to the browser language and then to Finnish. */
 function resolveLanguage() {
@@ -169,7 +124,7 @@ function formatDate(isoDate) {
   return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-/** Directory being browsed, read from the url hash as an S3 prefix such as `digiroad/2026_1/`. */
+/** Directory being browsed, read from the url hash as an S3 prefix such as `certified/`. */
 function currentPrefix() {
   // The folder lives in the hash so navigating between folders never reloads the page.
   const hashPath = window.location.hash.replace(/^#\/?/, "").split("?")[0];

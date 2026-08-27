@@ -1,5 +1,6 @@
 import { grantOACRights } from "@digitraffic/common/dist/aws/infra/bucket-policy";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createListingWebsiteSources } from "@digitraffic-cdk/s3-listing-website";
 import { Duration } from "aws-cdk-lib";
 import { AccountPrincipal, Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { BlockPublicAccess, Bucket, ObjectOwnership } from "aws-cdk-lib/aws-s3";
@@ -118,7 +119,21 @@ export class RoadnetworkStack extends DigitrafficStack {
     new BucketDeployment(this, "RoadnetworkWebsite", {
       destinationBucket: bucket,
       sources: [
-        Source.asset("./src/website"),
+        ...createListingWebsiteSources({
+          basePath: "/roadnetwork/",
+          messages: {
+            fi: {
+              title: "Road Network -aineistot",
+              intro:
+                "Ladattavat Road Network -aineistojulkaisut. latest/-kansio sisältää aina viimeisimmän julkaistun Road Network -aineiston. releases/-kansioon tallennetaan Road Network -aikaiset aineistojulkaisut vuodesta 2027 alkaen, joten kansio on alkuvaiheessa tyhjä. digiroad/-kansio sisältää Digiroadin vuoden 2026 aineistojulkaisut.",
+            },
+            en: {
+              title: "Road Network datasets",
+              intro:
+                "Downloadable Road Network dataset releases. The latest/ folder always contains the most recently published Road Network dataset. The releases/ folder stores Road Network-era dataset releases starting from 2027, so the folder is empty in the initial phase. The digiroad/ folder contains Digiroad dataset releases from 2026.",
+            },
+          },
+        }),
         // S3 has no directories, so keep placeholder objects to make the data structure visible
         // before the first real dataset upload.
         ...dataPrefixPlaceholders,

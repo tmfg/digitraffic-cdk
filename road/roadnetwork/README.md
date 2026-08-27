@@ -17,7 +17,7 @@ roadnetwork-<env>/
 ├── index.html, assets/     site, deployed by this stack
 ├── latest/                 most recent Road Network release
 ├── releases/               Road Network era releases, from 2027 onwards
-└── digiroad/2026_1, 2026_2 legacy Digiroad releases
+└── digiroad/2026_01, 2026_02 legacy Digiroad releases
 ```
 
 ## Publishing
@@ -79,12 +79,17 @@ releases happen about twice a year.
 
 ## Listing page
 
-`src/website` is a dependency-free page that lists the bucket contents live through
-`ListObjectsV2` (`/roadnetwork/?list-type=2&delimiter=/&prefix=...`). This requires
-`s3:ListBucket` for the CloudFront origin access control, which the stack grants.
-Available in Finnish and English via the hash query parameter `lang=fi|en`.
-The browser location uses the hash for the current folder and a hash query parameter for the
-page and language, so a shareable English link to page 10 of `releases/` is:
+The page itself lives in the shared [other/s3-listing-website](../../other/s3-listing-website)
+package, not in this project — see that package's README for how the engine works and how to
+develop it. This project only supplies its own `basePath`, title/intro text and mock data via
+`createListingWebsiteSources(...)` in `roadnetwork-stack.ts`.
+
+The page lists the bucket contents live through `ListObjectsV2`
+(`/roadnetwork/?list-type=2&delimiter=/&prefix=...`). This requires `s3:ListBucket` for the
+CloudFront origin access control, which the stack grants. Available in Finnish and English via
+the hash query parameter `lang=fi|en`. The browser location uses the hash for the current folder
+and a hash query parameter for the page and language, so a shareable English link to page 10 of
+`releases/` is:
 
 ```text
 /roadnetwork/#/releases/?page=10&lang=en
@@ -151,19 +156,23 @@ or wait for the relevant cache entry to expire before testing the listing again.
 
 ### Local preview
 
-Run a local static server from the project root without changing directories.
-Preferred option is the project script via `rushx`:
-
 ```bash
 rushx serve:website:local
 ```
 
-Equivalent direct command:
+runs the shared package's preview script against this project's own
+[local-preview.config.json](local-preview.config.json) (mirrors the config passed to
+`createListingWebsiteSources` in the stack, but is only used locally and never deployed). Open
+`http://localhost:8080/?mock=1` to see the mock listing (a plain `http://localhost:8080/` tries
+the real S3 REST API, which doesn't exist locally, and shows an error — that's expected).
+For English: `http://localhost:8080/?mock=1&lang=en`.
 
-```bash
-npx serve@14.2.6 src/website -l 8080
-```
+### Developing the listing page itself
 
-Then open `http://localhost:8080/`.
-For a local preview with English mock data, open
-`http://localhost:8080/#/?mock=1&lang=en`.
+Editing the shared engine's `index.html`/`assets/*` takes effect immediately — no build step, just
+re-run `rushx serve:website:local`. Editing the shared package's `createListingWebsiteSources`
+logic (`other/s3-listing-website/src/index.ts`) needs a rebuild; run
+`rushx build:watch` in `other/s3-listing-website` in its own terminal while iterating, and this
+project's `cdk synth`/`diff`/`deploy` will automatically use the freshly-compiled output. See
+[other/s3-listing-website's README](../../other/s3-listing-website/README.md) for details.
+

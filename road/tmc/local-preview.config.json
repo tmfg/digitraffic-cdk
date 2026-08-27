@@ -1,0 +1,70 @@
+{
+  "basePath": "/tmc/",
+  "messages": {
+    "fi": {
+      "title": "TMC/ALERT-C-sijaintitietokanta",
+      "intro": "Ladattavat TMC/ALERT-C-sijaintitietokannan aineistot. certified/-kansio sisältää sertifioidut aineistoversiot ja noncertified/-kansio sertifioimattomat aineistoversiot. Juurihakemistossa on lisäksi lisenssi- ja tapahtumalistatiedostoja."
+    },
+    "en": {
+      "title": "TMC/ALERT-C location table",
+      "intro": "Downloadable TMC/ALERT-C location table datasets. The certified/ folder contains certified dataset releases and the noncertified/ folder contains non-certified dataset releases. The root folder also has licence and event list files."
+    }
+  },
+  "mockListing": {
+    "": {
+      "folders": ["certified/", "noncertified/"],
+      "files": [
+        {
+          "key": "LICENSE.txt",
+          "size": 18524,
+          "modified": "2020-11-13T09:27:19.000Z"
+        },
+        {
+          "key": "finnish_eventlist_ver_1_0.zip",
+          "size": 155594,
+          "modified": "2020-11-13T09:27:19.000Z"
+        },
+        {
+          "key": "finnish_event_list _supplementary_ver 1_0.zip",
+          "size": 11996,
+          "modified": "2020-11-13T09:27:19.000Z"
+        },
+        {
+          "key": "public_fi_event_list_and_location_database.zip",
+          "size": 27453,
+          "modified": "2020-11-13T09:27:19.000Z"
+        }
+      ]
+    },
+    "certified/": {
+      "folders": [],
+      "files": [
+        {
+          "key": "certified/FI_118_E1_6_17_3.3_LTEF.zip",
+          "size": 1271055,
+          "modified": "2023-05-30T10:59:37.000Z"
+        },
+        {
+          "key": "certified/Fi_Loc_Singletable_ver3_3.zip",
+          "size": 1801594,
+          "modified": "2023-05-30T10:59:41.000Z"
+        }
+      ]
+    },
+    "noncertified/": {
+      "folders": [],
+      "files": [
+        {
+          "key": "noncertified/FI_LC_noncertified_1_11_45.zip",
+          "size": 2047312,
+          "modified": "2026-06-08T15:30:49.000Z"
+        },
+        {
+          "key": "noncertified/FI_LC_noncertified_simple_1_11_44_swe.zip",
+          "size": 1637661,
+          "modified": "2024-04-02T17:44:12.000Z"
+        }
+      ]
+    }
+  }
+}

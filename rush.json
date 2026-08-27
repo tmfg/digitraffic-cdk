@@ -166,6 +166,11 @@
       "tags": ["cdk", "other"]
     },
     {
+      "packageName": "@digitraffic-cdk/s3-listing-website",
+      "projectFolder": "other/s3-listing-website",
+      "tags": ["library", "other"]
+    },
+    {
       "packageName": "status",
       "projectFolder": "other/status",
       "decoupledLocalDependencies": ["@digitraffic/common"],
@@ -242,6 +247,12 @@
     {
       "packageName": "roadnetwork",
       "projectFolder": "road/roadnetwork",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "tmc",
+      "projectFolder": "road/tmc",
       "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "road"]
     },

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Road Network -aineistot | Digitraffic</title>
+    <title>Aineistot | Digitraffic</title>
     <link
       rel="icon"
       href="https://www.digitraffic.fi/favicon.ico"
@@ -24,11 +24,10 @@
     </header>
 
     <main>
-      <!-- Finnish defaults are shown before app.js runs and when Finnish is selected. -->
-      <h1 data-i18n="title">Road Network -aineistot</h1>
-      <p class="intro" data-i18n="intro">
-        Ladattavat Road Network -aineistojulkaisut.
-      </p>
+      <!-- Generic Finnish placeholders shown only before app.js runs; it overwrites
+           these immediately via the site's own config.js title/intro. -->
+      <h1 data-i18n="title">Aineistot</h1>
+      <p class="intro" data-i18n="intro">Ladattavat aineistot.</p>
 
       <nav class="breadcrumb" id="breadcrumb" aria-label="Breadcrumb"></nav>
 
@@ -92,6 +91,8 @@
       </p>
     </footer>
 
+    <!-- config.js (site-specific) must load before app.js (shared engine). -->
+    <script src="assets/config.js"></script>
     <script src="assets/app.js"></script>
   </body>
 </html>

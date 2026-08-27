@@ -1,0 +1,99 @@
+{
+  "basePath": "/roadnetwork/",
+  "messages": {
+    "fi": {
+      "title": "Road Network -aineistot",
+      "intro": "Ladattavat Road Network -aineistojulkaisut. latest/-kansio sisältää aina viimeisimmän julkaistun Road Network -aineiston. releases/-kansioon tallennetaan Road Network -aikaiset aineistojulkaisut vuodesta 2027 alkaen, joten kansio on alkuvaiheessa tyhjä. digiroad/-kansio sisältää Digiroadin vuoden 2026 aineistojulkaisut."
+    },
+    "en": {
+      "title": "Road Network datasets",
+      "intro": "Downloadable Road Network dataset releases. The latest/ folder always contains the most recently published Road Network dataset. The releases/ folder stores Road Network-era dataset releases starting from 2027, so the folder is empty in the initial phase. The digiroad/ folder contains Digiroad dataset releases from 2026."
+    }
+  },
+  "mockListing": {
+    "": {
+      "folders": ["latest/", "releases/", "digiroad/"],
+      "files": []
+    },
+    "latest/": {
+      "folders": [],
+      "files": [
+        {
+          "key": "latest/road-network-2027_1.zip",
+          "size": 734003200,
+          "modified": "2026-08-20T08:15:00.000Z"
+        },
+        {
+          "key": "latest/README.txt",
+          "size": 1840,
+          "modified": "2026-08-20T08:15:00.000Z"
+        }
+      ]
+    },
+    "releases/": {
+      "_comment": "25 folders here (page size is 20) so the pagination controls can be exercised locally.",
+      "folders": [
+        "releases/2020_01/",
+        "releases/2020_02/",
+        "releases/2020_03/",
+        "releases/2020_04/",
+        "releases/2020_05/",
+        "releases/2020_06/",
+        "releases/2020_07/",
+        "releases/2020_08/",
+        "releases/2020_09/",
+        "releases/2020_10/",
+        "releases/2020_11/",
+        "releases/2020_12/",
+        "releases/2021_01/",
+        "releases/2021_02/",
+        "releases/2021_03/",
+        "releases/2021_04/",
+        "releases/2021_05/",
+        "releases/2021_06/",
+        "releases/2021_07/",
+        "releases/2021_08/",
+        "releases/2021_09/",
+        "releases/2021_10/",
+        "releases/2021_11/",
+        "releases/2021_12/",
+        "releases/2022_01/"
+      ],
+      "files": []
+    },
+    "releases/2022_01/": {
+      "folders": [],
+      "files": [
+        {
+          "key": "releases/2022_01/road-network-2022_01.zip",
+          "size": 734003200,
+          "modified": "2026-08-20T08:15:00.000Z"
+        }
+      ]
+    },
+    "digiroad/": {
+      "folders": ["digiroad/2026_01/", "digiroad/2026_02/"],
+      "files": []
+    },
+    "digiroad/2026_01/": {
+      "folders": [],
+      "files": [
+        {
+          "key": "digiroad/2026_01/digiroad-2026_01.zip",
+          "size": 629145600,
+          "modified": "2026-04-15T06:20:00.000Z"
+        }
+      ]
+    },
+    "digiroad/2026_02/": {
+      "folders": [],
+      "files": [
+        {
+          "key": "digiroad/2026_02/digiroad-2026_02.zip",
+          "size": 681574400,
+          "modified": "2026-09-10T06:20:00.000Z"
+        }
+      ]
+    }
+  }
+}
