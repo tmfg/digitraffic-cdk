@@ -142,10 +142,10 @@ class TestDumpTrainLocations(unittest.TestCase):
                 self.assertEqual(filenames[0], "train-locations-2025-12-31.json")
 
                 with zf.open(filenames[0]) as f:
-                    data = json.load(f)
-                    self.assertIsInstance(data, dict)
-                    self.assertEqual(len(data['features']), 2)
-                    self.assertEqual(MOCK_LOCATIONS_101[0]["trainNumber"], data['features'][0]['properties']['trainNumber'])
+                    trainLocationGeoJson = json.load(f)
+                    self.assertIsInstance(trainLocationGeoJson, dict)
+                    self.assertEqual(len(trainLocationGeoJson['features']), 2)
+                    self.assertEqual(MOCK_LOCATIONS_101[0]["trainNumber"], trainLocationGeoJson['features'][0]['properties']['trainNumber'])
 
     def test_fails_on_location_fetch_error(self):
         """
