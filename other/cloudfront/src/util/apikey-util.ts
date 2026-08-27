@@ -25,20 +25,30 @@ async function getParameterValue(name: string): Promise<string> {
 
 export async function readApiKey(shortName: string): Promise<EndpointMetadata> {
   // parameter is a full url as in https://api-gateway-address/stage/
-  const endpoint = new URL(
-    await getParameterValue(`/digitraffic/${shortName}/endpointUrl`),
-  );
-  const apiKeyId = await getParameterValue(
-    `/digitraffic/${shortName}/apiKeyId`,
-  );
+  try {
+    const endpoint = new URL(
+      await getParameterValue(`/digitraffic/${shortName}/endpointUrl`),
+    );
 
-  const apiKey = await getApiKeyFromAPIGateway(apiKeyId);
-  const endpointUrl = endpoint.host;
+    const apiKeyId = await getParameterValue(
+      `/digitraffic/${shortName}/apiKeyId`,
+    );
 
-  return {
-    endpointUrl,
-    apiKey,
-  };
+    const apiKey = await getApiKeyFromAPIGateway(apiKeyId);
+    const endpointUrl = endpoint.host;
+
+    return {
+      endpointUrl,
+      apiKey,
+    };
+  } catch (error) {
+    console.error(`Error reading API key for ${shortName}:`, error);
+
+    return {
+      endpointUrl: "N/A",
+      apiKey: "N/A",
+    };
+  }
 }
 
 export async function getApiKeyFromAPIGateway(apiKey: string): Promise<string> {
