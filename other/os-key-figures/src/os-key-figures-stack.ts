@@ -246,13 +246,28 @@ export class OsKeyFiguresStack extends Stack {
       }),
     );
 
-    const rule2 = new Rule(this, "collect rail", {
+    const rule2 = new Rule(this, "collect rail 1", {
       schedule: Schedule.expression("cron(15 3 1 * ? *)"),
     });
     rule2.addTarget(
       new LambdaFunction(collectOsKeyFiguresLambda, {
         event: events.RuleTargetInput.fromObject({
           TRANSPORT_TYPE: Service.RAIL,
+          ENDPOINT_GROUP: 1,
+          TOTAL_GROUPS: 2,
+        }),
+      }),
+    );
+
+    const rule2b = new Rule(this, "collect rail 2", {
+      schedule: Schedule.expression("cron(30 4 1 * ? *)"),
+    });
+    rule2b.addTarget(
+      new LambdaFunction(collectOsKeyFiguresLambda, {
+        event: events.RuleTargetInput.fromObject({
+          TRANSPORT_TYPE: Service.RAIL,
+          ENDPOINT_GROUP: 2,
+          TOTAL_GROUPS: 2,
         }),
       }),
     );
