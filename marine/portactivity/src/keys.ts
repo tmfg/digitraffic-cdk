@@ -11,6 +11,7 @@ export enum PortactivitySecretKeys {
   PILOTWEB_AUTH = "pilotweb.auth",
   TEQPLAY_QUEUE = "teqplay.queue",
   SCHEDULES_URL = "schedules.url",
+  // TODO: remove the unused ETAS_* configuration when it is cleaned up
   ETAS_URL = "etas.url",
   ETAS_AUTH_URL = "etas.auth_url",
   ETAS_CLIENT_ID = "etas.client_id",

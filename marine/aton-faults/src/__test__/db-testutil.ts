@@ -261,6 +261,7 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
   ],
 };
 
+// TODO: remove this obsolete test fixture with AtonSecret. ATON certificate use was removed in DPO-3421 (f939d6ee7).
 export const TEST_ATON_SECRET: AtonSecret = {
   certificate: "",
   privatekey: "",
