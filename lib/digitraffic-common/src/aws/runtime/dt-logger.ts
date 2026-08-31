@@ -1,6 +1,7 @@
 import type { Writable } from "node:stream";
 import { lowerFirst, mapKeys } from "es-toolkit";
 import { getEnvVariableOrElse } from "../../utils/utils.js";
+import { EnvKeys } from "./environment.js";
 
 /** Logging level */
 export type LOG_LEVEL = "DEBUG" | "INFO" | "WARN" | "ERROR";
@@ -80,6 +81,7 @@ export interface LoggableType extends CustomParams {
  * * the actual message (as json or as string)
  */
 export class DtLogger {
+  readonly appName?: string;
   readonly lambdaName?: string;
   readonly runtime?: string;
 
@@ -91,6 +93,7 @@ export class DtLogger {
    * @param {LoggerConfiguration?} [config] - Accepts configuration options @see {@link LoggerConfiguration}
    */
   constructor(config?: LoggerConfiguration) {
+    this.appName = getEnvVariableOrElse(EnvKeys.APP_NAME, undefined);
     this.lambdaName =
       config?.lambdaName ??
       getEnvVariableOrElse("AWS_LAMBDA_FUNCTION_NAME", "unknown lambda name");
@@ -111,6 +114,7 @@ export class DtLogger {
     const logMessage = {
       message,
       level: "DEBUG",
+      app: this.appName,
       lambdaName: this.lambdaName,
       runtime: this.runtime,
     };
@@ -194,6 +198,7 @@ export class DtLogger {
       ...messageFields,
       error,
       stack,
+      app: this.appName,
       lambdaName: this.lambdaName,
       runtime: this.runtime,
     };
