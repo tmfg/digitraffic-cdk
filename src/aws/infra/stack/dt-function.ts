@@ -17,7 +17,7 @@ import {
   Runtime,
   SystemLogLevel,
 } from "aws-cdk-lib/aws-lambda";
-import { camelCase, startCase } from "es-toolkit";
+import { camelCase, kebabCase, startCase } from "es-toolkit";
 import { DatabaseEnvironmentKeys } from "../../../database/database.js";
 import type { TrafficType } from "../../../types/traffictype.js";
 import { EnvKeys } from "../../runtime/environment.js";
@@ -360,16 +360,18 @@ export class FunctionBuilder {
   }
 
   private getEnvironment(): LambdaEnvironment {
-    let environment = {};
+    let environment: LambdaEnvironment = {
+      [EnvKeys.APP_NAME]: `${this._stack.configuration.trafficType.toLowerCase()}-${kebabCase(this._stack.configuration.shortName)}`,
+    };
 
-    if (this._features.secretAccess) {
+    if (this._features.secretAccess && this._stack.configuration.secretId) {
       environment = {
         ...environment,
         [EnvKeys.SECRET_ID]: this._stack.configuration.secretId,
       };
     }
 
-    if (this._features.databaseAccess) {
+    if (this._features.databaseAccess && this._stack.configuration.shortName) {
       environment = {
         ...environment,
         [DatabaseEnvironmentKeys.DB_APPLICATION]:
