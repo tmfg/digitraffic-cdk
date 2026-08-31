@@ -49,6 +49,7 @@ on:
           - "roadnetwork"
           - "sea-state-estimate"
           - "shiplight"
+          - "tmc"
           - "variable-signs"
           - "winter-navigation"
           - "yearly-plans"
