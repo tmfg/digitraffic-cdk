@@ -83,6 +83,7 @@ describe("FunctionBuilder test", () => {
     template.hasResourceProperties("AWS::Lambda::Function", {
       Environment: {
         Variables: {
+          [EnvKeys.APP_NAME]: "road-test",
           [EnvKeys.SECRET_ID]: "testSecret",
           [TEST_ENV_VAR]: TEST_ENV_VALUE,
         },

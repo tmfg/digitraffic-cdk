@@ -9,7 +9,9 @@ import type { ITopic } from "aws-cdk-lib/aws-sns";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import type { Construct } from "constructs";
+import { kebabCase } from "es-toolkit";
 import type { TrafficType } from "../../../types/traffictype.js";
+import { EnvKeys } from "../../runtime/environment.js";
 import type { DBLambdaEnvironment } from "./lambda-configs.js";
 import { StackCheckingAspect } from "./stack-checking-aspect.js";
 
@@ -140,14 +142,13 @@ export class DigitrafficStack
   }
 
   createDefaultLambdaEnvironment(dbApplication: string): DBLambdaEnvironment {
-    return this.configuration.secretId
-      ? {
-          SECRET_ID: this.configuration.secretId,
-          DB_APPLICATION: dbApplication,
-        }
-      : {
-          DB_APPLICATION: dbApplication,
-        };
+    return {
+      [EnvKeys.APP_NAME]: `${this.configuration.trafficType.toLowerCase()}-${kebabCase(this.configuration.shortName)}`,
+      DB_APPLICATION: dbApplication,
+      ...(this.configuration.secretId
+        ? { SECRET_ID: this.configuration.secretId }
+        : {}),
+    };
   }
 
   getSecret(): ISecret {

@@ -184,6 +184,9 @@ jobs:
       - name: Rush Install
         run: node common/scripts/install-run-rush.js install
 
+      - name: Install Rush command-line tools
+        run: node common/scripts/install-run-rush.js update-autoinstaller --name rush-command-line-tools
+
       - name: Copy config
         id: copy-config
         env:
