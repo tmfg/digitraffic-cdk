@@ -143,6 +143,10 @@ export class Behavior {
     return new Behavior("mqtt*", Origin.http(originUrl));
   }
 
+  public static mqttVpc(originName: string): Behavior {
+    return new Behavior("mqtt*", Origin.vpc(originName));
+  }
+
   public static nginxPlain(path: string, originUrl: string): Behavior {
     return new Behavior(path, Origin.http(originUrl));
   }

@@ -52,7 +52,10 @@ export class CloudfrontCdkStack extends Stack {
   };
 
   private _originIndex: number = 0;
-  private _vpcOrigins: Record<string, CfnVpcOrigin> = {};
+  private _vpcOrigins: Record<
+    string,
+    { cfnOrigin: CfnVpcOrigin; domain: string }
+  > = {};
   private _originCache: Record<string, IOrigin> = {};
 
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -121,20 +124,19 @@ export class CloudfrontCdkStack extends Stack {
       builder.certificate,
     );
 
-    Object.entries(builder.vpcOrigins).forEach(([vpcOriginName, arn]) => {
-      this._vpcOrigins[vpcOriginName] = new CfnVpcOrigin(
-        this,
-        `CfnVpcOrigin-${vpcOriginName}`,
-        {
+    Object.entries(builder.vpcOrigins).forEach(([vpcOriginName, config]) => {
+      this._vpcOrigins[vpcOriginName] = {
+        cfnOrigin: new CfnVpcOrigin(this, `CfnVpcOrigin-${vpcOriginName}`, {
           vpcOriginEndpointConfig: {
-            arn,
+            arn: config.arn,
             httpsPort: 443,
             httpPort: 80,
             name: `CloudfrontVpcOrigin-${vpcOriginName}`,
             originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
           },
-        },
-      );
+        }),
+        domain: config.domain,
+      };
     });
 
     const webAcl: CfnWebACL = createWebAcl(
@@ -263,28 +265,27 @@ export class CloudfrontCdkStack extends Stack {
     // TODO: other custom headers
 
     if (behavior.origin._type === "vpc") {
-      const vpcOrigin = this._vpcOrigins[behavior.origin._origin];
+      const vpcOriginEntry = this._vpcOrigins[behavior.origin._origin];
 
-      if (!vpcOrigin) {
+      if (!vpcOriginEntry) {
         throw new Error(`Missing vpc origin ${behavior.origin._origin}`);
       }
 
       const cfVpcOrigin = CfVpcOrigin.fromVpcOriginId(
         this,
         `vpcOrigin-${behavior.origin._origin}`,
-        vpcOrigin.ref,
+        vpcOriginEntry.cfnOrigin.ref,
       );
 
       return VpcOrigin.withVpcOrigin(cfVpcOrigin, {
         originId: `vpcOrigin-${behavior.origin._origin}`,
-        domainName: "internal-web-test-1221465418.eu-west-1.elb.amazonaws.com",
+        domainName: vpcOriginEntry.domain,
         readTimeout: Duration.seconds(behavior.readTimeout),
         connectionAttempts: 3,
         connectionTimeout: Duration.seconds(10),
         keepaliveTimeout: Duration.seconds(5),
         customHeaders,
         originPath: behavior.origin._path,
-        //        protocolPolicy: OriginProtocolPolicy.MATCH_VIEWER
       });
     }
 
