@@ -87,7 +87,7 @@ class TestDumpTrainLocations(unittest.TestCase):
 
             objects = s3.list_objects_v2(Bucket=BUCKET_NAME)
             key = objects["Contents"][0]["Key"]
-            self.assertEqual(key, "digitraffic-rata-train-locations-2026-03-13-geojson.zip")
+            self.assertEqual(key, "digitraffic-rata-train-locations-2026-03-13.zip")
 
     def test_manual_trigger_with_date_parameter(self):
         """
