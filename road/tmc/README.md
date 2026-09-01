@@ -31,9 +31,8 @@ The stack manages the website and bucket policy for the existing bucket. Re-runn
 non-destructive: `BucketDeployment` uses `prune: false` and deploys only the listing page files,
 so the certified and non-certified datasets and the other root-level objects remain untouched.
 
-The bucket policy is managed by this stack for environments where `applyBucketPolicy` is enabled.
-Keep policy changes in the CDK stack so the CloudFront access rules remain consistent with the
-deployed infrastructure.
+The bucket policy is managed unconditionally by this stack. Keep policy changes in the CDK stack
+so the CloudFront access rules remain consistent with the deployed infrastructure.
 
 ## Inspecting bucket contents
 

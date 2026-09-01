@@ -38,26 +38,26 @@ on:
         required: true
         type: choice
         options: 
-          - "aton-faults"
-          - "counting-site"
-          - "data-dump"
-          - "data-upload"
-          - "digitraffic-statistics"
-          - "lam-history"
-          - "maintenance-tracking"
-          - "maintenance-tracking-municipality"
-          - "marinecam"
-          - "os-key-figures"
-          - "port-call"
-          - "portactivity"
-          - "rami"
-          - "roadnetwork"
-          - "sea-state-estimate"
-          - "shiplight"
-          - "tmc"
-          - "variable-signs"
-          - "winter-navigation"
-          - "yearly-plans"
+          - "marine/aton-faults"
+          - "marine/marinecam"
+          - "marine/port-call"
+          - "marine/portactivity"
+          - "marine/sea-state-estimate"
+          - "marine/shiplight"
+          - "marine/winter-navigation"
+          - "other/digitraffic-statistics"
+          - "other/os-key-figures"
+          - "rail/data-dump"
+          - "rail/rami"
+          - "rail/yearly-plans"
+          - "road/counting-site"
+          - "road/data-upload"
+          - "road/lam-history"
+          - "road/maintenance-tracking"
+          - "road/maintenance-tracking-municipality"
+          - "road/roadnetwork"
+          - "road/tmc"
+          - "road/variable-signs"
 
 jobs:
   log-parameters:
@@ -112,9 +112,18 @@ jobs:
             cat digitraffic-ci/aws/cdk/install-config.json >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
 
+      # install-config.json is still keyed by the bare project name (e.g. "tmc"), while the
+      # dropdown above shows "domain/name" (e.g. "road/tmc") so it's clear what's being
+      # installed. Strip everything up to the last "/" to get the key back.
+      - name: Parse application name
+        id: app
+        run: |
+            APP="${{ github.event.inputs.application }}"
+            echo "name=${APP##*/}" >> $GITHUB_OUTPUT
+
       - name: Check config exists for ${{ github.event.inputs.application }}
         run: |
-            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}"
+            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name] }}"
             if [ "$INSTALL_CONFIG" == "" ] || [ "$INSTALL_CONFIG" == "null" ]; then
               echo "Error: Application ${{ github.event.inputs.application }} not found in install config!"
               echo "Error: Application ${{ github.event.inputs.application }} not found in install config!" >> $GITHUB_STEP_SUMMARY
@@ -125,13 +134,14 @@ jobs:
       - name: Set environment variables for ${{ github.event.inputs.application }}
         id: environment
         run: |
-            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application] }}"
-            export DOMAIN="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].domain }}"
-            export DIRECTORY="${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].directory }}"
+            export INSTALL_CONFIG="${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name] }}"
+            export DOMAIN="${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name].domain }}"
+            export CONFIG_DIR="${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name].directory }}"
 
-            # by default, directory is same as domain
-            if [ "$DIRECTORY" == "" ]; then
-                export DIRECTORY=$DOMAIN
+            # shared config.ts folder defaults to the domain, some projects (e.g.
+            # digitraffic-statistics) override it via "directory" in install-config.json
+            if [ "$CONFIG_DIR" == "" ]; then
+                CONFIG_DIR=$DOMAIN
             fi;
 
             # handle multiline output
@@ -140,11 +150,13 @@ jobs:
             echo "EOF" >> $GITHUB_OUTPUT
 
             echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
-            echo "stack=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].stack }}" >> $GITHUB_OUTPUT
-            echo "dir=$DIRECTORY" >> $GITHUB_OUTPUT
-            echo "directory=$DIRECTORY/${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
-            echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].runGenerateSbom }}" >> $GITHUB_OUTPUT
-            echo "skip_environment_on_stack_name=${{ fromJson(steps.install-config.outputs.config).projects[github.event.inputs.application].skipEnvironmentOnStackName }}" >> $GITHUB_OUTPUT
+            echo "stack=${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name].stack }}" >> $GITHUB_OUTPUT
+            echo "dir=$CONFIG_DIR" >> $GITHUB_OUTPUT
+            # The dropdown value is already the real repo-relative path, e.g. "road/tmc".
+            echo "directory=${{ github.event.inputs.application }}" >> $GITHUB_OUTPUT
+            echo "generate_sbom=${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name].runGenerateSbom }}" >> $GITHUB_OUTPUT
+            echo "skip_sbom_upload=${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name].skipSbomUpload }}" >> $GITHUB_OUTPUT
+            echo "skip_environment_on_stack_name=${{ fromJson(steps.install-config.outputs.config).projects[steps.app.outputs.name].skipEnvironmentOnStackName }}" >> $GITHUB_OUTPUT
 
       - name: Read SBOM config
         id: sbom-config
@@ -227,7 +239,7 @@ jobs:
                 export STACK_NAME=${STACK}
             fi;
 
-            node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
+            node common/scripts/install-run-rush.js rebuild --to ${{ steps.app.outputs.name }}
 
             # --require-approval is only accepted by deploy, not by diff
             export CDK_ARGS=""
@@ -260,16 +272,16 @@ jobs:
           output-file: ${{ steps.environment.outputs.directory }}/sbom.json
 
       - name: Configure AWS credentials for SBOM
-        if: github.event.inputs.command == 'deploy'
+        if: github.event.inputs.command == 'deploy' && steps.environment.outputs.skip_sbom_upload != 'true'
         uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
         with:
           role-to-assume: ${{ fromJson(steps.sbom-config.outputs.common).sbomUploadRoleArn }}
-          role-session-name: gh-actions-upload-sbom-${{ github.event.inputs.application }}-${{ github.event.inputs.env }}
+          role-session-name: gh-actions-upload-sbom-${{ steps.app.outputs.name }}-${{ github.event.inputs.env }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Upload SBOM
-        if: github.event.inputs.command == 'deploy'
+        if: github.event.inputs.command == 'deploy' && steps.environment.outputs.skip_sbom_upload != 'true'
         run: |          
           aws s3 cp ${{ steps.environment.outputs.directory }}/sbom.json \
-            s3://${{ fromJson(steps.sbom-config.outputs.common).bucketArn }}/${{ fromJson(steps.sbom-config.outputs.config)[github.event.inputs.env][github.event.inputs.application] }}/${{ github.run_id }}-${{ github.sha }}.json
+            s3://${{ fromJson(steps.sbom-config.outputs.common).bucketArn }}/${{ fromJson(steps.sbom-config.outputs.config)[github.event.inputs.env][steps.app.outputs.name] }}/${{ github.run_id }}-${{ github.sha }}.json
 

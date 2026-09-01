@@ -19,11 +19,9 @@ import type { TmcProps } from "./app-props.js";
  * (and its data: LICENSE.txt, the zip packages, and the `certified/`/`noncertified/` prefixes)
  * predates this stack and is still managed by CloudFormation
  * (`digitraffic-ci-internal/aws/cloudformation/digitraffic-cloudformation.yml`). That template
- * keeps `DeletionPolicy: Retain` on the bucket and its policy, so removing those resources from
- * the template only ends CloudFormation's management of them; the objects themselves survive.
- * Only once that removal has happened for a given environment should this stack's own bucket
- * policy be applied, via `applyBucketPolicy` below.
- *
+ * keeps `DeletionPolicy: Retain` on the bucket, so removing it from the template only ends
+ * CloudFormation's management of it; the objects themselves survive. The bucket policy, however,
+ * is managed unconditionally by this stack (see `applyBucketPolicy` below).
  * The CloudFront behaviour that routes `/tmc/*` here lives in
  * `digitraffic-ci-internal/aws/cdk/other/cloudfront/cloudfront-road.ts`, alongside the
  * `/roadnetwork/*` behaviour that serves the same style of listing page.
@@ -38,12 +36,9 @@ export class TmcStack extends DigitrafficStack {
 
     this.deployWebsite(bucket);
 
-    // False until CloudFormation has released ownership of the bucket policy for this
-    // environment (see the class doc comment above). bucket.addToResourcePolicy on an
-    // imported bucket is a silent no-op, hence the explicit CfnBucketPolicy below.
-    if (configuration.applyBucketPolicy) {
-      this.applyBucketPolicy(bucket, configuration);
-    }
+    // bucket.addToResourcePolicy on an imported bucket is a silent no-op, hence the explicit
+    // CfnBucketPolicy below.
+    this.applyBucketPolicy(bucket, configuration);
   }
 
   /**

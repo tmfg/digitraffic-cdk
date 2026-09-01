@@ -17,6 +17,8 @@
 !/engine/**/*.css
 !/engine/**/*.js
 !/engine/**/*.svg
+!/engine/**/*.ico
+!/engine/**/*.png
 
 !/scripts/
 !/scripts/*.mjs
