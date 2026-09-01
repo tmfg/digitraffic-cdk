@@ -37,7 +37,7 @@ export class RamiStack extends DigitrafficStack {
     );
 
     const publicApi = new PublicApi(this, configuration.dbReaderHost);
-    publicApi.publicApi.exportEndpoint();
+
     if (!this.secret) throw new Error("secret not found");
     Canaries.create(this, dlq, publicApi, this.secret);
   }
