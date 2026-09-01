@@ -129,20 +129,22 @@ def writeTrainLocationsToFile(departureDate):
 
     logger.info('Wrote location records', count=recordCount, file_path=filePath)
 
-    logger.info('Zipping file', file_name=fileName)
-    with zipfile.ZipFile(s3_filePath, 'w', zipfile.ZIP_DEFLATED) as zip:
-        zip.write(filePath, fileName)
-        zip.write(filePathForGeoJson, fileNameForGeoJson)
-
-    # Remove uncompressed file to free /tmp space before upload
-    os.remove(filePath)
-    os.remove(filePathForGeoJson)
 
     s3_fileName = f'digitraffic-rata-train-locations-{departureDate}.zip'
     s3_filePath = f'/tmp/{s3_fileName}'
 
     s3_fileNameForGeoJson = f'digitraffic-rata-train-locations-{departureDate}.zip'
     s3_filePathForGeoJson = f'/tmp/{s3_fileNameForGeoJson}'
+
+    logger.info('Zipping file', file_name=fileName)
+    with zipfile.ZipFile(s3_filePath, 'w', zipfile.ZIP_DEFLATED) as zip,
+              zipfile.ZipFile(s3_filePathForGeoJson, 'w', zipfile.ZIP_DEFLATED) as zipForGeoJson:
+        zip.write(filePath, fileName)
+        zipForGeoJson.write(filePathForGeoJson, fileNameForGeoJson)
+
+    # Remove uncompressed file to free /tmp space before upload
+    os.remove(filePath)
+    os.remove(filePathForGeoJson)
 
     logger.info('Uploading to S3', s3_file_name=s3_fileName)
     s3 = boto3.client('s3')
