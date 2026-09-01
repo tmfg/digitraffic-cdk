@@ -27,6 +27,11 @@ on:
           - "deploy"
           - "diff"
         default: "deploy"
+      skip_approval:
+        description: "Deploy security-related changes without manual confirmation (cdk --require-approval never)"
+        required: true
+        type: boolean
+        default: false
 
       application:
         description: "Application to install"
@@ -69,6 +74,7 @@ jobs:
           echo "| ref | ${{ github.event.inputs.ref }} |" >> $GITHUB_STEP_SUMMARY
           echo "| config-repo-branch | ${{ github.event.inputs.config-repo-branch }} |" >> $GITHUB_STEP_SUMMARY
           echo "| command | ${{ github.event.inputs.command }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| skip_approval | ${{ github.event.inputs.skip_approval }} |" >> $GITHUB_STEP_SUMMARY
           echo "| application | ${{ github.event.inputs.application }} |" >> $GITHUB_STEP_SUMMARY
 
   build_and_deploy:
@@ -211,6 +217,8 @@ jobs:
         env:
           ENV: ${{ github.event.inputs.env }}
           STACK: ${{ steps.environment.outputs.stack }}
+          COMMAND: ${{ github.event.inputs.command }}
+          SKIP_APPROVAL: ${{ github.event.inputs.skip_approval }}
         run: |
             if [ "$ENV" == "prod" ]; then export STACK_NAME=${STACK}Prod; else export STACK_NAME=${STACK}Test; fi;
  
@@ -221,9 +229,15 @@ jobs:
 
             node common/scripts/install-run-rush.js rebuild --to ${{ github.event.inputs.application }}
 
+            # --require-approval is only accepted by deploy, not by diff
+            export CDK_ARGS=""
+            if [ "$COMMAND" == "deploy" ] && [ "$SKIP_APPROVAL" == "true" ]; then
+                export CDK_ARGS="--require-approval never"
+            fi;
+
             cd ${{ steps.environment.outputs.directory }}
             # and the run command
-            node ../../common/scripts/install-run-rush-pnpm.js cdk ${{ github.event.inputs.command }} $STACK_NAME
+            node ../../common/scripts/install-run-rush-pnpm.js cdk $COMMAND $STACK_NAME $CDK_ARGS
 
             if [ "${{ steps.environment.outputs.generate_sbom }}" == "true" ] && [ "${{ github.event.inputs.command }}" == "deploy" ]; then
               export IMAGE_URL=$(aws cloudformation describe-stacks \
