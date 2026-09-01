@@ -136,7 +136,7 @@ def writeTrainLocationsToFile(departureDate):
     #with zipfile.ZipFile(s3_filePath, 'w', zipfile.ZIP_DEFLATED) as zip:
     #    zip.write(filePath, fileName)
 
-    s3_fileNameForGeoJson = f'digitraffic-rata-train-locations-{departureDate}.zip'
+    s3_fileNameForGeoJson = f'digitraffic-rata-train-locations-{departureDate}-geojson.zip'
     s3_filePathForGeoJson = f'/tmp/{s3_fileNameForGeoJson}'
 
     with zipfile.ZipFile(s3_filePathForGeoJson, 'w', zipfile.ZIP_DEFLATED) as zipForGeoJson:
