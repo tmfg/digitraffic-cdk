@@ -139,7 +139,7 @@ class TestDumpTrainLocations(unittest.TestCase):
             with zipfile.ZipFile(io.BytesIO(zip_bytes), "r") as zf:
                 filenames = zf.namelist()
                 self.assertEqual(len(filenames), 1)
-                self.assertEqual(filenames[0], "train-locations-2025-12-31.json")
+                self.assertEqual(filenames[0], "train-locations-2025-12-31-geojson.json")
 
                 with zf.open(filenames[0]) as f:
                     trainLocationGeoJson = json.load(f)
