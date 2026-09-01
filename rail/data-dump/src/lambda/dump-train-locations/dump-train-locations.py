@@ -97,7 +97,7 @@ def writeTrainLocationsToFile(departureDate):
     # Write locations incrementally — stream each train's locations directly to files
     # instead of accumulating millions of records in memory
     with open(filePath, 'w') as f, open(filePathForGeoJson, 'w') as fileForGeoJson:
-        f.write('[')
+        #f.write('[')
 
         fileForGeoJson.write('{')
         fileForGeoJson.write('"type": "FeatureCollection",')
@@ -112,7 +112,7 @@ def writeTrainLocationsToFile(departureDate):
             locations = trainRequest.json()
             for loc in locations:
                 if not first:
-                    f.write(',')
+                    #f.write(',')
                     fileForGeoJson.write(',')
                 if checkThatJsonHasValuesRequiredByGeoJson(loc):
                     locationGeoJson = createGeoJsonFeaturePart(loc)
@@ -120,10 +120,10 @@ def writeTrainLocationsToFile(departureDate):
                 else:
                     return False
 
-                json.dump(loc, f)
+                #json.dump(loc, f)
                 first = False
                 recordCount += 1
-        f.write(']')
+        #f.write(']')
         fileForGeoJson.write(']')
         fileForGeoJson.write('}')
 
@@ -133,8 +133,8 @@ def writeTrainLocationsToFile(departureDate):
     s3_filePath = f'/tmp/{s3_fileName}'
 
     logger.info('Zipping file', file_name=fileName)
-    with zipfile.ZipFile(s3_filePath, 'w', zipfile.ZIP_DEFLATED) as zip:
-        zip.write(filePath, fileName)
+    #with zipfile.ZipFile(s3_filePath, 'w', zipfile.ZIP_DEFLATED) as zip:
+    #    zip.write(filePath, fileName)
 
     s3_fileNameForGeoJson = f'digitraffic-rata-train-locations-{departureDate}.zip'
     s3_filePathForGeoJson = f'/tmp/{s3_fileNameForGeoJson}'
@@ -150,7 +150,7 @@ def writeTrainLocationsToFile(departureDate):
     s3 = boto3.client('s3')
     bucket_name = os.environ['DUMP_BUCKET_NAME']
 
-    s3.upload_file(s3_filePath, bucket_name, s3_fileName)
+    #s3.upload_file(s3_filePath, bucket_name, s3_fileName)
     s3.upload_file(s3_filePathForGeoJson, bucket_name, s3_fileNameForGeoJson)
 
     return True
