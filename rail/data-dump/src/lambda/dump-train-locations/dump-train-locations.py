@@ -70,9 +70,7 @@ def lambda_handler(event, context):
           'statusCode': 200
       }
     else:
-      return {
-        'statusCode': 400
-      }
+      raise ValueError('A train location record is missing required GeoJSON values')
 
 def getTrainNumbers(departureDate):
     logger.info('Fetching train numbers', departure_date=str(departureDate))
