@@ -131,7 +131,7 @@ class TestDumpTrainLocations(unittest.TestCase):
             self.assertEqual(objects["KeyCount"], 1)
 
             key = objects["Contents"][0]["Key"]
-            self.assertEqual(key, "digitraffic-rata-train-locations-2025-12-31.zip")
+            self.assertEqual(key, "digitraffic-rata-train-locations-2025-12-31-geojson.zip")
 
             response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
             zip_bytes = response["Body"].read()
