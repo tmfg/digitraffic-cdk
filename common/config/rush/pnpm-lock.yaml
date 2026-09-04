@@ -1589,8 +1589,8 @@ importers:
   ../../rail/data-dump:
     dependencies:
       '@digitraffic/common':
-        specifier: 2026.8.31-2
-        version: 2026.8.31-2(@aws-sdk/client-api-gateway@3.1098.0)(@aws-sdk/client-s3@3.1098.0)(@aws-sdk/client-secrets-manager@3.1098.0)(@aws-sdk/client-sns@3.1098.0)(@aws-sdk/lib-storage@3.1098.0(@aws-sdk/client-s3@3.1098.0))(@date-fns/tz@1.5.0)(@smithy/fetch-http-handler@5.6.13)(@smithy/node-http-handler@4.9.13)(aws-cdk-lib@2.262.2(constructs@10.7.2))(constructs@10.7.2)(date-fns@4.4.0)(es-toolkit@1.50.0)(geojson-validation@1.0.2)(ky@2.0.2)(pg-native@3.8.0)(pg-promise@12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0))))(zod@4.4.3)
+        specifier: 2026.9.4-1
+        version: 2026.9.4-1(@aws-sdk/client-api-gateway@3.1098.0)(@aws-sdk/client-s3@3.1098.0)(@aws-sdk/client-secrets-manager@3.1098.0)(@aws-sdk/client-sns@3.1098.0)(@aws-sdk/lib-storage@3.1098.0(@aws-sdk/client-s3@3.1098.0))(@date-fns/tz@1.5.0)(@smithy/fetch-http-handler@5.6.13)(@smithy/node-http-handler@4.9.13)(aws-cdk-lib@2.262.2(constructs@10.7.2))(constructs@10.7.2)(date-fns@4.4.0)(es-toolkit@1.50.0)(geojson-validation@1.0.2)(ky@2.0.2)(pg-native@3.8.0)(pg-promise@12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0))))(zod@4.4.3)
       aws-cdk-lib:
         specifier: 2.262.2
         version: 2.262.2(constructs@10.7.2)
@@ -3041,6 +3041,28 @@ packages:
 
   '@digitraffic/common@2026.8.31-2':
     resolution: {integrity: sha512-1AdPtxAkoEgey7/l85JiivIaIjM6//HNnNt9UBnY5EohuVPfZKBrNcxcfBOv0P5nySGUC+pLScIiLNbY41KoSQ==}
+    engines: {node: '>=24 <25'}
+    peerDependencies:
+      '@aws-sdk/client-api-gateway': 3.1098.0
+      '@aws-sdk/client-s3': 3.1098.0
+      '@aws-sdk/client-secrets-manager': 3.1098.0
+      '@aws-sdk/client-sns': 3.1098.0
+      '@aws-sdk/lib-storage': 3.1098.0
+      '@date-fns/tz': 1.5.0
+      '@smithy/fetch-http-handler': 5.6.13
+      '@smithy/node-http-handler': 4.9.13
+      aws-cdk-lib: 2.262.2
+      constructs: 10.7.2
+      date-fns: 4.4.0
+      es-toolkit: 1.50.0
+      geojson-validation: 1.0.2
+      ky: 2.0.2
+      pg-native: 3.8.0
+      pg-promise: 12.7.0
+      zod: 4.4.3
+
+  '@digitraffic/common@2026.9.4-1':
+    resolution: {integrity: sha512-UCe1H6jpc9lUGPKm0Y9ta3D97PDxRH9Q8tCTDUsGtfR3E9jJu7NdmGjinQ4exNMlPYThqV4ToPb9y27iryoyNg==}
     engines: {node: '>=24 <25'}
     peerDependencies:
       '@aws-sdk/client-api-gateway': 3.1098.0
@@ -7734,6 +7756,26 @@ snapshots:
       node-source-walk: 7.0.2
 
   '@digitraffic/common@2026.8.31-2(@aws-sdk/client-api-gateway@3.1098.0)(@aws-sdk/client-s3@3.1098.0)(@aws-sdk/client-secrets-manager@3.1098.0)(@aws-sdk/client-sns@3.1098.0)(@aws-sdk/lib-storage@3.1098.0(@aws-sdk/client-s3@3.1098.0))(@date-fns/tz@1.5.0)(@smithy/fetch-http-handler@5.6.13)(@smithy/node-http-handler@4.9.13)(aws-cdk-lib@2.262.2(constructs@10.7.2))(constructs@10.7.2)(date-fns@4.4.0)(es-toolkit@1.50.0)(geojson-validation@1.0.2)(ky@2.0.2)(pg-native@3.8.0)(pg-promise@12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0))))(zod@4.4.3)':
+    dependencies:
+      '@aws-sdk/client-api-gateway': 3.1098.0
+      '@aws-sdk/client-s3': 3.1098.0
+      '@aws-sdk/client-secrets-manager': 3.1098.0
+      '@aws-sdk/client-sns': 3.1098.0
+      '@aws-sdk/lib-storage': 3.1098.0(@aws-sdk/client-s3@3.1098.0)
+      '@date-fns/tz': 1.5.0
+      '@smithy/fetch-http-handler': 5.6.13
+      '@smithy/node-http-handler': 4.9.13
+      aws-cdk-lib: 2.262.2(constructs@10.7.2)
+      constructs: 10.7.2
+      date-fns: 4.4.0
+      es-toolkit: 1.50.0
+      geojson-validation: 1.0.2
+      ky: 2.0.2
+      pg-native: 3.8.0
+      pg-promise: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+      zod: 4.4.3
+
+  '@digitraffic/common@2026.9.4-1(@aws-sdk/client-api-gateway@3.1098.0)(@aws-sdk/client-s3@3.1098.0)(@aws-sdk/client-secrets-manager@3.1098.0)(@aws-sdk/client-sns@3.1098.0)(@aws-sdk/lib-storage@3.1098.0(@aws-sdk/client-s3@3.1098.0))(@date-fns/tz@1.5.0)(@smithy/fetch-http-handler@5.6.13)(@smithy/node-http-handler@4.9.13)(aws-cdk-lib@2.262.2(constructs@10.7.2))(constructs@10.7.2)(date-fns@4.4.0)(es-toolkit@1.50.0)(geojson-validation@1.0.2)(ky@2.0.2)(pg-native@3.8.0)(pg-promise@12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0))))(zod@4.4.3)':
     dependencies:
       '@aws-sdk/client-api-gateway': 3.1098.0
       '@aws-sdk/client-s3': 3.1098.0

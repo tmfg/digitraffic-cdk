@@ -2,7 +2,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
-import { Duration } from "aws-cdk-lib";
+import { Duration, Size } from "aws-cdk-lib";
 import { Schedule } from "aws-cdk-lib/aws-events";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import type { Function as AwsFunction } from "aws-cdk-lib/aws-lambda";
@@ -47,6 +47,7 @@ export function create(stack: DataDumpStack): void {
       memorySize: 2048,
       bucket: props.trainLocationDumpBucket,
       layer: depsLayer,
+      storageSize: Size.gibibytes(1),
     },
   );
 
@@ -73,7 +74,12 @@ export function create(stack: DataDumpStack): void {
 function createDumperLambda(
   stack: DataDumpStack,
   name: string,
-  config: { memorySize: number; bucket: string; layer: LayerVersion },
+  config: {
+    memorySize: number;
+    bucket: string;
+    layer: LayerVersion;
+    storageSize?: Size;
+  },
 ): AwsFunction {
   const fn = FunctionBuilder.plain(stack, name)
     .withCode(Code.fromAsset(path.join(PROJECT_ROOT, "src", "lambda", name)))
@@ -84,6 +90,7 @@ function createDumperLambda(
     .withReservedConcurrentExecutions(1)
     .withEnvironment({ DUMP_BUCKET_NAME: config.bucket })
     .withLayers(config.layer)
+    .withStorageSize(config.storageSize ?? Size.gibibytes(0.5))
     .withRolePolicies(
       new PolicyStatement({
         actions: S3_ACTIONS,
