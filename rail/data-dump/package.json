@@ -16,7 +16,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.9.4-1",
+    "@digitraffic/common": "2026.9.4-2",
     "aws-cdk-lib": "2.262.2",
     "constructs": "10.7.2"
   },
