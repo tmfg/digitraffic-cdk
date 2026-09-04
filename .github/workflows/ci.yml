@@ -4,7 +4,8 @@ on: [push, workflow_dispatch]
 jobs:
   db-tests:
     if: github.repository != 'tmfg/digitraffic-cdk'
-    permissions: {}
+    permissions: 
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -15,11 +16,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 2
+         persist-credentials: false
       - name: Checkout ${{ matrix.domain }} repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: tmfg/digitraffic-${{ matrix.domain }}
           fetch-depth: 2
+          persist-credentials: false
           path: digitraffic-${{ matrix.domain }}
       - name: Install Node 24
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -75,7 +78,8 @@ jobs:
   other-tests:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-24.04
-    permissions: {}
+    permissions: 
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -85,6 +89,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 2
+          persist-credentials: false
       - name: Install Node 24
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
