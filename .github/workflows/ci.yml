@@ -1,11 +1,12 @@
 name: CI
 on: [push, workflow_dispatch]
 
+permissions: 
+  contents: read
+
 jobs:
   db-tests:
     if: github.repository != 'tmfg/digitraffic-cdk'
-    permissions: 
-      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -15,8 +16,8 @@ jobs:
       - name: Checkout cdk repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          fetch-depth: 2
-         persist-credentials: false
+          persist-credentials: false
+          fetch-depth: 2         
       - name: Checkout ${{ matrix.domain }} repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -78,8 +79,6 @@ jobs:
   other-tests:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-24.04
-    permissions: 
-      contents: read
     strategy:
       fail-fast: false
       matrix:
