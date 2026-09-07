@@ -125,12 +125,12 @@ export class RoadnetworkStack extends DigitrafficStack {
             fi: {
               title: "Road Network -aineistot",
               intro:
-                "Ladattavat Road Network -aineistojulkaisut. latest/-kansio sisältää aina viimeisimmän julkaistun Road Network -aineiston. releases/-kansioon tallennetaan Road Network -aikaiset aineistojulkaisut vuodesta 2027 alkaen, joten kansio on alkuvaiheessa tyhjä. digiroad/-kansio sisältää Digiroadin vuoden 2026 aineistojulkaisut.",
+                "Ladattavat Road Network -aineistojulkaisut. latest/-kansio sisältää aina viimeisimmän julkaistun Road Network -aineiston. releases/-kansioon tallennetaan Road Network -aikaiset aineistojulkaisut vuodesta 2027 alkaen, joten kansio on alkuvaiheessa tyhjä. digiroad/-kansio sisältää vanhan Digiroad-järjestelmän vuoden 2026 aineistojulkaisut.",
             },
             en: {
               title: "Road Network datasets",
               intro:
-                "Downloadable Road Network dataset releases. The latest/ folder always contains the most recently published Road Network dataset. The releases/ folder stores Road Network-era dataset releases starting from 2027, so the folder is empty in the initial phase. The digiroad/ folder contains Digiroad dataset releases from 2026.",
+                "Downloadable Road Network dataset releases. The latest/ folder always contains the most recently published Road Network dataset. The releases/ folder stores Road Network-era dataset releases starting from 2027, so the folder is empty in the initial phase. The digiroad/ folder contains legacy Digiroad dataset releases from 2026.",
             },
           },
         }),
