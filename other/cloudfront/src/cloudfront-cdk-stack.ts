@@ -369,6 +369,24 @@ export class CloudfrontCdkStack extends Stack {
           functionVersion = this._edgeLambdaFactory.getGzipRequirementLambda();
 
           break;
+
+        // Origin-request lambda, not a viewer-request CloudFront Function: see
+        // Behavior.withDirectoryIndexFunction() doc comment for why - a viewer-request rewrite
+        // would run before the cache lookup and could collide the cache key across origins.
+        case LambdaType.DIRECTORY_INDEX: {
+          const pathRemoveCount =
+            behavior.lambdaConfig.parameters.pathRemoveCount;
+          if (pathRemoveCount === undefined) {
+            throw new Error(
+              `${behavior.behaviorPath}: withDirectoryIndexFunction() needs the number of leading path parts to remove`,
+            );
+          }
+
+          functionVersion =
+            this._edgeLambdaFactory.getDirectoryIndexLambda(pathRemoveCount);
+
+          break;
+        }
       }
 
       lambdas.push({
@@ -422,23 +440,6 @@ export class CloudfrontCdkStack extends Stack {
           functionVersion = this._edgeFunctionFactory.getHttpHeadersFunction();
 
           break;
-
-        case FunctionType.DIRECTORY_INDEX: {
-          const pathRemoveCount =
-            behavior.lambdaConfig.parameters.pathRemoveCount;
-          if (!pathRemoveCount) {
-            throw new Error(
-              `${behavior.behaviorPath}: withDirectoryIndexFunction() needs the number of leading path parts to remove`,
-            );
-          }
-
-          functionVersion =
-            this._edgeFunctionFactory.getDirectoryIndexFunction(
-              pathRemoveCount,
-            );
-
-          break;
-        }
       }
 
       functions.push({

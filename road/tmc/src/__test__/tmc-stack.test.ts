@@ -74,22 +74,8 @@ describe("Tmc bucket", () => {
 });
 
 describe("Tmc bucket policy", () => {
-  test("is not created while applyBucketPolicy is left at its default", () => {
-    // CloudFormation still owns the real bucket policy until it's explicitly released for
-    // this environment; this stack must not create a competing AWS::S3::BucketPolicy
-    // meanwhile.
-    createTemplate().resourceCountIs("AWS::S3::BucketPolicy", 0);
-  });
-
-  test("is not created when applyBucketPolicy is explicitly false", () => {
-    createTemplate({ applyBucketPolicy: false }).resourceCountIs(
-      "AWS::S3::BucketPolicy",
-      0,
-    );
-  });
-
   test("grants CloudFront read and list access scoped to the distribution", () => {
-    const template = createTemplate({ applyBucketPolicy: true });
+    const template = createTemplate();
 
     const getObject = findStatement(template, "CloudfrontGetObject");
     expect(getObject.Action).toEqual("s3:GetObject");
@@ -105,7 +91,7 @@ describe("Tmc bucket policy", () => {
   });
 
   test("has exactly the two expected statements, nothing broader", () => {
-    const template = createTemplate({ applyBucketPolicy: true });
+    const template = createTemplate();
     const bucketArn = "arn:aws:s3:::tmc-road-test";
 
     expect(bucketPolicyStatements(template)).toHaveLength(2);

@@ -1,6 +1,9 @@
 name: CI
 on: [push, workflow_dispatch]
 
+permissions: 
+  contents: read
+
 jobs:
   db-tests:
     if: github.repository != 'tmfg/digitraffic-cdk'
@@ -13,7 +16,8 @@ jobs:
       - name: Checkout cdk repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          fetch-depth: 2
+          persist-credentials: false
+          fetch-depth: 2         
       - name: Checkout ${{ matrix.domain }} repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -83,6 +87,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 2
+          persist-credentials: false
       - name: Install Node 24
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:

@@ -11,7 +11,6 @@ export enum FunctionType {
   INDEX_HTML,
   REDIRECT,
   PATH_REWRITE,
-  DIRECTORY_INDEX,
   HTTP_HEADERS,
 }
 
@@ -75,21 +74,6 @@ export function createHttpHeadersFunction(
   const body = readFunctionBody("dist/lambda/function-http-headers.cjs");
 
   return createCloudfrontFunction(scope, "http-headers-function", body);
-}
-
-export function createDirectoryIndexFunction(
-  scope: Construct,
-  pathRemoveCount: number,
-): CloudfrontFunction {
-  const body = readFunctionBody(
-    "dist/lambda/function-directory-index.cjs",
-  ).replace(/EXT_PATHS_TO_REMOVE/gi, pathRemoveCount.toString());
-
-  return createCloudfrontFunction(
-    scope,
-    `directory-index-function-${pathRemoveCount}`,
-    body,
-  );
 }
 
 // let's make a chain of dependencies from the functions, as AWS won't allow deploying many functions at the same time!

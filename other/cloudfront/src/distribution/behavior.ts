@@ -343,7 +343,7 @@ export class Behavior {
    * Removes leading URI path segments and serves `index.html` for directory requests.
    *
    * Use when an S3 bucket is published below a CloudFront path prefix and the bucket also hosts
-   * a static browser for that prefix. The viewer request function first removes the configured
+   * a static browser for that prefix. The origin request lambda first removes the configured
    * number of leading URI path segments, usually the public CloudFront prefix, before the request
    * reaches S3. If the remaining path ends in `/`, it appends `index.html` so directory navigation
    * loads the static page.
@@ -360,12 +360,19 @@ export class Behavior {
    * - `/roadnetwork/?list-type=2&delimiter=/&prefix=latest/` -> S3 bucket listing request for
    *   prefix `latest/`
    *
+   * Implemented as an origin-request lambda, not a viewer-request CloudFront Function: the
+   * latter runs before the cache lookup, so its URI rewrite also becomes part of the cache key.
+   * Two behaviors on different origins that strip down to the same relative path (as any two
+   * users of this method with the same `pathPartsToRemove` will) would then collide into the
+   * same cache entry. Origin-request lambdas run only after the cache decision, which is always
+   * made from the original, distinct request path.
+   *
    * @param pathPartsToRemove how many leading URI path segments to remove, one per prefix level
    */
   public withDirectoryIndexFunction(pathPartsToRemove: number): Behavior {
-    this.addFunction(
-      FunctionEventType.VIEWER_REQUEST,
-      FunctionType.DIRECTORY_INDEX,
+    this.addLambda(
+      LambdaEdgeEventType.ORIGIN_REQUEST,
+      LambdaType.DIRECTORY_INDEX,
     );
 
     this.lambdaConfig.parameters.pathRemoveCount = pathPartsToRemove;

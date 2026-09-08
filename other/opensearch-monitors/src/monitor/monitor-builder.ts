@@ -37,6 +37,31 @@ import {
  * - exactly one trigger condition/action set
  *
  * `build()` returns the final `OSMonitor` payload consumed by monitor deployment.
+ *
+ * Time-limited filter example: suppress a known error only until a given date, after which
+ * matching documents are no longer excluded and the monitor alerts on them again automatically.
+ *
+ * ```ts
+ * builder.not(
+ *   and(
+ *     matchPhrase("error", "Known upstream outage"),
+ *     before("2026-10-01T00:00:00Z"),
+ *   ),
+ * );
+ * // TODO: remove this filter after 2026-10-01, it is a no-op after that date
+ * ```
+ *
+ * Recurring daily window example: suppress errors known to happen only during a daily
+ * maintenance/downtime window (e.g. an upstream service closed 19:00-06:30 local time).
+ *
+ * ```ts
+ * builder.not(
+ *   and(
+ *     matchPhrase("error", "Known upstream nightly closure"),
+ *     duringDailyWindow(19, 0, 6, 30),
+ *   ),
+ * );
+ * ```
  */
 
 export type OsDomain =
@@ -173,6 +198,40 @@ export function or(...queries: Query[]): BoolOrQuery {
       should: queries,
     },
   };
+}
+
+/** Combines queries with AND semantics. Useful for scoping a `.not()` exclusion, e.g. together with `before()` to make it expire automatically. */
+export function and(...queries: Query[]): BoolQuery {
+  return bool(queries, []);
+}
+
+/** Matches documents dated before the given date (exclusive of `date`). Combine with `and()` inside `.not()` to build a self-expiring suppression. */
+export function before(date: string): RangeQuery {
+  return matchRange("@timestamp", null, date);
+}
+
+/**
+ * Matches documents whose `@timestamp`, converted to the given IANA zone, falls within a recurring
+ * daily time-of-day window. Handles windows that cross midnight (e.g. 19:00-07:30).
+ * `zoneId` accepts any Java `ZoneId.of()` value, e.g. an IANA region ("Europe/Helsinki"), a fixed
+ * offset ("+02:00"), or "Z"/"UTC".
+ */
+export function duringDailyWindow(
+  startHour: number,
+  startMinute: number,
+  endHour: number,
+  endMinute: number,
+  zoneId: string = "Europe/Helsinki",
+): ScriptQuery {
+  const start = startHour * 60 + startMinute;
+  const end = endHour * 60 + endMinute;
+  const comparison =
+    start <= end
+      ? `minutesOfDay >= ${start} && minutesOfDay < ${end}`
+      : `minutesOfDay >= ${start} || minutesOfDay < ${end}`;
+  return script(
+    `def zdt = doc['@timestamp'].value.withZoneSameInstant(ZoneId.of('${zoneId}')); def minutesOfDay = zdt.getHour() * 60 + zdt.getMinute(); ${comparison}`,
+  );
 }
 
 function sort(field: OSLogField, order: Order): Sort {

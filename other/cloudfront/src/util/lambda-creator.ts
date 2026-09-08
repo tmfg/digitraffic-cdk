@@ -18,6 +18,7 @@ export enum LambdaType {
   WEATHERCAM_HTTP_HEADERS,
   LAM_REDIRECT,
   LAM_HEADERS,
+  DIRECTORY_INDEX,
 }
 
 function readBodyWithVersion(fileName: string): string {
@@ -132,6 +133,23 @@ export function createLamHeaders(
   const body = readBodyWithVersion("dist/lambda/lambda-lam-headers.cjs");
 
   return createVersionedFunction(scope, edgeLambdaRole, "lam-headers", body);
+}
+
+export function createDirectoryIndex(
+  scope: Construct,
+  edgeLambdaRole: Role,
+  pathRemoveCount: number,
+): Version {
+  const body = readBodyWithVersion(
+    "dist/lambda/lambda-directory-index.cjs",
+  ).replace(/EXT_PATHS_TO_REMOVE/gi, pathRemoveCount.toString());
+
+  return createVersionedFunction(
+    scope,
+    edgeLambdaRole,
+    `directory-index-${pathRemoveCount}`,
+    body,
+  );
 }
 
 export function createFunction(

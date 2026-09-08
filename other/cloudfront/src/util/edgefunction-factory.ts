@@ -2,7 +2,6 @@ import type { Stack } from "aws-cdk-lib";
 import type { Function as CloudfrontFunction } from "aws-cdk-lib/aws-cloudfront";
 import type { Construct } from "constructs";
 import {
-  createDirectoryIndexFunction,
   createHttpHeadersFunction,
   createIndexHtml,
   createPathRewriteFunction,
@@ -52,14 +51,6 @@ export class EdgeFunctionFactory {
   getHttpHeadersFunction(): CloudfrontFunction {
     return this.getFunction("http-headers-function", () =>
       createHttpHeadersFunction(this._scope),
-    );
-  }
-
-  getDirectoryIndexFunction(pathRemoveCount: number): CloudfrontFunction {
-    const key = `directoryIndex_${pathRemoveCount}`;
-
-    return this.getFunction(key, () =>
-      createDirectoryIndexFunction(this._scope, pathRemoveCount),
     );
   }
 }

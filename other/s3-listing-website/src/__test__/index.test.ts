@@ -34,6 +34,10 @@ describe("createListingWebsiteSources", () => {
       "assets/app.js",
       "assets/styles.css",
       "assets/fintraffic-logo.svg",
+      "assets/favicon.ico",
+      "assets/favicon-32x32.png",
+      "assets/favicon-16x16.png",
+      "assets/apple-touch-icon.png",
     ]) {
       expect(existsSync(path.join(ENGINE_DIR, relativePath))).toBe(true);
     }
