@@ -46,6 +46,7 @@ def createGeoJsonFeaturePart(oldJsonRow):
             "trainNumber": getDictionaryValueIfKeyExists("trainNumber", oldJsonRow),
             "departureDate": getDictionaryValueIfKeyExists("departureDate", oldJsonRow),
             "timestamp": getDictionaryValueIfKeyExists("timestamp", oldJsonRow),
+            "isGpsLocation": getDictionaryValueIfKeyExists("isGpsLocation", oldJsonRow),
         }
     }
 
