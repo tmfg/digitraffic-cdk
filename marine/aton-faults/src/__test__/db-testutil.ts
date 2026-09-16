@@ -4,7 +4,6 @@ import {
   dbTestBase as commonDbTestBase,
 } from "@digitraffic/common/dist/test/db-testutils";
 import type { DbFault } from "../model/fault.js";
-import type { AtonSecret } from "../model/secret.js";
 
 export const TEST_ACTIVE_WARNINGS_VALID = {
   type: "FeatureCollection",
@@ -259,14 +258,6 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
       },
     },
   ],
-};
-
-// TODO: remove this obsolete test fixture with AtonSecret. ATON certificate use was removed in DPO-3421 (f939d6ee7).
-export const TEST_ATON_SECRET: AtonSecret = {
-  certificate: "",
-  privatekey: "",
-  ca: "",
-  serviceRegistryUrl: "",
 };
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
