@@ -12,7 +12,7 @@ jobs:
   biome:
     name: Biome Lint & Format
     if: github.repository != 'tmfg/digitraffic-cdk'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     env:
