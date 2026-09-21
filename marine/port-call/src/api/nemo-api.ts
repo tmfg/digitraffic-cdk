@@ -37,28 +37,28 @@ export class NemoApi {
       });
 
       if (resp.statusCode !== 200) {
-        logger.debug(`error ${JSON.stringify(resp)}`);
+        const responseBody = await resp.body.text();
 
         logger.error({
           method,
           customStatus: resp.statusCode,
           customErrorCount: 1,
+          customResponsePreview: responseBody.slice(0, 1000),
         });
 
-        return Promise.reject();
+        throw new Error(
+          `NEMO getVisits failed with status ${resp.statusCode}: ${responseBody.slice(0, 1000)}`,
+        );
       }
 
       const response = (await resp.body.json()) as NemoResponse;
 
       logger.debug(`returning ${JSON.stringify(response)}`);
 
-      return Promise.resolve(response);
+      return response;
     } catch (error) {
       logger.debug(`error ${JSON.stringify(error)}`);
-
-      //            logException(logger, error);
-
-      return Promise.reject();
+      throw error;
     }
   }
 

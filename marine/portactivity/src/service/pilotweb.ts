@@ -18,7 +18,23 @@ export async function getMessagesFromPilotweb(
   authHeader: string,
 ): Promise<ApiTimestamp[]> {
   const message = await PilotwebAPI.getMessages(host, authHeader);
-  const pilotages = JSON.parse(message) as Pilotage[];
+  const parsed = JSON.parse(message) as unknown;
+
+  if (!Array.isArray(parsed)) {
+    logger.error({
+      method: "PilotwebService.getMessagesFromPilotweb",
+      message: "Pilotweb response was not an array",
+      customResponseType: typeof parsed,
+      customResponseKeys:
+        parsed && typeof parsed === "object"
+          ? Object.keys(parsed).slice(0, 20).join(",")
+          : "",
+      customResponsePreview: message.slice(0, 1000),
+    });
+    throw new Error("Pilotweb response was not an array");
+  }
+
+  const pilotages = parsed as Pilotage[];
 
   logger.info({
     method: "PilotwebService.getMessagesFromPilotweb",

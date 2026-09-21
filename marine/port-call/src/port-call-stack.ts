@@ -6,13 +6,18 @@ import { PublicApi } from "./public-api.js";
 
 export interface PortCallConfiguration extends StackConfiguration {
   readonly enableUpdate: boolean;
+  readonly limitUpdateToBusinessHours?: boolean;
 }
 
 export class PortCallStack extends DigitrafficStack {
   constructor(scope: Construct, id: string, config: PortCallConfiguration) {
     super(scope, id, config);
 
-    new InternalLambdas(this, config.enableUpdate);
+    new InternalLambdas(
+      this,
+      config.enableUpdate,
+      config.limitUpdateToBusinessHours ?? false,
+    );
     new PublicApi(this);
   }
 }

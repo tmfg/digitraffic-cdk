@@ -33,7 +33,10 @@ describe("nemo-api-tests", () => {
     test("calls request with a URL object, not a plain string", async () => {
       mockRequest.mockResolvedValue({
         statusCode: 200,
-        body: { json: async () => [] },
+        body: {
+          json: async () => [],
+          text: async () => "[]",
+        },
       } as never);
 
       const api = new NemoApi("https://api.example.com", "key", "cert");
@@ -50,7 +53,10 @@ describe("nemo-api-tests", () => {
     test("rejects on non-200 status code", async () => {
       mockRequest.mockResolvedValue({
         statusCode: 503,
-        body: { json: async () => null },
+        body: {
+          text: async () => '{"error":"Service Unavailable"}',
+          json: async () => null,
+        },
       } as never);
 
       const api = new NemoApi("https://api.example.com", "key", "cert");
@@ -59,7 +65,7 @@ describe("nemo-api-tests", () => {
           new Date("2025-01-01T00:00:00Z"),
           new Date("2025-01-02T00:00:00Z"),
         ),
-      ).rejects.toBeUndefined();
+      ).rejects.toThrow("NEMO getVisits failed with status 503");
     });
   });
 });
