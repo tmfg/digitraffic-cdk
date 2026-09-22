@@ -1,12 +1,10 @@
-import { defaultLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import {
   add404Support,
   createDefaultPolicyDocument,
 } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import type { Stack } from "aws-cdk-lib";
 import type { Resource } from "aws-cdk-lib/aws-apigateway";
 import {
@@ -15,7 +13,6 @@ import {
   MethodLoggingLevel,
   RestApi,
 } from "aws-cdk-lib/aws-apigateway";
-import { AssetCode } from "aws-cdk-lib/aws-lambda";
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import type { VoyagePlanGatewayProps } from "./app-props.js";
 import { VoyagePlanEnvKeys } from "./keys.js";
@@ -29,11 +26,7 @@ export function create(
 
   const resource = api.root.addResource("temp").addResource("schedules");
 
-  createUsagePlan(
-    api,
-    "VPGW Public CloudFront API Key",
-    "VPGW Public CloudFront Usage Plan",
-  );
+  createDefaultUsagePlan(api, "VPGW Public CloudFront");
   createVtsProxyHandler(stack, resource, secret, props);
 }
 
@@ -58,26 +51,19 @@ function createVtsProxyHandler(
 ): void {
   const env: Record<string, string> = {};
   env[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
-  const functionName = "VPGW-Get-Schedules";
-  const logGroup = createLambdaLogGroup({ stack, functionName });
   // ATTENTION!
   // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
   // The reason for this is IP based restriction in another system's firewall.
-  const handler = MonitoredFunction.create(
-    stack,
-    functionName,
-    defaultLambdaConfiguration({
-      functionName,
-      code: new AssetCode("dist/lambda"),
-      handler: "lambda-get-schedules.handler",
-      logGroup: logGroup,
-      environment: env,
-      vpc: stack.vpc,
-      timeout: 10,
-      reservedConcurrentExecutions: 1,
-      memorySize: 128,
-    }),
-  );
+  // createV2 derives the asset code path and handler from the "get-schedules"
+  // name (matching src/lambda/get-schedules/get-schedules.ts) and wires up
+  // the stack's VPC automatically, so it stays correct if the esbuild output
+  // layout changes again.
+  const handler = MonitoredFunction.createV2(stack, "get-schedules", env, {
+    functionName: "VPGW-Get-Schedules",
+    timeout: 10,
+    reservedConcurrentExecutions: 1,
+    memorySize: 128,
+  });
   secret.grantRead(handler);
   const integration = new LambdaIntegration(handler, {
     proxy: true,
