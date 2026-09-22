@@ -39,11 +39,13 @@ on:
         type: choice
         options: 
           - "marine/aton-faults"
+          - "marine/gofrep"
           - "marine/marinecam"
           - "marine/port-call"
           - "marine/portactivity"
           - "marine/sea-state-estimate"
           - "marine/shiplight"
+          - "marine/voyage-plan-gateway"
           - "marine/winter-navigation"
           - "other/digitraffic-statistics"
           - "other/os-key-figures"
