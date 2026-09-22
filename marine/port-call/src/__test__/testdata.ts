@@ -60,7 +60,11 @@ function buildVisit(
 ): NemoVisit {
   return {
     visitId,
-    latestUpdateTime: new Date(),
+    // Reuse the same instant as `eta` instead of calling `new Date()` again here.
+    // Two independent `new Date()` calls can straddle a millisecond boundary under
+    // load (e.g. in CI), which made the from/to boundary tests in get-visits.test.ts
+    // flaky since they assume eta === latestUpdateTime.
+    latestUpdateTime: eta,
     portCall: {
       vesselInformation: {
         identification,
