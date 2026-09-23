@@ -1,5 +1,5 @@
 import { basename } from "node:path";
-import type { Stack } from "aws-cdk-lib";
+import type { Size, Stack } from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
 import type { Metric } from "aws-cdk-lib/aws-cloudwatch";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
@@ -46,6 +46,7 @@ export class FunctionBuilder {
   private functionName: string;
   private environment: LambdaEnvironment = {};
   private vpc?: IVpc;
+  private storageSize?: Size;
   private alarms: DtFunctionAlarms = new DtFunctionAlarms();
 
   // these will be overridden in constructor, but inspection won't see it, so set some default values.
@@ -192,6 +193,15 @@ export class FunctionBuilder {
   }
 
   /**
+   * Set storage size for the lambda.  Defaults to AWS default (512MB).
+   */
+  public withStorageSize(storageSize: Size): this {
+    this.storageSize = storageSize;
+
+    return this;
+  }
+
+  /**
    * Add Lambda layers.
    */
   public withLayers(...layers: ILayerVersion[]): this {
@@ -320,6 +330,7 @@ export class FunctionBuilder {
       environment: this.getEnvironment(),
       description: this.description,
       layers: this.layers.length > 0 ? this.layers : undefined,
+      ephemeralStorageSize: this.storageSize,
     });
 
     if (this._features.secretAccess) {

@@ -146,7 +146,7 @@ export class DigitrafficStack
       [EnvKeys.APP_NAME]: `${this.configuration.trafficType.toLowerCase()}-${kebabCase(this.configuration.shortName)}`,
       DB_APPLICATION: dbApplication,
       ...(this.configuration.secretId
-        ? { SECRET_ID: this.configuration.secretId }
+        ? { [EnvKeys.SECRET_ID]: this.configuration.secretId }
         : {}),
     };
   }

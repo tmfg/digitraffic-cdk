@@ -12,15 +12,29 @@ jobs:
   biome:
     name: Biome Lint & Format
     if: github.repository != 'tmfg/digitraffic-common'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Biome
-        uses: biomejs/setup-biome@v2
+        uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
         with:
-          version: latest
+          # Read the version from the lockfile so CI matches the local install
+          # instead of drifting with "latest".
+          working-dir: .
       - name: Run Biome
-        run: biome ci --reporter=github --reporter=summary --no-errors-on-unmatched .
+        run: biome ci --reporter=github --reporter=summary --error-on-warnings --no-errors-on-unmatched .
+
+      # The reporters above only reach the log, so the summary is written separately.
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo '## Biome'
+            echo ''
+            echo '```'
+            biome ci --reporter=summary --error-on-warnings --no-errors-on-unmatched . 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
