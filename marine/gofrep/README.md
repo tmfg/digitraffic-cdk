@@ -1,3 +1,0 @@
-# Digitraffic Marine - GOFREP
-
-TODO

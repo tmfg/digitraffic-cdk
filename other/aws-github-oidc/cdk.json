@@ -1,3 +1,0 @@
-{
-  "app": "node lib/bin/aws-github-oidc-app.js"
-}

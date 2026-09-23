@@ -3,6 +3,7 @@ name: Biome Check
 on:
   workflow_dispatch:
   push:
+  pull_request:
 
 permissions:
   contents: read
@@ -10,8 +11,8 @@ permissions:
 jobs:
   biome:
     name: Biome Lint & Format
-    if: github.repository != 'tmfg/digitraffic-cdk'
-    runs-on: ubuntu-latest
+    if: github.repository != 'tmfg/digitraffic-common'
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -20,8 +21,20 @@ jobs:
       - name: Setup Biome
         uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
         with:
-          # Auto-detect version from rush-command-line-tools/package.json so CI
-          # matches the workspace-pinned Biome instead of drifting with "latest".
-          working-dir: common/autoinstallers/rush-command-line-tools
+          # Read the version from the lockfile so CI matches the local install
+          # instead of drifting with "latest".
+          working-dir: .
       - name: Run Biome
-        run: biome ci --reporter=github --no-errors-on-unmatched .
+        run: biome ci --reporter=github --reporter=summary --error-on-warnings --no-errors-on-unmatched .
+
+      # The reporters above only reach the log, so the summary is written separately.
+      - name: Write job summary
+        if: always()
+        run: |
+          {
+            echo '## Biome'
+            echo ''
+            echo '```'
+            biome ci --reporter=summary --error-on-warnings --no-errors-on-unmatched . 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

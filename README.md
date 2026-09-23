@@ -1,208 +1,187 @@
-# Digitraffic AWS CDK projects
+# Digitraffic-common
 
-This project contains CDK applications for the
-[Digitraffic](https://www.digitraffic.fi) project.
+This is a place for common utilities and classes that can be used in other cdk-projects.
 
-Projects are categorized as:
+## Setup
 
-- projects under other are generic, e.g. swagger-joiner
-- projects under road or marine are related to a mode of transport, e.g.
-  road/variable-signs
-
-## Links
-
-- [Developer guide](DEVELOPMENT.md)
-- [Architecture](ARCHITECTURE.md)
-- [Conventions](CONVENTIONS.md)
-
-Digitraffic is operated by [Fintraffic](https://www.fintraffic.fi)
-
-## TL;DR
-
-### Init rush, (e.g., installs Git hooks).
+Initialize the project scripts by running the following command. This only needs to be done once, after cloning or
+pulling the repository for the first time. It will install/reinstall lefthook git hooks.
 
 ```shell
-rush install
-rush update-autoinstaller --name rush-command-line-tools
-rush update
+pnpm run setup
 ```
 
-### Update dependencies for all projects
-
-All dependency updates use `./update-deps.sh` which automatically runs: `rush update --full`, `rush update-autoinstaller`, `rush install`
-
-**Update all dependencies (recommended)**
+After that approve esbuild:
 
 ```shell
-# Updates all dependencies with 7-day cooldown (excludes typescript and @types/node)
-./update-deps.sh
-
-# Audit dependency vulnerabilities
-rush audit
-
-# Verify everything builds
-rush rebuild
+pnpm approve-builds
 ```
 
-**Update CDK dependencies only**
+And then run again the setup.
 
-```shell
-# Update only AWS CDK packages (aws-cdk, aws-cdk-lib, @aws-cdk/*)
-./update-deps.sh '/^@?aws-cdk/'
+## How to build
 
-# Audit dependency vulnerabilities
-rush audit
+Use `pnpm` to build the code i.e.
 
-# Verify everything builds
-rush rebuild
+    pnpm install
+    pnpm run build
+    pnpm run test
+    pnpm run test --test-path-pattern 'dt-logger.test'
+    pnpm run test:watch
+    pnpm run test:watch --test-path-pattern 'dt-logger.test'
+
+Format code
+
+    pnpm run format:package-json # Format package.json
+    pnpm run format:check # Checks all files
+    pnpm run format:check-staged # Checks stagged files
+    pnpm run format:fix # Format all files
+    pnpm run format:fix-staged # Formats stagged files
+
+## Update deps
+
+This project uses exact dependency versions (no semver ranges)
+and has a 7-day cooldown defined in [.npmrc](.npmrc).
+
+### Full update workflow
+
+1. **Update all dependencies** (deps, peerDeps, and Node version in `.npmrc`):
+   ```bash
+   pnpm deps:update-all
+   ```
+   This updates `package.json`, `pnpm-lock.yaml`, and installs everything in one step — no separate `pnpm install`
+   needed. What `pnpm deps:update-all` does:
+    - Runs `pnpm up --latest` for all packages **except** those listed in
+      `pnpm.updateConfig.ignoredPackages` in `package.json` (e.g. `typescript`, `@types/node`)
+    - Updates all `peerDependencies` to latest (same exclusions apply)
+    - Updates `.npmrc` `use-node-version` to the newest Node release that is older than `minimum-release-age` and
+      matches `engines.node`
+
+   See `scripts/update-deps-and-peers.ts` for implementation details.
+
+   Also **update `packageManager` manually** — it is not touched by the script.
+   Check the latest pnpm 10.x version (older than 7 days) at
+   https://www.npmjs.com/package/pnpm?activeTab=versions and update `package.json`:
+   ```json
+   "packageManager": "pnpm@10.x.x"
+   ```
+   See [DEPENDENCY_OVERRIDES.md](./DEPENDENCY_OVERRIDES.md#4-pnpm-version-packagemanager-field) for details.
+
+2. **Check for vulnerabilities:**
+   ```bash
+   pnpm audit
+   ```
+   If vulnerabilities are reported in transitive dependencies, add or update overrides in
+   `package.json` and/or exclusions in `.npmrc`.
+
+3. **Check if existing overrides can be removed** — existing overrides may no longer be needed if upstream dependencies
+   now pull in a safe version. Test each override by temporarily removing it, reinstalling, and re-running `pnpm audit`:
+   ```bash
+   # Remove the override from package.json, then do a fresh resolution:
+   rm -rf node_modules pnpm-lock.yaml && pnpm install
+   pnpm audit
+   ```
+   If no vulnerabilities are reported, the override is no longer needed — keep it removed. If vulnerabilities reappear,
+   restore the override. See [DEPENDENCY_OVERRIDES.md](./DEPENDENCY_OVERRIDES.md) for details.
+
+4. **Build and test:**
+   ```bash
+   pnpm run build
+   pnpm run test
+   ```
+
+5. **Commit and open a pull request**
+
+   Do the work on a feature branch so changes can be reviewed before merging.
+
+6. **Publish a new version** — once the pull request is merged to master, publish so
+   downstream projects pick up the changes (especially important for security fixes):
+   ```bash
+   ./scripts/publish.sh
+   ```
+   See [Publishing to npmjs.com](#publishing-to-npmjscom) below for details.
+
+See [DEPENDENCY_OVERRIDES.md](./DEPENDENCY_OVERRIDES.md) for detailed instructions on adding, updating, and removing
+overrides and `.npmrc` exclusions.
+
+## Publishing to [npmjs.com](https://www.npmjs.com/)
+
+See https://www.npmjs.com/package/@digitraffic/common
+
+To publish using today's date as the version number:
+
+```bash
+./scripts/publish.sh
 ```
 
-**Update specific packages**
+To publish with a specific version number:
 
-```shell
-# Update only vitest-related packages
-./update-deps.sh '/^@?vitest|^vitest$/'
-
-# Audit dependency vulnerabilities
-rush audit
-
-# Update only AWS SDK packages
-./update-deps.sh '/^@aws-sdk\//'
-
-# Audit dependency vulnerabilities
-rush audit
-
-# Update multiple specific packages
-./update-deps.sh '/^(vitest|esbuild)$/'
-
-# Audit dependency vulnerabilities
-rush audit
-
-# Verify everything builds
-rush rebuild
+```bash
+./scripts/publish.sh 2026.8.6-1
 ```
 
-**Check global overrides still needed**
+## How to use
 
-```shell
-./check-global-overrides.sh
+In package.json dependencies:
+
 ```
-
-See [DEPENDENCY_OVERRIDES.md](DEPENDENCY_OVERRIDES.md) for the full review flow.
-
-**Advanced: Environment variables**
-
-```shell
-# Customize cooldown and target strategy for update-deps.sh
-COOLDOWN_DAYS=7 TARGET=greatest ./update-deps.sh
-```
-
-**Advanced: Rush commands (for CI/automation)**
-
-```shell
-# Update with SKIP_RUSH_UPDATE=1 (doesn't run final steps automatically)
-rush repo:update-deps-mature
-
-# Then manually run:
-rush update --full
-rush update-autoinstaller --name rush-command-line-tools
-rush rebuild
-```
-
-### Update toolchain (Node, Rush, pnpm, CDK CLI)
-
-When updating the toolchain versions, update these files manually:
-
-**1. Node.js version**
-
-Check latest versions with **individual release dates**:
-- [Node.js releases on GitHub](https://github.com/nodejs/node/releases) - Each release with exact date
-  - Find "Version 24." to find the latest 24.x release (e.g., 24.18.1)
-- [Node.js v24.x changelog](https://github.com/nodejs/node/blob/main/doc/changelogs/CHANGELOG_V24.md) - Detailed v24 release history with dates
-- [Node.js release schedule](https://github.com/nodejs/release#release-schedule) - LTS timeline
-
-Edit [.node-version](.node-version):
-```
-node/24.18.1
-```
-
-**2. Rush and pnpm versions**
-
-Check latest versions with release dates:
-- [Rush on npm](https://www.npmjs.com/package/@microsoft/rush?activeTab=versions) - Version history with dates
-- [pnpm on npm](https://www.npmjs.com/package/pnpm?activeTab=versions) - Version history with dates
-
-Edit [rush.json](rush.json):
-```json
-{
-  "nodeSupportedVersionRange": ">=24.0.0 <25.0.0",
-  "rushVersion": "5.178.0",
-  "pnpmVersion": "10.33.0"
+"dependencies": {
+  "@digitraffic/common": "*",
 }
 ```
 
-**3. CDK CLI version**
+In code:
 
-Check latest versions with release dates:
-- [aws-cdk CLI on npmjs](https://www.npmjs.com/package/aws-cdk?activeTab=versions) - CLI version history
-
-> **Note:** This is only for the CLI tool used in deployment scripts. The CDK library (`aws-cdk-lib`) in package.json is updated automatically via `./update-deps.sh`.
-
-Edit [scripts/cdk-diff-and-deploy.sh](scripts/cdk-diff-and-deploy.sh) for CLI version:
-```bash
-CDK_VERSION=2.1134.0
+```
+import {DigitrafficStack, StackConfiguration} from "@digitraffic/common/dist/aws/infra/stack/stack";
 ```
 
-**4. After toolchain updates**
+### DigitrafficStack
 
-```shell
-rush update --full
-rush update-autoinstaller --name rush-command-line-tools
-rush rebuild
+If you extend your stack from DigitrafficStack you get many benefits:
+
+- Secret, VPC, Sg & alarmTopics automatically
+- Stack validation with StackCheckingAspect
+- Easier configuration with StackConfiguration
+
+If you do not need those things, you should not use DigitrafficStack.
+
+### StackConfiguration
+
+Commonly used parameters are predefined in `StackConfiguration`. Write the configuration for your environments once and reuse it across cdk-projects.
+
+### StackCheckingAspect
+
+Uses cdk aspects to do some sanity checking for your cdk stack:
+
+- Stack naming check (Test/Prod in name)
+- Function configuration (memory, timeout, runtime, reservedConcurrency)
+- Tags, must have Solution tag defined
+- S3 Buckets, no public access
+- Api Gateway resource casing (kebabCase and snake_case)
+- Queue encrypting
+- LogGroup Retention
+
+You can use StackCheckingAspect for any stack, DigitrafficStack does it automatically, but you can call it manually:
+
+```
+Aspects.of(this).add(StackCheckingAspect.create(this));
 ```
 
-### Update digitraffic-common subtree
+Any resource can be whitelisted by giving it as a parameter or in the StackConfiguration
 
-The `lib/digitraffic-common` is a git subtree from the [digitraffic-common repository](https://github.com/tmfg/digitraffic-common).
+### FunctionBuilder
 
-**Note:** Projects consume `@digitraffic/common` as an npm package, not directly from the subtree.
+FunctionBuilder allows you to make lambdas with alarms on memory usage and timeouts.
 
-**Pull latest changes from common repository:**
+By default, the created function has access to database, but this can of course be controlled.
 
-```shell
-# Pull latest common changes
-rush common-subtree -c pull -r master
+Creating lambda is easy:
 
-# Commit the subtree update
-git add lib/digitraffic-common
-git commit -m "Update digitraffic-common subtree"
+```
+const lambda = FunctionBuilder.create(stack, "get-metadata")
+  .withTimeout(Duration.seconds(2))
+  .build();
 ```
 
-**Push changes to common repository:**
-
-If you made changes to files under `lib/digitraffic-common`:
-
-```shell
-# Push changes back to common repository
-rush common-subtree -c push -r master
-```
-
-See full guide: [Digitraffic-common maintenance](https://finrail.atlassian.net/wiki/spaces/DT/pages/2664530424/Digitraffic-common)
-
-### Format
-
-```shell
-rush format:package-json
-rush format:fix
-```
-
-## Rush commands
-
-Global Rush commands are configured in
-[command-line.json](common/config/rush/command-line.json)
-
-You can list them with:
-
-```shell
-rush --help
-```
+See the documentation for more information.
