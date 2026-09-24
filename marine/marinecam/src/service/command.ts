@@ -25,6 +25,9 @@ interface ResponseParam {
 }
 
 export type InputParameter =
+  | "PublicKey"
+  | "PrimeLength"
+  | "EncryptionPadding"
   | "Username"
   | "Password"
   | "CameraId"
@@ -120,15 +123,24 @@ class DefaultCommand extends Command<void> {
   }
 }
 
-export class ConnectCommand extends Command<string> {
+export interface ConnectResponse {
+  readonly connectionId: string;
+  readonly publicKey: string;
+}
+
+export class ConnectCommand extends Command<ConnectResponse> {
   constructor() {
     super("Connect");
   }
 
-  public getResult(response: CommandResponse): string {
+  public getResult(response: CommandResponse): ConnectResponse {
     // biome-ignore lint/style/noNonNullAssertion: should be set
-    return response.Communication.Command[0]!.OutputParams[0]!.Param[0]!.$
-      .Value;
+    const params = response.Communication.Command[0]!.OutputParams[0]!.Param;
+
+    return {
+      connectionId: getParamValue(params, "ConnectionId"),
+      publicKey: getParamValue(params, "PublicKey"),
+    };
   }
 }
 
@@ -145,6 +157,16 @@ function getFirstFromNullable<T>(array?: T[]): T {
 
   // biome-ignore lint/style/noNonNullAssertion: should be set
   return array[0]!;
+}
+
+function getParamValue(params: ResponseParam[], name: string): string {
+  const param = params.find((p) => p.$.Name === name);
+
+  if (!param) {
+    throw new Error(`Param ${name} not found`);
+  }
+
+  return param.$.Value;
 }
 
 export class GetThumbnailCommand extends Command<string> {
@@ -178,9 +200,7 @@ export class RequestStreamCommand extends Command<string> {
     // biome-ignore lint/style/noNonNullAssertion: should be set
     const output = response.Communication.Command[0]!.OutputParams[0]!.Param;
 
-    const videoId = output.find((o) => o.$.Name === "VideoId");
-
-    return videoId?.$.Value ?? "";
+    return getParamValue(output, "VideoId");
   }
 }
 

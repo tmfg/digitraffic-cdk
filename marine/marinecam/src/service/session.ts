@@ -1,3 +1,5 @@
+import type { DiffieHellman } from "node:crypto";
+import { createCipheriv, createDiffieHellman } from "node:crypto";
 import util from "node:util";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { Dispatcher } from "undici";
@@ -24,13 +26,48 @@ const REQUEST_TIMEOUT_MILLIS = 2000 as const;
 const COMMUNICATION_URL_PART = "/Communication";
 const VIDEO_URL_PART = "/Video/";
 
+const MOBILE_SERVER_PUBLIC_KEY =
+  "F488FD584E49DBCD20B49DE49107366B336C380D451D0F7C88B31C7C5B2D8EF6F3C923C043F0A55B188D8EBB558CB85D38D334FD7C175743A31D186CDE33212CB52AFF3CE1B1294018118D7C84A70A72D686C40319C807297ACA950CD9969FABD00A509B0246D3083D66A45D419F9C7CBD894B221926BAABA25EC355E92F78C7" as const;
+const MOBILE_SERVER_GENERATOR = "02" as const;
+
 const parse = util.promisify(parseString);
+
+// Node's DiffieHellman strips leading zero bytes, so keys/secrets can be shorter than the modulus
+function padLeft(buffer: Buffer, length: number): Buffer {
+  if (buffer.length >= length) {
+    return buffer;
+  }
+
+  return Buffer.concat([Buffer.alloc(length - buffer.length), buffer]);
+}
+
+// Node represents DH keys/secrets big-endian; the Milestone wire protocol uses little-endian,
+// with a trailing zero byte appended when the most significant byte would otherwise be read as negative
+function toLittleEndianWireFormat(
+  bigEndian: Buffer,
+  keyLength: number,
+): Buffer {
+  const littleEndian = padLeft(bigEndian, keyLength).reverse();
+
+  return (littleEndian[littleEndian.length - 1] ?? 0) >= 0x80
+    ? Buffer.concat([littleEndian, Buffer.alloc(1)])
+    : littleEndian;
+}
+
+function fromLittleEndianWireFormat(littleEndian: Buffer): Buffer {
+  return Buffer.from(littleEndian).reverse();
+}
 
 export class Session {
   readonly communicationUrl: string;
   readonly videoUrl: string;
   readonly dispatcher: Dispatcher;
   readonly hostname: string;
+
+  readonly dh: DiffieHellman;
+  readonly publicKey: Buffer;
+
+  serverPublicKey: Buffer | undefined = undefined;
 
   // this increases for every command
   sequenceId: number;
@@ -42,9 +79,20 @@ export class Session {
     this.videoUrl = url + VIDEO_URL_PART;
     this.sequenceId = 1;
     this.hostname = hostname;
+    this.dh = createDiffieHellman(
+      MOBILE_SERVER_PUBLIC_KEY,
+      "hex",
+      MOBILE_SERVER_GENERATOR,
+      "hex",
+    );
+    this.publicKey = toLittleEndianWireFormat(
+      this.dh.generateKeys(),
+      this.dh.getPrime().length,
+    );
 
     const agent = new Agent({
       connect: {
+        rejectUnauthorized: true,
         cert: Buffer.from(certificate, "base64").toString(),
         ca: Buffer.from(ca, "base64").toString(),
       },
@@ -97,11 +145,11 @@ export class Session {
     const xml = command.createXml(this.sequenceId, this.connectionId);
     this.sequenceId++;
 
-    //        logger.debug("sending:" + xml);
+    //    logger.debug("sending:" + xml);
 
     const resp = await this.post(this.communicationUrl, xml, configuration);
 
-    //        logger.debug("response " + JSON.stringify(resp));
+    //   logger.debug("response " + JSON.stringify(resp));
 
     if (resp.statusCode !== 200) {
       throw Error(`sendMessage failed ${JSON.stringify(resp)}`);
@@ -117,18 +165,67 @@ export class Session {
   }
 
   async connect(): Promise<string> {
+    const command = new ConnectCommand()
+      // public key must be base64 encoded
+      .addInputParameters("PublicKey", this.publicKey.toString("base64"))
+      .addInputParameters("PrimeLength", "1024")
+      .addInputParameters("EncryptionPadding", "PKCS7");
+
     // longer timeout for connect
-    this.connectionId = await this.sendMessage(new ConnectCommand(), {
+    const connectResponse = await this.sendMessage(command, {
       bodyTimeout: 4000,
     });
+    this.connectionId = connectResponse.connectionId;
+    // public key is base64 encoded little-endian, convert to the big-endian format Node's crypto expects
+    this.serverPublicKey = fromLittleEndianWireFormat(
+      Buffer.from(connectResponse.publicKey, "base64"),
+    );
 
     return this.connectionId;
   }
 
   login(username: string, password: string): Promise<void> {
+    if (!this.serverPublicKey) {
+      throw new Error("Server public key is not set");
+    }
+
+    const sharedSecret = this.dh.computeSecret(this.serverPublicKey);
+    // IV/key are derived from the least-significant bytes first, i.e. little-endian
+    const newSecret = padLeft(
+      sharedSecret,
+      this.dh.getPrime().length,
+    ).reverse();
+
+    const iv = newSecret.subarray(0, 16);
+    const key = newSecret.subarray(16, 48);
+
+    const usernameCipher = createCipheriv(
+      "aes-256-cbc",
+      key,
+      iv,
+    ).setAutoPadding(true);
+    const passwordCipher = createCipheriv(
+      "aes-256-cbc",
+      key,
+      iv,
+    ).setAutoPadding(true);
+    const encryptedUsername =
+      usernameCipher.update(username, "utf8", "hex") +
+      usernameCipher.final("hex");
+    const encryptedPassword =
+      passwordCipher.update(password, "utf8", "hex") +
+      passwordCipher.final("hex");
+
     const command = new LoginCommand()
-      .addInputParameters("Username", username)
-      .addInputParameters("Password", password);
+      // encrypt username and password using AES-256-CBC with the derived key and IV, base64 encoded
+      .addInputParameters(
+        "Username",
+        Buffer.from(encryptedUsername, "hex").toString("base64"),
+      )
+      .addInputParameters(
+        "Password",
+        Buffer.from(encryptedPassword, "hex").toString("base64"),
+      );
 
     // use a bit longer timeout for login
     return this.sendMessage(command, { bodyTimeout: 8000 });
