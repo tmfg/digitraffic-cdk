@@ -25,7 +25,6 @@
     "@rushstack/heft": "1.2.22",
     "@types/node": "24.12.2",
     "@vitest/coverage-v8": "4.1.10",
-    "serve": "14.2.6",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
   }

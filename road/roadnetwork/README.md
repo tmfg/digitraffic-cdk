@@ -4,6 +4,24 @@ Publishes Road Network dataset releases at
 [tie.digitraffic.fi/roadnetwork/](https://tie.digitraffic.fi/roadnetwork/).
 Replaces the Digiroad distribution previously served from Väylä's AVA service.
 
+## Development commands
+
+Run Road Network commands from this project directory:
+
+```bash
+rushx build
+rushx test
+```
+
+Review and deploy CDK changes with the environment-specific scripts:
+
+```bash
+rushx cdk-diff-road-test
+rushx cdk-deploy-road-test
+rushx cdk-diff-road-prod
+rushx cdk-deploy-road-prod
+```
+
 ## Structure
 
 The stack creates one S3 bucket per environment (`roadnetwork-<env>`) and deploys a static listing page into it. CloudFront serves both the
@@ -163,16 +181,17 @@ rushx serve:website:local
 runs the shared package's preview script against this project's own
 [local-preview.config.json](local-preview.config.json) (mirrors the config passed to
 `createListingWebsiteSources` in the stack, but is only used locally and never deployed). Open
-`http://localhost:8080/?mock=1` to see the mock listing (a plain `http://localhost:8080/` tries
+[http://localhost:8080/?mock=1](http://localhost:8080/?mock=1) to see the mock listing (a plain
+[http://localhost:8080/](http://localhost:8080/) tries
 the real S3 REST API, which doesn't exist locally, and shows an error — that's expected).
-For English: `http://localhost:8080/?mock=1&lang=en`.
+For English: [http://localhost:8080/?mock=1&lang=en](http://localhost:8080/?mock=1&lang=en).
 
 ### Developing the listing page itself
 
-Editing the shared engine's `index.html`/`assets/*` takes effect immediately — no build step, just
-re-run `rushx serve:website:local`. Editing the shared package's `createListingWebsiteSources`
+Editing the shared engine's `index.html`/`assets/*` takes effect immediately — no build step. The
+local preview reloads the browser automatically when the shared engine files or this project's
+`local-preview.config.json` change. Editing the shared package's `createListingWebsiteSources`
 logic (`other/s3-listing-website/src/index.ts`) needs a rebuild; run
 `rushx build:watch` in `other/s3-listing-website` in its own terminal while iterating, and this
 project's `cdk synth`/`diff`/`deploy` will automatically use the freshly-compiled output. See
 [other/s3-listing-website's README](../../other/s3-listing-website/README.md) for details.
-

@@ -68,15 +68,12 @@ needs this today, but it's there if a project ever needs a one-off customization
 rushx serve:website:local
 ```
 
-runs `scripts/serve-local.mjs --config ./local-preview.config.json`, which copies `engine/` to a
-temp directory, writes `assets/config.js` from that project's own `local-preview.config.json`
-(same shape as the config passed to `createListingWebsiteSources`, kept only for local preview —
-never deployed), and serves it. Open `http://localhost:8080/?mock=1` to see the mock listing
+runs `scripts/serve-local.mjs --config ./local-preview.config.json`, which serves `engine/`
+directly, injects `assets/config.js` from that project's own `local-preview.config.json` (same
+shape as the config passed to `createListingWebsiteSources`, kept only for local preview — never
+deployed), and reloads the browser automatically when those files change. Open
+[http://localhost:8080/?mock=1](http://localhost:8080/?mock=1) to see the mock listing
 (without `?mock=1` it tries the real S3 REST API, which doesn't exist locally).
-
-`serve` is a devDependency of this package (not an ad hoc `npx serve@...` call), resolved from
-`node_modules/.bin/serve` relative to this package regardless of which project's directory the
-script runs from, so its version updates through the normal dependency-update process.
 
 ## Developing this package
 
@@ -86,7 +83,7 @@ The shared package is consumed by both `road/tmc` and `road/roadnetwork`. Use th
 changing the shared listing website:
 
 1. For `engine/*` changes, run `rushx serve:website:local` in the consuming project to check the
-  local page. No package build is needed for the preview.
+  local page. The browser reloads automatically, and no package build is needed for the preview.
 2. For `src/index.ts` changes, build the consuming project from its project directory. Rush builds
   the shared package first because it is a workspace dependency:
 
@@ -105,9 +102,9 @@ changing the shared listing website:
   Deployment is performed separately for TMC and Road Network. To build or test this package
   independently, use `rushx build` or `rushx test` in `other/s3-listing-website`.
 
-- **Editing `engine/*` (HTML/CSS/JS/SVG):** takes effect immediately, no build needed. Both
-  `serve-local.mjs` and `createListingWebsiteSources` read the current files off disk every time
-  they run — just re-run `rushx serve:website:local` or `cdk synth`/`diff` in a consuming project.
+- **Editing `engine/*` (HTML/CSS/JS/SVG):** takes effect immediately, no build needed. The local
+  preview reads the current files from disk and reloads the browser automatically; `cdk synth`/`diff`
+  in a consuming project also reads the current files whenever it runs.
 - **Editing `src/index.ts`** (the `createListingWebsiteSources` logic itself): needs a rebuild.
   Run
   ```bash
