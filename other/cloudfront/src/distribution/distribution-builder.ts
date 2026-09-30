@@ -11,7 +11,7 @@ export class DistributionBuilder {
   private readonly _stack: CloudfrontCdkStack;
 
   readonly name: string;
-  readonly certificate: string;
+  readonly certificate: string | undefined;
 
   readonly aliasNames: string[] = [];
   readonly wafRules: WafRules[] = [];
@@ -28,7 +28,7 @@ export class DistributionBuilder {
   public constructor(
     stack: CloudfrontCdkStack,
     name: string,
-    certificate: string,
+    certificate: string | undefined = undefined,
   ) {
     this._stack = stack;
     this.name = name;

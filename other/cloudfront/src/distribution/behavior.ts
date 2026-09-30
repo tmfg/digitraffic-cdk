@@ -157,8 +157,12 @@ export class Behavior {
       .withGzipRequirementLambda();
   }
 
+  public static vpcPlain(path: string, originName: string): Behavior {
+    return new Behavior(path, Origin.vpc(originName));
+  }
+
   public static vpcLb(path: string, originName: string): Behavior {
-    return new Behavior(path, Origin.vpc(originName))
+    return Behavior.vpcPlain(path, originName)
       .withHttpHeadersLambda()
       .withGzipRequirementLambda();
   }

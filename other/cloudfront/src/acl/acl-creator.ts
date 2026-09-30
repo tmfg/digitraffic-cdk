@@ -1,16 +1,14 @@
 import { AclBuilder } from "@digitraffic/common/dist/aws/infra/acl-builder";
 import type { Stack } from "aws-cdk-lib";
-import { RemovalPolicy } from "aws-cdk-lib";
-import { LogGroup } from "aws-cdk-lib/aws-logs";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import type { WafRules } from "./waf-rules.js";
 
 export function createWebAcl(
   stack: Stack,
-  environment: string,
+  _environment: string,
   rulesCollection: WafRules[],
   distributionName: string,
-  logGroupName?: string,
+  _logGroupName?: string,
 ): CfnWebACL {
   const aclBuilder = new AclBuilder(stack, `WebACL-${distributionName}`);
 
@@ -40,13 +38,14 @@ export function createWebAcl(
 
   const acl = aclBuilder.build();
 
-  const _logGroup = new LogGroup(stack, `AclLogGroup-${environment}`, {
+  /*
+  const _logGroup = new LogGroup(stack, `AclLogGroup-${environment}-${logGroupName ?? distributionName}`, {
     // group name must begin with aws-waf-logs!!!!
     logGroupName: `aws-waf-logs-${
       logGroupName ?? distributionName
     }-${environment}`,
     removalPolicy: RemovalPolicy.RETAIN,
-  });
+  });*/
 
   // logGroup.logGroupArn is not in the right format for this, so have to construct the arn manually
   /*    new CfnLoggingConfiguration(stack, `AclLogConfig-${environment}`, {

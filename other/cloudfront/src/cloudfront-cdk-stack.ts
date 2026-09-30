@@ -81,7 +81,7 @@ export class CloudfrontCdkStack extends Stack {
 
   public withDistribution(
     name: string,
-    certificate: string,
+    certificate: string | undefined = undefined,
     buildFunction: (builder: DistributionBuilder) => void,
   ): this {
     const builder = new DistributionBuilder(this, name, certificate);
@@ -118,11 +118,13 @@ export class CloudfrontCdkStack extends Stack {
       (b) => b !== defaultBehavior,
     );
 
-    const certificate = Certificate.fromCertificateArn(
-      this,
-      `${builder.name}-Certificate`,
-      builder.certificate,
-    );
+    const certificate = builder.certificate
+      ? Certificate.fromCertificateArn(
+          this,
+          `${builder.name}-Certificate`,
+          builder.certificate,
+        )
+      : undefined;
 
     Object.entries(builder.vpcOrigins).forEach(([vpcOriginName, config]) => {
       this._vpcOrigins[vpcOriginName] = {
