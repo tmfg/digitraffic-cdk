@@ -61,6 +61,8 @@ export type DefaultPythonField = "filename.keyword" | "funcName.keyword";
 
 export type GtfsField = "gtfsFileName" | "entityCount";
 
+export type NetexField = "wide_event" | "outcome" | "gap";
+
 export type OSLogField =
   | DefaultField
   | DefaultJavaField
@@ -71,7 +73,8 @@ export type OSLogField =
   | CloudfrontField
   | HttpUserAgentField
   | AlertField
-  | GtfsField;
+  | GtfsField
+  | NetexField;
 
 export enum Bytes {
   KILO = 1000 * 1000,
