@@ -283,6 +283,7 @@ export class OsMonitorBuilder {
   messageSubject: string;
   rangeInMinutes: number;
   delayInMinutes?: number;
+  hitCount: number;
   trigger: OSTrigger;
 
   constructor(name: string, config: MonitorConfig) {
@@ -296,6 +297,7 @@ export class OsMonitorBuilder {
     this.phrases = ([] as Query[]).concat(config.phrases);
     this.notPhrases = [];
     this.aggs = {};
+    this.hitCount = 1;
     this.trigger = triggerWhenLinesFound(
       this.name,
       this.config.runbookSearchLink,
@@ -367,6 +369,13 @@ export class OsMonitorBuilder {
 
   delay(minutes: number): this {
     this.delayInMinutes = minutes;
+
+    return this;
+  }
+
+  /** How many matching lines the query returns, for alert messages that list every hit rather than a sample. */
+  hits(count: number): this {
+    this.hitCount = count;
 
     return this;
   }
@@ -483,7 +492,7 @@ export class OsMonitorBuilder {
       cron: this.cron,
       indices: [this.index],
       query: {
-        size: 1,
+        size: this.hitCount,
         query: bool(
           [
             createTimeRange(this.rangeInMinutes, this.delayInMinutes),
