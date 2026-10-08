@@ -2,11 +2,6 @@ import type { WafRules } from "../acl/waf-rules.js";
 import type { CloudfrontCdkStack } from "../cloudfront-cdk-stack.js";
 import type { Behavior } from "./behavior.js";
 
-export interface VpcOriginConfig {
-  readonly arn: string;
-  readonly domain: string;
-}
-
 export class DistributionBuilder {
   private readonly _stack: CloudfrontCdkStack;
 
@@ -22,8 +17,6 @@ export class DistributionBuilder {
   logConfig: string;
   logGroupName?: string;
   logicalId?: string;
-
-  readonly vpcOrigins: Record<string, VpcOriginConfig> = {};
 
   public constructor(
     stack: CloudfrontCdkStack,
@@ -61,12 +54,6 @@ export class DistributionBuilder {
 
   public withAliasName(...names: string[]): this {
     this.aliasNames.push(...names);
-
-    return this;
-  }
-
-  public withVpcOrigin(name: string, originArn: string, domain: string): this {
-    this.vpcOrigins[name] = { arn: originArn, domain };
 
     return this;
   }
