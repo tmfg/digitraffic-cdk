@@ -1,5 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import {
   BAD_REQUEST_MESSAGE,
   ERROR_MESSAGE,
@@ -8,7 +8,7 @@ import type * as SSE from "../../generated/tlsc-sse-reports-schema.d.ts";
 import type { SseSaveResult } from "../../service/sse-update-service.js";
 import * as SseUpdateService from "../../service/sse-update-service.js";
 
-const rdsHolder = RdsHolder.create();
+const proxyHolder = ProxyHolder.create();
 
 export async function handler(
   apiGWRequest: SSE.TheSSEReportRootSchema | undefined,
@@ -32,7 +32,7 @@ export async function handler(
 
     const messageSizeBytes = Buffer.byteLength(sseJsonStr);
 
-    await rdsHolder.setCredentials();
+    await proxyHolder.setCredentials();
     const result = await SseUpdateService.saveSseData(apiGWRequest.SSE_Reports);
 
     const end = Date.now();

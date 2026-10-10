@@ -23,10 +23,10 @@ const { saveSseData } = await import("../../../service/sse-update-service.js");
 const LambdaUpdateSseData = await import(
   "../../../lambda/update-sse-data/update-sse-data.js"
 );
-const rdsHolder = await import(
-  "@digitraffic/common/dist/aws/runtime/secrets/rds-holder"
+const proxyHolder = await import(
+  "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder"
 );
-const { RdsHolder } = rdsHolder;
+const { ProxyHolder } = proxyHolder;
 describe(
   "update-sse-data-test",
   DbTestutil.dbTestBase(() => {
@@ -48,7 +48,7 @@ describe(
 
       const retVal = { saved: 3, errors: 0 };
 
-      vi.spyOn(RdsHolder.prototype, "setCredentials").mockImplementationOnce(
+      vi.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementationOnce(
         () => Promise.resolve(),
       );
 
