@@ -264,6 +264,34 @@ function getThrottle(config: MonitorConfig): number {
   return config.throttleMinutes ?? config.rangeInMinutes * 2;
 }
 
+function formatDuration(minutes: number): string {
+  return minutes >= 60 && minutes % 60 === 0
+    ? `${minutes / 60} h`
+    : `${minutes} min`;
+}
+
+/** Human readable description of the query window, e.g. "last 60 min" or "last 5 min, ending 2 min ago". */
+function describeTimeWindow(
+  rangeInMinutes: number,
+  delayInMinutes?: number,
+): string {
+  const window = `last ${formatDuration(rangeInMinutes)}`;
+  return delayInMinutes
+    ? `${window}, ending ${formatDuration(delayInMinutes)} ago`
+    : window;
+}
+
+/** Appends the query time window to the subject of every action so alerts show which period they cover. */
+function withTimeWindow(trigger: OSTrigger, timeWindow: string): OSTrigger {
+  return {
+    ...trigger,
+    actions: trigger.actions.map((action) => ({
+      ...action,
+      subject: `${action.subject} (${timeWindow})`,
+    })),
+  };
+}
+
 export class OsMonitorBuilder {
   /**
    * Builds a single OpenSearch monitor from `MonitorConfig` + fluent query/trigger steps.
@@ -505,7 +533,12 @@ export class OsMonitorBuilder {
       },
 
       aggregations: this.aggs,
-      triggers: [this.trigger],
+      triggers: [
+        withTimeWindow(
+          this.trigger,
+          describeTimeWindow(this.rangeInMinutes, this.delayInMinutes),
+        ),
+      ],
     };
   }
 }
