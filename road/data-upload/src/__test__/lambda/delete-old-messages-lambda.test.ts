@@ -30,10 +30,20 @@ describe(
       await assertDataCount(db, 1);
     });
 
-    test("delete", async () => {
+    test("delete, old but not processed", async () => {
       await insertData(db, "test1", "TEST", "v1", "TEST", "TEST");
       await db.none(
         "update data_incoming set created_at = (current_date - interval '10 days')",
+      );
+      await getResponseFromLambda();
+
+      await assertDataCount(db, 1);
+    });
+
+    test("delete", async () => {
+      await insertData(db, "test1", "TEST", "v1", "TEST", "TEST");
+      await db.none(
+        "update data_incoming set status = 'PROCESSED', created_at = (current_date - interval '10 days')",
       );
       await getResponseFromLambda();
 

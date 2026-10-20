@@ -17,7 +17,7 @@ const PS_INSERT_DATA = new pgPromise.PreparedStatement({
 
 const PS_DELETE_OLD_DATA = new pgPromise.PreparedStatement({
   name: "delete-old-data",
-  text: "delete from data_incoming where created_at < (current_date - interval '7 days')",
+  text: "delete from data_incoming where created_at < (current_date - interval '7 days') and status = 'PROCESSED'",
 });
 
 const SQL_NEW_DATA = `select data_id, source, version, type, data
