@@ -1,5 +1,4 @@
 import type { StackProps } from "aws-cdk-lib";
-import type { IVpcOrigin } from "aws-cdk-lib/aws-cloudfront";
 import { Duration, Stack, Tags } from "aws-cdk-lib";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import type {
@@ -11,6 +10,7 @@ import type {
   IOrigin,
   IOriginRequestPolicy,
   IRealtimeLogConfig,
+  IVpcOrigin,
 } from "aws-cdk-lib/aws-cloudfront";
 import {
   CachedMethods,
@@ -53,7 +53,10 @@ export class CloudfrontCdkStack extends Stack {
   };
 
   private _originIndex: number = 0;
-  private _vpcOrigins: Record<string, {vpcOrigin: IVpcOrigin; domain: string}> = {};
+  private _vpcOrigins: Record<
+    string,
+    { vpcOrigin: IVpcOrigin; domain: string }
+  > = {};
   private _originCache: Record<string, IOrigin> = {};
 
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -79,25 +82,24 @@ export class CloudfrontCdkStack extends Stack {
 
   public withVpcOrigin(name: string, originArn: string, domain: string): this {
     const cfnVpcOrigin = new CfnVpcOrigin(this, `CfnVpcOrigin-${name}`, {
-        vpcOriginEndpointConfig: {
-          arn: originArn,
-          httpsPort: 443,
-          httpPort: 80,
-          name: `CloudfrontVpcOrigin-${name}`,
-          originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
-        },
-      });
+      vpcOriginEndpointConfig: {
+        arn: originArn,
+        httpsPort: 443,
+        httpPort: 80,
+        name: `CloudfrontVpcOrigin-${name}`,
+        originProtocolPolicy: OriginProtocolPolicy.HTTP_ONLY,
+      },
+    });
 
-      const vpcOrigin = CfVpcOrigin.fromVpcOriginId(
-        this,
-        `vpcOrigin-${name}`,
-        cfnVpcOrigin.ref,
-      );
-
+    const vpcOrigin = CfVpcOrigin.fromVpcOriginId(
+      this,
+      `vpcOrigin-${name}`,
+      cfnVpcOrigin.ref,
+    );
 
     this._vpcOrigins[name] = {
       vpcOrigin,
-      domain
+      domain,
     };
 
     return this;
