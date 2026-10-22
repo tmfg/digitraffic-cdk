@@ -4,7 +4,7 @@ CONCURRENCY=0
 
 # Check version from https://www.npmjs.com/package/aws-cdk?activeTab=versions
 # With 7 day cooldown
-CDK_VERSION=2.1134.0
+CDK_VERSION=2.1145.0
 
 # This script tries to do diff or deploy for cdk stack in given environment
 echo "Required parameters: <app>-<env> <diff|deploy> [stackName]"
