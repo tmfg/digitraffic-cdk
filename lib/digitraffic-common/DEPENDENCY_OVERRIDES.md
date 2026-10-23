@@ -23,6 +23,8 @@ already-safe versions unchanged.
 - `fast-uri@<3.1.8` → `3.1.8`: Fix URI parsing flaws (CVE-2026-76172, CVE-2026-75975, CVE-2026-75899, CVE-2026-75931, fixed in 3.1.6) plus the 3.1.7/3.1.8 follow-ons (CVE-2026-84292, CVE-2026-84394, CVE-2026-86472)
 - `nanoid@<3.3.18` → `3.3.18`: Fix CVE-2026-67213. Transitive via `postcss` (from `madge` and `vite`)
 - `brace-expansion@<5.0.12` → `5.0.12`: Fix uncontrolled recursion / quadratic expansion DoS (CVE-2026-102276, CVE-2026-102277, CVE-2026-102278). Transitive via `minimatch`/`glob`
+- `source-map-js@<1.2.2` → `1.2.2`: Fix event-loop DoS through indexed source maps (CVE-2026-93749). Transitive via `postcss`, `@vue/compiler-*` and `magicast` (vitest coverage tooling)
+- `vite@<8.1.6` → `8.1.6`: Fix launch-editor and dev-server file-serving issues (CVE-2026-112942, CVE-2026-112943, CVE-2026-112944, CVE-2026-112945, CVE-2026-112946). Transitive via `vitest` (requests `^6 || ^7 || ^8`)
 
 ### Adding a New Override
 
