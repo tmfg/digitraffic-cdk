@@ -20,8 +20,9 @@ already-safe versions unchanged.
 ### Current Overrides
 
 - `@aws-sdk/core@>=3.977.3 <3.977.6` → `3.977.6`: Fix JSON document-number parsing bug (deprecated versions 3.977.3–3.977.5 pulled in by `@aws-sdk/client-*@3.1098.0`)
-- `fast-uri@>=3.0.0 <3.1.5` → `3.1.5`: Fix host confusion via backslash authority introducer (GHSA-7p8r-x3mc-p8w7)
-- `brace-expansion@>=4.0.0 <5.0.9` → `5.0.9`: Fix DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation (GHSA-rgw5-rvv9-x895)
+- `fast-uri@<3.1.8` → `3.1.8`: Fix URI parsing flaws (CVE-2026-76172, CVE-2026-75975, CVE-2026-75899, CVE-2026-75931, fixed in 3.1.6) plus the 3.1.7/3.1.8 follow-ons (CVE-2026-84292, CVE-2026-84394, CVE-2026-86472)
+- `nanoid@<3.3.18` → `3.3.18`: Fix CVE-2026-67213. Transitive via `postcss` (from `madge` and `vite`)
+- `brace-expansion@<5.0.12` → `5.0.12`: Fix uncontrolled recursion / quadratic expansion DoS (CVE-2026-102276, CVE-2026-102277, CVE-2026-102278). Transitive via `minimatch`/`glob`
 
 ### Adding a New Override
 

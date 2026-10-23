@@ -45,6 +45,18 @@ describe("acl-builder tests", () => {
     expect(acl.rules).toHaveLength(1);
   });
 
+  test("geo block", () => {
+    const acl = createBuilder().withGeoBlockRule(["C1", "C2"]).build();
+
+    const geoBlockRule = (acl.rules! as Array<CfnWebACL.RuleProperty>)[0]!;
+    expect(geoBlockRule.action).toEqual({ block: {} });
+    expect(geoBlockRule.statement).toEqual({
+      geoMatchStatement: {
+        countryCodes: ["C1", "C2"],
+      },
+    });
+  });
+
   test("throttle rules", () => {
     for (const aclBuilder of [
       createBuilder().withThrottleDigitrafficUserIp(100),
@@ -94,6 +106,20 @@ describe("acl-builder tests", () => {
 
     expect(scopeDownStatements).toHaveLength(2);
     expect(regexMatchStatement.regexString).toBe("^\\/roadnetwork\\/");
+  });
+
+  test("path throttle rules have unique names", () => {
+    const acl = createBuilder()
+      .withThrottleAnonymousUserIpByUriPath(100, /^\/first/, "First")
+      .withThrottleAnonymousUserIpByUriPath(100, /^\/second/, "Second")
+      .build();
+
+    expect(
+      (acl.rules as Array<CfnWebACL.RuleProperty>).map((rule) => rule.name),
+    ).toEqual([
+      "ThrottleRuleWithAnonymousUserByPath-First",
+      "ThrottleRuleWithAnonymousUserByPath-Second",
+    ]);
   });
 
   test("Cannot define two rules with the same name", () => {

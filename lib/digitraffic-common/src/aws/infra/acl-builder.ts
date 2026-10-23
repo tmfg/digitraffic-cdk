@@ -146,6 +146,32 @@ export class AclBuilder {
   }
 
   /**
+   * Block access from the given ISO 3166-1 alpha-2 country codes.
+   */
+  withGeoBlockRule(countryCodes: string[]): this {
+    if (countryCodes.length === 0) {
+      return this;
+    }
+
+    this._blockRules.push({
+      name: "GeoBlock",
+      action: { block: {} },
+      statement: {
+        geoMatchStatement: {
+          countryCodes,
+        },
+      },
+      visibilityConfig: {
+        sampledRequestsEnabled: true,
+        cloudWatchMetricsEnabled: true,
+        metricName: "GeoBlock",
+      },
+    });
+
+    return this;
+  }
+
+  /**
    * Adds a rate-based WAF rule for either blocking or counting requests.
    *
    * @param name WAF rule name and CloudWatch metric name.
@@ -261,14 +287,18 @@ export class AclBuilder {
   withThrottleAnonymousUserIpByUriPath(
     limit: number | undefined,
     path: RegExp | undefined,
+    ruleId?: string,
   ): AclBuilder {
     if (limit === undefined || path === undefined) {
       return this;
     }
     const customResponseBodyKey = `IP_THROTTLE_ANONYMOUS_USER_BY_PATH_${limit}`;
     this._addThrottleResponseBody(customResponseBodyKey, limit);
+    const name = `ThrottleRuleWithAnonymousUserByPath${
+      ruleId ? `-${ruleId}` : ""
+    }`;
     return this.withThrottleRule(
-      "ThrottleRuleWithAnonymousUserByPath",
+      name,
       limit,
       false,
       false,
