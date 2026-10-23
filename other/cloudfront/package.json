@@ -51,7 +51,7 @@
     "@rollup/plugin-typescript": "12.3.0",
     "@rushstack/heft": "1.2.22",
     "@types/aws-lambda": "8.10.162",
-    "@types/node": "24.12.2",
+    "@types/node": "24.22.1",
     "@vitest/coverage-v8": "4.1.10",
     "aws-cdk": "2.1134.0",
     "esbuild": "0.28.1",
