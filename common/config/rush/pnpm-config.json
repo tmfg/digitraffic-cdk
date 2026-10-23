@@ -93,29 +93,28 @@
     "serialize-javascript@<=7.0.4": "7.0.5",
     // Fix glob CLI command injection vulnerability
     "glob@>=10.2.0 <10.5.0": "10.5.0",
-    // Fix ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6)
-    "ajv@>=7.0.0-alpha.0 <8.18.0": "8.18.0",
-    // Fix vite vulnerabilities (GHSA-fx2h-pf6j-xcff, GHSA-v6wh-96g9-6wx3)
-    "vite@>=7.0.0 <=7.3.4": "7.3.5",
-    "vite@>=8.0.0 <=8.0.4": "8.0.5",
+    // Fix vite vulnerabilities (GHSA-fx2h-pf6j-xcff, GHSA-v6wh-96g9-6wx3, GHSA-587h-7wmj-h5pm, GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw, GHSA-9jrq-w75r-8gcw, GHSA-rq7h-c2jc-7f22)
+    "vite@>=7.0.0 <7.3.7": "7.3.7",
     // Fix lodash code injection and prototype pollution (CVE-2026-4800, CVE-2026-2950)
     "lodash@>=4.0.0 <=4.17.23": "4.18.1",
-    // Fix brace-expansion DoS vulnerabilities (GHSA-mh99-v99m-4gvg, GHSA-rgw5-rvv9-x895)
-    "brace-expansion@<1.1.18": "1.1.18",
-    "brace-expansion@>=2.0.0 <2.1.4": "2.1.4",
-    "brace-expansion@>=4.0.0 <5.0.9": "5.0.9",
+    // Fix brace-expansion DoS vulnerabilities (GHSA-mh99-v99m-4gvg, GHSA-rgw5-rvv9-x895, GHSA-6j4f-fj2g-mc7p, GHSA-qhr7-859c-m2p7, GHSA-q2hr-2g5m-vwhr)
+    "brace-expansion@<1.1.21": "1.1.21",
+    "brace-expansion@>=2.0.0 <2.1.7": "2.1.7",
+    "brace-expansion@>=4.0.0 <5.0.12": "5.0.12",
     // Fix picomatch ReDoS vulnerabilities (CVE-2026-33671, CVE-2026-33672)
     "picomatch@<2.3.2": "2.3.2",
     "picomatch@>=4.0.0 <4.0.4": "4.0.4",
     // Fix postcss vulnerability (GHSA-fxqj-rqcc-2cmp)
     "postcss@<=8.5.22": "8.5.23",
-    // Fix fast-xml-parser vulnerabilities
-    "fast-xml-parser@<5.7.0": "5.7.0",
-    // Fix fast-uri vulnerabilities (GHSA-7p8r-x3mc-p8w7)
-    "fast-uri@<3.1.5": "3.1.5",
-    // Fix js-yaml quadratic CPU consumption (GHSA-5p4m-2wfm-xmqj)
-    "js-yaml@>=3.0.0 <3.15.1": "3.15.1",
-    "js-yaml@>=4.0.0 <=4.3.1": "4.3.1",
+    // Fix fast-uri vulnerabilities (GHSA-7p8r-x3mc-p8w7, GHSA-5jgf-p345-68v8, GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp, GHSA-qw65-cvwx-89v3, GHSA-hrr3-gc8f-f4qj)
+    "fast-uri@<3.1.8": "3.1.8",
+    // Fix js-yaml quadratic CPU consumption (GHSA-5p4m-2wfm-xmqj, GHSA-2883-xcg3-v3hh)
+    "js-yaml@>=3.0.0 <3.15.2": "3.15.2",
+    "js-yaml@>=4.0.0 <4.3.2": "4.3.2",
+    // Fix ip-address vulnerabilities (GHSA-rpw4-54j3-4h4q, GHSA-2vr4-cq9g-pvrc, GHSA-j6r3-76f7-8jcv, GHSA-h3mg-xc3c-68pw, GHSA-rxp7-6hxx-x8q5)
+    "ip-address@<10.7.4": "10.7.4",
+    // Fix source-map-js vulnerability (GHSA-68fv-2mgg-jv7q)
+    "source-map-js@<1.2.2": "1.2.2",
     // Fix velocityjs RCE vulnerability (GHSA-7gfh-x38p-prh3) - CRITICAL
     "velocityjs@<=2.1.6": "2.1.7",
     // Fix uuid buffer bounds check (GHSA-w5hq-g745-h8pq)
