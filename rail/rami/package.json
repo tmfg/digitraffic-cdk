@@ -22,7 +22,7 @@
     "@aws-sdk/client-secrets-manager": "3.1098.0",
     "@aws-sdk/client-sqs": "3.1098.0",
     "@date-fns/tz": "1.5.0",
-    "@digitraffic/common": "2026.8.31-2",
+    "@digitraffic/common": "2026.10.23-1",
     "@middy/core": "7.7.2",
     "@middy/sqs-partial-batch-failure": "7.7.2",
     "ajv": "8.20.0",
@@ -44,11 +44,11 @@
     "@rushstack/heft": "1.2.22",
     "@types/aws-lambda": "8.10.162",
     "@types/node": "24.12.2",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.12",
     "aws-cdk": "2.1134.0",
     "esbuild": "0.28.1",
     "parallelshell": "3.0.2",
     "typescript": "5.9.3",
-    "vitest": "4.1.10"
+    "vitest": "4.1.12"
   }
 }

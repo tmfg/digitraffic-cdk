@@ -24,7 +24,7 @@
     "@aws-crypto/sha256-browser": "5.2.0",
     "@aws-sdk/client-sts": "3.1098.0",
     "@aws-sdk/types": "3.974.2",
-    "@digitraffic/common": "2026.8.31-2",
+    "@digitraffic/common": "2026.10.23-1",
     "@smithy/node-http-handler": "4.9.13",
     "@smithy/protocol-http": "5.5.16",
     "@smithy/signature-v4": "5.6.12",
@@ -38,10 +38,10 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/heft": "1.2.22",
     "@types/node": "24.12.2",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.12",
     "aws-cdk": "2.1134.0",
     "esbuild": "0.28.1",
     "typescript": "5.9.3",
-    "vitest": "4.1.10"
+    "vitest": "4.1.12"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@digitraffic/common",
-  "version": "2026.10.2-2",
+  "version": "2026.10.23-1",
   "private": false,
   "description": "",
   "repository": {
@@ -142,7 +142,7 @@
     "@types/geojson-validation": "1.0.3",
     "@types/madge": "5.0.3",
     "@types/node": "24.13.3",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "4.1.12",
     "aws-cdk-lib": "2.262.2",
     "constructs": "10.7.2",
     "date-fns": "4.4.0",
@@ -159,7 +159,7 @@
     "sort-package-json": "4.0.0",
     "typescript": "5.9.3",
     "velocityjs": "2.1.7",
-    "vitest": "4.1.11",
+    "vitest": "4.1.12",
     "zod": "4.4.3"
   },
   "peerDependencies": {
@@ -196,7 +196,9 @@
       "@aws-sdk/core@>=3.977.3 <3.977.6": "3.977.6",
       "brace-expansion@<5.0.12": "5.0.12",
       "fast-uri@<3.1.8": "3.1.8",
-      "nanoid@<3.3.18": "3.3.18"
+      "nanoid@<3.3.18": "3.3.18",
+      "source-map-js@<1.2.2": "1.2.2",
+      "vite@<8.1.6": "8.1.6"
     }
   }
 }

@@ -14,6 +14,7 @@ aws-lambda-powertools = "3.28.0"
 # Transitive dependencies of requests
 certifi = "2026.2.25"
 idna = "3.15"
+urllib3 = "2.8.0"
 
 [tool.poetry.group.test.dependencies]
 moto = {version = "5.1.22", extras = ["s3"]}
@@ -23,6 +24,7 @@ cryptography = "48.0.1"
 boto3 = "1.42.92"
 botocore = "1.42.92"
 s3transfer = "0.16.0"
+werkzeug = "3.1.9"
 
 [build-system]
 requires = ["poetry-core"]

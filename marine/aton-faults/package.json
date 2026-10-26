@@ -23,7 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "3.1098.0",
     "@date-fns/tz": "1.5.0",
-    "@digitraffic/common": "2026.8.31-2",
+    "@digitraffic/common": "2026.10.23-1",
     "@middy/core": "7.7.2",
     "@middy/sqs-partial-batch-failure": "7.7.2",
     "@turf/turf": "7.3.5",
@@ -35,7 +35,7 @@
     "pg-native": "3.8.0",
     "pg-promise": "12.7.0",
     "spex": "4.1.0",
-    "undici": "8.9.0",
+    "undici": "8.10.2",
     "uuid": "14.0.1",
     "wkx": "0.5.0",
     "xml2js": "0.6.2",
@@ -51,12 +51,12 @@
     "@types/geojson": "7946.0.16",
     "@types/node": "24.12.2",
     "@types/xml2js": "0.4.14",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.12",
     "aws-cdk": "2.1134.0",
     "esbuild": "0.28.1",
     "parallelshell": "3.0.2",
     "typescript": "5.9.3",
-    "vitest": "4.1.10",
+    "vitest": "4.1.12",
     "xsd-schema-validator": "0.11.0"
   }
 }

@@ -23,7 +23,7 @@
     "@aws-crypto/sha256-browser": "5.2.0",
     "@aws-sdk/client-s3": "3.1098.0",
     "@aws-sdk/client-sts": "3.1098.0",
-    "@digitraffic/common": "2026.8.31-2",
+    "@digitraffic/common": "2026.10.23-1",
     "@smithy/node-http-handler": "4.9.13",
     "@smithy/protocol-http": "5.5.16",
     "@smithy/signature-v4": "5.6.12",
@@ -42,9 +42,9 @@
     "@rushstack/heft": "1.2.22",
     "@types/aws-lambda": "8.10.162",
     "@types/mysql": "2.15.27",
-    "@types/node": "24.22.1",
+    "@types/node": "24.12.2",
     "@types/sinon": "22.0.0",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.12",
     "aws-cdk": "2.1134.0",
     "dotenv": "17.4.2",
     "esbuild": "0.28.1",
@@ -53,7 +53,7 @@
     "parallelshell": "3.0.2",
     "sinon": "22.1.0",
     "typescript": "5.9.3",
-    "vitest": "4.1.10",
+    "vitest": "4.1.12",
     "zod": "4.4.3"
   }
 }
