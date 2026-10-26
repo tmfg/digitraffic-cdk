@@ -67,17 +67,9 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - name: Log workflow inputs
-        run: |
-          echo "## Workflow Inputs" >> $GITHUB_STEP_SUMMARY
-          echo "| Name | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| actor | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| env | ${{ github.event.inputs.env }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ref | ${{ github.event.inputs.ref }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| config-repo-branch | ${{ github.event.inputs.config-repo-branch }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| command | ${{ github.event.inputs.command }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| skip_approval | ${{ github.event.inputs.skip_approval }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| application | ${{ github.event.inputs.application }} |" >> $GITHUB_STEP_SUMMARY
+        uses: tmfg/digitraffic-actions@24e33d7e6d14273dde9094c5172e8b440a70440c # log-workflow-inputs/v1
+        with:
+          inputs: ${{ toJSON(inputs) }}
 
   build_and_deploy:
     if: ${{ github.repository != 'tmfg/digitraffic-cdk' }}
