@@ -12,7 +12,7 @@ python = "^3.12"
 requests = "2.33.0"
 aws-lambda-powertools = "3.28.0"
 # Transitive dependencies of requests
-certifi = "2026.2.25"
+certifi = "2026.10.19"
 idna = "3.15"
 urllib3 = "2.8.0"
 
