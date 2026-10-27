@@ -1,26 +1,30 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { LoggerFactory } from "@digitraffic/common/dist/aws/runtime/logging/http-logger";
 import { Agent, request } from "undici";
 import type { NemoResponse } from "../model/nemo.js";
+import { nemoVisitSchema } from "../model/nemo.js";
 
 export class NemoApi {
   readonly _url: string;
   readonly _certificate: string;
   readonly _privateKey: string;
 
+  readonly _loggerFactory: LoggerFactory;
+
   constructor(url: string, privateKey: string, certificate: string) {
     this._url = url;
     this._certificate = certificate;
     this._privateKey = privateKey;
+    this._loggerFactory = new LoggerFactory({
+      context: "Port-call",
+      urlTemplate: this.createTemplate(),
+    });
   }
 
   async getVisits(from: Date, to: Date): Promise<NemoResponse> {
     const method = "NemoApi.getVisits";
     const url = this.createUrl(from, to);
-
-    logger.info({
-      method,
-      message: `Getting visits from ${url}`,
-    });
+    const httpLogger = this._loggerFactory.logger(url);
 
     try {
       const resp = await request(new URL(url), {
@@ -35,6 +39,8 @@ export class NemoApi {
           },
         }),
       });
+
+      httpLogger.log(resp);
 
       if (resp.statusCode !== 200) {
         const responseBody = await resp.body.text();
@@ -51,19 +57,39 @@ export class NemoApi {
         );
       }
 
-      const response = (await resp.body.json()) as NemoResponse;
+      const response = this.convertResponse(await resp.body.json());
 
       logger.debug(`returning ${JSON.stringify(response)}`);
 
       return response;
     } catch (error) {
       logger.debug(`error ${JSON.stringify(error)}`);
+
       throw error;
     }
   }
 
+  convertResponse(response: unknown): NemoResponse {
+    const parseResponse = nemoVisitSchema.array().safeParse(response);
+
+    if (!parseResponse.success) {
+      logger.debug(`Got message ${JSON.stringify(response)}`);
+
+      logger.error({
+        message: `Invalid response format: ${JSON.stringify(parseResponse.error)}`,
+        method: "NemoApi.convertResponse",
+      });
+    }
+
+    return response as NemoResponse;
+  }
+
   createUrl(from: Date, to: Date): string {
     return `${this._url}/${this.getDate(from)}/${this.getDate(to)}`;
+  }
+
+  createTemplate(): string {
+    return `${this._url}/{date}/{date}`;
   }
 
   // get wanted format

@@ -177,10 +177,10 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       pg-query-stream:
         specifier: 4.16.0
-        version: 4.16.0(pg@8.22.0(pg-native@3.8.0))
+        version: 4.16.0(pg@8.23.0(pg-native@3.8.0))
       rimraf:
         specifier: 6.1.3
         version: 6.1.3
@@ -240,7 +240,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       spex:
         specifier: 4.1.0
         version: 4.1.0
@@ -398,7 +398,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       undici:
         specifier: 8.10.2
         version: 8.10.2
@@ -459,28 +459,28 @@ importers:
         version: 2026.10.23-1(@aws-sdk/client-api-gateway@3.1098.0)(@aws-sdk/client-s3@3.1098.0)(@aws-sdk/client-secrets-manager@3.1098.0)(@aws-sdk/client-sns@3.1098.0)(@aws-sdk/lib-storage@3.1098.0(@aws-sdk/client-s3@3.1098.0))(@date-fns/tz@1.5.0)(@smithy/fetch-http-handler@5.6.13)(@smithy/node-http-handler@4.9.13)(aws-cdk-lib@2.262.2(constructs@10.7.2))(constructs@10.7.2)(date-fns@4.4.0)(es-toolkit@1.50.0)(geojson-validation@1.0.2)(ky@2.0.2)(pg-native@3.8.0)(pg-promise@12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0))))(zod@4.4.3)
       aws-cdk-lib:
         specifier: 2.262.2
-        version: 2.262.2(constructs@10.7.2)
+        version: 2.262.2(constructs@10.8.1)
       constructs:
-        specifier: 10.7.2
-        version: 10.7.2
+        specifier: 10.8.1
+        version: 10.8.1
       date-fns:
         specifier: 4.4.0
         version: 4.4.0
       es-toolkit:
-        specifier: 1.50.0
-        version: 1.50.0
+        specifier: 1.52.0
+        version: 1.52.0
       pg-native:
         specifier: 3.8.0
         version: 3.8.0
       pg-promise:
-        specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        specifier: 12.7.1
+        version: 12.7.1(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       undici:
         specifier: 8.10.2
         version: 8.10.2
       zod:
-        specifier: 4.4.3
-        version: 4.4.3
+        specifier: 4.6.5
+        version: 4.6.5
     devDependencies:
       '@digitraffic-cdk/cdk-rig':
         specifier: workspace:*
@@ -568,7 +568,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       spex:
         specifier: 4.1.0
         version: 4.1.0
@@ -647,7 +647,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
     devDependencies:
       '@digitraffic-cdk/cdk-rig':
         specifier: workspace:*
@@ -720,7 +720,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       source-map-support:
         specifier: 0.5.21
         version: 0.5.21
@@ -854,7 +854,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -1887,7 +1887,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -1960,7 +1960,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       uuid:
         specifier: 14.0.1
         version: 14.0.1
@@ -2115,7 +2115,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       spex:
         specifier: 4.1.0
         version: 4.1.0
@@ -2194,7 +2194,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       spex:
         specifier: 4.1.0
         version: 4.1.0
@@ -2347,7 +2347,7 @@ importers:
         version: 3.8.0
       pg-promise:
         specifier: 12.7.0
-        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+        version: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
     devDependencies:
       '@aws-sdk/client-api-gateway':
         specifier: 3.1098.0
@@ -4886,6 +4886,9 @@ packages:
   constructs@10.7.2:
     resolution: {integrity: sha512-vA7JOqvO/xwq2HBCuq3qc6V2R9mHZCxJ8HPoucUcUWJY88YULe7bzMcsdBy27/gJJIphZi73U1oIXDY2Eqg6nA==}
 
+  constructs@10.8.1:
+    resolution: {integrity: sha512-98yGXYyhePqPYh3cYu8nzBERmAhC0DONe3UD03okK0nehZ7hYP4wgZuf02a04+uOWxnTJ5Rpp5m0GRNpwyLGGA==}
+
   content-disposition@0.5.4:
     resolution: {integrity: sha512-FveZTNuGw04cxlAiWbzi6zTAL/lhehaWbTtgluJh4/E95DqMwTmha3KZN1aAWA8cFIhHzMZUvLevkw5Rqk+tSQ==}
     engines: {node: '>= 0.6'}
@@ -5087,6 +5090,9 @@ packages:
 
   es-toolkit@1.50.0:
     resolution: {integrity: sha512-OyZKhUVvEep9ITEiwHn8GKnMRQIVqoSIX7WnRbkWgJkllCujilqP2rD0u979tkl8wqyc8ICwlc1UBVv/Sl1G6w==}
+
+  es-toolkit@1.52.0:
+    resolution: {integrity: sha512-XTNEJQh1tY1ZJVcf6ayP/2n4ZPyaHlW2FWs7xvw5ddPuhUVjLD3olQVQS7kf58JbAB48iL0uL/jerTrjtV3lDA==}
 
   esbuild@0.28.1:
     resolution: {integrity: sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==}
@@ -6114,6 +6120,12 @@ packages:
     peerDependencies:
       pg-query-stream: 4.16.0
 
+  pg-promise@12.7.1:
+    resolution: {integrity: sha512-tsemfuBRsHMGaFZKMpkmCAA9iLeHXuuTq+0DucJwJyftyXk7crlMFXq7SY0AOVelIrdSL8qwdl5omfj/R8JN6A==}
+    engines: {node: '>=16.0'}
+    peerDependencies:
+      pg-query-stream: 4.17.0
+
   pg-protocol@1.16.0:
     resolution: {integrity: sha512-sILXutLVjCLjcDuOmvhX5e2Z4cS5qG/6Bu3VkpFwdf/633ElGLpEh9bgmuI5I4sqKqkifQiGyiCcx1HdtrK7tg==}
 
@@ -6128,6 +6140,15 @@ packages:
 
   pg@8.22.0:
     resolution: {integrity: sha512-8wih1vVIBMxoUM2oB4soJsD9tDnDpLv4OXBJ+EJzFsvycD+lfyIreC2gGHq78f8jbLLt+bvlPTFdFZfJkOuzAA==}
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      pg-native: '>=3.0.1'
+    peerDependenciesMeta:
+      pg-native:
+        optional: true
+
+  pg@8.23.0:
+    resolution: {integrity: sha512-Ip2EQCngowJLGOfCwkFhPXU7/ljlhn6Rxlmy4XYfL2Y+vyRM59+8uR2xqRWKdYmbXmxCFOAmKxBuSUCdF34qLg==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
@@ -6974,6 +6995,9 @@ packages:
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
+
   zx@8.8.5:
     resolution: {integrity: sha512-SNgDF5L0gfN7FwVOdEFguY3orU5AkfFZm9B5YSHog/UDHv+lvmd82ZAsOenOkQixigwH2+yyH198AwNdKhj+RA==}
     engines: {node: '>= 12.17.0'}
@@ -7604,7 +7628,7 @@ snapshots:
       geojson-validation: 1.0.2
       ky: 2.0.2
       pg-native: 3.8.0
-      pg-promise: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)))
+      pg-promise: 12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)))
       zod: 4.4.3
 
   '@discoveryjs/json-ext@1.1.0': {}
@@ -10050,6 +10074,13 @@ snapshots:
       '@aws-cdk/cloud-assembly-schema': 54.20.0
       constructs: 10.7.2
 
+  aws-cdk-lib@2.262.2(constructs@10.8.1):
+    dependencies:
+      '@aws-cdk/asset-awscli-v1': 2.2.282
+      '@aws-cdk/asset-node-proxy-agent-v6': 2.1.2
+      '@aws-cdk/cloud-assembly-schema': 54.20.0
+      constructs: 10.8.1
+
   aws-cdk@2.1134.0: {}
 
   aws-ssl-profiles@1.1.2: {}
@@ -10315,6 +10346,8 @@ snapshots:
 
   constructs@10.7.2: {}
 
+  constructs@10.8.1: {}
+
   content-disposition@0.5.4:
     dependencies:
       safe-buffer: 5.2.1
@@ -10498,6 +10531,8 @@ snapshots:
   es-module-lexer@2.3.2: {}
 
   es-toolkit@1.50.0: {}
+
+  es-toolkit@1.52.0: {}
 
   esbuild@0.28.1:
     optionalDependencies:
@@ -11718,9 +11753,9 @@ snapshots:
 
   pg-connection-string@2.14.0: {}
 
-  pg-cursor@2.22.0(pg@8.22.0(pg-native@3.8.0)):
+  pg-cursor@2.22.0(pg@8.23.0(pg-native@3.8.0)):
     dependencies:
-      pg: 8.22.0(pg-native@3.8.0)
+      pg: 8.23.0(pg-native@3.8.0)
 
   pg-int8@1.0.1: {}
 
@@ -11735,22 +11770,36 @@ snapshots:
     dependencies:
       pg: 8.22.0(pg-native@3.8.0)
 
-  pg-promise@12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0))):
+  pg-pool@3.14.0(pg@8.23.0(pg-native@3.8.0)):
+    dependencies:
+      pg: 8.23.0(pg-native@3.8.0)
+
+  pg-promise@12.7.0(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0))):
     dependencies:
       assert-options: 0.8.3
       pg: 8.22.0(pg-native@3.8.0)
       pg-minify: 1.8.0
-      pg-query-stream: 4.16.0(pg@8.22.0(pg-native@3.8.0))
+      pg-query-stream: 4.16.0(pg@8.23.0(pg-native@3.8.0))
+      spex: 4.1.0
+    transitivePeerDependencies:
+      - pg-native
+
+  pg-promise@12.7.1(pg-native@3.8.0)(pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0))):
+    dependencies:
+      assert-options: 0.8.3
+      pg: 8.23.0(pg-native@3.8.0)
+      pg-minify: 1.8.0
+      pg-query-stream: 4.16.0(pg@8.23.0(pg-native@3.8.0))
       spex: 4.1.0
     transitivePeerDependencies:
       - pg-native
 
   pg-protocol@1.16.0: {}
 
-  pg-query-stream@4.16.0(pg@8.22.0(pg-native@3.8.0)):
+  pg-query-stream@4.16.0(pg@8.23.0(pg-native@3.8.0)):
     dependencies:
-      pg: 8.22.0(pg-native@3.8.0)
-      pg-cursor: 2.22.0(pg@8.22.0(pg-native@3.8.0))
+      pg: 8.23.0(pg-native@3.8.0)
+      pg-cursor: 2.22.0(pg@8.23.0(pg-native@3.8.0))
 
   pg-types@2.2.0:
     dependencies:
@@ -11764,6 +11813,17 @@ snapshots:
     dependencies:
       pg-connection-string: 2.14.0
       pg-pool: 3.14.0(pg@8.22.0(pg-native@3.8.0))
+      pg-protocol: 1.16.0
+      pg-types: 2.2.0
+      pgpass: 1.0.5
+    optionalDependencies:
+      pg-cloudflare: 1.4.0
+      pg-native: 3.8.0
+
+  pg@8.23.0(pg-native@3.8.0):
+    dependencies:
+      pg-connection-string: 2.14.0
+      pg-pool: 3.14.0(pg@8.23.0(pg-native@3.8.0))
       pg-protocol: 1.16.0
       pg-types: 2.2.0
       pgpass: 1.0.5
@@ -12666,5 +12726,7 @@ snapshots:
       readable-stream: 4.7.0
 
   zod@4.4.3: {}
+
+  zod@4.6.5: {}
 
   zx@8.8.5: {}

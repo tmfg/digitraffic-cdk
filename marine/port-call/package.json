@@ -23,15 +23,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.10.23-1",
+    "@digitraffic/common": "2026.10.26-1",
     "aws-cdk-lib": "2.262.2",
-    "constructs": "10.7.2",
+    "constructs": "10.8.1",
     "date-fns": "4.4.0",
-    "es-toolkit": "1.50.0",
+    "es-toolkit": "1.52.0",
     "pg-native": "3.8.0",
-    "pg-promise": "12.7.0",
-    "undici": "8.10.2",
-    "zod": "4.4.3"
+    "pg-promise": "12.7.1",
+    "undici": "8.9.0",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",

@@ -25,6 +25,7 @@ export class PublicApi {
     this.apiKeyId = this.publicApi.createUsagePlanV2("Port Call");
 
     const visitResource = this.createResources(this.publicApi);
+    this.createVisitsEndpoint(stack, visitResource);
     this.createVisitEndpoint(stack, visitResource);
 
     this.publicApi.exportEndpoint();
@@ -42,8 +43,8 @@ export class PublicApi {
     return visitsResource;
   }
 
-  createVisitEndpoint(stack: DigitrafficStack, visitResource: Resource): void {
-    const visitsLambda = FunctionBuilder.create(stack, "get-visits").build();
+  createVisitEndpoint(stack: DigitrafficStack, visitsResource: Resource): void {
+    const visitLambda = FunctionBuilder.create(stack, "get-visit").build();
     const visitModel = addServiceModel(
       "VisitModel",
       this.publicApi,
@@ -51,12 +52,63 @@ export class PublicApi {
         target: "draft-4",
       }) as JsonSchema,
     );
-    const visitsIntegration = new DigitrafficIntegration(visitsLambda)
+    const getVisitIntegration = new DigitrafficIntegration(
+      visitLambda,
+      MediaType.APPLICATION_JSON,
+    )
+      .addPathParameter("visitId")
+      .build();
+
+    const visitResource = visitsResource.addResource("{visitId}");
+
+    ["GET", "HEAD"].forEach((httpMethod) => {
+      visitResource.addMethod(httpMethod, getVisitIntegration, {
+        apiKeyRequired: true,
+        methodResponses: [
+          DigitrafficMethodResponse.response200(
+            visitModel,
+            MediaType.APPLICATION_JSON_UTF8,
+          ),
+          DigitrafficMethodResponse.response400(),
+          DigitrafficMethodResponse.response500(),
+        ],
+      });
+    });
+
+    this.publicApi.documentResource(
+      visitResource,
+      DocumentationPart.method(
+        PORT_CALL_TAG_V2,
+        "GetVisit",
+        "Return one visit.",
+      ),
+    );
+  }
+
+  createVisitsEndpoint(
+    stack: DigitrafficStack,
+    visitsResource: Resource,
+  ): void {
+    const visitsLambda = FunctionBuilder.create(stack, "get-visits")
+      .withReservedConcurrentExecutions(8)
+      .withMemorySize(256)
+      .build();
+    const visitModel = addServiceModel(
+      "VisitsModel",
+      this.publicApi,
+      z.toJSONSchema(visitResponseSchema.array(), {
+        target: "draft-4",
+      }) as JsonSchema,
+    );
+    const visitsIntegration = new DigitrafficIntegration(
+      visitsLambda,
+      MediaType.APPLICATION_JSON,
+    )
       .passAllQueryParameters()
       .build();
 
     ["GET", "HEAD"].forEach((httpMethod) => {
-      visitResource.addMethod(httpMethod, visitsIntegration, {
+      visitsResource.addMethod(httpMethod, visitsIntegration, {
         apiKeyRequired: true,
         requestParameters: {
           "method.request.querystring.fromDateTime": false,
@@ -78,7 +130,7 @@ export class PublicApi {
     });
 
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.method(
         PORT_CALL_TAG_V2,
         "GetVisits",
@@ -87,43 +139,43 @@ export class PublicApi {
     );
 
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.queryParameter(
         "fromDateTime",
         "Return visits where any timestamp (ETA, ETD, ATA or ATD) is on or after this value. Inclusive. ISO 8601 datetime.",
       ),
     );
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.queryParameter(
         "toDateTime",
         "Return visits where any timestamp (ETA, ETD, ATA or ATD) is before this value. Exclusive. ISO 8601 datetime.",
       ),
     );
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.queryParameter("portOfCall", "Filter by port locode."),
     );
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.queryParameter(
         "vesselName",
         "Filter by vessel name. Case-insensitive partial match.",
       ),
     );
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.queryParameter("imo", "Filter by IMO number."),
     );
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.queryParameter(
         "status",
         "Filter by visit status. Values: expected-to-arrive, arrived, departed, cancelled.",
       ),
     );
     this.publicApi.documentResource(
-      visitResource,
+      visitsResource,
       DocumentationPart.queryParameter(
         "sort",
         "Sort results by field:direction. Fields: eta, etd, ata, atd, vesselName, portOfCall, status. Directions: asc, desc. Example: sort=eta:desc",

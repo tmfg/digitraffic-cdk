@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import {
   inDatabase,
@@ -14,8 +14,8 @@ import type { VisitResponse } from "../model/visit-schema.js";
 
 const DATATYPE = "PC2_VISITS" as const;
 
+const UPDATE_DAYS_TO_PAST = 4 as const;
 const UPDATE_DAYS_TO_FUTURE = 100 as const;
-
 interface UpdateInfo extends DbInsertedUpdated {
   readonly items: number;
 }
@@ -35,7 +35,7 @@ export async function getAllVisits(
       getVisitsEvent.status,
       getVisitsEvent.sort,
     );
-  });
+  }, true);
 
   // get from visits
   return [visits.map(convertVisit), new Date()];
@@ -46,7 +46,25 @@ function convertVisit(dbVisit: DbVisit): VisitResponse {
     visitId: dbVisit.visit_id,
     vesselId: dbVisit.vessel_id,
     vesselName: dbVisit.vessel_name,
+    shipCallSign: dbVisit.ship_call_sign,
+    mmsi: dbVisit.mmsi,
+    vesselType: dbVisit.vessel_type,
+    grossTonnage: dbVisit.gross_tonnage,
+    netTonnage: dbVisit.net_tonnage,
+    length: dbVisit.length,
+    breadth: dbVisit.breadth,
+    height: dbVisit.height,
+    declarantName: dbVisit.declarant_name,
     portOfCall: dbVisit.port_locode,
+    portName: dbVisit.port_name,
+    previousPortOfCall: dbVisit.prev_port_locode,
+    previousPortName: dbVisit.prev_port_name,
+    nextPortOfCall: dbVisit.next_port_locode,
+    nextPortName: dbVisit.next_port_name,
+    portAreaCode: dbVisit.port_area_code,
+    portAreaName: dbVisit.port_area_name,
+    berthName: dbVisit.berth_name,
+    berthCode: dbVisit.berth_code,
     eta: dbVisit.eta.toISOString(),
     etd: dbVisit.etd?.toISOString(),
     ata: dbVisit.ata?.toISOString(),
@@ -61,7 +79,7 @@ export async function getVisit(
 ): Promise<[VisitResponse | undefined, Date]> {
   const visit = await inDatabaseReadonly((db: DTDatabase) => {
     return findVisit(db, visitId);
-  });
+  }, true);
 
   if (!visit) {
     return Promise.resolve([undefined, new Date()]);
@@ -70,12 +88,12 @@ export async function getVisit(
   return Promise.resolve([convertVisit(visit), visit.update_time]);
 }
 
-function getDaysToUpdate(dayCount: number): Date[] {
-  const yesterday = subDays(new Date(), 1);
+function getDaysToUpdate(daysToPast: number, daysToFuture: number): Date[] {
+  const start = subDays(new Date(), daysToPast);
 
   const days: Date[] = [];
-  for (let i = 0; i <= dayCount; i++) {
-    const day = addDays(yesterday, i);
+  for (let i = 0; i <= daysToFuture + daysToPast; i++) {
+    const day = addDays(start, i);
     days.push(day);
   }
 
@@ -113,10 +131,11 @@ export async function updateVisits(
   url: string,
   privateKey: string,
   certificate: string,
-  dayCount: number = UPDATE_DAYS_TO_FUTURE,
+  daysToPast: number = UPDATE_DAYS_TO_PAST,
+  daysToFuture: number = UPDATE_DAYS_TO_FUTURE,
 ): Promise<UpdateInfo> {
   const api = new NemoApi(url, privateKey, certificate);
-  const daysToUpdate = getDaysToUpdate(dayCount);
+  const daysToUpdate = getDaysToUpdate(daysToPast, daysToFuture);
 
   let updatedCount = 0;
   let insertedCount = 0;

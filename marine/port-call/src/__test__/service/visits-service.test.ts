@@ -15,7 +15,7 @@ export async function updateAndExpect(
 ): Promise<void> {
   vi.spyOn(NemoApi.prototype, "getVisits").mockResolvedValue(response);
 
-  const updated = await updateVisits("", "", "", 0);
+  const updated = await updateVisits("", "", "", 0, 0);
 
   expect(updated.inserted).toBe(expectInserted);
   expect(updated.updated).toBe(expectUpdated);

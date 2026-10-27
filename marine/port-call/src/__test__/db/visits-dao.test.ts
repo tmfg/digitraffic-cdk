@@ -34,6 +34,72 @@ describe(
       await assertVisitCount(db, 1);
     });
 
+    test("persists vessel and port details", async () => {
+      const visit = createTestVisit();
+      const visitWithDetails = {
+        ...visit,
+        portCall: {
+          ...visit.portCall,
+          vesselInformation: {
+            ...visit.portCall.vesselInformation,
+            shipCallSign: "CALL123",
+            mmsiNumber: "230123456",
+            vesselType: "CARG",
+            grossTonnage: 1000,
+            netTonnage: 600,
+            length: 100,
+            breadth: 20,
+            height: 30,
+          },
+          declarantName: "Declarant",
+          voyageInformation: {
+            ...visit.portCall.voyageInformation,
+            portLocation: "Port name",
+            previousPortIdentification: "PREV1",
+            previousPortName: "Previous port",
+            nextPortIdentification: "NEXT1",
+            nextPortName: "Next port",
+            portAreaCode: "AREA1",
+            portAreaName: "Port area",
+            berthName: "Berth 1",
+            berthCode: "B1",
+          },
+        },
+      };
+
+      await VisitsDAO.upsertVisit(db, visitWithDetails);
+      const saved = await VisitsDAO.findVisit(db, visit.visitId);
+
+      expect(saved).toMatchObject({
+        ship_call_sign:
+          visitWithDetails.portCall.vesselInformation.shipCallSign,
+        mmsi: visitWithDetails.portCall.vesselInformation.mmsiNumber,
+        vessel_type: visitWithDetails.portCall.vesselInformation.vesselType,
+        gross_tonnage: visitWithDetails.portCall.vesselInformation.grossTonnage,
+        net_tonnage: visitWithDetails.portCall.vesselInformation.netTonnage,
+        length: visitWithDetails.portCall.vesselInformation.length,
+        breadth: visitWithDetails.portCall.vesselInformation.breadth,
+        height: visitWithDetails.portCall.vesselInformation.height,
+        declarant_name: visitWithDetails.portCall.declarantName,
+        port_name: visitWithDetails.portCall.voyageInformation.portLocation,
+        prev_port_locode:
+          visitWithDetails.portCall.voyageInformation
+            .previousPortIdentification,
+        prev_port_name:
+          visitWithDetails.portCall.voyageInformation.previousPortName,
+        next_port_locode:
+          visitWithDetails.portCall.voyageInformation.nextPortIdentification,
+        next_port_name:
+          visitWithDetails.portCall.voyageInformation.nextPortName,
+        port_area_code:
+          visitWithDetails.portCall.voyageInformation.portAreaCode,
+        port_area_name:
+          visitWithDetails.portCall.voyageInformation.portAreaName,
+        berth_name: visitWithDetails.portCall.voyageInformation.berthName,
+        berth_code: visitWithDetails.portCall.voyageInformation.berthCode,
+      });
+    });
+
     describe("upsertVisits", () => {
       test("inserts multiple visits sequentially without concurrent query error", async () => {
         const visits = Array.from({ length: 10 }, (_, i) =>

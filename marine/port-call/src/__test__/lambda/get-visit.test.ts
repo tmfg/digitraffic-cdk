@@ -47,8 +47,8 @@ describe(
         portOfCall: testVisit.portCall.voyageInformation.portIdentification,
         status: testVisit.portCall.portCallStatus.status,
         updateTime: testVisit.latestUpdateTime.toISOString(),
-        vesselId: testVisit.portCall.vesselInformation.identification,
-        vesselName: testVisit.portCall.vesselInformation.name,
+        vesselId: testVisit.portCall.vesselInformation.identification!,
+        vesselName: testVisit.portCall.vesselInformation.name!,
         visitId: testVisit.visitId,
       } satisfies VisitResponse);
     });
