@@ -60,7 +60,11 @@ export const visitResponseSchema = z
       .regex(/^[0-9]{9}$/)
       .describe("Ship MMSI number")
       .optional(),
-    vesselType: z.string().max(4).describe("Vessel type code").optional(),
+    vesselType: z
+      .string()
+      .max(4)
+      .describe("Vessel type code (UN/ECE Recommendation 28)")
+      .optional(),
     grossTonnage: z
       .number()
       .int()
