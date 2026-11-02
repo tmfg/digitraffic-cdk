@@ -1,6 +1,7 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
+import { LoggerFactory } from "@digitraffic/common/dist/aws/runtime/logging/http-logger";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
 import type { FaultFeature } from "../model/fault.js";
 
@@ -10,13 +11,19 @@ interface ApiFeatures {
 
 export class FaultsApi {
   private readonly endpointUrl: string;
+  readonly _loggerFactory: LoggerFactory;
 
   constructor(endpointUrl: string) {
     this.endpointUrl = endpointUrl;
+
+    this._loggerFactory = new LoggerFactory({
+      context: "Aton-faults",
+      urlTemplate: endpointUrl,
+    });
   }
 
   public async getFaults(): Promise<FaultFeature[]> {
-    const start = Date.now();
+    const httpLogger = this._loggerFactory.logger(this.endpointUrl);
 
     return ky
       .get(this.endpointUrl, {
@@ -24,6 +31,7 @@ export class FaultsApi {
         headers: {
           Accept: MediaType.APPLICATION_JSON,
         },
+        hooks: createKyHooks(httpLogger),
       })
       .then(async (resp) => {
         if (resp.status !== 200) {
@@ -38,18 +46,9 @@ export class FaultsApi {
 
         const features = await resp.json<ApiFeatures>();
 
-        const end = Date.now();
-        logger.info({
-          method: "FaultsApi.getFaults",
-          tookMs: end - start,
-          customFaultCount: features.features.length,
-        });
-
         return features.features;
       })
-      .catch((error) => {
-        logException(logger, error);
-
+      .catch((_error) => {
         return [];
       });
   }

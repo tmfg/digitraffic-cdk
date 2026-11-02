@@ -1,4 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { createLoggingInterceptor } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
 import { LoggerFactory } from "@digitraffic/common/dist/aws/runtime/logging/http-logger";
 import { Agent, request } from "undici";
 import type { NemoResponse } from "../model/nemo.js";
@@ -25,6 +26,7 @@ export class NemoApi {
     const method = "NemoApi.getVisits";
     const url = this.createUrl(from, to);
     const httpLogger = this._loggerFactory.logger(url);
+    const loggingInterceptor = createLoggingInterceptor(httpLogger);
 
     try {
       const resp = await request(new URL(url), {
@@ -37,10 +39,8 @@ export class NemoApi {
             cert: this._certificate,
             key: this._privateKey,
           },
-        }),
+        }).compose(loggingInterceptor),
       });
-
-      httpLogger.log(resp);
 
       if (resp.statusCode !== 200) {
         const responseBody = await resp.body.text();

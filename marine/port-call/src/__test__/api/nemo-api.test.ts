@@ -2,7 +2,12 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { NemoApi } from "../../api/nemo-api.js";
 
 vi.mock("undici", () => ({
-  Agent: vi.fn().mockImplementation(() => ({})),
+  // A class, since Biome's useArrowFunction rewrites function expressions into non-constructible arrows
+  Agent: class {
+    compose() {
+      return {};
+    }
+  },
   request: vi.fn(),
 }));
 

@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { inDatabase } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
@@ -32,54 +32,60 @@ export class DataUpdater {
   async update(): Promise<void> {
     const to = await this._api.getCurrentVersion();
 
-    await inDatabase(async (db: DTDatabase) => {
-      await this.updateObjects(
-        db,
-        "wn_location",
-        to,
-        "location",
-        saveAllLocations,
-      );
-      await this.updateObjects(
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(db, "wn_location", to, "location", saveAllLocations),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(
         db,
         "wn_restriction",
         to,
         "restriction",
         saveAllRestrictions,
-      );
-      await this.updateObjects(db, "wn_vessel", to, "vessel", saveAllVessels);
-      await this.updateObjects(
-        db,
-        "wn_activity",
-        to,
-        "activity",
-        saveAllActivities,
-      );
-      await this.updateObjects(db, "wn_source", to, "source", saveAllSources);
-      await this.updateObjects(
+      ),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(db, "wn_vessel", to, "vessel", saveAllVessels),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(db, "wn_activity", to, "activity", saveAllActivities),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(db, "wn_source", to, "source", saveAllSources),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(
         db,
         "wn_port_suspension",
         to,
         "port-suspension",
         saveAllPortSuspensions,
-      );
-      await this.updateObjects(
+      ),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(
         db,
         "wn_port_suspension_location",
         to,
         "port-suspension-location",
         saveAllPortSuspensionLocations,
-      );
-      await this.updateObjects(db, "wn_queue", to, "queue", saveAllQueues);
-      await this.updateObjects(db, "wn_dirway", to, "dirway", saveAllDirways);
-      await this.updateObjects(
+      ),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(db, "wn_queue", to, "queue", saveAllQueues),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(db, "wn_dirway", to, "dirway", saveAllDirways),
+    );
+    await inDatabase((db: DTDatabase) =>
+      this.updateObjects(
         db,
         "wn_dirwaypoint",
         to,
         "dirwaypoint",
         saveAllDirwaypoints,
-      );
-    });
+      ),
+    );
   }
 
   async updateObjects<T extends ApiMetaData | Deleted>(
@@ -102,6 +108,9 @@ export class DataUpdater {
     }
 
     const objects = await this._api.fetch<T>(apiPath, from, to);
+
+    logger.debug(`Got ${objects.length} ${tableName} objects from API`);
+
     const deleted: Deleted[] = [];
     const updated: T[] = [];
 
@@ -127,7 +136,7 @@ export class DataUpdater {
       await setDeleted(db, tableName, deleted);
     }
 
-    if (deleted.length > 0 || updated.length > 0) {
+    if (objects.length > 0) {
       await updateDataVersion(db, tableName, to);
       await LastUpdatedDB.updateUpdatedTimestamp(
         db,

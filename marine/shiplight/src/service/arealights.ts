@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { RetryLogError, retry } from "@digitraffic/common/dist/utils/retry";
 import type { AreaLightsApi } from "../api/arealights.js";
 import type { AreaTraffic } from "../model/areatraffic.js";

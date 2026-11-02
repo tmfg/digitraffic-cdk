@@ -1,4 +1,6 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
+import { LoggerFactory } from "@digitraffic/common/dist/aws/runtime/logging/http-logger";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
@@ -20,13 +22,20 @@ export class IbnetApi {
   private _baseUrl: string;
   private _authHeaderValue: string;
 
+  readonly _loggerFactory: LoggerFactory;
+
   constructor(baseUrl: string, authHeaderValue: string) {
     this._baseUrl = baseUrl;
     this._authHeaderValue = authHeaderValue;
+
+    this._loggerFactory = new LoggerFactory({
+      context: "Winter-navigation",
+      urlTemplate: this.createTemplate(),
+    });
   }
 
-  async fetchFromUrl<T>(url: string): Promise<T> {
-    logger.debug(`Fetching from ${url}`);
+  async fetchFromUrl<T>(url: string, urlTemplate?: string): Promise<T> {
+    const httpLogger = this._loggerFactory.logger(url, urlTemplate);
 
     return ky
       .get(url, {
@@ -35,6 +44,7 @@ export class IbnetApi {
           Authorization: `Basic ${this._authHeaderValue}`,
           Accept: MediaType.APPLICATION_JSON,
         },
+        hooks: createKyHooks(httpLogger),
       })
       .then(async (resp) => {
         if (resp.status !== 200) {
@@ -48,16 +58,11 @@ export class IbnetApi {
         }
 
         return await resp.json<T>();
-      })
-      .catch((error) => {
-        logger.debug(`error: ${JSON.stringify(error)}`);
-        throw error;
       });
   }
 
   async fetch<T>(path: ApiPath, from: number, to: number): Promise<T[]> {
-    const start = Date.now();
-    const url = `${this._baseUrl}${path}?from=${from}&to=${to}`;
+    const url = this.createUrl(path, from, to);
 
     try {
       return await this.fetchFromUrl<T[]>(url);
@@ -65,12 +70,15 @@ export class IbnetApi {
       logException(logger, error);
 
       return [];
-    } finally {
-      logger.info({
-        method: "IbnetApi.fetch",
-        tookMs: Date.now() - start,
-      });
     }
+  }
+
+  createUrl(path: ApiPath, from: number, to: number): string {
+    return `${this._baseUrl}${path}?from=${from}&to=${to}`;
+  }
+
+  createTemplate(): string {
+    return `${this._baseUrl}{path}?from={date}&to={date}`;
   }
 
   async getCurrentVersion(): Promise<number> {

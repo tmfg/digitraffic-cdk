@@ -1,7 +1,9 @@
 import type { DiffieHellman } from "node:crypto";
 import { createCipheriv, createDiffieHellman } from "node:crypto";
 import util from "node:util";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { createLoggingInterceptor } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
+import { LoggerFactory } from "@digitraffic/common/dist/aws/runtime/logging/http-logger";
 import type { Dispatcher } from "undici";
 import { Agent, interceptors, request } from "undici";
 import { parseString } from "xml2js";
@@ -74,6 +76,8 @@ export class Session {
   // this is received after successful connect and must be used in every command after that
   connectionId: string | undefined = undefined;
 
+  readonly _loggerFactory: LoggerFactory;
+
   constructor(url: string, certificate: string, ca: string, hostname: string) {
     this.communicationUrl = url + COMMUNICATION_URL_PART;
     this.videoUrl = url + VIDEO_URL_PART;
@@ -89,6 +93,9 @@ export class Session {
       this.dh.generateKeys(),
       this.dh.getPrime().length,
     );
+    this._loggerFactory = new LoggerFactory({
+      context: "marinecam",
+    });
 
     const agent = new Agent({
       connect: {
@@ -113,9 +120,12 @@ export class Session {
 
   async post(
     url: string,
+    urlTemplate: string | undefined,
     xml: string,
     configuration?: Partial<Dispatcher.RequestOptions>,
   ): Promise<Dispatcher.ResponseData> {
+    const httpLogger = this._loggerFactory.logger(url, urlTemplate);
+    const loggingInterceptor = createLoggingInterceptor(httpLogger);
     try {
       return await request(url, {
         method: "POST",
@@ -124,7 +134,7 @@ export class Session {
           host: this.hostname,
           accept: "application/json",
         },
-        dispatcher: this.dispatcher,
+        dispatcher: this.dispatcher.compose(loggingInterceptor),
         bodyTimeout: REQUEST_TIMEOUT_MILLIS,
         ...configuration,
       });
@@ -147,7 +157,12 @@ export class Session {
 
     //    logger.debug("sending:" + xml);
 
-    const resp = await this.post(this.communicationUrl, xml, configuration);
+    const resp = await this.post(
+      this.communicationUrl,
+      this.communicationUrl,
+      xml,
+      configuration,
+    );
 
     //   logger.debug("response " + JSON.stringify(resp));
 
@@ -294,13 +309,8 @@ export class Session {
 
   async getFrameFromStream(videoId: string): Promise<string | undefined> {
     const streamUrl = this.videoUrl + videoId;
-
-    logger.info({
-      method: "SessionService.getFrameFromStream",
-      message: `posting to ${streamUrl}`,
-    });
-
-    const response = await this.post(streamUrl, "");
+    const urlTemplate = this.videoUrl + "{videoId}";
+    const response = await this.post(streamUrl, urlTemplate, "");
 
     // format is uuid(16) timestamp(8) datasize(4) headersize(2) headerExtension(2)...
     const buffer = Buffer.from(await response.body.arrayBuffer());

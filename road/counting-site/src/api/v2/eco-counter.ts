@@ -1,30 +1,39 @@
 import { TZDate } from "@date-fns/tz";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
+import { LoggerFactory } from "@digitraffic/common/dist/aws/runtime/logging/http-logger";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import ky from "ky";
 import type { ApiData, ApiSite } from "../../model/v2/api-model.js";
 
 export const URL_ALL_SITES = "/api/v2/sites?include=domain";
+const URL_ALL_SITES_TEMPLATE = "/api/v2/sites?include={string}";
 export const URL_SITE_DATA = "/api/v2/history/traffic/raw";
+const URL_SITE_TEMPLATE =
+  URL_SITE_DATA +
+  "?siteId={number}&startDate={date}&endDate={date}&startTime={time}&endTime={time}";
 
 export class EcoCounterApi {
   readonly _apiKey: string;
   readonly _endpointUrl: string;
 
+  readonly _loggerFactory: LoggerFactory;
+
   constructor(endpointUrl: string, apiKey: string) {
     this._endpointUrl = endpointUrl;
     this._apiKey = apiKey;
+    this._loggerFactory = new LoggerFactory({
+      context: "Counting-site",
+    });
   }
 
-  async getFromServer<T>(url: string): Promise<T> {
-    const start = Date.now();
+  async getFromServer<T>(url: string, template: string): Promise<T> {
     const serverUrl = `${this._endpointUrl}${url}`;
-
-    logger.info({
-      method: "EcoCounterApi.getFromServer",
-      message: `sending to url ${serverUrl}`,
-    });
+    const httpLogger = this._loggerFactory.logger(
+      url,
+      `${this._endpointUrl}${template}`,
+    );
 
     try {
       const resp = await ky.get(serverUrl, {
@@ -34,6 +43,7 @@ export class EcoCounterApi {
           "Accept-Encoding": "gzip, deflate, br",
           "X-API-KEY": this._apiKey,
         },
+        hooks: createKyHooks(httpLogger),
       });
 
       if (resp.status !== 200) {
@@ -49,16 +59,11 @@ export class EcoCounterApi {
       logException(logger, error);
 
       return Promise.reject();
-    } finally {
-      logger.info({
-        method: "EcoCounterApi.getFromServer",
-        tookMs: Date.now() - start,
-      });
     }
   }
 
   getSites(): Promise<ApiSite[]> {
-    return this.getFromServer(URL_ALL_SITES);
+    return this.getFromServer(URL_ALL_SITES, URL_ALL_SITES_TEMPLATE);
   }
 
   getDataForSite(siteId: number, from: Date, to: Date): Promise<ApiData[]> {
@@ -76,6 +81,7 @@ export class EcoCounterApi {
 
     return this.getFromServer(
       `${URL_SITE_DATA}?siteId=${siteId}&startDate=${fromDate}&endDate=${toDate}&startTime=${fromTime}&endTime=${toTime}`,
+      URL_SITE_TEMPLATE,
     );
   }
 }

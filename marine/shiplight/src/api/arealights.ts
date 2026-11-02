@@ -1,5 +1,6 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logException } from "@digitraffic/common/dist/utils/logging";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
+import { LoggerFactory } from "@digitraffic/common/dist/aws/runtime/logging/http-logger";
 import ky, { HTTPError } from "ky";
 
 export interface AreaLightsBrightenRequest {
@@ -46,19 +47,26 @@ export class AreaLightsApi {
   private readonly url: string;
   private readonly apiKey: string;
 
+  private readonly _loggerFactory: LoggerFactory;
+
   constructor(url: string, apiKey: string) {
     this.url = url;
     this.apiKey = apiKey;
+    this._loggerFactory = new LoggerFactory({
+      context: "Shiplight",
+      urlTemplate: url,
+    });
   }
 
   updateLightsForArea(
     request: AreaLightsBrightenRequest,
   ): Promise<AreaLightsBrightenResponse> {
-    const start = Date.now();
+    const httpLogger = this._loggerFactory.logger(this.url);
 
     const requestPromise = ky.post(this.url, {
       body: JSON.stringify(request),
       headers: { "x-api-key": this.apiKey },
+      hooks: createKyHooks(httpLogger),
       //            validateStatus: (status) => status === 200
     });
 
@@ -88,15 +96,7 @@ export class AreaLightsApi {
           }
         }
 
-        logException(logger, error as Error);
-
         return Promise.reject("Unknown error");
-      })
-      .finally(() => {
-        logger.info({
-          method: "AreaLightsApi.updateLightsForArea",
-          tookMs: Date.now() - start,
-        });
       });
   }
 }

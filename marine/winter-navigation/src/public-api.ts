@@ -1,7 +1,7 @@
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-function";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
@@ -125,15 +125,10 @@ function createLocationResources(
   v2Resource: Resource,
   locationsModel: Model,
 ): [Resource, Resource] {
-  const getLocationsLambda = MonitoredDBFunction.create(
-    stack,
-    "get-locations",
-    undefined,
-    {
-      memorySize: 256,
-      reservedConcurrentExecutions: 6,
-    },
-  );
+  const getLocationsLambda = FunctionBuilder.create(stack, "get-locations")
+    .withMemorySize(256)
+    .withReservedConcurrentExecutions(6)
+    .build();
 
   const locationsResource = v2Resource.addResource("locations");
   const locationResource = locationsResource.addResource("{locode}");
@@ -186,15 +181,10 @@ function createVesselResources(
   v2Resource: Resource,
   locationsModel: Model,
 ): [Resource, Resource] {
-  const getVesselsLambda = MonitoredDBFunction.create(
-    stack,
-    "get-vessels",
-    undefined,
-    {
-      memorySize: 512,
-      reservedConcurrentExecutions: 6,
-    },
-  );
+  const getVesselsLambda = FunctionBuilder.create(stack, "get-vessels")
+    .withMemorySize(512)
+    .withReservedConcurrentExecutions(6)
+    .build();
 
   const vesselsResource = v2Resource.addResource("vessels");
   const vesselResource = vesselsResource.addResource("{vesselId}");
@@ -258,15 +248,10 @@ function createDirwayResources(
   v2Resource: Resource,
   dirwaysModel: Model,
 ): Resource {
-  const getDirwaysLambda = MonitoredDBFunction.create(
-    stack,
-    "get-dirways",
-    undefined,
-    {
-      memorySize: 256,
-      reservedConcurrentExecutions: 6,
-    },
-  );
+  const getDirwaysLambda = FunctionBuilder.create(stack, "get-dirways")
+    .withMemorySize(256)
+    .withReservedConcurrentExecutions(6)
+    .build();
 
   const dirwaysResource = v2Resource.addResource("dirways");
 
