@@ -1,5 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { PortactivityEnvKeys } from "../../keys.js";

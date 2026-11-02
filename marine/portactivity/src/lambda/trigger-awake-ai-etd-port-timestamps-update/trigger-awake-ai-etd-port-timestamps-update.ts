@@ -1,5 +1,5 @@
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { PortactivityEnvKeys } from "../../keys.js";
 import { ETD_PORTS } from "../../model/awake-ai-etx-ports.js";

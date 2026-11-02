@@ -1,6 +1,7 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky, { HTTPError } from "ky";
+import { loggerFactory } from "../logging.js";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 
 export enum AwakeAiShipResponseType {
@@ -30,10 +31,10 @@ export interface AwakeAiShipVoyageSchedule {
 }
 
 export class AwakeAiETAShipApi {
-  private readonly url: string;
+  private readonly _url: string;
 
   constructor(url: string) {
-    this.url = url;
+    this._url = url;
   }
 
   /**
@@ -46,16 +47,16 @@ export class AwakeAiETAShipApi {
     imo: number,
     locode?: string,
   ): Promise<AwakeAiShipApiResponse> {
-    const start = Date.now();
     try {
-      let url = `${this.url}/ship/${imo}?predictionMetadata=true`;
+      let url = `${this._url}/ship/${imo}?predictionMetadata=true`;
+      const httpLogger = loggerFactory.logger(
+        url,
+        `${this._url}/ship/{number}`,
+      );
+
       if (locode) {
         url += `&destination=${locode}`;
       }
-      logger.info({
-        method: "AwakeAiETAShipApi.getETA",
-        message: `calling URL ${url}`,
-      });
 
       const response = await ky
         .get(url, {
@@ -63,6 +64,7 @@ export class AwakeAiETAShipApi {
             Authorization: `Bearer ${accessToken}`,
             Accept: MediaType.APPLICATION_JSON,
           },
+          hooks: createKyHooks(httpLogger),
           retry: 0,
         })
         .json();
@@ -75,11 +77,6 @@ export class AwakeAiETAShipApi {
         return AwakeAiETAShipApi.handleError(error);
       }
       throw error;
-    } finally {
-      logger.info({
-        method: "AwakeAiETAShipApi.getETA",
-        tookMs: Date.now() - start,
-      });
     }
   }
 

@@ -1,5 +1,7 @@
 import { URLSearchParams } from "node:url";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
 import ky, { HTTPError } from "ky";
+import { loggerFactory } from "../logging.js";
 import type { OAuthSecret } from "./oauth-secret.js";
 
 export const O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS = 3 * 60 * 1000; // 3 minute safety gap to get new token
@@ -68,18 +70,19 @@ export class OAuthTokenApi {
 
     const postData = {
       client_id: this.secret.oAuthClientId,
-
       client_secret: this.secret.oAuthClientSecret,
-
       grant_type: "client_credentials",
     };
 
     const url = this.secret.oAuthTokenEndpoint;
+    const httpLogger = loggerFactory.logger(url, url);
+
     return ky
       .post<Partial<OAuthTokenResponse>>(url, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
+        hooks: createKyHooks(httpLogger),
         body: new URLSearchParams(postData).toString(),
       })
       .then(async (response) => {

@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";

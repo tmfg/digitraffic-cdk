@@ -1,5 +1,5 @@
 import { TZDate } from "@date-fns/tz";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { inDatabase } from "@digitraffic/common/dist/database/database";
 import type { AwakeAiATXApi } from "../api/awake-ai-atx.js";

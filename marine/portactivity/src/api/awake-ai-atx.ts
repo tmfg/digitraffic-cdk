@@ -4,7 +4,7 @@ import {
   PutParameterCommand,
   SSMClient,
 } from "@aws-sdk/client-ssm";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import type { WebSocket } from "ws";
 import { PortActivityParameterKeys } from "../keys.js";

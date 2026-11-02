@@ -1,7 +1,8 @@
 import * as util from "node:util";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
 import ky from "ky";
 import * as xml2js from "xml2js";
+import { loggerFactory } from "../logging.js";
 
 export enum SchedulesDirection {
   EAST = "east",
@@ -9,28 +10,29 @@ export enum SchedulesDirection {
 }
 
 export class SchedulesApi {
-  private readonly url: string;
+  private readonly _url: string;
 
   constructor(url: string) {
-    this.url = url;
+    this._url = url;
   }
 
   async getSchedulesTimestamps(
     direction: SchedulesDirection,
     calculated: boolean,
   ): Promise<SchedulesResponse> {
-    const start = Date.now();
     const fullUrl = this.createUrl(direction, calculated);
-    logger.info({
-      method: "SchedulesApi.getSchedulesTimestamp",
-      message: `calling URL ${fullUrl}`,
-    });
-    const response = await ky.get(fullUrl).text();
+    const httpLogger = loggerFactory.logger(
+      fullUrl,
+      this.createUrlTemplate(calculated),
+    );
+
+    const response = await ky
+      .get(fullUrl, {
+        hooks: createKyHooks(httpLogger),
+      })
+      .text();
     const parse = util.promisify(xml2js.parseString);
-    logger.info({
-      method: "SchedulesApi.getSchedulesTimestamp",
-      tookMs: Date.now() - start,
-    });
+
     return (await parse(response)) as SchedulesResponse;
   }
 
@@ -38,7 +40,11 @@ export class SchedulesApi {
     direction: SchedulesDirection,
     calculated: boolean,
   ): string {
-    return `${this.url}/${direction}${calculated ? "/calculated" : ""}`;
+    return `${this._url}/${direction}${calculated ? "/calculated" : ""}`;
+  }
+
+  private createUrlTemplate(calculated: boolean): string {
+    return `${this._url}/{string}${calculated ? "/calculated" : ""}`;
   }
 }
 

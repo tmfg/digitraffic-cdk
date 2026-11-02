@@ -81,7 +81,7 @@ export const handler = (
         event.queryStringParameters,
         secret,
       );
-      const interval = Number.parseInt(parameters.interval ?? "4*24", 10);
+      const interval = Number.parseInt(parameters.interval ?? "96", 10);
 
       return inDatabaseReadonly(
         async (db: DTDatabase): Promise<APIGatewayProxyResult> => {

@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { retry } from "@digitraffic/common/dist/utils/retry";
 import { differenceInHours } from "date-fns";
 import type {
@@ -12,7 +12,10 @@ import type {
   AwakeAiVoyageEtaPrediction,
 } from "../api/awake-common.js";
 import { AwakeAiVoyageStatus, AwakeAiZoneType } from "../api/awake-common.js";
-import type { OAuthTokenApi } from "../api/oauth-token-api.js";
+import type {
+  OAuthTokenApi,
+  OAuthTokenResponse,
+} from "../api/oauth-token-api.js";
 import type { DbETAShip } from "../dao/timestamps.js";
 import { EventSource } from "../model/eventsource.js";
 import type { Locode } from "../model/locode.js";
@@ -31,7 +34,6 @@ interface AwakeAiETAResponseAndShip {
   readonly ship: DbETAShip;
   readonly diffHours: number;
 }
-
 export class AwakeAiETAShipService {
   private readonly api: AwakeAiETAShipApi;
   private readonly oAuthTokenApi: OAuthTokenApi;
@@ -66,9 +68,12 @@ export class AwakeAiETAShipService {
     this.enableETBForAllPorts = enableETBForAllPorts;
   }
 
-  getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
+  async getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
+    // use same token for all ships in this batch
+    const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
+
     return Promise.allSettled(
-      ships.map(this.getAwakeAiTimestamp.bind(this)),
+      ships.map((s) => this.getAwakeAiTimestamp(oAuthToken, s)),
     ).then((responses) =>
       responses.reduce<ApiTimestamp[]>((acc, result) => {
         const val = result.status === "fulfilled" ? result.value : undefined;
@@ -98,6 +103,7 @@ export class AwakeAiETAShipService {
   }
 
   private async getAwakeAiTimestamp(
+    oAuthToken: OAuthTokenResponse,
     ship: DbETAShip,
   ): Promise<AwakeAiETAResponseAndShip> {
     const start = Date.now();
@@ -109,7 +115,6 @@ export class AwakeAiETAShipService {
     const locode = diffHours < 24 ? ship.locode : undefined;
 
     const response = await retry(async () => {
-      const oAuthToken = await this.oAuthTokenApi.getOAuthToken();
       return this.api.getETA(oAuthToken.access_token, ship.imo, locode);
     }, 1);
 

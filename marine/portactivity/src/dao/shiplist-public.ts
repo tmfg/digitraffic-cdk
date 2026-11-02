@@ -19,12 +19,12 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
         pe.event_time,
         pe.event_source,
         pe.record_time,
-        COALESCE(v.name, upper(pc.vessel_name), 'Unknown') as ship_name,
+        COALESCE(v.name, (SELECT upper(pc.vessel_name) FROM public.port_call pc
+                  WHERE pc.imo_lloyds = pe.ship_imo ORDER BY pc.port_call_timestamp DESC, pc.port_call_id DESC LIMIT 1), 'Unknown') AS ship_name,
         pe.portcall_id,
         pe.ship_imo
     FROM port_call_timestamp pe
-    LEFT JOIN public.vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM public.vessel WHERE imo = v.imo)
-    LEFT JOIN public.port_call pc on pc.imo_lloyds = pe.ship_imo
+    LEFT JOIN LATERAL (SELECT name FROM public.vessel WHERE imo = pe.ship_imo ORDER BY timestamp DESC LIMIT 1) v ON true
     WHERE pe.record_time =
           (
               SELECT MAX(px.record_time) FROM port_call_timestamp px

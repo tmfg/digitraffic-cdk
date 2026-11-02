@@ -1,6 +1,7 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { createKyHooks } from "@digitraffic/common/dist/aws/runtime/logging/http-interceptors";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky, { HTTPError } from "ky";
+import { loggerFactory } from "../logging.js";
 import type { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake-common.js";
 import { AwakeAiPredictionType } from "./awake-common.js";
 
@@ -29,10 +30,10 @@ export interface AwakeAiPortResponse {
 }
 
 export class AwakeAiPortApi {
-  private readonly url: string;
+  private readonly _url: string;
 
   constructor(url: string) {
-    this.url = url;
+    this._url = url;
   }
 
   /**
@@ -48,14 +49,12 @@ export class AwakeAiPortApi {
     predictionType: AwakeAiPredictionType,
     maxSequenceNo: number = 1,
   ): Promise<AwakeAiPortResponse> {
-    const start = Date.now();
     try {
-      const url = `${this.url}/port/${locode}/${resource}?maxSequenceNo=${maxSequenceNo}&predictionType=${predictionType}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}&predictionMetadata=true`;
-
-      logger.info({
-        method: "AwakeAiPortApi.getPredictions",
-        message: `calling URL ${url}`,
-      });
+      const url = `${this._url}/port/${locode}/${resource}?maxSequenceNo=${maxSequenceNo}&predictionType=${predictionType}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}&predictionMetadata=true`;
+      const httpLogger = loggerFactory.logger(
+        url,
+        `${this._url}/port/{string}/{string}`,
+      );
 
       const response = await ky
         .get(url, {
@@ -63,6 +62,7 @@ export class AwakeAiPortApi {
             Authorization: `Bearer ${accessToken}`,
             Accept: MediaType.APPLICATION_JSON,
           },
+          hooks: createKyHooks(httpLogger),
           retry: 0,
         })
         .json();
@@ -76,11 +76,6 @@ export class AwakeAiPortApi {
         return AwakeAiPortApi.handleError(error);
       }
       throw error;
-    } finally {
-      logger.info({
-        method: "AwakeAiPortApi.getPredictions",
-        tookMs: Date.now() - start,
-      });
     }
   }
 

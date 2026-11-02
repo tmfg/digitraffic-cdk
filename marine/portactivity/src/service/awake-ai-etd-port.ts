@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { isBefore, parseISO } from "date-fns";
 import type { AwakeAiPortApi } from "../api/awake-ai-port.js";
 import { AwakeAiZoneType } from "../api/awake-common.js";
