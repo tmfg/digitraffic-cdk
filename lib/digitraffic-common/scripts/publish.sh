@@ -108,6 +108,26 @@ if ! gh auth status &>/dev/null; then
     exit 1
 fi
 
+# Fail early if the version already exists somewhere. Without these checks the
+# script would commit, push and create a GitHub release before npm publish
+# fails on a duplicate version, leaving a half-finished release behind.
+echo -e "${GREEN}Checking that version ${VERSION} is not already released...${NC}"
+
+if git fetch --tags --quiet && git rev-parse --verify --quiet "refs/tags/${VERSION}" >/dev/null; then
+    echo -e "${RED}Error: Git tag '${VERSION}' already exists.${NC}"
+    exit 1
+fi
+
+if gh release view "${VERSION}" &>/dev/null; then
+    echo -e "${RED}Error: GitHub release '${VERSION}' already exists.${NC}"
+    exit 1
+fi
+
+if npm view "@digitraffic/common@${VERSION}" version &>/dev/null; then
+    echo -e "${RED}Error: Version '${VERSION}' is already published to npm.${NC}"
+    exit 1
+fi
+
 # Check if logged in to npm
 if ! pnpm whoami &>/dev/null; then
     echo -e "${YELLOW}Not logged in to npm. Running 'pnpm login'...${NC}"

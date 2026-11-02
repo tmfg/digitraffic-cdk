@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { connectAsync } from "mqtt";
 import { getRttiBySituationId } from "../dao/rtti.js";

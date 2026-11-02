@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { compact } from "es-toolkit";
 import type { Connection } from "mysql2/promise";

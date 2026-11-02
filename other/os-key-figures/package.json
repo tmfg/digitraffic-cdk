@@ -23,7 +23,7 @@
     "@aws-crypto/sha256-browser": "5.2.0",
     "@aws-sdk/client-s3": "3.1098.0",
     "@aws-sdk/client-sts": "3.1098.0",
-    "@digitraffic/common": "2026.10.23-1",
+    "@digitraffic/common": "2026.11.2-1",
     "@smithy/node-http-handler": "4.9.13",
     "@smithy/protocol-http": "5.5.16",
     "@smithy/signature-v4": "5.6.12",
@@ -54,6 +54,6 @@
     "sinon": "22.1.0",
     "typescript": "5.9.3",
     "vitest": "4.1.12",
-    "zod": "4.4.3"
+    "zod": "4.6.7"
   }
 }

@@ -76,12 +76,22 @@ echo
 DO_OPERATION=false
 if [[ "${OPERATION}" == "diff" ]]; then
     DO_OPERATION=true
+# AUTO_APPROVE=true skips the confirmation. Give it on the command line,
+# for example: AUTO_APPROVE=true rushx cdk-deploy-all-test
+elif [[ "${AUTO_APPROVE:-false}" == "true" ]]; then
+    echo "AUTO_APPROVE=true, skipping confirmation for: ${OPERATION} ${STACK}"
+    DO_OPERATION=true
 else
     read -p "Are you sure you wanna run: npx --yes aws-cdk@${CDK_VERSION} ${OPERATION} ${STACK}? " -n 1 -r
     echo    # move to a new line
     if [[ "$REPLY" =~ ^[Yy]$ ]]
     then
         DO_OPERATION=true
+    else
+        # Fail so that a chained command, such as cdk-deploy-all-prod,
+        # stops instead of continuing with the remaining environments.
+        echo "Aborted by user."
+        exit 1
     fi
 fi
 
@@ -112,7 +122,13 @@ then
         diff -u -U 1000000 "${CDK_OUT}-old.txt" "${CDK_OUT}-new.txt" | npx --yes diff2html-cli@5.2.15 -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
       fi
     else
-        npx --yes "aws-cdk@${CDK_VERSION}" "${OPERATION}" "${STACK}" --debug --concurrency="${CONCURRENCY}"
+        # CDK itself asks approval for security changes. Skip it only when
+        # AUTO_APPROVE is set, otherwise keep the default behaviour.
+        if [[ "${AUTO_APPROVE:-false}" == "true" ]]; then
+            npx --yes "aws-cdk@${CDK_VERSION}" "${OPERATION}" "${STACK}" --debug --concurrency="${CONCURRENCY}" --require-approval never
+        else
+            npx --yes "aws-cdk@${CDK_VERSION}" "${OPERATION}" "${STACK}" --debug --concurrency="${CONCURRENCY}"
+        fi
     fi
 fi
 

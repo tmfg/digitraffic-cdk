@@ -3,7 +3,7 @@ import type {
   PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
 import { ObjectCannedACL, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import { openapiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import {
@@ -94,19 +94,30 @@ async function getAppData(
     customResponse: JSON.stringify(response),
   });
 
-  return [openapiSchema.parse(response)];
+  return [parseOpenApiSchema(response, appUrl)];
+}
+
+function parseOpenApiSchema(response: unknown, source: string): OpenApiSchema {
+  try {
+    return openapiSchema.parse(response);
+  } catch (error) {
+    throw new Error(`Invalid OpenAPI schema from ${source}`, { cause: error });
+  }
 }
 
 export const handler = async (): Promise<void> => {
   const apiResponses = await Promise.all(apigatewayIds.map(exportSwaggerApi));
 
-  const apis = apiResponses.map((resp) => {
+  const apis = apiResponses.map((resp, index) => {
     if (!resp.body) throw new Error("Missing body");
     // seriously AWS, wtf?
     const body: Uint8Array = resp.body;
     const schema = Buffer.from(body.buffer).toString();
 
-    return openapiSchema.parse(JSON.parse(schema));
+    return parseOpenApiSchema(
+      JSON.parse(schema),
+      `API Gateway ${apigatewayIds[index]}`,
+    );
   });
 
   // add nullable: true in place of broken anyOf: [schema, null] and similar oneOf fields produced by apigw

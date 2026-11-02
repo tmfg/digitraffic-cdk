@@ -4,7 +4,7 @@ import type {
   LoggingHandler,
 } from "../../../aws/infra/api/handler-factory.js";
 import { HandlerFactory } from "../../../aws/infra/api/handler-factory.js";
-import { DtLogger } from "../../../aws/runtime/dt-logger.js";
+import { DtLogger } from "../../../aws/runtime/logging/dt-logger.js";
 import type { LambdaResponse } from "../../../aws/types/lambda-response.js";
 
 const logger = new DtLogger();

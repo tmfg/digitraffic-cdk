@@ -5,7 +5,7 @@
 import type { AssumeRoleRequest } from "@aws-sdk/client-sts";
 import { STS } from "@aws-sdk/client-sts";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { KyResourceFetcher } from "../adapters/driven/http/ky-resource-fetcher.js";
 import { MySqlMetricStore } from "../adapters/driven/mysql/mysql-metric-store.js";
 import { OpenSearchMetricSource } from "../adapters/driven/opensearch/opensearch-metric-source.js";

@@ -7,7 +7,7 @@ import { isValidGeoJson } from "../../../utils/geometry.js";
 import { logException } from "../../../utils/logging.js";
 import { getEnvVariable } from "../../../utils/utils.js";
 import { getApiKeyFromAPIGateway } from "../../runtime/apikey.js";
-import { logger } from "../../runtime/dt-logger-default.js";
+import { logger } from "../../runtime/logging/dt-logger-default.js";
 import { MediaType } from "../../types/mediatypes.js";
 import { ENV_API_KEY, ENV_HOSTNAME } from "./canary-keys.js";
 

@@ -1,6 +1,6 @@
 import { Sha256 } from "@aws-crypto/sha256-browser";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";
 import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { NodeHttpHandler } from "@smithy/node-http-handler";

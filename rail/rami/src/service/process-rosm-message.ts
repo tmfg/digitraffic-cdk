@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { ValueOf } from "@digitraffic/common/dist/types/util-types";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { parseISO } from "date-fns";

@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { parseStringPromise } from "xml2js";
 import type { DatexFile, DatexType } from "./variable-signs.js";
 import type { IdentityAttribute } from "./xml-util.js";

@@ -3,7 +3,7 @@ import etag from "etag";
 import { compressBuffer, decodeBase64ToUtf8 } from "../../utils/base64.js";
 import { truncateMiddle } from "../../utils/logging.js";
 import { StopWatch } from "../../utils/stop-watch.js";
-import { logger } from "../runtime/dt-logger-default.js";
+import { logger } from "../runtime/logging/dt-logger-default.js";
 import { MediaType } from "./mediatypes.js";
 
 export const MAX_LAMBDA_PAYLOAD_BYTES = 6 * 1024 * 1024; // 6 MiB

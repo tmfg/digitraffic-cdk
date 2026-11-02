@@ -1,6 +1,6 @@
 import type { PutObjectCommandOutput } from "@aws-sdk/client-s3";
 import { PutObjectCommand, S3 } from "@aws-sdk/client-s3";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 
 export async function uploadToS3(
   bucketName: string,

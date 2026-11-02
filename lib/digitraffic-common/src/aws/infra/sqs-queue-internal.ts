@@ -11,7 +11,7 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type { NodeJsRuntimeStreamingBlobPayloadInputTypes } from "@smithy/types";
 import { InlineCode } from "aws-cdk-lib/aws-lambda";
 import type { SQSEvent, SQSHandler, SQSRecord } from "aws-lambda";
-import { logger } from "../runtime/dt-logger-default.js";
+import { logger } from "../runtime/logging/dt-logger-default.js";
 
 // CJS format is intentional: CDK InlineCode creates index.js, which Node.js treats as CJS.
 // ESM would require Code.fromAsset with an .mjs file or a bundled NodejsFunction.

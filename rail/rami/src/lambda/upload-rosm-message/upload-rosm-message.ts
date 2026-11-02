@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { sendDlq, sendRosmMessage } from "../../service/sqs-service.js";
 import { validateIncomingRosmMessage } from "../../service/validate-message.js";

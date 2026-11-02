@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { RamiEnvKeys } from "../../keys.js";

@@ -8,7 +8,7 @@ import {
   GetDocumentationVersionsCommand,
   GetExportCommand,
 } from "@aws-sdk/client-api-gateway";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { OpenApiSchema } from "@digitraffic/common/dist/types/openapi-schema";
 import { isObject } from "es-toolkit/compat";
 

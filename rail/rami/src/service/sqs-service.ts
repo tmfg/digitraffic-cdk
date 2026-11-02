@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
 import { RamiEnvKeys } from "../keys.js";
 import type { DlqMessage } from "../model/dlq-message.js";

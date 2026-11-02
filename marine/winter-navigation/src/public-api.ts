@@ -5,9 +5,8 @@ import { FunctionBuilder } from "@digitraffic/common/dist/aws/infra/stack/dt-fun
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest-api";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { omitDeep } from "@digitraffic/common/dist/utils/utils";
-import type { JsonSchema, Model, Resource } from "aws-cdk-lib/aws-apigateway";
-import { toJSONSchema } from "zod";
+import { toApiGatewayJsonSchema } from "@digitraffic/common/dist/utils/api-model";
+import type { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import {
   DirwayFeatureCollectionSchema,
   LocationFeatureCollectionSchema,
@@ -23,11 +22,10 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
   const v2Resource = createResources(publicApi);
 
-  const locationsSchema = omitDeep(
-    toJSONSchema(LocationFeatureCollectionSchema, {
-      target: "draft-4",
-    }) as JsonSchema,
-    "pattern",
+  // toApiGatewayJsonSchema converts nullable fields and removes patterns,
+  // which API Gateway models do not accept
+  const locationsSchema = toApiGatewayJsonSchema(
+    LocationFeatureCollectionSchema,
   );
 
   const locationsModel = publicApi.addJsonModel("Locations", locationsSchema);
@@ -37,12 +35,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     locationsModel,
   );
 
-  const vesselsSchema = omitDeep(
-    toJSONSchema(VesselsResponseSchema, {
-      target: "draft-4",
-    }) as JsonSchema,
-    "pattern",
-  );
+  const vesselsSchema = toApiGatewayJsonSchema(VesselsResponseSchema);
 
   const vesselsModel = publicApi.addJsonModel("Vessels", vesselsSchema);
   const [vesselResource, vesselsResource] = createVesselResources(
@@ -51,12 +44,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
     vesselsModel,
   );
 
-  const dirwaysSchema = omitDeep(
-    toJSONSchema(DirwayFeatureCollectionSchema, {
-      target: "draft-4",
-    }) as JsonSchema,
-    "pattern",
-  );
+  const dirwaysSchema = toApiGatewayJsonSchema(DirwayFeatureCollectionSchema);
 
   const dirwaysModel = publicApi.addJsonModel("Dirways", dirwaysSchema);
   const dirwaysResource = createDirwayResources(

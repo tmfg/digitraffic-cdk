@@ -22,7 +22,7 @@
     "@aws-sdk/client-secrets-manager": "3.1098.0",
     "@aws-sdk/client-sqs": "3.1098.0",
     "@date-fns/tz": "1.5.0",
-    "@digitraffic/common": "2026.10.23-1",
+    "@digitraffic/common": "2026.11.2-1",
     "@middy/core": "7.7.2",
     "@middy/sqs-partial-batch-failure": "7.7.2",
     "ajv": "8.20.0",
@@ -34,7 +34,7 @@
     "mysql2": "3.23.2",
     "source-map-support": "0.5.21",
     "spex": "4.1.0",
-    "zod": "4.4.3"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@digitraffic-cdk/cdk-rig": "workspace:*",

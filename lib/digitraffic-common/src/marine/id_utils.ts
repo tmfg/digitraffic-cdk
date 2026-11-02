@@ -1,4 +1,4 @@
-import { logger } from "../aws/runtime/dt-logger-default.js";
+import { logger } from "../aws/runtime/logging/dt-logger-default.js";
 
 export function isValidIMO(imo: number): boolean {
   return imo >= 1000000 && imo <= 9999999 && imoChecksumIsValid(imo);

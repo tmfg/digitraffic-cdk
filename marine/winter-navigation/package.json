@@ -9,6 +9,10 @@
     "build:tsc": "heft build --clean",
     "build:watch": "heft build-watch --clean",
     "cdk": "cdk",
+    "cdk-deploy-marine-prod": "rushx build && ../../scripts/cdk-diff-and-deploy.sh marine-prod deploy WinterNavigationProd",
+    "cdk-deploy-marine-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh marine-test deploy WinterNavigationTest",
+    "cdk-diff-marine-prod": "rushx build && ../../scripts/cdk-diff-and-deploy.sh marine-prod diff WinterNavigationProd",
+    "cdk-diff-marine-test": "rushx build && ../../scripts/cdk-diff-and-deploy.sh marine-test diff WinterNavigationTest",
     "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --platform=node --outdir=dist/nodejs/node_modules --external:Synthetics --target=node22,es2020",
     "compile-lambdas": "node lib/esbuild.js",
@@ -17,7 +21,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@digitraffic/common": "2026.10.30-1",
+    "@digitraffic/common": "2026.11.2-1",
     "aws-cdk-lib": "2.262.2",
     "constructs": "10.7.2",
     "es-toolkit": "1.50.0",

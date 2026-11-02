@@ -1,4 +1,4 @@
-import { logger } from "../dt-logger-default.js";
+import { logger } from "../logging/dt-logger-default.js";
 import type { GenericSecret } from "./secret.js";
 
 export enum RdsProxySecretKey {

@@ -1,4 +1,4 @@
-import { logger } from "../aws/runtime/dt-logger-default.js";
+import { logger } from "../aws/runtime/logging/dt-logger-default.js";
 import { AsyncTimeoutError } from "../types/async-timeout-error.js";
 import { HttpError } from "../types/http-error.js";
 

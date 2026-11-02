@@ -122,7 +122,7 @@ expectImportOk("errors import ok?", "../aws/types/errors.js");
 expectImportOk("lambdaResponse import ok?", "../aws/types/lambda-response.js");
 expectImportOk(
   "dtLoggerDefault import ok?",
-  "../aws/runtime/dt-logger-default.js",
+  "../aws/runtime/logging/dt-logger-default.js",
 );
 expectImportOk("secret import ok?", "../aws/runtime/secrets/secret.js");
 expectImportOk(
@@ -135,16 +135,10 @@ expectImportOk(
   "secretHolder import ok?",
   "../aws/runtime/secrets/secret-holder.js",
 );
-expectImportOk("dtLogger import ok?", "../aws/runtime/dt-logger.js");
+expectImportOk("dtLogger import ok?", "../aws/runtime/logging/dt-logger.js");
 expectImportOk("s3 import ok?", "../aws/runtime/s3.js");
 
-/*
-temporary disable, enable after sdk v2 is kicked out
-test('apikey import ok?', () => {
-  const apikey = import("../aws/runtime/apikey.js");
-  return expect(apikey).resolves.toBeDefined();
-});*/
-
+expectImportOk("apikey import ok?", "../aws/runtime/apikey.js");
 expectImportOk("environment import ok?", "../aws/runtime/environment.js");
 expectImportOk(
   "digitrafficIntegrationResponse import ok?",

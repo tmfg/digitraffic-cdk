@@ -1,6 +1,6 @@
 import type { DocumentationVersion } from "@aws-sdk/client-api-gateway";
 import { APIGatewayClient } from "@aws-sdk/client-api-gateway";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import {
   createDocumentationVersion,

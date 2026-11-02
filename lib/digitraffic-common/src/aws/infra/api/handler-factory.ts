@@ -1,6 +1,6 @@
 import { getEnvVariableOrElse } from "../../../utils/utils.js";
-import type { DtLogger } from "../../runtime/dt-logger.js";
-import { logger } from "../../runtime/dt-logger-default.js";
+import type { DtLogger } from "../../runtime/logging/dt-logger.js";
+import { logger } from "../../runtime/logging/dt-logger-default.js";
 import type { LambdaResponse } from "../../types/lambda-response.js";
 
 export type LoggingHandler = (

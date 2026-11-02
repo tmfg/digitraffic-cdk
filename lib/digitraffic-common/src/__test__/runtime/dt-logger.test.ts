@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import type {
   LoggableType,
   LoggerConfiguration,
-} from "../../aws/runtime/dt-logger.js";
-import { DtLogger } from "../../aws/runtime/dt-logger.js";
+} from "../../aws/runtime/logging/dt-logger.js";
+import { DtLogger } from "../../aws/runtime/logging/dt-logger.js";
 
 const LOG_LINE: LoggableType = {
   method: "dt-logger.test",
