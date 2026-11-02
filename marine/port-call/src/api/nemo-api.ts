@@ -26,7 +26,6 @@ export class NemoApi {
     const method = "NemoApi.getVisits";
     const url = this.createUrl(from, to);
     const httpLogger = this._loggerFactory.logger(url);
-    const loggingInterceptor = createLoggingInterceptor(httpLogger);
 
     try {
       const resp = await request(new URL(url), {
@@ -39,7 +38,7 @@ export class NemoApi {
             cert: this._certificate,
             key: this._privateKey,
           },
-        }).compose(loggingInterceptor),
+        }).compose(createLoggingInterceptor(httpLogger)),
       });
 
       if (resp.statusCode !== 200) {

@@ -187,9 +187,7 @@ export async function upsertVisit(
     });
 }
 
-const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
-  name: "find-all-visits",
-  text: `select visit_id, vessel_id, vessel_name, ship_call_sign, mmsi, vessel_type, gross_tonnage, net_tonnage, length, breadth, height, declarant_name, port_locode, port_name, prev_port_locode, prev_port_name, next_port_locode, next_port_name, port_area_code, port_area_name, berth_name, berth_code, eta, etd, ata, atd, status, update_time 
+const FIND_ALL_VISITS_SQL = `select visit_id, vessel_id, vessel_name, ship_call_sign, mmsi, vessel_type, gross_tonnage, net_tonnage, length, breadth, height, declarant_name, port_locode, port_name, prev_port_locode, prev_port_name, next_port_locode, next_port_name, port_area_code, port_area_name, berth_name, berth_code, eta, etd, ata, atd, status, update_time
     from pc2_visit
     where (
       ($1::timestamptz is null and $2::timestamptz is null)
@@ -227,8 +225,7 @@ const FIND_ALL_VISITS_PS = new pgPromise.PreparedStatement({
           when 'status' then status
         end
       end desc nulls last,
-      case when $7 is null then coalesce(ata, eta) end asc`,
-});
+      case when $7 is null then coalesce(ata, eta) end asc`;
 
 export function findAllVisits(
   db: DTDatabase,
@@ -240,7 +237,7 @@ export function findAllVisits(
   status?: VisitStatus,
   sort?: VisitSort,
 ): Promise<DbVisit[]> {
-  return db.manyOrNone(FIND_ALL_VISITS_PS, [
+  return db.manyOrNone(FIND_ALL_VISITS_SQL, [
     from,
     to,
     locode,

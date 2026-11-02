@@ -25,16 +25,12 @@ export const handler = async (
       portOfCall: parsed.portOfCall?.toUpperCase(),
     };
 
-    return proxyHolder
-      .setCredentials()
-      .then(() => getAllVisits(getVisitsEvent))
-      .then(([visits, lastUpdated]) => {
-        return lastUpdated
-          ? LambdaResponseBuilder.create(visits)
-              .withTimestamp(lastUpdated)
-              .build()
-          : LambdaResponseBuilder.create(visits).build();
-      });
+    await proxyHolder.setCredentials();
+    const [visits, lastUpdated] = await getAllVisits(getVisitsEvent);
+
+    return LambdaResponseBuilder.create(visits)
+      .withTimestamp(lastUpdated)
+      .build();
   } catch (error) {
     if (error instanceof ZodError) {
       return LambdaResponseBuilder.badRequest(
@@ -46,9 +42,11 @@ export const handler = async (
 
     return LambdaResponseBuilder.internalError();
   } finally {
+    const tookMs = Date.now() - start;
+
     logger.info({
       method: "GetVisits.handler",
-      tookMs: Date.now() - start,
+      tookMs,
     });
   }
 };
