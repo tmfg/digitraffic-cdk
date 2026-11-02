@@ -24,7 +24,10 @@ export class Canaries {
     addDLQAlarm(stack, dlq, stack.configuration as PortactivityConfiguration);
 
     if (stack.configuration.stackFeatures?.enableCanaries ?? false) {
-      const urlRole = new DigitrafficCanaryRole(stack, "portactivity-url");
+      const urlRole = new DigitrafficCanaryRole(
+        stack,
+        "portactivity-url",
+      ).withApiGatewayAccess();
       const dbRole = new DigitrafficCanaryRole(
         stack,
         "portactivity-db",
