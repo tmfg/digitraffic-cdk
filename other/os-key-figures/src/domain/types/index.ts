@@ -30,7 +30,7 @@ export {
   createMonitoredEndpoints,
   type MonitoredEndpoints,
 } from "./monitored-endpoints.js";
-export { parseService, Service } from "./service.js";
+export { Service } from "./service.js";
 export {
   createTimePeriod,
   type DateRange,

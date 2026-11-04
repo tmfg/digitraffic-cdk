@@ -291,7 +291,7 @@ export class OsKeyFiguresStack extends Stack {
         event: events.RuleTargetInput.fromObject({
           TRANSPORT_TYPE: Service.ROAD,
           ENDPOINT_GROUP: 1,
-          TOTAL_GROUPS: 2,
+          TOTAL_GROUPS: 3,
         }),
       }),
     );
@@ -304,7 +304,20 @@ export class OsKeyFiguresStack extends Stack {
         event: events.RuleTargetInput.fromObject({
           TRANSPORT_TYPE: Service.ROAD,
           ENDPOINT_GROUP: 2,
-          TOTAL_GROUPS: 2,
+          TOTAL_GROUPS: 3,
+        }),
+      }),
+    );
+
+    const rule1c = new Rule(this, "collect road 3", {
+      schedule: Schedule.expression("cron(45 4 1 * ? *)"),
+    });
+    rule1c.addTarget(
+      new LambdaFunction(collectOsKeyFiguresLambda, {
+        event: events.RuleTargetInput.fromObject({
+          TRANSPORT_TYPE: Service.ROAD,
+          ENDPOINT_GROUP: 3,
+          TOTAL_GROUPS: 3,
         }),
       }),
     );

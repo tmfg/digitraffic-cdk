@@ -7,6 +7,7 @@ A Lambda function that collects API usage statistics from OpenSearch access logs
 - [Overview](#overview)
 - [Design](#design)
 - [Configuration](#configuration)
+- [Running Manually](#running-manually)
 - [Extending the Code](#extending-the-code)
   - [Adding a New Metric](#scenario-1-adding-a-new-metric)
   - [Adding a New Service](#scenario-2-adding-a-new-service)
@@ -121,6 +122,29 @@ Configuration is loaded from environment variables in `handler-config.ts`
 
 ---
 
+## Running Manually
+
+`CollectOsKeyFigures` is run by EventBridge rules on the 1st of every month (see `os-key-figures-stack.ts`), and it collects the previous month by default. To run it manually, invoke it with the same event the rules use. You can also add `MONTH` to collect a specific month:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `TRANSPORT_TYPE` | yes | `*` (totals across all services), `rail`, `road`, `marine` or `afir` |
+| `ENDPOINT_GROUP` | no | Which group of endpoints to collect, starting from 1. Rail is split into 2 groups and road into 3 so that each run fits in the 15 minute Lambda timeout |
+| `TOTAL_GROUPS` | no | Number of endpoint groups, defaults to 1 |
+| `MONTH` | no | Month to collect in `YYYY-MM` format, defaults to the previous month |
+
+```bash
+aws lambda invoke --function-name CollectOsKeyFigures \
+  --invocation-type Event \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"TRANSPORT_TYPE":"rail","ENDPOINT_GROUP":1,"TOTAL_GROUPS":2,"MONTH":"2026-09"}' \
+  /dev/stdout
+```
+
+Re-running a month that has already been collected inserts duplicate rows, so delete the existing rows for that month first. Run `CreateKeyFigureVisualizations` afterwards to update the visualizations.
+
+---
+
 ## Extending the Code
 
 This section describes how to extend the codebase for adding a new metric or a new service.
@@ -179,15 +203,9 @@ export enum Service {
   AFIR = "afir",
   NEW_SERVICE = "new_service",  // Add new service
 }
-
-// Update parseService() function
-export function parseService(value: string): Service {
-  // ... existing cases
-  case "new_service":
-    return Service.NEW_SERVICE;
-  // ...
-}
 ```
+
+The lambda event's `TRANSPORT_TYPE` accepts every value in the enum, so nothing else is needed for parsing.
 
 **Step 2: Add OpenAPI URL for endpoint discovery** (`src/lambda/handler-config.ts`)
 

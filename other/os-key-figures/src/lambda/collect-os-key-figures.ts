@@ -6,6 +6,7 @@ import type { AssumeRoleRequest } from "@aws-sdk/client-sts";
 import { STS } from "@aws-sdk/client-sts";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
 import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { z } from "zod";
 import { KyResourceFetcher } from "../adapters/driven/http/ky-resource-fetcher.js";
 import { MySqlMetricStore } from "../adapters/driven/mysql/mysql-metric-store.js";
 import { OpenSearchMetricSource } from "../adapters/driven/opensearch/opensearch-metric-source.js";
@@ -19,17 +20,29 @@ import {
   createEndpointScope,
   createServiceScope,
 } from "../domain/types/metric-scope.js";
-import { parseService, Service } from "../domain/types/service.js";
-import { lastMonth } from "../domain/types/time-period.js";
+import { Service } from "../domain/types/service.js";
+import { forMonth, lastMonth } from "../domain/types/time-period.js";
 import { createConfigFromEnvironment } from "./handler-config.js";
 
-export interface KeyFigureLambdaEvent {
-  readonly TRANSPORT_TYPE: string;
+export const KeyFigureLambdaEventSchema = z.strictObject({
+  TRANSPORT_TYPE: z.string().toLowerCase().pipe(z.enum(Service)),
   /** 1-indexed group number for splitting endpoint-level collection across multiple invocations */
-  readonly ENDPOINT_GROUP?: number;
+  ENDPOINT_GROUP: z.int().positive().optional(),
   /** Total number of groups to split endpoints into (defaults to 1 = no splitting) */
-  readonly TOTAL_GROUPS?: number;
-}
+  TOTAL_GROUPS: z.int().positive().default(1),
+  /** Month to collect in "YYYY-MM" format (defaults to the previous month) */
+  MONTH: z
+    .string()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/, "MONTH must be in format YYYY-MM")
+    .optional()
+    .transform((month) =>
+      month
+        ? forMonth(Number(month.slice(0, 4)), Number(month.slice(5, 7)))
+        : lastMonth(),
+    ),
+});
+
+export type KeyFigureLambdaEvent = z.input<typeof KeyFigureLambdaEventSchema>;
 
 const sts = new STS({ apiVersion: "2011-06-15" });
 
@@ -58,12 +71,13 @@ async function assumeRole(roleArn: string): Promise<AwsCredentialIdentity> {
 export const handler = async (
   event: KeyFigureLambdaEvent,
 ): Promise<boolean> => {
+  const {
+    TRANSPORT_TYPE: service,
+    ENDPOINT_GROUP: endpointGroup,
+    TOTAL_GROUPS: totalGroups,
+    MONTH: period,
+  } = KeyFigureLambdaEventSchema.parse(event);
   const config = createConfigFromEnvironment();
-  const service = parseService(event.TRANSPORT_TYPE);
-  const period = lastMonth();
-
-  const endpointGroup = event.ENDPOINT_GROUP;
-  const totalGroups = event.TOTAL_GROUPS ?? 1;
 
   logger.info({
     message: `Starting metric collection for service: ${service}, group: ${endpointGroup ?? "all"}/${totalGroups}, period: ${period.from.toISOString()} -> ${period.to.toISOString()}`,
