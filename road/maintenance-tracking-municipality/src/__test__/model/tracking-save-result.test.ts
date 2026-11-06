@@ -24,7 +24,7 @@ describe("tracking-save-result-model-test", () => {
     );
   });
 
-  test("addError", () => {
+  test("addSaved", () => {
     expectSizeSaveErrors(
       new TrackingSaveResult(1, 2, 3).addSaved(10),
       11,
