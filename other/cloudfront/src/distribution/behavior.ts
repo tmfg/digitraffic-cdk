@@ -76,6 +76,7 @@ export class Behavior {
   readonly cacheKeys: string[] = [];
 
   readTimeout: number = 30; // seconds
+  connectionAttempts: number = 3;
 
   lambdaConfig: LambdaConfig = {
     lambdas: new Map(),
@@ -435,6 +436,12 @@ export class Behavior {
 
   public withReadTimeout(seconds: number): this {
     this.readTimeout = seconds;
+
+    return this;
+  }
+
+  public withConnectionAttempts(attempts: number): this {
+    this.connectionAttempts = attempts;
 
     return this;
   }

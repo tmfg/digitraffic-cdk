@@ -58,6 +58,7 @@ export class CloudfrontCdkStack extends Stack {
     { vpcOrigin: IVpcOrigin; domain: string }
   > = {};
   private _originCache: Record<string, IOrigin> = {};
+  private _vpcOriginCounts: Record<string, number> = {};
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -115,6 +116,7 @@ export class CloudfrontCdkStack extends Stack {
     // clear per-distribution caches; vpc origins persist across distributions
     this._originIndex = 0;
     this._originCache = {};
+    this._vpcOriginCounts = {};
 
     if (this._defaults.logConfigArn) {
       builder.withLogConfig(this._defaults.logConfigArn);
@@ -232,7 +234,18 @@ export class CloudfrontCdkStack extends Stack {
   }
 
   getOrigin(behavior: Behavior): IOrigin {
-    const cacheKey = behavior.origin._origin;
+    // the cache key must include every behavior setting that affects the
+    // created origin - otherwise the first behavior to use an origin would
+    // silently freeze its configuration for all later behaviors. Behaviors
+    // with identical settings still share one origin.
+    const cacheKey = [
+      behavior.origin._type,
+      behavior.origin._origin,
+      behavior.origin._path ?? "",
+      behavior.readTimeout,
+      behavior.connectionAttempts,
+      behavior.apiKey ?? "",
+    ].join(":");
 
     if (!this._originCache[cacheKey]) {
       this._originCache[cacheKey] = this.createOrigin(behavior);
@@ -277,17 +290,27 @@ export class CloudfrontCdkStack extends Stack {
     // TODO: other custom headers
 
     if (behavior.origin._type === "vpc") {
-      const vpcOrigin = this._vpcOrigins[behavior.origin._origin];
+      const vpcOriginName = behavior.origin._origin;
+      const vpcOrigin = this._vpcOrigins[vpcOriginName];
 
       if (!vpcOrigin) {
-        throw new Error(`Missing vpc origin ${behavior.origin._origin}`);
+        throw new Error(`Missing vpc origin ${vpcOriginName}`);
       }
 
+      // keep the plain id for the first origin per vpc origin name (stable
+      // with existing deployments), suffix later ones with differing settings
+      const count = this._vpcOriginCounts[vpcOriginName] ?? 0;
+      this._vpcOriginCounts[vpcOriginName] = count + 1;
+      const originId =
+        count === 0
+          ? `vpcOrigin-${vpcOriginName}`
+          : `vpcOrigin-${vpcOriginName}-${count}`;
+
       return VpcOrigin.withVpcOrigin(vpcOrigin.vpcOrigin, {
-        originId: `vpcOrigin-${behavior.origin._origin}`,
+        originId,
         domainName: vpcOrigin.domain,
         readTimeout: Duration.seconds(behavior.readTimeout),
-        connectionAttempts: 3,
+        connectionAttempts: behavior.connectionAttempts,
         connectionTimeout: Duration.seconds(10),
         keepaliveTimeout: Duration.seconds(5),
         customHeaders,
@@ -303,7 +326,7 @@ export class CloudfrontCdkStack extends Stack {
     return new HttpOrigin(behavior.origin._origin, {
       originId: `origin${this._originIndex}`,
       readTimeout: Duration.seconds(behavior.readTimeout),
-      connectionAttempts: 3,
+      connectionAttempts: behavior.connectionAttempts,
       connectionTimeout: Duration.seconds(10),
       httpPort: 80,
       httpsPort: 443,
