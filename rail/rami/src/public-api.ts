@@ -85,11 +85,8 @@ export class PublicApi {
   ): MonitoredFunction {
     const activeResource = resource.addResource("active");
     const lambdaEnv = {
-      ...(stack.configuration.secretId && {
-        SECRET_ID: stack.configuration.secretId,
-      }),
+      ...stack.createDefaultLambdaEnvironment("avoindata"),
       DB_URI: dbReaderHost,
-      DB_APPLICATION: "avoindata",
     };
     const getActiveMessagesLambda = MonitoredDBFunction.create(
       stack,
@@ -175,11 +172,8 @@ export class PublicApi {
       .addResource("updated-after")
       .addResource("{date}");
     const lambdaEnv = {
-      ...(stack.configuration.secretId && {
-        SECRET_ID: stack.configuration.secretId,
-      }),
+      ...stack.createDefaultLambdaEnvironment("avoindata"),
       DB_URI: dbReaderHost,
-      DB_APPLICATION: "avoindata",
     };
     const getMessagesUpdatedAfterLambda = MonitoredDBFunction.create(
       stack,

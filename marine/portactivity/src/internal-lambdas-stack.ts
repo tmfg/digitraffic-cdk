@@ -1,5 +1,4 @@
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
-import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import {
   databaseFunctionProps,
   defaultLambdaConfiguration,
@@ -284,7 +283,7 @@ function createProcessDLQLambda(
   dlq: Queue,
   stack: DigitrafficStack,
 ): MonitoredFunction {
-  const environment: LambdaEnvironment = {};
+  const environment = stack.createLambdaEnvironment();
   environment[PortactivityEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
 
   const functionName = "PortActivity-ProcessTimestampsDLQ";

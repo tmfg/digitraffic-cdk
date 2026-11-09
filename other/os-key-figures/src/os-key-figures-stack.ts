@@ -1,4 +1,5 @@
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
+import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 import type { App, StackProps } from "aws-cdk-lib";
 import { Duration, Stack } from "aws-cdk-lib";
 import { Port, SecurityGroup, Vpc } from "aws-cdk-lib/aws-ec2";
@@ -138,6 +139,7 @@ export class OsKeyFiguresStack extends Stack {
       securityGroups: [lambdaSecurityGroup],
       memorySize: 512,
       environment: {
+        [EnvKeys.APP_NAME]: "other-os-key-figures",
         MYSQL_ENDPOINT: osKeyFiguresProps.mysql.host,
         MYSQL_USERNAME: osKeyFiguresProps.mysql.user,
         MYSQL_PASSWORD: osKeyFiguresProps.mysql.password,
@@ -205,6 +207,7 @@ export class OsKeyFiguresStack extends Stack {
       securityGroups: [lambdaSecurityGroup],
       memorySize: 512,
       environment: {
+        [EnvKeys.APP_NAME]: "other-os-key-figures",
         ROLE: osKeyFiguresProps.openSearchLambdaRoleArn,
         OS_HOST: osKeyFiguresProps.openSearchHost,
         OS_VPC_ENDPOINT: osKeyFiguresProps.openSearchVPCEndpoint,

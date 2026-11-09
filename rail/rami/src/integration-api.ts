@@ -74,6 +74,7 @@ export class IntegrationApi {
       runtime: Runtime.NODEJS_24_X,
       reservedConcurrentExecutions: 20,
       environment: {
+        ...stack.createLambdaEnvironment(),
         [RamiEnvKeys.ROSM_SQS_URL]: sqs.queueUrl,
         [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
       },

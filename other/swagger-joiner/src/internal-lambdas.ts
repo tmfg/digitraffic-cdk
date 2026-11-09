@@ -24,7 +24,7 @@ function createUpdateApiGatewayDocumentationLambda(
   const functionName = `${stack.stackName}-UpdateApiGwDocumentation`;
   const props = stack.configuration as Props;
 
-  const lambdaEnv: LambdaEnvironment = {};
+  const lambdaEnv: LambdaEnvironment = stack.createLambdaEnvironment();
   lambdaEnv[UPDATE_SWAGGER_KEYS.REGION] = stack.region;
   lambdaEnv[KEY_APIGW_IDS] = JSON.stringify(props.apiGwAppIds);
 
@@ -69,7 +69,7 @@ function createUpdateSwaggerDescriptionsLambda(
   const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
   const props = stack.configuration as Props;
 
-  const lambdaEnv: LambdaEnvironment = {};
+  const lambdaEnv: LambdaEnvironment = stack.createLambdaEnvironment();
   lambdaEnv[UPDATE_SWAGGER_KEYS.BUCKET_NAME] = bucket.bucketName;
   lambdaEnv[UPDATE_SWAGGER_KEYS.REGION] = stack.region;
   lambdaEnv[UPDATE_SWAGGER_KEYS.APIGW_APPS] = JSON.stringify(props.apiGwAppIds);

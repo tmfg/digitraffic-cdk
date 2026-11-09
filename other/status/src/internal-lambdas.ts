@@ -2,6 +2,7 @@ import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import type { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { createLambdaLogGroup } from "@digitraffic/common/dist/aws/infra/stack/lambda-log-group";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import type { Stack } from "aws-cdk-lib";
 import { Duration } from "aws-cdk-lib";
@@ -61,6 +62,7 @@ export function create(
 
 function createCommonEnv(props: Props): LambdaEnvironment {
   return {
+    [EnvKeys.APP_NAME]: "other-status",
     [StatusEnvKeys.SECRET_ID]: props.secretId,
     [StatusEnvKeys.C_STATE_PAGE_URL]: props.cStatePageUrl,
     [StatusEnvKeys.CHECK_TIMEOUT_SECONDS]:

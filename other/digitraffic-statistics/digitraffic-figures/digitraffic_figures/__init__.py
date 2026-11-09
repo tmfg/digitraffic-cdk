@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 import time
 from logging import config
@@ -11,6 +13,22 @@ if os.getenv("DEV"):
     from dotenv import load_dotenv
 
     load_dotenv()
+
+
+class JsonFormatter(logging.Formatter):
+    """Same fields as DtLogger in digitraffic-common, so `app` ends up as a log field."""
+
+    def format(self, record):
+        log = {
+            "message": record.getMessage(),
+            "level": "WARN" if record.levelname == "WARNING" else record.levelname,
+            "app": os.getenv("APP_NAME"),
+            "lambdaName": os.getenv("AWS_LAMBDA_FUNCTION_NAME"),
+            "runtime": os.getenv("AWS_EXECUTION_ENV"),
+        }
+        if record.exc_info:
+            log["stack"] = self.formatException(record.exc_info)
+        return json.dumps(log)
 
 
 def create_app(kwargs_flask=None, kwargs_dash=None):
@@ -30,7 +48,7 @@ def create_app(kwargs_flask=None, kwargs_dash=None):
             "version": 1,
             "formatters": {
                 "default": {
-                    "format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+                    "()": JsonFormatter,
                 }
             },
             "handlers": {
