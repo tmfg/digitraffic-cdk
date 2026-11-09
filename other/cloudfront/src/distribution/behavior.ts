@@ -8,7 +8,13 @@ import type { IpRestrictionParameters } from "../util/edgalambda-factory.js";
 import { FunctionType } from "../util/function-creator.js";
 import { LambdaType } from "../util/lambda-creator.js";
 
-export type OriginType = "s3" | "api-gateway" | "http" | "https" | "vpc";
+export type OriginType =
+  | "s3"
+  | "api-gateway"
+  | "http"
+  | "https"
+  | "vpc"
+  | "static";
 
 export class Origin {
   readonly _type: OriginType;
@@ -36,9 +42,19 @@ export class Origin {
   static vpc(vpcOriginName: string): Origin {
     return new Origin("vpc", vpcOriginName);
   }
+
+  /**
+   * Origin for the per-environment static files bucket (see
+   * `DistributionBuilder.withStaticFiles()`). The origin string is the site
+   * name, resolved by the stack to the stack-owned static bucket with
+   * `/<site>` as origin path.
+   */
+  static staticFiles(site: string): Origin {
+    return new Origin("static", site, `/${site}`);
+  }
 }
 
-export type CacheSeconds = 30 | 60 | 120 | 600;
+export type CacheSeconds = 30 | 60 | 120 | 600 | 3600;
 
 export type CacheHeader =
   | "x-api-key"
@@ -174,6 +190,15 @@ export class Behavior {
 
   public static swagger(path: string, bucketName: string): Behavior {
     return Behavior.s3(path, bucketName).withIndexHtmlFunction();
+  }
+
+  /**
+   * Exact-path behavior serving a single file (e.g. `robots.txt`) from the
+   * per-environment static files bucket. Content changes are invalidated on
+   * deploy, so a long cache TTL is used.
+   */
+  public static staticFile(fileName: string, site: string): Behavior {
+    return new Behavior(fileName, Origin.staticFiles(site)).withCacheTtl(3600);
   }
 
   public withOAI(): this {
