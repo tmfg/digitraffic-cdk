@@ -105,11 +105,12 @@ export const monitoredApps: MonitoredApp[] = [
     url: "https://rata.digitraffic.fi/swagger/openapi.json",
     excluded: [],
     endpoints: [
+      /*
       {
         name: "Rail MQTT",
         url: "wss://rata.digitraffic.fi/mqtt",
         protocol: EndpointProtocol.WebSocket,
-      },
+      },*/
       {
         name: "Rail GraphQL",
         url: "https://rata.digitraffic.fi/api/v2/graphql/graphql",
