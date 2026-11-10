@@ -53,7 +53,7 @@ test("behaviors with the same origin but different settings get distinct origins
   expect(origins).toHaveLength(2);
 
   const connectionAttempts = origins
-    .map((origin) => origin.ConnectionAttempts)
+    .map((origin) => origin["ConnectionAttempts"])
     .sort();
   expect(connectionAttempts).toEqual([1, 3]);
 });
@@ -96,7 +96,8 @@ test("vpc origins keep a stable id and get suffixed ids for differing settings",
   const origins = getOrigins(stack);
 
   expect(origins).toHaveLength(2);
-  expect(origins.map((origin) => origin.Id).sort()).toEqual([
+
+  expect(origins.map((origin) => origin["Id"]).sort()).toEqual([
     "vpcOrigin-fargate",
     "vpcOrigin-fargate-1",
   ]);
