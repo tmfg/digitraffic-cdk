@@ -124,6 +124,7 @@ export const monitoredApps: MonitoredApp[] = [
         name: "Rail GraphiQL",
         url: "https://rata.digitraffic.fi/api/v2/graphql/graphiql",
         protocol: EndpointProtocol.HTTP,
+        method: EndpointHttpMethod.GET,
       },
       {
         name: "Rail train history",

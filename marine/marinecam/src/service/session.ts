@@ -309,7 +309,7 @@ export class Session {
 
   async getFrameFromStream(videoId: string): Promise<string | undefined> {
     const streamUrl = this.videoUrl + videoId;
-    const urlTemplate = this.videoUrl + "{videoId}";
+    const urlTemplate = `${this.videoUrl}{videoId}`;
     const response = await this.post(streamUrl, urlTemplate, "");
 
     // format is uuid(16) timestamp(8) datasize(4) headersize(2) headerExtension(2)...

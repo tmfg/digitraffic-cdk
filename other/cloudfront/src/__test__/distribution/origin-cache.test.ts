@@ -53,6 +53,7 @@ test("behaviors with the same origin but different settings get distinct origins
   expect(origins).toHaveLength(2);
 
   const connectionAttempts = origins
+    // biome-ignore lint/complexity/useLiteralKeys: Record<string, unknown> requires bracket notation for noPropertyAccessFromIndexSignature
     .map((origin) => origin["ConnectionAttempts"])
     .sort();
   expect(connectionAttempts).toEqual([1, 3]);
@@ -97,8 +98,10 @@ test("vpc origins keep a stable id and get suffixed ids for differing settings",
 
   expect(origins).toHaveLength(2);
 
-  expect(origins.map((origin) => origin["Id"]).sort()).toEqual([
-    "vpcOrigin-fargate",
-    "vpcOrigin-fargate-1",
-  ]);
+  expect(
+    origins
+      // biome-ignore lint/complexity/useLiteralKeys: Record<string, unknown> requires bracket notation for noPropertyAccessFromIndexSignature
+      .map((origin) => origin["Id"])
+      .sort(),
+  ).toEqual(["vpcOrigin-fargate", "vpcOrigin-fargate-1"]);
 });
