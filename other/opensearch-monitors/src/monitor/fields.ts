@@ -34,6 +34,9 @@ export type AppField =
 export type NginxField = "@timestamp";
 
 // prettier-ignore
+export type TimingField = "tookMs" | "name";
+
+// prettier-ignore
 export type CloudfrontField =
   | "@timestamp"
   | "env"
@@ -68,6 +71,7 @@ export type OSLogField =
   | DefaultJavaField
   | DefaultLambdaField
   | DefaultPythonField
+  | TimingField
   | AppField
   | NginxField
   | CloudfrontField
