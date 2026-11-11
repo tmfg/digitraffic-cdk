@@ -115,22 +115,24 @@ export class PublicApi {
       )
       .build();
 
-    activeResource.addMethod("GET", getActiveMessageIntegration, {
-      apiKeyRequired: true,
-      requestParameters: {
-        "method.request.querystring.station": false,
-        "method.request.querystring.train_number": false,
-        "method.request.querystring.train_departure_date": false,
-        "method.request.querystring.only_general": false,
-      },
-      requestValidator: validator,
-      methodResponses: [
-        DigitrafficMethodResponse.response200(
-          messageJsonModel,
-          MediaType.APPLICATION_JSON,
-        ),
-        DigitrafficMethodResponse.response400(errorResponseModel),
-      ],
+    ["GET", "HEAD"].forEach((httpMethod) => {
+      activeResource.addMethod(httpMethod, getActiveMessageIntegration, {
+        apiKeyRequired: true,
+        requestParameters: {
+          "method.request.querystring.station": false,
+          "method.request.querystring.train_number": false,
+          "method.request.querystring.train_departure_date": false,
+          "method.request.querystring.only_general": false,
+        },
+        requestValidator: validator,
+        methodResponses: [
+          DigitrafficMethodResponse.response200(
+            messageJsonModel,
+            MediaType.APPLICATION_JSON,
+          ),
+          DigitrafficMethodResponse.response400(errorResponseModel),
+        ],
+      });
     });
 
     this.publicApi.addCorsOptions(activeResource);
