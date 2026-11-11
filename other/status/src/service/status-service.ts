@@ -244,6 +244,41 @@ async function createChecks(
   });
 }
 
+function isCheckForExtraEndpoint(
+  check: NodePingCheck,
+  extraEndpoint: MonitoredEndpoint,
+  app: string,
+): boolean {
+  const label = check.label.toLowerCase();
+  const name = extraEndpoint.name.toLowerCase();
+  return label === name || label === `${app} ${name}`.toLowerCase();
+}
+
+/**
+ * Matches by label first (ie. updating mqtt url matches only for label as url has changed).
+ * Url is used only if the extra endpoint has no check of its own, so that a generated check
+ * sharing the url with an extra endpoint does not get the extra endpoint's settings.
+ */
+function findExtraEndpointForCheck(
+  check: NodePingCheck,
+  allChecks: NodePingCheck[],
+  extraEndpoints: MonitoredEndpoint[],
+  app: string,
+): MonitoredEndpoint | undefined {
+  const byLabel = extraEndpoints.find((e) =>
+    isCheckForExtraEndpoint(check, e, app),
+  );
+  if (byLabel) {
+    return byLabel;
+  }
+
+  return extraEndpoints.find(
+    (e) =>
+      e.url === check.parameters.target &&
+      !allChecks.some((c) => isCheckForExtraEndpoint(c, e, app)),
+  );
+}
+
 export async function updateChecks(
   checks: NodePingCheck[],
   internalContactIds: string[],
@@ -256,11 +291,11 @@ export async function updateChecks(
   const start = Date.now();
   let count = 0;
   for (const check of checks) {
-    // Ie. updating mqtt url matches only for label as url has changed.
-    const correspondingExtraEndpoint = extraEndpoints.find(
-      (e) =>
-        e.url === check.parameters.target ||
-        e.name.toLowerCase() === check.label.toLowerCase(),
+    const correspondingExtraEndpoint = findExtraEndpointForCheck(
+      check,
+      checks,
+      extraEndpoints,
+      app,
     );
 
     const checksContactIds = getContactIds(

@@ -447,6 +447,11 @@ export class NodePingApi {
       data.contentstring = extraData.contentstring;
       data.invert = extraData.invert ?? false;
       data.regex = extraData.regex ?? false;
+    } else {
+      // Clear content match left over from earlier settings
+      data.contentstring = "";
+      data.invert = false;
+      data.regex = false;
     }
 
     const message =
