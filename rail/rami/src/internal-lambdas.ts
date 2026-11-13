@@ -44,11 +44,8 @@ function createProcessRosmQueueLambda(
   dbWriterHost: string,
 ): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId && {
-      SECRET_ID: stack.configuration.secretId,
-    }),
+    ...stack.createDefaultLambdaEnvironment("avoindata"),
     DB_URI: dbWriterHost,
-    DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
   };
   const processQueueLambda = MonitoredDBFunction.create(
@@ -77,11 +74,8 @@ function createProcessSmQueueLambda(
   dbWriterHost: string,
 ): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId && {
-      SECRET_ID: stack.configuration.secretId,
-    }),
+    ...stack.createDefaultLambdaEnvironment("avoindata"),
     DB_URI: dbWriterHost,
-    DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
     [RamiEnvKeys.UDOT_SQS_URL]: udotQueue.queueUrl,
   };
@@ -117,11 +111,8 @@ function createProcessUdotQueueLambda(
   dbWriterHost: string,
 ): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId && {
-      SECRET_ID: stack.configuration.secretId,
-    }),
+    ...stack.createDefaultLambdaEnvironment("avoindata"),
     DB_URI: dbWriterHost,
-    DB_APPLICATION: "avoindata",
     [RamiEnvKeys.DLQ_URL]: dlq.queueUrl,
   };
   const processQueueLambda = MonitoredDBFunction.create(
@@ -151,11 +142,8 @@ function createDeleteOldDataLambda(
   dbWriterHost: string,
 ): MonitoredFunction {
   const lambdaEnv = {
-    ...(stack.configuration.secretId && {
-      SECRET_ID: stack.configuration.secretId,
-    }),
+    ...stack.createDefaultLambdaEnvironment("avoindata"),
     DB_URI: dbWriterHost,
-    DB_APPLICATION: "avoindata",
   };
   const deleteOldDataLambda = MonitoredDBFunction.create(
     stack,
@@ -180,6 +168,7 @@ function createProcessDLQLambda(
   dlqBucket: Bucket,
 ): MonitoredFunction {
   const lambdaEnv = {
+    ...stack.createLambdaEnvironment(),
     [RamiEnvKeys.SQS_DLQ_BUCKET_NAME]: dlqBucket.bucketName,
   };
 

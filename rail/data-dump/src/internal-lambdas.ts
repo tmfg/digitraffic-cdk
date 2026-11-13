@@ -44,7 +44,7 @@ export function create(stack: DataDumpStack): void {
     stack,
     "dump-train-locations",
     {
-      memorySize: 2048,
+      memorySize: 4096,
       bucket: props.trainLocationDumpBucket,
       layer: depsLayer,
       storageSize: Size.gibibytes(3),

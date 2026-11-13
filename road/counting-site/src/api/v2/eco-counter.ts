@@ -10,7 +10,7 @@ import type { ApiData, ApiSite } from "../../model/v2/api-model.js";
 export const URL_ALL_SITES = "/api/v2/sites?include=domain";
 const URL_ALL_SITES_TEMPLATE = "/api/v2/sites?include={string}";
 export const URL_SITE_DATA = "/api/v2/history/traffic/raw";
-const URL_SITE_TEMPLATE = URL_SITE_DATA + "?siteId={number}";
+const URL_SITE_TEMPLATE = `${URL_SITE_DATA}?siteId={number}`;
 
 export class EcoCounterApi {
   readonly _apiKey: string;

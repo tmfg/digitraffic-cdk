@@ -141,7 +141,7 @@ export class PublicApi {
     const getImageLambda = MonitoredDBFunction.create(
       stack,
       "get-sign-image",
-      {},
+      stack.createLambdaEnvironment(),
       {
         reservedConcurrentExecutions: 3,
       },

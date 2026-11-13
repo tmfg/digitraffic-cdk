@@ -1,5 +1,6 @@
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 import { Duration } from "aws-cdk-lib";
 import { AwsIntegration, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 import type { IVpc } from "aws-cdk-lib/aws-ec2";
@@ -108,7 +109,10 @@ export class StatisticsIntegrations {
         architecture: lambda.Architecture.ARM_64,
         memorySize: 4096,
         timeout: Duration.seconds(60),
-        environment: stack.statisticsProps.figuresLambdaEnv,
+        environment: {
+          ...stack.statisticsProps.figuresLambdaEnv,
+          [EnvKeys.APP_NAME]: "other-digitraffic-statistics",
+        },
       },
     );
 

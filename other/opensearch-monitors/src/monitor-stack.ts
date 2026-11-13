@@ -1,4 +1,5 @@
 import { writeFileSync } from "node:fs";
+import { EnvKeys as CommonEnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 import type { Environment } from "aws-cdk-lib";
 import { Duration, Stack } from "aws-cdk-lib";
 import type { ISecurityGroup, IVpc } from "aws-cdk-lib/aws-ec2";
@@ -122,6 +123,7 @@ export class UpdateOSMonitorsStack extends Stack {
       handler: "update-os-monitors.handler",
       code: new AssetCode("dist/lambda/update-os-monitors"),
       environment: {
+        [CommonEnvKeys.APP_NAME]: "other-opensearch-monitors",
         [EnvKeys.ROLE]: roleArn,
         [EnvKeys.OS_HOST]: osHost,
         [EnvKeys.OS_VPC_ENDPOINT]: osVpcEndpoint,

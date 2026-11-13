@@ -8,6 +8,26 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LAYER_DIR="$SCRIPT_DIR/layers"
 ZIP_FILE="$LAYER_DIR/data-dump-deps.zip"
 WORK_DIR="$(mktemp -d)"
+PYTHON_BIN="${PYTHON_BIN:-}"
+
+if [ -z "$PYTHON_BIN" ]; then
+	if command -v python3.12 >/dev/null 2>&1; then
+		PYTHON_BIN="python3.12"
+	else
+		PYTHON_BIN="python3"
+	fi
+fi
+
+if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+	echo "Python interpreter '$PYTHON_BIN' not found. Install Python 3.12 or set PYTHON_BIN to its executable path." >&2
+	exit 1
+fi
+
+PYTHON_VERSION=$("$PYTHON_BIN" -c 'import sys; print("%d.%d" % sys.version_info[:2])')
+if [ "$PYTHON_VERSION" != "3.12" ]; then
+	echo "Python 3.12 is required to build the Lambda dependency layer; found $PYTHON_VERSION from $PYTHON_BIN" >&2
+	exit 1
+fi
 
 trap 'rm -rf "$WORK_DIR"' EXIT
 
@@ -21,7 +41,7 @@ echo "Python libraries to include in layer:"
 cat "$WORK_DIR/requirements.txt"
 
 echo "Creating virtual environment..."
-python3 -m venv "$WORK_DIR/venv"
+"$PYTHON_BIN" -m venv "$WORK_DIR/venv"
 source "$WORK_DIR/venv/bin/activate"
 
 echo "Installing dependencies into layer..."
@@ -29,6 +49,11 @@ echo "Installing dependencies into layer..."
 # Pin to 26.0 (released ~June 19, 2026, within 7-day cooldown as of June 26)
 pip install --quiet --upgrade "pip>=26.0,<27"
 pip install --quiet --target "$WORK_DIR/python/" -r "$WORK_DIR/requirements.txt"
+
+if [ -z "$(find "$WORK_DIR/python/" -type f -print -quit)" ]; then
+	echo "No Python dependencies were installed into the Lambda layer" >&2
+	exit 1
+fi
 
 deactivate
 

@@ -29,13 +29,23 @@ import {
   VpcOrigin,
 } from "aws-cdk-lib/aws-cloudfront-origins";
 import type { IVersion } from "aws-cdk-lib/aws-lambda";
-import { Bucket } from "aws-cdk-lib/aws-s3";
+import {
+  BlockPublicAccess,
+  Bucket,
+  BucketEncryption,
+} from "aws-cdk-lib/aws-s3";
+import {
+  BucketDeployment,
+  CacheControl,
+  Source,
+} from "aws-cdk-lib/aws-s3-deployment";
 import type { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import type { Construct } from "constructs";
 import { createWebAcl } from "./acl/acl-creator.js";
 import type { WafRules } from "./acl/waf-rules.js";
 import type { Behavior, OriginType } from "./distribution/behavior.js";
 import { DistributionBuilder } from "./distribution/distribution-builder.js";
+import { staticSiteDirs } from "./distribution/static-files.js";
 import { CachePolicyFactory } from "./util/cachepolicy-factory.js";
 import { EdgeLambdaFactory } from "./util/edgalambda-factory.js";
 import { EdgeFunctionFactory } from "./util/edgefunction-factory.js";
@@ -58,6 +68,8 @@ export class CloudfrontCdkStack extends Stack {
     { vpcOrigin: IVpcOrigin; domain: string }
   > = {};
   private _originCache: Record<string, IOrigin> = {};
+  private _staticBucket?: Bucket;
+  private _vpcOriginCounts: Record<string, number> = {};
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -115,6 +127,7 @@ export class CloudfrontCdkStack extends Stack {
     // clear per-distribution caches; vpc origins persist across distributions
     this._originIndex = 0;
     this._originCache = {};
+    this._vpcOriginCounts = {};
 
     if (this._defaults.logConfigArn) {
       builder.withLogConfig(this._defaults.logConfigArn);
@@ -174,6 +187,10 @@ export class CloudfrontCdkStack extends Stack {
 
     Tags.of(distribution).add("EnableShieldAdvanced", "true");
 
+    if (builder.staticSite) {
+      this.addStaticFilesDeployment(builder, distribution);
+    }
+
     // temporary override logical-id to see actual diff from old implementation
     if (builder.logicalId) {
       (distribution.node.defaultChild as CfnDistribution).overrideLogicalId(
@@ -185,6 +202,7 @@ export class CloudfrontCdkStack extends Stack {
   getOriginRequestPolicy(originType: OriginType): IOriginRequestPolicy {
     switch (originType) {
       case "s3":
+      case "static":
         return OriginRequestPolicy.CORS_S3_ORIGIN;
       case "api-gateway":
         return OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER;
@@ -193,6 +211,49 @@ export class CloudfrontCdkStack extends Stack {
       case "https":
         return OriginRequestPolicy.ALL_VIEWER;
     }
+  }
+
+  /**
+   * Per-environment bucket for static files (robots.txt, llms.txt, ...),
+   * created lazily on first use. Content is uploaded per site under a
+   * `<site>/` prefix by {@link addStaticFilesDeployment}.
+   */
+  getStaticBucket(): Bucket {
+    if (!this._staticBucket) {
+      this._staticBucket = new Bucket(this, "StaticFilesBucket", {
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+        encryption: BucketEncryption.S3_MANAGED,
+        enforceSSL: true,
+      });
+    }
+
+    return this._staticBucket;
+  }
+
+  /**
+   * Uploads `static/common` and `static/<site>` (site overrides common) to the
+   * static bucket under the `<site>/` prefix and invalidates the served file
+   * paths in the distribution when content changes.
+   */
+  addStaticFilesDeployment(
+    builder: DistributionBuilder,
+    distribution: Distribution,
+  ): void {
+    if (!builder.staticSite) {
+      throw new Error(`No static site defined for ${builder.name}`);
+    }
+
+    new BucketDeployment(this, `StaticFilesDeployment-${builder.name}`, {
+      sources: staticSiteDirs(builder.staticSite).map((dir) =>
+        Source.asset(dir),
+      ),
+      destinationBucket: this.getStaticBucket(),
+      destinationKeyPrefix: `${builder.staticSite}/`,
+      contentType: "text/plain; charset=utf-8",
+      cacheControl: [CacheControl.maxAge(Duration.hours(1))],
+      distribution,
+      distributionPaths: builder.staticFiles.map((file) => `/${file}*`),
+    });
   }
 
   createBehavior(
@@ -232,7 +293,18 @@ export class CloudfrontCdkStack extends Stack {
   }
 
   getOrigin(behavior: Behavior): IOrigin {
-    const cacheKey = behavior.origin._origin;
+    // the cache key must include every behavior setting that affects the
+    // created origin - otherwise the first behavior to use an origin would
+    // silently freeze its configuration for all later behaviors. Behaviors
+    // with identical settings still share one origin.
+    const cacheKey = [
+      behavior.origin._type,
+      behavior.origin._origin,
+      behavior.origin._path ?? "",
+      behavior.readTimeout,
+      behavior.connectionAttempts,
+      behavior.apiKey ?? "",
+    ].join(":");
 
     if (!this._originCache[cacheKey]) {
       this._originCache[cacheKey] = this.createOrigin(behavior);
@@ -267,6 +339,14 @@ export class CloudfrontCdkStack extends Stack {
   createOrigin(behavior: Behavior): IOrigin {
     this._originIndex++;
 
+    if (behavior.origin._type === "static") {
+      // owned bucket, so withOriginAccessControl also sets the bucket policy
+      return S3BucketOrigin.withOriginAccessControl(this.getStaticBucket(), {
+        originId: `origin${this._originIndex}`,
+        originPath: behavior.origin._path,
+      });
+    }
+
     if (behavior.origin._type === "s3") {
       return this.createS3Origin(behavior.origin._origin);
     }
@@ -277,17 +357,27 @@ export class CloudfrontCdkStack extends Stack {
     // TODO: other custom headers
 
     if (behavior.origin._type === "vpc") {
-      const vpcOrigin = this._vpcOrigins[behavior.origin._origin];
+      const vpcOriginName = behavior.origin._origin;
+      const vpcOrigin = this._vpcOrigins[vpcOriginName];
 
       if (!vpcOrigin) {
-        throw new Error(`Missing vpc origin ${behavior.origin._origin}`);
+        throw new Error(`Missing vpc origin ${vpcOriginName}`);
       }
 
+      // keep the plain id for the first origin per vpc origin name (stable
+      // with existing deployments), suffix later ones with differing settings
+      const count = this._vpcOriginCounts[vpcOriginName] ?? 0;
+      this._vpcOriginCounts[vpcOriginName] = count + 1;
+      const originId =
+        count === 0
+          ? `vpcOrigin-${vpcOriginName}`
+          : `vpcOrigin-${vpcOriginName}-${count}`;
+
       return VpcOrigin.withVpcOrigin(vpcOrigin.vpcOrigin, {
-        originId: `vpcOrigin-${behavior.origin._origin}`,
+        originId,
         domainName: vpcOrigin.domain,
         readTimeout: Duration.seconds(behavior.readTimeout),
-        connectionAttempts: 3,
+        connectionAttempts: behavior.connectionAttempts,
         connectionTimeout: Duration.seconds(10),
         keepaliveTimeout: Duration.seconds(5),
         customHeaders,
@@ -303,7 +393,7 @@ export class CloudfrontCdkStack extends Stack {
     return new HttpOrigin(behavior.origin._origin, {
       originId: `origin${this._originIndex}`,
       readTimeout: Duration.seconds(behavior.readTimeout),
-      connectionAttempts: 3,
+      connectionAttempts: behavior.connectionAttempts,
       connectionTimeout: Duration.seconds(10),
       httpPort: 80,
       httpsPort: 443,

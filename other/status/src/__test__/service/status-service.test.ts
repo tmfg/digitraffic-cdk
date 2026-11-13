@@ -16,7 +16,7 @@ import {
   NodePingApi,
 } from "../../api/nodeping-api.js";
 import type { MonitoredApp, MonitoredEndpoint } from "../../app-props.js";
-import { EndpointHttpMethod } from "../../app-props.js";
+import { EndpointHttpMethod, EndpointProtocol } from "../../app-props.js";
 import type { AppWithEndpoints } from "../../model/app-with-endpoints.js";
 import type { UpdateStatusSecret } from "../../secret.js";
 import * as StatusService from "../../service/status-service.js";
@@ -275,6 +275,65 @@ describe("StatusServiceTest", () => {
 
     expect(nodePingApiUpdateSpy).toHaveBeenCalledTimes(0);
     expect(nodePingApiCreateNodepingCheckSpy).not.toHaveBeenCalled();
+  });
+
+  test("updateChecks - check sharing url with extra endpoint does not get extra endpoint settings", async () => {
+    const secret: UpdateStatusSecret = await secretHolder.get();
+    const nodePingApi = new NodePingApi(emptySecretHolder(), 1000, 10, 1);
+
+    const slackContact = makeContact(secret.nodePingContactIdSlack1);
+    const ghActionsContact = makeContact(`GitHub Actions for status master`);
+    const slackContactId = Object.keys(slackContact.addresses)[0]!;
+    const ghContactId = Object.keys(ghActionsContact.addresses)[0]!;
+
+    const url = "https://rata.digitraffic.fi/api/v1/last-updated";
+    const makeGetCheck = (label: string): NodePingCheck => {
+      const base = makeNodepingCheck(TrafficType.RAIL, url);
+      return {
+        ...base,
+        label,
+        parameters: { ...base.parameters, method: EndpointHttpMethod.GET },
+      };
+    };
+    const generatedCheck = makeGetCheck("Rail /api/v1/last-updated");
+    const extraCheck = makeGetCheck("Rail data is up to date");
+    for (const check of [generatedCheck, extraCheck]) {
+      check.notifications.push(
+        { [slackContactId]: { delay: 0, schedule: "All" } },
+        { [ghContactId]: { delay: 0, schedule: "All" } },
+      );
+    }
+    const extraEndpoint: MonitoredEndpoint = {
+      name: "Rail data is up to date",
+      url,
+      protocol: EndpointProtocol.HTTP,
+      method: EndpointHttpMethod.GET,
+      contentstring: "false",
+      invert: true,
+    };
+
+    const updateSpy = vi
+      .spyOn(nodePingApi, "updateNodepingCheck")
+      .mockReturnValue(Promise.resolve({} as unknown as NodePingCheck));
+
+    await StatusService.updateChecks(
+      [generatedCheck, extraCheck],
+      [slackContactId],
+      ghContactId,
+      nodePingApi,
+      [extraEndpoint],
+      "Rail",
+    );
+
+    // Only the generated check needs an update (GET -> HEAD) and gets no extra endpoint
+    expect(updateSpy).toHaveBeenCalledTimes(1);
+    expect(updateSpy).toHaveBeenCalledWith(
+      generatedCheck._id,
+      url,
+      expect.anything(),
+      generatedCheck.label,
+      undefined,
+    );
   });
 
   test("updateComponentsAndChecksForApp - missing contact -> new contact is created", async () => {

@@ -1,6 +1,7 @@
 import type { WafRules } from "../acl/waf-rules.js";
 import type { CloudfrontCdkStack } from "../cloudfront-cdk-stack.js";
-import type { Behavior } from "./behavior.js";
+import { Behavior } from "./behavior.js";
+import { listStaticFiles } from "./static-files.js";
 
 export class DistributionBuilder {
   private readonly _stack: CloudfrontCdkStack;
@@ -11,6 +12,9 @@ export class DistributionBuilder {
   readonly aliasNames: string[] = [];
   readonly wafRules: WafRules[] = [];
   readonly behaviors: Behavior[] = [];
+
+  staticSite?: string;
+  readonly staticFiles: string[] = [];
 
   defaultRootObject: string = "index.html";
 
@@ -89,5 +93,39 @@ export class DistributionBuilder {
     this.behaviors.push(...behaviors);
 
     return this;
+  }
+
+  /**
+   * Serves every file from `static/common` and `static/<site>` at the root of
+   * this distribution (e.g. `/robots.txt`, `/llms.txt`) from the
+   * per-environment static files bucket.
+   *
+   * One exact-path behavior is added per file found at synth time, so adding a
+   * new file to the static directories automatically serves it on the next
+   * deploy. Site files override common files with the same name. Content is
+   * uploaded on deploy and the changed paths are invalidated in CloudFront.
+   *
+   * All files are served as `text/plain; charset=utf-8`, so the static
+   * directories must only contain plain text files.
+   */
+  withStaticFiles(site: string): this {
+    if (this.staticSite) {
+      throw new Error(`Static files already configured for ${this.name}`);
+    }
+
+    const files = listStaticFiles(site);
+
+    if (files.length === 0) {
+      throw new Error(
+        `No static files found for site ${site} (checked static/common and static/${site})`,
+      );
+    }
+
+    this.staticSite = site;
+    this.staticFiles.push(...files);
+
+    return this.withBehaviors(
+      ...files.map((file) => Behavior.staticFile(file, site)),
+    );
   }
 }

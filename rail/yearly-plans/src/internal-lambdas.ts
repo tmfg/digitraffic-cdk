@@ -27,6 +27,7 @@ function createFetchYearlyPlansLambda(
   }
 
   const lambdaEnv = {
+    ...stack.createLambdaEnvironment(),
     [YearlyPlansEnvKeys.YEARLY_PLANS_BUCKET_NAME]: yearlyPlansBucket.bucketName,
     [YearlyPlansEnvKeys.PROJECT_PLANS_BUCKET_NAME]:
       projectPlansBucket.bucketName,

@@ -14,4 +14,18 @@ If you have made changes to the `digitraffic-figures` Python application and
 wish to deploy it, build and deploy this stack. The application is deployed as a
 container Lambda.
 
-`rushx build` `cdk deploy DigitrafficStatisticsStack`
+Before deploying Python application or dependency changes, verify the container
+build locally from this project directory:
+
+```bash
+rushx check:python-image
+```
+
+This builds the same `linux/arm64` image used by Lambda and checks that Python
+dependencies install and the application compiles. It requires Docker Desktop and
+does not deploy to AWS. Then build and deploy the stack:
+
+```bash
+rushx build
+cdk deploy DigitrafficStatisticsStack
+```
