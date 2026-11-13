@@ -22,11 +22,27 @@ CI uses), and refuses to run unless your profile name contains `-tst` or
 
     AWS_PROFILE=profile-name rushx test:runtime
 
+### Runtime test freshness reminder
+
+A successful `rushx test:runtime` writes a timestamp to `dist/.runtime-test-last-run`
+(only when run with an AWS profile). Every `cdk-deploy-*` command first runs
+`scripts/check-runtime-test-freshness.js`, which reads that timestamp and prints
+a warning if the runtime test has never been run or was last run over 6 hours ago.
+
+The reminder never blocks the deploy; it only warns. If you see the warning, run
+`AWS_PROFILE=profile-name rushx test:runtime` with a test account profile (see
+above), then deploy again. `cdk-diff-*` commands do not run the reminder.
+
 ## Deploy
 
 Use the per-environment `cdk-deploy-*` commands below; they run the runtime test
 freshness reminder first. The generic `rushx cdk deploy` bypasses that reminder,
-so prefer it only for one-off ad-hoc stacks, not for road/marine/afir.
+so prefer it only for one-off ad-hoc stacks, not for road/marine/rail/afir.
+
+Each command uses a fixed AWS profile (see `scripts/cdk-env.conf`), and a stack
+is created only when the profile matches its environment. Rail creates
+`CloudfrontRailTest` only with a `-rail-tst` profile and `CloudfrontRailProd`
+only with a `-rail-prd` profile.
 
     rushx cdk-diff-road-test
     rushx cdk-diff-road-prod
@@ -37,6 +53,11 @@ so prefer it only for one-off ad-hoc stacks, not for road/marine/afir.
     rushx cdk-diff-marine-prod
     rushx cdk-deploy-marine-test
     rushx cdk-deploy-marine-prod
+
+    rushx cdk-diff-rail-test
+    rushx cdk-diff-rail-prod
+    rushx cdk-deploy-rail-test
+    rushx cdk-deploy-rail-prod
 
     rushx cdk-diff-afir-test    
     rushx cdk-diff-afir-prod

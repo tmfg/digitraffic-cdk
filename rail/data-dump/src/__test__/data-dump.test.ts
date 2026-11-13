@@ -287,7 +287,7 @@ describe("DataDumpStack — Lambda functions", () => {
     // given: the synthesized template
     const template = createTemplate();
 
-    // then: compositions = 128, trains = 512, locations = 2048
+    // then: compositions = 128, trains = 512, locations = 4096
     template.hasResourceProperties("AWS::Lambda::Function", {
       FunctionName: "DataDump-DumpCompositions",
       MemorySize: 128,
@@ -298,7 +298,7 @@ describe("DataDumpStack — Lambda functions", () => {
     });
     template.hasResourceProperties("AWS::Lambda::Function", {
       FunctionName: "DataDump-DumpTrainLocations",
-      MemorySize: 2048,
+      MemorySize: 4096,
     });
   });
 
