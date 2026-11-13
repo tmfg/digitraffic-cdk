@@ -24,7 +24,7 @@
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff CloudfrontRoadTest",
     "cdk-diff-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test deploy CloudfrontStatusTest",
     "ci:test": "vitest run --reporter=junit --outputFile=test-results.xml",
-    "compile-lambdas": "rollup -c",
+    "compile-lambdas": "NODE_OPTIONS=--max-old-space-size=4096 rollup -c",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "vitest run",
     "test:runtime": "npm run compile-lambdas && RUN_CLOUDFRONT_RUNTIME_TEST=1 vitest run src/__test__/lambda/cloudfront-function-runtime.test.ts && node -e \"if(process.env.AWS_PROFILE||process.env.AWS_ACCESS_KEY_ID){require('node:fs').writeFileSync('dist/.runtime-test-last-run', String(Date.now()))}\"",
