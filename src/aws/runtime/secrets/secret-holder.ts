@@ -1,5 +1,5 @@
 import { getEnvVariable } from "../../../utils/utils.js";
-import { logger } from "../dt-logger-default.js";
+import { logger } from "../logging/dt-logger-default.js";
 import { checkExpectedSecretKeys } from "./dbsecret.js";
 import type { GenericSecret } from "./secret.js";
 import { getSecret } from "./secret.js";

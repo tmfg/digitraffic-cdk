@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { logger } from "../../aws/runtime/dt-logger-default.js";
+import { logger } from "../../aws/runtime/logging/dt-logger-default.js";
 import type { LeadTimeLogging } from "../../utils/lead-time-logging.js";
 import { logLeadTime, logLeadTimes } from "../../utils/lead-time-logging.js";
 

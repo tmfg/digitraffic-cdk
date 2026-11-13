@@ -2,7 +2,7 @@ import synthetics from "Synthetics";
 import type { DTDatabase } from "../../../database/database.js";
 import { inDatabaseReadonly } from "../../../database/database.js";
 import type { Countable } from "../../../database/models.js";
-import { logger } from "../../runtime/dt-logger-default.js";
+import { logger } from "../../runtime/logging/dt-logger-default.js";
 import { ProxyHolder } from "../../runtime/secrets/proxy-holder.js";
 import { RdsHolder } from "../../runtime/secrets/rds-holder.js";
 

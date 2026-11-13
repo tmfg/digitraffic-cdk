@@ -7,7 +7,7 @@ import {
   getDlqCode,
   sanitizeS3BucketName,
 } from "../../aws/infra/sqs-queue-internal.js";
-import { DtLogger } from "../../aws/runtime/dt-logger.js";
+import { DtLogger } from "../../aws/runtime/logging/dt-logger.js";
 
 describe("sqs-queue", () => {
   test("getDlqCode generates valid JavaScript", () => {

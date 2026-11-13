@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import { getRandomInteger } from "../../__test__/testutils.js";
-import { logger } from "../../aws/runtime/dt-logger-default.js";
+import { logger } from "../../aws/runtime/logging/dt-logger-default.js";
 import { RetryLogError, retry } from "../../utils/retry.js";
 
 vi.useFakeTimers();

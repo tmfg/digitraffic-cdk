@@ -8,6 +8,11 @@ permissions:
   actions: read
   checks: write
   id-token: write
+# GitHub Pages allows only one deployment at a time. Queue runs instead of
+# failing when two pushes publish their reports almost simultaneously.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
 jobs:
   build:
     if: github.repository != 'tmfg/digitraffic-common'
@@ -24,7 +29,7 @@ jobs:
         # Version is read automatically from "packageManager" field in package.json
 
       - name: Setup Node.js 24
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24.22.1"
           cache: "pnpm"
@@ -41,8 +46,10 @@ jobs:
       - name: Install madge
         run: npm -g install madge
 
-      - name: Setup Graphviz
-        uses: ts-graphviz/setup-graphviz@b1de5da23ed0a6d14e0aeee8ed52fdd87af2363c # v2.0.2
+      - name: Install Graphviz
+        # Plain apt install instead of ts-graphviz/setup-graphviz: the action
+        # has no release targeting Node 24 and triggers a deprecation warning.
+        run: sudo apt-get install -y --no-install-recommends graphviz
 
       - name: Run madge
         id: run-madge
@@ -70,7 +77,7 @@ jobs:
           echo "[Madge report](${{ steps.deployment.outputs.page_url }}/${{ github.ref_name }}/dependencies.svg)" >> $GITHUB_STEP_SUMMARY
 
       - name: Test Report
-        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
+        uses: dorny/test-reporter@d1b5dff021aa968b288b02285a8bf47471c5928a # v3.2.0
         if: success() || failure()
         with:
           name: Jest test report

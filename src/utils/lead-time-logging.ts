@@ -1,5 +1,5 @@
-import type { CustomParams } from "../aws/runtime/dt-logger.js";
-import { logger } from "../aws/runtime/dt-logger-default.js";
+import type { CustomParams } from "../aws/runtime/logging/dt-logger.js";
+import { logger } from "../aws/runtime/logging/dt-logger-default.js";
 
 export interface LeadTimeLogging {
   readonly target: string;

@@ -1,7 +1,7 @@
 import type { IDatabase, IInitOptions, IMain, ITask } from "pg-promise";
 import pgpImport from "pg-promise";
 import type { IClient } from "pg-promise/typescript/pg-subset.js";
-import { logger } from "../aws/runtime/dt-logger-default.js";
+import { logger } from "../aws/runtime/logging/dt-logger-default.js";
 import { logException } from "../utils/logging.js";
 import { getEnvVariable, getEnvVariableOrElse } from "../utils/utils.js";
 

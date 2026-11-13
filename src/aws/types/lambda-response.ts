@@ -2,7 +2,7 @@ import etag from "etag";
 import { encodeUtf8ToBase64 } from "../../utils/base64.js";
 import { truncateMiddle } from "../../utils/logging.js";
 import { StopWatch } from "../../utils/stop-watch.js";
-import { logger } from "../runtime/dt-logger-default.js";
+import { logger } from "../runtime/logging/dt-logger-default.js";
 import { MAX_LAMBDA_PAYLOAD_BYTES } from "./lambda-proxy-types.js";
 
 export class LambdaResponse {

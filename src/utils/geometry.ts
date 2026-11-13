@@ -9,7 +9,7 @@ import type {
   Position,
 } from "geojson";
 import * as geoJsonValidator from "geojson-validation";
-import { logger } from "../aws/runtime/dt-logger-default.js";
+import { logger } from "../aws/runtime/logging/dt-logger-default.js";
 
 export const SRID_WGS84 = 4326;
 

@@ -2,8 +2,8 @@ import type {
   DtLogger,
   LoggableType,
   LoggerMethodType,
-} from "../aws/runtime/dt-logger.js";
-import { logger } from "../aws/runtime/dt-logger-default.js";
+} from "../aws/runtime/logging/dt-logger.js";
+import { logger } from "../aws/runtime/logging/dt-logger-default.js";
 
 export interface TaskPeriod {
   startTime: number;

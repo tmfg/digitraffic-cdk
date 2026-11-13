@@ -1,7 +1,7 @@
 import type { Writable } from "node:stream";
 import { lowerFirst, mapKeys } from "es-toolkit";
-import { getEnvVariableOrElse } from "../../utils/utils.js";
-import { EnvKeys } from "./environment.js";
+import { getEnvVariableOrElse } from "../../../utils/utils.js";
+import { EnvKeys } from "../environment.js";
 
 /** Logging level */
 export type LOG_LEVEL = "DEBUG" | "INFO" | "WARN" | "ERROR";

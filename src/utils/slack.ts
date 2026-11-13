@@ -1,5 +1,5 @@
 import ky from "ky";
-import { logger } from "../aws/runtime/dt-logger-default.js";
+import { logger } from "../aws/runtime/logging/dt-logger-default.js";
 import { logException } from "./logging.js";
 
 export class SlackApi {
