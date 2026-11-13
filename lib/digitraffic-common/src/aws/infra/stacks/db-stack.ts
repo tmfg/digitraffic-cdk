@@ -18,7 +18,7 @@ import {
 } from "aws-cdk-lib/aws-rds";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib/core";
-import type { Construct } from "constructs/lib/construct.js";
+import type { Construct } from "constructs";
 import { exportValue, importVpc } from "../import-util.js";
 import { createParameter } from "../stack/parameters.js";
 import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
