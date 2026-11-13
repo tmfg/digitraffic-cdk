@@ -4,7 +4,7 @@
   "private": true,
   "description": "Autoinstaller package for rush commandline tools",
   "dependencies": {
-    "@biomejs/biome": "2.6.4",
+    "@biomejs/biome": "2.6.5",
     "sort-package-json": "4.1.0",
     "zx": "8.8.5"
   }

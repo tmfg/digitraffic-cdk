@@ -1,5 +1,5 @@
-import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { SlackApi } from "@digitraffic/common/dist/utils/slack";
 import type { CStateStatuspageApi } from "../api/cstate-statuspage-api.js";
 import type { NodePingApi } from "../api/nodeping-api.js";

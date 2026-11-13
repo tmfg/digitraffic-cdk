@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import type { AssumeRoleRequest } from "@aws-sdk/client-sts";
 import { STS } from "@aws-sdk/client-sts";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { SlackApi } from "@digitraffic/common/dist/utils/slack";

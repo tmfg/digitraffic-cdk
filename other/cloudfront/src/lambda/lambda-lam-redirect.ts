@@ -1,7 +1,7 @@
 import type { ParsedUrlQuery, ParsedUrlQueryInput } from "node:querystring";
 import queryStringHelper from "node:querystring";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import {

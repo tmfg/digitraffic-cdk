@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { EpcMessage } from "../../model/epcmessage.js";
 import type { EpcMessageResponse } from "../../model/epcmessage_response.js";
 import * as EpcMessageService from "../../service/epcmessage.js";

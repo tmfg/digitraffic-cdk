@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import type { Position } from "geojson";
 import type { DbMaintenanceTracking } from "../model/db-data.js";

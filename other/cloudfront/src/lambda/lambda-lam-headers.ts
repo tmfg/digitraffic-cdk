@@ -1,5 +1,5 @@
 import queryStringHelper from "node:querystring";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import * as Utils from "@digitraffic/common/dist/utils/utils";
 import type {
   CloudFrontRequest,

@@ -1,5 +1,5 @@
-import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import ky from "ky";

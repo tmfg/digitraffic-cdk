@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { LambdaResponseBuilder } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { InputError } from "@digitraffic/common/dist/types/input-error";
 import * as TextConverterService from "../../service/text-converter.js";

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
-import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { inDatabase } from "@digitraffic/common/dist/database/database";
 import { parseISO } from "date-fns";
