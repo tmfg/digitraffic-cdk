@@ -1,6 +1,9 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { App } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
-import { expect, test } from "vitest";
+import { afterAll, beforeAll, expect, test } from "vitest";
 import { WafRules } from "../../acl/waf-rules.js";
 import { CloudfrontCdkStack } from "../../cloudfront-cdk-stack.js";
 import { Behavior } from "../../distribution/behavior.js";
@@ -12,6 +15,26 @@ import {
 
 const LOG_CONFIG_ARN =
   "arn:aws:cloudfront::123456789012:realtime-log-config/test";
+
+// the real static content is not in this repository, so the tests use their own
+let staticRootDir: string;
+
+beforeAll(() => {
+  staticRootDir = mkdtempSync(join(tmpdir(), "cloudfront-static-"));
+  mkdirSync(join(staticRootDir, "common"));
+  mkdirSync(join(staticRootDir, "afir"));
+  writeFileSync(join(staticRootDir, "common", "robots.txt"), "common robots");
+  writeFileSync(join(staticRootDir, "common", "llms.txt"), "common llms");
+  writeFileSync(join(staticRootDir, "afir", "llms.txt"), "afir llms");
+  // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
+  process.env["CLOUDFRONT_STATIC_ROOT"] = staticRootDir;
+});
+
+afterAll(() => {
+  // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
+  delete process.env["CLOUDFRONT_STATIC_ROOT"];
+  rmSync(staticRootDir, { recursive: true, force: true });
+});
 
 function createStack(
   build: (stack: CloudfrontCdkStack) => void,
@@ -61,8 +84,8 @@ test("staticSiteDirs lists common before site so site files override", () => {
   const dirs = staticSiteDirs("afir");
 
   expect(dirs).toHaveLength(2);
-  expect(dirs[0]).toMatch(/static\/common$/);
-  expect(dirs[1]).toMatch(/static\/afir$/);
+  expect(dirs[0]).toBe(join(staticRootDir, "common"));
+  expect(dirs[1]).toBe(join(staticRootDir, "afir"));
 });
 
 test("withStaticFiles throws when called twice", () => {

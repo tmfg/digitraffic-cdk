@@ -15,7 +15,7 @@ function createUpdateDataLambda(stack: DigitrafficStack): AwsFunction {
 
   return FunctionBuilder.create(stack, "update-data")
     .withEnvironment(environment)
-    .withTimeout(Duration.seconds(60))
+    .withTimeout(Duration.minutes(5))
     .withMemorySize(512)
     .build();
 }

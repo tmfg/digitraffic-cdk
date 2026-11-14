@@ -88,6 +88,7 @@ export class Behavior {
   apiKey?: string;
 
   ttl: CacheSeconds = 60; // seconds
+  maxCacheTtl?: number;
   readonly cacheHeaders: string[] = [];
   readonly cacheKeys: string[] = [];
 
@@ -441,30 +442,76 @@ export class Behavior {
     return this;
   }
 
+  /**
+   * Default TTL: how long CloudFront keeps a response that has no
+   * Cache-Control or Expires header. The origin's max-age is used when
+   * present, but never longer than the max TTL (see withCacheMaxTtl).
+   * Default: 60 seconds.
+   */
   public withCacheTtl(ttl: CacheSeconds): this {
     this.ttl = ttl;
 
     return this;
   }
 
+  /**
+   * Maximum time CloudFront keeps a response, whatever the origin's
+   * Cache-Control max-age says. By default it equals the TTL, so set it
+   * separately when the origin sends a longer max-age.
+   * Default: same as the TTL (see withCacheTtl).
+   */
+  public withCacheMaxTtl(ttl: number): this {
+    this.maxCacheTtl = ttl;
+
+    return this;
+  }
+
+  /**
+   * Only the listed query parameters are part of the cache key; other
+   * parameters do not split the cache. For example with "language",
+   * `?language=fi&x=1` and `?language=fi&x=2` share one cached response,
+   * but `?language=en` does not.
+   * Unlisted parameters are still forwarded to http, https, vpc and
+   * api-gateway origins, but not to s3 and static origins: only the
+   * parameters listed here reach those.
+   * Default: all query parameters are part of the cache key.
+   */
   public withQueryCacheKeys(...keys: string[]): this {
     this.cacheKeys.push(...keys);
 
     return this;
   }
 
+  /**
+   * Adds request headers to the cache key: each different header value is
+   * cached separately, so add one only when the response depends on it.
+   * Default: no headers (Accept-Encoding is always included, because
+   * compression is on).
+   */
   public withCacheHeaders(...headers: CacheHeader[]): this {
     this.cacheHeaders.push(...headers);
 
     return this;
   }
 
+  /**
+   * How long CloudFront waits for the origin's response (and between response
+   * packets) before it gives up. A timed out GET or HEAD request is retried
+   * according to withConnectionAttempts.
+   * Default: 30 seconds.
+   */
   public withReadTimeout(seconds: number): this {
     this.readTimeout = seconds;
 
     return this;
   }
 
+  /**
+   * How many times CloudFront tries to reach the origin (1-3). Applies to
+   * failed connections and, for GET and HEAD requests, to read timeouts, so
+   * a slow origin may get the same request several times.
+   * Default: 3.
+   */
   public withConnectionAttempts(attempts: number): this {
     this.connectionAttempts = attempts;
 

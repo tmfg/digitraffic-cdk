@@ -20,13 +20,16 @@ export class CachePolicyFactory {
     ttl: CacheSeconds,
     headers: string[],
     keys: string[],
+    maxTtl: number = ttl,
   ): CachePolicy {
     const key = createHash("sha256")
-      .update(`${ttl}_${JSON.stringify(headers)}_${JSON.stringify(keys)}`)
+      .update(
+        `${ttl}_${JSON.stringify(headers)}_${JSON.stringify(keys)}${maxTtl === ttl ? "" : `_${maxTtl}`}`,
+      )
       .digest("hex");
 
     if (!this._cacheMap[key]) {
-      this._cacheMap[key] = this.createCache(ttl, key, headers, keys);
+      this._cacheMap[key] = this.createCache(ttl, maxTtl, key, headers, keys);
     }
 
     return this._cacheMap[key];
@@ -34,6 +37,7 @@ export class CachePolicyFactory {
 
   private createCache(
     ttl: CacheSeconds,
+    maxTtl: number,
     key: string,
     cacheHeaders: string[],
     cacheKeys: string[],
@@ -41,7 +45,7 @@ export class CachePolicyFactory {
   ): CachePolicy {
     return new CachePolicy(this._scope, `Cache-${ttl}-${key}`, {
       minTtl: Duration.seconds(0),
-      maxTtl: Duration.seconds(ttl),
+      maxTtl: Duration.seconds(maxTtl),
       defaultTtl: Duration.seconds(ttl),
       ...(cacheHeaders.length > 0 && {
         headerBehavior: CacheHeaderBehavior.allowList(...cacheHeaders),

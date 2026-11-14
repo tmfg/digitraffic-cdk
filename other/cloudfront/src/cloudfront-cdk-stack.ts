@@ -267,6 +267,7 @@ export class CloudfrontCdkStack extends Stack {
       behavior.ttl,
       behavior.cacheHeaders,
       behavior.cacheKeys,
+      behavior.maxCacheTtl,
     );
 
     const edgeLambdas = this.createEdgeLambdas(behavior);

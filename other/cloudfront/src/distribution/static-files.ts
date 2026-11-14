@@ -5,10 +5,19 @@ import { fileURLToPath } from "node:url";
 /**
  * Root of the static file content, resolves to `<project>/static` from both
  * `src/distribution` and the compiled `lib/distribution`.
+ *
+ * `CLOUDFRONT_STATIC_ROOT` overrides the root and exists only for tests: the
+ * real content is not in this repository (it is linked in like `src/bin`),
+ * so tests point it to their own temporary directory. Do not set it when
+ * synthesizing or deploying.
  */
-export const STATIC_ROOT = fileURLToPath(
-  new URL("../../static", import.meta.url),
-);
+export function staticRoot(): string {
+  return (
+    // biome-ignore lint/complexity/useLiteralKeys: Comes from indexed property
+    process.env["CLOUDFRONT_STATIC_ROOT"] ??
+    fileURLToPath(new URL("../../static", import.meta.url))
+  );
+}
 
 /**
  * Returns the existing source directories for the given site, in deployment
@@ -20,7 +29,9 @@ export function staticSiteDirs(site: string): string[] {
     throw new Error(`Invalid static site name: ${site}`);
   }
 
-  return [join(STATIC_ROOT, "common"), join(STATIC_ROOT, site)].filter((dir) =>
+  const root = staticRoot();
+
+  return [join(root, "common"), join(root, site)].filter((dir) =>
     existsSync(dir),
   );
 }

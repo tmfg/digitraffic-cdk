@@ -75,6 +75,33 @@ test("behaviors with identical origin settings share one origin", () => {
   expect(getOrigins(stack)).toHaveLength(1);
 });
 
+test("behaviors can have a longer maximum cache TTL than their default TTL", () => {
+  const stack = createStack((s) =>
+    s.withDistribution("test", undefined, (builder) =>
+      builder
+        .withAliasName("test.digitraffic.fi")
+        .withAclRule(WafRules.per5min(200, 100))
+        .withBehaviors(
+          Behavior.nginxPlain("*", "origin.example.com").withCacheMaxTtl(
+            31_536_000,
+          ),
+        ),
+    ),
+  );
+  const template = Template.fromStack(stack);
+
+  template.hasResourceProperties("AWS::CloudFront::CachePolicy", {
+    CachePolicyConfig: {
+      DefaultTTL: 60,
+      MaxTTL: 31_536_000,
+      MinTTL: 0,
+      ParametersInCacheKeyAndForwardedToOrigin: {
+        HeadersConfig: { HeaderBehavior: "none" },
+      },
+    },
+  });
+});
+
 test("vpc origins keep a stable id and get suffixed ids for differing settings", () => {
   const stack = createStack((s) =>
     s
