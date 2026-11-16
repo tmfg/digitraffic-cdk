@@ -223,6 +223,13 @@ function convertNullableSchema(
     return rest;
   }
 
+  // A null type already allows only null, so adding a null alternative
+  // would make null match two oneOf alternatives and be rejected.
+  // biome-ignore lint/complexity/useLiteralKeys: index signature requires bracket notation
+  if (rest["type"] === "null") {
+    return rest;
+  }
+
   // A simple typed schema cannot overlap with null, so oneOf is safe.
   // biome-ignore lint/complexity/useLiteralKeys: index signature requires bracket notation
   if (typeof rest["type"] === "string") {

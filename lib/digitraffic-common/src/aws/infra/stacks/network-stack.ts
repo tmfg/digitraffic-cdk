@@ -1,7 +1,7 @@
 import type { IVpc } from "aws-cdk-lib/aws-ec2";
 import { CfnRoute, IpAddresses, SubnetType, Vpc } from "aws-cdk-lib/aws-ec2";
 import { Stack } from "aws-cdk-lib/core";
-import type { Construct } from "constructs/lib/construct.js";
+import type { Construct } from "constructs";
 import { exportValue } from "../import-util.js";
 import type { InfraStackConfiguration } from "./intra-stack-configuration.js";
 

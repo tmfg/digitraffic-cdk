@@ -113,7 +113,11 @@ fi
 # fails on a duplicate version, leaving a half-finished release behind.
 echo -e "${GREEN}Checking that version ${VERSION} is not already released...${NC}"
 
-if git fetch --tags --quiet && git rev-parse --verify --quiet "refs/tags/${VERSION}" >/dev/null; then
+# Fetch separately so that a fetch failure aborts the script (set -e).
+# Inside an if condition a failure would silently skip the tag check.
+git fetch --tags --quiet
+
+if git rev-parse --verify --quiet "refs/tags/${VERSION}" >/dev/null; then
     echo -e "${RED}Error: Git tag '${VERSION}' already exists.${NC}"
     exit 1
 fi

@@ -1,7 +1,7 @@
 import * as util from "node:util";
 import { Sha256 } from "@aws-crypto/sha256-browser";
 import type { AwsCredentialIdentity } from "@aws-sdk/types";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import { NodeHttpHandler } from "@smithy/node-http-handler";
 import { HttpRequest } from "@smithy/protocol-http";

@@ -1,4 +1,4 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import type { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";

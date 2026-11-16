@@ -1,5 +1,5 @@
-import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import type { LoggerMethodType } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
 import ky from "ky";
 import type { MonitoredApp } from "../app-props.js";
 import type { AppWithEndpoints } from "../model/app-with-endpoints.js";

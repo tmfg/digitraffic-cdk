@@ -2,14 +2,14 @@
 
 [[package]]
 name = "aws-lambda-powertools"
-version = "3.28.0"
+version = "3.39.0"
 description = "Powertools for AWS Lambda (Python) is a developer toolkit to implement Serverless best practices and increase developer velocity."
 optional = false
 python-versions = "<4.0.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "aws_lambda_powertools-3.28.0-py3-none-any.whl", hash = "sha256:6db5996784913b4b3a7ff04943cefaef4089440569ecbc2180ce07f08dd87659"},
-    {file = "aws_lambda_powertools-3.28.0.tar.gz", hash = "sha256:8849bc4fb01562aa13f1530a456626192256081ce2cfdf0cb0836ad6cba3c6b1"},
+    {file = "aws_lambda_powertools-3.39.0-py3-none-any.whl", hash = "sha256:dc47690e0a3ced07bfe463a8bb6d1d3945b98bdc21e825196d37e9a3c9707f9f"},
+    {file = "aws_lambda_powertools-3.39.0.tar.gz", hash = "sha256:94d640db4d9b772a3627c5916de36c303250d32ec10b7bf36c71b276dd824939"},
 ]
 
 [package.dependencies]
@@ -17,68 +17,70 @@ jmespath = ">=1.0.1,<2.0.0"
 typing-extensions = ">=4.11.0,<5.0.0"
 
 [package.extras]
-all = ["aws-encryption-sdk (>=3.1.1,<5.0.0)", "aws-xray-sdk (>=2.8.0,<3.0.0)", "fastjsonschema (>=2.14.5,<3.0.0)", "jsonpath-ng (>=1.6.0,<2.0.0)", "pydantic (>=2.4.0,<3.0.0)", "pydantic-settings (>=2.6.1,<3.0.0)"]
+all = ["aws-encryption-sdk (>=4.0.5,<5.0.0)", "aws-xray-sdk (>=2.8.0,<3.0.0)", "cryptography (>=50.0.1,<51.0.0)", "fastjsonschema (>=2.14.5,<3.0.0)", "jsonpath-ng (>=1.6.0,<2.0.0)", "pydantic (>=2.4.0,<3.0.0)", "pydantic-settings (>=2.6.1,<3.0.0)", "pyjwt (>=2.14.0,<3.0.0)", "urllib3 (>=2.7.0,<3.0.0)"]
 aws-sdk = ["boto3 (>=1.34.32,<2.0.0)"]
 datadog = ["datadog-lambda (>=8.114.0,<9.0.0)"]
-datamasking = ["aws-encryption-sdk (>=3.1.1,<5.0.0)", "jsonpath-ng (>=1.6.0,<2.0.0)"]
+datamasking = ["aws-encryption-sdk (>=4.0.5,<5.0.0)", "jsonpath-ng (>=1.6.0,<2.0.0)"]
+jwt = ["cryptography (>=50.0.1,<51.0.0)", "pyjwt (>=2.14.0,<3.0.0)", "urllib3 (>=2.7.0,<3.0.0)"]
 kafka-consumer-avro = ["avro (>=1.12.0,<2.0.0)"]
 kafka-consumer-protobuf = ["protobuf (>=6.30.2,<8.0.0)"]
+oauth2 = ["urllib3 (>=2.7.0,<3.0.0)"]
 parser = ["pydantic (>=2.4.0,<3.0.0)"]
-redis = ["redis (>=4.4,<8.0)"]
+redis = ["redis (>=4.4,<9.0)"]
 tracer = ["aws-xray-sdk (>=2.8.0,<3.0.0)"]
 validation = ["fastjsonschema (>=2.14.5,<3.0.0)"]
 valkey = ["valkey-glide (>=1.3.5,<3.0)"]
 
 [[package]]
 name = "boto3"
-version = "1.42.92"
-description = "The AWS SDK for Python"
+version = "1.43.125"
+description = "The AWS SDK for Python (Boto3)"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "boto3-1.42.92-py3-none-any.whl", hash = "sha256:c90d9a170faa0585755fa103a3cd9595e1f53443864e902c180f3d8177589125"},
-    {file = "boto3-1.42.92.tar.gz", hash = "sha256:55ec6ef6fc81f46d567a7d1d398d1e5c375d468905d0ccd9e1f767f0c77dbe9b"},
+    {file = "boto3-1.43.125-py3-none-any.whl", hash = "sha256:101fe3ee99664e671efb9af65c8e98ec0bceddf6de922ea89685da4adc8c6907"},
+    {file = "boto3-1.43.125.tar.gz", hash = "sha256:5a635a0fbbd51f319e465b809cf043668705defbb9dddaf26ae66747f70b2a49"},
 ]
 
 [package.dependencies]
-botocore = ">=1.42.92,<1.43.0"
+botocore = ">=1.43.125,<1.44.0"
 jmespath = ">=0.7.1,<2.0.0"
-s3transfer = ">=0.16.0,<0.17.0"
+s3transfer = ">=0.19.0,<0.20.0"
 
 [package.extras]
 crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.42.92"
+version = "1.43.125"
 description = "Low-level, data-driven core of boto 3."
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "botocore-1.42.92-py3-none-any.whl", hash = "sha256:09ddefddbb1565ceef4b44b4b6e61b1ca5f12701d1494ecc85c1133d1b1e81fb"},
-    {file = "botocore-1.42.92.tar.gz", hash = "sha256:f1193d3057a2d0267353d7ef4e136be37ea432336d097fcb1951fae566ca3a22"},
+    {file = "botocore-1.43.125-py3-none-any.whl", hash = "sha256:e3969c8191d3435440037310187d324f37c00da53987ea31df2eceff19a2795a"},
+    {file = "botocore-1.43.125.tar.gz", hash = "sha256:e3ae5ebbfa8033015958a9cb16cef67a0592902ca8afb46ef06e8ae77475183f"},
 ]
 
 [package.dependencies]
 jmespath = ">=0.7.1,<2.0.0"
 python-dateutil = ">=2.1,<3.0.0"
-urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""}
+urllib3 = ">=1.25.4,<2.2.0 || >2.2.0,<3"
 
 [package.extras]
-crt = ["awscrt (==0.31.2)"]
+crt = ["awscrt (==0.38.0)"]
 
 [[package]]
 name = "certifi"
-version = "2026.10.19"
+version = "2026.10.23"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.7"
 groups = ["main", "test"]
 files = [
-    {file = "certifi-2026.10.19-py3-none-any.whl", hash = "sha256:42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b"},
-    {file = "certifi-2026.10.19.tar.gz", hash = "sha256:035c1e85572b141bf1c3a3eff0e33a8eb74917522f2559075ff8d2fea780a1ae"},
+    {file = "certifi-2026.10.23-py3-none-any.whl", hash = "sha256:e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1"},
+    {file = "certifi-2026.10.23.tar.gz", hash = "sha256:a9895e6e2758b371e0545e321a3a8fd1fcfd9829ada8824a936dfb16aaaf36cd"},
 ]
 
 [[package]]
@@ -395,36 +397,18 @@ ssh = ["bcrypt (>=3.1.5)"]
 
 [[package]]
 name = "idna"
-version = "3.15"
+version = "3.20"
 description = "Internationalized Domain Names in Applications (IDNA)"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["main", "test"]
 files = [
-    {file = "idna-3.15-py3-none-any.whl", hash = "sha256:048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8"},
-    {file = "idna-3.15.tar.gz", hash = "sha256:ca962446ea538f7092a95e057da437618e886f4d349216d2b1e294abfdb65fdc"},
+    {file = "idna-3.20-py3-none-any.whl", hash = "sha256:ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c"},
+    {file = "idna-3.20.tar.gz", hash = "sha256:a7db850025b95ded1eae8a46181a1a6c56c92c96f0e2b005d9ff8dc0210cab44"},
 ]
 
 [package.extras]
-all = ["mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
-
-[[package]]
-name = "jinja2"
-version = "3.1.6"
-description = "A very fast and expressive template engine."
-optional = false
-python-versions = ">=3.7"
-groups = ["test"]
-files = [
-    {file = "jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"},
-    {file = "jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d"},
-]
-
-[package.dependencies]
-MarkupSafe = ">=2.0"
-
-[package.extras]
-i18n = ["Babel (>=2.7)"]
+all = ["coverage (>=7.10.0)", "hypothesis (>=6.141.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.16.0)", "ty (>=0.0.37)"]
 
 [[package]]
 name = "jmespath"
@@ -539,23 +523,21 @@ files = [
 
 [[package]]
 name = "moto"
-version = "5.1.22"
+version = "5.2.5"
 description = "A library that allows you to easily mock out tests based on AWS infrastructure"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "moto-5.1.22-py3-none-any.whl", hash = "sha256:d9f20ae3cf29c44f93c1f8f06c8f48d5560e5dc027816ef1d0d2059741ffcfbe"},
-    {file = "moto-5.1.22.tar.gz", hash = "sha256:e5b2c378296e4da50ce5a3c355a1743c8d6d396ea41122f5bb2a40f9b9a8cc0e"},
+    {file = "moto-5.2.5-py3-none-any.whl", hash = "sha256:eef62cdcf3bfe73e0863743511ba042dfaba04ba3d5ecdcb896a196c693ad528"},
+    {file = "moto-5.2.5.tar.gz", hash = "sha256:391857257d5dac144334013c2c10e599def5f0562f553e979160140bd7bd9cf6"},
 ]
 
 [package.dependencies]
 boto3 = ">=1.9.201"
 botocore = ">=1.20.88,<1.35.45 || >1.35.45,<1.35.46 || >1.35.46"
 cryptography = ">=35.0.0"
-Jinja2 = ">=2.10.1"
 py-partiql-parser = {version = "0.6.3", optional = true, markers = "extra == \"s3\""}
-python-dateutil = ">=2.1,<3.0.0"
 PyYAML = {version = ">=5.1", optional = true, markers = "extra == \"s3\""}
 requests = ">=2.5"
 responses = ">=0.15.0,<0.25.5 || >0.25.5"
@@ -563,27 +545,27 @@ werkzeug = ">=0.5,<2.2.0 || >2.2.0,<2.2.1 || >2.2.1"
 xmltodict = "*"
 
 [package.extras]
-all = ["PyYAML (>=5.1)", "antlr4-python3-runtime", "aws-sam-translator (<=1.103.0)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0,<=1.41.0)", "docker (>=3.0.0)", "graphql-core", "joserfc (>=0.9.0)", "jsonpath_ng", "jsonschema", "multipart", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pydantic (<=2.12.4)", "pyparsing (>=3.0.7)", "setuptools"]
+all = ["PyYAML (>=5.1)", "antlr4-python3-runtime", "aws-xray-sdk (>=2.10.0)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "graphql-core", "joserfc (>=0.9.0)", "jsonpath_ng", "jsonschema", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pyparsing (>=3.0.7)"]
 apigateway = ["PyYAML (>=5.1)", "joserfc (>=0.9.0)", "openapi-spec-validator (>=0.5.0)"]
 apigatewayv2 = ["PyYAML (>=5.1)", "openapi-spec-validator (>=0.5.0)"]
 appsync = ["graphql-core"]
 awslambda = ["docker (>=3.0.0)"]
 batch = ["docker (>=3.0.0)"]
-cloudformation = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0,<=1.41.0)", "docker (>=3.0.0)", "graphql-core", "joserfc (>=0.9.0)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pyparsing (>=3.0.7)", "setuptools"]
+cloudformation = ["PyYAML (>=5.1)", "aws-xray-sdk (>=2.10.0)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "graphql-core", "joserfc (>=0.9.0)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pyparsing (>=3.0.7)"]
 cognitoidp = ["joserfc (>=0.9.0)"]
 dynamodb = ["docker (>=3.0.0)", "py-partiql-parser (==0.6.3)"]
 dynamodbstreams = ["docker (>=3.0.0)", "py-partiql-parser (==0.6.3)"]
 events = ["jsonpath_ng"]
 glue = ["pyparsing (>=3.0.7)"]
-proxy = ["PyYAML (>=5.1)", "antlr4-python3-runtime", "aws-sam-translator (<=1.103.0)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0,<=1.41.0)", "docker (>=2.5.1)", "graphql-core", "joserfc (>=0.9.0)", "jsonpath_ng", "multipart", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pydantic (<=2.12.4)", "pyparsing (>=3.0.7)", "setuptools"]
+proxy = ["PyYAML (>=5.1)", "antlr4-python3-runtime", "aws-xray-sdk (>=2.10.0)", "cfn-lint (>=0.40.0)", "docker (>=2.5.1)", "graphql-core", "joserfc (>=0.9.0)", "jsonpath_ng", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pyparsing (>=3.0.7)"]
 quicksight = ["jsonschema"]
-resourcegroupstaggingapi = ["PyYAML (>=5.1)", "cfn-lint (>=0.40.0,<=1.41.0)", "docker (>=3.0.0)", "graphql-core", "joserfc (>=0.9.0)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pyparsing (>=3.0.7)"]
+resourcegroupstaggingapi = ["PyYAML (>=5.1)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "graphql-core", "joserfc (>=0.9.0)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pyparsing (>=3.0.7)"]
 s3 = ["PyYAML (>=5.1)", "py-partiql-parser (==0.6.3)"]
 s3crc32c = ["PyYAML (>=5.1)", "crc32c", "py-partiql-parser (==0.6.3)"]
-server = ["PyYAML (>=5.1)", "antlr4-python3-runtime", "aws-sam-translator (<=1.103.0)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0,<=1.41.0)", "docker (>=3.0.0)", "flask (!=2.2.0,!=2.2.1)", "flask-cors", "graphql-core", "joserfc (>=0.9.0)", "jsonpath_ng", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pydantic (<=2.12.4)", "pyparsing (>=3.0.7)", "setuptools"]
+server = ["PyYAML (>=5.1)", "antlr4-python3-runtime", "aws-xray-sdk (>=2.10.0)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "flask (!=2.2.0,!=2.2.1)", "flask-cors", "graphql-core", "joserfc (>=0.9.0)", "jsonpath_ng", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.6.3)", "pyparsing (>=3.0.7)"]
 ssm = ["PyYAML (>=5.1)"]
 stepfunctions = ["antlr4-python3-runtime", "jsonpath_ng"]
-xray = ["aws-xray-sdk (>=0.93,!=0.96)", "setuptools"]
+xray = ["aws-xray-sdk (>=2.10.0)"]
 
 [[package]]
 name = "py-partiql-parser"
@@ -713,14 +695,14 @@ files = [
 
 [[package]]
 name = "requests"
-version = "2.33.0"
+version = "2.34.2"
 description = "Python HTTP for Humans."
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "test"]
 files = [
-    {file = "requests-2.33.0-py3-none-any.whl", hash = "sha256:3324635456fa185245e24865e810cecec7b4caf933d7eb133dcde67d48cee69b"},
-    {file = "requests-2.33.0.tar.gz", hash = "sha256:c7ebc5e8b0f21837386ad0e1c8fe8b829fa5f544d8df3b2253bff14ef29d7652"},
+    {file = "requests-2.34.2-py3-none-any.whl", hash = "sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0"},
+    {file = "requests-2.34.2.tar.gz", hash = "sha256:f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed"},
 ]
 
 [package.dependencies]
@@ -731,7 +713,6 @@ urllib3 = ">=1.26,<3"
 
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
-test = ["PySocks (>=1.5.6,!=1.5.7)", "pytest (>=3)", "pytest-cov", "pytest-httpbin (==2.1.0)", "pytest-mock", "pytest-xdist"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<8)"]
 
 [[package]]
@@ -774,14 +755,14 @@ tests = ["coverage (>=6.0.0)", "flake8", "mypy", "pytest (>=7.0.0)", "pytest-asy
 
 [[package]]
 name = "s3transfer"
-version = "0.16.0"
+version = "0.19.3"
 description = "An Amazon S3 Transfer Manager"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "s3transfer-0.16.0-py3-none-any.whl", hash = "sha256:18e25d66fed509e3868dc1572b3f427ff947dd2c56f844a5bf09481ad3f3b2fe"},
-    {file = "s3transfer-0.16.0.tar.gz", hash = "sha256:8e990f13268025792229cd52fa10cb7163744bf56e719e0b9cb925ab79abf920"},
+    {file = "s3transfer-0.19.3-py3-none-any.whl", hash = "sha256:24eb7535804306355e31c952a90022bf5b2f9d760f9a11062c7493a217c08553"},
+    {file = "s3transfer-0.19.3.tar.gz", hash = "sha256:8326acc3d056d7f7b8a37110c7d2aea41f67e83f6ae79cd3b5fbcca34c726406"},
 ]
 
 [package.dependencies]
@@ -868,4 +849,4 @@ test = ["pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "f7be8610ddaae209388e43ebc937a1ebc2760191091dd0909ec01cf5b9a58f0e"
+content-hash = "f555be478d122748f835022ba2a36bc7a0e9ce537500eb7d73033ff59dacd9dc"

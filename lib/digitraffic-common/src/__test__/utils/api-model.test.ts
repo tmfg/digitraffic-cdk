@@ -469,6 +469,25 @@ describe("convertJsonSchemaNullableToOneOfDeep", () => {
     ).not.toThrow();
   });
 
+  test("keeps null type working when it is also marked nullable", () => {
+    // { type: "null", nullable: true } must not become
+    // oneOf: [{ type: "null" }, { type: "null" }], because null would then
+    // match both alternatives and oneOf would reject it
+    const schema = convertJsonSchemaNullableToOneOfDeep({
+      type: "object",
+      properties: {
+        empty: { type: "null", nullable: true },
+      },
+    } as JsonSchema);
+
+    expect(schema).toEqual({
+      type: "object",
+      properties: {
+        empty: { type: "null" },
+      },
+    });
+  });
+
   test("creates an API Gateway schema from Zod", () => {
     const schema = toApiGatewayJsonSchema(
       z.object({

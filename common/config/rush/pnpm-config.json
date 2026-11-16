@@ -83,14 +83,12 @@
    * PNPM documentation: https://pnpm.io/package_json#pnpmoverrides
    */
   "globalOverrides": {
-    // Fix @aws-sdk/core vulnerabilities
-    "@aws-sdk/core@>=3.977.3 <3.977.6": "3.977.6",
     // Fix minimatch security vulnerabilities (GHSA-3ppc-4f35-3m26, GHSA-7r86-cg39-jmmj)
     "minimatch@<3.1.5": "3.1.5",
     "minimatch@>=9.0.0 <9.0.9": "9.0.9",
     "minimatch@>=10.0.0 <10.2.4": "10.2.4",
-    // Fix serialize-javascript RCE vulnerability (GHSA-5c6j-r48x-rmvq, CVE-2026-34043)
-    "serialize-javascript@<=7.0.4": "7.0.5",
+    // Fix serialize-javascript RCE vulnerability (GHSA-5c6j-r48x-rmvq, CVE-2026-34043) and CVE-2026-115897
+    "serialize-javascript@<7.1.4": "7.1.4",
     // Fix glob CLI command injection vulnerability
     "glob@>=10.2.0 <10.5.0": "10.5.0",
     // Fix vite vulnerabilities (GHSA-fx2h-pf6j-xcff, GHSA-v6wh-96g9-6wx3, GHSA-587h-7wmj-h5pm, GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw, GHSA-9jrq-w75r-8gcw, GHSA-rq7h-c2jc-7f22)
@@ -103,24 +101,23 @@
     "brace-expansion@>=4.0.0 <5.0.12": "5.0.12",
     // Fix picomatch ReDoS vulnerabilities (CVE-2026-33671, CVE-2026-33672)
     "picomatch@<2.3.2": "2.3.2",
-    "picomatch@>=4.0.0 <4.0.4": "4.0.4",
+    "picomatch@>=4.0.0 <4.0.7": "4.0.7",
     // Fix postcss vulnerability (GHSA-fxqj-rqcc-2cmp)
-    "postcss@<=8.5.22": "8.5.23",
-    // Fix fast-uri vulnerabilities (GHSA-7p8r-x3mc-p8w7, GHSA-5jgf-p345-68v8, GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp, GHSA-qw65-cvwx-89v3, GHSA-hrr3-gc8f-f4qj)
-    "fast-uri@<3.1.8": "3.1.8",
+    "postcss@<8.5.32": "8.5.32",
+    // Fix fast-uri vulnerabilities (GHSA-7p8r-x3mc-p8w7, GHSA-5jgf-p345-68v8, GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp, GHSA-qw65-cvwx-89v3, GHSA-hrr3-gc8f-f4qj,
+    // CVE-2026-110095, CVE-2026-110180, CVE-2026-110306, CVE-2026-110725)
+    "fast-uri@<3.1.9": "3.1.9",
     // Fix js-yaml quadratic CPU consumption (GHSA-5p4m-2wfm-xmqj, GHSA-2883-xcg3-v3hh)
     "js-yaml@>=3.0.0 <3.15.2": "3.15.2",
     "js-yaml@>=4.0.0 <4.3.2": "4.3.2",
     // Fix ip-address vulnerabilities (GHSA-rpw4-54j3-4h4q, GHSA-2vr4-cq9g-pvrc, GHSA-j6r3-76f7-8jcv, GHSA-h3mg-xc3c-68pw, GHSA-rxp7-6hxx-x8q5)
-    "ip-address@<10.7.4": "10.7.4",
+    "ip-address@<10.7.6": "10.7.6",
     // Fix source-map-js vulnerability (GHSA-68fv-2mgg-jv7q)
     "source-map-js@<1.2.2": "1.2.2",
     // Fix velocityjs RCE vulnerability (GHSA-7gfh-x38p-prh3) - CRITICAL
     "velocityjs@<=2.1.6": "2.1.7",
     // Fix uuid buffer bounds check (GHSA-w5hq-g745-h8pq)
-    "uuid@<11.1.1": "11.1.1",
-    // Fix esbuild arbitrary file read on Windows (GHSA-g7r4-m6w7-qqqr)
-    "esbuild@>=0.27.3 <0.28.1": "0.28.1"
+    "uuid@<11.1.1": "11.1.1"
   },
   /**
    * The `globalPeerDependencyRules` setting provides various settings for suppressing validation errors

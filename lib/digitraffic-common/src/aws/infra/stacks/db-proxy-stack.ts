@@ -10,7 +10,7 @@ import {
 import type { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { Duration, Stack } from "aws-cdk-lib/core";
-import type { Construct } from "constructs/lib/construct.js";
+import type { Construct } from "constructs";
 import { exportValue, importVpc } from "../import-util.js";
 import { createParameter } from "../stack/parameters.js";
 import { DbStack } from "./db-stack.js";

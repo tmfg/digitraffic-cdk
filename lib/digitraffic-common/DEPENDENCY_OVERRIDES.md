@@ -19,12 +19,10 @@ already-safe versions unchanged.
 
 ### Current Overrides
 
-- `@aws-sdk/core@>=3.977.3 <3.977.6` → `3.977.6`: Fix JSON document-number parsing bug (deprecated versions 3.977.3–3.977.5 pulled in by `@aws-sdk/client-*@3.1098.0`)
-- `fast-uri@<3.1.8` → `3.1.8`: Fix URI parsing flaws (CVE-2026-76172, CVE-2026-75975, CVE-2026-75899, CVE-2026-75931, fixed in 3.1.6) plus the 3.1.7/3.1.8 follow-ons (CVE-2026-84292, CVE-2026-84394, CVE-2026-86472)
-- `nanoid@<3.3.18` → `3.3.18`: Fix CVE-2026-67213. Transitive via `postcss` (from `madge` and `vite`)
+- `fast-uri@<3.1.9` → `3.1.9`: Fix URI parsing flaws (CVE-2026-76172, CVE-2026-75975, CVE-2026-75899, CVE-2026-75931, fixed in 3.1.6), the 3.1.7/3.1.8 follow-ons (CVE-2026-84292, CVE-2026-84394, CVE-2026-86472) and the 3.1.9 follow-ons (CVE-2026-110095, CVE-2026-110180, CVE-2026-110306, CVE-2026-110725)
 - `brace-expansion@<5.0.12` → `5.0.12`: Fix uncontrolled recursion / quadratic expansion DoS (CVE-2026-102276, CVE-2026-102277, CVE-2026-102278). Transitive via `minimatch`/`glob`
 - `source-map-js@<1.2.2` → `1.2.2`: Fix event-loop DoS through indexed source maps (CVE-2026-93749). Transitive via `postcss`, `@vue/compiler-*` and `magicast` (vitest coverage tooling)
-- `vite@<8.1.6` → `8.1.6`: Fix launch-editor and dev-server file-serving issues (CVE-2026-112942, CVE-2026-112943, CVE-2026-112944, CVE-2026-112945, CVE-2026-112946). Transitive via `vitest` (requests `^6 || ^7 || ^8`)
+- `vite@<8.3.6` → `8.3.6`: Fix launch-editor and dev-server file-serving issues (CVE-2026-112942, CVE-2026-112943, CVE-2026-112944, CVE-2026-112945, CVE-2026-112946, fixed in 8.1.6; pin moved to 8.3.5 on 2026-11-06 and to 8.3.6 on 2026-11-13). Transitive via `vitest` (requests `^6 || ^7 || ^8`)
 
 ### Adding a New Override
 
@@ -81,9 +79,7 @@ period elapses.
 
 ### Current Exclusions
 
-- `fast-uri@3.1.5`: Published 2026-07-31, allowed before 7-day cooldown — needed for GHSA-7p8r-x3mc-p8w7 fix. Can be removed after 2026-08-07.
-- `brace-expansion@5.0.9`: Published 2026-07-30, allowed before 7-day cooldown — needed for GHSA-rgw5-rvv9-x895 fix. Can be removed after 2026-08-06.
-- `@aws-sdk/core@3.977.6`: Published 2026-08-04, allowed before 7-day cooldown — needed to replace deprecated `3.977.3`. Can be removed after 2026-08-11.
+None (the 2026-08 exclusions for `fast-uri@3.1.5`, `brace-expansion@5.0.9` and `@aws-sdk/core@3.977.6` were removed on 2026-11-06: those versions are either no longer installed or long past the cooldown).
 
 ### Adding an Exclusion
 
