@@ -27,22 +27,24 @@ rushx cdk-deploy-road-prod
 The stack creates one S3 bucket per environment (`roadnetwork-<env>`) and deploys a static listing page into it. CloudFront serves both the
 page and the datasets under the `roadnetwork/*` behaviour of the road distribution;
 the behaviour is configured in `digitraffic-ci-internal/aws/cdk/other/cloudfront/cloudfront-road.ts`.
-The stack also creates placeholder objects (`.keep`) under `latest/`, `releases/` and
-`digiroad/` so the intended root folder structure is visible from day one.
+The stack also creates placeholder objects (`.keep`) under `latest/`, `releases/`,
+`digiroad/` (and `test/` in the test environment only) so the intended root folder structure is visible from day one.
 
 ```
 roadnetwork-<env>/
 ├── index.html, assets/     site, deployed by this stack
 ├── latest/                 most recent Road Network release
 ├── releases/               Road Network era releases, from 2027 onwards
-└── digiroad/2026_01, 2026_02 legacy Digiroad releases
+├── digiroad/2026_01, 2026_02 legacy Digiroad releases
+└── test/                   test files, test environment only
 ```
 
 ## Publishing
 
 The Road Network team publishes the datasets themselves from their own AWS account. Access is
 granted in the bucket policy to their configured SSO publisher permission set and limited to
-the three data prefixes, so the site files cannot be overwritten. The account ids are
+the data prefixes (`latest/`, `releases/`, `digiroad/` and, in the test environment only, `test/`), so
+the site files cannot be overwritten. The account ids are
 configured per environment in `digitraffic-ci-internal`.
 
 Individual dataset packages are over 5 GB, which forces multipart uploads. Use the CLI
@@ -64,7 +66,7 @@ direct link to the configured bucket instead:
 `https://eu-west-1.console.aws.amazon.com/s3/buckets/<bucket-name>`.
 
 The bucket uses S3 Bucket owner enforced object ownership, so ACLs are disabled. Publisher access
-is controlled by the bucket policy and is limited to the three data prefixes. Uploads must not
+is controlled by the bucket policy and is limited to the data prefixes. Uploads must not
 include an ACL, such as `--acl public-read`; S3 console uploads that try to configure an ACL fail
 with `AccessControlListNotSupported`. Test cross-account access with the CLI:
 
@@ -74,7 +76,7 @@ aws s3 cp s3://<bucket-name>/latest/test.txt ./test-download.txt --profile <aws-
 aws s3 rm s3://<bucket-name>/latest/test.txt --profile <aws-profile>
 ```
 
-Publisher access is limited to `latest/`, `releases/` and `digiroad/`. The website files, such as
+Publisher access is limited to `latest/`, `releases/`, `digiroad/` and, in the test environment only, `test/`. The website files, such as
 `index.html`, are intentionally not readable or writable by the publisher account.
 
 ## Inspecting bucket contents

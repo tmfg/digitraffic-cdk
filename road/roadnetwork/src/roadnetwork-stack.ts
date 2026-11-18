@@ -9,7 +9,10 @@ import type { Construct } from "constructs";
 import type { RoadnetworkProps } from "./app-props.js";
 
 /** Prefixes the Road Network team publishes into. Everything outside these is site assets. */
-const DATA_PREFIXES = ["latest", "releases", "digiroad"] as const;
+const DATA_PREFIXES_PROD = ["latest", "releases", "digiroad"] as const;
+
+/** The test environment also has a `test` prefix for test files. */
+const DATA_PREFIXES_TEST = [...DATA_PREFIXES_PROD, "test"] as const;
 
 /**
  * Distribution of the Road Network dataset releases.
@@ -23,10 +26,13 @@ export class RoadnetworkStack extends DigitrafficStack {
     super(scope, id, configuration);
 
     const bucket = this.createBucket(configuration);
+    const prefixes = configuration.production
+      ? DATA_PREFIXES_PROD
+      : DATA_PREFIXES_TEST;
 
     this.grantCloudfrontRead(bucket, configuration);
-    this.grantPublisherWrite(bucket, configuration);
-    this.deployWebsite(bucket);
+    this.grantPublisherWrite(bucket, configuration, prefixes);
+    this.deployWebsite(bucket, prefixes);
   }
 
   private createBucket(configuration: RoadnetworkProps): Bucket {
@@ -69,6 +75,7 @@ export class RoadnetworkStack extends DigitrafficStack {
   private grantPublisherWrite(
     bucket: Bucket,
     configuration: RoadnetworkProps,
+    prefixes: readonly string[],
   ): void {
     const { roadnetworkAccountId, ssoPermissionSetName } = configuration;
 
@@ -92,9 +99,7 @@ export class RoadnetworkStack extends DigitrafficStack {
           "s3:AbortMultipartUpload",
           "s3:ListMultipartUploadParts",
         ],
-        resources: DATA_PREFIXES.map(
-          (prefix) => `${bucket.bucketArn}/${prefix}/*`,
-        ),
+        resources: prefixes.map((prefix) => `${bucket.bucketArn}/${prefix}/*`),
         conditions: ssoRoleCondition,
       }),
     );
@@ -111,8 +116,8 @@ export class RoadnetworkStack extends DigitrafficStack {
     );
   }
 
-  private deployWebsite(bucket: Bucket): void {
-    const dataPrefixPlaceholders = DATA_PREFIXES.map((prefix) =>
+  private deployWebsite(bucket: Bucket, prefixes: readonly string[]): void {
+    const dataPrefixPlaceholders = prefixes.map((prefix) =>
       Source.data(`${prefix}/.keep`, ""),
     );
 

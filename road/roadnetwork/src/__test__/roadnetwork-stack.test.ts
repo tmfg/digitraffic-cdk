@@ -27,9 +27,9 @@ const CONFIG: RoadnetworkProps = {
   whitelistedResources: ["CDKBucketDeployment"],
 };
 
-function createTemplate(): Template {
+function createTemplate(config: RoadnetworkProps = CONFIG): Template {
   const app = new App();
-  const stack = new RoadnetworkStack(app, "RoadnetworkTest", CONFIG);
+  const stack = new RoadnetworkStack(app, "RoadnetworkTest", config);
   return Template.fromStack(stack);
 }
 
@@ -115,7 +115,19 @@ describe("Roadnetwork bucket policy", () => {
       "s3:AbortMultipartUpload",
       "s3:ListMultipartUploadParts",
     ]);
-    expect(statement.Resource).toHaveLength(3);
+    expect(statement.Resource).toHaveLength(4);
+    expect(JSON.stringify(statement.Resource)).toContain("/test/*");
+  });
+
+  test("does not grant the test prefix in production", () => {
+    const resources = JSON.stringify(
+      createTemplate({ ...CONFIG, production: true }).findResources(
+        "AWS::S3::BucketPolicy",
+      ),
+    );
+
+    expect(resources).not.toContain("/test/*");
+    expect(resources).toContain("/digiroad/*");
   });
 
   test("restricts publisher access to the SSO permission set role", () => {
