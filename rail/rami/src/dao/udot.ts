@@ -130,7 +130,23 @@ async function executeWithRetry<T extends QueryResult>(
   throw lastError;
 }
 
-export async function deleteOldValues(conn: Connection): Promise<void> {
-  await conn.execute(SQL_DELETE_OLD_UDOT_VALUES);
-  await conn.execute(SQL_DELETE_OLD_UDOT_HISTORY_VALUES);
+export interface DeleteOldValuesResult {
+  readonly udotCount: number;
+  readonly historyCount: number;
+}
+
+export async function deleteOldValues(
+  conn: Connection,
+): Promise<DeleteOldValuesResult> {
+  const [udotHeader] = await conn.execute<ResultSetHeader>(
+    SQL_DELETE_OLD_UDOT_VALUES,
+  );
+  const [historyHeader] = await conn.execute<ResultSetHeader>(
+    SQL_DELETE_OLD_UDOT_HISTORY_VALUES,
+  );
+
+  return {
+    udotCount: udotHeader.affectedRows,
+    historyCount: historyHeader.affectedRows,
+  };
 }

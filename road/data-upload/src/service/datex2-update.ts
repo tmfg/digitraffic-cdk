@@ -1,5 +1,8 @@
 import { SQS } from "@aws-sdk/client-sqs";
+import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { MaintenanceLogger } from "@digitraffic/common/dist/aws/runtime/logging/maintenance-logger";
 import { inDatabase } from "@digitraffic/common/dist/database/database";
+import { StopWatch } from "@digitraffic/common/dist/utils/stop-watch";
 import { getEnvVariableSafe } from "@digitraffic/common/dist/utils/utils";
 import { deleteOldDataMessages, insertData } from "../dao/data.js";
 import type { Datex2UpdateObject } from "../model/datex2-update-object.js";
@@ -10,9 +13,27 @@ const SQS_URL = getEnvVariableSafe("QUEUE_URL");
 const sqs = new SQS({});
 
 export async function deleteOldMessages(): Promise<void> {
-  await inDatabase(async (db) => {
-    return await deleteOldDataMessages(db);
-  });
+  const sw = StopWatch.createStarted();
+  const maintenanceLogger = MaintenanceLogger.instance();
+
+  try {
+    await inDatabase(async (db) => {
+      const deletedCount = await deleteOldDataMessages(db);
+      maintenanceLogger.logCleanup(
+        "data_incoming",
+        deletedCount,
+        -1,
+        sw.getDuration() / 1000,
+      );
+    });
+  } catch (error) {
+    maintenanceLogger.logError("data_incoming", sw.getDuration() / 1000, error);
+    logger.error({
+      method: "DataUploadService.deleteOldMessages",
+      error,
+    });
+    throw error;
+  }
 }
 
 export async function updateRtti(updateObject: UpdateObject): Promise<void> {

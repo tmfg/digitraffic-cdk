@@ -1,4 +1,5 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/logging/dt-logger-default";
+import { MaintenanceLogger } from "@digitraffic/common/dist/aws/runtime/logging/maintenance-logger";
 import type {
   DTDatabase,
   DTTransaction,
@@ -7,6 +8,7 @@ import {
   inDatabase,
   inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
+import { StopWatch } from "@digitraffic/common/dist/utils/stop-watch";
 import { parseISO } from "date-fns";
 import { groupBy } from "es-toolkit";
 import type {
@@ -274,18 +276,46 @@ export async function findETAShipsByLocode(ports: Ports): Promise<DbETAShip[]> {
 }
 
 export function deleteOldTimestampsAndPilotages(): Promise<void> {
+  const sw = StopWatch.createStarted();
+  const maintenanceLogger = MaintenanceLogger.instance();
+
   return inDatabase((db: DTDatabase) => {
     return db.tx(async (t) => {
-      const deletedPilotagesCount = await TimestampsDB.deleteOldPilotages(t);
-      logger.info({
-        method: "TimeStampsService.deleteOldTimestampsAndPilotages",
-        customDeletedPilotagesCount: deletedPilotagesCount,
-      });
-      const deletedTimestampsCount = await TimestampsDB.deleteOldTimestamps(t);
-      logger.info({
-        method: "TimeStampsService.deleteOldTimestampsAndPilotages",
-        customDeletedTimestampsCount: deletedTimestampsCount,
-      });
+      try {
+        const deletedPilotagesCount = await TimestampsDB.deleteOldPilotages(t);
+        maintenanceLogger.logCleanup(
+          "pilotage",
+          deletedPilotagesCount,
+          -1,
+          sw.getDuration() / 1000,
+        );
+        logger.info({
+          method: "TimeStampsService.deleteOldTimestampsAndPilotages",
+          customDeletedPilotagesCount: deletedPilotagesCount,
+        });
+
+        sw.start("timestamps");
+
+        const deletedTimestampsCount =
+          await TimestampsDB.deleteOldTimestamps(t);
+        maintenanceLogger.logCleanup(
+          "port_call_timestamp",
+          deletedTimestampsCount,
+          -1,
+          sw.getDuration("timestamps") / 1000,
+        );
+        logger.info({
+          method: "TimeStampsService.deleteOldTimestampsAndPilotages",
+          customDeletedTimestampsCount: deletedTimestampsCount,
+        });
+      } catch (error) {
+        maintenanceLogger.logError(
+          "timestamps_and_pilotages",
+          sw.getDuration() / 1000,
+          error,
+        );
+        throw error;
+      }
     });
   });
 }

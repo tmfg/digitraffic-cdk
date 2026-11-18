@@ -17,7 +17,7 @@ const PS_INSERT_DATA = new pgPromise.PreparedStatement({
 
 const PS_DELETE_OLD_DATA = new pgPromise.PreparedStatement({
   name: "delete-old-data",
-  text: "delete from data_incoming where created_at < (current_date - interval '7 days') and status = 'PROCESSED'",
+  text: "WITH deleted AS (DELETE FROM data_incoming WHERE created_at < (current_date - interval '7 days') AND status = 'PROCESSED' RETURNING *) SELECT COUNT(*) FROM deleted",
 });
 
 const SQL_NEW_DATA = `select data_id, source, version, type, data
@@ -36,8 +36,9 @@ export async function insertData(
   await db.none(PS_INSERT_DATA, [messageId, source, version, type, data]);
 }
 
-export async function deleteOldDataMessages(db: DTDatabase): Promise<void> {
-  await db.none(PS_DELETE_OLD_DATA);
+export async function deleteOldDataMessages(db: DTDatabase): Promise<number> {
+  const result = await db.one<{ count: string }>(PS_DELETE_OLD_DATA);
+  return parseInt(result.count, 10);
 }
 
 export async function getNewData(
