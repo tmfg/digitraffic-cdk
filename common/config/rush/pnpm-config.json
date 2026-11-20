@@ -83,14 +83,13 @@
    * PNPM documentation: https://pnpm.io/package_json#pnpmoverrides
    */
   "globalOverrides": {
-    // Fix minimatch security vulnerabilities (GHSA-3ppc-4f35-3m26, GHSA-7r86-cg39-jmmj)
+    // Fix minimatch security vulnerabilities (GHSA-3ppc-4f35-3m26, GHSA-7r86-cg39-jmmj, GHSA-g3hv-75wg-m249)
     "minimatch@<3.1.5": "3.1.5",
-    "minimatch@>=9.0.0 <9.0.9": "9.0.9",
-    "minimatch@>=10.0.0 <10.2.4": "10.2.4",
+    "minimatch@>=7.0.0 <11.0.1": "11.0.1",
     // Fix serialize-javascript RCE vulnerability (GHSA-5c6j-r48x-rmvq, CVE-2026-34043) and CVE-2026-115897
     "serialize-javascript@<7.1.4": "7.1.4",
-    // Fix glob CLI command injection vulnerability
-    "glob@>=10.2.0 <10.5.0": "10.5.0",
+    // Fix glob CLI command injection vulnerability and AbortSignal cancellation bypass (GHSA-3g3m-2fjr-6pw4)
+    "glob@>=9.0.0 <14.0.2": "14.0.2",
     // Fix vite vulnerabilities (GHSA-fx2h-pf6j-xcff, GHSA-v6wh-96g9-6wx3, GHSA-587h-7wmj-h5pm, GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw, GHSA-9jrq-w75r-8gcw, GHSA-rq7h-c2jc-7f22)
     "vite@>=7.0.0 <7.3.7": "7.3.7",
     // Fix lodash code injection and prototype pollution (CVE-2026-4800, CVE-2026-2950)
