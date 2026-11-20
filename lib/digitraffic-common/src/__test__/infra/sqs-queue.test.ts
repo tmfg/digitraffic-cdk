@@ -1,15 +1,49 @@
 import { Writable } from "node:stream";
 import vm from "node:vm";
+import { App } from "aws-cdk-lib";
+import { Template } from "aws-cdk-lib/assertions";
 import { describe, expect, test } from "vitest";
+import { DigitrafficDLQueue } from "../../aws/infra/sqs-queue.js";
 // Import from the internal module directly — these helpers are intentionally
 // not exported from sqs-queue.ts to keep the public API surface clean.
 import {
   getDlqCode,
   sanitizeS3BucketName,
 } from "../../aws/infra/sqs-queue-internal.js";
+import type { StackConfiguration } from "../../aws/infra/stack/stack.js";
+import { DigitrafficStack } from "../../aws/infra/stack/stack.js";
+import { EnvKeys } from "../../aws/runtime/environment.js";
 import { DtLogger } from "../../aws/runtime/logging/dt-logger.js";
+import { TrafficType } from "../../types/traffictype.js";
+
+function createStack(): DigitrafficStack {
+  const configuration: StackConfiguration = {
+    shortName: "VS",
+    trafficType: TrafficType.ROAD,
+    alarmTopicArn: "",
+    warningTopicArn: "",
+    production: false,
+    stackProps: {},
+  };
+
+  return new DigitrafficStack(new App(), "TestStack", configuration);
+}
 
 describe("sqs-queue", () => {
+  test("adds APP_NAME to the generated DLQ Lambda", () => {
+    const stack = createStack();
+    DigitrafficDLQueue.create(stack, "MqttUpdates");
+
+    Template.fromStack(stack).hasResourceProperties("AWS::Lambda::Function", {
+      FunctionName: "VS-MqttUpdates-DLQ-Function",
+      Environment: {
+        Variables: {
+          [EnvKeys.APP_NAME]: "road-vs",
+        },
+      },
+    });
+  });
+
   test("getDlqCode generates valid JavaScript", () => {
     const inlineCode = getDlqCode("test-bucket");
     // InlineCode stores the code in the `code` property
@@ -90,6 +124,7 @@ describe("sqs-queue", () => {
     const inlineLoggerLines: string[] = [];
     const stubProcess = {
       env: {
+        APP_NAME: "road-vs",
         AWS_LAMBDA_FUNCTION_NAME: "test-lambda",
         AWS_EXECUTION_ENV: "test-runtime",
       },
@@ -144,6 +179,8 @@ describe("sqs-queue", () => {
     expect(inlineOutput["runtime"]).toBe(dtLoggerOutput["runtime"]);
     // biome-ignore lint/complexity/useLiteralKeys: Record<string, unknown> requires bracket notation for noPropertyAccessFromIndexSignature
     expect(inlineOutput["method"]).toBe(dtLoggerOutput["method"]);
+    // biome-ignore lint/complexity/useLiteralKeys: Record<string, unknown> requires bracket notation for noPropertyAccessFromIndexSignature
+    expect(inlineOutput["app"]).toBe("road-vs");
   });
 });
 

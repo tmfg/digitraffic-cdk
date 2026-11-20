@@ -10,6 +10,7 @@ import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import type { QueueProps } from "aws-cdk-lib/aws-sqs";
 import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
+import { EnvKeys } from "../runtime/environment.js";
 // getDlqCode and sanitizeS3BucketName live in a separate internal module so they
 // are not part of the public API surface exported from this package.
 // Tests can import them directly from sqs-queue-internal.ts.
@@ -67,6 +68,11 @@ export const DigitrafficDLQueue = {
   create(stack: DigitrafficStack, name: string): DigitrafficSqsQueue {
     const dlqName = `${stack.configuration.shortName}-${name}-DLQ`;
     const dlqFunctionName = `${dlqName}-Function`;
+    const appName = stack.createLambdaEnvironment()[EnvKeys.APP_NAME];
+
+    if (!appName) {
+      throw new Error("APP_NAME is required for the DLQ Lambda");
+    }
 
     const dlq = new DigitrafficSqsQueue(stack, dlqName, {
       queueName: dlqName,
@@ -93,6 +99,9 @@ export const DigitrafficDLQueue = {
       handler: "index.handler",
       memorySize: 128,
       reservedConcurrentExecutions: 1,
+      environment: {
+        [EnvKeys.APP_NAME]: appName,
+      },
     });
 
     const statement = new PolicyStatement();

@@ -61,6 +61,10 @@ export interface LoggableType extends CustomParams {
   method: LoggerMethodType;
   /** Message to log, optional */
   message?: string;
+  /** context, optional */
+  context?: string;
+  /** Duration of the operation in seconds, optional */
+  duration?: number;
   /** Type of message, optional */
   type?: string;
   /** Stack trace, optional */

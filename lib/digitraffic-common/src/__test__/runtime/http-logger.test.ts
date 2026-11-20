@@ -36,7 +36,7 @@ describe("HttpLogger", () => {
 
     expect(infoSpy).toHaveBeenCalledWith({
       method: "HttpLogger.logStatus",
-      [WIDE_CONTEXT.LOGGING.CONTEXT]: "port_call",
+      [WIDE_CONTEXT.CONTEXT]: "port_call",
       [WIDE_CONTEXT.TRACE_ID]: "trace-123",
       [WIDE_CONTEXT.HTTP_KEYS.URL]: "https://example.test/visits/1",
       [WIDE_CONTEXT.HTTP_KEYS.URL_TEMPLATE]: "/visits/{id}",
@@ -51,7 +51,7 @@ describe("HttpLogger", () => {
     ["https://example.test/visits/{id}", "/visits/{id}"],
     ["http://example.test:8080/visits/{id}?a=1", "/visits/{id}?a=1"],
     ["HTTPS://example.test/visits/{id}", "/visits/{id}"],
-    ["https://example.test", ""],
+    ["https://example.test", "/"],
     ["https://example.test?a=1", "?a=1"],
     ["/visits/{id}", "/visits/{id}"],
     ["/redirect/https://other.test/{id}", "/redirect/https://other.test/{id}"],
@@ -117,7 +117,7 @@ describe("HttpLogger", () => {
     expect(infoSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         method: "HttpLogger.logStatus",
-        [WIDE_CONTEXT.LOGGING.CONTEXT]: "test",
+        [WIDE_CONTEXT.CONTEXT]: "test",
         [WIDE_CONTEXT.HTTP_KEYS.ERROR_TYPE]: "TypeError",
         [WIDE_CONTEXT.HTTP_KEYS.STATUS_CODE]: undefined,
         [WIDE_CONTEXT.HTTP_KEYS.CONTENT_LENGTH]: undefined,

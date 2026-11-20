@@ -66,10 +66,12 @@ export class HttpLogger {
     this._context = snakeCase(parameters.context);
     this._url = parameters.url;
     this._traceId = parameters.traceId;
-    this._urlTemplate = parameters.urlTemplate?.replace(
-      /^https?:\/\/[^/?#]+/i,
-      "",
-    );
+    this._urlTemplate = parameters.urlTemplate
+      ? parameters.urlTemplate.replace(
+          /^(?:[a-z][a-z0-9+.-]*:)?\/\/[^/?#]+/i,
+          "",
+        ) || "/"
+      : undefined;
 
     this._startTime = Date.now();
   }
@@ -120,7 +122,7 @@ export class HttpLogger {
     logger.info({
       method: METHOD,
       [WIDE_CONTEXT.TRACE_ID]: this._traceId,
-      [WIDE_CONTEXT.LOGGING.CONTEXT]: this._context,
+      [WIDE_CONTEXT.CONTEXT]: this._context,
       [WIDE_CONTEXT.HTTP_KEYS.URL]: this._url,
       [WIDE_CONTEXT.HTTP_KEYS.URL_TEMPLATE]: this._urlTemplate,
       [WIDE_CONTEXT.HTTP_KEYS.ERROR_TYPE]: parameters.errorType,

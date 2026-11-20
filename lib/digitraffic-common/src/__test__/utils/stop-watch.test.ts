@@ -139,6 +139,71 @@ describe("stop-watch.test.ts", () => {
     sw.reset();
     expect(sw.getDuration()).toEqual(0);
   });
+
+  test("getDurationInSeconds returns duration in seconds as number", async () => {
+    const sw = new StopWatch().start();
+    await sleepMs(100);
+    sw.stop();
+
+    const durationInSeconds = sw.getDurationInSeconds();
+    expect(typeof durationInSeconds).toBe("number");
+    expect(durationInSeconds).toBeGreaterThanOrEqual(0.09);
+    expect(durationInSeconds).toBeLessThan(0.15);
+  });
+
+  test("getDurationInSeconds with named task", async () => {
+    const sw = StopWatch.createStarted();
+    sw.start("namedTask");
+    await sleepMs(100);
+    sw.stop("namedTask");
+
+    const durationInSeconds = sw.getDurationInSeconds("namedTask");
+    expect(typeof durationInSeconds).toBe("number");
+    expect(durationInSeconds).toBeGreaterThanOrEqual(0.09);
+    expect(durationInSeconds).toBeLessThan(0.15);
+  });
+
+  test("getDurationInSeconds returns 0 for non-existent task", () => {
+    const sw = new StopWatch();
+    const durationInSeconds = sw.getDurationInSeconds("nonExistentTask");
+    expect(durationInSeconds).toBe(0);
+  });
+
+  test("getDurationInSeconds with running task includes current period", async () => {
+    const sw = StopWatch.createStarted();
+    sw.start("runningTask");
+    await sleepMs(100);
+    // Don't stop the task
+
+    const durationInSeconds = sw.getDurationInSeconds("runningTask");
+    expect(typeof durationInSeconds).toBe("number");
+    expect(durationInSeconds).toBeGreaterThanOrEqual(0.09);
+    expect(durationInSeconds).toBeLessThan(0.15);
+  });
+
+  test("getDurationInSeconds with multiple periods", async () => {
+    const sw = StopWatch.createStarted();
+    sw.start("multiPeriodTask");
+    await sleepMs(50);
+    sw.start("multiPeriodTask"); // This stops and starts a new period
+    await sleepMs(50);
+    sw.stop("multiPeriodTask");
+
+    const durationInSeconds = sw.getDurationInSeconds("multiPeriodTask");
+    expect(typeof durationInSeconds).toBe("number");
+    expect(durationInSeconds).toBeGreaterThanOrEqual(0.09);
+    expect(durationInSeconds).toBeLessThan(0.15);
+  });
+
+  test("getDurationInSeconds converts milliseconds to seconds correctly", async () => {
+    const sw = new StopWatch().start();
+    await sleepMs(1000);
+    sw.stop();
+
+    const durationInMs = sw.getDuration();
+    const durationInSeconds = sw.getDurationInSeconds();
+    expect(durationInSeconds).toBeCloseTo(durationInMs / 1000, 1);
+  });
 });
 
 function sleepMs(ms: number): Promise<void> {

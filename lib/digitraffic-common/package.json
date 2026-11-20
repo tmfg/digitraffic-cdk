@@ -1,6 +1,6 @@
 {
   "name": "@digitraffic/common",
-  "version": "2026.11.13-1",
+  "version": "2026.11.19-2",
   "private": false,
   "description": "",
   "repository": {
@@ -97,6 +97,7 @@
     "./dist/aws/runtime/logging/http-logger": "./dist/aws/runtime/logging/http-logger.js",
     "./dist/aws/runtime/logging/wide-context": "./dist/aws/runtime/logging/wide-context.js",
     "./dist/aws/runtime/logging/http-interceptors": "./dist/aws/runtime/logging/http-interceptors.js",
+    "./dist/aws/runtime/logging/maintenance-logger": "./dist/aws/runtime/logging/maintenance-logger.js",
     "./dist/aws/runtime/secrets/secret": "./dist/aws/runtime/secrets/secret.js",
     "./dist/aws/runtime/secrets/proxy-holder": "./dist/aws/runtime/secrets/proxy-holder.js",
     "./dist/aws/runtime/secrets/dbsecret": "./dist/aws/runtime/secrets/dbsecret.js",
@@ -200,7 +201,7 @@
     "overrides": {
       "brace-expansion@<5.0.12": "5.0.12",
       "fast-uri@<3.1.9": "3.1.9",
-      "minimatch@>=7.0.0 <11.0.1": "11.0.1",
+      "minimatch@>=10.0.0 <11.0.1": "11.0.1",
       "source-map-js@<1.2.2": "1.2.2",
       "vite@<8.3.6": "8.3.6"
     }

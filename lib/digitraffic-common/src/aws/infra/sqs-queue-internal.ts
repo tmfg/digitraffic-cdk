@@ -22,10 +22,11 @@ const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 // existing log parsing and CloudWatch alarms keep working.
 const lambdaName = process.env.AWS_LAMBDA_FUNCTION_NAME || "unknown lambda name";
 const runtime = process.env.AWS_EXECUTION_ENV || "unknown runtime";
+const app = process.env.APP_NAME;
 const logger = {
   error: (msg) => {
     const message = msg.method ? msg.method + " " + (msg.message || "") : msg.message || "";
-    process.stdout.write(JSON.stringify({ ...msg, message, level: "ERROR", lambdaName, runtime }) + "\\n");
+    process.stdout.write(JSON.stringify({ ...msg, message, level: "ERROR", app, lambdaName, runtime }) + "\\n");
   }
 };
 
