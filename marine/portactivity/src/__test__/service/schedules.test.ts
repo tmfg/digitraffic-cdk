@@ -269,7 +269,7 @@ function createSchedulesResponse(
 }
 
 function createApi(): SchedulesApi {
-  return new SchedulesApi("");
+  return new SchedulesApi("", "");
 }
 
 function verifyStructure(

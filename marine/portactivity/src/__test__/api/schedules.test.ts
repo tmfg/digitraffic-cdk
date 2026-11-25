@@ -1,5 +1,5 @@
-import { mockKyResponse } from "@digitraffic/common/dist/test/mock-ky";
-import ky from "ky";
+import type { Dispatcher } from "undici";
+import { request } from "undici";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { SchedulesResponse } from "../../api/schedules.js";
 import { SchedulesApi, SchedulesDirection } from "../../api/schedules.js";
@@ -26,16 +26,30 @@ const fakeSchedules = `
 </schedules>
 `.trim();
 
+vi.mock("undici", async () => {
+  const actual = await vi.importActual<typeof import("undici")>("undici");
+  return {
+    ...actual,
+    request: vi.fn(),
+  };
+});
+
 describe("api-schedules", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   test("getSchedulesTimestamps - in VTS control", async () => {
-    const api = new SchedulesApi(`http:/something/schedules`);
-    vi.spyOn(ky, "get").mockImplementation(() =>
-      mockKyResponse(200, fakeSchedules),
-    );
+    const api = new SchedulesApi(`http:/something/schedules`, "");
+
+    // Mock the request function
+    vi.mocked(request).mockResolvedValue({
+      statusCode: 200,
+      body: {
+        text: async () => fakeSchedules,
+      },
+    } as Dispatcher.ResponseData<unknown>);
+
     const resp = await api.getSchedulesTimestamps(
       SchedulesDirection.EAST,
       false,

@@ -16,33 +16,32 @@ const secretHolder = SecretHolder.create<SchedulesSecret>("schedules");
 
 export interface SchedulesSecret extends GenericSecret {
   readonly url: string;
+  readonly ca: string;
 }
 
 let service: SchedulesService | undefined;
 
-export const handler = (): Promise<void> => {
-  return rdsHolder
-    .setCredentials()
-    .then(() => secretHolder.get())
-    .then(async (secret) => {
-      if (!service) {
-        service = new SchedulesService(
-          new SchedulesApi(secret.url),
-          enableETBForAllPorts.toLowerCase() === "true",
-        );
-      }
+export const handler = async (): Promise<void> => {
+  await rdsHolder.setCredentials();
+  const secret = await secretHolder.get();
 
-      const vtsControlTimestamps = await service.getTimestampsUnderVtsControl();
-      const calculatedTimestamps = await service.getCalculatedTimestamps();
-      const timestamps = vtsControlTimestamps.concat(calculatedTimestamps);
+  if (!service) {
+    service = new SchedulesService(
+      new SchedulesApi(secret.url, secret.ca),
+      enableETBForAllPorts.toLowerCase() === "true",
+    );
+  }
 
-      logger.info({
-        method: "UpdateSchedulesTimestamps.handler",
-        customTimestampsReceivedCount: timestamps.length,
-      });
+  const vtsControlTimestamps = await service.getTimestampsUnderVtsControl();
+  const calculatedTimestamps = await service.getCalculatedTimestamps();
+  const timestamps = vtsControlTimestamps.concat(calculatedTimestamps);
 
-      await Promise.allSettled(
-        timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)),
-      );
-    });
+  logger.info({
+    method: "UpdateSchedulesTimestamps.handler",
+    customTimestampsReceivedCount: timestamps.length,
+  });
+
+  await Promise.allSettled(
+    timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)),
+  );
 };
