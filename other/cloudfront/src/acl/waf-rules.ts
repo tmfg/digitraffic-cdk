@@ -21,6 +21,8 @@ export class WafRules {
 
   readonly isCountOnly?: boolean;
 
+  readonly geoblocked: string[] = [];
+
   constructor(
     awsCommonRuleSets: "all" | AWSManagedWafRule[],
     digitrafficHeaderRules: boolean,
@@ -146,5 +148,14 @@ export class WafRules {
       undefined,
       excludedRules,
     );
+  }
+
+  /**
+   * Blocks requests from the given countries (ISO 3166-1 alpha-2 codes, e.g. "CN").
+   */
+  withGeoblock(...countryCodes: string[]): this {
+    this.geoblocked.push(...countryCodes);
+
+    return this;
   }
 }

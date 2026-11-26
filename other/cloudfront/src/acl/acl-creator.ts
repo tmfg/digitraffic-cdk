@@ -22,6 +22,7 @@ export function createWebAcl(
     } else {
       aclBuilder
         .withAWSManagedRules(rules.awsCommonRuleSets, rules.excludedRules)
+        .withGeoBlockRule(rules.geoblocked)
         .withThrottleDigitrafficUserIp(rules.perIpWithHeader)
         .withThrottleDigitrafficUserIpAndUriPath(rules.perIpAndQueryWithHeader)
         .withThrottleAnonymousUserIp(rules.perIpWithoutHeader)
